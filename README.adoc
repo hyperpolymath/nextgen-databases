@@ -1,0 +1,149 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+
+= Next-Gen Databases
+:author: Jonathan D.A. Jewell
+:email: jonathan.jewell@open.ac.uk
+:revdate: 2026-02-13
+:toc:
+:icons: font
+
+*Parent repository for tracking and coordinating database application development*
+
+**IMPORTANT:** This is a **PARENT REPOSITORY ONLY** — it contains documentation and tracking but NO implementation code.
+
+== Overview
+
+This repository serves as the central tracking hub for the Next-Gen Databases initiative — a coordinated effort to build specialised database applications across different domains, each with its own query language, storage engine, and web interface.
+
+**All database implementations are in their respective canonical repositories.**
+
+== Database Portfolio
+
+[cols="1,2,2,2,1"]
+|===
+| Database | Description | Technology | Query Language | Status
+
+| *QuandleDB*
+| Knot-theory database — stores knots as Gauss codes, computes invariants (Jones polynomial, genus, Seifert circles), queries by topological properties
+| Julia (Skein.jl engine) + ReScript frontend
+| KQL (Knot Query Language) — in development
+| Active
+
+| *VeriSimDB*
+| Multimodal verification database — 6 modalities (Graph, Vector, Tensor, Semantic, Document, Temporal) for security analysis and software verification
+| Rust (core) + ReScript (VQL parser) + Elixir (executor)
+| VQL (Verification Query Language)
+| Active
+
+| *LithoglyphDB*
+| Glyph and inscription database — catalogues lithographic specimens, inscriptions, and symbol systems with provenance tracking
+| Rust + Julia
+| (planned)
+| Active
+
+| *Glyphbase*
+| Web interface for LithoglyphDB — browser-based search, visualisation, and annotation of glyph specimens
+| ReScript frontend + LithoglyphDB API
+| (via LithoglyphDB)
+| Planned
+
+|===
+
+== Architecture
+
+Each database in the portfolio follows a layered architecture:
+
+----
+  Query Language (DSL)
+       ↓
+  Database Engine (storage, indexing, computation)
+       ↓
+  HTTP API Server (JSON endpoints)
+       ↓
+  Web Frontend (ReScript SPA)
+----
+
+=== Common Patterns
+
+* *Engines* are domain-specific libraries (Julia, Rust, Elixir)
+* *APIs* expose JSON endpoints wrapping engine queries
+* *Frontends* are ReScript + React SPAs with TEA-style state management
+* *Query languages* are typed DSLs parsed with ReScript or domain-native parsers
+* *Databases* use SQLite or custom storage depending on domain needs
+
+== Satellite Repositories
+
+[cols="1,1,2,1"]
+|===
+| Project | Repository | Description | Status
+
+| QuandleDB
+| link:https://github.com/hyperpolymath/quandledb[quandledb]
+| Knot-theory database wrapping Skein.jl
+| Active
+
+| Skein.jl
+| link:https://github.com/hyperpolymath/Skein.jl[Skein.jl]
+| Knot database engine (Julia library)
+| Active
+
+| VeriSimDB
+| link:https://github.com/hyperpolymath/verisimdb[verisimdb]
+| Multimodal verification database
+| Active
+
+| VeriSimDB Data
+| link:https://github.com/hyperpolymath/verisimdb-data[verisimdb-data]
+| Scan data ingestion pipeline
+| Active
+
+| Lithoglyph
+| link:https://github.com/hyperpolymath/lithoglyph[lithoglyph]
+| Glyph and inscription database
+| Active
+
+| Glyphbase
+| link:https://github.com/hyperpolymath/glyphbase[glyphbase]
+| Web frontend for Lithoglyph
+| Active
+
+|===
+
+== Query Language Ecosystem
+
+The database portfolio contributes three query languages to the link:https://github.com/hyperpolymath/nextgen-languages[nextgen-languages] portfolio:
+
+[cols="1,1,2"]
+|===
+| Language | Database | Status
+
+| *KQL* (Knot Query Language)
+| QuandleDB
+| In development
+
+| *VQL* (Verification Query Language)
+| VeriSimDB
+| ~40% complete
+
+| *FBQL-DT* (FormDB Query Language)
+| FormDB
+| ~50% complete
+
+|===
+
+== Documentation
+
+* `.machine_readable/STATE.scm` — Project state and progress
+* `.machine_readable/META.scm` — Architecture decisions
+* `.machine_readable/ECOSYSTEM.scm` — Ecosystem relationships
+
+== Contributing
+
+Each database welcomes contributions. See individual satellite repositories for project-specific contribution guidelines.
+
+== License
+
+PMPL-1.0-or-later (Palimpsest Licence)
+
+Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)
