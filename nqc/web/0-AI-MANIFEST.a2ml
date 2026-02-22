@@ -1,0 +1,110 @@
+; SPDX-License-Identifier: PMPL-1.0-or-later
+; SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath)
+
+; =============================================================================
+; AI MANIFEST — NQC Web UI
+; =============================================================================
+; This is the universal entry point for all AI agents working on the NQC Web UI.
+; Read this file FIRST before making any changes.
+
+(ai-manifest
+  (version "1.0")
+  (project "NQC Web UI")
+  (description "Browser-based query client for NextGen databases (VeriSimDB, Lithoglyph, QuandleDB)")
+  (parent-repo "nextgen-databases/nqc")
+  (relationship "Companion web UI alongside the Gleam CLI REPL. Does NOT modify Gleam source.")
+
+  ; =========================================================================
+  ; CANONICAL FILE LOCATIONS
+  ; =========================================================================
+  (canonical-locations
+    (source-code "web/src/")
+    (components "web/src/Components/")
+    (pages "web/src/Pages/")
+    (entry-point "web/src/Index.res")
+    (app-wiring "web/src/App.res")
+    (tea-update "web/src/Update.res")
+    (model "web/src/Model.res")
+    (messages "web/src/Msg.res")
+    (routing "web/src/Route.res")
+    (database-profiles "web/src/Database.res")
+    (api-layer "web/src/Api.res")
+    (html-and-css "web/index.html")
+    (cors-proxy "web/proxy/server.js")
+    (static-server "web/serve.js")
+    (build-config "web/rescript.json")
+    (deno-config "web/deno.json")
+    (custom-profiles "web/nqc-profiles.json (optional, user-created)"))
+
+  ; =========================================================================
+  ; CRITICAL INVARIANTS — NEVER VIOLATE
+  ; =========================================================================
+  (invariants
+    ("The Gleam REPL at nqc/src/ is NEVER modified by web UI work"
+     "ReScript 12 with rescript-legacy.exe (UTF-8 workaround)"
+     "JSX v4 automatic mode — no Tea_Html element constructors (they don't exist)"
+     "Tea_App.MakeWithDispatch functor — view receives (model, dispatch)"
+     "ReScript 12 @react.component uses props-record API: make({field: value})"
+     "All inline styles use record syntax: style={{color: \"...\"}}, NOT ReactDOMStyle.make"
+     "JSON.Classify.classify for runtime JSON inspection (NOT Js.Json.classify)"
+     "Dict.make() instead of Js.Dict.empty(), Dict.set instead of Js.Dict.set"
+     "Nullable.t/Nullable.toOption instead of Js.Nullable.t/Js.Nullable.toOption"
+     "Database.all() is a function (not a value) because customs load at runtime"
+     "All pattern matches on JSON.Classify.t must list all variants explicitly"
+     "All pattern matches on Route.t must list Picker | NotFound explicitly (not _)"
+     "CORS proxy at localhost:4000 forwards /api/:dbId/* to localhost:<port>/*"))
+
+  ; =========================================================================
+  ; ARCHITECTURE
+  ; =========================================================================
+  (architecture
+    (pattern "TEA (The Elm Architecture) via rescript-tea + cadre-router")
+    (rendering "React 19 via @rescript/react with JSX v4")
+    (styling "Embedded CSS in index.html — dark terminal aesthetic")
+    (data-flow "Model → View → User Action → Msg → Update → (Model, Cmd) → ...")
+    (routing "cadre-router Tea_Url + custom popstate listener (Tea_Router.listen has a bug)")
+    (http "Tea_Http via rescript-tea, through CORS proxy")
+    (state "Single immutable Model.t record, updated by pure Update.update function"))
+
+  ; =========================================================================
+  ; DEPENDENCIES (local symlinks)
+  ; =========================================================================
+  (dependencies
+    (rescript-tea
+      (path "developer-ecosystem/rescript-ecosystem/packages/web/tea")
+      (package-name "rescript-tea")
+      (note "TEA framework. Tea_App, Tea_Cmd, Tea_Sub, Tea_Http, Tea_Json"))
+    (cadre-router
+      (path "developer-ecosystem/rescript-ecosystem/cadre-router")
+      (package-name "@anthropics/cadre-router")
+      (note "URL routing. Tea_Url, Tea_Navigation, Tea_QueryParams, Tea_Router"))
+    (rescript-react
+      (package "@rescript/react")
+      (version "^0.14.0"))
+    (rescript-core
+      (package "@rescript/core")
+      (version "^1.6.0")))
+
+  ; =========================================================================
+  ; BUILD COMMANDS
+  ; =========================================================================
+  (build
+    (setup "cd web && bash setup.sh")
+    (compile "cd web && node_modules/.bin/rescript-legacy")
+    (clean "cd web && node_modules/.bin/rescript-legacy clean")
+    (dev-server "cd web && deno run --allow-net --allow-read serve.js")
+    (cors-proxy "cd web && deno run --allow-net proxy/server.js")
+    (full-stack "cd web && bash nqc-launcher.sh"))
+
+  ; =========================================================================
+  ; RESUMPTION GUIDE
+  ; =========================================================================
+  (resumption-guide
+    "If picking up this project after a session break:"
+    "1. cd nextgen-databases/nqc/web"
+    "2. Run: node_modules/.bin/rescript-legacy  (should compile 0 errors 0 warnings)"
+    "3. If deps missing: bash setup.sh"
+    "4. Key files: App.res (entry), Update.res (logic), Model.res (state), Msg.res (events)"
+    "5. CSS is in index.html <style> block, not separate files"
+    "6. Database profiles: Database.res (builtins + custom loader)"
+    "7. Design doc: DESIGN-2026-02-22-nqc-web-ui.md"))

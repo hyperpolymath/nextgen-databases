@@ -1,0 +1,190 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath)
+
+= NQC Web UI
+:toc:
+:toc-placement: macro
+
+Browser-based query client for NextGen databases (VeriSimDB, Lithoglyph, QuandleDB).
+Built with **ReScript 12** + **rescript-tea** (The Elm Architecture) + **cadre-router**.
+
+toc::[]
+
+== Architecture
+
+[source]
+----
+web/
+├── src/
+│   ├── App.res              # TEA app entry (MakeWithDispatch functor)
+│   ├── Model.res            # Immutable application state
+│   ├── Msg.res              # Message variants + output format types
+│   ├── Update.res           # Pure update function (state machine)
+│   ├── View.res             # Route-dispatched top-level view
+│   ├── Route.res            # URL parsing via cadre-router
+│   ├── Api.res              # HTTP commands (query execution, health checks)
+│   ├── Database.res         # Profile registry (builtins + custom JSON loader)
+│   ├── Subs.res             # Subscriptions (currently Tea_Sub.none)
+│   ├── Index.res            # ReactDOM.Client.createRoot entry point
+│   ├── Pages/
+│   │   ├── Picker.res       # Database card grid (landing page)
+│   │   └── Query.res        # Editor + results panel
+│   └── Components/
+│       ├── Header.res       # Navigation bar, DT toggle, format tabs
+│       ├── Editor.res       # Query textarea, keyword hints, history dropdown
+│       ├── Results.res      # Table / JSON / CSV result renderer
+│       └── Status.res       # Connection health dot indicator
+├── proxy/
+│   └── server.js            # Deno CORS proxy (port 4000 → database ports)
+├── serve.js                 # Deno static file server (port 8000)
+├── index.html               # HTML shell + all CSS (dark terminal theme)
+├── rescript.json             # ReScript 12 build config
+├── deno.json                # Deno dependencies and tasks
+├── setup.sh                 # First-time setup (symlinks, deps, build)
+├── nqc-launcher.sh          # Starts proxy + server, opens browser
+└── nqc-web.desktop          # Linux desktop shortcut (GNOME)
+----
+
+== Quick Start
+
+[source,bash]
+----
+cd nextgen-databases/nqc/web
+bash setup.sh           # Install deps, create symlinks, build
+bash nqc-launcher.sh    # Start proxy + dev server, open browser
+----
+
+Or manually:
+
+[source,bash]
+----
+# Terminal 1: CORS proxy
+deno run --allow-net proxy/server.js
+
+# Terminal 2: Dev server
+deno run --allow-net --allow-read serve.js
+
+# Open http://localhost:8000
+----
+
+== Build
+
+[source,bash]
+----
+# Compile ReScript → JavaScript
+node_modules/.bin/rescript-legacy
+
+# Clean build artifacts
+node_modules/.bin/rescript-legacy clean
+----
+
+The build uses `rescript-legacy.exe` instead of `rescript.exe` due to a
+UTF-8 crash in ReScript 12.1.0.
+
+== Routes
+
+[cols="1,1,2"]
+|===
+| Route | Page | Description
+
+| `/`
+| Picker
+| Grid of database cards with health status indicators
+
+| `/query/:dbId`
+| Query
+| Editor + results for the selected database
+
+| `/query/:dbId?dt=true`
+| Query
+| With dependent-type verification enabled
+
+| `/query/:dbId?format=json`
+| Query
+| With JSON output format pre-selected
+
+| `*`
+| 404
+| Not found, link back to picker
+|===
+
+== Features
+
+* **TEA architecture** — pure update function, immutable model, command-based side effects
+* **Three output formats** — Table (auto-detected columns), JSON (pretty-printed), CSV (RFC 4180)
+* **Dependent types toggle** — enables DT verification for databases that support it
+* **Keyword hints** — clickable keyword ribbon shows available query language keywords
+* **Query history** — session-scoped history dropdown with truncated query previews
+* **Custom profiles** — load additional database profiles from `/nqc-profiles.json`
+* **Health monitoring** — connection status dots per database, checked on page load
+* **Deep linking** — URL reflects full state (db, dt, format) for bookmarking/sharing
+* **Dark terminal theme** — monospace fonts, dark background, terminal aesthetic
+* **CORS proxy** — transparent proxying from browser to database engine ports
+
+== Custom Database Profiles
+
+Create a `nqc-profiles.json` file in the `web/` directory:
+
+[source,json]
+----
+[
+  {
+    "id": "mydb",
+    "displayName": "My Database",
+    "languageName": "MQL",
+    "description": "My custom database engine",
+    "aliases": ["mydb", "my"],
+    "defaultHost": "localhost",
+    "defaultPort": 9090,
+    "executePath": "/mql/execute",
+    "healthPath": "/health",
+    "prompt": "mql> ",
+    "supportsDt": false,
+    "keywords": ["SELECT", "FROM", "WHERE"]
+  }
+]
+----
+
+The file is loaded at startup. If it doesn't exist, only the three built-in
+databases (VQL, GQL, KQL) are available.
+
+== Dependencies
+
+[cols="1,1,2"]
+|===
+| Package | Source | Purpose
+
+| rescript-tea
+| Local symlink
+| TEA framework (App, Cmd, Sub, Http, Json)
+
+| @anthropics/cadre-router
+| Local symlink
+| URL routing (Tea_Url, Tea_Navigation, Tea_QueryParams)
+
+| @rescript/core ^1.6.0
+| npm via Deno
+| ReScript standard library
+
+| @rescript/react ^0.14.0
+| npm via Deno
+| React bindings for ReScript
+
+| react ^19.0.0
+| npm via Deno
+| React runtime
+
+| rescript ^12.1.0
+| npm via Deno
+| ReScript compiler
+|===
+
+== Relationship to Gleam REPL
+
+The web UI is a **standalone companion** to the Gleam CLI REPL at `nqc/src/`.
+Both share the same database APIs but have independent codebases.
+The web UI does **not** modify any Gleam source files.
+
+== License
+
+PMPL-1.0-or-later (Palimpsest License)

@@ -1,0 +1,62 @@
+rescript = 1
+g_finger := /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/rescript-tea/lib/ocaml/install.stamp
+g_finger := /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@anthropics/cadre-router/lib/ocaml/install.stamp
+g_finger := /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@rescript/core/lib/ocaml/install.stamp
+g_finger := /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@rescript/react/lib/ocaml/install.stamp
+rule astj
+  command = /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/.deno/@rescript+linux-x64@12.1.0/node_modules/@rescript/linux-x64/bin/bsc.exe -runtime-path /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/.deno/@rescript+runtime@12.1.0/node_modules/@rescript/runtime -w +A-48-42 -bs-jsx 4 -open RescriptCore -absname -bs-ast -o $out $i
+o src/Api.ast : astj ../../src/Api.res
+rule deps
+  command = /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/.deno/@rescript+linux-x64@12.1.0/node_modules/@rescript/linux-x64/bin/bsb_helper.exe -hash 2c7d72303cea30ff840546d6374c8c15 $in
+  restat = 1
+o src/Api.d : deps src/Api.ast
+rule mij
+  command = /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/.deno/@rescript+linux-x64@12.1.0/node_modules/@rescript/linux-x64/bin/bsc.exe -runtime-path /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/.deno/@rescript+runtime@12.1.0/node_modules/@rescript/runtime -I src/Pages -I src/Components -I src -I /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/rescript-tea/lib/ocaml -I /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@anthropics/cadre-router/lib/ocaml -I /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@rescript/core/lib/ocaml -I /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@rescript/react/lib/ocaml -open RescriptCore -w +A-48-42 -bs-package-name nqc-web -bs-package-output esmodule:$in_d:.res.mjs $i
+  dyndep = 1
+  restat = 1
+o src/Api.cmj src/Api.cmi ../../src/Api.res.mjs : mij src/Api.ast
+o src/App.ast : astj ../../src/App.res
+o src/App.d : deps src/App.ast
+o src/App.cmj src/App.cmi ../../src/App.res.mjs : mij src/App.ast
+o src/Msg.ast : astj ../../src/Msg.res
+o src/Msg.d : deps src/Msg.ast
+o src/Msg.cmj src/Msg.cmi ../../src/Msg.res.mjs : mij src/Msg.ast
+o src/Subs.ast : astj ../../src/Subs.res
+o src/Subs.d : deps src/Subs.ast
+o src/Subs.cmj src/Subs.cmi ../../src/Subs.res.mjs : mij src/Subs.ast
+o src/View.ast : astj ../../src/View.res
+o src/View.d : deps src/View.ast
+o src/View.cmj src/View.cmi ../../src/View.res.mjs : mij src/View.ast
+o src/Index.ast : astj ../../src/Index.res
+o src/Index.d : deps src/Index.ast
+o src/Index.cmj src/Index.cmi ../../src/Index.res.mjs : mij src/Index.ast
+o src/Model.ast : astj ../../src/Model.res
+o src/Model.d : deps src/Model.ast
+o src/Model.cmj src/Model.cmi ../../src/Model.res.mjs : mij src/Model.ast
+o src/Route.ast : astj ../../src/Route.res
+o src/Route.d : deps src/Route.ast
+o src/Route.cmj src/Route.cmi ../../src/Route.res.mjs : mij src/Route.ast
+o src/Update.ast : astj ../../src/Update.res
+o src/Update.d : deps src/Update.ast
+o src/Update.cmj src/Update.cmi ../../src/Update.res.mjs : mij src/Update.ast
+o src/Database.ast : astj ../../src/Database.res
+o src/Database.d : deps src/Database.ast
+o src/Database.cmj src/Database.cmi ../../src/Database.res.mjs : mij src/Database.ast
+o src/Components/Editor.ast : astj ../../src/Components/Editor.res
+o src/Components/Editor.d : deps src/Components/Editor.ast
+o src/Components/Editor.cmj src/Components/Editor.cmi ../../src/Components/Editor.res.mjs : mij src/Components/Editor.ast
+o src/Components/Header.ast : astj ../../src/Components/Header.res
+o src/Components/Header.d : deps src/Components/Header.ast
+o src/Components/Header.cmj src/Components/Header.cmi ../../src/Components/Header.res.mjs : mij src/Components/Header.ast
+o src/Components/Status.ast : astj ../../src/Components/Status.res
+o src/Components/Status.d : deps src/Components/Status.ast
+o src/Components/Status.cmj src/Components/Status.cmi ../../src/Components/Status.res.mjs : mij src/Components/Status.ast
+o src/Components/Results.ast : astj ../../src/Components/Results.res
+o src/Components/Results.d : deps src/Components/Results.ast
+o src/Components/Results.cmj src/Components/Results.cmi ../../src/Components/Results.res.mjs : mij src/Components/Results.ast
+o src/Pages/Query.ast : astj ../../src/Pages/Query.res
+o src/Pages/Query.d : deps src/Pages/Query.ast
+o src/Pages/Query.cmj src/Pages/Query.cmi ../../src/Pages/Query.res.mjs : mij src/Pages/Query.ast
+o src/Pages/Picker.ast : astj ../../src/Pages/Picker.res
+o src/Pages/Picker.d : deps src/Pages/Picker.ast
+o src/Pages/Picker.cmj src/Pages/Picker.cmi ../../src/Pages/Picker.res.mjs : mij src/Pages/Picker.ast

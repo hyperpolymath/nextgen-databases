@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<!-- SPDX-License-Identifier: PMPL-1.0-or-later -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NQC — NextGen Query Client</title>
+  <style>
+    /* ================================================================
+       NQC Web UI — Dark terminal-aesthetic theme
+       ================================================================ */
+
+    :root {
+      --bg-primary: #0d1117;
+      --bg-secondary: #161b22;
+      --bg-tertiary: #21262d;
+      --bg-card: #1c2128;
+      --border: #30363d;
+      --border-focus: #58a6ff;
+      --text-primary: #e6edf3;
+      --text-secondary: #8b949e;
+      --text-muted: #6e7681;
+      --accent-blue: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-red: #f85149;
+      --accent-orange: #d29922;
+      --accent-purple: #bc8cff;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Source Code Pro', monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body, #root {
+      height: 100%;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    /* Header */
+    .nqc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 56px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+    .nqc-header__brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent-blue);
+      text-decoration: none;
+    }
+    .nqc-header__nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nqc-header__db-badge {
+      padding: 2px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent-green);
+    }
+
+    /* Toggle */
+    .nqc-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .nqc-toggle__switch {
+      width: 36px;
+      height: 20px;
+      border-radius: 10px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      position: relative;
+      transition: background 0.2s;
+    }
+    .nqc-toggle__switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--text-secondary);
+      transition: transform 0.2s;
+    }
+    .nqc-toggle--active .nqc-toggle__switch {
+      background: var(--accent-purple);
+      border-color: var(--accent-purple);
+    }
+    .nqc-toggle--active .nqc-toggle__switch::after {
+      transform: translateX(16px);
+      background: white;
+    }
+
+    /* Format tabs */
+    .nqc-format-tabs {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .nqc-format-tab {
+      padding: 4px 12px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nqc-format-tab:not(:last-child) {
+      border-right: 1px solid var(--border);
+    }
+    .nqc-format-tab--active {
+      background: var(--accent-blue);
+      color: white;
+    }
+
+    /* Picker grid */
+    .nqc-picker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 80px 24px 40px;
+    }
+    .nqc-picker__title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .nqc-picker__subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 48px;
+    }
+    .nqc-picker__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 960px;
+    }
+
+    /* Database card */
+    .nqc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .nqc-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .nqc-card__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .nqc-card__name {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .nqc-card__lang {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-tertiary);
+      color: var(--accent-blue);
+    }
+    .nqc-card__desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .nqc-card__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .nqc-card__port {
+      color: var(--text-muted);
+    }
+
+    /* Status indicator */
+    .nqc-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .nqc-status__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+    .nqc-status__dot--connected { background: var(--accent-green); }
+    .nqc-status__dot--connecting {
+      background: var(--accent-orange);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    .nqc-status__dot--error { background: var(--accent-red); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Query page layout */
+    .nqc-query {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 56px);
+    }
+    .nqc-query__editor-pane {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+    .nqc-query__results-pane {
+      flex: 1;
+      overflow: auto;
+      padding: 16px 24px;
+    }
+
+    /* Editor */
+    .nqc-editor {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .nqc-editor__textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px 16px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .nqc-editor__textarea:focus {
+      border-color: var(--border-focus);
+    }
+    .nqc-editor__textarea::placeholder {
+      color: var(--text-muted);
+    }
+    .nqc-editor__bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nqc-editor__hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .nqc-editor__submit {
+      padding: 6px 20px;
+      font-size: 13px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: white;
+      background: var(--accent-blue);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .nqc-editor__submit:hover { opacity: 0.85; }
+    .nqc-editor__submit:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Keyword ribbon — clickable query language keyword hints */
+    .nqc-keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 6px 12px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      max-height: 60px;
+      overflow-y: auto;
+    }
+    .nqc-keywords__chip {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .nqc-keywords__chip:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Results */
+    .nqc-results__empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .nqc-results__table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+    .nqc-results__table th {
+      text-align: left;
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border-bottom: 2px solid var(--border);
+      color: var(--accent-blue);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .nqc-results__table td {
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+    .nqc-results__table tr:hover td {
+      background: var(--bg-secondary);
+    }
+    .nqc-results__pre {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      white-space: pre-wrap;
+      color: var(--text-primary);
+    }
+
+    /* Error banner */
+    .nqc-error {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin-bottom: 12px;
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid var(--accent-red);
+      border-radius: var(--radius-md);
+      color: var(--accent-red);
+      font-size: 13px;
+    }
+    .nqc-error__dismiss {
+      background: none;
+      border: none;
+      color: var(--accent-red);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0 4px;
+    }
+
+    /* 404 page */
+    .nqc-notfound {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: calc(100vh - 56px);
+      color: var(--text-secondary);
+    }
+    .nqc-notfound__code {
+      font-size: 72px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+    .nqc-notfound__link {
+      margin-top: 16px;
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 14px;
+    }
+    .nqc-notfound__link:hover { text-decoration: underline; }
+
+    /* History dropdown */
+    .nqc-history {
+      position: relative;
+    }
+    .nqc-history__list {
+      list-style: none;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .nqc-history__item {
+      padding: 6px 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .nqc-history__item:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    /* DT badge */
+    .nqc-dt-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+      background: rgba(188, 140, 255, 0.15);
+      color: var(--accent-purple);
+      border: 1px solid var(--accent-purple);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="./src/Index.res.mjs"></script>
+</body>
+</html>
