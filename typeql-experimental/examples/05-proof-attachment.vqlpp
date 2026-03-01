@@ -1,0 +1,28 @@
+-- VQL-dt++ Example 05: Proof Attachment (PROOF ATTACHED)
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- This example demonstrates proof-carrying code. The PROOF ATTACHED clause
+-- attaches a formal theorem to the query result. The result type becomes a
+-- sigma pair: (result, proof) where the proof certifies a property.
+--
+-- This is DIFFERENT from VQL's existing PROOF clause:
+--   PROOF EXISTENCE(...)       — pre-condition verification (VQL base)
+--   PROOF ATTACHED theorem     — post-condition proof attachment (VQL-dt++)
+--
+-- Available theorems:
+--   IntegrityTheorem    — result data has not been tampered with
+--   FreshnessGuarantee  — result is within a time bound
+--   ProvenanceChain     — result has verifiable lineage
+--   ConsistencyProof    — result is consistent across modalities
+
+-- Attach an integrity proof to query results
+SELECT GRAPH, DOCUMENT
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FULLTEXT CONTAINS "medical records"
+PROOF EXISTENCE(VerifyExists)
+PROOF ATTACHED IntegrityTheorem
+
+-- Attach a freshness guarantee (result is no older than 300 seconds)
+-- SELECT TEMPORAL, DOCUMENT
+-- FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+-- PROOF ATTACHED FreshnessGuarantee(maxAge="300")

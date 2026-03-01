@@ -1,0 +1,33 @@
+-- VQL-dt++ Example 03: Effect Tracking (EFFECTS { ... })
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- This example demonstrates declarative effect tracking. The EFFECTS clause
+-- declares which side effects the query may perform. The type checker verifies
+-- that the query's actual operations are a subset of the declared effects.
+--
+-- Available effects:
+--   Read      — read data from modalities
+--   Write     — mutate data in modalities
+--   Cite      — create citation references
+--   Audit     — write to the audit log
+--   Transform — apply data transformations
+--   Federate  — access federated data sources
+
+-- Pure read query — only Read effect
+SELECT GRAPH, VECTOR
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FIELD severity > 3
+EFFECTS { Read }
+
+-- Read with citation — Read + Cite effects
+-- SELECT DOCUMENT
+-- FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+-- WHERE FULLTEXT CONTAINS "quantum computing"
+-- PROOF CITATION(AcademicCitation)
+-- EFFECTS { Read, Cite }
+
+-- Federated read with audit trail
+-- SELECT *
+-- FROM FEDERATION /universities/*
+-- WHERE FULLTEXT CONTAINS "research"
+-- EFFECTS { Read, Federate, Audit }

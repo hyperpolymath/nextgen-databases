@@ -24,31 +24,38 @@ This repository serves as the central tracking hub for the Next-Gen Databases in
 |===
 | Database | Description | Technology | Query Language | Status
 
+| *VeriSimDB*
+| Cross-system entity consistency engine — 8 modalities (octad), drift detection, self-normalisation, formally verified queries. **Primary database project.** Operates as standalone database OR federation coordinator over existing databases (PostgreSQL, ArangoDB, Elasticsearch).
+| Rust (core) + ReScript (VQL parser) + Elixir (orchestration)
+| VQL (VeriSim Query Language) + VQL-DT (dependent types)
+| Active — beta
+
 | *QuandleDB*
-| Knot-theory database — stores knots as Gauss codes, computes invariants (Jones polynomial, genus, Seifert circles), queries by topological properties
+| Knot-theory database — stores knots as Gauss codes, computes invariants (Jones polynomial, genus, Seifert circles), queries by topological properties. **Exploratory/research project**: a thought experiment in applying knot theory to database design, not yet intended as a production tool.
 | Julia (Skein.jl engine) + ReScript frontend
 | KQL (Knot Query Language) — in development
-| Active
+| Exploratory
 
-| *VeriSimDB*
-| Multimodal verification database — 6 modalities (Graph, Vector, Tensor, Semantic, Document, Temporal) for security analysis and software verification
-| Rust (core) + ReScript (VQL parser) + Elixir (executor)
-| VQL (Verification Query Language)
-| Active
-
-| *LithoglyphDB*
-| Glyph and inscription database — catalogues lithographic specimens, inscriptions, and symbol systems with provenance tracking
-| Rust + Julia
-| (planned)
-| Active
+| *LithoGlyph*
+| Narrative-first, reversible, audit-grade database core for journalism, narrative arts, and media/comms. Working towards production but **secondary priority** to VeriSimDB. Long-term vision: intimate integration with portfolio tools (bofig, etc.) for journalism and PR applications.
+| Forth (storage) + Zig (bridge) + Factor (FQL) + Idris2 (proofs) + Lean 4 (normalizer)
+| GQL (Glyph Query Language) — planned
+| Active — on backburner
 
 | *Glyphbase*
-| Web interface for LithoglyphDB — browser-based search, visualisation, and annotation of glyph specimens
-| ReScript frontend + LithoglyphDB API
-| (via LithoglyphDB)
+| Web interface for LithoGlyph — browser-based search, visualisation, and annotation of glyph specimens
+| ReScript frontend + LithoGlyph API
+| (via LithoGlyph)
 | Planned
 
 |===
+
+[NOTE]
+====
+**Project priorities:** VeriSimDB is the primary database engineering project, receiving active development focus. LithoGlyph is working towards production for specialist use in journalism and narrative arts, but is secondary priority while VeriSimDB matures. QuandleDB is a research exploration into knot theory's applications in database design — valuable for the mathematical insights but not positioned as a production tool at this stage.
+
+Lessons learned from VeriSimDB development (drift detection, formal verification, federation) will directly improve LithoGlyph when development focus returns to it.
+====
 
 == Architecture
 

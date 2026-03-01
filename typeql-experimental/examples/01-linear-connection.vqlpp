@@ -1,0 +1,25 @@
+-- VQL-dt++ Example 01: Linear Connection (CONSUME AFTER N USE)
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- This example demonstrates resource-counted connections via linear types.
+-- The CONSUME AFTER clause tells the type system that the connection
+-- should be used exactly N times before being released.
+--
+-- Idris2 mapping:
+--   CONSUME AFTER 1 USE  →  (1 conn : LinConn 1)
+--   CONSUME AFTER 3 USE  →  (1 conn : LinConn 3)
+--
+-- The compiler will reject code that uses the connection more or fewer
+-- times than declared.
+
+-- Single-use connection: query once, then release
+SELECT GRAPH, DOCUMENT
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FULLTEXT CONTAINS "climate change"
+CONSUME AFTER 1 USE
+
+-- Triple-use connection: query three times across a plan
+-- SELECT VECTOR, SEMANTIC
+-- FROM FEDERATION /universities/*
+-- WHERE FIELD severity > 5
+-- CONSUME AFTER 3 USE

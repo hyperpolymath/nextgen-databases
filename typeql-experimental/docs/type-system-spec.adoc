@@ -1,0 +1,206 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= VQL-dt++ Type System Specification
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:date: 2026-03-01
+:toc: macro
+:icons: font
+
+== Overview
+
+This document specifies the formal type system for the six VQL-dt++ extensions.
+Each extension is defined by its Idris2 types, key judgements, and soundness
+properties. The implementation lives in `src/abi/`.
+
+== 1. Linear Types (Linear.idr)
+
+=== Core Idea
+
+Idris2's QTT assigns a _quantity_ to each variable binding:
+
+- `0` — erased at runtime (type-level only)
+- `1` — used exactly once (linear)
+- `ω` — used any number of times (unrestricted)
+
+A linear connection `(1 conn : Connection)` is enforced by the compiler to be
+used exactly once. This prevents connection leaks and double-use bugs.
+
+=== Types
+
+[source,idris]
+----
+-- A connection carrying a usage count
+data LinConn : (remaining : Nat) -> Type where
+  MkLinConn : (handle : Bits64) -> LinConn (S n)
+
+-- Using a connection decrements its count
+useConn : (1 _ : LinConn (S n)) -> (QueryResult, LinConn n)
+
+-- A fully-consumed connection (count = 0) can only be closed
+closeConn : (1 _ : LinConn 0) -> IO ()
+----
+
+=== Properties
+
+- **Linearity**: A `LinConn (S n)` must be consumed exactly once per scope.
+- **No leaks**: The type system rejects code that drops a `LinConn` without closing.
+- **No double-use**: Using `conn` twice in a linear context is a compile error.
+
+== 2. Session Types (Session.idr)
+
+=== Core Idea
+
+A database session progresses through protocol states. The session type is
+indexed by its current state, and only valid transitions are permitted.
+
+=== States
+
+[source]
+----
+Fresh → Authenticated → InTransaction → Committed → Closed
+                    ↑                        │
+                    └────── RolledBack ◄─────┘
+----
+
+=== Types
+
+[source,idris]
+----
+data SessionState = Fresh | Authenticated | InTransaction
+                  | Committed | RolledBack | Closed
+
+data Session : SessionState -> Type where
+  MkFresh : Session Fresh
+
+authenticate : (1 _ : Session Fresh) -> Either AuthError (Session Authenticated)
+beginTx      : (1 _ : Session Authenticated) -> Session InTransaction
+query        : (1 _ : Session InTransaction) -> QueryPlan -> (QueryResult, Session InTransaction)
+commit       : (1 _ : Session InTransaction) -> Either TxError (Session Committed)
+rollback     : (1 _ : Session InTransaction) -> Session RolledBack
+close        : (1 _ : Session s) -> {auto prf : CanClose s} -> IO ()
+----
+
+=== Properties
+
+- **Protocol compliance**: Can't query without authentication.
+- **No use-after-commit**: `Session Committed` has no `query` operation.
+- **No double-close**: Closing consumes the session linearly.
+
+== 3. Effect Systems (Effects.idr)
+
+=== Core Idea
+
+Each query declares its effects. The checker verifies that actual operations
+are a subset of declared effects.
+
+=== Types
+
+[source,idris]
+----
+data Effect = Read | Write | Cite | Audit | Transform | Federate
+
+-- An effect set is a sorted, deduplicated list of effects
+data EffectSet : List Effect -> Type
+
+-- Subsumption: actual effects are a subset of declared effects
+data Subsumes : (declared : List Effect) -> (actual : List Effect) -> Type where
+  SubNil  : Subsumes declared []
+  SubCons : Elem e declared -> Subsumes declared rest -> Subsumes declared (e :: rest)
+----
+
+=== Properties
+
+- **Effect safety**: A query with `EFFECTS { Read }` cannot perform writes.
+- **Subsumption**: If `declared ⊇ actual`, the query is well-typed.
+- **Monotonicity**: Adding effects to the declaration never breaks type checking.
+
+== 4. Modal Types (Modal.idr)
+
+=== Core Idea
+
+Data accessed in one transaction scope is wrapped in a modal `Box`. Data from
+different scopes cannot be mixed without explicit marshalling.
+
+=== Types
+
+[source,idris]
+----
+-- A world tag represents a transaction scope
+data World = MkWorld String
+
+-- Box wraps data in a specific scope
+data Box : World -> Type -> Type where
+  MkBox : (w : World) -> a -> Box w a
+
+-- Extracting requires being in the same scope
+unbox : Box w a -> {auto prf : InScope w} -> a
+
+-- Moving data between scopes requires explicit marshalling
+marshal : Box w1 a -> (a -> b) -> Box w2 b
+----
+
+=== Properties
+
+- **Scope isolation**: Data from world `w1` cannot leak to world `w2`.
+- **Explicit marshalling**: Cross-scope data flow is always visible in the types.
+
+== 5. Proof-Carrying Code (ProofCarrying.idr)
+
+=== Core Idea
+
+Query results can carry formal proofs of properties. The result type is a
+dependent pair (sigma type) bundling the data with its proof.
+
+=== Types
+
+[source,idris]
+----
+-- A theorem about query results
+data Theorem : Type where
+  IntegrityThm   : (hash : String) -> Theorem
+  FreshnessThm   : (maxAge : Nat) -> Theorem
+  ProvenanceThm  : (chain : List String) -> Theorem
+  ConsistencyThm : (modalities : List Modality) -> Theorem
+
+-- A proved result: data + proof as a dependent pair
+data ProvedResult : Type -> Theorem -> Type where
+  MkProved : (result : a) -> (thm : Theorem) -> ProvedResult a thm
+
+-- Verification: check that a theorem holds for a result
+verify : ProvedResult a thm -> Either VerifyError (result : a ** Holds thm result)
+----
+
+=== Properties
+
+- **Proof attachment**: Every `ProvedResult` carries an irrefutable proof.
+- **Verification**: Proofs can be checked independently of the query engine.
+
+== 6. Quantitative Type Theory (Quantitative.idr)
+
+=== Core Idea
+
+Generalises linear types from "exactly once" to "at most n times". A resource
+with usage limit `n` can be consumed at most `n` times across the query plan.
+
+=== Types
+
+[source,idris]
+----
+-- A resource with bounded usage
+data BoundedResource : (limit : Nat) -> Type -> Type where
+  MkBounded : (remaining : Nat) -> a -> BoundedResource remaining a
+
+-- Consuming a resource decrements the bound
+consume : BoundedResource (S n) a -> (a, BoundedResource n a)
+
+-- A depleted resource cannot be consumed
+-- (No consume for BoundedResource 0 a — it's simply absent from the API)
+
+-- Merging resource bounds (for parallel query plans)
+merge : BoundedResource n a -> BoundedResource m a -> BoundedResource (n + m) a
+----
+
+=== Properties
+
+- **Bounded consumption**: A resource with limit `n` cannot be used more than `n` times.
+- **Composability**: Parallel branches can split a resource budget.
+- **Subsumes linearity**: `BoundedResource 1 a` is equivalent to a linear resource.

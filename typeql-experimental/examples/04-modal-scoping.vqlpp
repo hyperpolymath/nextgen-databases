@@ -1,0 +1,31 @@
+-- VQL-dt++ Example 04: Modal Scoping (IN TRANSACTION)
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- This example demonstrates world-indexed access scoping via modal types.
+-- The IN TRANSACTION clause binds the query to a specific transaction scope.
+-- Data from different scopes cannot be mixed without explicit marshalling.
+--
+-- Transaction states:
+--   Fresh        — not yet started
+--   Active       — transaction in progress
+--   Committed    — transaction committed (read-only from here)
+--   RolledBack   — transaction rolled back
+--   ReadSnapshot — read-only snapshot (no writes possible)
+
+-- Query within an active transaction scope
+SELECT GRAPH, DOCUMENT
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FULLTEXT CONTAINS "climate data"
+IN TRANSACTION Active
+
+-- Read from a committed snapshot (immutable view)
+-- SELECT TEMPORAL
+-- FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+-- WHERE FIELD version == 3
+-- IN TRANSACTION Committed
+
+-- Read-only snapshot for analytics
+-- SELECT DOCUMENT.severity, COUNT(*)
+-- FROM FEDERATION /datasets/*
+-- GROUP BY DOCUMENT.severity
+-- IN TRANSACTION ReadSnapshot

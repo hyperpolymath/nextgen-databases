@@ -1,0 +1,25 @@
+-- VQL-dt++ Example 06: Usage Limit (USAGE LIMIT)
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- This example demonstrates quantitative type theory for resource budgeting.
+-- The USAGE LIMIT clause caps the total resource consumption across the
+-- entire query plan — connections, API calls, compute units, etc.
+--
+-- This is DIFFERENT from VQL's LIMIT clause:
+--   LIMIT 50          — caps result row count (VQL base)
+--   USAGE LIMIT 100   — caps resource consumption (VQL-dt++)
+--
+-- The type system tracks consumption through the query plan and rejects
+-- plans that exceed the budget.
+
+-- Budget 100 resource units for a federated query
+SELECT GRAPH, VECTOR, DOCUMENT
+FROM FEDERATION /universities/*
+WHERE FULLTEXT CONTAINS "deep learning"
+LIMIT 50
+USAGE LIMIT 100
+
+-- Tight budget: single-resource query
+-- SELECT DOCUMENT
+-- FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+-- USAGE LIMIT 1

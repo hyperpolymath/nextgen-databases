@@ -1,0 +1,24 @@
+-- VQL-dt++ Example 02: Session Protocol (WITH SESSION)
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- This example demonstrates session type protocols. The WITH SESSION clause
+-- constrains the database session to follow a specific protocol state machine.
+--
+-- State graph:
+--   Fresh → Authenticated → InTransaction → Committed → Closed
+--                       ↑                        │
+--                       └────── RolledBack ◄─────┘
+--
+-- ReadOnlyProtocol: only read operations allowed (no mutations)
+-- MutationProtocol: read and write operations allowed
+
+-- Read-only session: the type system prevents mutations
+SELECT GRAPH, DOCUMENT
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FULLTEXT CONTAINS "machine learning"
+WITH SESSION ReadOnlyProtocol
+
+-- Mutation session: allows INSERT/UPDATE/DELETE
+-- INSERT HEXAD WITH
+--   DOCUMENT(title="New Paper", severity=3)
+-- WITH SESSION MutationProtocol

@@ -1,0 +1,197 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Design Document: typeql-experimental (VQL-dt++)
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:date: 2026-03-01
+:repo: nextgen-databases/typeql-experimental
+:toc: macro
+
+== Summary
+
+Create an experimental exploration space for six advanced type-theoretic
+extensions to VQL (VeriSim Query Language). These extensions leverage Idris2's
+native quantitative type theory (QTT) to provide compiler-enforced resource
+safety, session protocols, and effect tracking for database queries.
+
+== Motivation
+
+VQL-dt (dependently-typed VQL) is ~35% wired end-to-end in VeriSimDB, covering
+Pi/Sigma types, proof clauses, and basic type checking. The next frontier is
+type-level resource management — ensuring connections aren't leaked, transactions
+follow protocols, and effects are tracked statically.
+
+These features are too experimental for the production VQL-dt codebase. A
+standalone exploration space allows rapid iteration without destabilising the
+existing type checker.
+
+== Design Decisions
+
+=== D1: VQL, Not SQL
+
+VQL's cross-modal semantics (HEXAD, 8 modalities, PROOF clauses) are the natural
+foundation. SQL's relational model is too flat for the kind of properties we want
+to prove (e.g., "this query touches only the GRAPH and DOCUMENT modalities" is a
+natural modal type constraint in VQL but meaningless in SQL).
+
+=== D2: Idris2 QTT as Killer Feature
+
+Idris2 variables carry quantities: `0` (erased), `1` (linear), `omega` (unrestricted).
+This means `CONSUME AFTER 1 USE` maps directly to `(1 conn : Connection)` — the
+compiler enforces linearity for free. No custom linearity checker needed.
+
+=== D3: Delta Grammar, Not Copy
+
+The EBNF extends VQL v3.0 by appending optional clauses AFTER the standard query.
+No keyword conflicts. All 6 new clause keywords (`CONSUME`, `SESSION`, `EFFECTS`,
+`TRANSACTION`, `ATTACHED`, `USAGE`) are disjoint from VQL's 60+ reserved keywords.
+
+=== D4: Dual-Language Split
+
+Idris2 for the type system kernel (proofs, specifications). ReScript for the
+parser (surface syntax, tokenisation). These operate independently — no runtime
+interop required for the experimental phase.
+
+=== D5: No `believe_me`
+
+Zero `believe_me`, `assert_total`, or `assert_smaller` in any Idris2 code. All
+proofs are real. This is a hard invariant inherited from the hyperpolymath
+development standards.
+
+=== D6: Session Types as Indexed Types
+
+`Session : SessionState -> Type` is indexed by protocol state. The type system
+ensures you can't query after commit, can't commit without a transaction, can't
+close twice. State transitions are the only way to advance the index.
+
+=== D7: Zig 0.15.2 Build API (Implementation Decision)
+
+Zig 0.15.2 removed `addStaticLibrary` from the Build API. The FFI bridge uses
+the `addModule` + `addTest(.root_module)` pattern instead. `build.zig.zon` is
+required for package metadata (name, version, fingerprint).
+
+=== D8: Effect Subsumption Direction (Implementation Decision)
+
+`Subsumes declared actual` is defined as `Subset actual declared` — meaning
+"every effect in the actual set appears in the declared set". The naive direction
+(`Subset declared actual`) was wrong: it would mean "every declared effect must
+be used", which rejects valid queries that declare but don't use an effect.
+
+== Six Extensions
+
+=== 1. Linear Types (CONSUME AFTER N USE)
+
+Resource-counted connections. A connection with usage count `n` can be used
+exactly `n` times before the type system forces it to be closed. Leverages
+Idris2's native `1` quantity.
+
+[source,idris]
+----
+-- The compiler rejects code that uses conn twice
+useOnce : (1 conn : Connection) -> IO Result
+----
+
+=== 2. Session Types (WITH SESSION)
+
+Protocol state machines for database sessions. The session progresses through
+states (Fresh -> Authenticated -> InTransaction -> Committed -> Closed) and the
+type system prevents illegal transitions.
+
+=== 3. Effect Systems (EFFECTS {...})
+
+Declarative effect tracking. A query declares its effects (Read, Write, Cite,
+Audit) and the checker verifies that the query's actual operations are a subset
+of the declared effects.
+
+=== 4. Modal Types (IN TRANSACTION)
+
+World-indexed access scoping. Data accessed in one transaction scope cannot
+leak to another without explicit marshalling. The modal box type `Box w a`
+ensures scope discipline.
+
+=== 5. Proof-Carrying Code (PROOF ATTACHED)
+
+Attach formal theorems to query results. The result type becomes a sigma pair
+`(result, proof)` where the proof certifies a property of the result (e.g.,
+integrity, freshness, provenance).
+
+=== 6. Quantitative Type Theory (USAGE LIMIT)
+
+Bounded resource accounting. A resource with usage limit `n` can be consumed
+at most `n` times across the entire query plan. This generalises linear types
+from exact-1 to at-most-n.
+
+== Implementation
+
+=== File Layout
+
+37 files across 6 phases:
+
+* **Phase 1**: Scaffolding & Spec (12 files) — manifest, README, design doc,
+  build configs, machine-readable SCM, grammar, type system spec
+* **Phase 2**: Idris2 Kernel (9 modules) — Core, Linear, Session, Effects,
+  Modal, ProofCarrying, Quantitative, Checker, Proofs
+* **Phase 3**: ReScript Parser (2 files) — TQLAst.res, TQLParser.res
+* **Phase 4**: Examples & Tests (11 files) — 7 .vqlpp examples, 3 Idris2 test
+  modules, 1 ReScript test module
+* **Phase 5**: FFI Skeleton (3 files) — build.zig, build.zig.zon, bridge.zig
+* **Phase 6**: Documentation (1 file) — examples.adoc
+
+=== Verification Results (2026-03-01)
+
+[cols="2,1,3"]
+|===
+|Check |Result |Details
+
+|Idris2 type-check
+|PASS
+|9/9 modules compile with `--total`, zero banned patterns
+
+|Zig FFI tests
+|PASS
+|5/5 tests pass on Zig 0.15.2
+
+|Banned pattern scan
+|PASS
+|Zero `believe_me`/`assert_total`/`assert_smaller`
+
+|ReScript build
+|PENDING
+|Written but not yet build-tested
+|===
+
+=== Issues Discovered and Fixed
+
+1. **ipkg `--check` vs `--typecheck`**: `idris2 --check file.ipkg` treats the
+   ipkg as Idris2 source, giving "Undefined name package". Use `--typecheck`.
+
+2. **Effects.idr `Subsumes` argument order**: Initial definition was
+   `Subsumes declared actual = Subset declared actual` (backwards). Fixed to
+   `Subset actual declared`.
+
+3. **Quantitative.idr erased implicit**: `hasUses {n = Z}` tried to
+   pattern-match on a quantity-0 implicit. Removed — the type system itself
+   distinguishes `BoundedResource 0 a` from `BoundedResource (S n) a`.
+
+4. **Proofs.idr `subsumesWeaken` in `where` clause**: Captured outer scope
+   variable `rest`, causing unification failure. Rewrote as top-level
+   `subsetWeaken` function.
+
+5. **Session.idr dead `authenticate` function**: Used the simpler `Session`
+   type rather than `SessionImpl`. Removed (the `auth` function on `SessionImpl`
+   is the real implementation).
+
+6. **ProofCarrying.idr and Checker.idr missing `import Data.Nat`**: `isLTE`
+   lives in `Data.Nat`, not auto-imported. Added explicit import.
+
+7. **Checker.idr `andCheck` non-associative**: Backtick infix chaining fails
+   for non-associative functions. Rewrote with explicit nested calls.
+
+8. **Zig 0.15.2 `addStaticLibrary` removed**: Rewrote `build.zig` to use
+   `addModule` + `addTest(.root_module)` pattern.
+
+== Verification Criteria
+
+1. `idris2 --typecheck typeql-experimental.ipkg` — all modules compile with `%default total`
+2. `cd ffi/zig && zig build test` — all 5 FFI tests pass
+3. `grep -rn 'believe_me\|assert_total\|assert_smaller' src/abi/` — returns nothing
+4. (Future) ReScript parser compiles and accepts all 7 example `.vqlpp` files
+5. (Future) Idris2 proofs validated against ReScript-parsed ASTs

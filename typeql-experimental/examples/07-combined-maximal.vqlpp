@@ -1,0 +1,34 @@
+-- VQL-dt++ Example 07: Combined Maximal Query (All 6 Extensions)
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- This example demonstrates all six VQL-dt++ extensions used together
+-- in a single query. This is the "maximal" query that exercises every
+-- extension simultaneously.
+--
+-- Extension stack:
+--   1. CONSUME AFTER 1 USE       — single-use connection (linear)
+--   2. WITH SESSION ReadOnly      — read-only protocol (session types)
+--   3. EFFECTS { Read, Cite }     — declared effects (effect system)
+--   4. IN TRANSACTION Committed   — committed scope (modal types)
+--   5. PROOF ATTACHED Integrity   — integrity proof (proof-carrying)
+--   6. USAGE LIMIT 100            — resource budget (QTT)
+--
+-- The type checker validates all six constraints simultaneously:
+--   - Connection is used exactly once before release
+--   - Session follows read-only protocol (no writes)
+--   - Only Read and Cite effects are performed
+--   - Data is scoped to the committed transaction world
+--   - Result carries an integrity proof as a sigma pair
+--   - Total resource consumption stays within 100 units
+
+SELECT GRAPH, DOCUMENT
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FULLTEXT CONTAINS "climate change"
+PROOF EXISTENCE(VerifyExists) AND CITATION(VerifyCitation)
+LIMIT 50
+CONSUME AFTER 1 USE
+WITH SESSION ReadOnlyProtocol
+EFFECTS { Read, Cite }
+IN TRANSACTION Committed
+PROOF ATTACHED IntegrityTheorem
+USAGE LIMIT 100

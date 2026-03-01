@@ -1,0 +1,131 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# STOP - CRITICAL READING REQUIRED
+
+**THIS FILE MUST BE READ FIRST BY ALL AI AGENTS**
+
+## WHAT IS THIS?
+
+This is the AI manifest for **typeql-experimental** (VQL-dt++ / TypeQL-experimental).
+An experimental exploration of six advanced type-theoretic extensions to VQL:
+
+1. **Linear types** — resource-counted connections via Idris2 QTT
+2. **Session types** — protocol-indexed database sessions
+3. **Effect systems** — tracked side-effects on queries
+4. **Modal types** — world-indexed access scoping
+5. **Proof-carrying code** — theorem attachment to query results
+6. **Quantitative type theory** — bounded resource accounting
+
+## CURRENT STATUS (2026-03-01)
+
+- **Idris2 kernel**: 9/9 modules type-check clean (`idris2 --typecheck`)
+- **Zig FFI bridge**: 5/5 tests pass (`zig build test`, Zig 0.15.2)
+- **ReScript parser**: Written, not yet build-tested
+- **Examples**: 7 annotated .vqlpp files
+- **Banned patterns**: Zero `believe_me`, `assert_total`, `assert_smaller`
+- **Overall completion**: ~85%
+
+## CANONICAL LOCATIONS
+
+### Machine-Readable Metadata: `.machine_readable/` ONLY
+
+- `STATE.scm` — Project state, progress, blockers
+- `META.scm` — Architecture decisions, governance
+- `ECOSYSTEM.scm` — Position in ecosystem, relationships
+
+**CRITICAL:** If ANY of these files exist outside `.machine_readable/`, this is an ERROR.
+
+### Source Code
+
+- `src/abi/` — Idris2 type system kernel (formal specification AND proof checker)
+- `src/parser/` — ReScript parser (surface syntax, parsing, validation)
+- `ffi/zig/` — Zig FFI bridge (C-compatible interface to type checker)
+
+### Build Artefacts
+
+- `typeql-experimental.ipkg` — Idris2 package definition
+- `rescript.json` — ReScript build config
+- `deno.json` — Deno runtime config
+- `ffi/zig/build.zig` — Zig build configuration (Zig 0.15.2)
+- `justfile` — Build recipes
+
+## CORE INVARIANTS
+
+1. **No `believe_me`** — Zero instances in any Idris2 code. All proofs are real.
+2. **No `assert_total`** — All functions provably total via `%default total`.
+3. **No `assert_smaller`** — Termination proved structurally.
+4. **No SCM duplication** — `.machine_readable/` is authoritative.
+5. **Delta grammar** — Extends VQL v3.0 (317 lines in `verisimdb/docs/vql-grammar.ebnf`).
+6. **Dual-language split** — Idris2 for types/proofs, ReScript for parsing.
+7. **Monorepo sub-project** — No `.git` directory. Inherits parent workflows.
+
+## ARCHITECTURE
+
+```
+Idris2 Type Kernel                    ReScript Parser
++--------------------+               +------------------+
+| Core.idr           |               | TQLAst.res       |
+| Linear.idr    (QTT)|               | TQLParser.res    |
+| Session.idr        |               +------------------+
+| Effects.idr        |                        |
+| Modal.idr          |                 parses surface
+| ProofCarrying.idr  |                    syntax
+| Quantitative.idr   |                        |
+| Checker.idr        |               +------------------+
+| Proofs.idr         |               | .vqlpp files     |
++--------------------+               +------------------+
+  proves properties                  VQL++ query language
+         |
+         v
++--------------------+
+| Zig FFI Bridge     |
+| ffi/zig/bridge.zig |
+| (C-ABI exports)    |
++--------------------+
+  exposes to non-Idris2
+  consumers
+```
+
+## VERIFIED BUILD COMMANDS
+
+```bash
+# Type-check Idris2 kernel (9 modules, --total)
+idris2 --typecheck typeql-experimental.ipkg
+
+# Run Zig FFI tests (5 tests, Zig 0.15.2)
+cd ffi/zig && zig build test
+
+# Check banned patterns (should return nothing)
+grep -rn 'believe_me\|assert_total\|assert_smaller' src/abi/
+```
+
+## KEY RELATIONSHIPS
+
+- **Parent**: `nextgen-databases` monorepo
+- **Sibling**: `verisimdb` (VQL v3.0 base grammar, VQL-dt ~35% wired)
+- **Sibling**: `lithoglyph` (GQL-dt, Idris2 ABI patterns)
+- **Reference**: `proven` (formal verification library)
+
+## IMPLEMENTATION NOTES
+
+- **Idris2 0.8.0**: Use `--typecheck` for ipkg files (not `--check`)
+- **Zig 0.15.2**: Use `addModule`/`addTest(.root_module)` API (no `addStaticLibrary`)
+- **Effect subsumption**: `Subsumes declared actual = Subset actual declared` (flipped from naive)
+- **Erased implicits**: Cannot pattern-match on quantity-0 implicits at runtime
+- **Non-associative helpers**: `andCheck` needs explicit nesting, not backtick infix
+
+## SESSION STARTUP CHECKLIST
+
+- Read THIS file first
+- Read `.machine_readable/STATE.scm` for current status
+- Understand the dual-language split (Idris2 + ReScript)
+- Know the banned patterns (believe_me, assert_total, assert_smaller)
+- Check `docs/vql-dtpp-grammar.ebnf` for the grammar delta
+
+## META
+
+- **Format Version:** 1.0.0
+- **Created:** 2026-03-01
+- **Last Updated:** 2026-03-01
+- **Maintained By:** Jonathan D.A. Jewell (hyperpolymath)
+- **License:** PMPL-1.0-or-later
+- **Protocol:** https://github.com/hyperpolymath/0-ai-gatekeeper-protocol

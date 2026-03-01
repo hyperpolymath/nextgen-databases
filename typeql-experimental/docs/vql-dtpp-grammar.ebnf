@@ -1,0 +1,198 @@
+(* SPDX-License-Identifier: PMPL-1.0-or-later *)
+(* VQL-dt++ (TypeQL-experimental) Grammar Delta *)
+(* Extends: VQL v3.0 (verisimdb/docs/vql-grammar.ebnf, 317 lines) *)
+(* Version: 0.1.0 *)
+(* Date: 2026-03-01 *)
+
+(* ============================================================================
+   OVERVIEW
+
+   This grammar EXTENDS VQL v3.0 with six new optional clauses appended AFTER
+   the standard query structure. The base VQL grammar is imported by reference
+   — this file specifies only the delta.
+
+   New clauses (all optional, any combination, in this order):
+
+   1. CONSUME AFTER <n> USE       — Linear types (resource counting)
+   2. WITH SESSION <protocol>     — Session types (protocol state machines)
+   3. EFFECTS { <effect>, ... }   — Effect systems (side-effect tracking)
+   4. IN TRANSACTION <state>      — Modal types (world-indexed scoping)
+   5. PROOF ATTACHED <theorem>    — Proof-carrying code (theorem attachment)
+   6. USAGE LIMIT <n>             — Quantitative type theory (bounded resources)
+
+   No keyword conflicts with VQL v3.0's 60+ reserved keywords. All new
+   keywords are disjoint:
+   - CONSUME, AFTER, USE (new)
+   - SESSION (new)
+   - EFFECTS (new)
+   - TRANSACTION (new)
+   - ATTACHED (new)
+   - USAGE (new — LIMIT already exists but USAGE LIMIT is unambiguous)
+   ============================================================================ *)
+
+(* ============================================================================
+   1. EXTENDED QUERY — Augments VQL v3.0 query production
+   ============================================================================ *)
+
+(* The base VQL query is:
+   query = select_clause, from_clause, [where_clause], [group_by_clause],
+           [having_clause], [proof_clause], [order_by_clause],
+           [limit_clause], [offset_clause] ;
+
+   We extend it with 6 optional trailing clauses: *)
+
+extended_query = query,
+                 [consume_clause],
+                 [session_clause],
+                 [effects_clause],
+                 [modal_clause],
+                 [proof_attached_clause],
+                 [usage_clause] ;
+
+(* ============================================================================
+   2. CONSUME AFTER — Linear Types (Resource Counting)
+   ============================================================================
+
+   Idris2 mapping: (1 conn : Connection) for single-use,
+                   (n conn : BoundedConn n) for multi-use.
+
+   Example:
+     SELECT GRAPH FROM HEXAD ... CONSUME AFTER 1 USE
+     SELECT * FROM FEDERATION ... CONSUME AFTER 3 USE
+   ============================================================================ *)
+
+consume_clause = 'CONSUME', 'AFTER', positive_integer, 'USE' ;
+
+positive_integer = ? non-zero digit ?, { ? digit ? } ;
+
+(* ============================================================================
+   3. WITH SESSION — Session Types (Protocol State Machines)
+   ============================================================================
+
+   Idris2 mapping: Session : SessionState -> Type
+   States: Fresh -> Authenticated -> InTransaction -> Committed -> Closed
+
+   Example:
+     SELECT GRAPH FROM HEXAD ... WITH SESSION ReadOnlyProtocol
+     INSERT HEXAD WITH ... WITH SESSION MutationProtocol
+   ============================================================================ *)
+
+session_clause = 'WITH', 'SESSION', protocol_name ;
+
+protocol_name = identifier ;
+
+(* Built-in protocols (extensible via schema) *)
+builtin_protocol = 'ReadOnlyProtocol'
+                 | 'MutationProtocol'
+                 | 'StreamProtocol'
+                 | 'BatchProtocol' ;
+
+(* ============================================================================
+   4. EFFECTS { ... } — Effect Systems (Side-Effect Tracking)
+   ============================================================================
+
+   Idris2 mapping: EffectSet with subsumption proofs.
+   The checker verifies actual operations are a subset of declared effects.
+
+   Example:
+     SELECT GRAPH FROM HEXAD ... EFFECTS { Read }
+     INSERT HEXAD WITH ... EFFECTS { Read, Write, Audit }
+   ============================================================================ *)
+
+effects_clause = 'EFFECTS', '{', effect_list, '}' ;
+
+effect_list = effect_name, { ',', effect_name } ;
+
+effect_name = 'Read'
+            | 'Write'
+            | 'Cite'
+            | 'Audit'
+            | 'Transform'
+            | 'Federate'
+            | identifier ;   (* extensible *)
+
+(* ============================================================================
+   5. IN TRANSACTION — Modal Types (World-Indexed Scoping)
+   ============================================================================
+
+   Idris2 mapping: Box : World -> Type -> Type
+   Data in one scope cannot leak to another without explicit marshalling.
+
+   Example:
+     SELECT GRAPH FROM HEXAD ... IN TRANSACTION Committed
+     SELECT * FROM FEDERATION ... IN TRANSACTION ReadSnapshot
+   ============================================================================ *)
+
+modal_clause = 'IN', 'TRANSACTION', transaction_state ;
+
+transaction_state = 'Fresh'
+                  | 'Active'
+                  | 'Committed'
+                  | 'RolledBack'
+                  | 'ReadSnapshot'
+                  | identifier ;   (* extensible *)
+
+(* ============================================================================
+   6. PROOF ATTACHED — Proof-Carrying Code (Theorem Attachment)
+   ============================================================================
+
+   Idris2 mapping: ProvedResult : (result : QueryResult) -> (prf : Theorem) -> Type
+   Attaches a formal proof to the query result as a sigma pair.
+
+   Note: This is DIFFERENT from VQL's existing PROOF clause. PROOF verifies
+   pre-conditions; PROOF ATTACHED attaches post-condition theorems to results.
+
+   Example:
+     SELECT GRAPH FROM HEXAD ... PROOF ATTACHED IntegrityTheorem
+     SELECT * FROM FEDERATION ... PROOF ATTACHED FreshnessGuarantee
+   ============================================================================ *)
+
+proof_attached_clause = 'PROOF', 'ATTACHED', theorem_name, [theorem_params] ;
+
+theorem_name = identifier ;
+
+theorem_params = '(', param_list, ')' ;
+
+param_list = identifier, '=', literal, { ',', identifier, '=', literal } ;
+
+(* ============================================================================
+   7. USAGE LIMIT — Quantitative Type Theory (Bounded Resources)
+   ============================================================================
+
+   Idris2 mapping: BoundedResource : (n : Nat) -> Type
+   Generalises linear types from exact-1 to at-most-n across the query plan.
+
+   Note: This is DIFFERENT from VQL's existing LIMIT clause. LIMIT caps result
+   rows; USAGE LIMIT caps resource consumption (connections, API calls, etc.).
+
+   Example:
+     SELECT GRAPH FROM HEXAD ... USAGE LIMIT 100
+     SELECT * FROM FEDERATION ... USAGE LIMIT 1000
+   ============================================================================ *)
+
+usage_clause = 'USAGE', 'LIMIT', positive_integer ;
+
+(* ============================================================================
+   8. EXTENDED RESERVED KEYWORDS
+   ============================================================================
+
+   New keywords added by VQL-dt++ (disjoint from VQL v3.0's 60+ keywords):
+   ============================================================================ *)
+
+vqldtpp_keywords = 'CONSUME' | 'AFTER' | 'USE'
+                 | 'SESSION'
+                 | 'EFFECTS'
+                 | 'TRANSACTION'
+                 | 'ATTACHED'
+                 | 'USAGE' ;
+
+(* Note: 'WITH', 'PROOF', 'LIMIT', 'IN' already exist in VQL v3.0.
+   These are reused in new contexts that are syntactically unambiguous:
+   - WITH SESSION vs WITH DRIFT — next token distinguishes
+   - PROOF ATTACHED vs PROOF EXISTENCE — next token distinguishes
+   - USAGE LIMIT vs LIMIT — 'USAGE' prefix distinguishes
+   - IN TRANSACTION — 'IN' is new in query context (only used in data contexts before) *)
+
+(* ============================================================================
+   END OF GRAMMAR DELTA
+   ============================================================================ *)

@@ -1,0 +1,272 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= VQL-dt++ Annotated Examples
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:date: 2026-03-01
+:toc: macro
+
+== Overview
+
+This document provides comprehensive, annotated examples of each VQL-dt++
+extension and their combinations. Each example shows the VQL++ surface syntax,
+the Idris2 type-level encoding, and the property being enforced.
+
+== 1. Linear Types: CONSUME AFTER N USE
+
+=== The Problem
+
+Database connections are finite resources. Forgetting to close a connection
+causes a leak; using a connection after closing it causes a use-after-free.
+Traditional approaches rely on `try/finally` or RAII — runtime mechanisms
+that can be bypassed.
+
+=== The Solution
+
+Idris2's QTT tracks usage at the type level. A connection marked with quantity
+`1` must be used exactly once. The compiler rejects code that leaks or
+double-uses a connection.
+
+=== Example
+
+[source,vql]
+----
+-- Single-use connection: use once, then it must be released
+SELECT GRAPH, DOCUMENT
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FULLTEXT CONTAINS "climate change"
+CONSUME AFTER 1 USE
+----
+
+[source,idris]
+----
+-- Type-level encoding:
+queryWithLinear : (1 conn : LinConn 1) -> (QueryResult, LinConn 0)
+queryWithLinear conn =
+  let (result, depleted) = useConn conn
+  in (result, depleted)
+-- After this, `depleted` can ONLY be closed. No more queries.
+----
+
+=== What the Compiler Catches
+
+[source,idris]
+----
+-- REJECTED: uses connection twice
+bad : (1 conn : LinConn 1) -> (QueryResult, QueryResult)
+bad conn =
+  let (r1, c0) = useConn conn
+      (r2, _)  = useConn conn   -- ERROR: conn already consumed on line above
+  in (r1, r2)
+----
+
+== 2. Session Types: WITH SESSION
+
+=== The Problem
+
+Database sessions have implicit state — you must authenticate before querying,
+begin a transaction before mutating, and commit or rollback before closing.
+Violating this protocol causes runtime errors.
+
+=== The Solution
+
+Index the session type by its protocol state. Each operation changes the state
+index, and the type system only permits operations that match the current state.
+
+=== Example
+
+[source,vql]
+----
+-- Read-only session: mutations are statically forbidden
+SELECT GRAPH, DOCUMENT
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FULLTEXT CONTAINS "machine learning"
+WITH SESSION ReadOnlyProtocol
+----
+
+[source,idris]
+----
+-- State machine: Fresh → Authenticated → InTransaction → Committed → Closed
+-- Each function consumes one state and produces the next.
+readOnlyFlow : SessionImpl Fresh -> Either String (SessionImpl Closed)
+readOnlyFlow fresh =
+  case auth fresh of             -- Fresh → Authenticated
+    Left err => Left err
+    Right authed =>
+      let tx = beginTx authed    -- Authenticated → InTransaction
+          (_, tx2) = query tx    -- InTransaction → InTransaction
+      in case commit tx2 of      -- InTransaction → Committed
+           Left err => Left err
+           Right done =>
+             Right (close done)  -- Committed → Closed
+----
+
+== 3. Effect Systems: EFFECTS { ... }
+
+=== The Problem
+
+A query declared as "read-only" might accidentally perform writes. Without
+static tracking, effect violations are only caught at runtime (or not at all).
+
+=== The Solution
+
+Declare effects explicitly. The type checker verifies that actual operations
+are a subset of declared effects.
+
+=== Example
+
+[source,vql]
+----
+-- Only Read effect is permitted
+SELECT GRAPH, VECTOR
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FIELD severity > 3
+EFFECTS { Read }
+----
+
+[source,idris]
+----
+-- The subsumption proof ensures Read ⊆ {Read}
+readQuery : EffectfulOp [Read] QueryResult
+readQuery = readOp (MkQueryResult [Graph, Vector] 10)
+
+-- This would be REJECTED:
+-- writeInReadContext : EffectfulOp [Write] ()
+-- runOp writeInReadContext  -- ERROR: Write ∉ {Read}, no Subsumes proof
+----
+
+== 4. Modal Types: IN TRANSACTION
+
+=== The Problem
+
+Data from one transaction scope can accidentally leak to another, causing
+isolation violations. Cross-scope data flow should be explicit.
+
+=== The Solution
+
+Wrap data in a modal `Box` tagged with its world (scope). Extraction requires
+evidence of being in the matching world.
+
+=== Example
+
+[source,vql]
+----
+-- Data is scoped to the Active transaction
+SELECT GRAPH, DOCUMENT
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FULLTEXT CONTAINS "climate data"
+IN TRANSACTION Active
+----
+
+[source,idris]
+----
+-- Data from world "tx-001" cannot be used in world "tx-002"
+let world1 = MkWorld "tx-001"
+let world2 = MkWorld "tx-002"
+let data1 = MkBox {w = world1} someResult   -- Box world1 QueryResult
+
+-- REJECTED: wrong scope evidence
+-- unbox data1 (ScopeEvidence world2)  -- ERROR: world1 ≠ world2
+
+-- OK: explicit marshalling
+let data2 = marshal data1 transformFn       -- Box world2 TransformedResult
+----
+
+== 5. Proof-Carrying Code: PROOF ATTACHED
+
+=== The Problem
+
+Query results are typically opaque data — the consumer has no formal guarantee
+about properties like integrity, freshness, or provenance.
+
+=== The Solution
+
+Attach theorems to results as sigma pairs. The proof is part of the return type,
+not an afterthought.
+
+=== Example
+
+[source,vql]
+----
+-- Result carries an integrity proof
+SELECT GRAPH, DOCUMENT
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FULLTEXT CONTAINS "medical records"
+PROOF ATTACHED IntegrityTheorem
+----
+
+[source,idris]
+----
+-- The result type is a dependent pair: (data, proof)
+result : ProvedResult QueryResult
+result = MkProved queryData (IntegrityThm "sha256:abc123...")
+
+-- Consumer can verify the proof independently
+case verifyIntegrity actualHash (getTheorem result) of
+  Verified _   => processResult (getResult result)
+  VerifyFail e => handleError e
+----
+
+== 6. Quantitative Type Theory: USAGE LIMIT
+
+=== The Problem
+
+Federated queries can consume unbounded resources (connections, API calls,
+compute units). There's no static guarantee that a query stays within budget.
+
+=== The Solution
+
+Track resource consumption at the type level. The budget is a type-level
+natural number that decreases with each consumption.
+
+=== Example
+
+[source,vql]
+----
+-- Budget 100 resource units
+SELECT GRAPH, VECTOR, DOCUMENT
+FROM FEDERATION /universities/*
+WHERE FULLTEXT CONTAINS "deep learning"
+USAGE LIMIT 100
+----
+
+[source,idris]
+----
+-- Start with budget of 100
+let budget = MkBounded {remaining = 100} ()
+
+-- Each operation consumes from the budget
+let (_, b99) = consume budget    -- 100 → 99
+let (_, b98) = consume b99       -- 99 → 98
+-- ... after 100 consumptions ...
+-- consume b0  -- ERROR: BoundedResource 0 has no consume operation
+----
+
+== 7. Combined: All Six Extensions
+
+=== Example
+
+[source,vql]
+----
+SELECT GRAPH, DOCUMENT
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE FULLTEXT CONTAINS "climate change"
+PROOF EXISTENCE(VerifyExists) AND CITATION(VerifyCitation)
+LIMIT 50
+CONSUME AFTER 1 USE
+WITH SESSION ReadOnlyProtocol
+EFFECTS { Read, Cite }
+IN TRANSACTION Committed
+PROOF ATTACHED IntegrityTheorem
+USAGE LIMIT 100
+----
+
+This single query enforces ALL of:
+
+1. **Connection is used exactly once** (linear type)
+2. **Session follows read-only protocol** (session type)
+3. **Only Read and Cite effects occur** (effect system)
+4. **Data is scoped to committed transaction** (modal type)
+5. **Result carries integrity proof** (proof-carrying code)
+6. **Total consumption ≤ 100 units** (QTT budget)
+
+The Idris2 type checker validates all six simultaneously. A violation of ANY
+constraint is a compile-time error, not a runtime exception.
