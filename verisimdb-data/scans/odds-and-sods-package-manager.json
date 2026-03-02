@@ -1,0 +1,2202 @@
+{
+  "program_path": ".",
+  "language": "elixir",
+  "frameworks": [
+    "Networking",
+    "WebServer",
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "scripts/har-agents/github-search.sh",
+      "severity": "Medium",
+      "description": "54 potentially unquoted variable expansions in scripts/har-agents/github-search.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/har-agents/github-search.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/har-agents/github-search.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/har-agents/install-services.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/har-agents/install-services.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/har-agents/mirror-finder.sh",
+      "severity": "Medium",
+      "description": "69 potentially unquoted variable expansions in scripts/har-agents/mirror-finder.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/har-agents/mirror-finder.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/har-agents/mirror-finder.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/validate-v1.0.sh",
+      "severity": "Medium",
+      "description": "40 potentially unquoted variable expansions in scripts/validate-v1.0.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/validate-v1.0.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/validate-v1.0.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "opsm_ex/lib/opsm/package/native.ex",
+      "severity": "Medium",
+      "description": "System command execution in opsm_ex/lib/opsm/package/native.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "opsm_ex/lib/opsm/safe_exec.ex",
+      "severity": "Medium",
+      "description": "System command execution in opsm_ex/lib/opsm/safe_exec.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "opsm_ex/lib/opsm/container.ex",
+      "severity": "Medium",
+      "description": "System command execution in opsm_ex/lib/opsm/container.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "opsm_ex/test/integration/e2e_test.exs",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in opsm_ex/test/integration/e2e_test.exs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "opsm_ex/test/opsm/validation_test.exs",
+      "severity": "Medium",
+      "description": "2 HTTP (non-HTTPS) URLs in opsm_ex/test/opsm/validation_test.exs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "opsm_ex/test/opsm/verified_test.exs",
+      "severity": "Medium",
+      "description": "4 HTTP (non-HTTPS) URLs in opsm_ex/test/opsm/verified_test.exs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "opsm_ex/test/opsm/crypto/password_test.exs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in opsm_ex/test/opsm/crypto/password_test.exs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "opsm_ex/test/opsm/crypto/api_key_storage_test.exs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in opsm_ex/test/opsm/crypto/api_key_storage_test.exs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "opsm_ex/doc/dist/html-YU4BZFVS.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in opsm_ex/doc/dist/html-YU4BZFVS.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "opsm_ex/doc/dist/html-YU4BZFVS.js",
+      "severity": "Medium",
+      "description": "2 HTTP (non-HTTPS) URLs in opsm_ex/doc/dist/html-YU4BZFVS.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "opsm_ex/doc/dist/html-YU4BZFVS.js",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in opsm_ex/doc/dist/html-YU4BZFVS.js",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 40512,
+    "unsafe_blocks": 33,
+    "panic_sites": 0,
+    "unwrap_calls": 2,
+    "allocation_sites": 29,
+    "io_operations": 120,
+    "threading_constructs": 13
+  },
+  "file_statistics": [
+    {
+      "file_path": "cli/clients/ClaimForge.res",
+      "lines": 248,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/clients/Palimpsest.res",
+      "lines": 268,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/Http.res",
+      "lines": 202,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/Http.res.js",
+      "lines": 164,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/Config.res",
+      "lines": 257,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/cli/clients/Palimpsest.res",
+      "lines": 268,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/cli/clients/ClaimForge.res",
+      "lines": 248,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/cli/Http.res",
+      "lines": 202,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/cli/Http.res.js",
+      "lines": 164,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/cli/Config.res",
+      "lines": 257,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Http.res",
+      "lines": 202,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Config.res",
+      "lines": 257,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Palimpsest.res",
+      "lines": 268,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/ClaimForge.res",
+      "lines": 248,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/har-agents/web-scraper.jl",
+      "lines": 207,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/har-agents/github-search.sh",
+      "lines": 139,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/har-agents/install-services.sh",
+      "lines": 163,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/har-agents/mirror-finder.sh",
+      "lines": 224,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/http.ex",
+      "lines": 127,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/clients/oikos.ex",
+      "lines": 91,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/clients/cicd_hyper_a.ex",
+      "lines": 140,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/clients/claim_forge.ex",
+      "lines": 112,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/clients/checky_monkey.ex",
+      "lines": 149,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/clients/palimpsest.ex",
+      "lines": 152,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/registries/registry.ex",
+      "lines": 260,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/package/downloader.ex",
+      "lines": 270,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/package/installer.ex",
+      "lines": 885,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/package/native.ex",
+      "lines": 293,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/package/transaction.ex",
+      "lines": 249,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/trust/pipeline.ex",
+      "lines": 267,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/cache.ex",
+      "lines": 150,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/maintenance.ex",
+      "lines": 322,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/lockfile.ex",
+      "lines": 433,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/manifest_ingestion.ex",
+      "lines": 130,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/registry_gateway/store.ex",
+      "lines": 45,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/har_queue.ex",
+      "lines": 226,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/verified/http.ex",
+      "lines": 178,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/config.ex",
+      "lines": 237,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/federation.ex",
+      "lines": 787,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/api/nickel.ex",
+      "lines": 31,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/lib/opsm/crypto/api_key_storage.ex",
+      "lines": 383,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/test/integration/pipeline_test.exs",
+      "lines": 314,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/test/integration/e2e_test.exs",
+      "lines": 604,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/test/opsm/package/transaction_test.exs",
+      "lines": 189,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/test/opsm/maintenance_test.exs",
+      "lines": 194,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/test/opsm/config_test.exs",
+      "lines": 178,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/test/opsm/lockfile_test.exs",
+      "lines": 466,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/test/opsm/crypto/api_key_storage_test.exs",
+      "lines": 353,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/scripts/seam_analysis.exs",
+      "lines": 135,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 11,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/doc/dist/html-YU4BZFVS.js",
+      "lines": 210,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_ex/doc/dist/sidebar_items-DFEFF054.js",
+      "lines": 1,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "opsm_mobile/src-tauri/src/lib.rs",
+      "lines": 252,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "services/claim-forge/src/main.rs",
+      "lines": 227,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "services/checky-monkey/src/main.rs",
+      "lines": 409,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "services/palimpsest-license/src/main.rs",
+      "lines": 383,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "services/svalinn/src/main.rs",
+      "lines": 449,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "services/selur/src/main.rs",
+      "lines": 447,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "services/vordr/src/main.rs",
+      "lines": 551,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "services/cerro-torre/src/main.rs",
+      "lines": 473,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "services/oikos/src/main.rs",
+      "lines": 288,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "services/cicd-hyper-a/src/main.rs",
+      "lines": 483,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "disk",
+    "network",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "cli/Http.res",
+        "to": "cli/Http.res.js",
+        "relation": "shared_dir:cli",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/Http.res.js",
+        "to": "cli/Config.res",
+        "relation": "shared_dir:cli",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/doc/dist/html-YU4BZFVS.js",
+        "to": "opsm_ex/doc/dist/sidebar_items-DFEFF054.js",
+        "relation": "shared_dir:opsm_ex/doc/dist",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/web-scraper.jl",
+        "to": "scripts/har-agents/github-search.sh",
+        "relation": "shared_dir:scripts/har-agents",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/github-search.sh",
+        "to": "scripts/har-agents/install-services.sh",
+        "relation": "shared_dir:scripts/har-agents",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/install-services.sh",
+        "to": "scripts/har-agents/mirror-finder.sh",
+        "relation": "shared_dir:scripts/har-agents",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/downloader.ex",
+        "to": "opsm_ex/lib/opsm/package/installer.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm/package",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/installer.ex",
+        "to": "opsm_ex/lib/opsm/package/native.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm/package",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/native.ex",
+        "to": "opsm_ex/lib/opsm/package/transaction.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm/package",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Http.res",
+        "to": "lib/ocaml/Config.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Config.res",
+        "to": "lib/ocaml/Palimpsest.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Palimpsest.res",
+        "to": "lib/ocaml/ClaimForge.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/cli/Http.res",
+        "to": "lib/bs/cli/Http.res.js",
+        "relation": "shared_dir:lib/bs/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/cli/Http.res.js",
+        "to": "lib/bs/cli/Config.res",
+        "relation": "shared_dir:lib/bs/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/maintenance_test.exs",
+        "to": "opsm_ex/test/opsm/config_test.exs",
+        "relation": "shared_dir:opsm_ex/test/opsm",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/config_test.exs",
+        "to": "opsm_ex/test/opsm/lockfile_test.exs",
+        "relation": "shared_dir:opsm_ex/test/opsm",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/oikos.ex",
+        "to": "opsm_ex/lib/opsm/clients/cicd_hyper_a.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm/clients",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/cicd_hyper_a.ex",
+        "to": "opsm_ex/lib/opsm/clients/claim_forge.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm/clients",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/claim_forge.ex",
+        "to": "opsm_ex/lib/opsm/clients/checky_monkey.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm/clients",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/checky_monkey.ex",
+        "to": "opsm_ex/lib/opsm/clients/palimpsest.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm/clients",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/integration/pipeline_test.exs",
+        "to": "opsm_ex/test/integration/e2e_test.exs",
+        "relation": "shared_dir:opsm_ex/test/integration",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/http.ex",
+        "to": "opsm_ex/lib/opsm/cache.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/cache.ex",
+        "to": "opsm_ex/lib/opsm/maintenance.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/maintenance.ex",
+        "to": "opsm_ex/lib/opsm/lockfile.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/lockfile.ex",
+        "to": "opsm_ex/lib/opsm/manifest_ingestion.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/manifest_ingestion.ex",
+        "to": "opsm_ex/lib/opsm/har_queue.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/har_queue.ex",
+        "to": "opsm_ex/lib/opsm/config.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/config.ex",
+        "to": "opsm_ex/lib/opsm/federation.ex",
+        "relation": "shared_dir:opsm_ex/lib/opsm",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/clients/ClaimForge.res",
+        "to": "cli/clients/Palimpsest.res",
+        "relation": "shared_dir:cli/clients",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/cli/clients/Palimpsest.res",
+        "to": "lib/bs/cli/clients/ClaimForge.res",
+        "relation": "shared_dir:lib/bs/cli/clients",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/clients/ClaimForge.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "cli/clients/ClaimForge.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "cli/clients/ClaimForge.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "cli/clients/Palimpsest.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "cli/clients/Palimpsest.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "cli/clients/Palimpsest.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "cli/Http.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "cli/Http.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "cli/Http.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "cli/Http.res.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/Http.res.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/Http.res.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/Config.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/Config.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/Config.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/cli/clients/Palimpsest.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/bs/cli/clients/Palimpsest.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/bs/cli/clients/Palimpsest.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/bs/cli/clients/ClaimForge.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/bs/cli/clients/ClaimForge.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/bs/cli/clients/ClaimForge.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/bs/cli/Http.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "lib/bs/cli/Http.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "lib/bs/cli/Http.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "lib/bs/cli/Http.res.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/cli/Http.res.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/cli/Http.res.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/cli/Config.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/cli/Config.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/cli/Config.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Http.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "lib/ocaml/Http.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "lib/ocaml/Http.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "lib/ocaml/Config.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Config.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Config.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Palimpsest.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/ocaml/Palimpsest.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/ocaml/Palimpsest.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/ocaml/ClaimForge.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/ocaml/ClaimForge.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/ocaml/ClaimForge.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "scripts/har-agents/web-scraper.jl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/web-scraper.jl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/web-scraper.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/github-search.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/github-search.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/github-search.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/install-services.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/install-services.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/install-services.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/mirror-finder.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/mirror-finder.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/har-agents/mirror-finder.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/http.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/http.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/http.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/oikos.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/oikos.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/oikos.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/cicd_hyper_a.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/cicd_hyper_a.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/cicd_hyper_a.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/claim_forge.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/claim_forge.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/claim_forge.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/checky_monkey.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/checky_monkey.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/checky_monkey.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/palimpsest.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/palimpsest.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/clients/palimpsest.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/registries/registry.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/registries/registry.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/registries/registry.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/downloader.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/downloader.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/downloader.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/installer.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/installer.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/installer.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/native.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/native.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/native.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/transaction.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/transaction.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/package/transaction.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/trust/pipeline.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/trust/pipeline.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/trust/pipeline.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/cache.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/cache.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/cache.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/maintenance.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/maintenance.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/maintenance.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/lockfile.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/lockfile.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/lockfile.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/manifest_ingestion.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/manifest_ingestion.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/manifest_ingestion.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/registry_gateway/store.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/registry_gateway/store.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/registry_gateway/store.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/har_queue.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/har_queue.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/har_queue.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/verified/http.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/verified/http.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/verified/http.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/config.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/config.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/config.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/federation.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/federation.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/federation.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/api/nickel.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/api/nickel.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/api/nickel.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/crypto/api_key_storage.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/crypto/api_key_storage.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/lib/opsm/crypto/api_key_storage.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/integration/pipeline_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/integration/pipeline_test.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/integration/pipeline_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/integration/e2e_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/integration/e2e_test.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/integration/e2e_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/package/transaction_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/package/transaction_test.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/package/transaction_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/maintenance_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/maintenance_test.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/maintenance_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/config_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/config_test.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/config_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/lockfile_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/lockfile_test.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/lockfile_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/crypto/api_key_storage_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/crypto/api_key_storage_test.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/test/opsm/crypto/api_key_storage_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/scripts/seam_analysis.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/scripts/seam_analysis.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/scripts/seam_analysis.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/doc/dist/html-YU4BZFVS.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/doc/dist/html-YU4BZFVS.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/doc/dist/html-YU4BZFVS.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/doc/dist/sidebar_items-DFEFF054.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/doc/dist/sidebar_items-DFEFF054.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_ex/doc/dist/sidebar_items-DFEFF054.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_mobile/src-tauri/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_mobile/src-tauri/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "opsm_mobile/src-tauri/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/claim-forge/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/claim-forge/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/claim-forge/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/checky-monkey/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/checky-monkey/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/checky-monkey/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/palimpsest-license/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/palimpsest-license/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/palimpsest-license/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/svalinn/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/svalinn/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/svalinn/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/selur/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/selur/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/selur/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/vordr/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/vordr/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/vordr/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/cerro-torre/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "services/cerro-torre/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "services/cerro-torre/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "services/oikos/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/oikos/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/oikos/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/cicd-hyper-a/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/cicd-hyper-a/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/cicd-hyper-a/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "opsm_ex/doc/dist/html-YU4BZFVS.js"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "DynamicCodeExecution->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "opsm_ex/doc/dist/html-YU4BZFVS.js"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "CommandInjection->Network"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/har-agents/github-search.sh",
+          "scripts/har-agents/install-services.sh",
+          "scripts/har-agents/mirror-finder.sh",
+          "scripts/validate-v1.0.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "opsm_ex/test/opsm/crypto/password_test.exs",
+          "opsm_ex/test/opsm/crypto/api_key_storage_test.exs"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "HardcodedSecret->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/har-agents/github-search.sh",
+          "scripts/har-agents/mirror-finder.sh",
+          "scripts/validate-v1.0.sh",
+          "opsm_ex/lib/opsm/package/native.ex",
+          "opsm_ex/lib/opsm/safe_exec.ex",
+          "opsm_ex/lib/opsm/container.ex"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "opsm_ex/lib/opsm/package/native.ex",
+          "opsm_ex/lib/opsm/safe_exec.ex",
+          "opsm_ex/lib/opsm/container.ex"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "opsm_ex/test/integration/e2e_test.exs",
+          "opsm_ex/test/opsm/validation_test.exs",
+          "opsm_ex/test/opsm/verified_test.exs",
+          "opsm_ex/doc/dist/html-YU4BZFVS.js"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "InsecureProtocol->Network"
+      }
+    ]
+  }
+}

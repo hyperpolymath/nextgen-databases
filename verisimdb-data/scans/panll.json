@@ -1,0 +1,507 @@
+{
+  "program_path": "/var/mnt/eclipse/repos/panll",
+  "language": "javascript",
+  "frameworks": [
+    "OTP",
+    "WebServer"
+  ],
+  "weak_points": [
+    {
+      "category": "UnsafeDeserialization",
+      "location": "src/core/EventChain.res",
+      "severity": "High",
+      "description": "1 JSON.parseExn calls in src/core/EventChain.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/core/OrbitalSync.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/core/OrbitalSync.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "src/core/PanicAttackerCapability.res",
+      "severity": "High",
+      "description": "1 JSON.parseExn calls in src/core/PanicAttackerCapability.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "src/core/AntiCrash.res.js",
+      "severity": "Critical",
+      "description": "eval() usage in src/core/AntiCrash.res.js",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/tea/Tea_Cmd.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/tea/Tea_Cmd.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/tea/Tea_Sub.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/tea/Tea_Sub.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "src/tea/Tea_Render.res.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in src/tea/Tea_Render.res.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "src/Storage.res",
+      "severity": "High",
+      "description": "1 JSON.parseExn calls in src/Storage.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src-tauri/src/main.rs",
+      "severity": "Medium",
+      "description": "24 unwrap/expect calls in src-tauri/src/main.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "tests/anti_crash_test.js",
+      "severity": "Critical",
+      "description": "eval() usage in tests/anti_crash_test.js",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "tests/storage_timeline_roundtrip_test.js",
+      "severity": "Critical",
+      "description": "eval() usage in tests/storage_timeline_roundtrip_test.js",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": ".machine_readable/NEUROSYM.scm",
+      "severity": "High",
+      "description": "System/process call in .machine_readable/NEUROSYM.scm",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 17268,
+    "unsafe_blocks": 4,
+    "panic_sites": 3,
+    "unwrap_calls": 27,
+    "allocation_sites": 6,
+    "io_operations": 0,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/core/EventChain.res",
+      "lines": 121,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/OrbitalSync.res",
+      "lines": 148,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/PanicAttackerCapability.res",
+      "lines": 51,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/tea/Tea_Cmd.res",
+      "lines": 60,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/tea/Tea_Sub.res",
+      "lines": 75,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/tea/Tea_Animationframe.res",
+      "lines": 23,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/tea/Tea_Render.res",
+      "lines": 367,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Storage.res",
+      "lines": 422,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src-tauri/src/main.rs",
+      "lines": 1017,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 24,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "memory",
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/core/EventChain.res",
+        "to": "src/core/OrbitalSync.res",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/OrbitalSync.res",
+        "to": "src/core/PanicAttackerCapability.res",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tea/Tea_Cmd.res",
+        "to": "src/tea/Tea_Sub.res",
+        "relation": "shared_dir:src/tea",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tea/Tea_Sub.res",
+        "to": "src/tea/Tea_Animationframe.res",
+        "relation": "shared_dir:src/tea",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tea/Tea_Animationframe.res",
+        "to": "src/tea/Tea_Render.res",
+        "relation": "shared_dir:src/tea",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/EventChain.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/core/EventChain.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/core/OrbitalSync.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/OrbitalSync.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/PanicAttackerCapability.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/core/PanicAttackerCapability.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/tea/Tea_Cmd.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tea/Tea_Cmd.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tea/Tea_Sub.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tea/Tea_Sub.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tea/Tea_Animationframe.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/tea/Tea_Animationframe.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/tea/Tea_Render.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/tea/Tea_Render.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/Storage.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/Storage.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src-tauri/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 28.0
+      },
+      {
+        "from": "src-tauri/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 28.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          ".machine_readable/NEUROSYM.scm"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "src/core/EventChain.res",
+          "src/core/PanicAttackerCapability.res",
+          "src/Storage.res"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "UnsafeDeserialization->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "src/core/AntiCrash.res.js",
+          "tests/anti_crash_test.js",
+          "tests/storage_timeline_roundtrip_test.js"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "src/core/AntiCrash.res.js",
+          "tests/anti_crash_test.js",
+          "tests/storage_timeline_roundtrip_test.js"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "DynamicCodeExecution->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "src/tea/Tea_Render.res.js"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "DynamicCodeExecution->Network"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "src/core/EventChain.res",
+          "src/core/PanicAttackerCapability.res",
+          "src/Storage.res"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "UnsafeDeserialization->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "src-tauri/src/main.rs"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/core/OrbitalSync.res",
+          "src/tea/Tea_Cmd.res",
+          "src/tea/Tea_Sub.res",
+          "src-tauri/src/main.rs"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          ".machine_readable/NEUROSYM.scm"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

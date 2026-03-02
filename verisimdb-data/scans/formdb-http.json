@@ -1,0 +1,698 @@
+{
+  "program_path": ".",
+  "language": "elixir",
+  "frameworks": [
+    "OTP",
+    "Phoenix",
+    "WebServer"
+  ],
+  "weak_points": [
+    {
+      "category": "DynamicCodeExecution",
+      "location": "lib/formdb_http/formdb.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in lib/formdb_http/formdb.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/formdb_http/temporal_index.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/formdb_http/temporal_index.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "lib/formdb_http_web.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in lib/formdb_http_web.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "lib/formdb_nif.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in lib/formdb_nif.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "test_http_api.sh",
+      "severity": "Medium",
+      "description": "22 potentially unquoted variable expansions in test_http_api.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "test_http_api.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in test_http_api.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "test_geo_api.sh",
+      "severity": "Medium",
+      "description": "22 potentially unquoted variable expansions in test_geo_api.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "test_geo_api.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in test_geo_api.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "test_analytics_api.sh",
+      "severity": "Medium",
+      "description": "35 potentially unquoted variable expansions in test_analytics_api.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "test_analytics_api.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in test_analytics_api.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "test_persistence.sh",
+      "severity": "Medium",
+      "description": "31 potentially unquoted variable expansions in test_persistence.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "test_persistence.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in test_persistence.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bench/run_all_benchmarks.sh",
+      "severity": "Medium",
+      "description": "21 potentially unquoted variable expansions in bench/run_all_benchmarks.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 6902,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 6,
+    "io_operations": 67,
+    "threading_constructs": 7
+  },
+  "file_statistics": [
+    {
+      "file_path": "lib/formdb_http/graceful_shutdown.ex",
+      "lines": 145,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/formdb_http/spatial_index.ex",
+      "lines": 271,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/formdb_http/temporal_index.ex",
+      "lines": 237,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/formdb_http/query_cache.ex",
+      "lines": 243,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/formdb_http/database_registry.ex",
+      "lines": 72,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/formdb_http_web/plugs/rate_limiter.ex",
+      "lines": 166,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/formdb_http_web/metrics/collector.ex",
+      "lines": 130,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "test_http_api.sh",
+      "lines": 69,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test_geo_api.sh",
+      "lines": 112,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test_analytics_api.sh",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 12,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test_observability.sh",
+      "lines": 56,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test_auth.sh",
+      "lines": 76,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test_persistence.sh",
+      "lines": 128,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test_m13.sh",
+      "lines": 175,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 12,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bench/run_all_benchmarks.sh",
+      "lines": 134,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu",
+    "memory",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "test_http_api.sh",
+        "to": "test_geo_api.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "test_geo_api.sh",
+        "to": "test_analytics_api.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "test_analytics_api.sh",
+        "to": "test_observability.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "test_observability.sh",
+        "to": "test_auth.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "test_auth.sh",
+        "to": "test_persistence.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "test_persistence.sh",
+        "to": "test_m13.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/formdb_http/graceful_shutdown.ex",
+        "to": "lib/formdb_http/spatial_index.ex",
+        "relation": "shared_dir:lib/formdb_http",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/formdb_http/spatial_index.ex",
+        "to": "lib/formdb_http/temporal_index.ex",
+        "relation": "shared_dir:lib/formdb_http",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/formdb_http/temporal_index.ex",
+        "to": "lib/formdb_http/query_cache.ex",
+        "relation": "shared_dir:lib/formdb_http",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/formdb_http/query_cache.ex",
+        "to": "lib/formdb_http/database_registry.ex",
+        "relation": "shared_dir:lib/formdb_http",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/formdb_http/graceful_shutdown.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/graceful_shutdown.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/graceful_shutdown.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/spatial_index.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/spatial_index.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/spatial_index.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/temporal_index.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/temporal_index.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/temporal_index.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/query_cache.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/query_cache.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/query_cache.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/database_registry.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/database_registry.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http/database_registry.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http_web/plugs/rate_limiter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http_web/plugs/rate_limiter.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http_web/plugs/rate_limiter.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http_web/metrics/collector.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http_web/metrics/collector.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/formdb_http_web/metrics/collector.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "test_http_api.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_http_api.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_http_api.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_geo_api.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_geo_api.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_geo_api.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_analytics_api.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_analytics_api.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_analytics_api.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_observability.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_observability.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_observability.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_auth.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_auth.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_auth.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_persistence.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_persistence.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_persistence.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_m13.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_m13.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test_m13.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bench/run_all_benchmarks.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bench/run_all_benchmarks.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bench/run_all_benchmarks.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "test_http_api.sh",
+          "test_geo_api.sh",
+          "test_analytics_api.sh",
+          "test_persistence.sh",
+          "bench/run_all_benchmarks.sh"
+        ],
+        "frameworks": [
+          "OTP",
+          "Phoenix",
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "AtomExhaustion",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "lib/formdb_http/temporal_index.ex"
+        ],
+        "frameworks": [
+          "OTP",
+          "Phoenix",
+          "WebServer"
+        ],
+        "relation": "AtomExhaustion->Memory"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "test_http_api.sh",
+          "test_geo_api.sh",
+          "test_analytics_api.sh",
+          "test_persistence.sh"
+        ],
+        "frameworks": [
+          "OTP",
+          "Phoenix",
+          "WebServer"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "lib/formdb_http/formdb.ex",
+          "lib/formdb_http_web.ex",
+          "lib/formdb_nif.ex"
+        ],
+        "frameworks": [
+          "OTP",
+          "Phoenix",
+          "WebServer"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      }
+    ]
+  }
+}

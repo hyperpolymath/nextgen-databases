@@ -1,0 +1,130 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# VeriSimDB - The Veridical Simulacrum Database
+# An 8-core multimodal database (octad) with self-normalization
+
+[workspace]
+resolver = "2"
+members = [
+    "rust-core/verisim-graph",
+    "rust-core/verisim-vector",
+    "rust-core/verisim-tensor",
+    "rust-core/verisim-semantic",
+    "rust-core/verisim-document",
+    "rust-core/verisim-temporal",
+    "rust-core/verisim-provenance",
+    "rust-core/verisim-spatial",
+    "rust-core/verisim-hexad",
+    "rust-core/verisim-normalizer",
+    "rust-core/verisim-drift",
+    "rust-core/verisim-planner",
+    "rust-core/verisim-api",
+    "rust-core/verisim-repl",
+    "rust-core/verisim-wal",
+    "rust-core/verisim-storage",
+    "rust-core/verisim-nif",
+    "benches",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]
+license = "PMPL-1.0-or-later"
+repository = "https://gitlab.com/hyperpolymath/verisimdb"
+homepage = "https://github.com/hyperpolymath/verisimdb"
+documentation = "https://github.com/hyperpolymath/verisimdb/tree/main/docs"
+keywords = ["database", "multimodal", "drift-detection", "federation", "consistency"]
+categories = ["database", "data-structures"]
+readme = "README.adoc"
+
+[workspace.dependencies]
+# Graph modality — SimpleGraphStore is default (pure Rust, no C++ linker needed).
+# Enable oxigraph-backend feature on verisim-graph for full RDF/SPARQL support.
+oxigraph = "0.4"
+
+# Vector modality (HNSW)
+hnsw_rs = "0.3"
+ndarray = "0.16"
+
+# Tensor modality
+burn = "0.20"
+
+# Semantic modality
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+ciborium = "0.2"  # CBOR for proof blobs
+
+# Document modality (LZ4 compression — pure Rust via lz4_flex, no zstd C library)
+tantivy = { version = "0.25", default-features = false, features = ["mmap", "lz4-compression"] }
+
+# Temporal modality
+chrono = { version = "0.4", features = ["serde"] }
+
+# API and networking
+axum = "0.8"
+tokio = { version = "1", features = ["full"] }
+tower = "0.5"
+hyper = "1.0"
+reqwest = { version = "0.12", default-features = false, features = ["json", "http2", "rustls-tls-webpki-roots-no-provider"] }
+
+# Serialization
+# bincode removed — not used in codebase. Use postcard or ciborium for future serialization needs.
+# bincode = "2.0.0-rc.3"
+postcard = { version = "1.0", features = ["alloc"] }
+
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# TLS (pure Rust via ring — no OpenSSL, no aws-lc-sys/cmake)
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+axum-server = { version = "0.7", default-features = false, features = ["tls-rustls-no-provider"] }
+
+# Testing
+proptest = "1.4"
+criterion = "0.5"
+
+# Async
+futures = "0.3"
+async-trait = "0.1"
+
+# Metrics
+prometheus = "0.14"
+
+# UUID
+uuid = { version = "1.11", features = ["v4"] }
+
+# Regex
+regex = "1.11"
+
+# Persistent storage (pure Rust, B-tree, ACID)
+redb = "3.1"
+
+# CRC (WAL integrity)
+crc32fast = "1.4"
+
+# Cryptography (ZKP proofs in semantic store)
+sha2 = "0.10"
+
+# GraphQL
+async-graphql = "7.2"
+async-graphql-axum = "7.2"
+
+# gRPC
+tonic = "0.14"
+tonic-prost = "0.14"
+prost = "0.14"
+prost-types = "0.14"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+
+# NOTE: lru 0.12.5 has RUSTSEC-2026-0002 (IterMut Stacked Borrows, LOW severity)
+# Transitive dependency of tantivy 0.25.0 and ratatui 0.29.0
+# Waiting for upstream fix. Not directly patchable without forking dependencies.

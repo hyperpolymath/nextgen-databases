@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://verisim.db/schema/hexad-status.json",
+  "$comment": "SPDX-License-Identifier: PMPL-1.0-or-later",
+  "title": "HexadStatus",
+  "description": "Status of a hexad entity across all eight octad modalities. Tracks creation time, modification time, current version, and which modalities are populated.",
+  "type": "object",
+  "required": ["id", "created_at", "modified_at", "version", "modality_status"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Entity identifier (matches the parent Hexad's id)."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the entity was first created."
+    },
+    "modified_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of the most recent modification."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Monotonically increasing version number. Incremented on each mutation."
+    },
+    "modality_status": {
+      "type": "object",
+      "description": "Boolean flags indicating which of the 8 octad modalities are populated for this entity.",
+      "required": ["graph", "vector", "tensor", "semantic", "document", "temporal", "provenance", "spatial"],
+      "properties": {
+        "graph": { "type": "boolean", "description": "Whether the graph modality is populated." },
+        "vector": { "type": "boolean", "description": "Whether the vector modality is populated." },
+        "tensor": { "type": "boolean", "description": "Whether the tensor modality is populated." },
+        "semantic": { "type": "boolean", "description": "Whether the semantic modality is populated." },
+        "document": { "type": "boolean", "description": "Whether the document modality is populated." },
+        "temporal": { "type": "boolean", "description": "Whether the temporal modality is populated." },
+        "provenance": { "type": "boolean", "description": "Whether the provenance modality is populated." },
+        "spatial": { "type": "boolean", "description": "Whether the spatial modality is populated." }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

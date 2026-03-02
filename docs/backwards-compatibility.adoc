@@ -1,0 +1,669 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= VQL Backwards Compatibility Strategy
+:toc:
+:toc-placement!:
+
+Strategy for maintaining backwards compatibility across VQL versions, schema evolution, and API changes.
+
+toc::[]
+
+== Overview
+
+VeriSimDB follows **semantic versioning** (SemVer) for VQL and API compatibility:
+
+- **Major version** (1.x.x → 2.x.x): Breaking changes allowed
+- **Minor version** (1.1.x → 1.2.x): New features, backwards compatible
+- **Patch version** (1.1.1 → 1.1.2): Bug fixes only, backwards compatible
+
+Current VQL version: **1.0.0**
+
+== Compatibility Guarantees
+
+=== What We Guarantee
+
+**Query Syntax (VQL):**
+
+- Valid VQL 1.x queries will parse and execute correctly in all 1.x releases
+- New keywords/operators are additive (won't conflict with existing identifiers)
+- Deprecations announced at least 2 minor versions before removal
+
+**API Endpoints:**
+
+- `/api/v1/*` endpoints remain stable within major version
+- New endpoints added without removing old ones
+- Response format changes are backwards compatible (new fields added, never removed)
+
+**Data Formats:**
+
+- Hexad storage format versioned independently
+- Old format readers maintained for at least 1 year after new format introduction
+- Automatic migration on read for legacy formats
+
+=== What We Don't Guarantee
+
+**Performance:**
+
+- Query performance may change between versions (optimizations, regressions)
+- Federation latency depends on network and remote store versions
+
+**Error Messages:**
+
+- Error message text may change (error codes remain stable)
+- Additional validation may be added (making previously accepted queries invalid)
+
+**Internal APIs:**
+
+- ReScript/Elixir module APIs may change without notice
+- Use public HTTP API for external integrations
+
+== Versioning Strategy
+
+=== VQL Syntax Versions
+
+Each query can optionally specify a version:
+
+```vql
+VERSION 1.0;
+
+FROM verisim:semantic
+WHERE hexad.types INCLUDES "http://schema.org/Person"
+LIMIT 10;
+```
+
+**Default Behavior:**
+
+- If `VERSION` is omitted, use latest stable version (currently 1.0)
+- Parser detects version and applies appropriate syntax rules
+- Mixing versions in a single query is NOT allowed
+
+=== API Versioning
+
+**URL-based versioning:**
+
+```
+/api/v1/hexads          # Version 1 (current)
+/api/v2/hexads          # Version 2 (future)
+```
+
+**Multiple versions supported concurrently:**
+
+- Old API versions maintained for at least 12 months after new version release
+- Deprecation warnings in response headers: `X-API-Deprecated: true; sunset=2026-12-31`
+
+=== Schema Evolution
+
+**Hexad schema changes:**
+
+```scheme
+;; STATE.scm tracks schema version
+(metadata
+  (schema-version "1.2.0")  ; Current Hexad schema
+  (min-compatible-version "1.0.0"))  ; Oldest readable format
+```
+
+**Format Evolution:**
+
+1. **Adding fields** (backwards compatible):
+   - Old readers ignore unknown fields
+   - New readers provide defaults for missing fields
+
+2. **Removing fields** (breaking change):
+   - Deprecated for 2+ minor versions first
+   - Removal only in major version bump
+
+3. **Changing field types** (breaking change):
+   - Add new field with new type
+   - Deprecate old field
+   - Remove old field in major version bump
+
+== Breaking vs Non-Breaking Changes
+
+=== Non-Breaking Changes (Minor Version)
+
+**Safe to add in 1.x.x releases:**
+
+- New VQL keywords (if not previously valid identifiers)
+- New modality types
+- New query operators (`INTERSECT`, `UNION ALL`)
+- New API endpoints
+- New response fields (optional)
+- New error codes
+- Performance optimizations
+
+**Example: Adding `INTERSECT` operator**
+
+```vql
+-- Version 1.2.0 introduces INTERSECT
+-- Old queries (1.0.0) continue to work
+
+-- New query using INTERSECT (requires 1.2.0+)
+VERSION 1.2;
+(FROM verisim:graph WHERE hexad.id IN @set1)
+INTERSECT
+(FROM verisim:graph WHERE hexad.id IN @set2);
+```
+
+=== Breaking Changes (Major Version)
+
+**Requires 2.0.0:**
+
+- Removing VQL keywords
+- Changing query semantics (e.g., `LIMIT` behavior)
+- Removing API endpoints
+- Removing response fields
+- Changing error codes
+
+**Example: Removing deprecated `USING` clause**
+
+```vql
+-- Version 1.0.0 syntax (deprecated in 1.2.0)
+FROM verisim:graph
+USING CONTRACT CitationContract
+WHERE hexad.types INCLUDES "Paper";
+
+-- Version 2.0.0 syntax (USING removed, VERIFY required)
+FROM verisim:graph
+VERIFY CitationContract
+WHERE hexad.types INCLUDES "Paper";
+```
+
+== Deprecation Process
+
+=== Timeline
+
+1. **Announce deprecation** (version N.x.x):
+   - Add deprecation warning to docs
+   - Log warning when deprecated feature is used
+   - Add `X-Deprecated: true` header to API responses
+
+2. **Maintain support** (versions N.x.x through N+1.x.x):
+   - Feature still works
+   - Warnings continue
+
+3. **Remove** (version N+2.0.0):
+   - Feature removed
+   - Queries using deprecated feature return error
+
+**Minimum timeline:** 6 months between deprecation and removal
+
+=== Deprecation Warnings
+
+**VQL Parser:**
+
+```rescript
+// VQLParser.res
+let parseUsingClause = (tokens: array<token>): result<ast, parseError> => {
+  Logger.warn("USING clause is deprecated since 1.2.0. Use VERIFY instead. Will be removed in 2.0.0.")
+
+  // Still parse correctly
+  parseUsingClauseImpl(tokens)
+}
+```
+
+**API Response Headers:**
+
+```http
+HTTP/1.1 200 OK
+X-Deprecated: true
+X-Deprecated-Since: 1.2.0
+X-Sunset: 2026-12-31
+Sunset: Wed, 31 Dec 2026 23:59:59 GMT
+Link: <https://verisimdb.org/docs/migration-guide>; rel="sunset"
+```
+
+== Migration Strategies
+
+=== Strategy 1: Version Pinning
+
+**Use case:** Stability-critical systems
+
+```elixir
+# config.exs
+config :verisim,
+  vql_version: "1.0.0",  # Pin to specific version
+  api_version: "v1"
+```
+
+**Trade-offs:**
+
+- ✅ No surprises from version updates
+- ❌ Miss performance improvements
+- ❌ Miss security fixes
+
+=== Strategy 2: Conservative Upgrades
+
+**Use case:** Production systems with good test coverage
+
+- Upgrade to latest **minor** version automatically (1.1.x → 1.2.x)
+- Upgrade to latest **major** version manually (1.x.x → 2.x.x)
+
+```yaml
+# Dockerfile
+ENV VQL_VERSION="1.x"  # Auto-upgrade within major version
+```
+
+**Trade-offs:**
+
+- ✅ Get bug fixes and features
+- ✅ No breaking changes
+- ⚠️ Require testing before major version upgrades
+
+=== Strategy 3: Gradual Migration
+
+**Use case:** Large codebases with many queries
+
+1. **Identify deprecated features:**
+   ```bash
+   grep -r "USING" queries/
+   # Find all queries using deprecated syntax
+   ```
+
+2. **Update queries gradually:**
+   ```vql
+   -- Old query (1.0.0)
+   FROM verisim:graph
+   USING CONTRACT CitationContract
+   WHERE ...;
+
+   -- New query (1.2.0+)
+   VERSION 1.2;
+   FROM verisim:graph
+   VERIFY CitationContract
+   WHERE ...;
+   ```
+
+3. **Test both versions side-by-side:**
+   ```elixir
+   old_result = VQL.parse_and_execute(old_query, version: "1.0.0")
+   new_result = VQL.parse_and_execute(new_query, version: "1.2.0")
+
+   assert old_result.data == new_result.data
+   ```
+
+4. **Switch cutover:**
+   ```elixir
+   # Deploy new queries
+   # Monitor for 1 week
+   # Remove old queries
+   ```
+
+== Compatibility Testing
+
+=== Version Compatibility Matrix
+
+**Test all VQL versions against current parser:**
+
+```elixir
+# test/vql_compatibility_test.exs
+defmodule VeriSim.VQLCompatibilityTest do
+  use ExUnit.Case
+
+  @vql_versions ["1.0.0", "1.1.0", "1.2.0"]
+  @test_queries [
+    # Basic SELECT
+    """
+    VERSION 1.0;
+    FROM verisim:graph
+    WHERE hexad.id = @id;
+    """,
+
+    # WITH clause (added 1.1.0)
+    """
+    VERSION 1.1;
+    WITH VERIFICATION CitationContract
+    FROM verisim:graph
+    WHERE hexad.types INCLUDES "Paper";
+    """,
+
+    # INTERSECT (added 1.2.0)
+    """
+    VERSION 1.2;
+    (FROM verisim:graph WHERE ...) INTERSECT (FROM verisim:vector WHERE ...);
+    """
+  ]
+
+  test "parse all versions" do
+    for query <- @test_queries do
+      assert {:ok, _ast} = VQL.parse(query)
+    end
+  end
+
+  test "1.0.0 queries work in all versions" do
+    query_1_0 = """
+    VERSION 1.0;
+    FROM verisim:graph LIMIT 10;
+    """
+
+    for version <- @vql_versions do
+      config = %{vql_version: version}
+      assert {:ok, _result} = VQL.execute(query_1_0, config)
+    end
+  end
+end
+```
+
+=== Upgrade Testing
+
+**Test suite for major version upgrades:**
+
+```elixir
+# test/upgrade_test.exs
+defmodule VeriSim.UpgradeTest do
+  use ExUnit.Case
+
+  @tag :upgrade
+  test "1.x data readable in 2.x" do
+    # Create hexad with 1.x format
+    hexad_1_x = create_hexad_v1()
+
+    # Upgrade to 2.x
+    Application.put_env(:verisim, :schema_version, "2.0.0")
+
+    # Read hexad (should auto-migrate)
+    assert {:ok, hexad_2_x} = VeriSim.Hexad.read(hexad_1_x.id)
+
+    # Verify data integrity
+    assert hexad_1_x.title == hexad_2_x.title
+    assert hexad_1_x.body == hexad_2_x.body
+  end
+
+  @tag :upgrade
+  test "1.x queries fail gracefully in 2.x if deprecated features used" do
+    deprecated_query = """
+    VERSION 1.0;
+    FROM verisim:graph
+    USING CONTRACT CitationContract
+    WHERE hexad.id = @id;
+    """
+
+    Application.put_env(:verisim, :vql_version, "2.0.0")
+
+    assert {:error, {:deprecated_syntax, "USING clause removed in 2.0.0"}} =
+      VQL.parse(deprecated_query)
+  end
+end
+```
+
+== Data Format Versioning
+
+=== Hexad Storage Format
+
+**Format version embedded in each hexad:**
+
+```json
+{
+  "_format_version": "1.2.0",
+  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "Machine Learning Paper",
+  "body": "...",
+  "created_at": "2025-01-15T10:30:00Z"
+}
+```
+
+**Format evolution example:**
+
+```rust
+// rust-core/verisim-hexad/src/format.rs
+
+#[derive(Serialize, Deserialize)]
+#[serde(tag = "_format_version")]
+pub enum HexadFormat {
+    #[serde(rename = "1.0.0")]
+    V1_0_0(HexadV1_0_0),
+
+    #[serde(rename = "1.1.0")]
+    V1_1_0(HexadV1_1_0),
+
+    #[serde(rename = "1.2.0")]
+    V1_2_0(HexadV1_2_0),
+}
+
+impl HexadFormat {
+    /// Read hexad in any format, auto-migrate to latest
+    pub fn read_and_migrate(data: &[u8]) -> Result<HexadV1_2_0, Error> {
+        let format: HexadFormat = serde_json::from_slice(data)?;
+
+        match format {
+            HexadFormat::V1_0_0(hexad) => hexad.migrate_to_1_1_0()?.migrate_to_1_2_0(),
+            HexadFormat::V1_1_0(hexad) => hexad.migrate_to_1_2_0(),
+            HexadFormat::V1_2_0(hexad) => Ok(hexad),
+        }
+    }
+}
+
+impl HexadV1_0_0 {
+    fn migrate_to_1_1_0(self) -> Result<HexadV1_1_0, Error> {
+        Ok(HexadV1_1_0 {
+            hexad_id: self.hexad_id,
+            title: self.title,
+            body: self.body,
+            created_at: self.created_at,
+            // New field in 1.1.0 (default value)
+            provenance: None,
+        })
+    }
+}
+```
+
+=== Migration on Read vs Write
+
+**Read migration (preferred):**
+
+- Old format stored on disk
+- Auto-migrate to new format when reading
+- No disk writes required
+- Lazy migration (only migrates what's accessed)
+
+**Write migration (for breaking changes):**
+
+- Background job migrates all hexads
+- Required when old format becomes unsupported
+- Progress tracked: `migration_status.json`
+
+```elixir
+# lib/verisim/migration_worker.ex
+defmodule VeriSim.MigrationWorker do
+  @doc """
+  Migrate all hexads from old format to new format.
+  """
+  def migrate_all_hexads(from_version, to_version) do
+    total = count_hexads(from_version)
+
+    Stream.iterate(0, &(&1 + 100))
+    |> Stream.take_while(&(&1 < total))
+    |> Enum.each(fn offset ->
+      hexads = fetch_hexads(from_version, limit: 100, offset: offset)
+
+      hexads
+      |> Enum.each(fn hexad ->
+        migrated = migrate_hexad(hexad, from_version, to_version)
+        write_hexad(migrated)
+      end)
+
+      update_progress(offset + length(hexads), total)
+    end)
+  end
+end
+```
+
+== Federation Compatibility
+
+=== Mixed Version Networks
+
+**Challenge:** Federated stores may run different VeriSimDB versions.
+
+**Solution: Version negotiation**
+
+```http
+POST /api/v1/federation/query HTTP/1.1
+Host: remote-store.edu
+X-VeriSimDB-Version: 1.2.0
+X-VQL-Version: 1.0.0
+
+{
+  "query": "FROM verisim:graph WHERE hexad.id = @id"
+}
+```
+
+**Response:**
+
+```http
+HTTP/1.1 200 OK
+X-VeriSimDB-Version: 1.1.0
+X-VQL-Version-Supported: 1.0.0, 1.1.0
+
+{
+  "data": [...]
+}
+```
+
+**Version compatibility rules:**
+
+1. **VQL version:** Query must use syntax supported by remote store
+   - If remote supports `[1.0.0, 1.1.0]` and query uses `1.2.0` → error
+   - Client downgrades query syntax if possible
+
+2. **API version:** Client uses highest common API version
+   - Local has `v1`, remote has `v1, v2` → use `v1`
+
+3. **Data format:** Responses auto-migrated by receiving store
+
+=== Feature Detection
+
+**Query store capabilities before sending complex queries:**
+
+```elixir
+def query_federation(stores, query) do
+  # Check if all stores support required features
+  required_features = VQL.detect_features(query)
+  # [:zkp_verification, :tensor_modality, :drift_detection]
+
+  compatible_stores = Enum.filter(stores, fn store ->
+    store_features = fetch_capabilities(store)
+    MapSet.subset?(required_features, store_features)
+  end)
+
+  if Enum.empty?(compatible_stores) do
+    {:error, {:insufficient_stores, "No stores support required features"}}
+  else
+    execute_federated_query(compatible_stores, query)
+  end
+end
+```
+
+**Store capabilities endpoint:**
+
+```http
+GET /api/v1/capabilities HTTP/1.1
+
+Response:
+{
+  "verisimdb_version": "1.2.0",
+  "vql_versions": ["1.0.0", "1.1.0", "1.2.0"],
+  "modalities": ["graph", "vector", "semantic", "document", "temporal"],
+  "features": [
+    "zkp_verification",
+    "drift_detection",
+    "cache_sharing",
+    "reversibility"
+  ],
+  "limits": {
+    "max_query_size": 1048576,
+    "max_results": 10000,
+    "timeout_ms": 60000
+  }
+}
+```
+
+== Client Library Compatibility
+
+=== Language Bindings
+
+**Support multiple language clients:**
+
+- Rust client: `verisim-client-rs` (official)
+- Python client: `verisim-client-py` (community)
+- JavaScript client: `verisim-client-js` (official, Deno)
+
+**Version compatibility:**
+
+```toml
+# Cargo.toml
+[dependencies]
+verisim-client = "1.2.0"  # Client version matches server minor version
+
+# Server compatibility:
+# verisim-client 1.x.x works with verisim-server 1.y.z (any y, z)
+# verisim-client 2.x.x works with verisim-server 2.y.z (any y, z)
+```
+
+=== Client API Stability
+
+**Stable client API (no breaking changes in minor versions):**
+
+```rust
+// Stable API
+pub trait VeriSimClient {
+    fn query(&self, vql: &str) -> Result<QueryResult>;
+    fn create_hexad(&self, hexad: Hexad) -> Result<HexadId>;
+    fn get_hexad(&self, id: HexadId) -> Result<Hexad>;
+}
+
+// Adding new methods is OK (minor version bump)
+pub trait VeriSimClient {
+    fn query(&self, vql: &str) -> Result<QueryResult>;
+    fn create_hexad(&self, hexad: Hexad) -> Result<HexadId>;
+    fn get_hexad(&self, id: HexadId) -> Result<Hexad>;
+
+    // New in 1.2.0
+    fn batch_query(&self, queries: &[&str]) -> Result<Vec<QueryResult>>;
+}
+```
+
+== Compatibility Checklist
+
+=== Before Releasing Minor Version (1.x.x → 1.y.x)
+
+- [ ] All existing tests pass with new changes
+- [ ] New features have tests
+- [ ] Deprecation warnings added for features planned for removal
+- [ ] Documentation updated with new features
+- [ ] `CHANGELOG.md` updated with new features
+- [ ] No breaking changes to API, VQL syntax, or data formats
+- [ ] Federation compatibility tested with previous minor version
+
+=== Before Releasing Major Version (1.x.x → 2.x.x)
+
+- [ ] Migration guide written for all breaking changes
+- [ ] Deprecated features removed (with at least 6 months notice)
+- [ ] Data migration tools provided
+- [ ] Previous major version supported for at least 12 months
+- [ ] All examples and tutorials updated
+- [ ] Client libraries updated
+- [ ] Federation compatibility tested
+- [ ] Rollback procedure documented
+
+== Summary
+
+VeriSimDB maintains backwards compatibility through:
+
+1. **Semantic versioning** - Clear breaking vs non-breaking change policy
+2. **Deprecation timeline** - At least 6 months notice before removal
+3. **Format versioning** - Auto-migration for data formats
+4. **API versioning** - Multiple API versions supported concurrently
+5. **VQL versioning** - Explicit version markers in queries
+6. **Feature detection** - Capability negotiation for federation
+7. **Comprehensive testing** - Compatibility test suite
+
+**For users:**
+
+- Pin to major version for stability
+- Upgrade to minor versions for bug fixes and features
+- Plan major version upgrades carefully with migration guide
+
+**For developers:**
+
+- Follow deprecation process for all breaking changes
+- Maintain compatibility test suite
+- Document version changes in CHANGELOG.md

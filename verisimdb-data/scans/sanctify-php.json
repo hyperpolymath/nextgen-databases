@@ -1,0 +1,152 @@
+{
+  "program_path": ".",
+  "language": "haskell",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/Sanctify/WordPress/Security.hs",
+      "severity": "Medium",
+      "description": "4 partial function calls (head/tail/fromJust) in src/Sanctify/WordPress/Security.hs",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 9239,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 10,
+    "allocation_sites": 0,
+    "io_operations": 10,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "app/Main.hs",
+      "lines": 585,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Sanctify/Analysis/Security.hs",
+      "lines": 645,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Sanctify/Analysis/Advanced.hs",
+      "lines": 438,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Sanctify/Transform/TypeHints.hs",
+      "lines": 258,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Sanctify/WordPress/Security.hs",
+      "lines": 519,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Sanctify/Parser.hs",
+      "lines": 848,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Sanctify/Ruleset.hs",
+      "lines": 445,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test/Main.hs",
+      "lines": 256,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/Sanctify/Parser.hs",
+        "to": "src/Sanctify/Ruleset.hs",
+        "relation": "shared_dir:src/Sanctify",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Sanctify/Analysis/Security.hs",
+        "to": "src/Sanctify/Analysis/Advanced.hs",
+        "relation": "shared_dir:src/Sanctify/Analysis",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/Sanctify/WordPress/Security.hs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

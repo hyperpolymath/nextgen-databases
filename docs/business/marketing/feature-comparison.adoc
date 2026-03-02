@@ -1,0 +1,446 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB Feature Comparison Matrix
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-02-28
+:revremark: Competitive feature comparison for marketing and sales enablement
+:toc: macro
+:toclevels: 2
+:sectnums:
+:icons: font
+
+[abstract]
+A detailed feature-by-feature comparison of VeriSimDB against the leading
+databases in the graph, vector, multi-model, and multimodal segments: Neo4j,
+Pinecone, Weaviate, ArangoDB, and SurrealDB. This document is intended for
+technical evaluators, architects, and procurement teams.
+
+toc::[]
+
+== Summary Matrix
+
+Legend: {check} = Full support | {half} = Partial/limited | {cross} = Not supported
+
+[cols="4,1,1,1,1,1,1"]
+|===
+| Feature | VeriSimDB | Neo4j | Pinecone | Weaviate | ArangoDB | SurrealDB
+
+7+h| *Data Modalities*
+
+| Graph queries (traversals, path finding)
+| {check}
+| {check}
+| {cross}
+| {cross}
+| {check}
+| {check}
+
+| Vector search (ANN, similarity)
+| {check}
+| {half}
+| {check}
+| {check}
+| {cross}
+| {check}
+
+| Full-text search
+| {check}
+| {check}
+| {cross}
+| {check}
+| {check}
+| {check}
+
+| Tensor operations (multi-dimensional)
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+| Temporal versioning (bitemporal)
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+| Provenance tracking (lineage)
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+| Spatial queries (GIS)
+| {check}
+| {check}
+| {cross}
+| {cross}
+| {check}
+| {cross}
+
+| Semantic/ontological (RDF, knowledge)
+| {check}
+| {cross}
+| {cross}
+| {half}
+| {cross}
+| {cross}
+
+| Document storage (schemaless JSON)
+| {check}
+| {half}
+| {cross}
+| {check}
+| {check}
+| {check}
+
+| *Modalities per entity*
+| *8*
+| *1-2*
+| *1*
+| *2*
+| *3*
+| *3*
+
+7+h| *Cross-Modal Intelligence*
+
+| Cross-modal drift detection
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+| Coherence scoring
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+| Self-normalisation (auto-repair)
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+| Cross-modal joins
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {half}
+| {half}
+
+| Multi-modal consistency guarantees
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+7+h| *Query Language*
+
+| Purpose-built query language
+| VQL
+| Cypher
+| N/A (API)
+| GraphQL
+| AQL
+| SurrealQL
+
+| Dependent-type proofs (compile-time)
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+| Cross-modal query expressions
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {half}
+| {half}
+
+| Formal semantics specification
+| {check}
+| {half}
+| {cross}
+| {cross}
+| {half}
+| {cross}
+
+7+h| *Federation & Integration*
+
+| Federation across heterogeneous DBs
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+| PostgreSQL connector
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+| ArangoDB connector
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| N/A
+| {cross}
+
+| Elasticsearch connector
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+| Neo4j connector
+| {check}
+| N/A
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+7+h| *Engineering & Operations*
+
+| Open source
+| PMPL
+| GPLv3
+| Proprietary
+| BSD-3-Clause
+| Apache 2.0
+| BSL 1.1
+
+| Core language
+| Rust
+| Java
+| Proprietary
+| Go
+| C++
+| Rust
+
+| Fault tolerance model
+| OTP (Elixir)
+| JVM
+| Managed
+| None
+| Foxx
+| None
+
+| Managed cloud offering
+| No (roadmap)
+| Neo4j Aura
+| Yes (only)
+| Weaviate Cloud
+| ArangoDB Oasis
+| SurrealDB Cloud
+
+| SLSA provenance
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+
+| SBOM generation
+| {check}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+| {cross}
+|===
+
+== Detailed Analysis by Competitor
+
+=== Neo4j
+
+*Category:* Graph database (market leader)
+
+*Strengths:*
+
+* Mature graph query language (Cypher), widely adopted
+* Large ecosystem of tools, drivers, and integrations
+* Neo4j Aura managed cloud service
+* Strong community and enterprise customer base
+* GDS (Graph Data Science) library for analytics
+
+*Limitations relative to VeriSimDB:*
+
+* *Single modality:* Graph-only. Vector search is a recent, limited addition
+  (Neo4j 5.x vector index) without deep integration into the graph model.
+* *No drift detection:* No concept of cross-modal consistency. If a graph node
+  disagrees with its vector embedding, Neo4j has no mechanism to detect this.
+* *No temporal versioning:* No built-in bitemporal queries or time-travel.
+* *No provenance:* Lineage tracking requires external tooling.
+* *No federation:* Cannot federate with other databases.
+* *GPLv3 license:* More restrictive than PMPL for embedding in proprietary
+  products.
+
+=== Pinecone
+
+*Category:* Vector database (managed service)
+
+*Strengths:*
+
+* Best-in-class vector similarity search performance
+* Fully managed, zero-ops deployment
+* Simple API for embedding storage and retrieval
+* Strong adoption in AI/ML community
+* Serverless pricing model
+
+*Limitations relative to VeriSimDB:*
+
+* *Single modality:* Vector-only. No graph, document, temporal, or spatial
+  capabilities.
+* *No drift detection:* No awareness of whether embeddings are consistent with
+  source data or other representations.
+* *No query language:* API-only access; no expressive query language for complex
+  operations.
+* *Proprietary:* Closed-source, managed-only. No self-hosted option.
+* *No federation:* Isolated from existing data infrastructure.
+* *Vendor lock-in:* Data and operations entirely within Pinecone's managed service.
+
+=== Weaviate
+
+*Category:* Vector database with object storage
+
+*Strengths:*
+
+* Combines vector search with structured object storage
+* GraphQL API for flexible querying
+* Built-in vectorisation modules (integrates with OpenAI, Cohere, etc.)
+* Open source (BSD-3-Clause)
+* Good developer experience and documentation
+
+*Limitations relative to VeriSimDB:*
+
+* *Two modalities:* Vector + object/document. No graph traversals, tensor
+  operations, temporal versioning, provenance, or spatial queries.
+* *No drift detection:* No mechanism to detect when vector embeddings diverge
+  from their source objects.
+* *No self-normalisation:* No automatic reconciliation of inconsistent data.
+* *No formal verification:* No dependent-type proofs for query correctness.
+* *No federation:* Cannot connect to existing databases.
+* *Limited cross-modal operations:* Vector-object joins are basic; no coherence
+  scoring.
+
+=== ArangoDB
+
+*Category:* Multi-model database
+
+*Strengths:*
+
+* Three models in one database: graph, document, key-value
+* AQL query language supports cross-model queries
+* Mature, production-tested (since 2014)
+* Foxx microservices framework for server-side logic
+* Apache 2.0 license
+* ArangoSearch for full-text search
+
+*Limitations relative to VeriSimDB:*
+
+* *Three modalities:* Graph + document + key-value. No vector search, tensor
+  operations, temporal versioning, provenance, or spatial queries.
+* *No drift detection:* ArangoDB can store data in multiple models but has no
+  mechanism to verify that those models are consistent with each other. A graph
+  edge and a document describing the same relationship can diverge without
+  detection.
+* *No self-normalisation:* No automatic reconciliation.
+* *No formal verification:* AQL is not formally specified; no dependent-type
+  proofs.
+* *No federation:* Cannot connect to external databases.
+* *C++ core:* Higher risk of memory safety issues compared to Rust.
+
+=== SurrealDB
+
+*Category:* Multi-model database (newer entrant)
+
+*Strengths:*
+
+* Modern multi-model: document, graph, and vector in one database
+* SurrealQL combines SQL-like syntax with graph and document operations
+* Rust core for performance and memory safety
+* Record links and graph traversals
+* Real-time subscriptions via WebSocket
+* Growing community and developer enthusiasm
+
+*Limitations relative to VeriSimDB:*
+
+* *Three modalities:* Document + graph + vector (recent). No tensor, temporal,
+  provenance, or spatial capabilities.
+* *No drift detection:* No cross-modal consistency checking despite supporting
+  multiple models.
+* *No self-normalisation:* No automatic repair of divergent data.
+* *No formal verification:* SurrealQL has no formal semantics or dependent-type
+  proofs.
+* *No federation:* Cannot connect to external databases.
+* *BSL 1.1 license:* Business Source License restricts commercial use until
+  source-available conversion date.
+* *Maturity:* Younger project; production readiness is less established than
+  ArangoDB or Neo4j.
+
+== Why Cross-Modal Drift Detection Cannot Be Retrofitted
+
+The most common question from technical evaluators is: "Why can't Neo4j/ArangoDB/
+SurrealDB just add drift detection as a feature?"
+
+The answer is architectural. Cross-modal drift detection requires:
+
+1. *A unified entity model:* Every representation of an entity must be linked at
+   the storage layer so the database knows they represent the same real-world
+   thing. Existing multi-model databases store models independently.
+
+2. *Coherence metrics per modality pair:* The database must define what
+   "consistency" means between each pair of modalities (graph-vector, graph-
+   document, vector-temporal, etc.). This is combinatorial: 8 modalities produce
+   28 pairwise consistency functions.
+
+3. *Continuous monitoring infrastructure:* Drift detection cannot be a batch
+   process. It must run on every write operation to maintain real-time coherence
+   scores. This requires deep integration into the write path.
+
+4. *Self-normalisation strategies:* The database must know how to reconcile each
+   modality pair when drift is detected. This requires domain-specific resolution
+   logic per modality.
+
+Retrofitting this onto an existing database would require rewriting the storage
+engine, write path, query planner, and replication layer. It is effectively a new
+database.
+
+== Conclusion
+
+VeriSimDB occupies a unique position in the database landscape. It is not the
+fastest graph database (Neo4j), the most scalable vector database (Pinecone), or
+the most developer-friendly multi-model database (SurrealDB). Its differentiation
+is orthogonal to these axes: *VeriSimDB is the only database that tracks whether
+multiple representations of the same entity agree with each other*.
+
+For organisations whose primary data challenge is cross-system inconsistency --
+which Gartner identifies as the leading cause of data quality costs -- VeriSimDB
+addresses the root cause rather than the symptoms.

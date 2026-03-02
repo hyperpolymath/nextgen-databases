@@ -1,0 +1,2209 @@
+{
+  "program_path": ".",
+  "language": "ada",
+  "frameworks": [
+    "WebServer",
+    "Phoenix",
+    "Networking",
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "src/core/cerro_crypto.adb",
+      "severity": "High",
+      "description": "1 Unchecked_* operations in src/core/cerro_crypto.adb",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "src/core/ct_transparency.adb",
+      "severity": "Low",
+      "description": "18 TODO/FIXME/HACK markers in src/core/ct_transparency.adb",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/core/ct_sbom.ads",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in src/core/ct_sbom.ads",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/importers/debian/cerro_import_debian.adb",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in src/importers/debian/cerro_import_debian.adb",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "src/policy/cerro_policy_enforce.adb",
+      "severity": "Low",
+      "description": "17 TODO/FIXME/HACK markers in src/policy/cerro_policy_enforce.adb",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/bindings/liboqs.adb",
+      "severity": "High",
+      "description": "3 Unchecked_* operations in src/bindings/liboqs.adb",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "verification/idris/CryptoProofs.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in verification/idris/CryptoProofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "verification/idris/SignatureProofs.idr",
+      "severity": "Critical",
+      "description": "9 believe_me (type checker bypass) in verification/idris/SignatureProofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "verification/idris/ImporterProofs.idr",
+      "severity": "Critical",
+      "description": "7 believe_me (type checker bypass) in verification/idris/ImporterProofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "verification/idris/Theorems.idr",
+      "severity": "Critical",
+      "description": "10 believe_me (type checker bypass) in verification/idris/Theorems.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "cerro_torre_stack/apps/svalinn/lib/svalinn_web.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in cerro_torre_stack/apps/svalinn/lib/svalinn_web.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "cerro_torre_stack/test_both_modes.sh",
+      "severity": "Medium",
+      "description": "76 potentially unquoted variable expansions in cerro_torre_stack/test_both_modes.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "tests/manual-e2e-test.sh",
+      "severity": "Medium",
+      "description": "23 potentially unquoted variable expansions in tests/manual-e2e-test.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 27834,
+    "unsafe_blocks": 44,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 164,
+    "io_operations": 213,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/cli/cerro_cli.ads",
+      "lines": 122,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/cerro_main.adb",
+      "lines": 152,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/cerro_cli.adb",
+      "lines": 2990,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 17,
+      "io_operations": 80,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/ct_test_crypto.adb",
+      "lines": 130,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/ct_test_parser.adb",
+      "lines": 106,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/cerro_explain.adb",
+      "lines": 674,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/cerro_cli_keygen_rust.adb",
+      "lines": 118,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/cerro_crypto.adb",
+      "lines": 1270,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/cerro_manifest.adb",
+      "lines": 1124,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/cerro_manifest.ads",
+      "lines": 230,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/cerro_provenance.ads",
+      "lines": 209,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/cerro_tar.adb",
+      "lines": 289,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/cerro_tar.ads",
+      "lines": 72,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/cerro_trust_store.adb",
+      "lines": 568,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/ct_registry.ads",
+      "lines": 343,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/ct_registry.adb",
+      "lines": 1106,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 12,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/ct_transparency.ads",
+      "lines": 358,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/ct_http.ads",
+      "lines": 435,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/ct_sbom.ads",
+      "lines": 502,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/ct_http.adb",
+      "lines": 692,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/ct_sbom.adb",
+      "lines": 1388,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/ct_json.ads",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/cerro_crypto_openssl.ads",
+      "lines": 100,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/cerro_crypto_openssl.adb",
+      "lines": 588,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 55,
+      "io_operations": 20,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/exporters/oci/cerro_export_oci.adb",
+      "lines": 436,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 24,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/exporters/rpm-ostree/cerro_export_ostree.ads",
+      "lines": 121,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/importers/debian/cerro_import_debian.adb",
+      "lines": 705,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/policy/cerro_selinux.adb",
+      "lines": 421,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 9,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/policy/cerro_policy_a2ml.ads",
+      "lines": 159,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/policy/cerro_policy_a2ml.adb",
+      "lines": 210,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/policy/cerro_policy_enforce.adb",
+      "lines": 241,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/runtime/cerro_runtime.adb",
+      "lines": 465,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/bindings/liboqs.ads",
+      "lines": 281,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/bindings/liboqs.adb",
+      "lines": 417,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/mvp/ct_build.py",
+      "lines": 244,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 13,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/mvp/ct_mvp.py",
+      "lines": 280,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/mvp/ct_pack.py",
+      "lines": 121,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/mvp/ct_plugin.py",
+      "lines": 40,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verification/idris/CryptoProofs.idr",
+      "lines": 105,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verification/idris/SignatureProofs.idr",
+      "lines": 116,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verification/idris/ImporterProofs.idr",
+      "lines": 162,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verification/idris/Theorems.idr",
+      "lines": 168,
+      "unsafe_blocks": 10,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cerro_torre_stack/apps/svalinn/lib/svalinn/vordr_adapter.ex",
+      "lines": 288,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cerro_torre_stack/apps/svalinn/mix.exs",
+      "lines": 92,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cerro_torre_stack/test_both_modes.sh",
+      "lines": 365,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 12,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/ct_test_e2e.adb",
+      "lines": 348,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/manual-e2e-test.sh",
+      "lines": 306,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 13,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "disk",
+    "memory",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_selinux.adb",
+        "to": "src/policy/cerro_policy_a2ml.ads",
+        "relation": "shared_dir:src/policy",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_a2ml.ads",
+        "to": "src/policy/cerro_policy_a2ml.adb",
+        "relation": "shared_dir:src/policy",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_a2ml.adb",
+        "to": "src/policy/cerro_policy_enforce.adb",
+        "relation": "shared_dir:src/policy",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli.ads",
+        "to": "src/cli/cerro_main.adb",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_main.adb",
+        "to": "src/cli/cerro_cli.adb",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli.adb",
+        "to": "src/cli/ct_test_crypto.adb",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/ct_test_crypto.adb",
+        "to": "src/cli/ct_test_parser.adb",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/ct_test_parser.adb",
+        "to": "src/cli/cerro_explain.adb",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_explain.adb",
+        "to": "src/cli/cerro_cli_keygen_rust.adb",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_build.py",
+        "to": "tools/mvp/ct_mvp.py",
+        "relation": "shared_dir:tools/mvp",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_mvp.py",
+        "to": "tools/mvp/ct_pack.py",
+        "relation": "shared_dir:tools/mvp",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_pack.py",
+        "to": "tools/mvp/ct_plugin.py",
+        "relation": "shared_dir:tools/mvp",
+        "weight": 1.0
+      },
+      {
+        "from": "src/bindings/liboqs.ads",
+        "to": "src/bindings/liboqs.adb",
+        "relation": "shared_dir:src/bindings",
+        "weight": 1.0
+      },
+      {
+        "from": "verification/idris/CryptoProofs.idr",
+        "to": "verification/idris/SignatureProofs.idr",
+        "relation": "shared_dir:verification/idris",
+        "weight": 1.0
+      },
+      {
+        "from": "verification/idris/SignatureProofs.idr",
+        "to": "verification/idris/ImporterProofs.idr",
+        "relation": "shared_dir:verification/idris",
+        "weight": 1.0
+      },
+      {
+        "from": "verification/idris/ImporterProofs.idr",
+        "to": "verification/idris/Theorems.idr",
+        "relation": "shared_dir:verification/idris",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ct_test_e2e.adb",
+        "to": "tests/manual-e2e-test.sh",
+        "relation": "shared_dir:tests",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_crypto.adb",
+        "to": "src/core/cerro_manifest.adb",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_manifest.adb",
+        "to": "src/core/cerro_manifest.ads",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_manifest.ads",
+        "to": "src/core/cerro_provenance.ads",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_provenance.ads",
+        "to": "src/core/cerro_tar.adb",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_tar.adb",
+        "to": "src/core/cerro_tar.ads",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_tar.ads",
+        "to": "src/core/cerro_trust_store.adb",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_trust_store.adb",
+        "to": "src/core/ct_registry.ads",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_registry.ads",
+        "to": "src/core/ct_registry.adb",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_registry.adb",
+        "to": "src/core/ct_transparency.ads",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_transparency.ads",
+        "to": "src/core/ct_http.ads",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_http.ads",
+        "to": "src/core/ct_sbom.ads",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_sbom.ads",
+        "to": "src/core/ct_http.adb",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_http.adb",
+        "to": "src/core/ct_sbom.adb",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_sbom.adb",
+        "to": "src/core/ct_json.ads",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_json.ads",
+        "to": "src/core/cerro_crypto_openssl.ads",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_crypto_openssl.ads",
+        "to": "src/core/cerro_crypto_openssl.adb",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/cli/cerro_cli.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_main.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_main.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_main.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_main.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/ct_test_crypto.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/ct_test_crypto.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/ct_test_crypto.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/ct_test_crypto.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/ct_test_parser.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/ct_test_parser.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/ct_test_parser.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/ct_test_parser.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_explain.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_explain.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_explain.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_explain.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli_keygen_rust.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli_keygen_rust.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli_keygen_rust.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cerro_cli_keygen_rust.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_crypto.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/core/cerro_crypto.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/core/cerro_crypto.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/core/cerro_crypto.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/core/cerro_manifest.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_manifest.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_manifest.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_manifest.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_manifest.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_manifest.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_manifest.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_manifest.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_provenance.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_provenance.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_provenance.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_provenance.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_tar.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_tar.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_tar.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_tar.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_tar.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_tar.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_tar.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_tar.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_trust_store.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_trust_store.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_trust_store.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_trust_store.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_registry.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_registry.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_registry.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_registry.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_registry.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_registry.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_registry.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_registry.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_transparency.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_transparency.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_transparency.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_transparency.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_http.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_http.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_http.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_http.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_sbom.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_sbom.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_sbom.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_sbom.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_http.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_http.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_http.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_http.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_sbom.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_sbom.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_sbom.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_sbom.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_json.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_json.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_json.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/ct_json.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_crypto_openssl.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_crypto_openssl.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_crypto_openssl.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_crypto_openssl.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_crypto_openssl.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_crypto_openssl.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_crypto_openssl.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/cerro_crypto_openssl.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/exporters/oci/cerro_export_oci.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/exporters/oci/cerro_export_oci.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/exporters/oci/cerro_export_oci.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/exporters/oci/cerro_export_oci.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/exporters/rpm-ostree/cerro_export_ostree.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/exporters/rpm-ostree/cerro_export_ostree.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/exporters/rpm-ostree/cerro_export_ostree.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/exporters/rpm-ostree/cerro_export_ostree.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/importers/debian/cerro_import_debian.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/importers/debian/cerro_import_debian.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/importers/debian/cerro_import_debian.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/importers/debian/cerro_import_debian.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_selinux.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_selinux.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_selinux.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_selinux.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_a2ml.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_a2ml.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_a2ml.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_a2ml.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_a2ml.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_a2ml.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_a2ml.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_a2ml.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_enforce.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_enforce.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_enforce.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy/cerro_policy_enforce.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/runtime/cerro_runtime.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/runtime/cerro_runtime.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/runtime/cerro_runtime.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/runtime/cerro_runtime.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/bindings/liboqs.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/bindings/liboqs.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/bindings/liboqs.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/bindings/liboqs.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/bindings/liboqs.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "src/bindings/liboqs.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "src/bindings/liboqs.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "src/bindings/liboqs.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "tools/mvp/ct_build.py",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_build.py",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_build.py",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_build.py",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_mvp.py",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_mvp.py",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_mvp.py",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_mvp.py",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_pack.py",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_pack.py",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_pack.py",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_pack.py",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_plugin.py",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_plugin.py",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_plugin.py",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/mvp/ct_plugin.py",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verification/idris/CryptoProofs.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "verification/idris/CryptoProofs.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "verification/idris/CryptoProofs.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "verification/idris/CryptoProofs.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "verification/idris/SignatureProofs.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "verification/idris/SignatureProofs.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "verification/idris/SignatureProofs.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "verification/idris/SignatureProofs.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "verification/idris/ImporterProofs.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "verification/idris/ImporterProofs.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "verification/idris/ImporterProofs.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "verification/idris/ImporterProofs.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "verification/idris/Theorems.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "verification/idris/Theorems.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "verification/idris/Theorems.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "verification/idris/Theorems.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/apps/svalinn/lib/svalinn/vordr_adapter.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/apps/svalinn/lib/svalinn/vordr_adapter.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/apps/svalinn/lib/svalinn/vordr_adapter.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/apps/svalinn/lib/svalinn/vordr_adapter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/apps/svalinn/mix.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/apps/svalinn/mix.exs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/apps/svalinn/mix.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/apps/svalinn/mix.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/test_both_modes.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/test_both_modes.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/test_both_modes.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cerro_torre_stack/test_both_modes.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ct_test_e2e.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ct_test_e2e.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ct_test_e2e.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ct_test_e2e.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/manual-e2e-test.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/manual-e2e-test.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/manual-e2e-test.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/manual-e2e-test.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "src/core/cerro_crypto.adb",
+          "src/bindings/liboqs.adb",
+          "verification/idris/CryptoProofs.idr",
+          "verification/idris/SignatureProofs.idr",
+          "verification/idris/ImporterProofs.idr",
+          "verification/idris/Theorems.idr"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Phoenix",
+          "Networking",
+          "OTP"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          "src/core/ct_transparency.adb",
+          "src/policy/cerro_policy_enforce.adb"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Phoenix",
+          "Networking",
+          "OTP"
+        ],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "src/core/ct_sbom.ads",
+          "src/importers/debian/cerro_import_debian.adb"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Phoenix",
+          "Networking",
+          "OTP"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "cerro_torre_stack/test_both_modes.sh",
+          "tests/manual-e2e-test.sh"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Phoenix",
+          "Networking",
+          "OTP"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "cerro_torre_stack/apps/svalinn/lib/svalinn_web.ex"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Phoenix",
+          "Networking",
+          "OTP"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      }
+    ]
+  }
+}

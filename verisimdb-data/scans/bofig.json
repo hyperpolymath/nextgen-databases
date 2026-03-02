@@ -1,0 +1,388 @@
+{
+  "program_path": ".",
+  "language": "elixir",
+  "frameworks": [
+    "Ecto",
+    "Phoenix",
+    "OTP",
+    "Database",
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "HardcodedSecret",
+      "location": "config/dev.exs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in config/dev.exs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "config/test.exs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in config/test.exs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "lib/evidence_graph_web.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in lib/evidence_graph_web.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 6122,
+    "unsafe_blocks": 45,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 1,
+    "io_operations": 2,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/D3.res",
+      "lines": 39,
+      "unsafe_blocks": 26,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/EvidenceGraph.res",
+      "lines": 192,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/D3.res",
+        "to": "src/EvidenceGraph.res",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/D3.res",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 78.0
+      },
+      {
+        "from": "src/D3.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 78.0
+      },
+      {
+        "from": "src/D3.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 78.0
+      },
+      {
+        "from": "src/D3.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 78.0
+      },
+      {
+        "from": "src/D3.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 78.0
+      },
+      {
+        "from": "src/EvidenceGraph.res",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "src/EvidenceGraph.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "src/EvidenceGraph.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "src/EvidenceGraph.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "src/EvidenceGraph.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "lib/evidence_graph_web.ex"
+        ],
+        "frameworks": [
+          "Ecto",
+          "Phoenix",
+          "OTP",
+          "Database",
+          "Networking"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "config/dev.exs",
+          "config/test.exs"
+        ],
+        "frameworks": [
+          "Ecto",
+          "Phoenix",
+          "OTP",
+          "Database",
+          "Networking"
+        ],
+        "relation": "HardcodedSecret->Network"
+      }
+    ]
+  }
+}

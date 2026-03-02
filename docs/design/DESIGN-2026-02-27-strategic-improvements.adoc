@@ -1,0 +1,750 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Design Document: VerisimDB Strategic Improvements
+// Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+// Date: 2026-02-27
+// Repository: verisimdb
+
+= VerisimDB Strategic Improvements
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+2026-02-27
+:toc: left
+:toclevels: 3
+:icons: font
+:source-highlighter: rouge
+:sectnums:
+
+== Purpose
+
+An honest assessment of where VerisimDB stands, what makes it genuinely novel,
+what is weak, and what specific work would make it a database that people outside
+hyperpolymath would actually want to use.
+
+This is not a roadmap with deadlines.  It is a prioritised list of improvements
+that can be picked up in any future session.
+
+== Honest Assessment
+
+=== What VerisimDB Has That Nothing Else Does
+
+No existing database -- Virtuoso, ArangoDB, SurrealDB, Tigris, Neo4j, none of
+them -- tracks whether different representations of the same entity are
+consistent with each other.
+
+VerisimDB's *drift detection* thesis: you store an entity, it gets a graph
+representation, a document representation, a vector embedding, a temporal
+snapshot, and VerisimDB _notices_ when those diverge and can reconcile them
+automatically.  This is genuinely novel.
+
+=== What Is Actually Strong
+
+[cols="1,3"]
+|===
+| Area | Status
+
+| **Drift detection**
+| Real implementation.  `DriftMonitor` sweeps on schedule, `compute_modality_drift/3`
+  uses cosine distance between modality embeddings, Rust core computes per-entity
+  drift scores.
+
+| **Self-normalisation**
+| Real implementation.  Regeneration strategies inspect hexad data, select the
+  authoritative modality, and derive drifted modality content from it.
+
+| **HNSW vector search**
+| Real implementation (~670 lines Rust).  Genuine approximate nearest-neighbour,
+  not brute-force.
+
+| **Tantivy full-text**
+| Real implementation.  Inverted index, ranked results, phrase queries.
+
+| **Temporal versioning**
+| Real implementation.  Native version history per hexad, not audit table hacks.
+
+| **ETS caching**
+| Real implementation.  Read-through cache with TTL in the Elixir layer, write
+  invalidation.
+
+| **Federation**
+| Real implementation.  HTTP fanout to peers, query decomposition, result merging,
+  drift policy filtering.
+
+| **Benchmarks**
+| All 6 modality stores benchmarked via Criterion.  Baselines established.
+
+| **Zero believe_me**
+| All Idris2 ABI code is clean.  No unsafe casts.
+|===
+
+=== What Is Actually Weak
+
+[cols="1,1,3"]
+|===
+| Problem | Severity | Detail
+
+| **VQL is incomplete**
+| HIGH
+| VQL parses and executes basic queries, but the language is not fully specified
+  and lacks documentation.  Without a usable query language, VerisimDB is an HTTP
+  CRUD API with caching.  _This is the single biggest gap._
+
+| **VQL-DT not wired**
+| MEDIUM
+| Lean type definitions exist but the checker is not invoked at runtime.  PROOF
+  clauses are syntactically supported but proof certificates are not formally
+  verified.  See KNOWN-ISSUES #21.
+
+| **No production users**
+| HIGH
+| Only used by hyperpolymath repos.  No adversarial workloads, no unexpected
+  query patterns, no real-world edge cases discovered.
+
+| **Modality stores are wrappers**
+| LOW
+| The stores wrap Oxigraph, Tantivy, HNSW, ndarray, CBOR.  This is fine
+  architecturally -- the novel contribution is the hexad coordination and drift
+  layer, not the individual stores.  But it means the "8 modalities" pitch is
+  weaker than it sounds; the real pitch is drift detection.  (The tensor
+  modality is an exception — active research is uncovering novel applications
+  with significant future potential.)
+
+| **Single developer**
+| MEDIUM
+| Bus factor of 1.  No adversarial review of design decisions.
+
+| **oxrocksdb-sys build pain**
+| MEDIUM
+| Oxigraph pulls ~400K lines of C++ via RocksDB.  15-minute container builds,
+  requires clang-19.  See KNOWN-ISSUES #24.
+
+| **No introspection by design**
+| NONE
+| This is correct -- no `/_introspect` endpoint, no `SHOW COLLECTIONS`.  The
+  Elixir layer knows the schema from source code.  Listed here to confirm it is
+  intentional, not an oversight.
+|===
+
+== Competitive Position
+
+=== VerisimDB vs Virtuoso
+
+[cols="<3,^2,^2",options="header"]
+|===
+| Capability
+| Virtuoso
+| VerisimDB
+
+| **Core model**
+| RDF triple store + relational SQL
+| 8-modal octad (graph, vector, tensor, semantic, document, temporal, provenance, spatial)
+
+| **Graph**
+| RDF graphs (SPARQL 1.1), billions of triples proven at scale
+| Oxigraph RDF + property graph, smaller scale
+
+| **Relational / SQL**
+| Full SQL support (ODBC/JDBC/ADO.NET)
+| None -- not a goal
+
+| **Full-text search**
+| Built-in (decent, older tech)
+| Tantivy (Rust Lucene equivalent, modern)
+
+| **Vector / similarity search**
+| Not built-in
+| HNSW embeddings, native
+
+| **Tensor / numeric**
+| Not built-in
+| ndarray/Burn, native
+
+| **Semantic / proofs**
+| RDF inference, OWL reasoning (mature)
+| CBOR proof blobs (novel, less mature)
+
+| **Temporal / versioning**
+| Graph versioning via named graphs (manual)
+| Native temporal modality, automatic
+
+| **Drift detection**
+| None
+| Core feature -- cross-modal consistency
+
+| **Self-normalisation**
+| None
+| Core feature -- auto-repair diverged modalities
+
+| **Query language**
+| SPARQL + SQL (both mature, standardised)
+| VQL (custom, incomplete)
+
+| **Linked Data / LOD**
+| First-class citizen -- LOD cloud backbone
+| Not a focus
+
+| **SPARQL endpoint**
+| Production-grade, federation support
+| Via Oxigraph (basic)
+
+| **Wire protocols**
+| HTTP (8890) + ODBC/JDBC (1111)
+| HTTP only (single port)
+
+| **Maturity**
+| ~25 years, powers DBpedia, LOD cloud
+| ~1 year, powers hyperpolymath repos
+
+| **Community**
+| Established (OpenLink, academic users)
+| Solo developer
+
+| **Documentation**
+| Extensive (if sometimes dated)
+| Sparse (VQL docs incomplete)
+
+| **Operational complexity**
+| Moderate-high (multi-port, config-heavy)
+| High (6 stores + Rust + Elixir)
+
+| **License**
+| GPLv2 (open source edition) / commercial
+| PMPL-1.0-or-later
+
+| **Performance at scale**
+| Proven (billions of triples, production workloads)
+| Unproven at scale
+
+| **"Find things similar to X"**
+| SPARQL text patterns only
+| Vector embeddings -- semantic similarity
+
+| **"Show me X as it was last week"**
+| Manual (named graph snapshots)
+| Single temporal query
+
+| **"Are these modalities consistent?"**
+| Not a concept
+| Core concept (drift scores)
+|===
+
+=== Where VerisimDB Should NOT Compete
+
+Do not try to out-query ArangoDB at graph traversal or out-SPARQL Virtuoso at
+linked data.  They have had decades.  VerisimDB is not a general-purpose
+database and should not pretend to be one.
+
+=== Where VerisimDB Wins
+
+The moment you say "ArangoDB doesn't know that your graph and your document
+disagree -- VerisimDB does" -- that is the differentiator.  Nobody else is
+playing in that space.
+
+VerisimDB is closer to "database + data observability" than "another database."
+The real competitors are data quality tools like Great Expectations or Monte
+Carlo, not database engines.
+
+== The Three Differentiators (Layered Strategy)
+
+VerisimDB has three genuinely novel capabilities.  They serve different
+audiences and should be presented in this order:
+
+=== Layer 1: Drift Detection (Door-Opener)
+
+The easiest to explain, the broadest audience.
+
+_"Your Postgres and your Elasticsearch disagree about the same customer.
+VerisimDB detects that."_
+
+Every enterprise data team has this problem.  Nobody else solves it at the
+entity level across heterogeneous systems.  Data quality tools like Great
+Expectations validate individual tables; VerisimDB validates cross-system
+entity consistency.
+
+=== Layer 2: Heterogeneous Database Federation (Enterprise Value)
+
+The same customer exists in five different databases.  VerisimDB sits above
+all of them as a consistency layer, monitoring for drift without requiring
+data to move into VerisimDB itself.
+
+_"VerisimDB watches your existing databases and tells you when they disagree.
+No migration required."_
+
+The current federation implementation works between VerisimDB peers (resolved
+in KNOWN-ISSUES #2, #3, #19).  The strategic evolution is federation over
+heterogeneous databases — ArangoDB, Postgres, Elasticsearch, Neo4j — with
+VerisimDB as the coordination layer.  The IDApTIK database bridge (ArangoDB +
+VerisimDB) is the first working example of this pattern.
+
+=== Layer 3: VQL-DT — Formally Verified Queries (Technical Moat)
+
+The deepest technical capability.  Small audience (formal methods, regulated
+industries, safety-critical systems) but impossible to replicate quickly.
+
+_"VerisimDB returns your query results with a machine-verifiable proof
+certificate.  The Lean type checker proves the result satisfies your
+constraints."_
+
+No database in existence does this.  VQL-DT is the reason a competitor
+cannot clone VerisimDB in a weekend after seeing the drift detection demo.
+It takes years of type theory knowledge to even attempt it.
+
+**Who cares about VQL-DT:**
+
+- Regulated industries (finance, medical devices, aerospace) where you must
+  _prove_ a query result is correct, not just assert it
+- Cross-organisational trust scenarios — verify results without trusting
+  the database operator
+- Safety-critical systems (Ada/SPARK territory)
+- Academic formal methods community
+
+**VQL-DT is not the lead pitch.** It is the moat.  Drift detection gets
+people in the door.  Federation keeps them.  VQL-DT ensures nobody can
+compete.
+
+== Competitor Analysis: Data Quality / Observability Space
+
+VerisimDB overlaps more with data quality tools than with traditional databases.
+Here is how it compares:
+
+[cols="<2,<3,<3",options="header"]
+|===
+| Tool
+| What It Does
+| How It Differs from VerisimDB
+
+| **Great Expectations**
+| Python library.  Assertions on data ("expect this column to have values
+  between 0 and 100").  Validates data in pipelines.
+| Single tables/dataframes.  No cross-system consistency.  No storage — it
+  is a testing framework, not a database.
+
+| **Monte Carlo**
+| Commercial SaaS.  ML-based anomaly detection across data warehouses.
+  Detects freshness issues, volume changes, schema drift.
+| Watches one system (Snowflake/BigQuery/Redshift).  Statistical anomalies,
+  not semantic inconsistencies between representations.
+
+| **Soda**
+| Open-source data quality checks.  YAML-based rules, integrates with
+  Airflow/dbt.
+| Similar to Great Expectations with different UX.  Single-system,
+  pipeline-level.
+
+| **Atlan**
+| Data catalog + quality.  Metadata management, lineage tracking.
+| Catalog, not enforcement.  Tells you _what_ data exists, not whether
+  representations agree.
+
+| **Bigeye**
+| Automated data quality monitoring.  Thresholds, alerts on anomalies.
+| Statistical monitoring (row counts, null rates, distribution shifts).
+  No cross-system entity-level consistency.
+
+| **Anomalo**
+| ML-based data quality.  Learns "normal" patterns, alerts on deviations.
+| Smart anomaly detection but still single-system, table-level.
+
+| **Elementary**
+| dbt-native data observability.  Monitors dbt model quality.
+| Tied to dbt.  If you don't use dbt, it doesn't exist for you.
+
+| **Datafold**
+| Data diff tool.  Compares table states before/after migrations.
+| Diff, not continuous monitoring.  Useful but narrow.
+|===
+
+**The gap none of them fill:**
+
+Every one of these tools operates on _one system at a time_ at the _table or
+column level_.  None of them ask: "is entity X in Postgres consistent with
+entity X in Elasticsearch?"
+
+Great Expectations says "this column should have no nulls."  VerisimDB says
+"this entity's graph representation has 3 edges but its document says 4
+relationships — drift score 0.31."
+
+**The integration gap (honest):**
+
+All of those tools integrate with the existing ecosystem.
+`pip install great-expectations`, point it at your Snowflake, done.
+VerisimDB currently requires data to be stored _in_ VerisimDB.  If federation
+evolves to watch external databases (Layer 2 above), VerisimDB gets the
+ecosystem integration of Great Expectations with the cross-system consistency
+checking that none of them offer.
+
+== From Hexad to Octad: Two New Modalities
+
+The current 6 modalities cover data representation well.  Two additions
+complete the model.
+
+=== The Octad
+
+[cols="1,2,1",options="header"]
+|===
+| Modality | Question It Answers | Status
+
+| Graph
+| "How is this related to that?"
+| Implemented
+
+| Vector
+| "What's similar to this?"
+| Implemented
+
+| Tensor
+| "What patterns exist in this high-dimensional data?"  The tensor modality's
+  multi-dimensional representation capabilities open possibilities for novel
+  applications currently under active research.  Early results suggest
+  compelling use cases that go well beyond traditional numeric storage —
+  details will be shared as the work matures.
+| Implemented
+
+| Semantic
+| "Is this valid?  Prove it."
+| Implemented
+
+| Document
+| "Search for this text."
+| Implemented
+
+| Temporal
+| "What did this look like before?"
+| Implemented
+
+| **Provenance**
+| **"Where did this come from?"**
+| Planned (CRITICAL)
+
+| **Spatial**
+| **"Where is this?  What's nearby?"**
+| Planned
+|===
+
+=== Provenance / Lineage — 7th Modality (CRITICAL)
+
+Temporal tracks _versions_ (what changed).  Provenance tracks _origins_
+(where it came from, how it was transformed, who touched it).  These are
+fundamentally different questions.
+
+==== Why This Is Critical
+
+Provenance / lineage compounds with federation to create something no other
+tool offers:
+
+_"This entity was created in Postgres, transformed by a Spark pipeline,
+cached in Redis, and indexed in Elasticsearch.  Here is the full chain of
+custody.  Here is where the drift was introduced — step 3 of the pipeline
+dropped a field."_
+
+This is the difference between "your data is inconsistent" (drift detection
+alone) and "your data is inconsistent _and here is exactly where it went
+wrong_" (drift + provenance).
+
+==== Compliance and Regulatory Value
+
+[cols="1,3"]
+|===
+| Regulation | What Provenance Enables
+
+| **GDPR Article 22**
+| Right to explanation.  Prove how a data-driven decision was made by
+  tracing the data lineage from source to query result.
+
+| **SOX / MiFID II**
+| Financial audit trail.  Prove the report's source data was not tampered
+  with by showing the full transformation chain.
+
+| **IEC 62304**
+| Medical device data integrity.  Trace every input to a clinical decision
+  back to its origin system.
+
+| **FAIR Principles**
+| Provenance is required for Reusability (the R in FAIR).  VerisimDB already
+  implements FAIR; provenance completes it.
+|===
+
+==== What the 7th Modality Stores
+
+Each entity gains a provenance record:
+
+- **Origin system** — which database or service created this entity
+- **Transformation chain** — ordered list of pipeline steps that modified it
+- **Actor trail** — which user, service account, or automation touched it
+- **Timestamp chain** — when each transformation occurred
+- **Integrity hash** — cryptographic hash at each step (detect tampering)
+- **Federation source** — which federated peer contributed this data
+
+==== Implementation Approach
+
+The provenance modality is structurally simpler than graph or vector:
+
+- Storage: append-only log per entity (similar to temporal, but tracking
+  _origins_ not _versions_)
+- Query: `SELECT hexads WHERE provenance.origin = 'postgres'` or
+  `WHERE provenance.chain CONTAINS 'spark-etl-step-3'`
+- Drift integration: when drift is detected, provenance can pinpoint
+  _which transformation step_ introduced the inconsistency
+- VQL extension: `PROVENANCE` clause alongside existing `PROOF` clause
+
+==== Priority
+
+**CRITICAL.**  Implement after VQL (Priority 1) and the drift demo
+(Priority 2), but before or alongside heterogeneous federation (Priority 5).
+Provenance and federation are mutually reinforcing — federation without
+provenance tells you data disagrees; federation _with_ provenance tells you
+why.
+
+=== Spatial / Geospatial — 8th Modality
+
+Spatial drift is a real consistency problem: "the map says this device is in
+zone A but the database record says zone B."  Every IoT, logistics, and
+fleet management system has this.
+
+==== What the 8th Modality Stores
+
+- **Coordinates** — latitude/longitude, 3D points, projected coordinates
+- **Geometries** — polygons, lines, multipoints (zone boundaries, patrol routes)
+- **Spatial index** — R-tree for efficient proximity and containment queries
+- **CRS metadata** — coordinate reference system (WGS84, UTM, etc.)
+
+==== Spatial Queries in VQL
+
+- `WHERE spatial.within(polygon)` — containment
+- `WHERE spatial.distance(point) < 5000` — proximity (metres)
+- `WHERE spatial.intersects(geometry)` — overlap
+
+==== Implementation
+
+Rust crates `geo` and `rstar` (R-tree) provide the core.  Same architectural
+slot as the other modality stores — `verisim-spatial` crate, HTTP API
+endpoints, Elixir orchestration integration.
+
+==== Priority
+
+After provenance.  Spatial is valuable but not thesis-critical.  Provenance
+compounds with drift detection and federation; spatial is additive.
+
+== Priority Improvements
+
+Ordered by impact.  Each item is self-contained and can be picked up in any
+future session.
+
+=== Priority 1: Finish VQL (HIGH)
+
+**Why:** A database without a usable query language is a key-value store with
+extra steps.  This is the single highest-impact improvement.
+
+**Scope:** Not VQL-DT.  Just VQL.  The query language that end users type.
+
+**What "finished" means:**
+
+1. **Language specification** -- a document (adoc or djot) that defines VQL
+   syntax and semantics exhaustively.  Every valid query form documented with
+   examples.  Every error case specified.
+
+2. **Cross-modal queries work end-to-end** -- a query like
+   `SELECT hexads WHERE drift_score > 0.3 AND modality.temporal.version > 5`
+   must parse, plan, execute, and return correct results.
+
+3. **WHERE clause routing is correct** -- fulltext conditions go to Tantivy,
+   vector conditions go to HNSW, graph patterns go to Oxigraph, drift
+   conditions go to the drift engine.  The resolved issues (#12, #13) fixed
+   the stubs; this is about ensuring coverage of all clause combinations.
+
+4. **Aggregates work** -- `COUNT`, `AVG`, `MIN`, `MAX`, `SUM` over hexad
+   fields.  `GROUP BY` modality or custom fields.
+
+5. **EXPLAIN is accurate** -- the resolved EXPLAIN (#18) produces real cost
+   estimates; verify they correlate with actual execution time.
+
+6. **Error messages are helpful** -- parse errors include line/column,
+   semantic errors explain what went wrong (e.g., "modality 'graphh' does
+   not exist, did you mean 'graph'?").
+
+**Deliverables:**
+
+- `docs/VQL-SPEC.adoc` -- language specification
+- Updated parser/executor to cover all specified forms
+- 20+ integration tests proving the spec is implemented
+
+=== Priority 2: Drift Detection Demo (HIGH)
+
+**Why:** This is the differentiator.  It needs to be undeniable.
+
+**Scope:** Build a reproducible demonstration.
+
+**What the demo does:**
+
+1. Create 1000 octad entities with consistent data across all modalities
+2. Deliberately corrupt 50 of them -- alter the document text without
+   updating the vector embedding, change graph edges without updating the
+   document, modify temporal history to create inconsistencies
+3. Run drift detection -- show VerisimDB identifying all 50 corrupted
+   entities with drift scores
+4. Run self-normalisation -- show VerisimDB repairing the inconsistencies
+   by regenerating drifted modalities from the authoritative one
+5. Verify -- re-run drift detection, show all 1000 entities are now
+   consistent
+
+**Deliverables:**
+
+- `demos/drift-detection/` directory with a runnable script
+- `demos/drift-detection/README.adoc` explaining what it does and what to look for
+- Output showing before/after drift scores
+- This is the thing you show people.  This is the pitch.
+
+=== Priority 3: One External User (HIGH)
+
+**Why:** Using your own database for your own projects proves it works for you.
+One external user proves it works for someone else.  That external user will
+find assumptions you did not know you made.
+
+**How:**
+
+- IDApTIK (Joshua) is a start but you control both sides
+- Find one other project -- academic, open-source, or a friend's -- that has
+  multi-representation data and would benefit from drift detection
+- The demo from Priority 2 is the sales pitch
+- Do not wait for VQL to be perfect; the REST API is sufficient for a first
+  user
+
+=== Priority 4: Positioning and Documentation (MEDIUM)
+
+**Why:** "6-modal database" sounds like marketing.  "Database that catches
+data rot" is a value proposition.
+
+**What to change:**
+
+1. **README** -- lead with drift detection, not the 6 modalities.  The
+   modalities are implementation; drift detection is the product.
+
+2. **Tagline** -- not "6-core multimodal database with self-normalization"
+   but "the database that knows when your data disagrees with itself."
+
+3. **Comparison page** -- show the Virtuoso/ArangoDB comparison table from
+   this document.  Be honest about where VerisimDB loses (maturity, query
+   language, scale) and where it wins (drift, temporal, vector).
+
+4. **Tutorial** -- a 10-minute "store a hexad, search it, check its drift,
+   corrupt it, watch it heal" walkthrough.
+
+=== Priority 5: Heterogeneous Federation (MEDIUM-HIGH)
+
+**Why:** This is Layer 2 of the differentiator stack.  VerisimDB watching
+_other_ databases for consistency — not just other VerisimDB instances — is
+the enterprise value proposition.
+
+**Scope:** Extend the existing federation system to support non-VerisimDB
+peers via HTTP adapters.
+
+**What "done" means:**
+
+1. **Adapter interface** — a trait/behaviour that maps an external database's
+   API to VerisimDB's hexad model.  Each adapter knows how to read an entity
+   from its source and extract modality-relevant data.
+
+2. **ArangoDB adapter** — the IDApTIK bridge (`ArangoClient`) is the first
+   working example.  Generalise it into a federation adapter that VerisimDB
+   can monitor for drift.
+
+3. **PostgreSQL adapter** — HTTP via PostgREST or direct SQL via Postgrex.
+   Read an entity from Postgres, extract document/graph/semantic data, compare
+   against VerisimDB's representation.
+
+4. **Drift detection across adapters** — "entity X in ArangoDB has 3 edges
+   but entity X in VerisimDB's graph modality has 4 — drift score 0.28."
+
+**Deliverables:**
+
+- `lib/verisim/federation/adapter.ex` — adapter behaviour
+- `lib/verisim/federation/adapters/arango.ex` — ArangoDB adapter
+- `lib/verisim/federation/adapters/postgres.ex` — PostgreSQL adapter
+- Integration test with ArangoDB + VerisimDB running
+
+=== Priority 6: Replace oxrocksdb-sys (MEDIUM)
+
+**Why:** 15-minute container builds and a clang-19 dependency are painful.
+
+**Options (from KNOWN-ISSUES #24):**
+
+- `fjall` -- LSM-tree, same architecture as RocksDB, pure Rust
+- `redb` -- B-tree, simpler, pure Rust
+- ETS backend for the graph store (Elixir-side)
+
+The `GraphStore` trait abstraction already exists, so this is a backend swap.
+
+=== Priority 7: Wire VQL-DT (HIGH — but after VQL)
+
+**Why:** VQL-DT is the technical moat — the reason nobody can clone VerisimDB
+quickly.  Formally verified query results via Lean type checking is genuinely
+unique in the database world.  But VQL must work reliably first (Priority 1).
+No point verifying proofs in a query language that cannot execute reliably.
+
+**Why it matters more than it might seem:**
+
+VQL-DT is not a nice-to-have.  It is the capability that separates VerisimDB
+from every other database and every data quality tool.  Great Expectations can
+assert "this column has no nulls."  VerisimDB with VQL-DT can return a
+_machine-verifiable proof certificate_ that the query result satisfies
+dependent type constraints.  This is the kind of guarantee required in:
+
+- Financial regulation (MiFID II, SOX compliance — prove the report is correct)
+- Medical devices (IEC 62304 — formally verified data integrity)
+- Aerospace (DO-178C — evidence-based assurance)
+- Cross-institutional research (prove results without exposing raw data)
+
+No other database can do this.  Not Virtuoso, not ArangoDB, not Postgres.
+The Lean type definitions already exist.  The proof obligation generation is
+designed.  The gap is wiring the Lean checker into the execution path.
+
+**Defer until:** VQL spec is complete and integration-tested (Priority 1).
+Then this becomes the highest priority.
+
+**See:** KNOWN-ISSUES #21, `docs/vql-vs-vql-dt.adoc` for the phased roadmap.
+
+== What NOT to Do
+
+These are tempting but would dilute focus:
+
+1. **Do not add SQL support.** VerisimDB is not a relational database.  Adding
+   SQL invites comparison with Postgres/MariaDB where VerisimDB loses.
+
+2. **Do not add SPARQL support.** Virtuoso and Oxigraph already do this.
+   VerisimDB's Oxigraph store speaks SPARQL internally; exposing it externally
+   makes VerisimDB look like a worse Virtuoso.
+
+3. **Do not add a web admin UI.** Admin UIs are maintenance burdens.  The REPL
+   works.  The REST API works.  The Elixir orchestration layer is the admin
+   interface.
+
+4. **Do not chase benchmarks against other databases.** VerisimDB will not
+   beat ArangoDB at graph traversal speed or Tantivy at raw text search.  The
+   benchmark that matters is: "how fast does VerisimDB detect that these 50
+   entities are inconsistent?"  That is a benchmark nobody else can run.
+
+5. **Do not add introspection endpoints.** No `/_introspect`, no
+   `SHOW COLLECTIONS`, no `DESCRIBE HEXAD`.  The schema is in the code.
+   Introspection is attack surface with no upside for a system where the
+   orchestration layer is the sole client.
+
+== Summary
+
+VerisimDB is not crap.  It has a genuine thesis that no other database
+addresses.  But the thesis is buried under incomplete query language support
+and zero external validation.
+
+The path forward (priority order):
+
+1. **Finish VQL** so the database is _queryable_
+2. **Drift detection demo** so the differentiator is _undeniable_
+3. **Provenance / lineage modality** so cross-system data origins are _traceable_ (CRITICAL)
+4. **One external user** so the assumptions are _tested_
+5. **Heterogeneous federation** so enterprise adoption is _practical_
+6. **Reposition** around drift detection so the value proposition is _clear_
+7. **Wire VQL-DT** so the technical moat is _operational_ (after VQL is solid)
+
+The layered pitch:
+
+- **Drift detection** gets people in the door (broad audience, easy to explain)
+- **Federation** keeps them (watches existing databases, no migration)
+- **Provenance** makes them depend on it (audit trail, GDPR, compliance)
+- **VQL-DT** ensures nobody can compete (years of type theory to replicate)

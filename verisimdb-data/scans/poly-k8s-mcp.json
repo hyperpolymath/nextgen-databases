@@ -1,0 +1,185 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "ExcessivePermissions",
+      "location": "run-test.sh",
+      "severity": "High",
+      "description": "Deno -A (all permissions) in run-test.sh",
+      "recommended_attack": [
+        "network",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 8621,
+    "unsafe_blocks": 3,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 3,
+    "io_operations": 7,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/adapters/Kubectl.res",
+      "lines": 342,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/adapters/Kustomize.res",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/bindings/Deno.res",
+      "lines": 70,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Deno.res",
+      "lines": 70,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Kubectl.res",
+      "lines": 342,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Kustomize.res",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/adapters/Kubectl.res",
+      "lines": 342,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/adapters/Kustomize.res",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/bindings/Deno.res",
+      "lines": 70,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "network",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/adapters/Kubectl.res",
+        "to": "src/adapters/Kustomize.res",
+        "relation": "shared_dir:src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/src/adapters/Kubectl.res",
+        "to": "lib/bs/src/adapters/Kustomize.res",
+        "relation": "shared_dir:lib/bs/src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Deno.res",
+        "to": "lib/ocaml/Kubectl.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Kubectl.res",
+        "to": "lib/ocaml/Kustomize.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          "run-test.sh"
+        ],
+        "frameworks": [],
+        "relation": "ExcessivePermissions->Disk"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "run-test.sh"
+        ],
+        "frameworks": [],
+        "relation": "ExcessivePermissions->Network"
+      }
+    ]
+  }
+}

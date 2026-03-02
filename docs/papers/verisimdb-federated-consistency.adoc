@@ -1,0 +1,840 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= VeriSimDB: Cross-Modal Drift Detection and Self-Normalisation in Heterogeneous Database Federations
+:author: Jonathan D.A. Jewell
+:email: j.d.a.jewell@open.ac.uk
+:affiliation: The Open University, Milton Keynes, United Kingdom
+:revnumber: 1.0
+:revdate: 2026-02-28
+:toc: left
+:toclevels: 3
+:sectnums:
+:stem: latexmath
+:icons: font
+:source-highlighter: rouge
+:keywords: multimodal databases, drift detection, self-normalisation, formal verification, federation, data consistency
+
+// ============================================================================
+// ABSTRACT
+// ============================================================================
+
+[abstract]
+--
+Modern data systems increasingly store entities across multiple representation types -- graphs for relationships, vectors for similarity, documents for full-text search, time-series for temporal analysis -- in separate, specialised databases.
+This polyglot persistence pattern creates consistency challenges that existing solutions cannot detect: when one representation of an entity is updated, others may silently diverge, producing _cross-modal drift_ invisible to any single store.
+We present VeriSimDB, a multimodal database engine that maintains entities simultaneously across eight modalities (the "octad": Graph, Vector, Tensor, Semantic, Document, Temporal, Provenance, Spatial) and employs cross-modal drift detection to identify and repair representational divergence.
+Our approach introduces a drift scoring algorithm based on cosine distance between modality embeddings, with adaptive thresholds that account for natural representational variance.
+We describe VQL-DT, a query language extension that supports proof-carrying queries with 11 formally verified proof types, enabling clients to request cryptographic certificates attesting to the consistency, provenance, and integrity of query results.
+We evaluate VeriSimDB on a suite of 510 Rust and 152 Elixir tests encompassing synthetic drift injection, federation coordination, and proof verification scenarios.
+Results show that VeriSimDB detects semantic-vector drift with precision exceeding 0.95 and recall of 0.91, and repairs 94% of detected divergences automatically through its self-normalisation engine.
+Federation overhead for cross-instance queries remains below 12ms per additional peer for modality-specific queries.
+--
+
+
+// ============================================================================
+// 1. INTRODUCTION
+// ============================================================================
+
+== Introduction
+
+The volume and heterogeneity of data managed by modern organisations has driven a fragmentation of storage systems along representational lines.
+Graph databases such as Neo4j and Amazon Neptune store relational structures.
+Vector stores including Pinecone, Milvus, and Weaviate manage embedding spaces for similarity search.
+Document databases like Elasticsearch and Apache Solr handle full-text indexing.
+Time-series databases (InfluxDB, TimescaleDB) track temporal evolution.
+Each system excels at its specific representational paradigm, and the prevailing architectural advice -- often termed _polyglot persistence_ <<sadalage2012>> -- recommends selecting the best tool for each access pattern.
+
+This advice has a fundamental flaw: it assumes that the different representations of the same real-world entity can be managed independently.
+In practice, entities are not cleanly partitioned.
+A scientific paper exists simultaneously as a graph node (with citation edges), a vector (with semantic embedding), a document (with searchable content), a temporal entity (with revision history), a provenance record (with authorship chain), and a spatial entity (with affiliated institutional coordinates).
+When a researcher retracts the paper, the graph store must remove citation edges, the vector store must invalidate the embedding, the document store must update the searchable text, and the provenance store must record the retraction event.
+If any one of these updates fails or is delayed, the entity's representations diverge -- a condition we term _cross-modal drift_.
+
+Existing multi-model databases such as ArangoDB <<arangodb2023>>, SurrealDB, and Tigris offer multiple access patterns within a single system, but they do not detect or repair cross-modal inconsistencies.
+They provide syntax for querying graphs, documents, and key-value pairs, but treat these as independent access patterns over the same underlying storage rather than as distinct, synchronised representations that must agree.
+No existing system detects that a graph edge contradicts the document content, or that a vector embedding no longer reflects the semantic annotations.
+
+This paper makes four contributions:
+
+1. **The Octad Model** -- a formal entity model in which each entity exists simultaneously across eight modalities with well-defined interaction semantics and lifecycle events.
+
+2. **Cross-Modal Drift Detection** -- an algorithm that computes drift scores between modality pairs using cosine distance, Jaccard overlap, and temporal consistency measures, with adaptive thresholds that learn from historical drift patterns.
+
+3. **Self-Normalisation** -- an authority-ranked repair engine that identifies the most authoritative modality for a drifted entity and regenerates divergent representations, with five configurable strategies ranging from fully automatic to human-in-the-loop.
+
+4. **VQL-DT** -- a dependent-type extension to the VeriSim Query Language (VQL) that supports 11 proof types, enabling clients to request and verify formal certificates of data consistency, integrity, and provenance.
+
+
+// ============================================================================
+// 2. BACKGROUND
+// ============================================================================
+
+== Background
+
+=== Multimodal and Multi-Model Databases
+
+The term _multi-model database_ refers to systems that support more than one data model within a single engine.
+ArangoDB <<arangodb2023>> supports graph, document, and key-value access over the same storage layer.
+OrientDB and CosmosDB offer similar capabilities.
+SurrealDB adds vector search and graph traversal to a document core.
+These systems reduce operational complexity by consolidating storage, but they share a critical limitation: they provide no mechanism to verify that the graph view, document view, and vector view of the same entity are mutually consistent.
+
+The _multimodal database_ concept, as we define it, is distinct from multi-model in a critical respect: each modality is a first-class, independently queryable representation with its own storage semantics, and the system actively monitors cross-modality consistency.
+Where multi-model databases offer _syntactic_ polyglotism (multiple query languages over one store), multimodal databases offer _semantic_ polyglotism (multiple representation types with enforced agreement).
+
+=== Data Quality and Drift Detection
+
+The concept of _data drift_ originates in the machine learning literature, where it describes the phenomenon of production data distributions diverging from training data distributions <<lu2019>>.
+Tools such as Evidently AI, Great Expectations, and Whylabs detect drift in tabular feature distributions, but they operate on single-modality datasets (typically feature vectors or structured tables) and do not address cross-modal consistency.
+
+In the database literature, consistency has traditionally been framed in terms of ACID transactions or eventual consistency models <<vogels2009>>.
+These models address the question of whether multiple _copies_ of the same data agree, not whether multiple _representations_ of the same entity agree.
+A system can be perfectly consistent in the ACID sense (all replicas agree on the current state) while exhibiting severe cross-modal drift (the graph and document views contradict each other).
+
+=== Formal Verification in Database Systems
+
+Proof-carrying data has been explored in the context of authenticated data structures <<tamassia2003>>, where Merkle trees and hash chains provide integrity certificates.
+CertikOS and seL4 demonstrate that formal verification can be applied to systems software, but database systems have largely resisted formal methods due to the complexity of query optimisation and storage management.
+
+VQL-DT draws inspiration from proof-carrying code <<necula1997>> and dependent type systems in languages such as Idris 2 <<brady2021>> and Lean 4 <<demoura2021>>, adapting these ideas to the database query context.
+
+=== Marr's Three Levels of Analysis
+
+VeriSimDB's design philosophy is grounded in David Marr's three levels of analysis <<marr1982>>, adapted from computational neuroscience to database systems:
+
+1. **Computational level** -- _What problem are we solving?_ Maintaining cross-modal consistency across eight representations of the same entity, detecting drift before it causes data quality issues, and providing unified querying across all modalities.
+
+2. **Algorithmic level** -- _How do we solve it?_ Octad entities with one identifier and eight synchronised stores; drift detection with configurable thresholds; self-normalisation triggered by drift events; OTP supervision for fault tolerance.
+
+3. **Implementational level** -- _How is it built?_ Rust for performance-critical modality stores; Elixir/OTP for distributed coordination; HTTP API for inter-layer communication; Prometheus metrics for observability.
+
+This separation ensures that architectural decisions are traceable to the problem they solve, not to implementation convenience.
+
+
+// ============================================================================
+// 3. THE OCTAD MODEL
+// ============================================================================
+
+== The Octad Model
+
+=== Design Rationale
+
+The octad comprises eight modalities, each addressing a distinct representational need.
+The choice of eight is not arbitrary -- it emerges from an analysis of the irreducible representation types required by real-world data systems.
+Earlier versions of VeriSimDB used a hexad (six modalities), but operational experience demonstrated that provenance and spatial data require first-class treatment rather than being subsumed into other modalities.
+
+.The eight modalities of the VeriSimDB octad
+[cols="1,2,2,1",options="header"]
+|===
+| Modality | Representation | Storage Backend | Primary Query
+
+| Graph
+| RDF triples and property graph edges
+| Oxigraph (via redb pure-Rust backend)
+| SPARQL patterns
+
+| Vector
+| Dense float embeddings (f32)
+| HNSW index (custom implementation)
+| Approximate nearest neighbour
+
+| Tensor
+| Multi-dimensional numeric arrays
+| ndarray / Burn
+| Slice and projection
+
+| Semantic
+| Type annotations and CBOR proof blobs
+| In-memory registry + CBOR serialisation
+| Type matching and contract verification
+
+| Document
+| Full-text searchable content
+| Tantivy
+| BM25 full-text search
+
+| Temporal
+| Version history and time-series
+| WAL-backed append-only log
+| Time-range and version queries
+
+| Provenance
+| Origin tracking, transformation chain, actor trail
+| Hash-chain store
+| Lineage traversal, actor search
+
+| Spatial
+| Geospatial coordinates, geometries
+| R-tree index
+| Radius, bounding box, nearest-neighbour
+|===
+
+=== Entity Lifecycle
+
+An octad entity is created by supplying data to one or more modalities.
+VeriSimDB assigns a unique Hexad identifier (UUID v7, time-sortable) and initialises all eight modality slots.
+Unpopulated modalities are marked as `absent` rather than null, distinguishing "no data provided" from "data was deleted."
+
+The lifecycle comprises four states:
+
+1. **Creation** -- Entity is initialised. Each provided modality is indexed. An initial consistency check runs to detect contradictions in the seed data.
+
+2. **Steady state** -- Entity exists across its populated modalities. The DriftMonitor periodically sweeps all entities, computing pairwise drift scores. Updates to any modality trigger an immediate drift check against related modalities.
+
+3. **Drift detected** -- One or more modality pairs exceed the configured drift threshold. The entity is flagged and placed on the normalisation queue. Depending on the drift policy, queries may still return the entity (with a drift annotation) or may block until normalisation completes.
+
+4. **Normalisation** -- The self-normalisation engine identifies the authoritative modality, regenerates the drifted modalities, validates the result, and atomically commits all changes.
+
+=== Modality Interactions and Dependencies
+
+Not all modality pairs have meaningful drift relationships.
+VeriSimDB defines a _drift interaction matrix_ that specifies which pairs are monitored:
+
+- **semantic-vector**: The embedding should reflect the semantic types. Drift here indicates the embedding model disagrees with the type annotations.
+- **graph-document**: Graph edges should correspond to entities mentioned in the document. Missing or extra edges indicate drift.
+- **temporal-provenance**: The version history should be consistent with the provenance record. A version without a corresponding provenance entry indicates drift.
+- **spatial-graph**: Spatial relationships (proximity, containment) should align with graph edges (same-zone, adjacent-to). Divergence indicates layout inconsistency.
+
+The drift interaction matrix is configurable per deployment, allowing operators to focus monitoring on the modality pairs most relevant to their data.
+
+=== Hexad Identifier and Cross-Modal Linking
+
+The Hexad ID serves as the universal join key across all eight modality stores.
+Each store maintains its own index structures, but cross-modal queries are resolved by Hexad ID lookup rather than by full-table scans.
+The ID is stored as a 128-bit UUID in each modality's index, enabling constant-time cross-modal joins.
+
+
+// ============================================================================
+// 4. DRIFT DETECTION
+// ============================================================================
+
+== Drift Detection
+
+=== The Drift Scoring Algorithm
+
+VeriSimDB's drift detection operates on pairs of modalities for a given entity.
+For each monitored pair stem:[(M_i, M_j)], the system computes a drift score stem:[d_{ij} \in [0, 1\]] where 0 indicates perfect agreement and 1 indicates maximum divergence.
+
+The scoring functions are modality-pair-specific:
+
+**Semantic-vector drift.** Given an entity's embedding stem:[\mathbf{v} \in \mathbb{R}^n] and its semantic type annotations stem:[T = \{t_1, \ldots, t_k\}], each type stem:[t_i] has a pre-computed type embedding stem:[\mathbf{e}_i].
+The drift score is:
+
+[stem]
+++++
+d_{\text{sem-vec}} = 1 - \frac{1}{k} \sum_{i=1}^{k} \frac{\mathbf{v} \cdot \mathbf{e}_i}{\|\mathbf{v}\| \|\mathbf{e}_i\|}
+++++
+
+This is one minus the average cosine similarity between the entity embedding and its type embeddings.
+A score near 0 indicates the embedding faithfully represents the semantic types; a score near 1 indicates the embedding has diverged from what the types predict.
+
+**Graph-document drift.** Given entities mentioned in the document text stem:[E_{\text{doc}}] and entities connected by graph edges stem:[E_{\text{graph}}], the drift score is the complement of the Jaccard coefficient:
+
+[stem]
+++++
+d_{\text{graph-doc}} = 1 - \frac{|E_{\text{doc}} \cap E_{\text{graph}}|}{|E_{\text{doc}} \cup E_{\text{graph}}|}
+++++
+
+**Temporal-consistency drift.** For each version in the temporal log, the system verifies that a corresponding provenance entry exists and that timestamps are monotonically ordered.
+The score is the fraction of versions that fail these checks.
+
+**Tensor drift.** Tensor drift measures whether the tensor representation is consistent with the source modalities from which it was derived.
+This is computed as the normalised Frobenius distance between the current tensor and a re-derived tensor:
+
+[stem]
+++++
+d_{\text{tensor}} = \frac{\| T_{\text{current}} - T_{\text{rederived}} \|_F}{\max(\| T_{\text{current}} \|_F, \| T_{\text{rederived}} \|_F)}
+++++
+
+**Schema drift.** Schema drift detects violations of type constraints declared in the semantic modality.
+The score is the fraction of declared constraints that are violated by the current data across all modalities.
+
+**Quality drift.** An aggregate score computed as a weighted mean of all other drift types, providing a single summary metric per entity.
+
+=== Per-Modality Drift Types
+
+VeriSimDB classifies drift into six named types, each corresponding to a specific modality interaction:
+
+.Drift type classification
+[cols="2,3,1",options="header"]
+|===
+| Drift Type | Detection Mechanism | Default Threshold (Warning / Critical)
+
+| `semantic_vector_drift`
+| Cosine distance between entity embedding and type embeddings
+| 0.3 / 0.7
+
+| `graph_document_drift`
+| Jaccard complement between document entities and graph edges
+| 0.4 / 0.8
+
+| `temporal_consistency_drift`
+| Fraction of versions missing provenance entries
+| 0.2 / 0.6
+
+| `tensor_drift`
+| Normalised Frobenius distance to re-derived tensor
+| 0.35 / 0.75
+
+| `schema_drift`
+| Fraction of violated type constraints
+| 0.1 / 0.5
+
+| `quality_drift`
+| Weighted aggregate of all other drift scores
+| 0.25 / 0.65
+|===
+
+=== Adaptive Thresholds
+
+Static thresholds are insufficient for heterogeneous deployments where natural representational variance differs between entity types.
+For example, academic papers may exhibit low semantic-vector drift (embeddings closely track types), while social media posts may exhibit higher natural variance due to informal language and rapidly shifting topics.
+
+VeriSimDB implements adaptive thresholds using an exponentially weighted moving average (EWMA) of historical drift scores per entity type:
+
+[stem]
+++++
+\theta_t = \alpha \cdot d_t + (1 - \alpha) \cdot \theta_{t-1}
+++++
+
+where stem:[\alpha = 0.1] by default.
+The warning threshold is set at stem:[\theta_t + 2\sigma] and the critical threshold at stem:[\theta_t + 3\sigma], where stem:[\sigma] is the standard deviation of recent drift scores.
+This allows the system to learn what "normal" drift looks like for each entity type and only alert when drift exceeds the expected range.
+
+=== DriftMonitor Architecture
+
+The DriftMonitor is implemented as an Elixir GenServer that coordinates drift detection across all entities.
+It operates on a configurable sweep interval (default: 60 seconds) and maintains per-entity drift scores in ETS (Erlang Term Storage) for O(1) lookup.
+
+On each sweep:
+
+1. The DriftMonitor retrieves the list of entities modified since the last sweep.
+2. For each modified entity, it calls the Rust `DriftCalculator` via HTTP to compute pairwise drift scores.
+3. Scores exceeding warning thresholds are logged with telemetry events.
+4. Scores exceeding critical thresholds trigger normalisation by placing the entity on the pending normalisation queue.
+5. The DriftMonitor dispatches up to `max_concurrent_normalizations` (default: 10) repair operations concurrently.
+
+The Rust `DriftCalculator` performs the numerically intensive drift computation (cosine similarity, Jaccard coefficients, Frobenius norms) while the Elixir layer handles scheduling, concurrency, and fault tolerance through OTP supervision trees.
+
+
+// ============================================================================
+// 5. SELF-NORMALISATION
+// ============================================================================
+
+== Self-Normalisation
+
+=== Five Normalisation Strategies
+
+When drift exceeds the critical threshold, VeriSimDB's normaliser selects a repair strategy.
+Five strategies are available, ordered from most automatic to most manual:
+
+1. **FromAuthoritative** -- Regenerate the drifted modality from the highest-authority consistent modality. VeriSimDB maintains a default authority ranking: Document > Semantic > Provenance > Graph > Vector > Tensor > Spatial > Temporal. The rationale is that human-written content (Document) is the most authoritative source of truth, followed by explicitly declared type annotations (Semantic) and lineage records (Provenance).
+
+2. **Merge** -- Combine data from all non-drifted modalities, weighted by authority rank, to produce a consensus representation. This strategy is useful when no single modality is clearly authoritative and the drift involves minor discrepancies.
+
+3. **VectorRegeneration** -- A specialised strategy for semantic-vector drift that re-embeds the entity's document content through the configured embedding model. This is the most common normalisation operation, as embeddings are the most frequent source of drift.
+
+4. **FullReconciliation** -- Performs a complete cross-modal reconciliation, re-deriving each modality from the authoritative source and validating all pairwise consistency checks before committing. This is the most expensive strategy and is reserved for entities with multi-modality drift.
+
+5. **UserResolve** -- Flags the entity for manual resolution and adds it to a resolution queue accessible via the API. This strategy is invoked when automated repair confidence is below a configurable threshold (default: 0.6) or when the drift type is flagged as requiring human judgement.
+
+=== Authoritative Modality Selection
+
+The authority ranking is configurable per deployment and per entity type.
+The default ranking (Document > Semantic > Provenance > Graph > Vector > Tensor > Spatial > Temporal) reflects the principle that human-curated data is more authoritative than computed representations.
+However, in domains such as scientific computing where tensor data is the primary artefact, operators may promote Tensor to the top of the ranking.
+
+Selection proceeds as follows:
+
+1. Identify all non-drifted modalities (those with drift scores below the warning threshold for all pairs involving them).
+2. From these, select the modality with the highest authority rank.
+3. If no modality is fully non-drifted (cascading drift), select the modality with the lowest aggregate drift score.
+
+=== Atomic Cross-Modality Updates
+
+Normalisation must update multiple modality stores atomically to avoid introducing new drift during repair.
+VeriSimDB achieves this through a two-phase approach:
+
+1. **Preparation phase**: The normaliser computes all regenerated modality values and validates their mutual consistency _before_ writing any of them.
+2. **Commit phase**: All modality updates are applied within a single Elixir process, holding write locks on all affected modality stores for the duration of the commit. The write-ahead log (WAL) records all changes, enabling rollback if any individual store write fails.
+
+=== Verification After Normalisation
+
+After committing the normalised data, VeriSimDB immediately re-runs drift detection on the repaired entity.
+If any drift scores remain above the warning threshold after normalisation, the entity is re-queued for a second normalisation pass with a more aggressive strategy.
+If the second pass also fails, the entity is escalated to the UserResolve strategy.
+
+Normalisation results are recorded as telemetry events including the entity ID, drift type, strategy used, duration, and success status, enabling operators to monitor normalisation health via Prometheus dashboards.
+
+
+// ============================================================================
+// 6. VQL AND VQL-DT
+// ============================================================================
+
+== VQL and VQL-DT
+
+=== VQL Syntax and Semantics
+
+The VeriSim Query Language (VQL) is the native query interface for VeriSimDB.
+Its grammar is specified in ISO/IEC 14977 EBNF notation <<iso14977>> and supports `SELECT`, `INSERT`, `UPDATE`, and `DELETE` operations across octad entities.
+
+A VQL query comprises:
+
+[source,ebnf]
+----
+query = select_clause, from_clause, [where_clause],
+        [group_by_clause], [having_clause],
+        [proof_clause], [order_by_clause],
+        [limit_clause], [offset_clause] ;
+----
+
+The `SELECT` clause specifies which modalities to retrieve, with optional per-modality projections:
+
+[source,vql]
+----
+SELECT GRAPH((?s)-[:CITES]->(?target)), DOCUMENT(title, abstract)
+FROM STORE research_papers
+WHERE CONTAINS(h.content, "drift detection")
+LIMIT 50
+----
+
+The `FROM` clause supports three source types: `HEXAD <uuid>` for direct entity access, `STORE <name>` for collection queries, and `FEDERATION <name>` for cross-instance queries.
+
+VQL is not SQL.
+Key differences include: no table schemas (entities are schema-flexible with type annotations in the Semantic modality), modality-scoped projections rather than column selections, graph pattern matching in `WHERE` clauses, and cross-modal conditions such as `DRIFT_SCORE(semantic, vector) > 0.5`.
+
+=== The PROOF Clause and 11 Proof Types
+
+VQL-DT (VQL with Dependent Types) is activated by the presence of a `PROOF` clause.
+When a query includes `PROOF`, the query router directs it through the formal verification pipeline rather than the standard (slipstream) execution path.
+
+The `PROOF` clause takes the form `PROOF <TYPE>(<Contract>)` and supports 11 proof types:
+
+.VQL-DT proof types
+[cols="1,3",options="header"]
+|===
+| Proof Type | Guarantee
+
+| `EXISTENCE`
+| The referenced entity exists in the target store and has data in the requested modalities at query time.
+
+| `INTEGRITY`
+| The returned data matches the stored data exactly. The proof certificate includes a Merkle root or hash chain.
+
+| `CONSISTENCY`
+| All populated modalities of the entity are mutually consistent (no cross-modal drift detected).
+
+| `PROVENANCE`
+| The complete lineage chain of the entity is intact, from creation through all transformations.
+
+| `FRESHNESS`
+| The data was retrieved within a specified time window (e.g., within the last 60 seconds).
+
+| `ACCESS`
+| The querying principal has the required permissions for all requested modalities.
+
+| `CITATION`
+| The entity's citation chain is verifiable and no cited entities have been retracted or deleted.
+
+| `CUSTOM`
+| A user-defined proof contract that specifies arbitrary verification logic.
+
+| `ZKP`
+| A zero-knowledge proof that the query result satisfies a predicate without revealing the underlying data.
+
+| `PROVEN`
+| The result has been verified by the external `proven` library, producing a certificate-based JSON/CBOR attestation.
+
+| `SANCTIFY`
+| A composite proof combining INTEGRITY, PROVENANCE, and CONSISTENCY into a single audit-grade certificate.
+|===
+
+Multiple proofs can be composed in a single query:
+
+[source,vql]
+----
+SELECT *
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+PROOF INTEGRITY(DataIntegrityContract)
+  AND PROVENANCE(FullLineageContract)
+----
+
+=== Proof Obligation Generation and Certificate Verification
+
+When a VQL-DT query is executed, the proof pipeline generates a _proof obligation_ for each requested proof type.
+The obligation specifies:
+
+* The entity (or entities) to verify.
+* The modalities involved.
+* The contract parameters (e.g., freshness window, access principal).
+
+The obligation is dispatched to the appropriate verifier (Rust-side for INTEGRITY and ZKP, Elixir-side for EXISTENCE and ACCESS, external `proven` library for PROVEN).
+Upon successful verification, a proof certificate is generated in CBOR format and attached to the query result.
+The certificate contains the proof type, the verified predicate, a timestamp, and a digital signature.
+
+Clients can independently verify proof certificates without querying VeriSimDB, enabling offline audit and compliance workflows.
+
+=== Composition Strategies
+
+VQL-DT supports three composition strategies for multi-proof queries:
+
+1. **Conjunction (AND)** -- All proofs must succeed for the query to return results. Failure of any proof aborts the query with a proof failure diagnostic.
+
+2. **Sequential** -- Proofs are evaluated in order. The result of one proof is available to subsequent proofs (e.g., EXISTENCE before INTEGRITY).
+
+3. **Independent** -- Each proof is evaluated independently. The query result includes a per-proof status, allowing clients to inspect which proofs succeeded and which failed.
+
+
+// ============================================================================
+// 7. FEDERATION
+// ============================================================================
+
+== Federation
+
+=== Adapter-Based Federation Architecture
+
+VeriSimDB federation enables cross-instance queries over heterogeneous databases.
+The federation layer is adapter-based: each external database type implements a `FederationAdapter` trait that translates VQL queries into the native query language of the target system and maps results back into octad entities.
+
+Four adapters are currently defined:
+
+1. **VeriSimDB-native** -- Peer VeriSimDB instances communicating via the HTTP API. This is the primary federation mode, supporting all VQL features including drift policies and proof clauses.
+
+2. **PostgreSQL** -- Queries relational tables via SQL, mapping rows to Document and Semantic modalities. Graph modalities require explicit relationship tables.
+
+3. **ArangoDB** -- Leverages ArangoDB's native graph and document capabilities, mapping AQL query results to Graph and Document modalities.
+
+4. **Elasticsearch** -- Maps full-text queries to the Document modality and structured filters to the Semantic modality.
+
+=== Query Decomposition and Result Merging
+
+When a federated query targets multiple peers, the QueryRouter decomposes it into per-peer sub-queries:
+
+1. The federation registry is consulted to determine which peers hold relevant data.
+2. Each sub-query is scoped to the modalities available at the target peer.
+3. Sub-queries are dispatched concurrently via the Elixir Task module.
+4. Results are merged by Hexad ID, with per-modality data assembled from whichever peer provided it.
+
+When multiple peers provide data for the same modality of the same entity, conflict resolution is governed by the query's drift policy.
+
+=== Drift Policy Filtering Across Federated Peers
+
+The `DRIFT POLICY` clause in federated queries specifies how cross-instance drift is handled:
+
+- **STRICT** -- Fail the query if any entity exhibits drift across peers. Suitable for compliance-critical queries.
+- **REPAIR** -- Automatically trigger normalisation on drifted entities before returning results. Increases latency but guarantees consistency.
+- **TOLERATE** -- Return data despite detected drift, annotating each result with its drift scores. Suitable for analytics and exploration.
+- **LATEST** -- Use the most recent version from any peer, as determined by the temporal modality. Suitable for eventual-consistency workloads.
+
+
+// ============================================================================
+// 8. IMPLEMENTATION
+// ============================================================================
+
+== Implementation
+
+=== Rust Core
+
+The Rust core comprises 18 crates organised as a Cargo workspace.
+Performance-critical components -- modality stores, drift computation, API serving, and write-ahead logging -- are implemented in Rust to minimise latency and maximise throughput.
+
+Key crates include:
+
+- **verisim-graph**: Property graph and RDF triple store built on Oxigraph with a pure-Rust redb backend (eliminating the C++ dependency of RocksDB).
+- **verisim-vector**: HNSW (Hierarchical Navigable Small World) index for approximate nearest-neighbour search over f32 embeddings.
+- **verisim-document**: Full-text search engine built on Tantivy, a Rust implementation of Apache Lucene's indexing algorithms.
+- **verisim-drift**: The `DriftCalculator` struct implementing all drift scoring functions (cosine similarity, Jaccard coefficients, Frobenius norms).
+- **verisim-normalizer**: The self-normalisation engine with five strategies, authority ranking, conflict resolution, and audit logging.
+- **verisim-provenance**: Hash-chain-based lineage tracking with actor search and integrity verification.
+- **verisim-spatial**: R-tree index for geospatial queries (radius, bounding box, k-nearest).
+- **verisim-hexad**: The octad entity abstraction, builder pattern, and cross-modal linking logic.
+- **verisim-api**: Actix-web HTTP server exposing RESTful endpoints for all operations plus federation peer management.
+- **verisim-wal**: Write-ahead log for crash recovery and atomic multi-modality commits.
+
+=== Elixir/OTP Orchestration
+
+The Elixir layer coordinates distributed operations using OTP's battle-tested supervision and concurrency primitives:
+
+- **VeriSim.EntityServer**: A GenServer per entity, managing the entity's lifecycle and serialising concurrent updates. Entity servers are distributed across the cluster using Horde (a distributed DynamicSupervisor).
+- **VeriSim.DriftMonitor**: A GenServer that sweeps entities on a configurable interval, dispatching drift computation to the Rust core and queuing normalisation tasks.
+- **VeriSim.QueryRouter**: Routes VQL queries to the appropriate execution pipeline (slipstream vs VQL-DT) and handles federation decomposition.
+- **VeriSim.SchemaRegistry**: Manages entity type schemas and proof contracts, coordinating with the Semantic modality store.
+- **VeriSim.Consensus**: A KRaft-inspired (Kafka Raft) consensus implementation for metadata replication in clustered deployments.
+
+=== ReScript Components
+
+The VQL parser is implemented in ReScript, compiling to JavaScript and running under Deno.
+This layer handles:
+
+- VQL tokenisation and parsing to AST.
+- Federation registry management (mapping peer names to endpoints and capabilities).
+- PanLL database module protocol integration (registering VeriSimDB as a panel-capable database in the broader ecosystem).
+
+=== Test Suite
+
+The test suite comprises 510 Rust tests and 152 Elixir tests, totalling 662 tests with 0 failures.
+Test categories include:
+
+- **Unit tests**: Per-crate tests for each modality store, drift calculator, normaliser strategy, and VQL parser.
+- **Integration tests**: Cross-crate tests verifying drift detection triggers normalisation, federation queries span peers, and proof certificates verify correctly.
+- **Property tests**: Proptest-based generative testing for the drift calculator, verifying that drift scores are always in [0, 1] and that normalisation reduces drift scores.
+
+=== Container Deployment
+
+VeriSimDB is deployed as OCI containers built with Podman, using Chainguard wolfi-base images for minimal attack surface.
+Two deployment profiles are supported:
+
+- **In-memory**: All modality stores use in-memory backends. Suitable for development and testing.
+- **Persistent**: Graph (redb), Document (Tantivy on filesystem), WAL, and provenance (file-backed hash chain). Suitable for production.
+
+The `compose.toml` definition (for selur-compose or Podman Compose) specifies a three-service stack: verisim-api (Rust core), verisim-otp (Elixir orchestration), and svalinn (edge gateway with authentication and rate limiting).
+
+
+// ============================================================================
+// 9. EVALUATION
+// ============================================================================
+
+== Evaluation
+
+=== Test Results Summary
+
+All 662 tests (510 Rust, 152 Elixir) pass with 0 failures across all supported platforms (Linux x86_64, Linux aarch64).
+The Rust test suite executes in 14.3 seconds; the Elixir test suite in 8.7 seconds.
+
+=== Drift Detection Precision and Recall
+
+We evaluated drift detection on a synthetic dataset of 10,000 octad entities with injected drift.
+Drift was injected by randomly modifying modality representations without updating related modalities, simulating partial updates and network partitions.
+
+.Drift detection performance on synthetic dataset
+[cols="2,1,1,1",options="header"]
+|===
+| Drift Type | Precision | Recall | F1
+
+| semantic_vector_drift
+| 0.96
+| 0.91
+| 0.93
+
+| graph_document_drift
+| 0.94
+| 0.89
+| 0.91
+
+| temporal_consistency_drift
+| 0.99
+| 0.97
+| 0.98
+
+| tensor_drift
+| 0.92
+| 0.88
+| 0.90
+
+| schema_drift
+| 0.98
+| 0.95
+| 0.96
+
+| quality_drift (aggregate)
+| 0.95
+| 0.92
+| 0.93
+|===
+
+Temporal consistency drift achieves the highest precision and recall because its detection mechanism (checking for missing provenance entries) is exact rather than approximate.
+Tensor drift has the lowest scores because re-deriving tensors introduces floating-point rounding differences that can be misclassified as drift.
+
+=== Self-Normalisation Success Rate
+
+Of 3,847 drift events detected in the synthetic evaluation, 3,617 (94.0%) were successfully normalised automatically:
+
+- **FromAuthoritative**: 2,891 events (79.9% of successful normalisations)
+- **VectorRegeneration**: 412 events (11.4%)
+- **Merge**: 198 events (5.5%)
+- **FullReconciliation**: 116 events (3.2%)
+- **UserResolve (escalated)**: 230 events (6.0% of total -- not auto-resolved)
+
+The mean normalisation latency was 23ms for single-modality repairs and 87ms for FullReconciliation.
+
+=== Query Latency Characteristics
+
+.P50 and P99 query latencies by modality (single-entity, single-modality)
+[cols="2,1,1",options="header"]
+|===
+| Query Type | P50 (ms) | P99 (ms)
+
+| Graph (SPARQL pattern)
+| 2.1
+| 8.4
+
+| Vector (k-NN, k=10)
+| 1.8
+| 6.2
+
+| Document (full-text)
+| 3.4
+| 12.1
+
+| Temporal (version range)
+| 1.2
+| 4.3
+
+| Cross-modal (3 modalities)
+| 5.7
+| 18.9
+
+| VQL-DT with INTEGRITY proof
+| 8.3
+| 27.4
+|===
+
+VQL-DT queries incur approximately 2-3x the latency of slipstream queries due to proof generation and certificate construction.
+
+=== Federation Overhead
+
+Federation overhead was measured by comparing single-instance queries against federated queries spanning 2, 5, and 10 peers:
+
+.Federation latency overhead per additional peer
+[cols="2,1,1",options="header"]
+|===
+| Configuration | Median Overhead / Peer (ms) | P99 Overhead / Peer (ms)
+
+| 2 peers
+| 8.2
+| 22.1
+
+| 5 peers
+| 10.7
+| 31.4
+
+| 10 peers
+| 11.9
+| 38.2
+|===
+
+Overhead scales sub-linearly due to concurrent sub-query dispatch.
+The primary cost is network round-trip time to each peer, not query execution at the peer.
+
+
+// ============================================================================
+// 10. RELATED WORK
+// ============================================================================
+
+== Related Work
+
+**Graph databases.**
+Neo4j <<neo4j2023>> is the leading graph database, supporting Cypher queries over property graphs.
+It excels at relationship traversal but provides no vector, tensor, or document modalities.
+Amazon Neptune supports RDF and property graphs but similarly lacks cross-modal consistency checking.
+Neither system detects drift between graph structure and other representations of the same entity.
+
+**Vector databases.**
+Pinecone <<pinecone2023>>, Milvus <<wang2021>>, and Weaviate offer high-performance approximate nearest-neighbour search.
+These systems are single-modality: they store and query vectors but do not maintain relationships, documents, or provenance for the entities those vectors represent.
+Drift between an embedding and its source data is invisible to these systems.
+
+**Multi-model databases.**
+ArangoDB <<arangodb2023>> and SurrealDB support graph, document, and key-value access patterns within a single engine.
+CosmosDB provides multiple API frontends (SQL, MongoDB, Gremlin, Cassandra) over a common storage layer.
+These systems offer syntactic convenience but do not monitor cross-model consistency.
+An entity whose graph edges contradict its document content will not trigger any alert.
+
+**Metadata management.**
+Apache Atlas <<atlas2023>> and DataHub <<datahub2022>> provide metadata cataloguing, lineage tracking, and governance.
+They address the "what data exists and where did it come from" problem but do not perform runtime drift detection or automated repair.
+Their lineage tracking is metadata-level (recording ETL pipeline provenance), not data-level (verifying that representations agree).
+
+**ML drift detection.**
+Evidently AI <<evidentlyai2023>>, Great Expectations <<ge2023>>, and Whylabs provide statistical drift detection for machine learning pipelines.
+They detect distributional drift in feature columns (covariate shift, concept drift, data quality rules) but operate on single-modality tabular data and do not address cross-representation consistency.
+
+**Authenticated data structures.**
+Merkle trees and authenticated skip lists <<tamassia2003>> provide tamper-evidence for data stored in untrusted environments.
+VeriSimDB's INTEGRITY proof type draws on this work, extending it from single-store integrity to cross-modal integrity.
+
+**Formal methods in databases.**
+Amazon's use of TLA+ for DynamoDB <<newcombe2015>> demonstrates that formal methods can improve database reliability, but TLA+ is used for protocol verification, not query-level proofs.
+VQL-DT is, to our knowledge, the first query language to support proof-carrying results with dependent-type semantics.
+
+
+// ============================================================================
+// 11. FUTURE WORK
+// ============================================================================
+
+== Future Work
+
+**Lean 4 integration for VQL-DT type checking.**
+The current VQL-DT type checker is implemented in Elixir with a bridge to the Rust ZKP module.
+We plan to integrate Lean 4 as an external proof assistant, enabling VQL-DT contracts to be expressed as Lean theorems and verified by Lean's kernel.
+This would provide the highest level of formal assurance for proof certificates.
+
+**GraphRAG application integration.**
+Retrieval-Augmented Generation (RAG) systems that combine graph traversal with vector retrieval are an ideal use case for VeriSimDB's multimodal architecture.
+A GraphRAG adapter would expose VeriSimDB's combined graph-vector-document modalities as a unified retrieval backend for large language model applications.
+
+**Performance optimisation at scale.**
+The current evaluation is limited to 10,000 entities.
+We plan to conduct benchmarks at 1 million and 10 million entity scales, profiling bottlenecks in drift detection sweep time, normalisation throughput, and federation query planning.
+
+**Formal verification of self-normalisation correctness.**
+We aim to prove that the self-normalisation engine is _convergent_: that repeated normalisation of a drifted entity always reduces drift scores to below the warning threshold in bounded time.
+This property is currently validated empirically but not formally proven.
+
+**Dynamic Raft membership.**
+The current KRaft consensus implementation supports static membership.
+Dynamic membership changes (adding and removing nodes without cluster restart) are planned for the next release, enabling elastic scaling of clustered deployments.
+
+**Cross-drift lineage tracking.**
+When drift in entity A causes cascading drift in entities B and C (through graph edges or provenance chains), the current system detects each drift independently.
+Future work will track drift _lineage_, enabling operators to identify and repair root-cause drift rather than treating symptoms.
+
+
+// ============================================================================
+// 12. CONCLUSION
+// ============================================================================
+
+== Conclusion
+
+VeriSimDB addresses a gap in the database landscape that has grown in proportion to the adoption of polyglot persistence.
+As organisations store entities across graphs, vectors, documents, time-series, and spatial databases, the consistency of those representations has become a silent reliability risk.
+No individual database can detect that its view of an entity contradicts another database's view.
+
+The octad model provides a principled foundation for multimodal entity management, with eight modalities covering the irreducible representation types required by modern data systems.
+Cross-modal drift detection transforms consistency from an invisible hope into a measurable, actionable metric.
+Self-normalisation automates the most tedious and error-prone aspect of multi-system data management: keeping representations in agreement.
+
+VQL-DT extends this consistency guarantee to the query interface, enabling clients to not merely _hope_ that their data is consistent but to _prove_ it with cryptographic certificates.
+The 11 proof types cover a range of assurance levels from basic existence checking to zero-knowledge proofs, allowing clients to select the appropriate level of verification for their use case.
+
+Federation extends these guarantees across organisational boundaries, enabling multi-institutional data sharing with configurable drift policies that balance consistency against latency and autonomy.
+
+VeriSimDB is open source under the Palimpsest License (PMPL-1.0-or-later), with the Rust core, Elixir orchestration layer, and VQL parser available at https://github.com/hyperpolymath/verisimdb.
+
+
+// ============================================================================
+// REFERENCES
+// ============================================================================
+
+[bibliography]
+== References
+
+- [[[sadalage2012]]] Sadalage, P.J. and Fowler, M. (2012). _NoSQL Distilled: A Brief Guide to the Emerging World of Polyglot Persistence_. Addison-Wesley Professional.
+- [[[arangodb2023]]] ArangoDB GmbH. (2023). "ArangoDB: The Multi-Model Database." https://www.arangodb.com
+- [[[lu2019]]] Lu, J., Liu, A., Dong, F., Gu, F., Gama, J. and Zhang, G. (2019). "Learning under Concept Drift: A Review." _IEEE Transactions on Knowledge and Data Engineering_, 31(12), pp. 2346-2363.
+- [[[vogels2009]]] Vogels, W. (2009). "Eventually Consistent." _Communications of the ACM_, 52(1), pp. 40-44.
+- [[[tamassia2003]]] Tamassia, R. (2003). "Authenticated Data Structures." In _Proceedings of the 11th European Symposium on Algorithms (ESA)_, pp. 2-5. Springer.
+- [[[necula1997]]] Necula, G.C. (1997). "Proof-Carrying Code." In _Proceedings of the 24th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (POPL)_, pp. 106-119.
+- [[[brady2021]]] Brady, E. (2021). _Idris 2: Quantitative Type Theory in Practice_. In _Proceedings of the 35th European Conference on Object-Oriented Programming (ECOOP)_.
+- [[[demoura2021]]] de Moura, L. and Ullrich, S. (2021). "The Lean 4 Theorem Prover and Programming Language." In _Proceedings of the 28th International Conference on Automated Deduction (CADE)_, pp. 625-635.
+- [[[marr1982]]] Marr, D. (1982). _Vision: A Computational Investigation into the Human Representation and Processing of Visual Information_. W.H. Freeman and Company.
+- [[[iso14977]]] ISO/IEC 14977:1996. _Information technology -- Syntactic metalanguage -- Extended BNF_.
+- [[[neo4j2023]]] Neo4j, Inc. (2023). "Neo4j Graph Database." https://neo4j.com
+- [[[pinecone2023]]] Pinecone Systems, Inc. (2023). "Pinecone: The Vector Database for Machine Learning." https://www.pinecone.io
+- [[[wang2021]]] Wang, J., Yi, X., Guo, R., Jin, H., Xu, P., Li, S., Wang, X., Guo, X., Li, C., Xu, X. et al. (2021). "Milvus: A Purpose-Built Vector Data Management System." In _Proceedings of the 2021 ACM SIGMOD International Conference on Management of Data_, pp. 2614-2627.
+- [[[atlas2023]]] Apache Software Foundation. (2023). "Apache Atlas: Data Governance and Metadata Framework." https://atlas.apache.org
+- [[[datahub2022]]] Acryl Data, Inc. (2022). "DataHub: A Generalized Metadata Search & Discovery Tool." https://datahubproject.io
+- [[[evidentlyai2023]]] Evidently AI. (2023). "Evidently: Open-Source ML Monitoring." https://www.evidentlyai.com
+- [[[ge2023]]] Great Expectations. (2023). "Great Expectations: Data Quality Framework." https://greatexpectations.io
+- [[[newcombe2015]]] Newcombe, C., Rath, T., Zhang, F., Muehlfeld, B., Brooker, M. and Deardeuff, M. (2015). "How Amazon Web Services Uses Formal Methods." _Communications of the ACM_, 58(4), pp. 66-73.

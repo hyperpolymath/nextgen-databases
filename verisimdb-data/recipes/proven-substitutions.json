@@ -1,0 +1,186 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Maps panic-attacker WeakPointCategories to proven safety modules with triangle tiers",
+  "substitutions": [
+    {
+      "pa_rule": "PA001",
+      "category": "UncheckedAllocation",
+      "triangle_tier": "substitute",
+      "proven_modules": ["SafeBuffer"],
+      "confidence": 0.85,
+      "formally_proven": false,
+      "note": "SafeBuffer provides bounds-checked allocation with dependent types"
+    },
+    {
+      "pa_rule": "PA002",
+      "category": "UnboundedLoop",
+      "triangle_tier": "control",
+      "proven_modules": [],
+      "confidence": 0.70,
+      "formally_proven": false,
+      "note": "No proven module — add loop bound annotations and documentation"
+    },
+    {
+      "pa_rule": "PA003",
+      "category": "BlockingIO",
+      "triangle_tier": "control",
+      "proven_modules": [],
+      "confidence": 0.65,
+      "formally_proven": false,
+      "note": "No proven module — add timeout guards and async alternatives"
+    },
+    {
+      "pa_rule": "PA004",
+      "category": "UnsafeCode",
+      "triangle_tier": "substitute",
+      "proven_modules": ["SafeBuffer", "SafeMath"],
+      "confidence": 0.80,
+      "formally_proven": false,
+      "note": "SafeBuffer for memory ops, SafeMath for arithmetic — covers most unsafe blocks"
+    },
+    {
+      "pa_rule": "PA005",
+      "category": "PanicPath",
+      "triangle_tier": "control",
+      "proven_modules": [],
+      "confidence": 0.75,
+      "formally_proven": false,
+      "note": "No proven module — replace unwrap/expect with proper error handling"
+    },
+    {
+      "pa_rule": "PA006",
+      "category": "RaceCondition",
+      "triangle_tier": "control",
+      "proven_modules": [],
+      "confidence": 0.60,
+      "formally_proven": false,
+      "note": "No proven module — requires manual synchronization review"
+    },
+    {
+      "pa_rule": "PA007",
+      "category": "DeadlockPotential",
+      "triangle_tier": "control",
+      "proven_modules": [],
+      "confidence": 0.55,
+      "formally_proven": false,
+      "note": "No proven module — requires lock ordering analysis"
+    },
+    {
+      "pa_rule": "PA008",
+      "category": "ResourceLeak",
+      "triangle_tier": "control",
+      "proven_modules": [],
+      "confidence": 0.70,
+      "formally_proven": false,
+      "note": "No proven module — add RAII guards and defer patterns"
+    },
+    {
+      "pa_rule": "PA009",
+      "category": "CommandInjection",
+      "triangle_tier": "substitute",
+      "proven_modules": ["SafeCommand", "SafeSQL", "SafeGit", "SafeSSH"],
+      "confidence": 0.90,
+      "formally_proven": false,
+      "note": "SafeCommand for shell, SafeSQL for SQL, SafeGit for git ops, SafeSSH for remote"
+    },
+    {
+      "pa_rule": "PA010",
+      "category": "UnsafeDeserialization",
+      "triangle_tier": "substitute",
+      "proven_modules": ["SafeJson", "SafeYAML", "SafeXML"],
+      "confidence": 0.95,
+      "formally_proven": true,
+      "note": "SafeJson is formally proven in Idris2 with dependent types"
+    },
+    {
+      "pa_rule": "PA011",
+      "category": "DynamicCodeExecution",
+      "triangle_tier": "substitute",
+      "proven_modules": ["SafeHtml", "SafeTemplate"],
+      "confidence": 0.85,
+      "formally_proven": false,
+      "note": "SafeHtml for DOM injection, SafeTemplate for template injection"
+    },
+    {
+      "pa_rule": "PA012",
+      "category": "UnsafeFFI",
+      "triangle_tier": "control",
+      "proven_modules": [],
+      "confidence": 0.60,
+      "formally_proven": false,
+      "note": "No proven module — follow Idris2 ABI + Zig FFI standard pattern"
+    },
+    {
+      "pa_rule": "PA013",
+      "category": "AtomExhaustion",
+      "triangle_tier": "eliminate",
+      "proven_modules": [],
+      "confidence": 0.70,
+      "formally_proven": false,
+      "note": "No proven module — use String.to_existing_atom or bounded atom pools"
+    },
+    {
+      "pa_rule": "PA014",
+      "category": "InsecureProtocol",
+      "triangle_tier": "substitute",
+      "proven_modules": ["SafeUrl", "SafeNetwork"],
+      "confidence": 0.95,
+      "formally_proven": true,
+      "note": "SafeUrl and SafeNetwork formally proven — enforce HTTPS, reject downgrade"
+    },
+    {
+      "pa_rule": "PA015",
+      "category": "ExcessivePermissions",
+      "triangle_tier": "substitute",
+      "proven_modules": ["SafeCapability"],
+      "confidence": 0.80,
+      "formally_proven": false,
+      "note": "SafeCapability provides object-capability security model"
+    },
+    {
+      "pa_rule": "PA016",
+      "category": "PathTraversal",
+      "triangle_tier": "substitute",
+      "proven_modules": ["SafePath"],
+      "confidence": 0.98,
+      "formally_proven": true,
+      "note": "Dependent types prove no .. escapes — highest assurance"
+    },
+    {
+      "pa_rule": "PA017",
+      "category": "HardcodedSecret",
+      "triangle_tier": "eliminate",
+      "proven_modules": ["SafeEnv"],
+      "confidence": 0.90,
+      "formally_proven": false,
+      "note": "SafeEnv provides typed environment variable access — secrets never in source"
+    },
+    {
+      "pa_rule": "PA018",
+      "category": "UncheckedError",
+      "triangle_tier": "control",
+      "proven_modules": [],
+      "confidence": 0.75,
+      "formally_proven": false,
+      "note": "No proven module — replace with Result/Option handling"
+    },
+    {
+      "pa_rule": "PA019",
+      "category": "InfiniteRecursion",
+      "triangle_tier": "control",
+      "proven_modules": [],
+      "confidence": 0.65,
+      "formally_proven": false,
+      "note": "No proven module — add recursion depth bounds or totality annotations"
+    },
+    {
+      "pa_rule": "PA020",
+      "category": "UnsafeTypeCoercion",
+      "triangle_tier": "eliminate",
+      "proven_modules": [],
+      "confidence": 0.70,
+      "formally_proven": false,
+      "note": "No proven module — use explicit conversion functions with validation"
+    }
+  ]
+}

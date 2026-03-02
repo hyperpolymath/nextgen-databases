@@ -1,0 +1,67 @@
+{
+  "program_path": ".",
+  "language": "shell",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "scripts/connect-peers.sh",
+      "severity": "Medium",
+      "description": "21 potentially unquoted variable expansions in scripts/connect-peers.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 916,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 2,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "scripts/generate-swarm-key.sh",
+      "lines": 29,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": []
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/connect-peers.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

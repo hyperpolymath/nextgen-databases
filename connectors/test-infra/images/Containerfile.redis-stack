@@ -1,0 +1,116 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# VeriSimDB Test Infrastructure — Redis Stack
+#
+# Multi-stage build of Redis with RediSearch, RedisJSON, RedisTimeSeries,
+# and RedisGraph modules on top of Chainguard wolfi-base.
+#
+# Provides:
+#   - RediSearch: full-text search over hexad document modalities
+#   - RedisJSON: native JSON storage for hexad documents
+#   - RedisTimeSeries: temporal modality time-series data
+#   - RedisGraph: lightweight graph queries (deprecated upstream but
+#     still useful for test coverage of graph federation paths)
+#
+# Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+
+# ---------------------------------------------------------------------------
+# Stage 1: Build Redis and modules from source
+# ---------------------------------------------------------------------------
+FROM cgr.dev/chainguard/wolfi-base:latest AS builder
+
+RUN apk add --no-cache \
+    build-base \
+    cmake \
+    git \
+    curl \
+    clang \
+    llvm \
+    rust \
+    cargo \
+    openssl-dev \
+    libstdc++-dev
+
+# Build Redis
+ARG REDIS_VERSION=7.4.2
+RUN curl -fsSL "https://download.redis.io/releases/redis-${REDIS_VERSION}.tar.gz" \
+    | tar xz -C /tmp \
+    && cd "/tmp/redis-${REDIS_VERSION}" \
+    && make -j"$(nproc)" BUILD_TLS=yes \
+    && make install PREFIX=/opt/redis
+
+# Build RediSearch
+ARG REDISEARCH_VERSION=2.10.7
+RUN git clone --depth 1 --branch "v${REDISEARCH_VERSION}" \
+    --recurse-submodules \
+    https://github.com/RediSearch/RediSearch.git /tmp/RediSearch \
+    && cd /tmp/RediSearch \
+    && mkdir build && cd build \
+    && cmake .. -DCMAKE_BUILD_TYPE=Release \
+    && make -j"$(nproc)" \
+    && cp /tmp/RediSearch/build/redisearch.so /opt/redis/lib/
+
+# Build RedisJSON
+ARG REDISJSON_VERSION=2.8.5
+RUN git clone --depth 1 --branch "v${REDISJSON_VERSION}" \
+    https://github.com/RedisJSON/RedisJSON.git /tmp/RedisJSON \
+    && cd /tmp/RedisJSON \
+    && cargo build --release \
+    && cp target/release/librejson.so /opt/redis/lib/rejson.so
+
+# Build RedisTimeSeries
+ARG REDISTIMESERIES_VERSION=1.12.2
+RUN git clone --depth 1 --branch "v${REDISTIMESERIES_VERSION}" \
+    --recurse-submodules \
+    https://github.com/RedisTimeSeries/RedisTimeSeries.git /tmp/RedisTimeSeries \
+    && cd /tmp/RedisTimeSeries \
+    && mkdir build && cd build \
+    && cmake .. -DCMAKE_BUILD_TYPE=Release \
+    && make -j"$(nproc)" \
+    && cp /tmp/RedisTimeSeries/build/redistimeseries.so /opt/redis/lib/
+
+# ---------------------------------------------------------------------------
+# Stage 2: Runtime image (minimal)
+# ---------------------------------------------------------------------------
+FROM cgr.dev/chainguard/wolfi-base:latest
+
+RUN apk add --no-cache \
+    libstdc++ \
+    openssl \
+    curl
+
+# Copy Redis binaries and modules
+COPY --from=builder /opt/redis /opt/redis
+
+# Create non-root user
+RUN addgroup -g 1000 redis \
+    && adduser -u 1000 -G redis -D -h /data redis
+
+# Create directories
+RUN mkdir -p /data /etc/redis \
+    && chown -R redis:redis /data /etc/redis
+
+# Redis configuration with modules loaded
+RUN printf '%s\n' \
+    "bind 0.0.0.0" \
+    "port 6379" \
+    "dir /data" \
+    "loadmodule /opt/redis/lib/redisearch.so" \
+    "loadmodule /opt/redis/lib/rejson.so" \
+    "loadmodule /opt/redis/lib/redistimeseries.so" \
+    "protected-mode no" \
+    "save ''" \
+    "appendonly no" \
+    > /etc/redis/redis.conf
+
+ENV PATH="/opt/redis/bin:${PATH}"
+
+USER redis
+WORKDIR /data
+
+EXPOSE 6379
+
+HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=10s \
+    CMD redis-cli ping | grep -q PONG
+
+ENTRYPOINT ["redis-server", "/etc/redis/redis.conf"]

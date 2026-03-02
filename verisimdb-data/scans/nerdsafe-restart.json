@@ -1,0 +1,148 @@
+{
+  "program_path": ".",
+  "language": "ada",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "bootstrap-check.sh",
+      "severity": "Critical",
+      "description": "eval usage in bootstrap-check.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bootstrap-check.sh",
+      "severity": "Medium",
+      "description": "55 potentially unquoted variable expansions in bootstrap-check.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "nerdsafe-restart.sh",
+      "severity": "Medium",
+      "description": "83 potentially unquoted variable expansions in nerdsafe-restart.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 2484,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 2,
+    "io_operations": 7,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/ada/main.adb",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/nerdsafe_tui.adb",
+      "lines": 485,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/nerdsafe_tui.ads",
+      "lines": 161,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bootstrap-check.sh",
+      "lines": 241,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "nerdsafe-restart.sh",
+      "lines": 487,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "bootstrap-check.sh",
+        "to": "nerdsafe-restart.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/main.adb",
+        "to": "src/ada/nerdsafe_tui.adb",
+        "relation": "shared_dir:src/ada",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/nerdsafe_tui.adb",
+        "to": "src/ada/nerdsafe_tui.ads",
+        "relation": "shared_dir:src/ada",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "bootstrap-check.sh",
+          "bootstrap-check.sh",
+          "nerdsafe-restart.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "bootstrap-check.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Disk"
+      }
+    ]
+  }
+}

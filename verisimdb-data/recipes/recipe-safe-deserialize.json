@@ -1,0 +1,23 @@
+{
+  "id": "recipe-safe-deserialize",
+  "triangle_tier": "substitute",
+  "pattern_ids": [
+    "PA010-json-parseexn",
+    "PA010-unsafe-deserialize",
+    "PA010-yaml-unsafe-load"
+  ],
+  "description": "Replace throwing deserialization (JSON.parseExn, yaml.unsafe_load, pickle.loads) with safe Result-returning alternatives",
+  "action": "substitute_text",
+  "match": "JSON.parseExn, yaml.unsafe_load, pickle.loads, or other throwing deserializers",
+  "replacement": "JSON.parse (Result), yaml.safe_load, or validated decode pipeline",
+  "confidence": 0.70,
+  "proven_module": "SafeDeserialize",
+  "proven_modules": ["SafeDeserialize"],
+  "formally_proven": false,
+  "languages": ["rescript", "javascript", "elixir", "*"],
+  "auto_fixable": false,
+  "fix_script": null,
+  "successful_fixes": 0,
+  "failed_fixes": 0,
+  "total_attempts": 0
+}

@@ -1,0 +1,168 @@
+{
+  "program_path": ".",
+  "language": "nickel",
+  "frameworks": [],
+  "weak_points": [],
+  "statistics": {
+    "total_lines": 2487,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 1,
+    "io_operations": 9,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "extract-current-dns.sh",
+      "lines": 52,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "workers/security-headers.js",
+      "lines": 38,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "workers/consent-aware-http.js",
+      "lines": 85,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "workers/http-capability-gateway.js",
+      "lines": 139,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "generate-domains-csv.sh",
+      "lines": 63,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "auto-add-new-sites.sh",
+      "lines": 63,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "extract-current-dns.sh",
+        "to": "generate-domains-csv.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "generate-domains-csv.sh",
+        "to": "auto-add-new-sites.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "workers/security-headers.js",
+        "to": "workers/consent-aware-http.js",
+        "relation": "shared_dir:workers",
+        "weight": 1.0
+      },
+      {
+        "from": "workers/consent-aware-http.js",
+        "to": "workers/http-capability-gateway.js",
+        "relation": "shared_dir:workers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": []
+  }
+}

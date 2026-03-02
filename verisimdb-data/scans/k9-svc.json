@@ -1,0 +1,244 @@
+{
+  "program_path": ".",
+  "language": "nickel",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "InsecureProtocol",
+      "location": "register.ncl",
+      "severity": "Medium",
+      "description": "2 HTTP (non-HTTPS) URLs in register.ncl",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "sign.sh",
+      "severity": "Medium",
+      "description": "82 potentially unquoted variable expansions in sign.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "k9-sign/src/tests.rs",
+      "severity": "Medium",
+      "description": "45 unwrap/expect calls in k9-sign/src/tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "k9-sign/install.sh",
+      "severity": "Medium",
+      "description": "48 potentially unquoted variable expansions in k9-sign/install.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "benchmarks/k9-bench.sh",
+      "severity": "Critical",
+      "description": "eval usage in benchmarks/k9-bench.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "benchmarks/k9-bench.sh",
+      "severity": "Medium",
+      "description": "44 potentially unquoted variable expansions in benchmarks/k9-bench.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "benchmarks/quick-bench.sh",
+      "severity": "Critical",
+      "description": "eval usage in benchmarks/quick-bench.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "benchmarks/quick-bench.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in benchmarks/quick-bench.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 4908,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 45,
+    "allocation_sites": 0,
+    "io_operations": 12,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "examples/hello.k9.ncl",
+      "lines": 41,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/config.k9.ncl",
+      "lines": 99,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/deploy.k9.ncl",
+      "lines": 152,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "k9-sign/src/tests.rs",
+      "lines": 358,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 45,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "k9-sign/install.sh",
+      "lines": 288,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "benchmarks/k9-bench.sh",
+      "lines": 382,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "memory",
+    "cpu",
+    "network"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "examples/hello.k9.ncl",
+        "to": "examples/config.k9.ncl",
+        "relation": "shared_dir:examples",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/config.k9.ncl",
+        "to": "examples/deploy.k9.ncl",
+        "relation": "shared_dir:examples",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "benchmarks/k9-bench.sh",
+          "benchmarks/quick-bench.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "k9-sign/src/tests.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "register.ncl"
+        ],
+        "frameworks": [],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "sign.sh",
+          "k9-sign/install.sh",
+          "benchmarks/k9-bench.sh",
+          "benchmarks/k9-bench.sh",
+          "benchmarks/quick-bench.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "k9-sign/src/tests.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "benchmarks/quick-bench.sh"
+        ],
+        "frameworks": [],
+        "relation": "PathTraversal->Disk"
+      }
+    ]
+  }
+}

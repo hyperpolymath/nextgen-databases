@@ -1,0 +1,22 @@
+{
+  "action": "substitute_text",
+  "auto_fixable": true,
+  "confidence": 0.99,
+  "description": "Replace hardcoded /tmp/ paths with mktemp -d for safe temporary directories",
+  "failed_fixes": 0,
+  "fix_script": "fix-tmp-paths.sh",
+  "id": "recipe-tmp-to-mktemp",
+  "languages": [
+    "shell",
+    "bash"
+  ],
+  "match": "hardcoded /tmp/ path",
+  "pattern_ids": [
+    "PA016-hardcoded-tmp-path"
+  ],
+  "proven_module": "SafePath",
+  "replacement": "$(mktemp -d)",
+  "successful_fixes": 64,
+  "total_attempts": 64,
+  "triangle_tier": "eliminate"
+}

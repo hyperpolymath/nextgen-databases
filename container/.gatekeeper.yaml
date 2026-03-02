@@ -1,0 +1,100 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# Svalinn gatekeeper policy for VeriSimDB
+#
+# Controls which operations are permitted through the edge gateway.
+# See: stapeln/container-stack/svalinn/
+
+version: "1.0"
+
+# Authentication requirements
+auth:
+  # Public endpoints (no auth required)
+  public:
+    - path: "/health"
+      methods: ["GET"]
+    - path: "/ready"
+      methods: ["GET"]
+    - path: "/metrics"
+      methods: ["GET"]
+
+  # Endpoints requiring JWT/OAuth2 authentication
+  authenticated:
+    - path: "/api/v1/*"
+      methods: ["GET", "POST", "PUT", "DELETE"]
+    - path: "/graphql"
+      methods: ["POST"]
+
+  # Federation endpoints require PSK in addition to JWT
+  federation:
+    - path: "/api/v1/federation/*"
+      methods: ["GET", "POST"]
+      require: ["jwt", "psk"]
+
+# Rate limiting
+rate_limits:
+  # Global: 1000 req/s per authenticated client
+  global:
+    requests_per_second: 1000
+    burst: 2000
+
+  # Write operations: 100 req/s (protects modality stores)
+  writes:
+    paths: ["/api/v1/hexads"]
+    methods: ["POST", "PUT", "DELETE"]
+    requests_per_second: 100
+    burst: 200
+
+  # Search operations: 500 req/s (protects Tantivy/HNSW)
+  search:
+    paths: ["/api/v1/search/*"]
+    methods: ["GET", "POST"]
+    requests_per_second: 500
+    burst: 1000
+
+# Container trust policy
+trust:
+  # Only accept .ctp bundles signed by these keys
+  trusted_signers:
+    - key_id: "hyperpolymath-release"
+      algorithm: "Ed25519"
+      public_key_file: "/etc/svalinn/keys/hyperpolymath-release.pub"
+
+  # Require these attestations on all .ctp bundles
+  required_attestations:
+    - "source-signature"
+    - "sbom-complete"
+
+  # Reject unsigned or untrusted images
+  reject_unsigned: true
+
+# Request validation
+validation:
+  # Maximum request body size (16MB — accommodates large tensor uploads)
+  max_body_size: "16MB"
+
+  # Reject requests with NaN/Inf in numeric fields
+  reject_nan_inf: true
+
+  # Maximum vector dimension (prevents OOM from oversized embeddings)
+  max_vector_dimension: 4096
+
+  # Maximum hexad limit per list/search query
+  max_result_limit: 1000
+
+# CORS policy (delegated from Rust core)
+cors:
+  allow_origins: ["*"]
+  allow_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+  allow_headers: ["Content-Type", "Authorization", "X-Federation-PSK"]
+  max_age: 3600
+
+# Logging
+logging:
+  format: "json"
+  level: "info"
+  # Log all write operations for audit trail
+  audit_paths:
+    - "/api/v1/hexads"
+    - "/api/v1/federation/*"
+    - "/api/v1/normalizer/trigger/*"

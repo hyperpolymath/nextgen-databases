@@ -1,0 +1,28 @@
+{
+  "action": "refactor_pattern",
+  "auto_fixable": false,
+  "confidence": 0.60,
+  "description": "Eliminate unsafe type coercion functions (Obj.magic, transmute, unsafeCoerce, believe_me)",
+  "failed_fixes": 0,
+  "fix_script": null,
+  "id": "recipe-unsafe-type-coercion",
+  "languages": [
+    "ocaml",
+    "rust",
+    "haskell",
+    "lean",
+    "idris2"
+  ],
+  "match": "Obj.magic, mem::transmute, unsafeCoerce, believe_me",
+  "pattern_ids": [
+    "PA020-obj-magic",
+    "PA020-transmute",
+    "PA020-unsafe-coerce",
+    "PA020-believe-me"
+  ],
+  "proven_module": null,
+  "replacement": "Use explicit conversion functions with type-safe wrappers",
+  "successful_fixes": 0,
+  "total_attempts": 0,
+  "triangle_tier": "eliminate"
+}

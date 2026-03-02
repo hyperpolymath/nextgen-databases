@@ -1,0 +1,454 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB Pitch Deck — 12-Slide Structure
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-02-28
+:revremark: Complete pitch deck content for investor and partner presentations
+:toc: macro
+:toclevels: 2
+:sectnums:
+:icons: font
+
+[abstract]
+This document contains the full content for a 12-slide pitch deck presenting
+VeriSimDB to investors, enterprise partners, and early adopters. Each slide
+includes speaker notes, key messages, and visual guidance.
+
+toc::[]
+
+== Slide 1: Title
+
+=== Content
+
+----
+VeriSimDB
+The World's First Multimodal Database with
+Cross-Modal Drift Detection
+
+[Logo Placeholder]
+
+Jonathan D.A. Jewell
+hyperpolymath
+j.d.a.jewell@open.ac.uk
+----
+
+=== Speaker Notes
+
+Open with the tagline. VeriSimDB is not another database -- it is a new category
+of data infrastructure. The word "verisimilitude" means "the appearance of being
+true" -- VeriSimDB ensures that all representations of your data maintain
+verisimilitude with reality and with each other.
+
+== Slide 2: The Problem
+
+=== Content
+
+*Data Inconsistency Costs Enterprises $12.9 Million Per Year*
+
+The same entity exists in 5+ systems. When one changes, the others go stale.
+
+----
+Customer "Jane Doe"
+  ├── Graph DB:    Connected to 47 accounts     ← Updated yesterday
+  ├── Vector DB:   Embedding [0.23, 0.87, ...]  ← Computed 3 months ago
+  ├── Document DB: { "address": "123 Old St" }  ← Never updated
+  ├── RDBMS:       Row #4821, address = "456 New Ave" ← Updated today
+  └── Audit Trail: Last change: ???              ← Gap in history
+----
+
+*Nobody detects this. Nobody repairs it. Downstream systems consume stale data.*
+
+=== Key Statistics
+
+* *$12.9M/year* -- Average cost of poor data quality per organisation (Gartner)
+* *80%* -- Time data workers spend on cleaning vs. analysis (McKinsey)
+* *35%* -- Enterprises citing data quality as primary barrier to AI adoption (IBM)
+
+=== Speaker Notes
+
+Walk through the "Jane Doe" example. Point out that each system is individually
+correct -- the graph relationships are valid, the vector embedding is
+mathematically sound, the document is well-formed. The problem is that they
+disagree with each other. No existing tool detects this disagreement.
+
+== Slide 3: The Solution
+
+=== Content
+
+*VeriSimDB: 8 Modalities, One Coherent Entity*
+
+The *octad model* -- every entity stored across 8 simultaneous representations
+with continuous cross-modal consistency monitoring.
+
+----
+Entity "Jane Doe" — Coherence Score: 0.94
+  ├── Graph:      47 connections           ✓ Consistent
+  ├── Vector:     [0.23, 0.87, ...]        ⚠ Drift: 0.12
+  ├── Tensor:     Feature matrix updated   ✓ Consistent
+  ├── Semantic:   Ontology: Customer       ✓ Consistent
+  ├── Document:   { "addr": "456 New" }    ✓ Updated
+  ├── Temporal:   Full history, no gaps    ✓ Consistent
+  ├── Provenance: Source: CRM → sync       ✓ Traced
+  └── Spatial:    Geo: 51.5074° N          ✓ Consistent
+----
+
+*When the vector embedding drifts, VeriSimDB detects it and triggers
+self-normalisation.*
+
+=== Speaker Notes
+
+Emphasise the coherence score. This is the key innovation -- a quantified measure
+of cross-modal consistency that no other database computes. The octad model is not
+about storing 8 copies of data; it is about maintaining 8 complementary
+representations that together provide a complete picture of each entity.
+
+== Slide 4: How It Works
+
+=== Content
+
+*Architecture*
+
+----
+                    ┌─────────────────────────┐
+                    │       VQL Engine         │
+                    │   (Query + VQL-DT)       │
+                    └────────────┬────────────┘
+                                 │
+                    ┌────────────▼────────────┐
+                    │   Drift Detection Engine │
+                    │   (Coherence Scoring)     │
+                    └────────────┬────────────┘
+                                 │
+          ┌──────────────────────┼──────────────────────┐
+          │                      │                      │
+  ┌───────▼───────┐   ┌─────────▼─────────┐   ┌───────▼───────┐
+  │  Rust Core    │   │ Elixir/OTP Orch.  │   │ ReScript Reg. │
+  │  (Storage +   │   │ (Concurrency +    │   │ (Type-safe    │
+  │   Indexing)   │   │  Fault Tolerance) │   │  Registry)    │
+  └───────┬───────┘   └─────────┬─────────┘   └───────────────┘
+          │                      │
+  ┌───────▼──────────────────────▼───────┐
+  │         Octad Storage Layer          │
+  │  [Graph][Vector][Tensor][Semantic]   │
+  │  [Document][Temporal][Provenance]    │
+  │  [Spatial]                           │
+  └──────────────────────────────────────┘
+          │
+  ┌───────▼──────────────────────────────┐
+  │      Federation Layer                │
+  │  PostgreSQL │ ArangoDB │ Elastic │ … │
+  └──────────────────────────────────────┘
+----
+
+=== Speaker Notes
+
+Three layers: the VQL query engine parses and type-checks queries; the drift
+detection engine continuously monitors coherence across modalities; the storage
+layer handles the octad per entity. Federation allows VeriSimDB to bring drift
+detection to existing databases without data migration. Rust provides performance,
+Elixir/OTP provides fault tolerance and concurrency, ReScript provides a type-safe
+registry for modality metadata.
+
+== Slide 5: Demo — Drift Detection in Action
+
+=== Content
+
+*Before: Traditional Multi-Model Query*
+
+[source,sql]
+----
+-- ArangoDB: Get customer graph + document
+FOR c IN customers
+  FILTER c._key == "jane-doe"
+  FOR rel IN OUTBOUND c customer_accounts
+    RETURN { customer: c, accounts: rel }
+
+-- Separately: Pinecone vector search
+pinecone.query(vector=[0.23, 0.87, ...], top_k=10)
+
+-- No way to know if these agree!
+----
+
+*After: VeriSimDB Cross-Modal Query with Drift Detection*
+
+[source]
+----
+-- VQL: Query across modalities with coherence check
+SELECT entity, coherence_score, drifted_modalities
+FROM entities
+WHERE entity.id = "jane-doe"
+  AND modalities IN (graph, vector, document)
+  AND coherence_score > 0.90
+
+-- Result:
+-- entity: jane-doe
+-- coherence_score: 0.82  ⚠ BELOW THRESHOLD
+-- drifted_modalities: [vector]
+-- action: self-normalise triggered
+----
+
+=== Speaker Notes
+
+Walk through both examples. In the "before" scenario, a developer queries two
+separate databases and has no way to know if the results are consistent. In the
+"after" scenario, VeriSimDB's VQL query spans modalities and includes the
+coherence score directly in the result set. When the score drops below the
+configured threshold, self-normalisation is triggered automatically. The developer
+does not need to write reconciliation logic.
+
+== Slide 6: Technology
+
+=== Content
+
+*Built for Production*
+
+[cols="2,3"]
+|===
+| Component | Technology
+
+| Core storage + indexing
+| *Rust* -- Near-C performance, memory safety without GC
+
+| Orchestration + fault tolerance
+| *Elixir/OTP* -- Battle-tested concurrency model (Erlang VM)
+
+| Type-safe registry
+| *ReScript* -- ML-family type system compiling to JavaScript
+
+| Query language
+| *VQL* -- Purpose-built for cross-modal operations
+
+| Formal verification
+| *VQL-DT* -- Dependent-type proofs of query correctness
+
+| ABI definitions
+| *Idris2* -- Dependent types for interface verification
+
+| FFI implementation
+| *Zig* -- C-compatible, zero-overhead foreign function interface
+|===
+
+*Test Suite:* 510 Rust tests + 152 Elixir tests = *662 total, 0 failures*
+
+=== Speaker Notes
+
+Emphasise the engineering quality. Rust + Elixir is an increasingly popular
+combination for data infrastructure (used by Discord, Fly.io, and others). The
+test suite is comprehensive and runs in CI on every commit. VQL-DT's dependent
+types are optional -- teams can start with plain VQL and adopt formal verification
+incrementally.
+
+== Slide 7: Market Opportunity
+
+=== Content
+
+*$51M Serviceable Obtainable Market*
+
+[cols="2,1,1,1"]
+|===
+| Segment | TAM | SAM | SOM
+
+| Data Quality Tools
+| $2.3B
+| $460M
+| $23M
+
+| Graph Databases
+| $5.6B
+| $280M
+| $14M
+
+| Vector Databases
+| $1.2B
+| $120M
+| $6M
+
+| Multimodal Databases
+| $800M
+| $160M
+| $8M
+
+| *Combined*
+|
+|
+| *$51M*
+|===
+
+*VeriSimDB creates a new category at the intersection of these markets.*
+
+=== Speaker Notes
+
+The SOM estimates are deliberately conservative (1% of SAM). VeriSimDB sits at
+the intersection of four high-growth markets, each expanding at 15-25% CAGR.
+The multimodal database segment is nascent -- there is an opportunity to define
+the category rather than compete within an established one.
+
+== Slide 8: Business Model
+
+=== Content
+
+*Open Core: Full-Featured Free + Commercial Support*
+
+----
+┌─────────────────────────────────────────────┐
+│           Community Edition (PMPL)          │
+│  All 8 modalities, drift detection,        │
+│  self-normalisation, VQL, federation       │
+│  FREE — forever                            │
+├─────────────────────────────────────────────┤
+│         Commercial Support License          │
+│  ├── Enterprise SLA (99.9% uptime)         │
+│  ├── Priority security patches (24hr)      │
+│  ├── Dedicated support channel             │
+│  ├── Deployment consulting                 │
+│  └── Training & certification              │
+│  Annual subscription: $40K ACV             │
+├─────────────────────────────────────────────┤
+│              OEM License                    │
+│  Embed VeriSimDB in your product           │
+│  Per-deployment or flat annual fee         │
+└─────────────────────────────────────────────┘
+----
+
+*No feature gating. Revenue from operational value, not artificial restrictions.*
+
+=== Speaker Notes
+
+This model is inspired by successful open-core companies (GitLab, Elastic,
+Confluent). The community edition is intentionally full-featured because feature
+gating erodes developer trust. Enterprise customers pay for operational value:
+SLAs, priority patches, and deployment expertise. This creates a large adoption
+funnel and a natural conversion path.
+
+== Slide 9: Competitive Landscape
+
+=== Content
+
+*Feature Comparison Matrix*
+
+[cols="3,1,1,1,1,1,1"]
+|===
+| Feature | VeriSimDB | Neo4j | Pinecone | Weaviate | ArangoDB | SurrealDB
+
+| Graph queries      | * | * |   |   | * | *
+| Vector search      | * |   | * | * |   | *
+| Tensor operations  | * |   |   |   |   |
+| Temporal versioning| * |   |   |   |   |
+| Provenance tracking| * |   |   |   |   |
+| Spatial queries    | * | * |   |   | * |
+| *Drift detection*  | * |   |   |   |   |
+| *Self-normalisation* | * |   |   |   |   |
+| *Formal proofs*    | * |   |   |   |   |
+| Federation         | * |   |   |   |   |
+| Modalities/entity  | 8 | 1 | 1 | 2 | 3 | 3
+| Open source        | PMPL | GPLv3 | No | BSD-3 | Apache | BSL
+|===
+
+_* = supported_
+
+*VeriSimDB is the only database in any category with cross-modal drift detection.*
+
+=== Speaker Notes
+
+Walk through the matrix column by column. The key insight is not that VeriSimDB
+does everything -- it is that VeriSimDB does something no one else does: cross-modal
+consistency monitoring. This is not a feature that can be easily added to existing
+architectures; it requires the data model to be designed around multi-modal
+coherence from the ground up.
+
+== Slide 10: Traction
+
+=== Content
+
+*Engineering Maturity*
+
+* *662 tests* (510 Rust + 152 Elixir), *0 failures*
+* *8 modalities* fully architected and implemented
+* *VQL grammar* specified in EBNF with formal semantics
+* *VQL-DT* dependent-type layer with Idris2 proofs
+* *Federation connectors* for PostgreSQL, ArangoDB, Elasticsearch
+* *Comprehensive documentation:* Architecture, deployment, query language,
+  drift handling, error handling, safety theory
+
+*Open Source Readiness*
+
+* PMPL-1.0-or-later license
+* CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md
+* CI/CD pipeline with Hypatia neurosymbolic scanning
+* SBOM generation, SLSA provenance, OpenSSF Scorecard
+
+=== Speaker Notes
+
+VeriSimDB is not a whitepaper or a prototype. The test suite, documentation, and
+engineering infrastructure are at a level that most open-source databases do not
+reach until much later. The 0-failure test suite across 662 tests demonstrates
+engineering discipline. The formal semantics and dependent-type proofs are unique
+in the database industry.
+
+== Slide 11: Team
+
+=== Content
+
+*Jonathan D.A. Jewell*
+
+* *Role:* Creator, architect, and lead developer
+* *Affiliation:* The Open University (UK)
+* *GitHub:* https://github.com/hyperpolymath[hyperpolymath]
+* *Expertise:* Multimodal data systems, formal methods, programming language
+  theory, neurosymbolic AI, database internals
+
+*hyperpolymath Ecosystem*
+
+* *265+ repositories* spanning databases, programming languages, developer tools,
+  formal verification, and AI infrastructure
+* *Related projects:* QuandleDB (dependent-type graph database), LithoGlyph
+  (provenance database), PanLL (neurosymbolic mission control)
+* *Community:* gitbot-fleet (6 automated bots), Hypatia CI/CD intelligence,
+  Rhodium Standard Repository (RSR) compliance framework
+
+=== Speaker Notes
+
+VeriSimDB is part of a larger ecosystem of data infrastructure projects, all
+designed to interoperate. The breadth of the ecosystem demonstrates deep expertise
+in database internals, formal methods, and production engineering. The Open
+University affiliation provides academic rigour and access to research
+collaborations.
+
+== Slide 12: The Ask
+
+=== Content
+
+*What We Are Looking For*
+
+[cols="1,3"]
+|===
+| Contributors
+| Rust, Elixir, and ReScript developers interested in multimodal data systems,
+  formal methods, or database internals. VeriSimDB is open source -- contributions
+  are welcome and credited.
+
+| Early Adopters
+| Organisations with multimodal data challenges (GraphRAG, biomedical, financial
+  services, supply chain) willing to pilot VeriSimDB and provide feedback.
+
+| Partnerships
+| Database vendors, system integrators, and cloud providers interested in
+  federation connectors or OEM licensing.
+
+| Academic Collaborators
+| Researchers in database theory, formal methods, data quality, or multimodal
+  AI interested in joint publications or research grants.
+|===
+
+*Get Started:*
+
+* GitHub: https://github.com/hyperpolymath/verisimdb
+* Email: j.d.a.jewell@open.ac.uk
+* License: PMPL-1.0-or-later (full-featured, free forever)
+
+=== Speaker Notes
+
+End with a clear call to action. VeriSimDB is not looking for traditional VC
+funding at this stage -- it is looking for community, adoption, and partnerships.
+The open-core model means the product grows through usage, and commercial revenue
+follows adoption naturally.

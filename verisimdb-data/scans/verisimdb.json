@@ -1,0 +1,685 @@
+{
+  "program_path": "/var/mnt/eclipse/repos/verisimdb",
+  "language": "elixir",
+  "frameworks": [
+    "Networking",
+    "MessageQueue",
+    "WebServer",
+    "Concurrent",
+    "Database",
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-vector/src/lib.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in rust-core/verisim-vector/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-vector/src/hnsw.rs",
+      "severity": "Medium",
+      "description": "32 unwrap/expect calls in rust-core/verisim-vector/src/hnsw.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-tensor/src/lib.rs",
+      "severity": "Medium",
+      "description": "23 unwrap/expect calls in rust-core/verisim-tensor/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-semantic/src/lib.rs",
+      "severity": "Medium",
+      "description": "12 unwrap/expect calls in rust-core/verisim-semantic/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-semantic/src/zkp.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in rust-core/verisim-semantic/src/zkp.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-document/src/lib.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in rust-core/verisim-document/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-document/tests/property_tests.rs",
+      "severity": "Medium",
+      "description": "45 unwrap/expect calls in rust-core/verisim-document/tests/property_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-temporal/src/lib.rs",
+      "severity": "Medium",
+      "description": "20 unwrap/expect calls in rust-core/verisim-temporal/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-temporal/tests/property_tests.rs",
+      "severity": "Medium",
+      "description": "51 unwrap/expect calls in rust-core/verisim-temporal/tests/property_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-hexad/src/store.rs",
+      "severity": "Medium",
+      "description": "16 unwrap/expect calls in rust-core/verisim-hexad/src/store.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-hexad/tests/integration_tests.rs",
+      "severity": "Medium",
+      "description": "42 unwrap/expect calls in rust-core/verisim-hexad/tests/integration_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-drift/src/lib.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in rust-core/verisim-drift/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-api/src/lib.rs",
+      "severity": "Medium",
+      "description": "19 unwrap/expect calls in rust-core/verisim-api/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-core/verisim-api/src/federation.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in rust-core/verisim-api/src/federation.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "rust-core/verisim-api/src/federation.rs",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in rust-core/verisim-api/src/federation.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "elixir-orchestration/lib/verisim/query/vql_bridge.ex",
+      "severity": "Medium",
+      "description": "System command execution in elixir-orchestration/lib/verisim/query/vql_bridge.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "benches/modality_benchmarks.rs",
+      "severity": "Medium",
+      "description": "39 unwrap/expect calls in benches/modality_benchmarks.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "debugger/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in debugger/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/integration_test.rs",
+      "severity": "Medium",
+      "description": "27 unwrap/expect calls in tests/integration_test.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "ai-cli-crash-capture/recoverer-setup.sh",
+      "severity": "Medium",
+      "description": "47 potentially unquoted variable expansions in ai-cli-crash-capture/recoverer-setup.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "practice-mirror/discourse-start.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in practice-mirror/discourse-start.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "practice-mirror/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in practice-mirror/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 24875,
+    "unsafe_blocks": 42,
+    "panic_sites": 1,
+    "unwrap_calls": 370,
+    "allocation_sites": 32,
+    "io_operations": 29,
+    "threading_constructs": 31
+  },
+  "file_statistics": [
+    {
+      "file_path": "rust-core/verisim-graph/src/lib.rs",
+      "lines": 244,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-core/verisim-vector/src/lib.rs",
+      "lines": 252,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "rust-core/verisim-vector/src/hnsw.rs",
+      "lines": 669,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 32,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "rust-core/verisim-tensor/src/lib.rs",
+      "lines": 322,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 23,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "rust-core/verisim-semantic/src/lib.rs",
+      "lines": 385,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 12,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "rust-core/verisim-semantic/src/zkp.rs",
+      "lines": 367,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-core/verisim-document/src/lib.rs",
+      "lines": 331,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 1,
+      "io_operations": 3,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "rust-core/verisim-document/tests/property_tests.rs",
+      "lines": 224,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 45,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-core/verisim-temporal/src/diff.rs",
+      "lines": 169,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-core/verisim-temporal/src/lib.rs",
+      "lines": 380,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 20,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "rust-core/verisim-temporal/tests/property_tests.rs",
+      "lines": 319,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 51,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-core/verisim-hexad/src/lib.rs",
+      "lines": 389,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-core/verisim-hexad/src/store.rs",
+      "lines": 715,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 16,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "rust-core/verisim-hexad/tests/integration_tests.rs",
+      "lines": 358,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 42,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "rust-core/verisim-normalizer/src/lib.rs",
+      "lines": 409,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "rust-core/verisim-drift/src/lib.rs",
+      "lines": 484,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "rust-core/verisim-api/src/lib.rs",
+      "lines": 796,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 19,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "rust-core/verisim-api/src/federation.rs",
+      "lines": 384,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir-orchestration/lib/verisim/drift/drift_monitor.ex",
+      "lines": 291,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "elixir-orchestration/lib/verisim/entity/entity_server.ex",
+      "lines": 210,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "elixir-orchestration/lib/verisim/query/query_router.ex",
+      "lines": 170,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir-orchestration/lib/verisim/query/vql_bridge.ex",
+      "lines": 376,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir-orchestration/lib/verisim/schema/schema_registry.ex",
+      "lines": 250,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir-orchestration/lib/verisim/rust_client.ex",
+      "lines": 226,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "elixir-orchestration/lib/verisim/federation/resolver.ex",
+      "lines": 260,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "elixir-orchestration/lib/verisim/consensus/kraft_node.ex",
+      "lines": 684,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "benches/modality_benchmarks.rs",
+      "lines": 382,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 39,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "debugger/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "debugger/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/integration_test.rs",
+      "lines": 334,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 27,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ai-cli-crash-capture/recoverer-setup.sh",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "lib/verisim/adaptive_learner.ex",
+      "lines": 516,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/verisim/circuit_breaker.ex",
+      "lines": 301,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/verisim/query_cache.ex",
+      "lines": 577,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/verisim/query_planner_config.ex",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "practice-mirror/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "practice-mirror/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "disk",
+    "memory",
+    "concurrency",
+    "cpu"
+  ]
+}

@@ -1,0 +1,339 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "ExcessivePermissions",
+      "location": "cli/lsp-server.ts",
+      "severity": "High",
+      "description": "Deno -A (all permissions) in cli/lsp-server.ts",
+      "recommended_attack": [
+        "network",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "compiler/src/FiveWhys.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in compiler/src/FiveWhys.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "compiler/src/VM.res",
+      "severity": "Medium",
+      "description": "8 unsafe get calls in compiler/src/VM.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 15144,
+    "unsafe_blocks": 33,
+    "panic_sites": 0,
+    "unwrap_calls": 9,
+    "allocation_sites": 40,
+    "io_operations": 13,
+    "threading_constructs": 1
+  },
+  "file_statistics": [
+    {
+      "file_path": "compiler/src/Lexer.res",
+      "lines": 605,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/src/Parser.res",
+      "lines": 952,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 19,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/src/FiveWhys.res",
+      "lines": 387,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/src/VM.res",
+      "lines": 386,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/03-mutable-ripple.err",
+      "lines": 47,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/05-web-server-stable.err",
+      "lines": 79,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/09-null-cascade.err",
+      "lines": 113,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "levels/03-unterminated-string.err",
+      "lines": 31,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "levels/09-operators.err",
+      "lines": 70,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ide/src/Main.res",
+      "lines": 74,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 448,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "playground/compiler/src/errors/ErrorInjector.res",
+      "lines": 239,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "playground/compiler/src/lexer/Lexer.res",
+      "lines": 483,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "playground/compiler/src/parser/Parser.res",
+      "lines": 428,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 9,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "playground/compiler/src/bindings/Deno.res",
+      "lines": 40,
+      "unsafe_blocks": 16,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "error-pkg/src/resolve.rs",
+      "lines": 51,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "error-pkg/src/install.rs",
+      "lines": 120,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "network",
+    "memory",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "compiler/src/Lexer.res",
+        "to": "compiler/src/Parser.res",
+        "relation": "shared_dir:compiler/src",
+        "weight": 1.0
+      },
+      {
+        "from": "compiler/src/Parser.res",
+        "to": "compiler/src/FiveWhys.res",
+        "relation": "shared_dir:compiler/src",
+        "weight": 1.0
+      },
+      {
+        "from": "compiler/src/FiveWhys.res",
+        "to": "compiler/src/VM.res",
+        "relation": "shared_dir:compiler/src",
+        "weight": 1.0
+      },
+      {
+        "from": "error-pkg/src/resolve.rs",
+        "to": "error-pkg/src/install.rs",
+        "relation": "shared_dir:error-pkg/src",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/03-mutable-ripple.err",
+        "to": "examples/05-web-server-stable.err",
+        "relation": "shared_dir:examples",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/05-web-server-stable.err",
+        "to": "examples/09-null-cascade.err",
+        "relation": "shared_dir:examples",
+        "weight": 1.0
+      },
+      {
+        "from": "levels/03-unterminated-string.err",
+        "to": "levels/09-operators.err",
+        "relation": "shared_dir:levels",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "cli/lsp-server.ts"
+        ],
+        "frameworks": [],
+        "relation": "ExcessivePermissions->Network"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "compiler/src/FiveWhys.res",
+          "compiler/src/VM.res"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          "cli/lsp-server.ts"
+        ],
+        "frameworks": [],
+        "relation": "ExcessivePermissions->Disk"
+      }
+    ]
+  }
+}

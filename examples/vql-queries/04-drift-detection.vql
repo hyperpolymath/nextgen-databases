@@ -1,0 +1,25 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- 04-drift-detection.vql
+-- Drift detection: find all entities with cross-modal drift above 0.3
+--
+-- VeriSimDB continuously computes a drift_score for each hexad entity.
+-- The drift score measures cross-modal inconsistency: how much the
+-- different modality representations of the same entity have diverged
+-- from each other. A score of 0.0 means perfect consistency; 1.0 means
+-- the modalities are completely unrelated.
+--
+-- Common drift causes:
+--   - Vector embedding computed from an older version of the document
+--   - Semantic types that no longer match the document content
+--   - Temporal version count mismatching provenance chain length
+--   - Spatial coordinates inconsistent with document-described location
+--
+-- Expected results: entities with intentional_drift=true in the sample
+-- data should appear here, including entity-003 (stale embedding),
+-- entity-005 (affiliation mismatch), entity-009 (embedding from wrong
+-- version), entity-029 (spatial coordinates wrong), etc.
+
+SELECT id, drift_score, document.title FROM hexads
+WHERE drift_score > 0.3
+ORDER BY drift_score DESC

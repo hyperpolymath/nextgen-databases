@@ -1,0 +1,286 @@
+{
+  "program_path": ".",
+  "language": "elixir",
+  "frameworks": [
+    "Ecto",
+    "Database",
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "lib/squisher_corpus/port_runner.ex",
+      "severity": "Medium",
+      "description": "System command execution in lib/squisher_corpus/port_runner.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 3346,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 16,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/squisher_corpus/pipeline/search_worker.ex",
+      "lines": 154,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/squisher_corpus/pipeline/fetch_worker.ex",
+      "lines": 92,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/squisher_corpus/pipeline/sync_worker.ex",
+      "lines": 149,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/squisher_corpus/rate_limiter.ex",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/squisher_corpus/port_runner.ex",
+      "lines": 89,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "test/pipeline/sync_worker_test.exs",
+      "lines": 33,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "lib/squisher_corpus/pipeline/search_worker.ex",
+        "to": "lib/squisher_corpus/pipeline/fetch_worker.ex",
+        "relation": "shared_dir:lib/squisher_corpus/pipeline",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/pipeline/fetch_worker.ex",
+        "to": "lib/squisher_corpus/pipeline/sync_worker.ex",
+        "relation": "shared_dir:lib/squisher_corpus/pipeline",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/rate_limiter.ex",
+        "to": "lib/squisher_corpus/port_runner.ex",
+        "relation": "shared_dir:lib/squisher_corpus",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/pipeline/search_worker.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/pipeline/search_worker.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/pipeline/search_worker.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/pipeline/fetch_worker.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/pipeline/fetch_worker.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/pipeline/fetch_worker.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/pipeline/sync_worker.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/pipeline/sync_worker.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/pipeline/sync_worker.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/squisher_corpus/rate_limiter.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/squisher_corpus/rate_limiter.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/squisher_corpus/rate_limiter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/squisher_corpus/port_runner.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/squisher_corpus/port_runner.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/squisher_corpus/port_runner.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "test/pipeline/sync_worker_test.exs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test/pipeline/sync_worker_test.exs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test/pipeline/sync_worker_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "lib/squisher_corpus/port_runner.ex"
+        ],
+        "frameworks": [
+          "Ecto",
+          "Database",
+          "OTP"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "lib/squisher_corpus/port_runner.ex"
+        ],
+        "frameworks": [
+          "Ecto",
+          "Database",
+          "OTP"
+        ],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

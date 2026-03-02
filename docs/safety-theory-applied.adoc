@@ -1,0 +1,1336 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= Safety Theory Applied to VeriSimDB
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+VeriSimDB's design explicitly considers **safety science research** from James Reason, Jop Groeneweg, Jens Rasmussen, and others. This document analyzes how their theories apply to database systems and how VeriSimDB addresses identified hazards.
+
+**Key Insight:** Safety is not just about technical defenses, but about recognizing **incompatible goals** and understanding that **defenses themselves can become threats**.
+
+== James Reason: Swiss Cheese Model
+
+=== The Model
+
+[source,text]
+----
+Hazard → [Layer 1] → [Layer 2] → [Layer 3] → [Layer 4] → Accident
+           🧀          🧀          🧀          🧀
+         Holes align across all layers = failure
+----
+
+**Layers in VeriSimDB:**
+
+1. **Design** - Architecture prevents classes of errors (type safety, ownership)
+2. **Implementation** - Code reviews, testing, formal verification
+3. **Runtime** - Supervisors, circuit breakers, drift detection
+4. **Operational** - Monitoring, alerts, runbooks, incident response
+
+**Reason's Distinction:**
+
+- **Active Failures** - Direct causes (bug in code, operator mistake)
+- **Latent Conditions** - Systemic issues (poor design, inadequate testing, production pressure)
+
+=== Incompatible Goals in VeriSimDB
+
+**Goal Conflict 1: Performance vs Correctness**
+
+[cols="1,1,2"]
+|===
+|Goal A |Goal B |Conflict
+
+|**Query Speed**
+Fast response times
+|**Dependent-Type Verification**
+ZKP proof generation (expensive)
+|Users skip verification path when performance matters
+
+|**Cache Hit Rate**
+Serve from cache (< 1ms)
+|**Data Freshness**
+Always query authoritative store
+|Stale data served under load
+
+|**Slipstream Path**
+No verification overhead
+|**Byzantine Fault Tolerance**
+Verify all data sources
+|Malicious data accepted when verification skipped
+|===
+
+**VeriSimDB Mitigation:**
+
+[source,elixir]
+----
+defmodule VeriSim.IncompatibleGoals do
+  @moduledoc """
+  Explicit recognition of goal conflicts with policy enforcement.
+  """
+
+  @doc """
+  Enforce minimum verification for sensitive operations.
+  """
+  def enforce_verification_policy(query, context) do
+    # High-risk queries MUST use dependent-type path
+    if is_high_risk?(query) and not context.use_dependent_types do
+      {:error, {:verification_required,
+        "This query involves sensitive data and requires dependent-type verification"}}
+    else
+      :ok
+    end
+  end
+
+  defp is_high_risk?(query) do
+    # Medical data, financial data, PII
+    has_sensitive_hexads?(query) or
+    has_cross_org_access?(query) or
+    has_write_operations?(query)
+  end
+end
+----
+
+**Goal Conflict 2: Availability vs Consistency**
+
+[cols="1,1,2"]
+|===
+|Goal A |Goal B |Conflict
+
+|**Always Available**
+Return results even if some stores fail
+|**Strong Consistency**
+All stores must agree
+|Partial/divergent results under partition
+
+|**Federation Scale**
+100+ organizations
+|**Consensus Overhead**
+Raft quorum requires majority
+|Cannot achieve consensus at scale
+
+|**Drift Tolerance**
+Allow temporary inconsistency
+|**Referential Integrity**
+Citations must reference valid hexads
+|Broken citations during drift windows
+|===
+
+**VeriSimDB Mitigation:**
+
+[source,elixir]
+----
+defmodule VeriSim.CAP do
+  @moduledoc """
+  Explicit CAP theorem trade-offs based on operation criticality.
+  """
+
+  def execute_with_policy(query, policy) do
+    case policy do
+      :cp_mode ->
+        # Consistency + Partition tolerance (sacrifice availability)
+        execute_with_strong_consistency(query)
+
+      :ap_mode ->
+        # Availability + Partition tolerance (sacrifice consistency)
+        execute_with_eventual_consistency(query)
+
+      :auto ->
+        # Choose based on query semantics
+        if requires_strong_consistency?(query) do
+          execute_with_strong_consistency(query)
+        else
+          execute_with_eventual_consistency(query)
+        end
+    end
+  end
+
+  defp requires_strong_consistency?(query) do
+    # Writes, financial transactions, medical records
+    query.mutation? or
+    query.hexads |> Enum.any?(&critical_data?/1)
+  end
+end
+----
+
+**Goal Conflict 3: Developer Velocity vs Security**
+
+[cols="1,1,2"]
+|===
+|Goal A |Goal B |Conflict
+
+|**Ship Features Fast**
+Short development cycles
+|**Thorough Security Review**
+Slow, careful analysis
+|Security corners cut under pressure
+
+|**Experiment Freely**
+Try new modalities/stores
+|**Audit Trail**
+Every change logged
+|Experimental code bypasses logging
+
+|**Flexible Federation**
+Easy to join/leave
+|**Byzantine Fault Prevention**
+Strict vetting of participants
+|Malicious nodes join federation
+|===
+
+**VeriSimDB Mitigation:**
+
+[source,adoc]
+----
+= Development Policy (Governance)
+
+## Feature Development
+
+1. **Security Review Gate** - All features touching sensitive data require security team sign-off
+   - NOT optional, even under deadline pressure
+   - Estimated 2-5 days review time (budget this upfront)
+
+2. **Experimental Flag** - New features behind feature flags
+   - `config :verisim, experimental_features: [:new_modality]`
+   - Disabled by default in production
+   - Audit log captures all experimental feature usage
+
+3. **Federation Vetting** - New federation members require:
+   - Technical review (2 weeks)
+   - Legal agreement (data governance)
+   - Trial period (3 months, revocable)
+   - Background check for operators
+
+**Why This Works:**
+- Makes incompatible goals visible (not hidden)
+- Slows down risky operations (by design)
+- Provides escape valve (experimental flags) without compromising production
+----
+
+=== Defenses as Threats (Reason's Paradox)
+
+**Threat 1: Circuit Breakers Mask Problems**
+
+[source,text]
+----
+Problem: Store is slow/unreliable
+Defense: Circuit breaker opens, fail fast
+Threat: Operators don't notice degraded service
+        (circuit breaker "working as intended")
+Result: Underlying issue never fixed
+----
+
+**Mitigation:**
+
+[source,elixir]
+----
+defmodule VeriSim.CircuitBreakerMonitor do
+  @moduledoc """
+  Alert when circuit breakers open too frequently.
+  Defense working = problem hidden.
+  """
+
+  def check_circuit_health do
+    breakers = CircuitBreaker.get_all_stats()
+
+    # Alert if ANY breaker opened in last hour
+    recently_opened = Enum.filter(breakers, fn {_store, stats} ->
+      stats.last_open_time &&
+      DateTime.diff(DateTime.utc_now(), stats.last_open_time, :minute) < 60
+    end)
+
+    if length(recently_opened) > 0 do
+      alert(:circuit_breaker_opened, """
+      Circuit breakers opened recently:
+      #{inspect(recently_opened)}
+
+      This indicates underlying store problems.
+      Circuit breaker is MASKING the issue.
+      Investigate root cause immediately.
+      """)
+    end
+  end
+end
+----
+
+**Threat 2: Caching Serves Incorrect Data**
+
+[source,text]
+----
+Problem: Cache serves stale data
+Defense: Drift detection + invalidation
+Threat: Drift detection has false negatives
+        (doesn't catch all inconsistencies)
+Result: Stale cache incorrectly trusted
+----
+
+**Mitigation:**
+
+[source,elixir]
+----
+defmodule VeriSim.CacheAudit do
+  @moduledoc """
+  Randomly audit cached results against authoritative store.
+  """
+
+  def audit_random_cache_entries(sample_rate \\ 0.01) do
+    # 1% of cache hits trigger audit
+    if :rand.uniform() < sample_rate do
+      cached_entries = QueryCache.get_random_sample(100)
+
+      Enum.each(cached_entries, fn entry ->
+        # Re-execute query without cache
+        fresh_result = QueryRouter.execute(entry.query, force_fresh: true)
+
+        unless results_match?(entry.cached_result, fresh_result) do
+          alert(:cache_mismatch, """
+          Cache audit failed!
+          Query: #{entry.query}
+          Cached: #{inspect(entry.cached_result)}
+          Fresh: #{inspect(fresh_result)}
+
+          This indicates drift detection missed an inconsistency.
+          """)
+
+          # Invalidate this cache entry
+          QueryCache.invalidate(entry.key)
+        end
+      end)
+    end
+  end
+end
+----
+
+**Threat 3: Automatic Retry Amplifies Cascading Failures**
+
+[source,text]
+----
+Problem: Store is overloaded
+Defense: Retry with backoff
+Threat: All clients retry simultaneously
+        (thundering herd)
+Result: Store goes from degraded → down
+----
+
+**Mitigation:**
+
+[source,elixir]
+----
+defmodule VeriSim.ErrorRecovery do
+  @doc """
+  Add jitter to prevent thundering herd.
+  """
+  defp calculate_backoff(attempt, base_delay_ms, max_delay_ms) do
+    delay = base_delay_ms * :math.pow(2, attempt) |> round()
+
+    # Jitter: ±25% randomization
+    jitter = delay * (0.75 + :rand.uniform() * 0.5) |> round()
+
+    min(jitter, max_delay_ms)
+  end
+
+  @doc """
+  Global retry budget: limit concurrent retries.
+  """
+  def retry_with_budget(func, opts \\ []) do
+    if can_acquire_retry_token?() do
+      try do
+        retry_with_backoff(func, opts)
+      after
+        release_retry_token()
+      end
+    else
+      # Retry budget exhausted, fail fast
+      {:error, {:retry_budget_exhausted, "System under load, retry later"}}
+    end
+  end
+
+  defp can_acquire_retry_token? do
+    # Token bucket: max 100 concurrent retries system-wide
+    RetryBucket.try_acquire()
+  end
+end
+----
+
+**Threat 4: ZKP Overhead Incentivizes Skipping Verification**
+
+[source,text]
+----
+Problem: ZKP proof generation is expensive (500ms)
+Defense: Dependent-type path with verification
+Threat: Users switch to slipstream path to avoid overhead
+Result: Verification bypassed entirely
+----
+
+**Mitigation:**
+
+[source,elixir]
+----
+defmodule VeriSim.VerificationPolicy do
+  @doc """
+  Mandatory verification for sensitive operations.
+  Cannot be overridden even by administrator.
+  """
+  def enforce_mandatory_verification(query, context) do
+    if requires_mandatory_verification?(query) do
+      if context.use_dependent_types do
+        :ok
+      else
+        {:error, {:mandatory_verification,
+          """
+          This query involves sensitive data and REQUIRES dependent-type verification.
+          The slipstream path is NOT available for this operation.
+
+          Rationale: Medical data, financial transactions, and PII require
+          cryptographic proofs for audit and compliance.
+          """}}
+      end
+    else
+      :ok
+    end
+  end
+
+  # Audit: Track verification opt-outs
+  def log_verification_decision(query, context) do
+    if not context.use_dependent_types and context.available_dependent_types do
+      Temporal.append_audit_log("verification_optout", %{
+        query_id: query.id,
+        user_id: context.user_id,
+        reason: "User chose slipstream path despite dependent-type availability",
+        hexad_ids: extract_hexad_ids(query)
+      })
+    end
+  end
+end
+----
+
+== Jop Groeneweg: Tripod Theory
+
+=== 11 Basic Risk Factors (BRFs)
+
+Groeneweg identified 11 organizational factors that create preconditions for accidents:
+
+[cols="1,2,2"]
+|===
+|BRF |How It Manifests in Databases |VeriSimDB Mitigation
+
+|**1. Hardware**
+|Disk failures, network outages, memory corruption
+|Redundant storage, CRC checksums, ECC memory
+
+|**2. Design**
+|SQL injection, buffer overflows, race conditions
+|Type safety (ReScript), ownership (Rust), immutability (Elixir)
+
+|**3. Procedures**
+|Unclear deployment steps, missing rollback procedures
+|Runbooks, ADRs, documented incident response
+
+|**4. Error-Enforcing Conditions**
+|Time pressure, understaffing, 24/7 on-call
+|On-call rotation limits (max 1 week), blameless post-mortems
+
+|**5. Housekeeping**
+|Stale dependencies, obsolete code, technical debt
+|Dependency auditing, automated cleanup, refactoring sprints
+
+|**6. Incompatible Goals**
+|Performance vs correctness, availability vs consistency
+|**Explicit policy enforcement** (see above)
+
+|**7. Communication**
+|Undocumented assumptions, siloed teams
+|ADRs, architecture docs, cross-team reviews
+
+|**8. Organization**
+|Unclear responsibility, no owner for security
+|Governance model, steering committee, RACI matrix
+
+|**9. Training**
+|Operators don't understand ZKP, drift, federation
+|Onboarding docs, runbooks, chaos engineering exercises
+
+|**10. Defenses**
+|Over-reliance on automation, complacency
+|**Random audits** (cache correctness, circuit breaker health)
+
+|**11. Incompatible Materials/Equipment**
+|Mixing trusted and untrusted data sources
+|Org-scoped caches, cross-org access control
+|===
+
+=== Tripod Delta: Preconditions → Defenses → Accident
+
+[source,text]
+----
+┌──────────────────────────────────────────────────────┐
+│  BASIC RISK FACTORS (Latent Conditions)             │
+│  • Time pressure (ship features fast)                │
+│  • Incompatible goals (performance vs correctness)   │
+│  • Inadequate training (operators don't know ZKP)    │
+└───────────────────┬──────────────────────────────────┘
+                    │
+                    ▼
+┌──────────────────────────────────────────────────────┐
+│  PRECONDITIONS (Active in Workplace)                 │
+│  • Slipstream path chosen for speed                  │
+│  • Cache hit rate prioritized over freshness         │
+│  • Circuit breaker masks slow store                  │
+└───────────────────┬──────────────────────────────────┘
+                    │
+                    ▼
+┌──────────────────────────────────────────────────────┐
+│  DEFENSES (Should Prevent Accident)                  │
+│  • Drift detection (passive)                         │
+│  • ZKP verification (skipped!)                       │
+│  • Access control (bypassed via cache)               │
+└───────────────────┬──────────────────────────────────┘
+                    │ DEFENSES FAIL
+                    ▼
+┌──────────────────────────────────────────────────────┐
+│  ACCIDENT                                            │
+│  • Stale data served from cache                      │
+│  • User receives incorrect medical diagnosis         │
+│  • Lawsuit, regulatory fine, loss of trust           │
+└──────────────────────────────────────────────────────┘
+----
+
+**VeriSimDB Strategy: Break the Chain**
+
+1. **Eliminate BRFs** - Address incompatible goals explicitly
+2. **Detect Preconditions** - Audit when slipstream chosen for sensitive data
+3. **Active Defenses** - Random cache audits, not just passive drift detection
+4. **Redundant Defenses** - Multiple layers (Swiss cheese)
+
+== Jens Rasmussen: Dynamic Safety Model
+
+=== The Boundary Model
+
+[source,text]
+----
+                    ┌─────────────────────────┐
+                    │ SAFE OPERATING SPACE    │
+                    │                         │
+         Economically   │      ⬤ ← System      │   Unacceptable
+         Infeasible     │                         │   Workload
+                    │                         │
+                    └─────────────────────────┘
+                              │
+                    Safety Boundary
+                    (Accident happens)
+
+System migrates toward boundaries under pressure:
+• Management pressure → Economic boundary (under-provision)
+• Workload pressure → Unacceptable workload (burnout)
+• Least effort → Safety boundary (skip verification)
+----
+
+**Rasmussen's Insight:** Systems naturally drift toward boundaries due to:
+
+1. **Economic Pressure** - Cost reduction, faster time-to-market
+2. **Workload Pressure** - Do more with less, 24/7 operations
+3. **Gradient of Least Effort** - Shortcuts save time, rarely punished
+
+=== Boundaries in VeriSimDB
+
+**Economic Boundary:**
+
+[source,text]
+----
+Pressure: "Why provision 3 stores? Use 1 to save cost!"
+Drift: Single store, no redundancy
+Accident: Store fails → complete outage
+----
+
+**Mitigation:**
+
+[source,elixir]
+----
+defmodule VeriSim.CapacityPlanning do
+  @doc """
+  Enforce minimum redundancy for production.
+  """
+  def validate_deployment(config) do
+    if config.environment == :production do
+      # Require minimum 3 stores per modality
+      Enum.each(config.modalities, fn {modality, stores} ->
+        if length(stores) < 3 do
+          raise """
+          PRODUCTION SAFETY VIOLATION:
+          Modality #{modality} has only #{length(stores)} stores.
+          Minimum 3 required for fault tolerance.
+
+          This is NOT negotiable. Under-provisioning to save cost
+          will result in complete outage when ANY store fails.
+          """
+        end
+      end)
+    end
+  end
+end
+----
+
+**Workload Boundary:**
+
+[source,text]
+----
+Pressure: "We need 24/7 on-call coverage but only 2 engineers"
+Drift: Engineers burned out, skip careful verification
+Accident: Operator mistake during incident, data corruption
+----
+
+**Mitigation:**
+
+[source,adoc]
+----
+= On-Call Policy (Governance)
+
+## Rotation Limits
+
+1. **Maximum on-call duration:** 1 week
+2. **Minimum team size for 24/7 coverage:** 4 engineers
+3. **Mandatory break after on-call:** 3 days off-rotation
+
+## Escalation
+
+If staffing inadequate for 24/7:
+1. Reduce coverage to business hours (8am-6pm)
+2. Hire contractors for interim coverage
+3. Use external monitoring service (PagerDuty, Opsgenie)
+
+**DO NOT:**
+- Extend on-call shifts beyond 1 week
+- Expect engineers to "cover for each other" indefinitely
+- Sacrifice safety for 24/7 availability
+----
+
+**Safety Boundary (Least Effort Gradient):**
+
+[source,text]
+----
+Pressure: "ZKP verification is slow, just use slipstream"
+Drift: Operators routinely skip verification
+Accident: Malicious data accepted, Byzantine fault undetected
+----
+
+**Mitigation:**
+
+[source,elixir]
+----
+defmodule VeriSim.SafetyBoundary do
+  @doc """
+  Make the safe path the EASIEST path (not the hard one).
+  """
+
+  # DEFAULT: Dependent-type path (safe)
+  def execute_query(query, opts \\ []) do
+    # use_dependent_types: true by default
+    use_dependent_types = Keyword.get(opts, :use_dependent_types, true)
+
+    # Cache results to amortize ZKP cost
+    if use_dependent_types do
+      VeriSim.QueryRouter.Cached.execute_with_cache(query, opts)
+    else
+      # Slipstream requires explicit opt-in + reason
+      reason = Keyword.fetch!(opts, :slipstream_reason)
+      log_slipstream_optout(query, reason)
+
+      VeriSim.QueryRouter.execute_slipstream(query, opts)
+    end
+  end
+
+  defp log_slipstream_optout(query, reason) do
+    Logger.warn("Slipstream path chosen: #{reason}")
+
+    Temporal.append_audit_log("slipstream_usage", %{
+      query: query,
+      reason: reason,
+      timestamp: DateTime.utc_now()
+    })
+  end
+end
+----
+
+**Key Insight:** Make the **safe path the default**, make the **unsafe path require justification**.
+
+=== Rasmussen's SRK Framework
+
+**Skill-based** - Automatic, unconscious (muscle memory)
+**Rule-based** - Following procedures (if X then Y)
+**Knowledge-based** - Problem-solving, novel situations
+
+**Application to VeriSimDB Operators:**
+
+[cols="1,2,2"]
+|===
+|Level |Operator Behavior |Error Mode
+
+|**Skill-based**
+|Routine deployments, restart services
+|Slip: Type wrong command, forget step
+
+|**Rule-based**
+|Follow runbook for known incident
+|Mistake: Misapply rule, wrong context
+
+|**Knowledge-based**
+|Novel failure, no runbook
+|Knowledge gap: Wrong mental model
+|===
+
+**VeriSimDB Mitigation:**
+
+[source,adoc]
+----
+= Runbook Design Principles
+
+## Skill-based Operations (Routine)
+
+1. **Automate** - Use scripts, not manual commands
+2. **Checklist** - Pre-flight checklist before deploy
+3. **Muscle memory** - Practice in staging first
+
+## Rule-based Operations (Known Incidents)
+
+1. **Decision trees** - Clear if/then flowcharts
+2. **Verification steps** - "Check X before proceeding to Y"
+3. **Rollback procedure** - Always provide undo path
+
+## Knowledge-based Operations (Novel Failures)
+
+1. **Escalation path** - When to call expert
+2. **Diagnostics** - How to gather information
+3. **Safe mode** - Fall back to minimal functionality
+4. **Post-incident review** - Convert novel → rule-based
+
+**Example Runbook: Store Unreachable**
+
+SKILL-BASED:
+```
+1. Check monitoring dashboard
+2. Run: `systemctl status verisim-store`
+3. Check logs: `journalctl -u verisim-store -n 100`
+```
+
+RULE-BASED:
+```
+IF store_status == "stopped" THEN
+  1. Restart: `systemctl start verisim-store`
+  2. Verify: `curl http://store:8080/health`
+  3. IF health_check == "ok" THEN done
+  4. ELSE escalate
+
+IF store_status == "degraded" THEN
+  1. Check disk space: `df -h /var/lib/verisim`
+  2. IF disk_full THEN clear old logs
+  3. ELSE escalate
+```
+
+KNOWLEDGE-BASED:
+```
+IF none of the above work:
+  1. Escalate to on-call engineer
+  2. Gather: logs, metrics, recent changes
+  3. Consider: network partition, hardware failure, Byzantine fault
+  4. Safe fallback: Isolate store, use replicas
+```
+----
+
+== Diane Vaughan: Normalization of Deviance
+
+**The Challenger Disaster Lesson:**
+
+NASA gradually accepted O-ring erosion as normal because:
+1. Flights succeeded despite erosion (luck masked danger)
+2. Small violations accumulated over time
+3. Engineers normalized the deviance socially
+4. New engineers didn't know original safety standards
+
+**Definition:** **Normalization of Deviance** is the gradual process where unacceptable practices become acceptable through repetition without immediate consequences.
+
+=== Deviance Normalization in Databases
+
+[source,text]
+----
+NORMAL → DEVIANT → NORMALIZED DEVIANCE → CATASTROPHE
+
+Week 1: "Cache should be fresh" (NORMAL)
+Week 2: "Cache hit rate is low, let's increase TTL to 5 min"
+Week 3: "5 min worked fine, let's try 1 hour"
+Week 4: "1 hour is great! No issues so far" (DEVIANCE NORMALIZED)
+Week 8: User receives 3-hour-old medical diagnosis → HARM
+
+Why it happens:
+• No immediate negative feedback (luck)
+• Gradual boundary expansion (boiling frog)
+• Social reinforcement ("everyone does it")
+• Production pressure (performance metrics reward it)
+----
+
+**Example 1: Cache TTL Creep**
+
+[source,text]
+----
+Timeline of Normalization:
+
+Month 1: Cache TTL = 5 minutes (by design)
+         "Data must be reasonably fresh"
+
+Month 2: Performance team increases TTL to 15 minutes
+         "No user complaints, looks good!"
+
+Month 3: TTL increased to 1 hour
+         "Still no issues, cache hit rate excellent!"
+
+Month 6: TTL increased to 6 hours
+         "System is so fast now!"
+         [DEVIANCE NORMALIZED]
+
+Month 7: Medical database serves 8-hour-old diagnosis
+         Patient receives outdated treatment protocol
+         HARM
+
+What went wrong:
+• Each increase seemed small/safe
+• No immediate consequences (lag between cause and effect)
+• Organizational memory: New engineers don't know original 5-min rationale
+• Metrics rewarded high cache hit rate, not data freshness
+----
+
+**VeriSimDB Protection:**
+
+[source,elixir]
+----
+defmodule VeriSim.DevianceMonitor do
+  @moduledoc """
+  Detect normalization of deviance via configuration drift.
+  """
+
+  @original_config %{
+    cache_ttl_seconds: 300,  # 5 minutes (design intent)
+    verification_required: true,
+    drift_tolerance: :strict
+  }
+
+  def check_for_deviance do
+    current_config = get_current_config()
+
+    # Flag ANY deviation from original design
+    deviations = Map.keys(@original_config)
+    |> Enum.filter(fn key ->
+      @original_config[key] != current_config[key]
+    end)
+    |> Enum.map(fn key ->
+      %{
+        setting: key,
+        original: @original_config[key],
+        current: current_config[key],
+        changed_at: get_config_change_date(key),
+        changed_by: get_config_change_author(key)
+      }
+    end)
+
+    if length(deviations) > 0 do
+      alert(:deviance_detected, """
+      NORMALIZATION OF DEVIANCE ALERT
+
+      Current configuration deviates from original design:
+      #{inspect(deviations, pretty: true)}
+
+      WHY THIS MATTERS:
+      Each change seemed small and safe at the time.
+      But accumulated deviations indicate boundary erosion.
+
+      REQUIRED ACTION:
+      1. Review each deviation's rationale (ADR required)
+      2. Measure actual risk vs perceived risk
+      3. Restore original config OR document why deviation is safe
+
+      Remember: Challenger disaster happened because small O-ring
+      erosions were normalized over 24 flights.
+      """)
+    end
+  end
+end
+----
+
+**Example 2: Verification Bypass Creep**
+
+[source,text]
+----
+Timeline of Normalization:
+
+Month 1: 100% of writes use dependent-type path (by design)
+         "All mutations must be verified via ZKP"
+
+Month 2: Dev team adds "skip verification" flag for testing
+         "Just for local dev, will remove before production"
+
+Month 3: Flag makes it to production (behind feature flag)
+         "Only used in emergencies"
+
+Month 4: Emergency occurs, flag used
+         "It worked! No issues!"
+
+Month 5: Flag used routinely to speed up batch imports
+         "Verification is too slow for bulk operations"
+         [DEVIANCE NORMALIZED]
+
+Month 6: Malicious data inserted via unverified bulk import
+         Byzantine fault undetected
+         HARM
+
+What went wrong:
+• "Emergency" exception became routine
+• Speed prioritized over security (incompatible goals)
+• No immediate consequences from skipping verification
+• New engineers don't know why verification was mandatory
+----
+
+**VeriSimDB Protection:**
+
+[source,elixir]
+----
+defmodule VeriSim.VerificationAudit do
+  @moduledoc """
+  Track verification bypass usage and alert on normalization.
+  """
+
+  def audit_verification_patterns do
+    # Get last 30 days of verification decisions
+    usage = Temporal.query_audit_log("""
+      SELECT
+        DATE(timestamp) as date,
+        COUNT(*) as total_queries,
+        SUM(CASE WHEN use_dependent_types = false THEN 1 ELSE 0 END) as slipstream_count
+      FROM query_log
+      WHERE timestamp > NOW() - INTERVAL '30 days'
+      GROUP BY DATE(timestamp)
+      ORDER BY date
+    """)
+
+    # Detect upward trend in slipstream usage
+    trend = calculate_trend(usage, :slipstream_count)
+
+    if trend.direction == :increasing and trend.slope > 0.05 do
+      alert(:deviance_normalizing, """
+      NORMALIZATION OF DEVIANCE: Verification Bypass Increasing
+
+      Slipstream path (unverified queries) usage is trending UP:
+      #{format_trend(trend)}
+
+      This indicates verification is being bypassed more frequently.
+
+      TYPICAL PATTERN (Challenger-style):
+      Week 1: "Just this once for performance testing"
+      Week 2: "It worked fine, let's use it again"
+      Week 4: "Everyone's doing it now"
+      Week 8: Malicious data inserted, Byzantine fault
+
+      REQUIRED ACTION:
+      1. Interview teams: Why is verification being skipped?
+      2. Address root cause (is ZKP too slow? improve performance)
+      3. DO NOT normalize the bypass as acceptable
+      """)
+    end
+  end
+end
+----
+
+=== Practical Drift (Scott Snook)
+
+**Definition:** **Practical Drift** is the slow, steady uncoupling of practice from written procedure due to:
+
+1. **Local Rationality** - Actions make sense in local context
+2. **Decentralization** - No single person sees the full picture
+3. **Production Pressure** - Get the job done trumps follow the rules
+
+**Snook's Friendly Fire Analysis:**
+
+- Procedure: Pilots must confirm target ID before firing
+- Reality: Pilots skip confirmation when time-pressured
+- Local Rationality: "We're in a combat zone, it's obviously hostile"
+- Drift: Confirmation step routinely skipped
+- Result: Friendly fire (two US helicopters shot down)
+
+**Application to VeriSimDB:**
+
+[source,text]
+----
+PROCEDURE vs PRACTICE DRIFT
+
+Written Procedure:
+  "All cross-org queries must use federation quorum (3/5 stores)"
+
+Actual Practice (Month 1):
+  100% compliance
+
+Actual Practice (Month 3):
+  Developer: "Quorum is slow, let's use 1/5 for read-only queries"
+  [LOCAL RATIONALITY: Makes sense for this specific query]
+
+Actual Practice (Month 6):
+  Team: "Everyone uses 1/5 now, it's the new normal"
+  [DECENTRALIZATION: No one sees they ALL drifted]
+
+Actual Practice (Month 12):
+  New engineer: "The docs say 3/5 but everyone uses 1/5"
+  [ORGANIZATIONAL MEMORY LOSS: Procedure obsolete]
+
+Result:
+  Byzantine fault undetected (malicious store serves bad data)
+  No other stores consulted to detect inconsistency
+  HARM
+----
+
+**VeriSimDB Protection:**
+
+[source,elixir]
+----
+defmodule VeriSim.ProcedureDriftDetector do
+  @moduledoc """
+  Detect drift between documented procedure and actual practice.
+  """
+
+  @documented_procedures %{
+    federation_quorum: 3,  # Documented: 3/5 stores required
+    cache_ttl_medical: 60,  # Documented: 1 minute for medical data
+    verification_rate: 1.0  # Documented: 100% of writes verified
+  }
+
+  def detect_drift do
+    actual_practice = measure_actual_practice()
+
+    drifts = Map.keys(@documented_procedures)
+    |> Enum.filter(fn key ->
+      documented = @documented_procedures[key]
+      actual = actual_practice[key]
+
+      # Significant drift: >10% deviation
+      abs(actual - documented) / documented > 0.1
+    end)
+    |> Enum.map(fn key ->
+      %{
+        procedure: key,
+        documented: @documented_procedures[key],
+        actual: actual_practice[key],
+        drift_percent: calculate_drift_percent(key, actual_practice[key])
+      }
+    end)
+
+    if length(drifts) > 0 do
+      alert(:procedure_drift, """
+      PRACTICAL DRIFT DETECTED
+
+      Written procedures vs actual practice:
+      #{inspect(drifts, pretty: true)}
+
+      WHAT THIS MEANS:
+      Your documentation describes one thing, but teams do another.
+
+      This is "practical drift" (Snook):
+      • Each deviation made sense locally ("faster this way")
+      • Decentralized: No one saw EVERYONE was drifting
+      • New members learn from practice, not documentation
+
+      REQUIRED ACTION:
+      1. Determine correct approach (update docs OR enforce procedure)
+      2. If docs are wrong: Update them (ADR explaining why)
+      3. If practice is wrong: Re-train teams, add enforcement
+      4. DO NOT let drift continue silently
+      """)
+    end
+  end
+
+  defp measure_actual_practice do
+    # Sample actual system behavior
+    %{
+      federation_quorum: measure_avg_quorum_size(),
+      cache_ttl_medical: measure_avg_cache_ttl_for_medical_data(),
+      verification_rate: measure_verification_usage_rate()
+    }
+  end
+end
+----
+
+=== Organizational Memory Loss
+
+**Problem:** Original design rationale forgotten over time.
+
+[source,text]
+----
+Year 1: "Cache TTL is 5 minutes because medical data must be fresh"
+        [Original engineer documents this]
+
+Year 2: Original engineer leaves
+
+Year 3: New engineer: "Why is TTL only 5 minutes? That's slow!"
+        [No memory of rationale]
+        Changes TTL to 1 hour
+
+Year 4: Another engineer: "Why was it ever 5 minutes? 1 hour seems normal"
+        [Deviance fully normalized]
+----
+
+**VeriSimDB Protection: Architecture Decision Records (ADRs)**
+
+[source,adoc]
+----
+= ADR-023: Cache TTL for Medical Data
+
+Date: 2025-01-15
+Status: Accepted
+Supersedes: ADR-015
+
+## Context
+
+Medical diagnosis data must be fresh to prevent harm:
+- Treatments change rapidly (new studies, drug recalls)
+- Stale data can lead to incorrect medical decisions
+- Regulatory requirement (HIPAA): data freshness guarantees
+
+## Decision
+
+Cache TTL for medical data (hexads tagged "medical:*") is **5 minutes**.
+
+This is NOT negotiable. Do NOT increase this TTL without:
+1. New ADR with medical review board approval
+2. Risk assessment by safety team
+3. Legal review (regulatory compliance)
+
+## Consequences
+
+Positive:
+- Patients receive up-to-date medical information
+- Regulatory compliance maintained
+- Reduced liability
+
+Negative:
+- Lower cache hit rate for medical queries
+- Higher load on medical data stores
+
+## Why 5 Minutes Specifically?
+
+Medical review board determined:
+- Most treatment updates occur hourly
+- 5-minute lag is acceptable risk
+- 1-hour lag is UNACCEPTABLE (could miss critical updates)
+
+## Rationale for Future Maintainers
+
+If you're reading this and thinking "5 minutes is too short":
+
+STOP. Consider:
+1. Challenger disaster: Small O-ring erosions normalized
+2. Each TTL increase seems harmless until it isn't
+3. Medical data requires freshness, not just performance
+
+If you have a legitimate reason to change this:
+- Write a new ADR (supersede this one)
+- Get medical review board approval
+- Document your rationale for the NEXT maintainer
+----
+
+== Other Relevant Researchers
+
+=== Nancy Leveson: STAMP/STPA
+
+**Systems-Theoretic Accident Model (STAMP):**
+
+- Accidents caused by inadequate **control** of interactions
+- Not just component failures, but **emergent properties**
+- Focus on constraints, not just events
+
+**Application to VeriSimDB:**
+
+[source,text]
+----
+Control Structure:
+
+┌─────────────────────────────────────────────┐
+│  Governance (Steering Committee)            │
+│  Control: Policy, standards, oversight      │
+└─────────────────┬───────────────────────────┘
+                  │ Policy feedback
+                  ▼
+┌─────────────────────────────────────────────┐
+│  Development Team                           │
+│  Control: Code review, testing, deploy      │
+└─────────────────┬───────────────────────────┘
+                  │ Metrics, alerts
+                  ▼
+┌─────────────────────────────────────────────┐
+│  VeriSimDB (System)                         │
+│  Control: Supervisors, circuit breakers     │
+└─────────────────┬───────────────────────────┘
+                  │ State, logs
+                  ▼
+┌─────────────────────────────────────────────┐
+│  Modality Stores (Controlled Process)       │
+│  Control: Rate limits, timeouts             │
+└─────────────────────────────────────────────┘
+
+Hazard: Data corruption
+Constraint: Writes must be verified via ZKP
+Control Action: Enforce dependent-type path for writes
+----
+
+=== Erik Hollnagel: Safety-II (Resilience Engineering)
+
+**Safety-I:** Things go wrong (accident prevention)
+**Safety-II:** Things go right (performance variability)
+
+**Application:**
+
+Instead of asking "Why did the circuit breaker fail?", ask:
+
+- "How do operators successfully manage load spikes?" (learn from success)
+- "What workarounds do users employ when stores are slow?" (performance variability)
+- "How does the system gracefully degrade?" (resilience)
+
+**VeriSimDB Resilience:**
+
+[source,elixir]
+----
+defmodule VeriSim.ResilienceMonitor do
+  @moduledoc """
+  Study how the system succeeds under stress.
+  """
+
+  def analyze_successful_degradation do
+    # Find incidents where system degraded but didn't fail
+    incidents = Temporal.query_audit_log("""
+      SELECT * FROM audit_log
+      WHERE event_type = 'degraded_service'
+        AND duration > 5 minutes
+        AND NOT EXISTS (
+          SELECT * FROM audit_log AS outages
+          WHERE outages.event_type = 'complete_outage'
+            AND outages.timestamp BETWEEN incident.start AND incident.end
+        )
+    """)
+
+    # Analyze what kept the system running
+    Enum.each(incidents, fn incident ->
+      resilience_factors = %{
+        cache_hit_rate: incident.cache_stats.hit_rate,
+        partial_results_used: incident.partial_results_count > 0,
+        circuit_breakers_active: incident.circuit_breakers_open > 0,
+        load_shedding_active: incident.rate_limit_exceeded > 0
+      }
+
+      Logger.info("""
+      Successful degradation (not failure):
+      #{inspect(resilience_factors)}
+
+      System remained available despite:
+      - #{incident.failed_stores} stores unavailable
+      - #{incident.latency_p99}ms p99 latency
+
+      Learn from this success!
+      """)
+    end)
+  end
+end
+----
+
+== Summary: Safety Theory in Practice
+
+[cols="1,2,2"]
+|===
+|Theory |Key Insight |VeriSimDB Implementation
+
+|**Reason (Swiss Cheese)**
+|Multiple defense layers, latent conditions
+|Design, implementation, runtime, operational layers
+
+|**Reason (Incompatible Goals)**
+|Safety vs performance trade-offs
+|Explicit policy enforcement, mandatory verification
+
+|**Reason (Defenses as Threats)**
+|Safety mechanisms can mask problems
+|Random audits, circuit breaker alerts
+
+|**Vaughan (Normalization of Deviance)**
+|Small violations accumulate, become normal
+|Configuration drift monitoring, ADRs preserve rationale
+
+|**Snook (Practical Drift)**
+|Practice uncouples from procedure
+|Measure actual behavior vs documented procedure
+
+|**Groeneweg (Tripod)**
+|11 organizational factors create preconditions
+|Address BRFs (training, procedures, housekeeping)
+
+|**Rasmussen (Boundaries)**
+|Systems drift toward unsafe boundaries
+|Make safe path easiest, enforce minimums
+
+|**Rasmussen (SRK)**
+|Different error modes at different cognitive levels
+|Runbooks for skill/rule/knowledge levels
+
+|**Leveson (STAMP)**
+|Accidents from inadequate control
+|Control structure with feedback loops
+
+|**Hollnagel (Safety-II)**
+|Learn from success, not just failure
+|Analyze successful degradation, resilience factors
+|===
+
+=== The Normalization Cascade (Most Dangerous)
+
+[source,text]
+----
+1. Incompatible Goals (Reason)
+   ↓
+   Pressure to prioritize performance over safety
+
+2. Practical Drift (Snook)
+   ↓
+   Teams skip safety steps "just this once"
+   (locally rational, no immediate consequences)
+
+3. Normalization of Deviance (Vaughan)
+   ↓
+   Skipping safety becomes routine practice
+   (organizational amnesia, social reinforcement)
+
+4. Boundary Migration (Rasmussen)
+   ↓
+   System operates closer to safety boundary
+   (gradient of least effort)
+
+5. ACCIDENT
+   ↓
+   Eventually the lack of immediate consequences
+   runs out (luck exhausted)
+----
+
+**VeriSimDB Protection Against The Cascade:**
+
+1. **Make goals compatible** - Fast AND safe (via caching)
+2. **Monitor drift** - Alert when practice ≠ procedure
+3. **Preserve memory** - ADRs explain "why" for future maintainers
+4. **Enforce boundaries** - Hard limits, not soft guidelines
+5. **Learn from success** - What kept system safe under pressure?
+
+**Core Principle:**
+
+Safety is not just **avoiding bad outcomes** (Safety-I), but **understanding and amplifying successful adaptations** (Safety-II) while **recognizing that defenses themselves can become threats** (Reason) and **incompatible goals create systemic pressure toward unsafe boundaries** (Rasmussen).
+
+== References
+
+- Reason, J. (1997). Managing the Risks of Organizational Accidents
+- Reason, J. (1990). Human Error
+- Groeneweg, J. (1992). Controlling the Controllable: The Management of Safety
+- Rasmussen, J. (1997). Risk Management in a Dynamic Society: A Modelling Problem
+- Rasmussen, J. (1983). Skills, Rules, and Knowledge (SRK Framework)
+- Leveson, N. (2011). Engineering a Safer World (STAMP/STPA)
+- Hollnagel, E. (2014). Safety-I and Safety-II (Resilience Engineering)
+- link:safety-and-fault-tolerance.adoc[Safety & Fault Tolerance] - Technical implementation
+- link:error-handling-strategy.adoc[Error Handling Strategy] - Recovery mechanisms

@@ -1,0 +1,37 @@
+{
+  "id": "issue-019",
+  "source": "known-issues",
+  "created_at": "2026-02-13T16:20:01Z",
+  "document": {
+    "title": "VQL Executor Federation Stub",
+    "body": "\\n**Location:** `elixir-orchestration/lib/verisim/query/vql_executor.ex`, `rust-core/verisim-api/src/federation.rs`\\n\\n**Resolved:** 2026-02-13. Added `GET /hexads` list endpoint with `?limit=N&offset=M` pagination to the Rust API. The `HexadStore` trait now includes a `list(limit, offset)` method. Federation `query_single_peer()` now falls back to the `/hexads` list endpoint when neither text_query nor vector_query is provided, so bare `SELECT * FROM FEDERATION /pattern/*` returns actual hexad data instead of empty results.\\n\\n",
+    "fields": {
+      "type": "known_issue",
+      "status": "resolved",
+      "severity": "resolved"
+    }
+  },
+  "graph": {
+    "relationships": [{"predicate": "documented_in", "target": "file:KNOWN-ISSUES.adoc"}]
+  },
+  "vector": {
+    "embedding": [-0.648437,0.781250,-0.554687,0.281250,-0.757812,-0.359375,0.664062,-0.570312,0.867187,-0.062500,-0.867187,0.851562,-0.617187,0.054687,-0.648437,0.703125,0.554687,-0.984375,-0.507812,-0.078125,-0.250000,0.203125,-0.843750,0.101562,0.453125,-0.023437,0.531250,-0.953125,0.867187,0.296875,0.125000,-0.335937,-0.648437,0.781250,-0.554687,0.281250,-0.757812,-0.359375,0.664062,-0.570312,0.867187,-0.062500,-0.867187,0.851562,-0.617187,0.054687,-0.648437,0.703125,0.554687,-0.984375,-0.507812,-0.078125,-0.250000,0.203125,-0.843750,0.101562,0.453125,-0.023437,0.531250,-0.953125,0.867187,0.296875,0.125000,-0.335937],
+    "model": "sha256-hash-64d"
+  },
+  "tensor": {
+    "shape": [1, 2],
+    "data": [1.0, 0.0]
+  },
+  "semantic": {
+    "types": ["https://verisim.db/self/type/KnownIssue", "https://verisim.db/self/type/resolved"],
+    "properties": {
+      "status": "resolved",
+      "severity": "resolved"
+    }
+  },
+  "temporal": {
+    "timestamp": "2026-02-13T16:20:01Z",
+    "version": 1,
+    "author": "self-ingest"
+  }
+}

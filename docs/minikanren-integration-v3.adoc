@@ -1,0 +1,329 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= miniKanren Integration (v3 Roadmap)
+:toc:
+:toc-placement!:
+
+**Status:** STUB - Planned for VeriSimDB v3.0
+
+Proposed integration of miniKanren for advanced constraint-based query optimization and learning.
+
+toc::[]
+
+== Overview
+
+**Current (v1.x):** Adaptive learning uses Elixir feedback loops (`adaptive_learner.ex`)
+
+**Future (v3.x):** Enhance with miniKanren for:
+- Constraint-based query plan optimization
+- Rule-based normalization policy synthesis
+- Declarative drift repair strategies
+- Symbolic reasoning over ZKP contracts
+
+== Why miniKanren?
+
+=== Advantages Over Mozart/Oz
+
+- **Lightweight** - Embeddable, no separate runtime
+- **Minimal footprint** - ~500 LOC core implementation
+- **Multiple host languages** - Available for Scheme, Racket, Clojure, JavaScript, Python
+- **Relational programming** - Natural fit for query optimization
+
+=== Why Not Now (v1.x)?
+
+- **Elixir feedback loops sufficient** for current learning needs
+- **Tiny core philosophy** - Avoid premature complexity
+- **Prove value first** - Demonstrate adaptive learning works before adding logic programming
+
+== Proposed Architecture (v3)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Elixir Orchestration Layer                                 │
+│    ├── VeriSim.EntityServer (GenServer per Hexad)           │
+│    ├── VeriSim.DriftMonitor (drift detection coordinator)   │
+│    ├── VeriSim.QueryRouter (distributes queries)            │
+│    ├── VeriSim.AdaptiveLearner (v1: feedback loops)         │
+│    └── VeriSim.MiniKanren (v3: constraint solving) ◄─ NEW   │
+│              ↓ FFI/NIFs                                      │
+├─────────────────────────────────────────────────────────────┤
+│  miniKanren Logic Engine (Rust or ReScript binding)         │
+│    ├── Query plan constraint solver                         │
+│    ├── Normalization rule synthesizer                       │
+│    └── Drift repair strategy generator                      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+== Use Cases for miniKanren (v3)
+
+=== 1. Query Plan Optimization
+
+**Problem:** Given query constraints and store capabilities, find optimal execution plan.
+
+**miniKanren approach:**
+
+```scheme
+;; Define relations for query planning
+(defrel (query-plano query plan)
+  (fresh (modalities predicates stores)
+    (query-modalitieso query modalities)
+    (query-predicateso query predicates)
+    (available-storeso stores)
+    (plan-satisfieso plan modalities predicates stores)
+    (plan-minimizes-costo plan)))
+
+;; Ask miniKanren: What plans satisfy this query?
+(run* (plan)
+  (query-plano
+    '(FROM verisim:graph WHERE hexad.types INCLUDES "Paper")
+    plan))
+```
+
+**Output:** Multiple valid plans, ranked by estimated cost.
+
+=== 2. Normalization Policy Synthesis
+
+**Problem:** Given observed deviance patterns, synthesize detection rules.
+
+**miniKanren approach:**
+
+```scheme
+;; Learn rule from positive/negative examples
+(defrel (normalization-ruleo examples rule)
+  (fresh (positive-examples negative-examples)
+    (partition-exampleso examples positive-examples negative-examples)
+    (rule-accepts-allo rule positive-examples)
+    (rule-rejects-allo rule negative-examples)
+    (rule-is-minimalo rule)))
+
+;; Synthesize rule from training data
+(run 1 (rule)
+  (normalization-ruleo
+    '((cache-ttl 300 . ok)
+      (cache-ttl 3600 . deviance)
+      (cache-ttl 60 . ok))
+    rule))
+```
+
+**Output:** `(rule (lambda (ttl) (and (>= ttl 60) (<= ttl 600))))`
+
+=== 3. Drift Repair Strategy Selection
+
+**Problem:** Given drift type and context, choose best repair strategy.
+
+**miniKanren approach:**
+
+```scheme
+;; Relational specification of repair strategies
+(defrel (repair-strategyo drift-type context strategy)
+  (conde
+    ;; latest_wins when temporal ordering clear
+    [(== drift-type 'timestamp-mismatch)
+     (fresh (timestamps)
+       (all-have-timestampso context timestamps)
+       (== strategy 'latest-wins))]
+
+    ;; quorum when values diverge
+    [(== drift-type 'title-mismatch)
+     (multiple-valueso context)
+     (== strategy 'quorum)]
+
+    ;; manual for critical fields
+    [(critical-fieldo drift-type)
+     (== strategy 'manual)]))
+
+;; Query: What strategy for this drift?
+(run* (strategy)
+  (repair-strategyo
+    'title-mismatch
+    '{:values ["ML Paper" "Machine Learning Paper"]
+      :modalities [graph document]}
+    strategy))
+```
+
+**Output:** `(quorum manual)` - multiple valid strategies
+
+=== 4. ZKP Contract Satisfaction
+
+**Problem:** Verify if a hexad satisfies contract constraints symbolically.
+
+**miniKanren approach:**
+
+```scheme
+;; Relational specification of ZKP contracts
+(defrel (contract-satisfiedo hexad contract)
+  (fresh (contract-type constraints)
+    (contract-typeo contract contract-type)
+    (contract-constraintso contract constraints)
+    (all-constraints-satisfiedo hexad constraints)))
+
+;; Check satisfaction without executing ZKP
+(run* (result)
+  (contract-satisfiedo
+    '{:types ["Paper"] :citations []}
+    'CitationContract
+    result))
+```
+
+**Output:** `(#f)` - hexad does NOT satisfy contract (missing citations)
+
+== Implementation Options (v3)
+
+=== Option A: Rust miniKanren Binding
+
+**Crate:** `rust-kanren` or `microkanren-rs`
+
+```rust
+// lib/verisim_minikanren/src/lib.rs
+
+use microkanren::*;
+
+#[rustler::nif]
+fn solve_query_plan(query_ast: String) -> Result<Vec<String>, String> {
+    let state = State::new();
+
+    // Encode query as miniKanren goal
+    let goal = parse_query_to_goal(&query_ast)?;
+
+    // Run miniKanren search
+    let results = state.run(goal, 10); // Top 10 plans
+
+    Ok(results.into_iter().map(|r| r.to_string()).collect())
+}
+```
+
+**Integration:** Elixir calls Rust NIF → miniKanren → returns results
+
+=== Option B: ReScript miniKanren Binding
+
+**Package:** `rescript-minikanren` (port from JavaScript implementation)
+
+```rescript
+// src/bindings/MiniKanren.res
+
+module MiniKanren = {
+  type goal
+  type state
+
+  @module("minikanren") external run: (state, goal, int) => array<string> = "run"
+  @module("minikanren") external fresh: (state => goal) => goal = "fresh"
+  @module("minikanren") external eq: (string, string) => goal = "=="
+}
+
+let solveQueryPlan = (queryAst: string): array<string> => {
+  let state = MiniKanren.State.new()
+  let goal = parseQueryToGoal(queryAst)
+  MiniKanren.run(state, goal, 10)
+}
+```
+
+**Integration:** Elixir calls ReScript (compiled to JS) → Deno → miniKanren → returns results
+
+=== Option C: Scheme miniKanren (via Guile)
+
+**Use existing STATE.scm infrastructure:**
+
+```scheme
+;; lib/verisim_minikanren.scm
+
+(use-modules (minikanren))
+
+(define (solve-query-plan query-ast)
+  (run 10 (plan)
+    (query-plano query-ast plan)))
+
+;; Called from Elixir via Ports
+```
+
+**Integration:** Elixir spawns Guile process → miniKanren → returns results via stdin/stdout
+
+== Performance Considerations (v3)
+
+=== When to Use miniKanren
+
+**Good for:**
+- Small search spaces (< 1000 possibilities)
+- Symbolic reasoning (type checking, contract verification)
+- Policy synthesis (learn rules from examples)
+- Offline optimization (query plan analysis)
+
+**Not good for:**
+- Large search spaces (> 10,000 possibilities) - use heuristics instead
+- Real-time critical path (miniKanren search is slow)
+- Numeric optimization (use gradient descent, not logic search)
+
+=== Hybrid Approach (Recommended)
+
+```elixir
+defmodule VeriSim.QueryPlanner do
+  @doc """
+  v1: Use adaptive learner (fast feedback loops)
+  v3: Use miniKanren for hard cases (constraint solving)
+  """
+  def plan_query(query) do
+    if simple_query?(query) do
+      # Fast path: Use learned plans from adaptive_learner
+      VeriSim.AdaptiveLearner.get_policy(:query_plan)
+      |> apply_to_query(query)
+    else
+      # Slow path: Use miniKanren for complex constraints
+      VeriSim.MiniKanren.solve_query_plan(query)
+    end
+  end
+end
+```
+
+== Migration Path (v1 → v3)
+
+=== Phase 1: v1.x (Current)
+
+- ✅ Adaptive learner with Elixir feedback loops
+- ✅ Heuristic query planning
+- ✅ Rule-based drift repair
+
+=== Phase 2: v2.x (Intermediate)
+
+- Collect query plan training data
+- Measure adaptive learner limitations
+- Prototype miniKanren integration in non-critical paths
+
+=== Phase 3: v3.x (Full Integration)
+
+- Replace heuristic query planner with miniKanren solver
+- Synthesize normalization rules from examples
+- Symbolic ZKP contract verification
+- Declarative drift repair strategies
+
+== Success Criteria (v3)
+
+Before adding miniKanren, we need:
+
+1. **Demonstrated Need**
+   - Adaptive learner hits optimization ceiling
+   - Query planning requires constraint solving (not just heuristics)
+   - Rule synthesis requested by users
+
+2. **Performance Acceptable**
+   - miniKanren query planning < 100ms for typical queries
+   - Acceptable latency impact on critical path
+
+3. **Tiny Core Maintained**
+   - miniKanren binding < 1,000 LOC
+   - Total coordination logic still < 5,000 LOC
+
+== References
+
+- https://minikanren.org/[miniKanren official site]
+- http://minikanren.org/workshop/2023/[miniKanren Workshop 2023]
+- https://github.com/webyrd/faster-minikanren[Faster miniKanren implementation]
+- https://www.youtube.com/watch?v=eQL48qYDwp4[The Reasoned Schemer (book/video)]
+
+== Summary
+
+miniKanren integration is **planned for v3** as an enhancement to v1's adaptive learner.
+
+**Current approach (v1):** Elixir feedback loops - fast, simple, good enough
+
+**Future approach (v3):** miniKanren for hard problems - constraint solving, rule synthesis, symbolic reasoning
+
+**Decision:** Prove adaptive learning works before adding logic programming.

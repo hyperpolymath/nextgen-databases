@@ -1,0 +1,316 @@
+(* SPDX-License-Identifier: PMPL-1.0-or-later *)
+(* VeriSim Query Language (VQL) Grammar *)
+(* Format: Extended Backus-Naur Form (EBNF) *)
+(* Version: 3.0 — Octad (8 modalities), provenance conditions, spatial conditions *)
+(* Date: 2026-02-27 *)
+
+(* ============================================================================
+   1. TOP-LEVEL STRUCTURE
+   ============================================================================ *)
+statement = query | mutation ;
+
+query = select_clause,
+        from_clause,
+        [where_clause],
+        [group_by_clause],
+        [having_clause],
+        [proof_clause],
+        [order_by_clause],
+        [limit_clause],
+        [offset_clause] ;
+
+(* ============================================================================
+   2. SELECT CLAUSE - Modality Selection, Column Projections & Aggregates
+   ============================================================================ *)
+select_clause = 'SELECT', select_item_list ;
+
+select_item_list = select_item, { ',', select_item } ;
+
+(* A select item can be an aggregate, a column projection, or a full modality *)
+select_item = aggregate_expr | field_ref | modality_spec ;
+
+(* Column projection: MODALITY.field_name *)
+field_ref = modality_name, '.', identifier ;
+
+(* Aggregate functions *)
+aggregate_expr = count_all | aggregate_field ;
+count_all = 'COUNT', '(', '*', ')' ;
+aggregate_field = aggregate_func, '(', field_ref, ')' ;
+aggregate_func = 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX' ;
+
+(* Bare modality selection *)
+modality_spec = 'GRAPH', [graph_projection] | 'VECTOR', [vector_projection] | 'TENSOR', [tensor_projection] | 'SEMANTIC', [semantic_projection] | 'DOCUMENT', [document_projection] | 'TEMPORAL', [temporal_projection] | 'PROVENANCE', [provenance_projection] | 'SPATIAL', [spatial_projection] | '*'  (* All available modalities *) ;
+
+modality_name = 'GRAPH' | 'VECTOR' | 'TENSOR' | 'SEMANTIC' | 'DOCUMENT' | 'TEMPORAL' | 'PROVENANCE' | 'SPATIAL' ;
+
+(* Projection specifics per modality *)
+graph_projection = '(', sparql_pattern, ')' ;
+vector_projection = '(', vector_fields, ')' ;
+tensor_projection = '(', tensor_slice, ')' ;
+semantic_projection = '(', contract_names, ')' ;
+document_projection = '(', document_fields, ')' ;
+temporal_projection = '(', version_spec, ')' ;
+provenance_projection = '(', provenance_fields, ')' ;
+spatial_projection = '(', spatial_fields, ')' ;
+
+(* ============================================================================
+   3. FROM CLAUSE - Data Sources
+   ============================================================================ *)
+from_clause = 'FROM', source_spec ;
+
+source_spec = hexad_source | federation_source | store_source ;
+
+(* Direct hexad reference *)
+hexad_source = 'HEXAD', uuid ;
+
+(* Federation pattern (multiple nodes) *)
+federation_source = 'FEDERATION', node_pattern, [drift_policy] ;
+
+node_pattern = glob_pattern  (* e.g., '/universities/*' *) | node_list      (* e.g., '[node1, node2, node3]' *) ;
+
+drift_policy = 'WITH', 'DRIFT', drift_mode ;
+drift_mode = 'STRICT'     (* Fail on any drift *) | 'REPAIR'     (* Auto-repair detected drift *) | 'TOLERATE'   (* Return data despite drift *) | 'LATEST'     (* Use most recent version *) ;
+
+(* Specific store reference *)
+store_source = 'STORE', store_id ;
+
+(* ============================================================================
+   4. WHERE CLAUSE - Filtering Conditions,
+   ============================================================================ *)
+where_clause = 'WHERE', condition ;
+
+condition = simple_condition | compound_condition | '(', condition, ')' ;
+
+simple_condition = graph_condition | vector_condition | tensor_condition | semantic_condition | document_condition | temporal_condition | provenance_condition | spatial_condition | cross_modal_condition ;
+
+(* 4.9. Cross-Modal Conditions — relationships BETWEEN modalities *)
+cross_modal_condition = cross_modal_field_compare | drift_condition | consistency_condition | exists_condition | not_exists_condition ;
+
+(* Compare fields across modalities: WHERE DOCUMENT.severity > GRAPH.centrality *)
+cross_modal_field_compare = field_ref, comparison_op, field_ref ;
+
+(* Drift between modalities: WHERE DRIFT(VECTOR, DOCUMENT) > 0.3 *)
+drift_condition = 'DRIFT', '(', modality_name, ',', modality_name, ')', comparison_op, float ;
+
+(* Consistency check: WHERE CONSISTENT(VECTOR, SEMANTIC) USING COSINE *)
+consistency_condition = 'CONSISTENT', '(', modality_name, ',', modality_name, ')', 'USING', metric_name ;
+metric_name = 'COSINE' | 'EUCLIDEAN' | 'DOT_PRODUCT' | 'JACCARD' ;
+
+(* Modality existence: WHERE VECTOR EXISTS *)
+exists_condition = modality_name, 'EXISTS' ;
+
+(* Modality absence: WHERE TENSOR NOT EXISTS *)
+not_exists_condition = modality_name, 'NOT', 'EXISTS' ;
+
+compound_condition = condition, 'AND', condition | condition, 'OR', condition | 'NOT', condition ;
+
+(* 4.1. Graph Conditions (SPARQL-like) *)
+graph_condition = sparql_pattern | path_pattern ;
+
+sparql_pattern = '(', node_var, ')', edge_pattern, '(', node_var, ')' ;
+edge_pattern = '-[', edge_type, ']->' | '-[', edge_type, ']-' | '<-[', edge_type, ']-' ;
+node_var = identifier | ('?', identifier) ;
+edge_type = ':', identifier ;
+
+path_pattern = node_var, path_quantifier, node_var ;
+path_quantifier = '-[', edge_type, ('*' | '+' | '{', integer, ',', integer, '}'), ']->' ;
+
+(* 4.2. Vector Conditions (Similarity Search) *)
+vector_condition = vector_field, 'SIMILAR', 'TO', vector_literal, [similarity_threshold] | vector_field, 'NEAREST', integer, [metric_type] ;
+
+vector_field = identifier, '.', 'embedding' ;
+vector_literal = '[', float, { ',', float }, ']' ;
+similarity_threshold = 'WITHIN', float ;
+metric_type = 'USING', ('COSINE' | 'EUCLIDEAN' | 'DOT_PRODUCT') ;
+
+(* 4.3. Tensor Conditions (Multi-dimensional) *)
+tensor_condition = tensor_field, tensor_op, tensor_literal ;
+tensor_op = '==' | '>' | '<' | '>=' | '<=' | 'SHAPE' | 'RANK' ;
+tensor_literal = array_literal | scalar_literal ;
+
+(* 4.4. Semantic Conditions (ZKP Contracts) *)
+semantic_condition = 'SATISFIES', contract_name, [contract_params] | 'HAS', 'PROOF', proof_type | 'VERIFIED', 'BY', verifier_id ;
+
+contract_name = identifier ;
+contract_params = '(', param_list, ')' ;
+param_list = identifier, '=', literal, { ',', identifier, '=', literal } ;
+
+(* 4.5. Document Conditions (Full-text Search) *)
+document_condition = 'FULLTEXT', 'CONTAINS', string_literal | 'FULLTEXT', 'MATCHES', regex_literal | 'FIELD', identifier, comparison_op, literal ;
+
+comparison_op = '==' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' ;
+
+(* 4.6. Temporal Conditions (Versioning) *)
+temporal_condition = 'AS', 'OF', timestamp | 'BETWEEN', timestamp, 'AND', timestamp | 'VERSION', version_id | 'MODIFIED', 'BY', actor_id ;
+
+(* 4.7. Provenance Conditions (Lineage Tracking) *)
+provenance_condition = provenance_actor | provenance_origin | provenance_chain | provenance_event ;
+
+(* Filter by actor: WHERE PROVENANCE.actor = 'system' *)
+provenance_actor = 'PROVENANCE', '.', 'actor', comparison_op, string_literal ;
+
+(* Filter by origin: WHERE PROVENANCE.origin = 'import' *)
+provenance_origin = 'PROVENANCE', '.', 'origin', comparison_op, string_literal ;
+
+(* Filter by chain integrity: WHERE PROVENANCE.chain_valid = true *)
+provenance_chain = 'PROVENANCE', '.', 'chain_valid', '=', boolean
+                 | 'PROVENANCE', '.', 'chain_length', comparison_op, integer ;
+
+(* Filter by event type: WHERE PROVENANCE.event_type = 'Modified' *)
+provenance_event = 'PROVENANCE', '.', 'event_type', comparison_op, string_literal ;
+
+(* Provenance-specific fields *)
+provenance_fields = identifier, { ',', identifier } ;
+
+(* 4.8. Spatial Conditions (Geospatial Queries) *)
+spatial_condition = spatial_radius | spatial_bounds | spatial_nearest | spatial_field ;
+
+(* Radius search: WHERE WITHIN RADIUS(51.5074, -0.1278, 100.0) *)
+spatial_radius = 'WITHIN', 'RADIUS', '(', float, ',', float, ',', float, ')' ;
+
+(* Bounding box: WHERE WITHIN BOUNDS(51.0, -1.0, 52.0, 0.5) *)
+spatial_bounds = 'WITHIN', 'BOUNDS', '(', float, ',', float, ',', float, ',', float, ')' ;
+
+(* K-nearest: WHERE NEAREST(51.5074, -0.1278, 10) *)
+spatial_nearest = 'NEAREST', '(', float, ',', float, ',', integer, ')' ;
+
+(* Field access: WHERE SPATIAL.latitude > 51.0 *)
+spatial_field = 'SPATIAL', '.', identifier, comparison_op, literal ;
+
+(* Spatial-specific fields *)
+spatial_fields = identifier, { ',', identifier } ;
+
+(* ============================================================================
+   5. PROOF CLAUSE - Dependent-Type Safety (Multi-Proof Composition)
+   ============================================================================ *)
+proof_clause = 'PROOF', proof_spec_list ;
+
+proof_spec_list = proof_spec, { 'AND', proof_spec } ;
+
+proof_spec = proof_type, '(', contract_name, ')', [proof_params] ;
+
+proof_type = 'EXISTENCE'    (* Hexad exists and is accessible *) | 'CITATION'     (* Citation chain is valid *) | 'ACCESS'       (* User has access rights *) | 'INTEGRITY'    (* Data has not been tampered with *) | 'PROVENANCE'   (* Lineage is verifiable *) | 'CUSTOM'       (* Custom ZKP contract *) ;
+
+proof_params = 'WITH', param_list ;
+
+(* ============================================================================
+   6. GROUP BY / HAVING CLAUSES - Aggregation
+   ============================================================================ *)
+group_by_clause = 'GROUP', 'BY', field_ref_list ;
+field_ref_list = field_ref, { ',', field_ref } ;
+
+having_clause = 'HAVING', condition ;
+
+(* ============================================================================
+   7. ORDER BY CLAUSE - Sorting
+   ============================================================================ *)
+order_by_clause = 'ORDER', 'BY', order_by_list ;
+order_by_list = order_by_item, { ',', order_by_item } ;
+order_by_item = field_ref, [sort_direction] ;
+sort_direction = 'ASC' | 'DESC' ;
+
+(* ============================================================================
+   8. PAGINATION CLAUSES
+   ============================================================================ *)
+limit_clause = 'LIMIT', integer ;
+offset_clause = 'OFFSET', integer ;
+
+(* ============================================================================
+   9. MUTATIONS - Write Path (INSERT / UPDATE / DELETE)
+   ============================================================================ *)
+mutation = insert_mutation | update_mutation | delete_mutation ;
+
+(* INSERT: Create a new hexad with modality data *)
+insert_mutation = 'INSERT', 'HEXAD', 'WITH', modality_data_list, [proof_clause] ;
+
+modality_data_list = modality_data, { ',', modality_data } ;
+
+modality_data = document_data | vector_data | graph_data | tensor_data | semantic_data | temporal_data | provenance_data | spatial_data ;
+
+document_data = 'DOCUMENT', '(', field_assignment_list, ')' ;
+vector_data = 'VECTOR', '(', vector_literal, ')' ;
+graph_data = 'GRAPH', '(', identifier, ',', identifier, ')' ;  (* edge_type, target_hexad_id *)
+tensor_data = 'TENSOR', '(', array_literal, ')' ;
+semantic_data = 'SEMANTIC', '(', identifier, ')' ;  (* contract name *)
+temporal_data = 'TEMPORAL', '(', timestamp, ')' ;
+provenance_data = 'PROVENANCE', '(', field_assignment_list, ')' ;  (* actor, event_type, description, source *)
+spatial_data = 'SPATIAL', '(', field_assignment_list, ')' ;  (* latitude, longitude, altitude, geometry_type, srid *)
+
+field_assignment_list = field_assignment, { ',', field_assignment } ;
+field_assignment = identifier, '=', literal ;
+
+(* UPDATE: Modify fields of an existing hexad *)
+update_mutation = 'UPDATE', 'HEXAD', uuid, 'SET', set_list, [proof_clause] ;
+
+set_list = set_assignment, { ',', set_assignment } ;
+set_assignment = field_ref, '=', literal ;
+
+(* DELETE: Remove a hexad *)
+delete_mutation = 'DELETE', 'HEXAD', uuid, [proof_clause] ;
+
+(* ============================================================================
+   10. LEXICAL ELEMENTS
+   ============================================================================ *)
+uuid = hex_digit, hex_digit, hex_digit, hex_digit, hex_digit, hex_digit, hex_digit, hex_digit, '-',
+       hex_digit, hex_digit, hex_digit, hex_digit, '-',
+       hex_digit, hex_digit, hex_digit, hex_digit, '-',
+       hex_digit, hex_digit, hex_digit, hex_digit, '-',
+       hex_digit, hex_digit, hex_digit, hex_digit, hex_digit, hex_digit, hex_digit, hex_digit, hex_digit, hex_digit, hex_digit, hex_digit ;
+hex_digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+          | 'a' | 'b' | 'c' | 'd' | 'e' | 'f'
+          | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' ;
+
+identifier = ? letter or underscore ?, { ? letter, digit, or underscore ? } ;
+store_id = identifier ;
+verifier_id = identifier ;
+actor_id = identifier ;
+version_id = identifier ;
+
+integer = ? digit ?, { ? digit ? } ;
+float = ? digit ?, { ? digit ? }, '.', ? digit ?, { ? digit ? }, [('e' | 'E'), ['+' | '-'], ? digit ?, { ? digit ? }] ;
+
+string_literal = "'", { ? any character except ' and \ ? | "\'", | "\\" }, "'" ;
+regex_literal = '/', { ? any character except / and \ ? | '\/' | '\\' }, '/' ;
+
+timestamp = iso8601_datetime ;
+iso8601_datetime = year, '-', month, '-', day, 'T', hour, ':', minute, ':', second, ['.', fraction], timezone ;
+
+glob_pattern = '/', path_segment, { '/', path_segment }, ('/*' | '/**') ;
+path_segment = ? alphanumeric, underscore, or hyphen ?, { ? alphanumeric, underscore, or hyphen ? } ;
+
+array_literal = '[', literal, { ',', literal }, ']' ;
+scalar_literal = integer | float | string_literal | boolean ;
+boolean = 'true' | 'false' ;
+literal = scalar_literal | array_literal ;
+
+(* ============================================================================
+   11. COMMENTS
+   ============================================================================ *)
+comment = '--', { ? any character except newline ? }, '\n'  (* Line comment *)
+        | '/*', ? any characters ?, '*/'  (* Block comment *) ;
+
+(* ============================================================================
+   12. RESERVED KEYWORDS
+   ============================================================================ *)
+(* Keywords are case-insensitive in VQL *)
+keywords = 'SELECT' | 'FROM' | 'WHERE' | 'PROOF' | 'LIMIT' | 'OFFSET'
+         | 'GRAPH' | 'VECTOR' | 'TENSOR' | 'SEMANTIC' | 'DOCUMENT' | 'TEMPORAL' | 'PROVENANCE' | 'SPATIAL'
+         | 'HEXAD' | 'FEDERATION' | 'STORE'
+         | 'WITH' | 'DRIFT' | 'STRICT' | 'REPAIR' | 'TOLERATE' | 'LATEST'
+         | 'AND' | 'OR' | 'NOT'
+         | 'SIMILAR' | 'TO' | 'WITHIN' | 'NEAREST' | 'USING'
+         | 'SATISFIES' | 'HAS' | 'VERIFIED' | 'BY'
+         | 'FULLTEXT' | 'CONTAINS' | 'MATCHES' | 'FIELD' | 'LIKE'
+         | 'AS' | 'OF' | 'BETWEEN' | 'VERSION' | 'MODIFIED'
+         | 'EXISTENCE' | 'CITATION' | 'ACCESS' | 'INTEGRITY' | 'CUSTOM'
+         | 'COSINE' | 'EUCLIDEAN' | 'DOT_PRODUCT' | 'JACCARD' | 'SHAPE' | 'RANK'
+         | 'RADIUS' | 'BOUNDS'
+         | 'ORDER' | 'GROUP' | 'HAVING' | 'ASC' | 'DESC'
+         | 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX'
+         | 'INSERT' | 'UPDATE' | 'DELETE' | 'SET'
+         | 'EXISTS' | 'CONSISTENT'
+         | 'true' | 'false' ;
+
+(* ============================================================================
+   END OF GRAMMAR
+   ============================================================================ *)

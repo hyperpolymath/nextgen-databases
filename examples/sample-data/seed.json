@@ -1,0 +1,2210 @@
+[
+  {
+    "id": "entity-001",
+    "category": "paper",
+    "document": {
+      "title": "VeriSimDB: A Multimodal Database with Drift Detection",
+      "content": "This paper introduces VeriSimDB, a novel database system that unifies eight distinct data modalities — document, graph, vector, semantic, temporal, provenance, spatial, and tensor — into a single hexad abstraction. We present a drift detection mechanism that identifies cross-modal inconsistencies in real time, enabling self-healing data pipelines. Our evaluation on the PolyBench benchmark demonstrates sub-millisecond drift scoring with 97.3% precision.",
+      "tags": ["multimodal", "drift detection", "database", "hexad", "VeriSimDB"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-011", "relation": "authored_by"},
+        {"target": "entity-012", "relation": "authored_by"},
+        {"target": "entity-031", "relation": "evaluated_on"},
+        {"target": "entity-041", "relation": "presented_at"},
+        {"target": "entity-021", "relation": "affiliated_with"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.91, 0.23, 0.67, 0.44, 0.85, 0.12, 0.56, 0.78]
+    },
+    "semantic": {
+      "types": ["http://schema.org/ScholarlyArticle", "http://schema.org/TechArticle"],
+      "properties": {
+        "keywords": ["multimodal databases", "drift detection"],
+        "doi": "10.1234/verisimdb-2025",
+        "pageCount": 14
+      }
+    },
+    "temporal": {
+      "created": "2025-03-15T09:00:00Z",
+      "modified": "2026-02-10T14:22:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "Imperial College London — Data Systems Lab",
+      "actor": "entity-011",
+      "chain": ["draft-v1", "peer-review-revision", "camera-ready"]
+    },
+    "spatial": {
+      "lat": 51.4988,
+      "lon": -0.1749,
+      "label": "Imperial College London, South Kensington"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-002",
+    "category": "paper",
+    "document": {
+      "title": "Formal Verification of Cross-Modal Consistency in Polystore Systems",
+      "content": "We present a dependent-type framework for verifying consistency invariants across heterogeneous data modalities. By encoding modal relationships as type-level constraints in Idris2, we can statically guarantee that graph edges, vector embeddings, and semantic annotations remain coherent after arbitrary transformation pipelines. The framework is evaluated against VeriSimDB's octad model.",
+      "tags": ["formal verification", "dependent types", "Idris2", "consistency", "polystore"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-013", "relation": "authored_by"},
+        {"target": "entity-014", "relation": "authored_by"},
+        {"target": "entity-032", "relation": "evaluated_on"},
+        {"target": "entity-042", "relation": "presented_at"},
+        {"target": "entity-022", "relation": "affiliated_with"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.88, 0.31, 0.72, 0.39, 0.81, 0.15, 0.61, 0.73]
+    },
+    "semantic": {
+      "types": ["http://schema.org/ScholarlyArticle"],
+      "properties": {
+        "keywords": ["formal verification", "dependent types", "cross-modal consistency"],
+        "doi": "10.1234/formal-polystore-2025",
+        "pageCount": 12
+      }
+    },
+    "temporal": {
+      "created": "2025-06-01T10:30:00Z",
+      "modified": "2026-01-20T11:15:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "University of Edinburgh — Laboratory for Foundations of Computer Science",
+      "actor": "entity-013",
+      "chain": ["initial-submission", "revision-1"]
+    },
+    "spatial": {
+      "lat": 55.9445,
+      "lon": -3.1872,
+      "label": "University of Edinburgh, Informatics Forum"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-003",
+    "category": "paper",
+    "document": {
+      "title": "Hexad Embeddings: Unified Vector Representations for Multi-Modal Data",
+      "content": "We propose a novel embedding technique that produces a single dense vector from all eight modalities of a hexad record. Unlike concatenation or late-fusion approaches, our method uses attention-based cross-modal alignment to produce compact 768-dimensional embeddings that capture inter-modal relationships. Evaluation on the PolyBench and ModalMix benchmarks shows 12% improvement over baseline approaches.",
+      "tags": ["embeddings", "vector", "attention", "multi-modal", "fusion"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-011", "relation": "authored_by"},
+        {"target": "entity-015", "relation": "authored_by"},
+        {"target": "entity-031", "relation": "evaluated_on"},
+        {"target": "entity-033", "relation": "evaluated_on"},
+        {"target": "entity-043", "relation": "presented_at"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.85, 0.19, 0.74, 0.52, 0.79, 0.08, 0.63, 0.81]
+    },
+    "semantic": {
+      "types": ["http://schema.org/ScholarlyArticle"],
+      "properties": {
+        "keywords": ["hexad embeddings", "cross-modal fusion", "vector representations"],
+        "doi": "10.1234/hexad-embed-2025",
+        "pageCount": 10
+      }
+    },
+    "temporal": {
+      "created": "2025-07-20T08:45:00Z",
+      "modified": "2026-02-01T16:30:00Z",
+      "version": 4
+    },
+    "provenance": {
+      "origin": "Imperial College London — Data Systems Lab",
+      "actor": "entity-011",
+      "chain": ["draft-v1", "internal-review", "conference-submission", "camera-ready"]
+    },
+    "spatial": {
+      "lat": 51.4988,
+      "lon": -0.1749,
+      "label": "Imperial College London, South Kensington"
+    },
+    "intentional_drift": true,
+    "drift_note": "Vector embedding is from draft-v1 and was never re-computed after the camera-ready text changes; the document content diverged from the embedding in version 3."
+  },
+  {
+    "id": "entity-004",
+    "category": "paper",
+    "document": {
+      "title": "Provenance Graphs for Reproducible Data Science Pipelines",
+      "content": "Tracking data lineage through complex transformation pipelines is critical for scientific reproducibility. We introduce ProvenanceDAG, a directed acyclic graph representation that captures every transformation applied to a data entity across heterogeneous storage backends. Our system integrates with VeriSimDB's provenance modality and the W3C PROV-O ontology to provide end-to-end lineage tracking with sub-second query response times.",
+      "tags": ["provenance", "reproducibility", "data lineage", "DAG", "PROV-O"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-016", "relation": "authored_by"},
+        {"target": "entity-012", "relation": "authored_by"},
+        {"target": "entity-034", "relation": "evaluated_on"},
+        {"target": "entity-044", "relation": "presented_at"},
+        {"target": "entity-023", "relation": "affiliated_with"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.72, 0.41, 0.58, 0.33, 0.90, 0.22, 0.47, 0.66]
+    },
+    "semantic": {
+      "types": ["http://schema.org/ScholarlyArticle"],
+      "properties": {
+        "keywords": ["provenance", "reproducibility", "lineage graphs"],
+        "doi": "10.1234/provdag-2025",
+        "pageCount": 11
+      }
+    },
+    "temporal": {
+      "created": "2025-04-10T13:00:00Z",
+      "modified": "2026-01-05T09:45:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "University College London — Information Studies",
+      "actor": "entity-016",
+      "chain": ["initial-draft", "final-version"]
+    },
+    "spatial": {
+      "lat": 51.5246,
+      "lon": -0.1340,
+      "label": "University College London, Gower Street"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-005",
+    "category": "paper",
+    "document": {
+      "title": "Semantic Drift in Knowledge Graphs: Detection and Repair Strategies",
+      "content": "Knowledge graphs evolve over time, and their semantic annotations can drift away from the entities they describe. We formalise the notion of semantic drift using information-theoretic measures and propose three repair strategies: anchor-based realignment, consensus-driven correction, and proof-carrying patches. Experiments on DBpedia and Wikidata subsets show our detection achieves 94% recall.",
+      "tags": ["semantic drift", "knowledge graphs", "repair", "information theory"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-013", "relation": "authored_by"},
+        {"target": "entity-017", "relation": "authored_by"},
+        {"target": "entity-035", "relation": "evaluated_on"},
+        {"target": "entity-041", "relation": "presented_at"},
+        {"target": "entity-024", "relation": "affiliated_with"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.79, 0.35, 0.62, 0.48, 0.83, 0.18, 0.55, 0.71]
+    },
+    "semantic": {
+      "types": ["http://schema.org/ScholarlyArticle", "http://schema.org/Article"],
+      "properties": {
+        "keywords": ["semantic drift", "knowledge graphs", "repair"],
+        "doi": "10.1234/sem-drift-2025",
+        "pageCount": 13
+      }
+    },
+    "temporal": {
+      "created": "2025-05-22T11:00:00Z",
+      "modified": "2026-02-15T10:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "University of Oxford — Department of Computer Science",
+      "actor": "entity-013",
+      "chain": ["draft", "revision", "accepted"]
+    },
+    "spatial": {
+      "lat": 51.7598,
+      "lon": -1.2584,
+      "label": "University of Oxford, Wolfson Building"
+    },
+    "intentional_drift": true,
+    "drift_note": "Semantic types list includes 'http://schema.org/Article' which is a supertype of ScholarlyArticle; the graph edges reference entity-024 (Oxford) but the provenance says Edinburgh LFCS — affiliation is inconsistent between modalities."
+  },
+  {
+    "id": "entity-006",
+    "category": "paper",
+    "document": {
+      "title": "Tensor Decomposition for Anomaly Detection in Streaming Hexad Data",
+      "content": "Real-time anomaly detection in multimodal data streams requires efficient tensor representations. We present HexTensor, a streaming tensor decomposition framework that processes VeriSimDB hexad records as 8-mode tensors. By applying Tucker decomposition incrementally, we detect anomalous entities within 50ms of ingestion. Our approach scales to 100K entities per second on commodity hardware.",
+      "tags": ["tensor", "anomaly detection", "streaming", "Tucker decomposition"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-018", "relation": "authored_by"},
+        {"target": "entity-011", "relation": "authored_by"},
+        {"target": "entity-036", "relation": "evaluated_on"},
+        {"target": "entity-042", "relation": "presented_at"},
+        {"target": "entity-025", "relation": "affiliated_with"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.82, 0.27, 0.69, 0.51, 0.77, 0.14, 0.59, 0.84]
+    },
+    "semantic": {
+      "types": ["http://schema.org/ScholarlyArticle"],
+      "properties": {
+        "keywords": ["tensor decomposition", "anomaly detection", "streaming"],
+        "doi": "10.1234/hextensor-2026",
+        "pageCount": 9
+      }
+    },
+    "temporal": {
+      "created": "2025-09-01T14:00:00Z",
+      "modified": "2026-02-20T08:30:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "King's College London — Informatics Department",
+      "actor": "entity-018",
+      "chain": ["preprint", "camera-ready"]
+    },
+    "spatial": {
+      "lat": 51.5115,
+      "lon": -0.1160,
+      "label": "King's College London, Strand Campus"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-007",
+    "category": "paper",
+    "document": {
+      "title": "R-Tree Indexing Strategies for Spatial-Temporal Hexad Queries",
+      "content": "Spatial-temporal queries over multimodal data require specialised indexing. We evaluate four R-tree variants — R*-tree, Hilbert R-tree, STR-packed R-tree, and our novel Hexad R-tree — for combined spatial and temporal range queries on VeriSimDB datasets. The Hexad R-tree achieves 3.2x throughput improvement by co-locating spatial and temporal dimensions in the same tree nodes.",
+      "tags": ["R-tree", "spatial-temporal", "indexing", "query optimisation"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-019", "relation": "authored_by"},
+        {"target": "entity-015", "relation": "authored_by"},
+        {"target": "entity-037", "relation": "evaluated_on"},
+        {"target": "entity-045", "relation": "presented_at"},
+        {"target": "entity-026", "relation": "affiliated_with"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.76, 0.44, 0.55, 0.38, 0.88, 0.20, 0.50, 0.69]
+    },
+    "semantic": {
+      "types": ["http://schema.org/ScholarlyArticle"],
+      "properties": {
+        "keywords": ["R-tree", "spatial indexing", "temporal indexing"],
+        "doi": "10.1234/hexad-rtree-2025",
+        "pageCount": 10
+      }
+    },
+    "temporal": {
+      "created": "2025-08-15T10:00:00Z",
+      "modified": "2026-01-30T17:00:00Z",
+      "version": 5
+    },
+    "provenance": {
+      "origin": "Queen Mary University of London — School of EECS",
+      "actor": "entity-019",
+      "chain": ["draft-v1", "internal-review", "submitted", "revised", "accepted"]
+    },
+    "spatial": {
+      "lat": 51.5229,
+      "lon": -0.0408,
+      "label": "Queen Mary University of London, Mile End"
+    },
+    "intentional_drift": true,
+    "drift_note": "Temporal version is 5 but provenance chain has exactly 5 entries — this is correct. However, the spatial coordinates point to QMUL but the paper's affiliated_with edge points to entity-026 (Turing Institute), not QMUL. The affiliation and spatial location are inconsistent."
+  },
+  {
+    "id": "entity-008",
+    "category": "paper",
+    "document": {
+      "title": "VQL: A Query Language for Verified Multimodal Databases",
+      "content": "Existing query languages are designed for single-modality databases. We present VQL (VeriSim Query Language), a declarative language that enables cross-modal queries with optional proof obligations. VQL extends SQL syntax with PROOF clauses for existence, consistency, and provenance verification. We describe the formal semantics, the query planner architecture, and benchmark results showing acceptable overhead for proof-carrying queries.",
+      "tags": ["VQL", "query language", "proof-carrying", "multimodal", "SQL extension"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-011", "relation": "authored_by"},
+        {"target": "entity-014", "relation": "authored_by"},
+        {"target": "entity-020", "relation": "authored_by"},
+        {"target": "entity-038", "relation": "evaluated_on"},
+        {"target": "entity-043", "relation": "presented_at"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.93, 0.20, 0.70, 0.46, 0.87, 0.10, 0.58, 0.80]
+    },
+    "semantic": {
+      "types": ["http://schema.org/ScholarlyArticle", "http://schema.org/TechArticle"],
+      "properties": {
+        "keywords": ["query language", "VQL", "proof-carrying queries"],
+        "doi": "10.1234/vql-lang-2026",
+        "pageCount": 16
+      }
+    },
+    "temporal": {
+      "created": "2025-11-01T09:00:00Z",
+      "modified": "2026-02-25T12:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "Imperial College London — Data Systems Lab",
+      "actor": "entity-011",
+      "chain": ["design-doc", "implementation-paper", "camera-ready"]
+    },
+    "spatial": {
+      "lat": 51.4988,
+      "lon": -0.1749,
+      "label": "Imperial College London, South Kensington"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-009",
+    "category": "paper",
+    "document": {
+      "title": "Neurosymbolic Approaches to Database Query Optimisation",
+      "content": "Traditional query optimisers rely on cost models that struggle with cross-modal queries. We present NeuroPlanner, a neurosymbolic query optimiser that combines learned cost estimation with symbolic reasoning about modality constraints. NeuroPlanner uses a graph neural network to predict query execution costs and a constraint solver to ensure plans respect modal consistency invariants. Evaluation shows 40% latency reduction on VeriSimDB workloads.",
+      "tags": ["neurosymbolic", "query optimisation", "GNN", "constraint solving"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-015", "relation": "authored_by"},
+        {"target": "entity-016", "relation": "authored_by"},
+        {"target": "entity-039", "relation": "evaluated_on"},
+        {"target": "entity-044", "relation": "presented_at"},
+        {"target": "entity-027", "relation": "affiliated_with"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.87, 0.29, 0.65, 0.42, 0.82, 0.16, 0.54, 0.76]
+    },
+    "semantic": {
+      "types": ["http://schema.org/ScholarlyArticle"],
+      "properties": {
+        "keywords": ["neurosymbolic", "query optimisation", "GNN"],
+        "doi": "10.1234/neuroplanner-2026",
+        "pageCount": 12
+      }
+    },
+    "temporal": {
+      "created": "2025-10-05T15:00:00Z",
+      "modified": "2026-02-18T13:45:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "University of Cambridge — Computer Laboratory",
+      "actor": "entity-015",
+      "chain": ["workshop-paper", "full-paper"]
+    },
+    "spatial": {
+      "lat": 52.2107,
+      "lon": 0.0917,
+      "label": "University of Cambridge, William Gates Building"
+    },
+    "intentional_drift": true,
+    "drift_note": "The vector embedding was computed from the workshop-paper text (version 1) but the document content is the full-paper (version 2). The embedding no longer represents the current document."
+  },
+  {
+    "id": "entity-010",
+    "category": "paper",
+    "document": {
+      "title": "Benchmark Suite for Multimodal Database Systems",
+      "content": "We introduce PolyBench, a comprehensive benchmark suite for evaluating multimodal database systems. PolyBench provides standardised workloads across eight modalities including document retrieval, graph traversal, vector similarity, semantic reasoning, temporal queries, provenance tracing, spatial range queries, and tensor operations. We evaluate five systems: VeriSimDB, ArangoDB, NebulaGraph, Milvus, and a baseline PostgreSQL configuration.",
+      "tags": ["benchmark", "PolyBench", "multimodal", "evaluation"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-012", "relation": "authored_by"},
+        {"target": "entity-020", "relation": "authored_by"},
+        {"target": "entity-031", "relation": "includes_dataset"},
+        {"target": "entity-045", "relation": "presented_at"},
+        {"target": "entity-028", "relation": "affiliated_with"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.80, 0.36, 0.60, 0.45, 0.84, 0.19, 0.52, 0.74]
+    },
+    "semantic": {
+      "types": ["http://schema.org/ScholarlyArticle", "http://schema.org/Dataset"],
+      "properties": {
+        "keywords": ["benchmark", "PolyBench", "evaluation suite"],
+        "doi": "10.1234/polybench-2026",
+        "pageCount": 18
+      }
+    },
+    "temporal": {
+      "created": "2025-12-01T08:00:00Z",
+      "modified": "2026-02-22T10:30:00Z",
+      "version": 4
+    },
+    "provenance": {
+      "origin": "The Alan Turing Institute",
+      "actor": "entity-012",
+      "chain": ["design-phase", "implementation", "evaluation", "publication"]
+    },
+    "spatial": {
+      "lat": 51.5299,
+      "lon": -0.1278,
+      "label": "The Alan Turing Institute, British Library"
+    },
+    "intentional_drift": true,
+    "drift_note": "Temporal version is 4 but provenance chain has 4 entries — those match. However, semantic types include 'http://schema.org/Dataset' which is wrong: this is a paper about a benchmark, not a dataset itself. The semantic annotation has drifted to describe the benchmark artefact rather than the paper."
+  },
+  {
+    "id": "entity-011",
+    "category": "person",
+    "document": {
+      "title": "Dr. Amara Okonkwo",
+      "content": "Dr. Amara Okonkwo is a Senior Lecturer in Data Systems at Imperial College London. Her research focuses on multimodal database architectures, cross-modal drift detection, and query language design. She is the principal investigator of the VeriSimDB project and lead author of the VQL specification. Prior to Imperial, she held a postdoctoral position at ETH Zurich.",
+      "tags": ["researcher", "databases", "Imperial College", "VeriSimDB lead"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-001", "relation": "author_of"},
+        {"target": "entity-003", "relation": "author_of"},
+        {"target": "entity-006", "relation": "author_of"},
+        {"target": "entity-008", "relation": "author_of"},
+        {"target": "entity-021", "relation": "employed_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.90, 0.22, 0.68, 0.43, 0.86, 0.11, 0.57, 0.79]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Person", "http://schema.org/Researcher"],
+      "properties": {
+        "orcid": "0000-0001-2345-6789",
+        "h-index": 28,
+        "affiliation": "Imperial College London"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-10T10:00:00Z",
+      "modified": "2026-02-26T09:00:00Z",
+      "version": 5
+    },
+    "provenance": {
+      "origin": "Imperial College staff directory",
+      "actor": "system-admin",
+      "chain": ["initial-import", "orcid-link", "publication-update", "h-index-refresh", "profile-update"]
+    },
+    "spatial": {
+      "lat": 51.4988,
+      "lon": -0.1749,
+      "label": "Imperial College London, South Kensington"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-012",
+    "category": "person",
+    "document": {
+      "title": "Prof. Marcus Chen-Ramirez",
+      "content": "Prof. Marcus Chen-Ramirez is a Professor of Information Systems at The Alan Turing Institute, with a joint appointment at University College London. His research interests include data provenance, scientific reproducibility, and benchmark design for novel database systems. He co-leads the PolyBench initiative and serves on the steering committee of the VLDB Endowment.",
+      "tags": ["researcher", "provenance", "benchmarks", "Turing Institute"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-001", "relation": "author_of"},
+        {"target": "entity-004", "relation": "author_of"},
+        {"target": "entity-010", "relation": "author_of"},
+        {"target": "entity-028", "relation": "employed_by"},
+        {"target": "entity-023", "relation": "affiliated_with"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.78, 0.38, 0.59, 0.35, 0.89, 0.21, 0.48, 0.67]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Person", "http://schema.org/Researcher"],
+      "properties": {
+        "orcid": "0000-0002-3456-7890",
+        "h-index": 42,
+        "affiliation": "The Alan Turing Institute / UCL"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-10T10:00:00Z",
+      "modified": "2026-02-20T15:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "Turing Institute staff directory",
+      "actor": "system-admin",
+      "chain": ["initial-import", "publication-update", "h-index-refresh"]
+    },
+    "spatial": {
+      "lat": 51.5299,
+      "lon": -0.1278,
+      "label": "The Alan Turing Institute, British Library"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-013",
+    "category": "person",
+    "document": {
+      "title": "Dr. Fiona MacLeod",
+      "content": "Dr. Fiona MacLeod is a Reader in Formal Methods at the University of Edinburgh. She specialises in dependent type theory, formal verification of distributed systems, and semantic drift analysis. She is a core contributor to the Idris2 ecosystem and co-author of VeriSimDB's formal verification framework.",
+      "tags": ["researcher", "formal methods", "Idris2", "Edinburgh"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-002", "relation": "author_of"},
+        {"target": "entity-005", "relation": "author_of"},
+        {"target": "entity-022", "relation": "employed_by"},
+        {"target": "entity-024", "relation": "visiting_researcher"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.86, 0.30, 0.71, 0.40, 0.80, 0.14, 0.60, 0.72]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Person", "http://schema.org/Researcher"],
+      "properties": {
+        "orcid": "0000-0003-4567-8901",
+        "h-index": 19,
+        "affiliation": "University of Edinburgh"
+      }
+    },
+    "temporal": {
+      "created": "2025-02-15T11:30:00Z",
+      "modified": "2026-01-10T14:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "University of Edinburgh staff page",
+      "actor": "system-admin",
+      "chain": ["initial-import", "orcid-link"]
+    },
+    "spatial": {
+      "lat": 55.9445,
+      "lon": -3.1872,
+      "label": "University of Edinburgh, Informatics Forum"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-014",
+    "category": "person",
+    "document": {
+      "title": "Dr. Rajesh Kapoor",
+      "content": "Dr. Rajesh Kapoor is a Lecturer in Programming Languages at the University of Edinburgh. His work bridges type theory and database systems, focusing on proof-carrying queries and verified query compilation. He co-designed the VQL-DT (Dependent Type) extension and the PROOF clause semantics.",
+      "tags": ["researcher", "type theory", "VQL", "query compilation"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-002", "relation": "author_of"},
+        {"target": "entity-008", "relation": "author_of"},
+        {"target": "entity-022", "relation": "employed_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.84, 0.33, 0.66, 0.41, 0.78, 0.17, 0.56, 0.70]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Person", "http://schema.org/Researcher"],
+      "properties": {
+        "orcid": "0000-0004-5678-9012",
+        "h-index": 15,
+        "affiliation": "University of Edinburgh"
+      }
+    },
+    "temporal": {
+      "created": "2025-02-15T11:30:00Z",
+      "modified": "2026-02-12T10:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "University of Edinburgh staff page",
+      "actor": "system-admin",
+      "chain": ["initial-import", "publication-sync", "profile-update"]
+    },
+    "spatial": {
+      "lat": 55.9445,
+      "lon": -3.1872,
+      "label": "University of Edinburgh, Informatics Forum"
+    },
+    "intentional_drift": true,
+    "drift_note": "The temporal version is 3 with 3 provenance entries (consistent), but the vector embedding was copied from entity-013 (Fiona MacLeod) during a bulk import error. The embedding represents a different person entirely."
+  },
+  {
+    "id": "entity-015",
+    "category": "person",
+    "document": {
+      "title": "Dr. Lena Vasquez",
+      "content": "Dr. Lena Vasquez is a Research Fellow at the University of Cambridge. Her expertise spans machine learning for database systems, embedding techniques, and neurosymbolic AI. She is the architect of the NeuroPlanner query optimiser and co-author of the hexad embedding methodology.",
+      "tags": ["researcher", "ML", "embeddings", "Cambridge", "neurosymbolic"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-003", "relation": "author_of"},
+        {"target": "entity-007", "relation": "author_of"},
+        {"target": "entity-009", "relation": "author_of"},
+        {"target": "entity-027", "relation": "employed_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.83, 0.25, 0.73, 0.50, 0.81, 0.09, 0.62, 0.82]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Person", "http://schema.org/Researcher"],
+      "properties": {
+        "orcid": "0000-0005-6789-0123",
+        "h-index": 22,
+        "affiliation": "University of Cambridge"
+      }
+    },
+    "temporal": {
+      "created": "2025-03-01T09:00:00Z",
+      "modified": "2026-02-15T11:30:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "Cambridge Computer Laboratory directory",
+      "actor": "system-admin",
+      "chain": ["initial-import", "publication-update", "h-index-refresh"]
+    },
+    "spatial": {
+      "lat": 52.2107,
+      "lon": 0.0917,
+      "label": "University of Cambridge, William Gates Building"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-016",
+    "category": "person",
+    "document": {
+      "title": "Dr. James Okafor",
+      "content": "Dr. James Okafor is a Senior Research Fellow at University College London, specialising in data provenance, scientific workflows, and information governance. He led the ProvenanceDAG project and works closely with the Turing Institute on reproducibility standards.",
+      "tags": ["researcher", "provenance", "UCL", "reproducibility"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-004", "relation": "author_of"},
+        {"target": "entity-009", "relation": "author_of"},
+        {"target": "entity-023", "relation": "employed_by"},
+        {"target": "entity-028", "relation": "affiliated_with"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.74, 0.40, 0.57, 0.34, 0.91, 0.23, 0.46, 0.65]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Person", "http://schema.org/Researcher"],
+      "properties": {
+        "orcid": "0000-0006-7890-1234",
+        "h-index": 31,
+        "affiliation": "University College London"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-20T14:00:00Z",
+      "modified": "2026-01-25T16:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "UCL staff directory",
+      "actor": "system-admin",
+      "chain": ["initial-import", "publication-update"]
+    },
+    "spatial": {
+      "lat": 51.5246,
+      "lon": -0.1340,
+      "label": "University College London, Gower Street"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-017",
+    "category": "person",
+    "document": {
+      "title": "Dr. Sofia Petridis",
+      "content": "Dr. Sofia Petridis is a Postdoctoral Researcher at the University of Oxford, focusing on knowledge graph evolution, ontology alignment, and semantic web technologies. She contributed the semantic drift detection algorithms to the VeriSimDB project.",
+      "tags": ["researcher", "knowledge graphs", "ontology", "Oxford"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-005", "relation": "author_of"},
+        {"target": "entity-024", "relation": "employed_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.77, 0.37, 0.64, 0.47, 0.82, 0.19, 0.53, 0.70]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Person", "http://schema.org/Researcher"],
+      "properties": {
+        "orcid": "0000-0007-8901-2345",
+        "h-index": 11,
+        "affiliation": "University of Oxford"
+      }
+    },
+    "temporal": {
+      "created": "2025-04-01T10:00:00Z",
+      "modified": "2026-02-01T09:30:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "Oxford CS department page",
+      "actor": "system-admin",
+      "chain": ["initial-import", "profile-update"]
+    },
+    "spatial": {
+      "lat": 51.7598,
+      "lon": -1.2584,
+      "label": "University of Oxford, Wolfson Building"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-018",
+    "category": "person",
+    "document": {
+      "title": "Dr. Kwame Asante",
+      "content": "Dr. Kwame Asante is a Lecturer in Machine Learning at King's College London. His research covers tensor methods, streaming algorithms, and real-time anomaly detection. He designed the HexTensor decomposition framework and contributes to VeriSimDB's tensor modality implementation.",
+      "tags": ["researcher", "tensors", "streaming", "King's College"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-006", "relation": "author_of"},
+        {"target": "entity-025", "relation": "employed_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.81, 0.28, 0.70, 0.49, 0.76, 0.13, 0.58, 0.83]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Person", "http://schema.org/Researcher"],
+      "properties": {
+        "orcid": "0000-0008-9012-3456",
+        "h-index": 14,
+        "affiliation": "King's College London"
+      }
+    },
+    "temporal": {
+      "created": "2025-05-10T08:30:00Z",
+      "modified": "2026-02-18T14:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "KCL staff directory",
+      "actor": "system-admin",
+      "chain": ["initial-import", "publication-update"]
+    },
+    "spatial": {
+      "lat": 51.5115,
+      "lon": -0.1160,
+      "label": "King's College London, Strand Campus"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-019",
+    "category": "person",
+    "document": {
+      "title": "Dr. Yuki Tanaka",
+      "content": "Dr. Yuki Tanaka is a Research Associate at Queen Mary University of London, specialising in spatial indexing, computational geometry, and location-aware databases. She designed the Hexad R-tree variant and contributed spatial query optimisations to VeriSimDB.",
+      "tags": ["researcher", "spatial", "R-tree", "QMUL"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-007", "relation": "author_of"},
+        {"target": "entity-026", "relation": "employed_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.75, 0.43, 0.56, 0.37, 0.87, 0.21, 0.49, 0.68]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Person", "http://schema.org/Researcher"],
+      "properties": {
+        "orcid": "0000-0009-0123-4567",
+        "h-index": 9,
+        "affiliation": "Queen Mary University of London"
+      }
+    },
+    "temporal": {
+      "created": "2025-06-15T13:00:00Z",
+      "modified": "2026-01-28T12:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "QMUL EECS directory",
+      "actor": "system-admin",
+      "chain": ["initial-import", "publication-update"]
+    },
+    "spatial": {
+      "lat": 51.5229,
+      "lon": -0.0408,
+      "label": "Queen Mary University of London, Mile End"
+    },
+    "intentional_drift": true,
+    "drift_note": "The document says 'Research Associate' but the semantic types only list 'Person' and 'Researcher' with no specific role type. Meanwhile, the h-index of 9 was last updated 6 months ago and is now stale — the temporal.modified date was bumped for a different reason (publication list) but h-index was not refreshed."
+  },
+  {
+    "id": "entity-020",
+    "category": "person",
+    "document": {
+      "title": "Dr. Nia Williams",
+      "content": "Dr. Nia Williams is a Research Software Engineer at Imperial College London, bridging the gap between database research and production systems. She co-designed VQL's runtime, the benchmark harness for PolyBench, and maintains VeriSimDB's Rust core. She advocates for reproducible research infrastructure.",
+      "tags": ["RSE", "Rust", "VQL", "benchmark", "Imperial"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-008", "relation": "author_of"},
+        {"target": "entity-010", "relation": "author_of"},
+        {"target": "entity-021", "relation": "employed_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.89, 0.24, 0.67, 0.44, 0.85, 0.12, 0.55, 0.77]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Person", "http://schema.org/Researcher"],
+      "properties": {
+        "orcid": "0000-0010-1234-5678",
+        "h-index": 8,
+        "affiliation": "Imperial College London"
+      }
+    },
+    "temporal": {
+      "created": "2025-03-20T16:00:00Z",
+      "modified": "2026-02-25T18:00:00Z",
+      "version": 4
+    },
+    "provenance": {
+      "origin": "Imperial College RSE team page",
+      "actor": "system-admin",
+      "chain": ["initial-import", "orcid-link", "publication-update", "role-update"]
+    },
+    "spatial": {
+      "lat": 51.4988,
+      "lon": -0.1749,
+      "label": "Imperial College London, South Kensington"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-021",
+    "category": "organisation",
+    "document": {
+      "title": "Imperial College London",
+      "content": "Imperial College London is a world-leading research university in South Kensington, London. The Department of Computing hosts the Data Systems Lab where VeriSimDB was conceived and developed. Imperial is ranked in the top 10 globally for computer science and engineering.",
+      "tags": ["university", "London", "Russell Group", "data systems"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-011", "relation": "employs"},
+        {"target": "entity-020", "relation": "employs"},
+        {"target": "entity-028", "relation": "partner_of"},
+        {"target": "entity-029", "relation": "funded_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.60, 0.50, 0.45, 0.30, 0.70, 0.35, 0.40, 0.55]
+    },
+    "semantic": {
+      "types": ["http://schema.org/EducationalOrganization", "http://schema.org/CollegeOrUniversity"],
+      "properties": {
+        "founded": 1907,
+        "country": "United Kingdom",
+        "ror": "https://ror.org/041kmwe10"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-01T00:00:00Z",
+      "modified": "2026-01-15T10:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "ROR registry import",
+      "actor": "system-admin",
+      "chain": ["ror-import", "manual-enrichment"]
+    },
+    "spatial": {
+      "lat": 51.4988,
+      "lon": -0.1749,
+      "label": "Imperial College London, South Kensington, London SW7 2AZ"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-022",
+    "category": "organisation",
+    "document": {
+      "title": "University of Edinburgh",
+      "content": "The University of Edinburgh is one of the oldest and most prestigious universities in the UK. The School of Informatics is Europe's largest informatics research centre, and the Laboratory for Foundations of Computer Science (LFCS) is a world leader in type theory and formal methods.",
+      "tags": ["university", "Edinburgh", "informatics", "formal methods"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-013", "relation": "employs"},
+        {"target": "entity-014", "relation": "employs"},
+        {"target": "entity-028", "relation": "partner_of"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.58, 0.52, 0.47, 0.32, 0.68, 0.37, 0.42, 0.53]
+    },
+    "semantic": {
+      "types": ["http://schema.org/EducationalOrganization", "http://schema.org/CollegeOrUniversity"],
+      "properties": {
+        "founded": 1583,
+        "country": "United Kingdom",
+        "ror": "https://ror.org/01nrxwf90"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-01T00:00:00Z",
+      "modified": "2026-01-15T10:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "ROR registry import",
+      "actor": "system-admin",
+      "chain": ["ror-import", "manual-enrichment"]
+    },
+    "spatial": {
+      "lat": 55.9445,
+      "lon": -3.1872,
+      "label": "University of Edinburgh, Informatics Forum, Edinburgh EH8 9AB"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-023",
+    "category": "organisation",
+    "document": {
+      "title": "University College London",
+      "content": "UCL is a leading multidisciplinary university in central London. The Department of Information Studies and the Department of Computer Science collaborate on data management, provenance, and digital scholarship research. UCL is a founding member of the Russell Group.",
+      "tags": ["university", "London", "UCL", "information studies"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-016", "relation": "employs"},
+        {"target": "entity-012", "relation": "affiliated_researcher"},
+        {"target": "entity-028", "relation": "partner_of"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.62, 0.48, 0.44, 0.31, 0.72, 0.33, 0.41, 0.57]
+    },
+    "semantic": {
+      "types": ["http://schema.org/EducationalOrganization", "http://schema.org/CollegeOrUniversity"],
+      "properties": {
+        "founded": 1826,
+        "country": "United Kingdom",
+        "ror": "https://ror.org/02jx3x895"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-01T00:00:00Z",
+      "modified": "2026-01-15T10:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "ROR registry import",
+      "actor": "system-admin",
+      "chain": ["ror-import", "manual-enrichment"]
+    },
+    "spatial": {
+      "lat": 51.5246,
+      "lon": -0.1340,
+      "label": "University College London, Gower Street, London WC1E 6BT"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-024",
+    "category": "organisation",
+    "document": {
+      "title": "University of Oxford — Department of Computer Science",
+      "content": "Oxford's Department of Computer Science conducts world-class research in algorithms, verification, machine learning, and knowledge representation. The Knowledge Representation and Reasoning group works on ontology alignment and semantic web technologies relevant to VeriSimDB's semantic modality.",
+      "tags": ["university", "Oxford", "knowledge representation", "verification"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-017", "relation": "employs"},
+        {"target": "entity-013", "relation": "hosts_visitor"},
+        {"target": "entity-030", "relation": "funded_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.56, 0.54, 0.49, 0.34, 0.66, 0.39, 0.44, 0.51]
+    },
+    "semantic": {
+      "types": ["http://schema.org/EducationalOrganization", "http://schema.org/CollegeOrUniversity"],
+      "properties": {
+        "founded": 1096,
+        "country": "United Kingdom",
+        "ror": "https://ror.org/052gg0110"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-01T00:00:00Z",
+      "modified": "2026-01-15T10:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "ROR registry import",
+      "actor": "system-admin",
+      "chain": ["ror-import", "manual-enrichment"]
+    },
+    "spatial": {
+      "lat": 51.7598,
+      "lon": -1.2584,
+      "label": "University of Oxford, Wolfson Building, Parks Road, Oxford OX1 3QD"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-025",
+    "category": "organisation",
+    "document": {
+      "title": "King's College London — Department of Informatics",
+      "content": "King's College London's Department of Informatics focuses on AI, data science, and cybersecurity. The Streaming Analytics group, led by Dr. Kwame Asante, develops real-time data processing frameworks including the HexTensor system for VeriSimDB.",
+      "tags": ["university", "London", "KCL", "streaming", "AI"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-018", "relation": "employs"},
+        {"target": "entity-028", "relation": "partner_of"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.64, 0.46, 0.43, 0.29, 0.74, 0.31, 0.39, 0.59]
+    },
+    "semantic": {
+      "types": ["http://schema.org/EducationalOrganization", "http://schema.org/CollegeOrUniversity"],
+      "properties": {
+        "founded": 1829,
+        "country": "United Kingdom",
+        "ror": "https://ror.org/0220mzb33"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-01T00:00:00Z",
+      "modified": "2026-01-15T10:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "ROR registry import",
+      "actor": "system-admin",
+      "chain": ["ror-import", "manual-enrichment"]
+    },
+    "spatial": {
+      "lat": 51.5115,
+      "lon": -0.1160,
+      "label": "King's College London, Strand, London WC2R 2LS"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-026",
+    "category": "organisation",
+    "document": {
+      "title": "The Alan Turing Institute — Research Engineering Group",
+      "content": "The Alan Turing Institute is the UK's national institute for data science and artificial intelligence, headquartered at the British Library. The Research Engineering Group builds production-quality tools for research, including the PolyBench benchmark infrastructure used to evaluate VeriSimDB.",
+      "tags": ["research institute", "Turing", "data science", "AI", "REG"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-021", "relation": "partner_of"},
+        {"target": "entity-022", "relation": "partner_of"},
+        {"target": "entity-023", "relation": "partner_of"},
+        {"target": "entity-029", "relation": "funded_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.66, 0.42, 0.48, 0.36, 0.76, 0.28, 0.45, 0.61]
+    },
+    "semantic": {
+      "types": ["http://schema.org/ResearchOrganization", "http://schema.org/GovernmentOrganization"],
+      "properties": {
+        "founded": 2015,
+        "country": "United Kingdom",
+        "ror": "https://ror.org/01bd7kw46"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-01T00:00:00Z",
+      "modified": "2026-02-01T08:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "Turing Institute website",
+      "actor": "system-admin",
+      "chain": ["initial-import", "partner-update", "funding-update"]
+    },
+    "spatial": {
+      "lat": 51.5299,
+      "lon": -0.1278,
+      "label": "The Alan Turing Institute, British Library, 96 Euston Road, London NW1 2DB"
+    },
+    "intentional_drift": true,
+    "drift_note": "The semantic types include 'GovernmentOrganization' which is incorrect — the Turing Institute is an independent research body (a charity), not a government organisation. It receives government funding via EPSRC but is not itself a government entity. The semantic annotation has conflated funding source with organisational type."
+  },
+  {
+    "id": "entity-027",
+    "category": "organisation",
+    "document": {
+      "title": "University of Cambridge — Computer Laboratory",
+      "content": "The University of Cambridge Computer Laboratory is one of the oldest and most distinguished computer science departments in the world. Research groups span programming languages, systems, AI, and security. Dr. Lena Vasquez's work on neurosymbolic query optimisation is conducted here.",
+      "tags": ["university", "Cambridge", "computer laboratory", "PL"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-015", "relation": "employs"},
+        {"target": "entity-028", "relation": "partner_of"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.55, 0.56, 0.50, 0.33, 0.65, 0.40, 0.46, 0.50]
+    },
+    "semantic": {
+      "types": ["http://schema.org/EducationalOrganization", "http://schema.org/CollegeOrUniversity"],
+      "properties": {
+        "founded": 1209,
+        "country": "United Kingdom",
+        "ror": "https://ror.org/013meh722"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-01T00:00:00Z",
+      "modified": "2026-01-15T10:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "ROR registry import",
+      "actor": "system-admin",
+      "chain": ["ror-import", "manual-enrichment"]
+    },
+    "spatial": {
+      "lat": 52.2107,
+      "lon": 0.0917,
+      "label": "University of Cambridge, William Gates Building, Cambridge CB3 0FD"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-028",
+    "category": "organisation",
+    "document": {
+      "title": "Queen Mary University of London — School of Electronic Engineering and Computer Science",
+      "content": "QMUL's School of EECS is a research-intensive department in East London. The Spatial Computing group develops novel indexing techniques for geographic and location-aware data. Dr. Yuki Tanaka's Hexad R-tree work is based here.",
+      "tags": ["university", "London", "QMUL", "EECS", "spatial"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-019", "relation": "employs"},
+        {"target": "entity-026", "relation": "partner_of"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.61, 0.47, 0.46, 0.28, 0.71, 0.34, 0.38, 0.56]
+    },
+    "semantic": {
+      "types": ["http://schema.org/EducationalOrganization", "http://schema.org/CollegeOrUniversity"],
+      "properties": {
+        "founded": 1885,
+        "country": "United Kingdom",
+        "ror": "https://ror.org/026zzn846"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-01T00:00:00Z",
+      "modified": "2026-01-15T10:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "ROR registry import",
+      "actor": "system-admin",
+      "chain": ["ror-import", "manual-enrichment"]
+    },
+    "spatial": {
+      "lat": 51.5229,
+      "lon": -0.0408,
+      "label": "Queen Mary University of London, Mile End Road, London E1 4NS"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-029",
+    "category": "organisation",
+    "document": {
+      "title": "EPSRC — Engineering and Physical Sciences Research Council",
+      "content": "EPSRC is the UK's main funding body for engineering and physical sciences research. It funds the VeriSimDB project through grant EP/X012345/1 ('Verified Multimodal Data Management') and supports the Turing Institute's data science programme.",
+      "tags": ["funder", "EPSRC", "UKRI", "research council"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-021", "relation": "funds"},
+        {"target": "entity-026", "relation": "funds"},
+        {"target": "entity-030", "relation": "parent_of"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.45, 0.60, 0.38, 0.25, 0.55, 0.45, 0.35, 0.42]
+    },
+    "semantic": {
+      "types": ["http://schema.org/FundingAgency", "http://schema.org/GovernmentOrganization"],
+      "properties": {
+        "country": "United Kingdom",
+        "parent": "UKRI",
+        "fundref": "https://doi.org/10.13039/501100000266"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-01T00:00:00Z",
+      "modified": "2025-12-01T10:00:00Z",
+      "version": 1
+    },
+    "provenance": {
+      "origin": "CrossRef Funder Registry",
+      "actor": "system-admin",
+      "chain": ["fundref-import"]
+    },
+    "spatial": {
+      "lat": 51.7520,
+      "lon": -1.2577,
+      "label": "EPSRC, Polaris House, Swindon (HQ); grant managed from Oxford"
+    },
+    "intentional_drift": true,
+    "drift_note": "The spatial coordinates (51.7520, -1.2577) point to Oxford, not Swindon where EPSRC HQ actually is (51.5584, -1.7817). The label mentions Swindon but the coordinates are wrong — a classic spatial-document inconsistency."
+  },
+  {
+    "id": "entity-030",
+    "category": "organisation",
+    "document": {
+      "title": "UKRI — UK Research and Innovation",
+      "content": "UKRI is the umbrella body for the UK's seven research councils, including EPSRC, and Research England and Innovate UK. UKRI coordinates national research strategy and infrastructure, including the Digital Research Infrastructure programme that supports projects like VeriSimDB.",
+      "tags": ["funder", "UKRI", "research infrastructure", "government"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-029", "relation": "parent_of"},
+        {"target": "entity-024", "relation": "funds"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.43, 0.62, 0.36, 0.23, 0.53, 0.47, 0.33, 0.40]
+    },
+    "semantic": {
+      "types": ["http://schema.org/GovernmentOrganization", "http://schema.org/FundingAgency"],
+      "properties": {
+        "country": "United Kingdom",
+        "established": 2018,
+        "fundref": "https://doi.org/10.13039/100014013"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-01T00:00:00Z",
+      "modified": "2025-12-01T10:00:00Z",
+      "version": 1
+    },
+    "provenance": {
+      "origin": "CrossRef Funder Registry",
+      "actor": "system-admin",
+      "chain": ["fundref-import"]
+    },
+    "spatial": {
+      "lat": 51.7520,
+      "lon": -1.2577,
+      "label": "UKRI, Polaris House, Swindon SN2 1FL"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-031",
+    "category": "dataset",
+    "document": {
+      "title": "PolyBench v1.0 — Multimodal Database Benchmark Dataset",
+      "content": "PolyBench v1.0 is a benchmark dataset containing 100,000 synthetic hexad records across five domains: academic publications, social networks, geospatial entities, financial transactions, and IoT sensor readings. Each record contains all eight VeriSimDB modalities with controlled levels of cross-modal drift for evaluation purposes.",
+      "tags": ["benchmark", "dataset", "PolyBench", "synthetic", "multimodal"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-001", "relation": "used_in"},
+        {"target": "entity-003", "relation": "used_in"},
+        {"target": "entity-010", "relation": "described_in"},
+        {"target": "entity-012", "relation": "created_by"},
+        {"target": "entity-020", "relation": "maintained_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.70, 0.45, 0.55, 0.40, 0.75, 0.30, 0.50, 0.65]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Dataset", "http://schema.org/CreativeWork"],
+      "properties": {
+        "size": "2.3 GB",
+        "records": 100000,
+        "format": "JSON hexad",
+        "license": "CC-BY-4.0"
+      }
+    },
+    "temporal": {
+      "created": "2025-06-01T00:00:00Z",
+      "modified": "2026-02-01T12:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "Imperial College London — Data Systems Lab",
+      "actor": "entity-020",
+      "chain": ["initial-generation", "drift-injection", "v1.0-release"]
+    },
+    "spatial": {
+      "lat": 51.4988,
+      "lon": -0.1749,
+      "label": "Imperial College London (generation site)"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-032",
+    "category": "dataset",
+    "document": {
+      "title": "IdrisProofs Corpus — Verified Database Invariants",
+      "content": "A curated collection of 500 Idris2 proof terms establishing cross-modal consistency invariants for the VeriSimDB octad model. Each proof covers a specific invariant (e.g., 'graph edge targets must exist as entities', 'vector dimensionality matches schema declaration'). Used to evaluate the formal verification framework in entity-002.",
+      "tags": ["dataset", "Idris2", "proofs", "verification", "invariants"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-002", "relation": "used_in"},
+        {"target": "entity-013", "relation": "created_by"},
+        {"target": "entity-022", "relation": "hosted_at"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.82, 0.35, 0.68, 0.38, 0.79, 0.16, 0.58, 0.72]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Dataset"],
+      "properties": {
+        "size": "45 MB",
+        "records": 500,
+        "format": "Idris2 source files",
+        "license": "MIT"
+      }
+    },
+    "temporal": {
+      "created": "2025-07-01T00:00:00Z",
+      "modified": "2026-01-15T09:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "University of Edinburgh — LFCS",
+      "actor": "entity-013",
+      "chain": ["initial-curation", "v2-expansion"]
+    },
+    "spatial": {
+      "lat": 55.9445,
+      "lon": -3.1872,
+      "label": "University of Edinburgh (curation site)"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-033",
+    "category": "dataset",
+    "document": {
+      "title": "ModalMix — Cross-Modal Embedding Evaluation Set",
+      "content": "ModalMix is an evaluation dataset of 10,000 entity pairs with human-annotated similarity scores across different modality combinations. It enables evaluation of cross-modal embedding quality: does the vector similarity between two entities correlate with their semantic similarity, graph proximity, and document relevance?",
+      "tags": ["dataset", "embeddings", "evaluation", "similarity", "human-annotated"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-003", "relation": "used_in"},
+        {"target": "entity-015", "relation": "created_by"},
+        {"target": "entity-027", "relation": "hosted_at"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.78, 0.32, 0.64, 0.48, 0.73, 0.15, 0.56, 0.75]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Dataset"],
+      "properties": {
+        "size": "890 MB",
+        "records": 10000,
+        "format": "Parquet",
+        "license": "CC-BY-SA-4.0"
+      }
+    },
+    "temporal": {
+      "created": "2025-08-15T00:00:00Z",
+      "modified": "2026-01-20T14:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "University of Cambridge — Computer Laboratory",
+      "actor": "entity-015",
+      "chain": ["annotation-campaign", "quality-review"]
+    },
+    "spatial": {
+      "lat": 52.2107,
+      "lon": 0.0917,
+      "label": "University of Cambridge (annotation site)"
+    },
+    "intentional_drift": true,
+    "drift_note": "The provenance chain has 2 entries but the temporal version is also 2 (consistent). However, the document says '10,000 entity pairs' while the semantic properties say 'records: 10000'. These are entity PAIRS not individual records — the actual dataset has 20,000 rows. The semantic record count is wrong."
+  },
+  {
+    "id": "entity-034",
+    "category": "dataset",
+    "document": {
+      "title": "W3C PROV-O Test Suite — Provenance Ontology Conformance Data",
+      "content": "The official W3C PROV-O conformance test suite adapted for VeriSimDB's provenance modality. Contains 200 provenance graphs in PROV-N notation covering all 16 PROV-O relations, with corresponding VeriSimDB hexad representations. Used to validate ProvenanceDAG's compliance with the W3C standard.",
+      "tags": ["dataset", "W3C", "PROV-O", "provenance", "conformance"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-004", "relation": "used_in"},
+        {"target": "entity-016", "relation": "adapted_by"},
+        {"target": "entity-023", "relation": "hosted_at"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.68, 0.42, 0.53, 0.35, 0.88, 0.25, 0.44, 0.62]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Dataset"],
+      "properties": {
+        "size": "12 MB",
+        "records": 200,
+        "format": "PROV-N + JSON hexad",
+        "license": "W3C Software License"
+      }
+    },
+    "temporal": {
+      "created": "2025-05-01T00:00:00Z",
+      "modified": "2025-11-30T16:00:00Z",
+      "version": 1
+    },
+    "provenance": {
+      "origin": "W3C Provenance Working Group (adapted by UCL)",
+      "actor": "entity-016",
+      "chain": ["w3c-import"]
+    },
+    "spatial": {
+      "lat": 51.5246,
+      "lon": -0.1340,
+      "label": "University College London (adaptation site)"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-035",
+    "category": "dataset",
+    "document": {
+      "title": "DBpedia-Wikidata Drift Corpus",
+      "content": "A parallel corpus of 50,000 entities present in both DBpedia and Wikidata, annotated with semantic drift labels. Each entity pair is tagged with drift type (ontology mismatch, temporal lag, factual disagreement, or no drift) and severity score. Used to evaluate semantic drift detection in entity-005.",
+      "tags": ["dataset", "DBpedia", "Wikidata", "drift", "parallel corpus"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-005", "relation": "used_in"},
+        {"target": "entity-017", "relation": "created_by"},
+        {"target": "entity-024", "relation": "hosted_at"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.73, 0.39, 0.60, 0.44, 0.80, 0.20, 0.51, 0.68]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Dataset"],
+      "properties": {
+        "size": "4.7 GB",
+        "records": 50000,
+        "format": "N-Triples + JSON",
+        "license": "CC-BY-3.0"
+      }
+    },
+    "temporal": {
+      "created": "2025-06-20T00:00:00Z",
+      "modified": "2026-01-10T11:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "University of Oxford — CS Department",
+      "actor": "entity-017",
+      "chain": ["dbpedia-extract", "wikidata-extract", "alignment-annotation"]
+    },
+    "spatial": {
+      "lat": 51.7598,
+      "lon": -1.2584,
+      "label": "University of Oxford (curation site)"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-036",
+    "category": "dataset",
+    "document": {
+      "title": "StreamHex — Synthetic Streaming Hexad Data Generator Output",
+      "content": "StreamHex is a 1-million-record dataset generated by a synthetic streaming data generator. Each record simulates a real-time hexad arriving from IoT sensors, social media feeds, or financial tickers. The dataset includes injected anomalies at known positions for evaluating the HexTensor anomaly detection system.",
+      "tags": ["dataset", "streaming", "synthetic", "anomaly", "IoT"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-006", "relation": "used_in"},
+        {"target": "entity-018", "relation": "created_by"},
+        {"target": "entity-025", "relation": "hosted_at"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.71, 0.34, 0.62, 0.50, 0.72, 0.18, 0.54, 0.77]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Dataset"],
+      "properties": {
+        "size": "18 GB",
+        "records": 1000000,
+        "format": "Apache Parquet (streaming chunks)",
+        "license": "CC-BY-4.0"
+      }
+    },
+    "temporal": {
+      "created": "2025-09-15T00:00:00Z",
+      "modified": "2026-02-15T10:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "King's College London — Informatics Department",
+      "actor": "entity-018",
+      "chain": ["generation-run-1", "anomaly-injection"]
+    },
+    "spatial": {
+      "lat": 51.5115,
+      "lon": -0.1160,
+      "label": "King's College London (generation site)"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-037",
+    "category": "dataset",
+    "document": {
+      "title": "GeoHex London — Spatial Hexad Dataset of London Points of Interest",
+      "content": "A curated dataset of 25,000 London-area points of interest encoded as VeriSimDB hexads. Each POI includes spatial coordinates, OpenStreetMap tags (semantic), textual descriptions (document), connectivity to nearby POIs (graph), and temporal opening/closing history. Used to benchmark spatial indexing strategies.",
+      "tags": ["dataset", "spatial", "London", "POI", "OpenStreetMap"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-007", "relation": "used_in"},
+        {"target": "entity-019", "relation": "created_by"},
+        {"target": "entity-028", "relation": "hosted_at"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.65, 0.48, 0.50, 0.36, 0.85, 0.26, 0.43, 0.60]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Dataset"],
+      "properties": {
+        "size": "1.2 GB",
+        "records": 25000,
+        "format": "GeoJSON + JSON hexad",
+        "license": "ODbL-1.0"
+      }
+    },
+    "temporal": {
+      "created": "2025-09-01T00:00:00Z",
+      "modified": "2026-01-25T15:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "OpenStreetMap extract (London bounding box), enriched at QMUL",
+      "actor": "entity-019",
+      "chain": ["osm-extract", "hexad-enrichment"]
+    },
+    "spatial": {
+      "lat": 51.5074,
+      "lon": -0.1278,
+      "label": "Central London (coverage area centroid)"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-038",
+    "category": "dataset",
+    "document": {
+      "title": "VQL Test Suite — Query Language Conformance Tests",
+      "content": "A comprehensive test suite of 1,200 VQL queries covering all language features: basic SELECT, cross-modal joins, PROOF clauses (existence, consistency, provenance), temporal range filters, spatial radius queries, and error handling. Each query has expected results for deterministic evaluation of VQL implementations.",
+      "tags": ["dataset", "VQL", "test suite", "conformance", "queries"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-008", "relation": "used_in"},
+        {"target": "entity-020", "relation": "created_by"},
+        {"target": "entity-014", "relation": "reviewed_by"},
+        {"target": "entity-021", "relation": "hosted_at"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.88, 0.26, 0.66, 0.43, 0.84, 0.13, 0.55, 0.78]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Dataset", "http://schema.org/SoftwareSourceCode"],
+      "properties": {
+        "size": "8 MB",
+        "records": 1200,
+        "format": "VQL + JSON expected results",
+        "license": "PMPL-1.0-or-later"
+      }
+    },
+    "temporal": {
+      "created": "2025-12-01T00:00:00Z",
+      "modified": "2026-02-24T17:00:00Z",
+      "version": 5
+    },
+    "provenance": {
+      "origin": "Imperial College London — Data Systems Lab",
+      "actor": "entity-020",
+      "chain": ["initial-suite", "proof-clause-tests", "spatial-tests", "temporal-tests", "error-handling-tests"]
+    },
+    "spatial": {
+      "lat": 51.4988,
+      "lon": -0.1749,
+      "label": "Imperial College London (development site)"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-039",
+    "category": "dataset",
+    "document": {
+      "title": "NeuroPlan Workload Traces — Query Optimiser Training Data",
+      "content": "A collection of 50,000 VQL query execution traces with measured latencies, resource consumption, and plan choices. Each trace captures the query plan selected by VeriSimDB's default optimiser alongside the optimal plan found by exhaustive search. Used to train the NeuroPlanner's GNN cost model.",
+      "tags": ["dataset", "query traces", "optimisation", "training data", "GNN"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-009", "relation": "used_in"},
+        {"target": "entity-015", "relation": "created_by"},
+        {"target": "entity-027", "relation": "hosted_at"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.84, 0.30, 0.63, 0.41, 0.80, 0.17, 0.53, 0.74]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Dataset"],
+      "properties": {
+        "size": "3.6 GB",
+        "records": 50000,
+        "format": "Apache Arrow",
+        "license": "CC-BY-4.0"
+      }
+    },
+    "temporal": {
+      "created": "2025-11-01T00:00:00Z",
+      "modified": "2026-02-10T13:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "University of Cambridge — Computer Laboratory",
+      "actor": "entity-015",
+      "chain": ["workload-capture", "annotation"]
+    },
+    "spatial": {
+      "lat": 52.2107,
+      "lon": 0.0917,
+      "label": "University of Cambridge (capture site)"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-040",
+    "category": "dataset",
+    "document": {
+      "title": "DriftSeed — Controlled Drift Injection Toolkit Output",
+      "content": "DriftSeed is a meta-dataset of 5,000 hexad records generated with precisely controlled cross-modal drift. Each record documents the type of drift injected (vector staleness, semantic type mismatch, temporal-provenance desync, spatial-document inconsistency), its severity, and ground-truth labels. Essential for calibrating VeriSimDB's drift detection thresholds.",
+      "tags": ["dataset", "drift", "controlled", "ground truth", "calibration"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-001", "relation": "used_in"},
+        {"target": "entity-005", "relation": "used_in"},
+        {"target": "entity-011", "relation": "created_by"},
+        {"target": "entity-021", "relation": "hosted_at"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.76, 0.38, 0.58, 0.42, 0.82, 0.22, 0.49, 0.67]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Dataset"],
+      "properties": {
+        "size": "120 MB",
+        "records": 5000,
+        "format": "JSON hexad with drift labels",
+        "license": "PMPL-1.0-or-later"
+      }
+    },
+    "temporal": {
+      "created": "2025-04-01T00:00:00Z",
+      "modified": "2026-02-20T09:00:00Z",
+      "version": 4
+    },
+    "provenance": {
+      "origin": "Imperial College London — Data Systems Lab",
+      "actor": "entity-011",
+      "chain": ["baseline-generation", "drift-injection-v1", "drift-injection-v2", "threshold-calibration"]
+    },
+    "spatial": {
+      "lat": 51.4988,
+      "lon": -0.1749,
+      "label": "Imperial College London (generation site)"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-041",
+    "category": "event",
+    "document": {
+      "title": "VLDB 2025 — 51st International Conference on Very Large Data Bases",
+      "content": "VLDB 2025 was held in London, UK, bringing together over 1,500 researchers and practitioners in data management. The conference featured the first public presentation of VeriSimDB and the semantic drift detection paper. The industrial track included demonstrations of multimodal database systems.",
+      "tags": ["conference", "VLDB", "2025", "London", "databases"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-001", "relation": "featured_paper"},
+        {"target": "entity-005", "relation": "featured_paper"},
+        {"target": "entity-026", "relation": "co-located_with"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.50, 0.55, 0.40, 0.35, 0.60, 0.50, 0.38, 0.48]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Event", "http://schema.org/BusinessEvent"],
+      "properties": {
+        "startDate": "2025-08-25",
+        "endDate": "2025-08-29",
+        "attendees": 1500,
+        "url": "https://vldb.org/2025/"
+      }
+    },
+    "temporal": {
+      "created": "2025-01-15T00:00:00Z",
+      "modified": "2025-09-15T10:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "VLDB Endowment",
+      "actor": "system-admin",
+      "chain": ["cfp-announcement", "programme-published", "post-event-update"]
+    },
+    "spatial": {
+      "lat": 51.5032,
+      "lon": -0.0195,
+      "label": "ExCeL London, Royal Victoria Dock, London E16 1XL"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-042",
+    "category": "event",
+    "document": {
+      "title": "SIGMOD 2026 — ACM International Conference on Management of Data",
+      "content": "SIGMOD 2026 is scheduled for Berlin, Germany. The formal verification paper (entity-002) and the HexTensor paper (entity-006) are accepted for presentation. The conference includes a new track on verified data management systems, reflecting growing interest in provably correct databases.",
+      "tags": ["conference", "SIGMOD", "2026", "Berlin", "data management"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-002", "relation": "featured_paper"},
+        {"target": "entity-006", "relation": "featured_paper"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.48, 0.57, 0.42, 0.33, 0.58, 0.52, 0.36, 0.46]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Event", "http://schema.org/BusinessEvent"],
+      "properties": {
+        "startDate": "2026-06-14",
+        "endDate": "2026-06-19",
+        "attendees": 1200,
+        "url": "https://sigmod2026.org/"
+      }
+    },
+    "temporal": {
+      "created": "2025-06-01T00:00:00Z",
+      "modified": "2026-02-15T12:00:00Z",
+      "version": 4
+    },
+    "provenance": {
+      "origin": "ACM SIGMOD",
+      "actor": "system-admin",
+      "chain": ["cfp-announcement", "submission-deadline", "acceptance-notification", "programme-draft"]
+    },
+    "spatial": {
+      "lat": 52.5200,
+      "lon": 13.4050,
+      "label": "Berlin Conference Centre, Berlin, Germany"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-043",
+    "category": "event",
+    "document": {
+      "title": "ICDE 2026 — 42nd IEEE International Conference on Data Engineering",
+      "content": "ICDE 2026 takes place in Utrecht, Netherlands. The hexad embeddings paper (entity-003) and the VQL language paper (entity-008) are both accepted. A tutorial on 'Building Multimodal Databases from Scratch' by Dr. Okonkwo is a highlight of the programme.",
+      "tags": ["conference", "ICDE", "2026", "Utrecht", "data engineering"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-003", "relation": "featured_paper"},
+        {"target": "entity-008", "relation": "featured_paper"},
+        {"target": "entity-011", "relation": "tutorial_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.52, 0.53, 0.41, 0.37, 0.62, 0.48, 0.37, 0.50]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Event", "http://schema.org/BusinessEvent"],
+      "properties": {
+        "startDate": "2026-04-20",
+        "endDate": "2026-04-24",
+        "attendees": 800,
+        "url": "https://icde2026.org/"
+      }
+    },
+    "temporal": {
+      "created": "2025-07-01T00:00:00Z",
+      "modified": "2026-02-20T09:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "IEEE TCDE",
+      "actor": "system-admin",
+      "chain": ["cfp-announcement", "acceptance-notification", "programme-published"]
+    },
+    "spatial": {
+      "lat": 52.0907,
+      "lon": 5.1214,
+      "label": "TivoliVredenburg, Utrecht, Netherlands"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-044",
+    "category": "event",
+    "document": {
+      "title": "Workshop on Provenance and Annotation of Data (IPAW 2025)",
+      "content": "The International Provenance and Annotation Workshop (IPAW) 2025 was co-located with eScience 2025 in Edinburgh. Dr. Okafor presented the ProvenanceDAG work (entity-004) and Dr. Vasquez presented the neurosymbolic optimiser (entity-009). The workshop attracted 120 attendees from the provenance and reproducibility communities.",
+      "tags": ["workshop", "provenance", "IPAW", "2025", "Edinburgh"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-004", "relation": "featured_paper"},
+        {"target": "entity-009", "relation": "featured_paper"},
+        {"target": "entity-016", "relation": "presented_by"},
+        {"target": "entity-015", "relation": "presented_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.55, 0.50, 0.45, 0.38, 0.65, 0.42, 0.40, 0.52]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Event"],
+      "properties": {
+        "startDate": "2025-10-13",
+        "endDate": "2025-10-14",
+        "attendees": 120,
+        "url": "https://ipaw2025.org/"
+      }
+    },
+    "temporal": {
+      "created": "2025-03-01T00:00:00Z",
+      "modified": "2025-11-01T10:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "IPAW Steering Committee",
+      "actor": "system-admin",
+      "chain": ["cfp-announcement", "programme-published", "post-event-summary"]
+    },
+    "spatial": {
+      "lat": 55.9445,
+      "lon": -3.1872,
+      "label": "University of Edinburgh, Informatics Forum, Edinburgh"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-045",
+    "category": "event",
+    "document": {
+      "title": "ACM SIGSPATIAL 2025 — 33rd International Conference on Advances in Geographic Information Systems",
+      "content": "SIGSPATIAL 2025 was held in Atlanta, USA. The R-tree indexing paper (entity-007) and the PolyBench benchmark paper (entity-010) were presented. The conference included a panel on 'Spatial Data in Multimodal Databases' with participants from the VeriSimDB team.",
+      "tags": ["conference", "SIGSPATIAL", "2025", "Atlanta", "spatial", "GIS"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-007", "relation": "featured_paper"},
+        {"target": "entity-010", "relation": "featured_paper"},
+        {"target": "entity-019", "relation": "presented_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.53, 0.51, 0.43, 0.36, 0.63, 0.46, 0.39, 0.49]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Event", "http://schema.org/BusinessEvent"],
+      "properties": {
+        "startDate": "2025-11-04",
+        "endDate": "2025-11-07",
+        "attendees": 600,
+        "url": "https://sigspatial2025.org/"
+      }
+    },
+    "temporal": {
+      "created": "2025-04-01T00:00:00Z",
+      "modified": "2025-12-01T14:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "ACM SIGSPATIAL",
+      "actor": "system-admin",
+      "chain": ["cfp-announcement", "programme-published", "post-event-summary"]
+    },
+    "spatial": {
+      "lat": 33.7490,
+      "lon": -84.3880,
+      "label": "Georgia World Congress Center, Atlanta, GA, USA"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-046",
+    "category": "event",
+    "document": {
+      "title": "Turing Multimodal Data Workshop 2026",
+      "content": "An invitation-only workshop at the Alan Turing Institute bringing together the VeriSimDB research team to plan the next phase of development. Topics included VQL-DT finalisation, drift detection threshold calibration, and the roadmap for VeriSimDB v0.2.0. Attended by all 10 researchers in this dataset.",
+      "tags": ["workshop", "Turing", "VeriSimDB", "planning", "2026"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-011", "relation": "attended_by"},
+        {"target": "entity-012", "relation": "attended_by"},
+        {"target": "entity-013", "relation": "attended_by"},
+        {"target": "entity-014", "relation": "attended_by"},
+        {"target": "entity-015", "relation": "attended_by"},
+        {"target": "entity-026", "relation": "hosted_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.58, 0.48, 0.44, 0.39, 0.67, 0.40, 0.42, 0.54]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Event"],
+      "properties": {
+        "startDate": "2026-01-20",
+        "endDate": "2026-01-21",
+        "attendees": 25,
+        "url": null
+      }
+    },
+    "temporal": {
+      "created": "2025-11-15T00:00:00Z",
+      "modified": "2026-01-25T16:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "Alan Turing Institute Events Office",
+      "actor": "entity-012",
+      "chain": ["invitation-sent", "post-workshop-notes"]
+    },
+    "spatial": {
+      "lat": 51.5299,
+      "lon": -0.1278,
+      "label": "The Alan Turing Institute, British Library, London"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-047",
+    "category": "event",
+    "document": {
+      "title": "London Data Engineering Meetup — February 2026",
+      "content": "A monthly meetup for data engineers in London. The February 2026 edition featured a talk by Dr. Nia Williams on 'VeriSimDB: From Research Prototype to Production System', covering the Rust core architecture, Elixir orchestration layer, and deployment strategies. Over 80 attendees, with lively Q&A about drift detection in production.",
+      "tags": ["meetup", "London", "data engineering", "VeriSimDB", "production"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-020", "relation": "presented_by"},
+        {"target": "entity-021", "relation": "sponsored_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.56, 0.46, 0.47, 0.41, 0.64, 0.38, 0.41, 0.55]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Event", "http://schema.org/SocialEvent"],
+      "properties": {
+        "startDate": "2026-02-18",
+        "endDate": "2026-02-18",
+        "attendees": 80,
+        "url": "https://meetup.com/london-data-engineering/events/feb-2026"
+      }
+    },
+    "temporal": {
+      "created": "2026-01-15T00:00:00Z",
+      "modified": "2026-02-20T10:00:00Z",
+      "version": 2
+    },
+    "provenance": {
+      "origin": "Meetup.com event page",
+      "actor": "system-admin",
+      "chain": ["event-created", "post-event-update"]
+    },
+    "spatial": {
+      "lat": 51.5177,
+      "lon": -0.0869,
+      "label": "Skills Matter CodeNode, 10 South Place, London EC2M 7EB"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-048",
+    "category": "event",
+    "document": {
+      "title": "POPL 2026 — 53rd ACM SIGPLAN Symposium on Principles of Programming Languages",
+      "content": "POPL 2026 was held in Denver, USA. While not a database conference, it featured a pearl paper on dependent types for database query verification, co-authored by Dr. MacLeod and Dr. Kapoor. This work underpins the PROOF clause semantics in VQL-DT.",
+      "tags": ["conference", "POPL", "2026", "Denver", "programming languages", "types"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-013", "relation": "presented_by"},
+        {"target": "entity-014", "relation": "presented_by"},
+        {"target": "entity-002", "relation": "builds_on"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.60, 0.45, 0.50, 0.42, 0.58, 0.35, 0.48, 0.56]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Event", "http://schema.org/BusinessEvent"],
+      "properties": {
+        "startDate": "2026-01-19",
+        "endDate": "2026-01-25",
+        "attendees": 700,
+        "url": "https://popl26.sigplan.org/"
+      }
+    },
+    "temporal": {
+      "created": "2025-05-01T00:00:00Z",
+      "modified": "2026-02-01T08:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "ACM SIGPLAN",
+      "actor": "system-admin",
+      "chain": ["cfp-announcement", "acceptance-notification", "post-event-summary"]
+    },
+    "spatial": {
+      "lat": 39.7392,
+      "lon": -104.9903,
+      "label": "Colorado Convention Center, Denver, CO, USA"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-049",
+    "category": "event",
+    "document": {
+      "title": "EDBT 2026 — 29th International Conference on Extending Database Technology",
+      "content": "EDBT 2026 is scheduled for Barcelona, Spain. A demonstration paper on the VeriSimDB playground — an interactive web UI for exploring hexad data — has been accepted. The demo showcases real-time drift visualisation and VQL query editing.",
+      "tags": ["conference", "EDBT", "2026", "Barcelona", "demo", "VeriSimDB"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-011", "relation": "presented_by"},
+        {"target": "entity-020", "relation": "presented_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.54, 0.49, 0.46, 0.40, 0.61, 0.44, 0.40, 0.53]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Event", "http://schema.org/BusinessEvent"],
+      "properties": {
+        "startDate": "2026-03-24",
+        "endDate": "2026-03-27",
+        "attendees": 500,
+        "url": "https://edbt2026.org/"
+      }
+    },
+    "temporal": {
+      "created": "2025-08-01T00:00:00Z",
+      "modified": "2026-02-22T11:00:00Z",
+      "version": 4
+    },
+    "provenance": {
+      "origin": "OpenProceedings.org",
+      "actor": "system-admin",
+      "chain": ["cfp-announcement", "demo-submission", "acceptance", "programme-update"]
+    },
+    "spatial": {
+      "lat": 41.3874,
+      "lon": 2.1686,
+      "label": "Centre de Convencions Internacional de Barcelona, Spain"
+    },
+    "intentional_drift": false
+  },
+  {
+    "id": "entity-050",
+    "category": "event",
+    "document": {
+      "title": "VeriSimDB Community Hackathon 2026",
+      "content": "A two-day community hackathon at Imperial College London, open to anyone interested in contributing to VeriSimDB. Teams worked on VQL parser improvements, new drift detection heuristics, spatial index benchmarks, and documentation. The event produced 23 pull requests, 15 of which were merged.",
+      "tags": ["hackathon", "community", "VeriSimDB", "open source", "Imperial"]
+    },
+    "graph": {
+      "edges": [
+        {"target": "entity-011", "relation": "organised_by"},
+        {"target": "entity-020", "relation": "organised_by"},
+        {"target": "entity-021", "relation": "hosted_by"},
+        {"target": "entity-029", "relation": "funded_by"}
+      ]
+    },
+    "vector": {
+      "embedding": [0.57, 0.44, 0.48, 0.43, 0.66, 0.36, 0.43, 0.57]
+    },
+    "semantic": {
+      "types": ["http://schema.org/Event", "http://schema.org/Hackathon"],
+      "properties": {
+        "startDate": "2026-02-08",
+        "endDate": "2026-02-09",
+        "attendees": 45,
+        "url": "https://verisimdb.dev/hackathon-2026"
+      }
+    },
+    "temporal": {
+      "created": "2025-12-01T00:00:00Z",
+      "modified": "2026-02-12T18:00:00Z",
+      "version": 3
+    },
+    "provenance": {
+      "origin": "VeriSimDB project governance",
+      "actor": "entity-011",
+      "chain": ["planning", "registration-open", "post-event-report"]
+    },
+    "spatial": {
+      "lat": 51.4988,
+      "lon": -0.1749,
+      "label": "Imperial College London, Huxley Building, South Kensington"
+    },
+    "intentional_drift": false
+  }
+]

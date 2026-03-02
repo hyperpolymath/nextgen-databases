@@ -1,0 +1,201 @@
+{
+  "program_path": ".",
+  "language": "idris",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "cno/src/CNO/Examples.idr",
+      "severity": "Critical",
+      "description": "4 believe_me (type checker bypass) in cno/src/CNO/Examples.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "dyadt/src/Dyadt/Integration/Echidna.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in dyadt/src/Dyadt/Integration/Echidna.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "dyadt/src/Dyadt/Examples.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in dyadt/src/Dyadt/Examples.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "dyadt/src/Dyadt/Verdict.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in dyadt/src/Dyadt/Verdict.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "xml-toolkit/src/Xml744/Attribute.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in xml-toolkit/src/Xml744/Attribute.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "xml-toolkit/src/Xml744/Document.idr",
+      "severity": "Medium",
+      "description": "5 HTTP (non-HTTPS) URLs in xml-toolkit/src/Xml744/Document.idr",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "xml-toolkit/src/Xml744/Element.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in xml-toolkit/src/Xml744/Element.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 5699,
+    "unsafe_blocks": 21,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 0,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "cno/src/CNO/Examples.idr",
+      "lines": 307,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dyadt/src/Dyadt/Integration/Echidna.idr",
+      "lines": 113,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dyadt/src/Dyadt/Examples.idr",
+      "lines": 260,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dyadt/src/Dyadt/Verdict.idr",
+      "lines": 73,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "echidna/src/Echidna/FFI.idr",
+      "lines": 158,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "xml-toolkit/src/Xml744/Attribute.idr",
+      "lines": 87,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "xml-toolkit/src/Xml744/Element.idr",
+      "lines": 130,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "network"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "dyadt/src/Dyadt/Examples.idr",
+        "to": "dyadt/src/Dyadt/Verdict.idr",
+        "relation": "shared_dir:dyadt/src/Dyadt",
+        "weight": 1.0
+      },
+      {
+        "from": "xml-toolkit/src/Xml744/Attribute.idr",
+        "to": "xml-toolkit/src/Xml744/Element.idr",
+        "relation": "shared_dir:xml-toolkit/src/Xml744",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "cno/src/CNO/Examples.idr",
+          "dyadt/src/Dyadt/Integration/Echidna.idr",
+          "dyadt/src/Dyadt/Examples.idr",
+          "dyadt/src/Dyadt/Verdict.idr",
+          "xml-toolkit/src/Xml744/Attribute.idr",
+          "xml-toolkit/src/Xml744/Element.idr"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "xml-toolkit/src/Xml744/Document.idr"
+        ],
+        "frameworks": [],
+        "relation": "InsecureProtocol->Network"
+      }
+    ]
+  }
+}

@@ -1,0 +1,174 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# Vordr runtime monitoring configuration for VeriSimDB test infrastructure
+#
+# Monitors health endpoints of all 7 database services in the test stack.
+# Alerts on container crashes, unhealthy services, and port unreachability.
+# Logs to stdout for test-time visibility.
+#
+# See: stapeln/container-stack/vordr/
+#
+# Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+
+[metadata]
+name = "verisimdb-test-infra-monitor"
+version = "0.1.0"
+description = "Runtime health monitoring for VeriSimDB test database stack"
+
+# ---------------------------------------------------------------------------
+# Global settings
+# ---------------------------------------------------------------------------
+
+[settings]
+# Check interval for all probes (seconds)
+check_interval = 10
+
+# Number of consecutive failures before alerting
+failure_threshold = 3
+
+# Number of consecutive successes to clear alert
+recovery_threshold = 1
+
+# Log output target
+log_target = "stdout"
+
+# Log format: "text" for human-readable, "json" for structured
+log_format = "text"
+
+# Log level: "debug", "info", "warn", "error"
+log_level = "info"
+
+# ---------------------------------------------------------------------------
+# Service probes — health endpoints for each database
+# ---------------------------------------------------------------------------
+
+[[probes]]
+name = "mongodb"
+type = "tcp"
+host = "localhost"
+port = 27017
+timeout = 5
+description = "MongoDB replica set (document store federation)"
+
+[[probes]]
+name = "mongodb-command"
+type = "exec"
+command = "mongosh --eval 'db.adminCommand({ping:1})' --quiet mongodb://localhost:27017"
+timeout = 10
+description = "MongoDB command-level health (replica set status)"
+
+[[probes]]
+name = "redis-stack"
+type = "exec"
+command = "redis-cli -h localhost -p 6379 ping"
+expect = "PONG"
+timeout = 5
+description = "Redis Stack (RediSearch + RedisJSON + RedisTimeSeries)"
+
+[[probes]]
+name = "neo4j-http"
+type = "http"
+url = "http://localhost:7474/"
+method = "GET"
+expected_status = 200
+timeout = 5
+description = "Neo4j HTTP API (browser + REST)"
+
+[[probes]]
+name = "neo4j-bolt"
+type = "tcp"
+host = "localhost"
+port = 7687
+timeout = 5
+description = "Neo4j Bolt protocol (driver connections)"
+
+[[probes]]
+name = "clickhouse-http"
+type = "http"
+url = "http://localhost:8123/ping"
+method = "GET"
+expected_status = 200
+timeout = 5
+description = "ClickHouse HTTP interface (queries + health)"
+
+[[probes]]
+name = "clickhouse-native"
+type = "tcp"
+host = "localhost"
+port = 9000
+timeout = 5
+description = "ClickHouse native TCP protocol (client connections)"
+
+[[probes]]
+name = "surrealdb"
+type = "http"
+url = "http://localhost:8000/health"
+method = "GET"
+expected_status = 200
+timeout = 5
+description = "SurrealDB HTTP API (document + graph)"
+
+[[probes]]
+name = "influxdb"
+type = "http"
+url = "http://localhost:8086/health"
+method = "GET"
+expected_status = 200
+timeout = 5
+description = "InfluxDB 2 HTTP API (time-series)"
+
+[[probes]]
+name = "minio-api"
+type = "http"
+url = "http://localhost:9002/minio/health/live"
+method = "GET"
+expected_status = 200
+timeout = 5
+description = "MinIO S3 API (object storage)"
+
+[[probes]]
+name = "minio-console"
+type = "tcp"
+host = "localhost"
+port = 9001
+timeout = 5
+description = "MinIO web console"
+
+# ---------------------------------------------------------------------------
+# Alerts — actions on failure/recovery
+# ---------------------------------------------------------------------------
+
+[alerts]
+# Log to stdout on state change (default for test environments)
+on_failure = "log"
+on_recovery = "log"
+
+# In production, these would be:
+# on_failure = "webhook"
+# webhook_url = "https://hooks.example.com/verisimdb-alerts"
+# on_recovery = "webhook"
+
+# ---------------------------------------------------------------------------
+# Container monitoring — detect crashes and restarts
+# ---------------------------------------------------------------------------
+
+[container_monitor]
+enabled = true
+runtime = "podman"
+
+# Watch these container name patterns
+watch_patterns = [
+    "test-infra-mongodb*",
+    "test-infra-redis*",
+    "test-infra-neo4j*",
+    "test-infra-clickhouse*",
+    "test-infra-surrealdb*",
+    "test-infra-influxdb*",
+    "test-infra-minio*",
+]
+
+# Alert on these container events
+alert_on = ["die", "oom", "restart"]
+
+# Ignore these events (too noisy for testing)
+ignore = ["start", "stop", "pause", "unpause"]

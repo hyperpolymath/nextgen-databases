@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+
+[package]
+name = "verisimdb-benchmarks"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[[bench]]
+name = "modality_benchmarks"
+path = "modality_benchmarks.rs"
+harness = false
+
+[dependencies]
+criterion = { version = "0.5", features = ["async_tokio", "html_reports"] }
+tokio = { version = "1", features = ["full"] }
+uuid = { version = "1.11", features = ["v4"] }
+futures = "0.3"
+
+verisim-document = { path = "../rust-core/verisim-document" }
+verisim-graph = { path = "../rust-core/verisim-graph" }
+verisim-vector = { path = "../rust-core/verisim-vector" }
+verisim-tensor = { path = "../rust-core/verisim-tensor" }
+verisim-semantic = { path = "../rust-core/verisim-semantic" }
+verisim-temporal = { path = "../rust-core/verisim-temporal" }
+verisim-hexad = { path = "../rust-core/verisim-hexad" }
+verisim-drift = { path = "../rust-core/verisim-drift" }
+verisim-normalizer = { path = "../rust-core/verisim-normalizer" }

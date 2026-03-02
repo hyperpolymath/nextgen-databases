@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://verisim.db/schema/error.json",
+  "$comment": "SPDX-License-Identifier: PMPL-1.0-or-later",
+  "title": "ErrorResponse",
+  "description": "Standard error response envelope for the VeriSimDB API. All error responses follow this structure, providing a machine-readable error code, a human-readable message, the HTTP status, and optional structured details for programmatic handling.",
+  "type": "object",
+  "required": ["error", "message", "status"],
+  "properties": {
+    "error": {
+      "type": "string",
+      "description": "Machine-readable error code. Uses snake_case naming convention. Standard codes include: 'not_found', 'validation_error', 'consistency_violation', 'modality_error', 'drift_detected', 'chain_corrupted', 'unauthorized', 'forbidden', 'rate_limited', 'internal_error', 'federation_error', 'timeout'.",
+      "examples": [
+        "not_found",
+        "validation_error",
+        "consistency_violation",
+        "modality_error",
+        "drift_detected",
+        "chain_corrupted",
+        "unauthorized",
+        "internal_error"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable error message providing context about what went wrong. Suitable for display in developer tools and logs. Should not contain sensitive information.",
+      "examples": [
+        "Entity not found: 550e8400-e29b-41d4-a716-446655440000",
+        "Tensor shape [3, 4] does not match data length 15 (expected 12)",
+        "Provenance chain corrupted for entity abc-123: record 5 parent_hash mismatch"
+      ]
+    },
+    "status": {
+      "type": "integer",
+      "description": "HTTP status code that was returned with this error response.",
+      "minimum": 400,
+      "maximum": 599,
+      "examples": [400, 401, 403, 404, 409, 422, 429, 500, 502, 503, 504]
+    },
+    "details": {
+      "type": "object",
+      "description": "Optional structured details for programmatic error handling. Content varies by error type. Examples include affected modalities, validation failures, drift scores, or federation peer information.",
+      "additionalProperties": true,
+      "examples": [
+        {
+          "entity_id": "550e8400-e29b-41d4-a716-446655440000",
+          "modality": "vector",
+          "expected_dimension": 384,
+          "actual_dimension": 256
+        },
+        {
+          "field": "spatial.latitude",
+          "constraint": "range",
+          "min": -90.0,
+          "max": 90.0,
+          "actual": 91.5
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

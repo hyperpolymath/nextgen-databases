@@ -1,0 +1,707 @@
+{
+  "program_path": ".",
+  "language": "julia",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "HardcodedSecret",
+      "location": "src/julia/data_sources/BEA.jl",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in src/julia/data_sources/BEA.jl",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "src/julia/data_sources/Census.jl",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in src/julia/data_sources/Census.jl",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/julia/data_sources/IMF.jl",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in src/julia/data_sources/IMF.jl",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/rescript/ConstraintEditor.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/rescript/ConstraintEditor.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/rescript/Settings.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/rescript/Settings.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "src/python/economic_toolkit/client.py",
+      "severity": "Critical",
+      "description": "Dynamic code execution (eval/exec) in src/python/economic_toolkit/client.py",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/collaboration/comments.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/collaboration/comments.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/enterprise/saml_auth.jl",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in src/enterprise/saml_auth.jl",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/visualization/charts.rs",
+      "severity": "Medium",
+      "description": "4 HTTP (non-HTTPS) URLs in src/visualization/charts.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/visualization/geo_viz.res",
+      "severity": "Medium",
+      "description": "4 HTTP (non-HTTPS) URLs in src/visualization/geo_viz.res",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "tests/python/test_client.py",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in tests/python/test_client.py",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 23289,
+    "unsafe_blocks": 54,
+    "panic_sites": 0,
+    "unwrap_calls": 5,
+    "allocation_sites": 14,
+    "io_operations": 109,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "scripts/bootstrap.sh",
+      "lines": 180,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/cache/sqlite_cache.jl",
+      "lines": 245,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/data_sources/BEA.jl",
+      "lines": 287,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/data_sources/BIS.jl",
+      "lines": 422,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/data_sources/Census.jl",
+      "lines": 296,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/data_sources/DBnomics.jl",
+      "lines": 363,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 10,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/data_sources/ECB.jl",
+      "lines": 464,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/data_sources/Eurostat.jl",
+      "lines": 373,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/data_sources/FRED.jl",
+      "lines": 275,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/data_sources/IMF.jl",
+      "lines": 448,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/data_sources/OECD.jl",
+      "lines": 447,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/data_sources/WorldBank.jl",
+      "lines": 315,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/utils/retry.jl",
+      "lines": 166,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/EconomicToolkit.jl",
+      "lines": 196,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/server/authentication.jl",
+      "lines": 76,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/julia/server/rate_limiting.jl",
+      "lines": 101,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rescript/adapters/OfficeJsAdapter.res",
+      "lines": 526,
+      "unsafe_blocks": 25,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rescript/adapters/UnoAdapter.res",
+      "lines": 323,
+      "unsafe_blocks": 16,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rescript/ribbons/DataRibbon.res",
+      "lines": 292,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rescript/ConstraintEditor.res",
+      "lines": 363,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rescript/DataBrowser.res",
+      "lines": 120,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rescript/Settings.res",
+      "lines": 543,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/web/app.res",
+      "lines": 174,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/collaboration/websocket_server.jl",
+      "lines": 139,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/collaboration/comments.res",
+      "lines": 296,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cloud/s3_cache.jl",
+      "lines": 124,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/streaming/websocket_data.jl",
+      "lines": 107,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/nlp/query_parser.jl",
+      "lines": 287,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ai/insights.jl",
+      "lines": 331,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/enterprise/audit_log.jl",
+      "lines": 314,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/visualization/charts.rs",
+      "lines": 411,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/visualization/report_generator.jl",
+      "lines": 384,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/plugins/plugin_system.jl",
+      "lines": 349,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/plugins/marketplace.jl",
+      "lines": 358,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/plugins/webhooks.jl",
+      "lines": 360,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/integration/test_e2e.jl",
+      "lines": 294,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "memory",
+    "disk",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/rescript/adapters/OfficeJsAdapter.res",
+        "to": "src/rescript/adapters/UnoAdapter.res",
+        "relation": "shared_dir:src/rescript/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "src/julia/server/authentication.jl",
+        "to": "src/julia/server/rate_limiting.jl",
+        "relation": "shared_dir:src/julia/server",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rescript/ConstraintEditor.res",
+        "to": "src/rescript/DataBrowser.res",
+        "relation": "shared_dir:src/rescript",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rescript/DataBrowser.res",
+        "to": "src/rescript/Settings.res",
+        "relation": "shared_dir:src/rescript",
+        "weight": 1.0
+      },
+      {
+        "from": "src/julia/data_sources/BEA.jl",
+        "to": "src/julia/data_sources/BIS.jl",
+        "relation": "shared_dir:src/julia/data_sources",
+        "weight": 1.0
+      },
+      {
+        "from": "src/julia/data_sources/BIS.jl",
+        "to": "src/julia/data_sources/Census.jl",
+        "relation": "shared_dir:src/julia/data_sources",
+        "weight": 1.0
+      },
+      {
+        "from": "src/julia/data_sources/Census.jl",
+        "to": "src/julia/data_sources/DBnomics.jl",
+        "relation": "shared_dir:src/julia/data_sources",
+        "weight": 1.0
+      },
+      {
+        "from": "src/julia/data_sources/DBnomics.jl",
+        "to": "src/julia/data_sources/ECB.jl",
+        "relation": "shared_dir:src/julia/data_sources",
+        "weight": 1.0
+      },
+      {
+        "from": "src/julia/data_sources/ECB.jl",
+        "to": "src/julia/data_sources/Eurostat.jl",
+        "relation": "shared_dir:src/julia/data_sources",
+        "weight": 1.0
+      },
+      {
+        "from": "src/julia/data_sources/Eurostat.jl",
+        "to": "src/julia/data_sources/FRED.jl",
+        "relation": "shared_dir:src/julia/data_sources",
+        "weight": 1.0
+      },
+      {
+        "from": "src/julia/data_sources/FRED.jl",
+        "to": "src/julia/data_sources/IMF.jl",
+        "relation": "shared_dir:src/julia/data_sources",
+        "weight": 1.0
+      },
+      {
+        "from": "src/julia/data_sources/IMF.jl",
+        "to": "src/julia/data_sources/OECD.jl",
+        "relation": "shared_dir:src/julia/data_sources",
+        "weight": 1.0
+      },
+      {
+        "from": "src/julia/data_sources/OECD.jl",
+        "to": "src/julia/data_sources/WorldBank.jl",
+        "relation": "shared_dir:src/julia/data_sources",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/visualization/charts.rs",
+        "to": "src/visualization/report_generator.jl",
+        "relation": "shared_dir:src/visualization",
+        "weight": 1.0
+      },
+      {
+        "from": "src/collaboration/websocket_server.jl",
+        "to": "src/collaboration/comments.res",
+        "relation": "shared_dir:src/collaboration",
+        "weight": 1.0
+      },
+      {
+        "from": "src/plugins/plugin_system.jl",
+        "to": "src/plugins/marketplace.jl",
+        "relation": "shared_dir:src/plugins",
+        "weight": 1.0
+      },
+      {
+        "from": "src/plugins/marketplace.jl",
+        "to": "src/plugins/webhooks.jl",
+        "relation": "shared_dir:src/plugins",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/rescript/ConstraintEditor.res",
+          "src/rescript/Settings.res",
+          "src/collaboration/comments.res"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "src/python/economic_toolkit/client.py"
+        ],
+        "frameworks": [],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "src/julia/data_sources/IMF.jl",
+          "src/enterprise/saml_auth.jl",
+          "src/visualization/charts.rs",
+          "src/visualization/geo_viz.res"
+        ],
+        "frameworks": [],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "src/python/economic_toolkit/client.py"
+        ],
+        "frameworks": [],
+        "relation": "DynamicCodeExecution->Memory"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "src/julia/data_sources/BEA.jl",
+          "src/julia/data_sources/Census.jl",
+          "tests/python/test_client.py"
+        ],
+        "frameworks": [],
+        "relation": "HardcodedSecret->Network"
+      }
+    ]
+  }
+}

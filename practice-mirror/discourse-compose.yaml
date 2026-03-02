@@ -1,0 +1,89 @@
+version: "1.0"
+# discourse-compose.yaml
+# Orchestration for Discourse with PostgreSQL and Dragonfly
+
+# This file defines the services for the discourse.nuj-lcb.org.uk forum.
+
+services:
+  discourse:
+    image: /var/mnt/eclipse/repos/branch-website/dist/discourse.ctp.ctp
+    container_name: nuj-lcb-discourse
+    hostname: discourse
+    ports:
+      - "80:80"   # Nginx HTTP
+      - "443:443" # Nginx HTTPS (Svalinn will handle TLS termination)
+    environment:
+      # Discourse database connection settings
+      DISCOURSE_DB_HOST: postgresql
+      DISCOURSE_DB_USERNAME: discourse_user
+      DISCOURSE_DB_PASSWORD: YOUR_DISCOURSE_DB_PASSWORD # <<< REPLACE WITH STRONG PASSWORD
+      DISCOURSE_DB_NAME: discourse_db
+      # Discourse Redis connection settings (using Dragonfly)
+      DISCOURSE_REDIS_HOST: dragonfly
+      DISCOURSE_REDIS_PORT: 6379
+      DISCOURSE_REDIS_PASSWORD: YOUR_DRAGONFLY_PASSWORD # <<< REPLACE WITH STRONG PASSWORD
+      # Discourse specific settings
+      DISCOURSE_DEVELOPER_EMAILS: admin@nuj-lcb.org.uk # Replace with actual admin email
+      DISCOURSE_HOSTNAME: discourse.nuj-lcb.org.uk
+      DISCOURSE_TITLE: "NUJ London Central Branch Forum"
+      # Other optional settings (e.g., SMTP for email, S3 for uploads)
+    volumes:
+      - discourse_data:/var/www/discourse/public/uploads # Persistent uploads
+      - discourse_logs:/var/www/discourse/log            # Persistent logs
+    networks:
+      - discourse_network
+    restart: unless-stopped
+    x-svalinn:
+      policy: strict
+      verify: true
+
+  postgresql:
+    image: /var/mnt/eclipse/repos/branch-website/dist/postgresql.ctp.ctp
+    container_name: nuj-lcb-postgresql
+    hostname: postgresql
+    environment:
+      - POSTGRES_DB=discourse_db
+      - POSTGRES_USER=discourse_user
+      - POSTGRES_PASSWORD=YOUR_DISCOURSE_DB_PASSWORD
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data # Persistent database data
+      - postgresql_logs:/var/log/postgresql      # Persistent database logs
+    networks:
+      - discourse_network
+    restart: unless-stopped
+    x-svalinn:
+      policy: strict
+      verify: true
+
+  dragonfly:
+    image: /var/mnt/eclipse/repos/branch-website/dist/dragonfly.ctp.ctp
+    container_name: nuj-lcb-dragonfly
+    hostname: dragonfly
+    environment:
+      - DRAGONFLY_PASSWORD=YOUR_DRAGONFLY_PASSWORD
+    volumes:
+      - dragonfly_data:/data # Persistent data for Dragonfly
+    networks:
+      - discourse_network
+    restart: unless-stopped
+    x-svalinn:
+      policy: strict
+      verify: true
+
+networks:
+  discourse_network:
+    driver: bridge
+
+volumes:
+  discourse_data:
+  discourse_logs:
+  postgresql_data:
+  postgresql_logs:
+  dragonfly_data:
+
+x-svalinn:
+  # Global svalinn policies if any apply to the entire stack
+  policy: standard
+  attestations:
+    require-sbom: true
+    require-signature: true

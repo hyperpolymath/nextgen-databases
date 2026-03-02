@@ -1,0 +1,1024 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)
+#
+# OpenAPI 3.1 specification for the VeriSimDB REST API.
+# Covers all hexad CRUD operations, search endpoints, drift monitoring,
+# provenance chain management, spatial queries, normalisation triggers,
+# and VQL query execution.
+
+openapi: "3.1.0"
+
+info:
+  title: VeriSimDB API
+  version: "1.0.0"
+  description: |
+    VeriSimDB (Veridical Simulacrum Database) REST API.
+
+    Each entity (hexad) exists simultaneously across 8 modalities -- the
+    octad: Graph, Vector, Tensor, Semantic, Document, Temporal, Provenance,
+    and Spatial.  This API provides unified CRUD, search, drift detection,
+    normalisation, and provenance management for all modalities.
+  contact:
+    name: Jonathan D.A. Jewell
+    email: j.d.a.jewell@open.ac.uk
+  license:
+    name: PMPL-1.0-or-later
+    url: https://github.com/hyperpolymath/verisimdb/blob/main/LICENSE
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: health
+    description: Health check and readiness probes
+  - name: hexads
+    description: Hexad entity CRUD operations
+  - name: search
+    description: Text, vector, and relationship search
+  - name: spatial
+    description: Geospatial search (radius, bounds, nearest)
+  - name: drift
+    description: Cross-modal drift detection and monitoring
+  - name: normalizer
+    description: Self-normalisation trigger and status
+  - name: provenance
+    description: Provenance chain management and verification
+  - name: vql
+    description: VeriSim Query Language execution
+
+paths:
+  # ---------------------------------------------------------------------------
+  # Health
+  # ---------------------------------------------------------------------------
+  /api/v1/health:
+    get:
+      operationId: healthCheck
+      summary: Health check
+      description: |
+        Returns the health status of the VeriSimDB instance, including
+        storage backend connectivity and current drift health.
+      tags: [health]
+      responses:
+        "200":
+          description: Service is healthy.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, version]
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy, degraded, critical]
+                    description: Overall health status.
+                  version:
+                    type: string
+                    description: VeriSimDB version string.
+                  uptime_seconds:
+                    type: integer
+                    description: Seconds since the service started.
+                  drift_health:
+                    type: string
+                    enum: [healthy, warning, degraded, critical]
+                    description: Current drift subsystem health.
+        "503":
+          description: Service is unhealthy.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  # ---------------------------------------------------------------------------
+  # Hexad CRUD
+  # ---------------------------------------------------------------------------
+  /api/v1/hexads:
+    post:
+      operationId: createHexad
+      summary: Create a new hexad entity
+      description: |
+        Creates a new hexad with the provided modality data.  A UUID is
+        generated automatically.  Only the modalities included in the
+        request body are populated; omitted modalities remain empty.
+        A provenance "created" event is recorded automatically.
+      tags: [hexads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../json-schema/hexad-input.json"
+      responses:
+        "201":
+          description: Hexad created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/hexad.json"
+        "400":
+          description: Validation error (e.g. tensor shape mismatch, invalid coordinates).
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+    get:
+      operationId: listHexads
+      summary: List hexad entities (paginated)
+      description: |
+        Returns a paginated list of hexad entities.  Results are ordered
+        by creation time (newest first).
+      tags: [hexads]
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of results (default 100, max 10000).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10000
+            default: 100
+        - name: offset
+          in: query
+          description: Number of results to skip for pagination.
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        "200":
+          description: List of hexad entities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "../json-schema/hexad.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  /api/v1/hexads/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Hexad entity UUID.
+        schema:
+          type: string
+
+    get:
+      operationId: getHexad
+      summary: Get a hexad entity by ID
+      description: |
+        Returns the full hexad entity including all populated modality
+        data, status, version count, provenance chain length, and
+        spatial data.
+      tags: [hexads]
+      responses:
+        "200":
+          description: Hexad entity found.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/hexad.json"
+        "404":
+          description: Entity not found.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+    put:
+      operationId: updateHexad
+      summary: Update an existing hexad entity
+      description: |
+        Updates the specified modalities of an existing hexad.  Only
+        the modalities included in the request body are modified;
+        omitted modalities are left unchanged.  A new temporal version
+        is created, and a provenance "modified" event is recorded.
+      tags: [hexads]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "../json-schema/hexad-input.json"
+      responses:
+        "200":
+          description: Hexad updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/hexad.json"
+        "400":
+          description: Validation error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "404":
+          description: Entity not found.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+    delete:
+      operationId: deleteHexad
+      summary: Delete a hexad entity
+      description: |
+        Deletes the hexad and all its modality data.  A provenance
+        "deleted" event is recorded before the entity is removed.
+      tags: [hexads]
+      responses:
+        "204":
+          description: Entity deleted successfully (no content).
+        "404":
+          description: Entity not found.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  # ---------------------------------------------------------------------------
+  # Search
+  # ---------------------------------------------------------------------------
+  /api/v1/search/text:
+    get:
+      operationId: searchText
+      summary: Full-text search across hexad documents
+      description: |
+        Searches the document modality using the Tantivy full-text
+        engine.  Returns hexads whose title or body match the query,
+        ranked by BM25 relevance.
+      tags: [search]
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Text search query string.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum results to return (default 100).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10000
+            default: 100
+      responses:
+        "200":
+          description: Search results.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "../json-schema/hexad.json"
+        "400":
+          description: Missing or invalid query parameter.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  /api/v1/search/vector:
+    post:
+      operationId: searchVector
+      summary: Vector similarity search
+      description: |
+        Searches the vector modality using HNSW approximate nearest
+        neighbour search.  Returns the k most similar hexads ranked
+        by cosine similarity.
+      tags: [search]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [vector, k]
+              properties:
+                vector:
+                  type: array
+                  items:
+                    type: number
+                  description: Query embedding vector. Dimensionality must match the store's vector_dimension.
+                k:
+                  type: integer
+                  minimum: 1
+                  maximum: 10000
+                  description: Number of nearest neighbours to return.
+      responses:
+        "200":
+          description: Similar entities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "../json-schema/hexad.json"
+        "400":
+          description: Invalid vector dimension or missing parameters.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  /api/v1/search/related/{id}:
+    get:
+      operationId: searchRelated
+      summary: Find related entities via graph traversal
+      description: |
+        Traverses the graph modality to find entities related to the
+        given hexad.  Returns entities connected by outgoing edges.
+      tags: [search]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Source hexad entity UUID.
+          schema:
+            type: string
+        - name: predicate
+          in: query
+          description: Filter by relationship type / edge label. If omitted, all relationships are returned.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Related entities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "../json-schema/hexad.json"
+        "404":
+          description: Source entity not found.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  # ---------------------------------------------------------------------------
+  # Spatial Search
+  # ---------------------------------------------------------------------------
+  /api/v1/spatial/search/radius:
+    post:
+      operationId: spatialSearchRadius
+      summary: Search entities within a radius
+      description: |
+        Finds hexad entities within a given radius (km) of a centre
+        point.  Results are sorted by distance ascending.
+      tags: [spatial]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [latitude, longitude, radius_km]
+              properties:
+                latitude:
+                  type: number
+                  minimum: -90.0
+                  maximum: 90.0
+                  description: Centre latitude (WGS84).
+                longitude:
+                  type: number
+                  minimum: -180.0
+                  maximum: 180.0
+                  description: Centre longitude (WGS84).
+                radius_km:
+                  type: number
+                  minimum: 0.0
+                  description: Search radius in kilometres.
+                limit:
+                  type: integer
+                  minimum: 1
+                  maximum: 10000
+                  default: 100
+                  description: Maximum results.
+      responses:
+        "200":
+          description: Entities within the radius.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [entity_id, distance_km, spatial_data]
+                  properties:
+                    entity_id:
+                      type: string
+                    distance_km:
+                      type: number
+                    spatial_data:
+                      type: object
+        "400":
+          description: Invalid coordinates or radius.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  /api/v1/spatial/search/bounds:
+    post:
+      operationId: spatialSearchBounds
+      summary: Search entities within a bounding box
+      description: |
+        Finds hexad entities within a geographic bounding box defined
+        by south-west and north-east corners (WGS84).
+      tags: [spatial]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [min_lat, min_lon, max_lat, max_lon]
+              properties:
+                min_lat:
+                  type: number
+                  minimum: -90.0
+                  maximum: 90.0
+                  description: Southern latitude boundary.
+                min_lon:
+                  type: number
+                  minimum: -180.0
+                  maximum: 180.0
+                  description: Western longitude boundary.
+                max_lat:
+                  type: number
+                  minimum: -90.0
+                  maximum: 90.0
+                  description: Northern latitude boundary.
+                max_lon:
+                  type: number
+                  minimum: -180.0
+                  maximum: 180.0
+                  description: Eastern longitude boundary.
+                limit:
+                  type: integer
+                  minimum: 1
+                  maximum: 10000
+                  default: 100
+                  description: Maximum results.
+      responses:
+        "200":
+          description: Entities within the bounding box.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [entity_id, distance_km, spatial_data]
+                  properties:
+                    entity_id:
+                      type: string
+                    distance_km:
+                      type: number
+                    spatial_data:
+                      type: object
+        "400":
+          description: Invalid bounding box.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  /api/v1/spatial/search/nearest:
+    post:
+      operationId: spatialSearchNearest
+      summary: Find k nearest entities to a point
+      description: |
+        Finds the k nearest hexad entities to a given geographic point
+        using the Haversine formula for distance computation.
+      tags: [spatial]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [latitude, longitude, k]
+              properties:
+                latitude:
+                  type: number
+                  minimum: -90.0
+                  maximum: 90.0
+                  description: Query point latitude (WGS84).
+                longitude:
+                  type: number
+                  minimum: -180.0
+                  maximum: 180.0
+                  description: Query point longitude (WGS84).
+                k:
+                  type: integer
+                  minimum: 1
+                  maximum: 10000
+                  description: Number of nearest neighbours to return.
+      responses:
+        "200":
+          description: Nearest entities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [entity_id, distance_km, spatial_data]
+                  properties:
+                    entity_id:
+                      type: string
+                    distance_km:
+                      type: number
+                    spatial_data:
+                      type: object
+        "400":
+          description: Invalid coordinates.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  # ---------------------------------------------------------------------------
+  # Drift Detection
+  # ---------------------------------------------------------------------------
+  /api/v1/drift/entity/{id}:
+    get:
+      operationId: getDriftScore
+      summary: Get drift score for an entity
+      description: |
+        Returns the current drift measurement for a specific hexad
+        entity, including per-modality scores and whether normalisation
+        is needed.
+      tags: [drift]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Hexad entity UUID.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Drift score for the entity.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/drift-score.json"
+        "404":
+          description: Entity not found.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  /api/v1/drift/status:
+    get:
+      operationId: getDriftStatus
+      summary: Get overall drift status
+      description: |
+        Returns the aggregate drift health status for the entire
+        VeriSimDB instance, including the worst drift type and score.
+      tags: [drift]
+      responses:
+        "200":
+          description: Overall drift health status.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, worst_drift_type, worst_score, checked_at]
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy, warning, degraded, critical]
+                    description: Overall drift health status.
+                  worst_drift_type:
+                    type: string
+                    description: The drift type with the highest current score.
+                  worst_score:
+                    type: number
+                    minimum: 0.0
+                    maximum: 1.0
+                    description: The highest current drift score across all types.
+                  checked_at:
+                    type: string
+                    format: date-time
+                    description: When the health check was performed.
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  # ---------------------------------------------------------------------------
+  # Normalizer
+  # ---------------------------------------------------------------------------
+  /api/v1/normalizer/trigger/{id}:
+    post:
+      operationId: triggerNormalization
+      summary: Trigger normalisation for an entity
+      description: |
+        Manually triggers the self-normalisation process for a specific
+        hexad entity.  The normaliser identifies the most authoritative
+        modality and regenerates drifted modalities from it, validating
+        consistency and updating all modalities atomically.
+      tags: [normalizer]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Hexad entity UUID to normalise.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Normalisation completed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [entity_id, status, modalities_repaired]
+                properties:
+                  entity_id:
+                    type: string
+                    description: The normalised entity's ID.
+                  status:
+                    type: string
+                    enum: [completed, no_drift, failed]
+                    description: Normalisation outcome.
+                  modalities_repaired:
+                    type: array
+                    items:
+                      $ref: "../json-schema/modality.json"
+                    description: Which modalities were repaired.
+                  drift_score_before:
+                    type: number
+                    description: Overall drift score before normalisation.
+                  drift_score_after:
+                    type: number
+                    description: Overall drift score after normalisation.
+        "404":
+          description: Entity not found.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  /api/v1/normalizer/status:
+    get:
+      operationId: getNormalizerStatus
+      summary: Get normaliser status
+      description: |
+        Returns the current status of the normalisation subsystem,
+        including queue depth, active normalisations, and recent
+        normalisation history.
+      tags: [normalizer]
+      responses:
+        "200":
+          description: Normaliser status.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [active, queue_depth]
+                properties:
+                  active:
+                    type: boolean
+                    description: Whether the normaliser is currently running.
+                  queue_depth:
+                    type: integer
+                    minimum: 0
+                    description: Number of entities awaiting normalisation.
+                  entities_normalised_total:
+                    type: integer
+                    minimum: 0
+                    description: Total entities normalised since startup.
+                  last_normalisation_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp of the most recent normalisation.
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  # ---------------------------------------------------------------------------
+  # Provenance
+  # ---------------------------------------------------------------------------
+  /api/v1/provenance/{id}:
+    get:
+      operationId: getProvenanceChain
+      summary: Get provenance chain for an entity
+      description: |
+        Returns the full provenance chain for a hexad entity -- an
+        ordered list of provenance events linked by SHA-256 hashes.
+        Records are returned oldest-first.
+      tags: [provenance]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Hexad entity UUID.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Provenance chain.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [entity_id, records]
+                properties:
+                  entity_id:
+                    type: string
+                  records:
+                    type: array
+                    items:
+                      $ref: "../json-schema/provenance-event.json"
+                  chain_length:
+                    type: integer
+                    minimum: 0
+        "404":
+          description: Entity or provenance chain not found.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  /api/v1/provenance/{id}/record:
+    post:
+      operationId: recordProvenanceEvent
+      summary: Record a provenance event
+      description: |
+        Appends a new provenance event to the entity's hash chain.
+        The parent_hash is computed automatically from the previous
+        record's content_hash.
+      tags: [provenance]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Hexad entity UUID.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [event_type, actor, description]
+              properties:
+                event_type:
+                  type: string
+                  enum: [created, modified, imported, normalized, federated, deleted]
+                  description: Type of provenance event.
+                actor:
+                  type: string
+                  description: Who or what caused this event.
+                source:
+                  type: string
+                  description: Optional source identifier.
+                description:
+                  type: string
+                  description: Human-readable description.
+      responses:
+        "201":
+          description: Provenance event recorded.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/provenance-event.json"
+        "404":
+          description: Entity not found.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  /api/v1/provenance/{id}/verify:
+    get:
+      operationId: verifyProvenanceChain
+      summary: Verify provenance chain integrity
+      description: |
+        Verifies the SHA-256 hash chain integrity for an entity's
+        provenance records.  Each record's parent_hash is checked
+        against the content_hash of the preceding record, and each
+        record's content_hash is recomputed to detect tampering.
+      tags: [provenance]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Hexad entity UUID.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Verification result.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [entity_id, valid, chain_length]
+                properties:
+                  entity_id:
+                    type: string
+                  valid:
+                    type: boolean
+                    description: Whether the hash chain is intact.
+                  chain_length:
+                    type: integer
+                    minimum: 0
+                  error:
+                    type: string
+                    description: Description of the integrity violation, if any.
+        "404":
+          description: Entity or provenance chain not found.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+
+  # ---------------------------------------------------------------------------
+  # VQL
+  # ---------------------------------------------------------------------------
+  /api/v1/vql/execute:
+    post:
+      operationId: executeVql
+      summary: Execute a VQL query
+      description: |
+        Executes a VeriSim Query Language (VQL) query against the
+        database.  VQL is VeriSimDB's native query language, providing
+        cross-modal querying with optional proof requirements.
+      tags: [vql]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query]
+              properties:
+                query:
+                  type: string
+                  description: |
+                    VQL query string.  Example:
+                    `FIND entities WHERE document CONTAINS "neural" AND vector SIMILAR TO [0.1, 0.2, ...] LIMIT 10`
+                explain:
+                  type: boolean
+                  default: false
+                  description: If true, return the query execution plan instead of results.
+                timeout_ms:
+                  type: integer
+                  minimum: 100
+                  maximum: 300000
+                  default: 30000
+                  description: Query timeout in milliseconds.
+      responses:
+        "200":
+          description: Query results or execution plan.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [results, execution_time_ms]
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: "../json-schema/hexad.json"
+                    description: Matching hexad entities.
+                  execution_time_ms:
+                    type: integer
+                    description: Time taken to execute the query.
+                  total_count:
+                    type: integer
+                    description: Total matching entities (may exceed returned results).
+                  explain_plan:
+                    type: object
+                    description: Query execution plan (only when explain=true).
+        "400":
+          description: VQL syntax error or invalid query.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "408":
+          description: Query timed out.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "../json-schema/error.json"

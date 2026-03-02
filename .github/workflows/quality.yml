@@ -1,0 +1,101 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+name: Code Quality
+on: [push, pull_request]
+
+permissions: read-all
+
+jobs:
+  rust-quality:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
+        with:
+          components: clippy, rustfmt
+
+      - uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2
+
+      - name: Install cargo-deny
+        run: cargo install cargo-deny --locked
+
+      - name: cargo fmt
+        run: cargo fmt --all -- --check
+
+      - name: cargo clippy
+        run: cargo clippy --workspace -- -D warnings
+
+      - name: cargo test
+        run: cargo test --workspace
+
+      - name: cargo deny
+        run: cargo deny check
+
+  elixir-quality:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: elixir-orchestration
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27"
+          elixir-version: "1.18"
+
+      - name: Install deps
+        run: mix deps.get
+
+      - name: Compile
+        run: mix compile --warnings-as-errors
+
+      - name: Test
+        run: mix test
+
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@7ee2e0fdffec27d19ccbb8fb3dcf8a83b9d7f9e8 # main
+        with:
+          path: ./
+          base: ${{ github.event.pull_request.base.sha || github.event.before }}
+          head: ${{ github.sha }}
+        continue-on-error: true
+
+      - name: EditorConfig check
+        uses: editorconfig-checker/action-editorconfig-checker@4054fa83a075fdf090bd098bdb1c09aaf64a4169 # main
+        continue-on-error: true
+
+      - name: Check for large files
+        run: |
+          find . -type f -size +1M -not -path "./.git/*" | head -10 || echo "No large files"
+
+  docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Check documentation
+        run: |
+          MISSING=""
+          [ ! -f "README.md" ] && [ ! -f "README.adoc" ] && MISSING="$MISSING README"
+          [ ! -f "LICENSE" ] && [ ! -f "LICENSE.txt" ] && [ ! -f "LICENSE.md" ] && MISSING="$MISSING LICENSE"
+          [ ! -f "CONTRIBUTING.md" ] && [ ! -f "CONTRIBUTING.adoc" ] && MISSING="$MISSING CONTRIBUTING"
+
+          if [ -n "$MISSING" ]; then
+            echo "::warning::Missing docs:$MISSING"
+          else
+            echo "All core documentation present"
+          fi

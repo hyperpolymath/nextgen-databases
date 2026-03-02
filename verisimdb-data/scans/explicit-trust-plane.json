@@ -1,0 +1,158 @@
+{
+  "program_path": ".",
+  "language": "shell",
+  "frameworks": [],
+  "weak_points": [],
+  "statistics": {
+    "total_lines": 2649,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 1,
+    "io_operations": 10,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "scripts/export-dns.sh",
+      "lines": 140,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/generate-ca.sh",
+      "lines": 95,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/generate-cert.sh",
+      "lines": 93,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/generate-kex.sh",
+      "lines": 73,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/generate-pgp.sh",
+      "lines": 108,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/export-dns.sh",
+        "to": "scripts/generate-ca.sh",
+        "relation": "shared_dir:scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/generate-ca.sh",
+        "to": "scripts/generate-cert.sh",
+        "relation": "shared_dir:scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/generate-cert.sh",
+        "to": "scripts/generate-kex.sh",
+        "relation": "shared_dir:scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/generate-kex.sh",
+        "to": "scripts/generate-pgp.sh",
+        "relation": "shared_dir:scripts",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": []
+  }
+}

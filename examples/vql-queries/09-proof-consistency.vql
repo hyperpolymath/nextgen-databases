@@ -1,0 +1,24 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- 09-proof-consistency.vql
+-- Proof of consistency: verify graph-semantic coherence for entity-005
+--
+-- PROOF CONSISTENCY(entity-id) verifies that two or more modalities
+-- of the same entity are mutually consistent. Specifically, it checks:
+--   - Graph edge targets exist as entities (referential integrity)
+--   - Semantic type annotations are valid schema.org types
+--   - Graph relationships are compatible with semantic types
+--     (e.g., an entity typed as 'Person' should have 'author_of' edges,
+--     not 'employs' edges)
+--
+-- Entity-005 has intentional drift: its semantic types and graph edges
+-- contain an affiliation inconsistency (Oxford in graph, Edinburgh in
+-- provenance). The PROOF CONSISTENCY clause should FAIL for this entity
+-- and return a detailed explanation of the inconsistency.
+--
+-- Expected result: proof failure with diagnostic information about
+-- the affiliation mismatch between graph and provenance modalities.
+
+SELECT graph, semantic FROM hexads
+WHERE id = 'entity-005'
+PROOF CONSISTENCY(entity-005)

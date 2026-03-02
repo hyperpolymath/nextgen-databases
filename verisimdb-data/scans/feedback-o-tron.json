@@ -1,0 +1,445 @@
+{
+  "program_path": ".",
+  "language": "elixir",
+  "frameworks": [
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "elixir-mcp/lib/feedback_a_tron/network_verifier.ex",
+      "severity": "Medium",
+      "description": "System command execution in elixir-mcp/lib/feedback_a_tron/network_verifier.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "elixir-mcp/lib/feedback_a_tron/submitter.ex",
+      "severity": "Medium",
+      "description": "System command execution in elixir-mcp/lib/feedback_a_tron/submitter.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "elixir-mcp/lib/feedback_a_tron/cli.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in elixir-mcp/lib/feedback_a_tron/cli.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "elixir-mcp/scripts/mcp_tcp_smoke_test.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in elixir-mcp/scripts/mcp_tcp_smoke_test.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "packaging/guix/packages.scm",
+      "severity": "Low",
+      "description": "23 TODO/FIXME/HACK markers in packaging/guix/packages.scm",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/sync-state.sh",
+      "severity": "Medium",
+      "description": "21 potentially unquoted variable expansions in scripts/sync-state.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 5840,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 2,
+    "io_operations": 19,
+    "threading_constructs": 16
+  },
+  "file_statistics": [
+    {
+      "file_path": "config/example.ncl",
+      "lines": 84,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "elixir-mcp/lib/feedback_a_tron/credentials.ex",
+      "lines": 172,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "elixir-mcp/lib/feedback_a_tron/deduplicator.ex",
+      "lines": 280,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir-mcp/lib/feedback_a_tron/mcp/server.ex",
+      "lines": 258,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 4
+    },
+    {
+      "file_path": "elixir-mcp/lib/feedback_a_tron/network_verifier.ex",
+      "lines": 497,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 7
+    },
+    {
+      "file_path": "elixir-mcp/lib/feedback_a_tron/submitter.ex",
+      "lines": 304,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir-mcp/lib/feedback_a_tron/audit_log.ex",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir-mcp/scripts/mcp_tcp_smoke_test.sh",
+      "lines": 15,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "julia-stats/src/FeedbackStats.jl",
+      "lines": 408,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/scraper.exs",
+      "lines": 302,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/sync-state.sh",
+      "lines": 125,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "concurrency",
+    "disk",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "scripts/scraper.exs",
+        "to": "scripts/sync-state.sh",
+        "relation": "shared_dir:scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-mcp/lib/feedback_a_tron/credentials.ex",
+        "to": "elixir-mcp/lib/feedback_a_tron/deduplicator.ex",
+        "relation": "shared_dir:elixir-mcp/lib/feedback_a_tron",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-mcp/lib/feedback_a_tron/deduplicator.ex",
+        "to": "elixir-mcp/lib/feedback_a_tron/network_verifier.ex",
+        "relation": "shared_dir:elixir-mcp/lib/feedback_a_tron",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-mcp/lib/feedback_a_tron/network_verifier.ex",
+        "to": "elixir-mcp/lib/feedback_a_tron/submitter.ex",
+        "relation": "shared_dir:elixir-mcp/lib/feedback_a_tron",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-mcp/lib/feedback_a_tron/submitter.ex",
+        "to": "elixir-mcp/lib/feedback_a_tron/audit_log.ex",
+        "relation": "shared_dir:elixir-mcp/lib/feedback_a_tron",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "config/example.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-mcp/lib/feedback_a_tron/credentials.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-mcp/lib/feedback_a_tron/deduplicator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir-mcp/lib/feedback_a_tron/mcp/server.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "elixir-mcp/lib/feedback_a_tron/network_verifier.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "elixir-mcp/lib/feedback_a_tron/submitter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir-mcp/lib/feedback_a_tron/audit_log.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir-mcp/scripts/mcp_tcp_smoke_test.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "julia-stats/src/FeedbackStats.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/scraper.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/sync-state.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          "packaging/guix/packages.scm"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "elixir-mcp/lib/feedback_a_tron/network_verifier.ex",
+          "elixir-mcp/lib/feedback_a_tron/submitter.ex",
+          "scripts/sync-state.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "AtomExhaustion",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "elixir-mcp/lib/feedback_a_tron/cli.ex"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "AtomExhaustion->Memory"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "elixir-mcp/scripts/mcp_tcp_smoke_test.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "elixir-mcp/lib/feedback_a_tron/network_verifier.ex",
+          "elixir-mcp/lib/feedback_a_tron/submitter.ex"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Disk"
+      }
+    ]
+  }
+}

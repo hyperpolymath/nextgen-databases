@@ -1,0 +1,6540 @@
+{
+  "program_path": ".",
+  "language": "shell",
+  "frameworks": [
+    "WebServer",
+    "Networking",
+    "Database",
+    "Ecto",
+    "OTP",
+    "Phoenix"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "cli/build.sh",
+      "severity": "Medium",
+      "description": "34 potentially unquoted variable expansions in cli/build.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "cli/completions/generate_completions.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in cli/completions/generate_completions.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "components/ai-jail/src/model.rs",
+      "severity": "High",
+      "description": "1 unsafe blocks in components/ai-jail/src/model.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "components/ai-jail/tests/test_isolation.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in components/ai-jail/tests/test_isolation.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "components/backend/lib/awap_backend/ai/container.ex",
+      "severity": "Medium",
+      "description": "System command execution in components/backend/lib/awap_backend/ai/container.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "components/backend/lib/awap_backend/core_bridge.ex",
+      "severity": "Medium",
+      "description": "System command execution in components/backend/lib/awap_backend/core_bridge.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "components/backend/lib/awap_backend/core_bridge.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in components/backend/lib/awap_backend/core_bridge.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "components/backend/lib/awap_backend_web.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in components/backend/lib/awap_backend_web.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "components/core/src/events.rs",
+      "severity": "High",
+      "description": "1 unsafe blocks in components/core/src/events.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "components/core/src/events.rs",
+      "severity": "Medium",
+      "description": "13 unwrap/expect calls in components/core/src/events.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "components/core/src/ipc.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in components/core/src/ipc.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "components/core/src/security.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in components/core/src/security.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "components/shared/src/logging.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in components/shared/src/logging.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "components/shared/src/time.rs",
+      "severity": "Medium",
+      "description": "37 unwrap/expect calls in components/shared/src/time.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "components/shared/src/crypto.rs",
+      "severity": "Medium",
+      "description": "44 unwrap/expect calls in components/shared/src/crypto.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "components/shared/tests/integration_test.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in components/shared/tests/integration_test.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "config/validate.sh",
+      "severity": "Critical",
+      "description": "eval usage in config/validate.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "config/validate.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in config/validate.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "examples/api/curl/batch_processing.sh",
+      "severity": "Medium",
+      "description": "84 potentially unquoted variable expansions in examples/api/curl/batch_processing.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "examples/api/curl/get_feedback.sh",
+      "severity": "Medium",
+      "description": "25 potentially unquoted variable expansions in examples/api/curl/get_feedback.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "examples/api/curl/submit_tma.sh",
+      "severity": "Medium",
+      "description": "25 potentially unquoted variable expansions in examples/api/curl/submit_tma.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "examples/demos/web-ui/app.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in examples/demos/web-ui/app.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "examples/quickstart/batch_marking.sh",
+      "severity": "Medium",
+      "description": "88 potentially unquoted variable expansions in examples/quickstart/batch_marking.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "examples/quickstart/mark_single_tma.sh",
+      "severity": "Medium",
+      "description": "30 potentially unquoted variable expansions in examples/quickstart/mark_single_tma.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "monitoring/exporters/aws_exporter.rs",
+      "severity": "Medium",
+      "description": "24 unwrap/expect calls in monitoring/exporters/aws_exporter.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "monitoring/healthchecks/healthcheck.sh",
+      "severity": "Medium",
+      "description": "62 potentially unquoted variable expansions in monitoring/healthchecks/healthcheck.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "monitoring/healthchecks/healthcheck.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in monitoring/healthchecks/healthcheck.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "monitoring/scripts/backup_dashboards.sh",
+      "severity": "Medium",
+      "description": "63 potentially unquoted variable expansions in monitoring/scripts/backup_dashboards.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "monitoring/scripts/backup_dashboards.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in monitoring/scripts/backup_dashboards.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "monitoring/scripts/setup_monitoring.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in monitoring/scripts/setup_monitoring.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "monitoring/scripts/setup_monitoring.sh",
+      "severity": "Medium",
+      "description": "2 HTTP (non-HTTPS) URLs in monitoring/scripts/setup_monitoring.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "monitoring/scripts/test_alerts.sh",
+      "severity": "Medium",
+      "description": "37 potentially unquoted variable expansions in monitoring/scripts/test_alerts.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "release/scripts/package.sh",
+      "severity": "Medium",
+      "description": "79 potentially unquoted variable expansions in release/scripts/package.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "release/scripts/release.sh",
+      "severity": "Medium",
+      "description": "93 potentially unquoted variable expansions in release/scripts/release.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "release/scripts/version.sh",
+      "severity": "Medium",
+      "description": "81 potentially unquoted variable expansions in release/scripts/version.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "release/verify/verify_release.sh",
+      "severity": "Medium",
+      "description": "84 potentially unquoted variable expansions in release/verify/verify_release.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "release/verify/test_install.sh",
+      "severity": "Medium",
+      "description": "76 potentially unquoted variable expansions in release/verify/test_install.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/ci/build-all.sh",
+      "severity": "Medium",
+      "description": "37 potentially unquoted variable expansions in scripts/ci/build-all.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/ci/package.sh",
+      "severity": "Medium",
+      "description": "38 potentially unquoted variable expansions in scripts/ci/package.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "scripts/ci/package.sh",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in scripts/ci/package.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/ci/test-integration.sh",
+      "severity": "Critical",
+      "description": "eval usage in scripts/ci/test-integration.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/ci/test-integration.sh",
+      "severity": "Medium",
+      "description": "54 potentially unquoted variable expansions in scripts/ci/test-integration.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/install/install-linux.sh",
+      "severity": "Medium",
+      "description": "86 potentially unquoted variable expansions in scripts/install/install-linux.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/install/install.sh",
+      "severity": "Critical",
+      "description": "eval usage in scripts/install/install.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/install/install.sh",
+      "severity": "Medium",
+      "description": "240 potentially unquoted variable expansions in scripts/install/install.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/management/backup.sh",
+      "severity": "Medium",
+      "description": "211 potentially unquoted variable expansions in scripts/management/backup.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "scripts/management/backup.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in scripts/management/backup.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/management/dev-setup.sh",
+      "severity": "Medium",
+      "description": "98 potentially unquoted variable expansions in scripts/management/dev-setup.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/management/health-check.sh",
+      "severity": "Medium",
+      "description": "137 potentially unquoted variable expansions in scripts/management/health-check.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "scripts/management/health-check.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in scripts/management/health-check.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/management/init-database.sh",
+      "severity": "Medium",
+      "description": "155 potentially unquoted variable expansions in scripts/management/init-database.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "scripts/management/init-database.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in scripts/management/init-database.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/management/test-all.sh",
+      "severity": "Medium",
+      "description": "136 potentially unquoted variable expansions in scripts/management/test-all.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/management/uninstall.sh",
+      "severity": "Medium",
+      "description": "135 potentially unquoted variable expansions in scripts/management/uninstall.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/management/uninstall.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/management/uninstall.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "scripts/management/uninstall.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in scripts/management/uninstall.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/management/update.sh",
+      "severity": "Medium",
+      "description": "132 potentially unquoted variable expansions in scripts/management/update.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "scripts/management/update.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in scripts/management/update.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/compliance/gdpr/data_flow_audit.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/compliance/gdpr/data_flow_audit.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/compliance/gdpr/data_portability_test.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/compliance/gdpr/data_portability_test.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/compliance/gdpr/retention_policy_check.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/compliance/gdpr/retention_policy_check.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/compliance/gdpr/right_to_erasure_test.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/compliance/gdpr/right_to_erasure_test.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/dynamic-analysis/memory_safety.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/dynamic-analysis/memory_safety.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/dynamic-analysis/sanitizer_tests.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/dynamic-analysis/sanitizer_tests.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+      "severity": "Medium",
+      "description": "25 potentially unquoted variable expansions in security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "security/penetration-testing/api-fuzzing/xss_tests.sh",
+      "severity": "Medium",
+      "description": "24 potentially unquoted variable expansions in security/penetration-testing/api-fuzzing/xss_tests.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/penetration-testing/api-fuzzing/xss_tests.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/penetration-testing/api-fuzzing/xss_tests.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/penetration-testing/container-escape/escape_attempts.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/penetration-testing/container-escape/escape_attempts.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "security/penetration-testing/container-escape/filesystem_access.sh",
+      "severity": "Medium",
+      "description": "36 potentially unquoted variable expansions in security/penetration-testing/container-escape/filesystem_access.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/penetration-testing/container-escape/filesystem_access.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/penetration-testing/container-escape/filesystem_access.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "security/penetration-testing/container-escape/network_isolation_verify.sh",
+      "severity": "Medium",
+      "description": "22 potentially unquoted variable expansions in security/penetration-testing/container-escape/network_isolation_verify.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/penetration-testing/container-escape/network_isolation_verify.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/penetration-testing/container-escape/network_isolation_verify.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "security/penetration-testing/container-escape/privilege_escalation.sh",
+      "severity": "Medium",
+      "description": "28 potentially unquoted variable expansions in security/penetration-testing/container-escape/privilege_escalation.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/penetration-testing/container-escape/privilege_escalation.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/penetration-testing/container-escape/privilege_escalation.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/privacy-testing/pii-detection/anonymization_verification.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/privacy-testing/pii-detection/anonymization_verification.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "security/privacy-testing/pii-detection/audit_trail_verification.sh",
+      "severity": "Medium",
+      "description": "22 potentially unquoted variable expansions in security/privacy-testing/pii-detection/audit_trail_verification.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/privacy-testing/pii-detection/audit_trail_verification.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/privacy-testing/pii-detection/audit_trail_verification.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/static-analysis/run_codeql.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/static-analysis/run_codeql.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/static-analysis/run_semgrep.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/static-analysis/run_semgrep.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "security/run_all_security_tests.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in security/run_all_security_tests.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "tests/ai-isolation/network-tests/container_escape_test.sh",
+      "severity": "Critical",
+      "description": "eval usage in tests/ai-isolation/network-tests/container_escape_test.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "tests/ai-isolation/network-tests/container_escape_test.sh",
+      "severity": "Medium",
+      "description": "37 potentially unquoted variable expansions in tests/ai-isolation/network-tests/container_escape_test.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "tests/ai-isolation/network-tests/network_isolation_test.sh",
+      "severity": "Critical",
+      "description": "eval usage in tests/ai-isolation/network-tests/network_isolation_test.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "tests/ai-isolation/network-tests/network_isolation_test.sh",
+      "severity": "Medium",
+      "description": "2 HTTP (non-HTTPS) URLs in tests/ai-isolation/network-tests/network_isolation_test.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "tests/ai-isolation/network-tests/pii_leakage_test.sh",
+      "severity": "Medium",
+      "description": "35 potentially unquoted variable expansions in tests/ai-isolation/network-tests/pii_leakage_test.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "tests/ai-isolation/network-tests/pii_leakage_test.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in tests/ai-isolation/network-tests/pii_leakage_test.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/benchmarks/benches/core_benchmarks.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in tests/benchmarks/benches/core_benchmarks.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/benchmarks/benches/ipc_benchmarks.rs",
+      "severity": "Medium",
+      "description": "21 unwrap/expect calls in tests/benchmarks/benches/ipc_benchmarks.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/benchmarks/benches/lmdb_bench.rs",
+      "severity": "Medium",
+      "description": "55 unwrap/expect calls in tests/benchmarks/benches/lmdb_bench.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "website/build.sh",
+      "severity": "Medium",
+      "description": "63 potentially unquoted variable expansions in website/build.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "website/build.sh",
+      "severity": "Medium",
+      "description": "2 HTTP (non-HTTPS) URLs in website/build.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 47852,
+    "unsafe_blocks": 18,
+    "panic_sites": 8,
+    "unwrap_calls": 313,
+    "allocation_sites": 36,
+    "io_operations": 201,
+    "threading_constructs": 16
+  },
+  "file_statistics": [
+    {
+      "file_path": "cli/completions/generate_completions.sh",
+      "lines": 406,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/examples/setup-project.sh",
+      "lines": 93,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/api_client.rs",
+      "lines": 330,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/commands/batch.rs",
+      "lines": 185,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cli/src/commands/doctor.rs",
+      "lines": 232,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/commands/feedback.rs",
+      "lines": 88,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/commands/init.rs",
+      "lines": 153,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/commands/mark.rs",
+      "lines": 113,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/commands/status.rs",
+      "lines": 151,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/commands/sync.rs",
+      "lines": 175,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/config.rs",
+      "lines": 122,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/interactive.rs",
+      "lines": 262,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/models.rs",
+      "lines": 191,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/ai-jail/examples/integration_example.sh",
+      "lines": 98,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/ai-jail/src/inference.rs",
+      "lines": 379,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/ai-jail/src/main.rs",
+      "lines": 235,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/ai-jail/src/model.rs",
+      "lines": 287,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/ai-jail/src/protocol.rs",
+      "lines": 215,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/ai-jail/tests/test_isolation.rs",
+      "lines": 288,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/backend/lib/awap_backend/ai/manager.ex",
+      "lines": 303,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "components/backend/lib/awap_backend/core/job_registry.ex",
+      "lines": 159,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "components/backend/lib/awap_backend/core/worker.ex",
+      "lines": 119,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "components/backend/lib/awap_backend/moodle/http_client.ex",
+      "lines": 227,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/backend/lib/awap_backend/moodle/sync_scheduler.ex",
+      "lines": 394,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "components/backend/lib/awap_backend/core_bridge.ex",
+      "lines": 293,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "components/backend/lib/awap_backend/event_store.ex",
+      "lines": 309,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "components/backend/lib/awap_backend/moodle.ex",
+      "lines": 563,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/core/src/events.rs",
+      "lines": 887,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 13,
+      "allocation_sites": 4,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/core/src/feedback.rs",
+      "lines": 429,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/core/src/ipc.rs",
+      "lines": 476,
+      "unsafe_blocks": 0,
+      "panic_sites": 5,
+      "unwrap_calls": 11,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/core/src/security.rs",
+      "lines": 453,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/core/src/tma.rs",
+      "lines": 541,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/core/src/main.rs",
+      "lines": 90,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/core/src/config.rs",
+      "lines": 172,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/office-addin/src/BackendClient.res",
+      "lines": 534,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 11,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/office-addin/src/OfficeAPI.res",
+      "lines": 500,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/office-addin/src/RibbonCommands.res",
+      "lines": 207,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/office-addin/src/Types.res",
+      "lines": 189,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/shared/benches/crypto_bench.rs",
+      "lines": 102,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/shared/src/errors.rs",
+      "lines": 294,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/shared/src/logging.rs",
+      "lines": 498,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/shared/src/sanitization.rs",
+      "lines": 490,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/shared/src/testing.rs",
+      "lines": 584,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/shared/src/time.rs",
+      "lines": 600,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 37,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/shared/src/validation.rs",
+      "lines": 504,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/shared/src/lib.rs",
+      "lines": 135,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/shared/src/crypto.rs",
+      "lines": 998,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 44,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/shared/tests/integration_test.rs",
+      "lines": 384,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "components/shared/tests/property_tests.rs",
+      "lines": 323,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "config/validate.sh",
+      "lines": 364,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/api/curl/batch_processing.sh",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/api/curl/get_feedback.sh",
+      "lines": 90,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/api/curl/submit_tma.sh",
+      "lines": 79,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/api/javascript/examples/mark-tma.js",
+      "lines": 86,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/api/rust/src/main.rs",
+      "lines": 285,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/automation/cron/daily_sync.sh",
+      "lines": 67,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/demos/web-ui/app.js",
+      "lines": 190,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/integrations/canvas/awap_integration.rb",
+      "lines": 187,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/quickstart/batch_marking.sh",
+      "lines": 165,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/quickstart/mark_single_tma.js",
+      "lines": 215,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/quickstart/mark_single_tma.sh",
+      "lines": 97,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/exporters/aws_exporter.rs",
+      "lines": 405,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 24,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/healthchecks/healthcheck.sh",
+      "lines": 280,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/scripts/backup_dashboards.sh",
+      "lines": 200,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/scripts/setup_monitoring.sh",
+      "lines": 463,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/scripts/test_alerts.sh",
+      "lines": 351,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 11,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "release/scripts/release.sh",
+      "lines": 378,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "release/scripts/version.sh",
+      "lines": 293,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "release/verify/verify_release.sh",
+      "lines": 364,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "release/verify/test_install.sh",
+      "lines": 424,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/ci/package.sh",
+      "lines": 341,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/ci/test-integration.sh",
+      "lines": 290,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/install/install-linux.sh",
+      "lines": 665,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 15,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/install/install.sh",
+      "lines": 1210,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/management/backup.sh",
+      "lines": 719,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/management/dev-setup.sh",
+      "lines": 723,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/management/health-check.sh",
+      "lines": 539,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/management/init-database.sh",
+      "lines": 544,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/management/test-all.sh",
+      "lines": 676,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/management/uninstall.sh",
+      "lines": 601,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/management/update.sh",
+      "lines": 704,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/audit-scripts/dependency-audit.sh",
+      "lines": 200,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/audit-scripts/license-check.sh",
+      "lines": 246,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/compliance/gdpr/data_portability_test.sh",
+      "lines": 52,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+      "lines": 287,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+      "lines": 218,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/penetration-testing/api-fuzzing/xss_tests.sh",
+      "lines": 266,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/penetration-testing/container-escape/escape_attempts.sh",
+      "lines": 240,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/penetration-testing/container-escape/filesystem_access.sh",
+      "lines": 287,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/penetration-testing/container-escape/network_isolation_verify.sh",
+      "lines": 283,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/privacy-testing/pii-detection/output_validation_tests.rs",
+      "lines": 241,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 5,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+      "lines": 221,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/ai-isolation/network-tests/network_isolation_test.sh",
+      "lines": 200,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/ai-isolation/network-tests/pii_leakage_test.sh",
+      "lines": 350,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/benchmarks/benches/ai_benchmarks.rs",
+      "lines": 328,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "tests/benchmarks/benches/core_benchmarks.rs",
+      "lines": 246,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/benchmarks/benches/ipc_benchmarks.rs",
+      "lines": 298,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 21,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/benchmarks/benches/lmdb_bench.rs",
+      "lines": 332,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 55,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/benchmarks/integration_bench.sh",
+      "lines": 389,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/benchmarks/profile_memory.sh",
+      "lines": 346,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/benchmarks/run_all_benchmarks.sh",
+      "lines": 488,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/unit/test_data.rs",
+      "lines": 415,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "website/build.sh",
+      "lines": 339,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "concurrency",
+    "disk",
+    "memory",
+    "cpu",
+    "network"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "scripts/install/install-linux.sh",
+        "to": "scripts/install/install.sh",
+        "relation": "shared_dir:scripts/install",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/package.sh",
+        "to": "scripts/ci/test-integration.sh",
+        "relation": "shared_dir:scripts/ci",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/integration_bench.sh",
+        "to": "tests/benchmarks/profile_memory.sh",
+        "relation": "shared_dir:tests/benchmarks",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/profile_memory.sh",
+        "to": "tests/benchmarks/run_all_benchmarks.sh",
+        "relation": "shared_dir:tests/benchmarks",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+        "to": "security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+        "relation": "shared_dir:security/penetration-testing/api-fuzzing",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+        "to": "security/penetration-testing/api-fuzzing/xss_tests.sh",
+        "relation": "shared_dir:security/penetration-testing/api-fuzzing",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/BackendClient.res",
+        "to": "components/office-addin/src/OfficeAPI.res",
+        "relation": "shared_dir:components/office-addin/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/OfficeAPI.res",
+        "to": "components/office-addin/src/RibbonCommands.res",
+        "relation": "shared_dir:components/office-addin/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/RibbonCommands.res",
+        "to": "components/office-addin/src/Types.res",
+        "relation": "shared_dir:components/office-addin/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/api_client.rs",
+        "to": "cli/src/config.rs",
+        "relation": "shared_dir:cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "cli/src/interactive.rs",
+        "relation": "shared_dir:cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/interactive.rs",
+        "to": "cli/src/models.rs",
+        "relation": "shared_dir:cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/tests/integration_test.rs",
+        "to": "components/shared/tests/property_tests.rs",
+        "relation": "shared_dir:components/shared/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/network_isolation_test.sh",
+        "to": "tests/ai-isolation/network-tests/pii_leakage_test.sh",
+        "relation": "shared_dir:tests/ai-isolation/network-tests",
+        "weight": 1.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/output_validation_tests.rs",
+        "to": "security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+        "relation": "shared_dir:security/privacy-testing/pii-detection",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/errors.rs",
+        "to": "components/shared/src/logging.rs",
+        "relation": "shared_dir:components/shared/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/logging.rs",
+        "to": "components/shared/src/sanitization.rs",
+        "relation": "shared_dir:components/shared/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/sanitization.rs",
+        "to": "components/shared/src/testing.rs",
+        "relation": "shared_dir:components/shared/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/testing.rs",
+        "to": "components/shared/src/time.rs",
+        "relation": "shared_dir:components/shared/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/time.rs",
+        "to": "components/shared/src/validation.rs",
+        "relation": "shared_dir:components/shared/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/validation.rs",
+        "to": "components/shared/src/lib.rs",
+        "relation": "shared_dir:components/shared/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/lib.rs",
+        "to": "components/shared/src/crypto.rs",
+        "relation": "shared_dir:components/shared/src",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/release.sh",
+        "to": "release/scripts/version.sh",
+        "relation": "shared_dir:release/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/backup_dashboards.sh",
+        "to": "monitoring/scripts/setup_monitoring.sh",
+        "relation": "shared_dir:monitoring/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/setup_monitoring.sh",
+        "to": "monitoring/scripts/test_alerts.sh",
+        "relation": "shared_dir:monitoring/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/events.rs",
+        "to": "components/core/src/feedback.rs",
+        "relation": "shared_dir:components/core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/feedback.rs",
+        "to": "components/core/src/ipc.rs",
+        "relation": "shared_dir:components/core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/ipc.rs",
+        "to": "components/core/src/security.rs",
+        "relation": "shared_dir:components/core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/security.rs",
+        "to": "components/core/src/tma.rs",
+        "relation": "shared_dir:components/core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/tma.rs",
+        "to": "components/core/src/main.rs",
+        "relation": "shared_dir:components/core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/main.rs",
+        "to": "components/core/src/config.rs",
+        "relation": "shared_dir:components/core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/backup.sh",
+        "to": "scripts/management/dev-setup.sh",
+        "relation": "shared_dir:scripts/management",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/dev-setup.sh",
+        "to": "scripts/management/health-check.sh",
+        "relation": "shared_dir:scripts/management",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/health-check.sh",
+        "to": "scripts/management/init-database.sh",
+        "relation": "shared_dir:scripts/management",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/init-database.sh",
+        "to": "scripts/management/test-all.sh",
+        "relation": "shared_dir:scripts/management",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/test-all.sh",
+        "to": "scripts/management/uninstall.sh",
+        "relation": "shared_dir:scripts/management",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/uninstall.sh",
+        "to": "scripts/management/update.sh",
+        "relation": "shared_dir:scripts/management",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/escape_attempts.sh",
+        "to": "security/penetration-testing/container-escape/filesystem_access.sh",
+        "relation": "shared_dir:security/penetration-testing/container-escape",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/filesystem_access.sh",
+        "to": "security/penetration-testing/container-escape/network_isolation_verify.sh",
+        "relation": "shared_dir:security/penetration-testing/container-escape",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core_bridge.ex",
+        "to": "components/backend/lib/awap_backend/event_store.ex",
+        "relation": "shared_dir:components/backend/lib/awap_backend",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/event_store.ex",
+        "to": "components/backend/lib/awap_backend/moodle.ex",
+        "relation": "shared_dir:components/backend/lib/awap_backend",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/verify_release.sh",
+        "to": "release/verify/test_install.sh",
+        "relation": "shared_dir:release/verify",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ai_benchmarks.rs",
+        "to": "tests/benchmarks/benches/core_benchmarks.rs",
+        "relation": "shared_dir:tests/benchmarks/benches",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/benches/core_benchmarks.rs",
+        "to": "tests/benchmarks/benches/ipc_benchmarks.rs",
+        "relation": "shared_dir:tests/benchmarks/benches",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ipc_benchmarks.rs",
+        "to": "tests/benchmarks/benches/lmdb_bench.rs",
+        "relation": "shared_dir:tests/benchmarks/benches",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "cli/src/commands/doctor.rs",
+        "relation": "shared_dir:cli/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/doctor.rs",
+        "to": "cli/src/commands/feedback.rs",
+        "relation": "shared_dir:cli/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/feedback.rs",
+        "to": "cli/src/commands/init.rs",
+        "relation": "shared_dir:cli/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/init.rs",
+        "to": "cli/src/commands/mark.rs",
+        "relation": "shared_dir:cli/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/mark.rs",
+        "to": "cli/src/commands/status.rs",
+        "relation": "shared_dir:cli/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/status.rs",
+        "to": "cli/src/commands/sync.rs",
+        "relation": "shared_dir:cli/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/inference.rs",
+        "to": "components/ai-jail/src/main.rs",
+        "relation": "shared_dir:components/ai-jail/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/main.rs",
+        "to": "components/ai-jail/src/model.rs",
+        "relation": "shared_dir:components/ai-jail/src",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/model.rs",
+        "to": "components/ai-jail/src/protocol.rs",
+        "relation": "shared_dir:components/ai-jail/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/job_registry.ex",
+        "to": "components/backend/lib/awap_backend/core/worker.ex",
+        "relation": "shared_dir:components/backend/lib/awap_backend/core",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/batch_processing.sh",
+        "to": "examples/api/curl/get_feedback.sh",
+        "relation": "shared_dir:examples/api/curl",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/get_feedback.sh",
+        "to": "examples/api/curl/submit_tma.sh",
+        "relation": "shared_dir:examples/api/curl",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/dependency-audit.sh",
+        "to": "security/audit-scripts/license-check.sh",
+        "relation": "shared_dir:security/audit-scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/batch_marking.sh",
+        "to": "examples/quickstart/mark_single_tma.js",
+        "relation": "shared_dir:examples/quickstart",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.js",
+        "to": "examples/quickstart/mark_single_tma.sh",
+        "relation": "shared_dir:examples/quickstart",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/http_client.ex",
+        "to": "components/backend/lib/awap_backend/moodle/sync_scheduler.ex",
+        "relation": "shared_dir:components/backend/lib/awap_backend/moodle",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/completions/generate_completions.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/completions/generate_completions.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/completions/generate_completions.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/completions/generate_completions.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/completions/generate_completions.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/completions/generate_completions.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/examples/setup-project.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/examples/setup-project.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/examples/setup-project.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/examples/setup-project.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/examples/setup-project.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/examples/setup-project.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/api_client.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/api_client.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/api_client.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/api_client.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/api_client.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/api_client.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cli/src/commands/doctor.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/doctor.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/doctor.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/doctor.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/doctor.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/doctor.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/feedback.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/feedback.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/feedback.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/feedback.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/feedback.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/feedback.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/init.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/commands/init.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/commands/init.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/commands/init.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/commands/init.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/commands/init.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/commands/mark.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/mark.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/mark.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/mark.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/mark.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/mark.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/status.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/status.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/status.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/status.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/status.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/status.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/sync.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/sync.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/sync.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/sync.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/sync.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/sync.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cli/src/interactive.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/interactive.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/interactive.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/interactive.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/interactive.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/interactive.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/models.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/models.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/models.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/models.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/models.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/models.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/ai-jail/examples/integration_example.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/examples/integration_example.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/examples/integration_example.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/examples/integration_example.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/examples/integration_example.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/examples/integration_example.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/inference.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/inference.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/inference.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/inference.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/inference.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/inference.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/main.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/main.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/ai-jail/src/model.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/ai-jail/src/model.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/ai-jail/src/model.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/ai-jail/src/model.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/ai-jail/src/model.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/ai-jail/src/model.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/ai-jail/src/protocol.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/ai-jail/src/protocol.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/ai-jail/src/protocol.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/ai-jail/src/protocol.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/ai-jail/src/protocol.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/ai-jail/src/protocol.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/ai-jail/tests/test_isolation.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/ai-jail/tests/test_isolation.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/ai-jail/tests/test_isolation.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/ai-jail/tests/test_isolation.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/ai-jail/tests/test_isolation.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/ai-jail/tests/test_isolation.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/ai/manager.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/ai/manager.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/ai/manager.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/ai/manager.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/ai/manager.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/ai/manager.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/job_registry.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/job_registry.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/job_registry.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/job_registry.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/job_registry.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/job_registry.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/worker.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/worker.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/worker.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/worker.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/worker.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core/worker.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/http_client.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/http_client.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/http_client.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/http_client.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/http_client.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/http_client.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/sync_scheduler.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/sync_scheduler.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/sync_scheduler.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/sync_scheduler.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/sync_scheduler.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle/sync_scheduler.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core_bridge.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core_bridge.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core_bridge.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core_bridge.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core_bridge.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/core_bridge.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/event_store.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/event_store.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/event_store.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/event_store.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/event_store.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/event_store.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/backend/lib/awap_backend/moodle.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/events.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "components/core/src/events.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "components/core/src/events.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "components/core/src/events.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "components/core/src/events.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "components/core/src/events.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "components/core/src/feedback.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "components/core/src/feedback.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "components/core/src/feedback.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "components/core/src/feedback.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "components/core/src/feedback.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "components/core/src/feedback.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "components/core/src/ipc.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "components/core/src/ipc.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "components/core/src/ipc.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "components/core/src/ipc.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "components/core/src/ipc.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "components/core/src/ipc.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "components/core/src/security.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/core/src/security.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/core/src/security.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/core/src/security.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/core/src/security.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/core/src/security.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/core/src/tma.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/tma.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/tma.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/tma.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/tma.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/tma.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/core/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/core/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/core/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/core/src/main.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/core/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/core/src/main.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/core/src/config.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/core/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/core/src/config.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/core/src/config.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/core/src/config.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/core/src/config.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "components/office-addin/src/BackendClient.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/BackendClient.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/BackendClient.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/BackendClient.res",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/BackendClient.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/BackendClient.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/OfficeAPI.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/OfficeAPI.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/OfficeAPI.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/OfficeAPI.res",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/OfficeAPI.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/OfficeAPI.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/office-addin/src/RibbonCommands.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/office-addin/src/RibbonCommands.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/office-addin/src/RibbonCommands.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/office-addin/src/RibbonCommands.res",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/office-addin/src/RibbonCommands.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/office-addin/src/RibbonCommands.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/office-addin/src/Types.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/office-addin/src/Types.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/office-addin/src/Types.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/office-addin/src/Types.res",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/office-addin/src/Types.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/office-addin/src/Types.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "components/shared/benches/crypto_bench.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/benches/crypto_bench.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/benches/crypto_bench.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/benches/crypto_bench.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/benches/crypto_bench.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/benches/crypto_bench.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/errors.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/errors.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/errors.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/errors.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/errors.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/errors.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/logging.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "components/shared/src/logging.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "components/shared/src/logging.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "components/shared/src/logging.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "components/shared/src/logging.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "components/shared/src/logging.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "components/shared/src/sanitization.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/sanitization.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/sanitization.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/sanitization.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/sanitization.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/sanitization.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/testing.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/testing.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/testing.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/testing.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/testing.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/testing.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/src/time.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "components/shared/src/time.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "components/shared/src/time.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "components/shared/src/time.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "components/shared/src/time.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "components/shared/src/time.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "components/shared/src/validation.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/shared/src/validation.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/shared/src/validation.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/shared/src/validation.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/shared/src/validation.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/shared/src/validation.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "components/shared/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/lib.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/lib.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/lib.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "components/shared/src/crypto.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 44.0
+      },
+      {
+        "from": "components/shared/src/crypto.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 44.0
+      },
+      {
+        "from": "components/shared/src/crypto.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 44.0
+      },
+      {
+        "from": "components/shared/src/crypto.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 44.0
+      },
+      {
+        "from": "components/shared/src/crypto.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 44.0
+      },
+      {
+        "from": "components/shared/src/crypto.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 44.0
+      },
+      {
+        "from": "components/shared/tests/integration_test.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/shared/tests/integration_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/shared/tests/integration_test.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/shared/tests/integration_test.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/shared/tests/integration_test.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/shared/tests/integration_test.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "components/shared/tests/property_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/tests/property_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/tests/property_tests.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/tests/property_tests.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/tests/property_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "components/shared/tests/property_tests.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "config/validate.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "config/validate.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "config/validate.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "config/validate.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "config/validate.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "config/validate.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/batch_processing.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/batch_processing.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/batch_processing.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/batch_processing.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/batch_processing.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/batch_processing.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/get_feedback.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/get_feedback.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/get_feedback.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/get_feedback.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/get_feedback.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/get_feedback.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/submit_tma.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/submit_tma.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/submit_tma.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/submit_tma.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/submit_tma.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/curl/submit_tma.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/javascript/examples/mark-tma.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/javascript/examples/mark-tma.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/javascript/examples/mark-tma.js",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/javascript/examples/mark-tma.js",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/javascript/examples/mark-tma.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/javascript/examples/mark-tma.js",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/rust/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/rust/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/rust/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/rust/src/main.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/rust/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/api/rust/src/main.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/automation/cron/daily_sync.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/automation/cron/daily_sync.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/automation/cron/daily_sync.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/automation/cron/daily_sync.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/automation/cron/daily_sync.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/automation/cron/daily_sync.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/demos/web-ui/app.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/demos/web-ui/app.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/demos/web-ui/app.js",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/demos/web-ui/app.js",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/demos/web-ui/app.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/demos/web-ui/app.js",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/integrations/canvas/awap_integration.rb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/integrations/canvas/awap_integration.rb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/integrations/canvas/awap_integration.rb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/integrations/canvas/awap_integration.rb",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/integrations/canvas/awap_integration.rb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/integrations/canvas/awap_integration.rb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/batch_marking.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/batch_marking.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/batch_marking.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/batch_marking.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/batch_marking.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/batch_marking.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.js",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.js",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.js",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/quickstart/mark_single_tma.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/exporters/aws_exporter.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 24.0
+      },
+      {
+        "from": "monitoring/exporters/aws_exporter.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 24.0
+      },
+      {
+        "from": "monitoring/exporters/aws_exporter.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 24.0
+      },
+      {
+        "from": "monitoring/exporters/aws_exporter.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 24.0
+      },
+      {
+        "from": "monitoring/exporters/aws_exporter.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 24.0
+      },
+      {
+        "from": "monitoring/exporters/aws_exporter.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 24.0
+      },
+      {
+        "from": "monitoring/healthchecks/healthcheck.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/healthchecks/healthcheck.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/healthchecks/healthcheck.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/healthchecks/healthcheck.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/healthchecks/healthcheck.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/healthchecks/healthcheck.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/backup_dashboards.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/backup_dashboards.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/backup_dashboards.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/backup_dashboards.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/backup_dashboards.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/backup_dashboards.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/setup_monitoring.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/setup_monitoring.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/setup_monitoring.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/setup_monitoring.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/setup_monitoring.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/setup_monitoring.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/test_alerts.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/test_alerts.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/test_alerts.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/test_alerts.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/test_alerts.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/scripts/test_alerts.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/release.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/release.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/release.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/release.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/release.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/release.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/version.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/version.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/version.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/version.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/version.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/scripts/version.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/verify_release.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/verify_release.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/verify_release.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/verify_release.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/verify_release.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/verify_release.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/test_install.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/test_install.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/test_install.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/test_install.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/test_install.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "release/verify/test_install.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/package.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/package.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/package.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/package.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/package.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/package.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/test-integration.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/test-integration.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/test-integration.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/test-integration.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/test-integration.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/ci/test-integration.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install-linux.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install-linux.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install-linux.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install-linux.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install-linux.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install-linux.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install/install.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/backup.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/backup.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/backup.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/backup.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/backup.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/backup.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/dev-setup.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/dev-setup.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/dev-setup.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/dev-setup.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/dev-setup.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/dev-setup.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/health-check.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/health-check.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/health-check.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/health-check.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/health-check.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/health-check.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/init-database.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/init-database.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/init-database.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/init-database.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/init-database.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/init-database.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/test-all.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/test-all.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/test-all.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/test-all.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/test-all.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/test-all.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/uninstall.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/uninstall.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/uninstall.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/uninstall.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/uninstall.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/uninstall.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/update.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/update.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/update.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/update.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/update.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/management/update.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/dependency-audit.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/dependency-audit.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/dependency-audit.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/dependency-audit.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/dependency-audit.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/dependency-audit.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/license-check.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/license-check.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/license-check.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/license-check.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/license-check.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/audit-scripts/license-check.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/compliance/gdpr/data_portability_test.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/compliance/gdpr/data_portability_test.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/compliance/gdpr/data_portability_test.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/compliance/gdpr/data_portability_test.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/compliance/gdpr/data_portability_test.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/compliance/gdpr/data_portability_test.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/xss_tests.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/xss_tests.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/xss_tests.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/xss_tests.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/xss_tests.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/api-fuzzing/xss_tests.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/escape_attempts.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/escape_attempts.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/escape_attempts.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/escape_attempts.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/escape_attempts.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/escape_attempts.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/filesystem_access.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/filesystem_access.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/filesystem_access.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/filesystem_access.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/filesystem_access.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/filesystem_access.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/network_isolation_verify.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/network_isolation_verify.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/network_isolation_verify.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/network_isolation_verify.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/network_isolation_verify.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/penetration-testing/container-escape/network_isolation_verify.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/output_validation_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/output_validation_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/output_validation_tests.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/output_validation_tests.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/output_validation_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/output_validation_tests.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/network_isolation_test.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/network_isolation_test.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/network_isolation_test.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/network_isolation_test.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/network_isolation_test.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/network_isolation_test.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/pii_leakage_test.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/pii_leakage_test.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/pii_leakage_test.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/pii_leakage_test.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/pii_leakage_test.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/ai-isolation/network-tests/pii_leakage_test.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ai_benchmarks.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ai_benchmarks.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ai_benchmarks.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ai_benchmarks.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ai_benchmarks.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ai_benchmarks.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "tests/benchmarks/benches/core_benchmarks.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "tests/benchmarks/benches/core_benchmarks.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "tests/benchmarks/benches/core_benchmarks.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "tests/benchmarks/benches/core_benchmarks.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "tests/benchmarks/benches/core_benchmarks.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "tests/benchmarks/benches/core_benchmarks.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ipc_benchmarks.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ipc_benchmarks.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ipc_benchmarks.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ipc_benchmarks.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ipc_benchmarks.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "tests/benchmarks/benches/ipc_benchmarks.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "tests/benchmarks/benches/lmdb_bench.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 55.0
+      },
+      {
+        "from": "tests/benchmarks/benches/lmdb_bench.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 55.0
+      },
+      {
+        "from": "tests/benchmarks/benches/lmdb_bench.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 55.0
+      },
+      {
+        "from": "tests/benchmarks/benches/lmdb_bench.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 55.0
+      },
+      {
+        "from": "tests/benchmarks/benches/lmdb_bench.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 55.0
+      },
+      {
+        "from": "tests/benchmarks/benches/lmdb_bench.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 55.0
+      },
+      {
+        "from": "tests/benchmarks/integration_bench.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/integration_bench.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/integration_bench.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/integration_bench.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/integration_bench.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/integration_bench.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/profile_memory.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/profile_memory.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/profile_memory.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/profile_memory.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/profile_memory.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/profile_memory.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/run_all_benchmarks.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/run_all_benchmarks.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/run_all_benchmarks.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/run_all_benchmarks.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/run_all_benchmarks.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/benchmarks/run_all_benchmarks.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/unit/test_data.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/unit/test_data.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/unit/test_data.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/unit/test_data.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/unit/test_data.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/unit/test_data.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "website/build.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "website/build.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "website/build.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "website/build.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "website/build.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "website/build.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 36.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "components/ai-jail/tests/test_isolation.rs",
+          "components/core/src/events.rs",
+          "components/core/src/ipc.rs",
+          "components/core/src/security.rs",
+          "components/shared/src/logging.rs",
+          "components/shared/src/time.rs",
+          "components/shared/src/crypto.rs",
+          "components/shared/tests/integration_test.rs",
+          "monitoring/exporters/aws_exporter.rs",
+          "security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+          "tests/benchmarks/benches/core_benchmarks.rs",
+          "tests/benchmarks/benches/ipc_benchmarks.rs",
+          "tests/benchmarks/benches/lmdb_bench.rs"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking",
+          "Database",
+          "Ecto",
+          "OTP",
+          "Phoenix"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "components/backend/lib/awap_backend/ai/container.ex",
+          "components/backend/lib/awap_backend/core_bridge.ex",
+          "config/validate.sh",
+          "scripts/ci/test-integration.sh",
+          "scripts/install/install.sh",
+          "tests/ai-isolation/network-tests/container_escape_test.sh",
+          "tests/ai-isolation/network-tests/network_isolation_test.sh"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking",
+          "Database",
+          "Ecto",
+          "OTP",
+          "Phoenix"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "examples/demos/web-ui/app.js"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking",
+          "Database",
+          "Ecto",
+          "OTP",
+          "Phoenix"
+        ],
+        "relation": "DynamicCodeExecution->Network"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "components/backend/lib/awap_backend/core_bridge.ex",
+          "components/backend/lib/awap_backend_web.ex"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking",
+          "Database",
+          "Ecto",
+          "OTP",
+          "Phoenix"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "monitoring/healthchecks/healthcheck.sh",
+          "monitoring/scripts/backup_dashboards.sh",
+          "scripts/management/backup.sh",
+          "scripts/management/health-check.sh",
+          "scripts/management/init-database.sh",
+          "scripts/management/uninstall.sh",
+          "scripts/management/update.sh"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking",
+          "Database",
+          "Ecto",
+          "OTP",
+          "Phoenix"
+        ],
+        "relation": "HardcodedSecret->Network"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "monitoring/scripts/setup_monitoring.sh",
+          "scripts/ci/package.sh",
+          "tests/ai-isolation/network-tests/network_isolation_test.sh",
+          "website/build.sh"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking",
+          "Database",
+          "Ecto",
+          "OTP",
+          "Phoenix"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "components/ai-jail/src/model.rs",
+          "components/core/src/events.rs"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking",
+          "Database",
+          "Ecto",
+          "OTP",
+          "Phoenix"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "cli/build.sh",
+          "components/backend/lib/awap_backend/ai/container.ex",
+          "components/backend/lib/awap_backend/core_bridge.ex",
+          "config/validate.sh",
+          "examples/api/curl/batch_processing.sh",
+          "examples/api/curl/get_feedback.sh",
+          "examples/api/curl/submit_tma.sh",
+          "examples/quickstart/batch_marking.sh",
+          "examples/quickstart/mark_single_tma.sh",
+          "monitoring/healthchecks/healthcheck.sh",
+          "monitoring/scripts/backup_dashboards.sh",
+          "monitoring/scripts/test_alerts.sh",
+          "release/scripts/package.sh",
+          "release/scripts/release.sh",
+          "release/scripts/version.sh",
+          "release/verify/verify_release.sh",
+          "release/verify/test_install.sh",
+          "scripts/ci/build-all.sh",
+          "scripts/ci/package.sh",
+          "scripts/ci/test-integration.sh",
+          "scripts/ci/test-integration.sh",
+          "scripts/install/install-linux.sh",
+          "scripts/install/install.sh",
+          "scripts/install/install.sh",
+          "scripts/management/backup.sh",
+          "scripts/management/dev-setup.sh",
+          "scripts/management/health-check.sh",
+          "scripts/management/init-database.sh",
+          "scripts/management/test-all.sh",
+          "scripts/management/uninstall.sh",
+          "scripts/management/update.sh",
+          "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+          "security/penetration-testing/api-fuzzing/xss_tests.sh",
+          "security/penetration-testing/container-escape/filesystem_access.sh",
+          "security/penetration-testing/container-escape/network_isolation_verify.sh",
+          "security/penetration-testing/container-escape/privilege_escalation.sh",
+          "security/privacy-testing/pii-detection/audit_trail_verification.sh",
+          "tests/ai-isolation/network-tests/container_escape_test.sh",
+          "tests/ai-isolation/network-tests/container_escape_test.sh",
+          "tests/ai-isolation/network-tests/network_isolation_test.sh",
+          "tests/ai-isolation/network-tests/pii_leakage_test.sh",
+          "website/build.sh"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking",
+          "Database",
+          "Ecto",
+          "OTP",
+          "Phoenix"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "components/ai-jail/src/model.rs",
+          "components/core/src/events.rs"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking",
+          "Database",
+          "Ecto",
+          "OTP",
+          "Phoenix"
+        ],
+        "relation": "UnsafeCode->Concurrency"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "cli/completions/generate_completions.sh",
+          "config/validate.sh",
+          "monitoring/scripts/setup_monitoring.sh",
+          "scripts/management/uninstall.sh",
+          "security/compliance/gdpr/data_flow_audit.sh",
+          "security/compliance/gdpr/data_portability_test.sh",
+          "security/compliance/gdpr/retention_policy_check.sh",
+          "security/compliance/gdpr/right_to_erasure_test.sh",
+          "security/dynamic-analysis/memory_safety.sh",
+          "security/dynamic-analysis/sanitizer_tests.sh",
+          "security/penetration-testing/api-fuzzing/auth_bypass_tests.sh",
+          "security/penetration-testing/api-fuzzing/sql_injection_tests.sh",
+          "security/penetration-testing/api-fuzzing/xss_tests.sh",
+          "security/penetration-testing/container-escape/escape_attempts.sh",
+          "security/penetration-testing/container-escape/filesystem_access.sh",
+          "security/penetration-testing/container-escape/network_isolation_verify.sh",
+          "security/penetration-testing/container-escape/privilege_escalation.sh",
+          "security/privacy-testing/pii-detection/anonymization_verification.sh",
+          "security/privacy-testing/pii-detection/audit_trail_verification.sh",
+          "security/static-analysis/run_codeql.sh",
+          "security/static-analysis/run_semgrep.sh",
+          "security/run_all_security_tests.sh",
+          "tests/ai-isolation/network-tests/pii_leakage_test.sh"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking",
+          "Database",
+          "Ecto",
+          "OTP",
+          "Phoenix"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "components/ai-jail/tests/test_isolation.rs",
+          "components/core/src/events.rs",
+          "components/core/src/ipc.rs",
+          "components/core/src/security.rs",
+          "components/shared/src/logging.rs",
+          "components/shared/src/time.rs",
+          "components/shared/src/crypto.rs",
+          "components/shared/tests/integration_test.rs",
+          "monitoring/exporters/aws_exporter.rs",
+          "security/privacy-testing/pii-detection/pii_leakage_tests.rs",
+          "tests/benchmarks/benches/core_benchmarks.rs",
+          "tests/benchmarks/benches/ipc_benchmarks.rs",
+          "tests/benchmarks/benches/lmdb_bench.rs"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking",
+          "Database",
+          "Ecto",
+          "OTP",
+          "Phoenix"
+        ],
+        "relation": "PanicPath->Disk"
+      }
+    ]
+  }
+}

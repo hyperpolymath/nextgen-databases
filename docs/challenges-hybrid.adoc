@@ -1,0 +1,782 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= Challenges: Hybrid Deployment Mode
+
+== Overview
+
+Hybrid deployment runs **some modalities locally** (fast access, low latency) while **federating others** (cost savings, institutional collaboration). This mode offers the best balance of performance and federation but introduces unique challenges at the **boundary between local and remote stores**.
+
+This document details the **technical challenges** specific to hybrid deployment, focusing on consistency, configuration, and cross-boundary coordination.
+
+== 1. Architectural Challenges
+
+=== 1.1. Hot/Cold Data Boundary Design
+
+**Problem:** Deciding **which modalities** stay local vs federate requires predicting access patterns.
+
+**Design Questions:**
+1. Which modalities are "hot" (high query rate) vs "cold" (archive)?
+2. Do access patterns change over time (seasonality, research trends)?
+3. What if a "cold" modality suddenly becomes hot (e.g., regulatory audit)?
+
+**Example Decision Matrix:**
+[cols="1,2,2,1"]
+|===
+|Modality |Access Pattern |Decision |Rationale
+
+|**Vector**
+|10k qps (RAG pipeline)
+|**Local**
+|Sub-ms latency critical
+
+|**Graph**
+|500 qps (citation lookup)
+|**Local**
+|Medium load, queries cheap
+
+|**Document**
+|50 qps (full-text search)
+|**Remote**
+|Archive.org has corpus already
+
+|**Temporal**
+|10 qps (version history)
+|**Remote**
+|Cold data, institutional archive
+
+|**Tensor**
+|100 qps (model inference)
+|**Local**
+|GPU-bound, needs local acceleration
+
+|**Semantic**
+|5 qps (proof validation)
+|**Remote**
+|Validation logic centralized
+|===
+
+**Risk:** Incorrect boundary placement leads to:
+- **Over-provisioning local:** Wasting resources on cold data
+- **Over-federating:** Network latency kills performance
+
+**Mitigation:**
+- **Instrumentation:** Deploy with full telemetry, collect 30 days of query logs before deciding
+- **Dynamic Reconfiguration:** Design orchestrator to support **live migration** of modalities (hot → local, cold → remote)
+- **Hybrid-Hybrid:** Allow **same modality split** across local/remote (e.g., recent Temporal versions local, old versions remote)
+
+=== 1.2. Network Topology Complexity
+
+**Problem:** Hybrid mode requires orchestrator to route queries across **multiple network hops**.
+
+**Network Paths:**
+[source,text]
+----
+Client → Orchestrator → Local Modality (1 hop)  ✓ Fast
+Client → Orchestrator → Remote Store → Modality (2+ hops)  ✗ Slow
+Client → Orchestrator → Remote Store → Remote Store → ... (N hops)  ✗✗ Cascade failure risk
+----
+
+**Latency Breakdown Example:**
+|===
+|Query Type |Local Path |Remote Path |Slowdown Factor
+
+|Vector search
+|2ms
+|50ms (network) + 2ms = 52ms
+|**26x**
+
+|Graph SPARQL
+|10ms
+|50ms + 10ms = 60ms
+|**6x**
+
+|Cross-modal join (Vector + Graph)
+|12ms (parallel)
+|52ms + 60ms = 112ms (sequential)
+|**9x**
+|===
+
+**Consequences:**
+- **Unpredictable Latency:** Queries touching mixed local/remote modalities have variable latency
+- **Timeout Tuning:** Must set different timeouts per modality (local: 100ms, remote: 5s)
+- **Cascading Failures:** Remote store timeout delays local query completion
+
+**Mitigation:**
+- **Parallel Dispatch:** Query local and remote modalities **concurrently**, combine results
+- **Timeouts Per Modality:** Configure `VeriSim.QueryRouter` with modality-specific timeouts
+- **Circuit Breakers:** Implement Hystrix-style circuit breakers to fail fast when remote stores degrade
+
+=== 1.3. Partial Consistency Models
+
+**Problem:** Local modalities offer **strong consistency**, remote modalities offer **eventual consistency** → hybrid has **mixed consistency**.
+
+**Consistency Matrix:**
+[cols="1,2,2"]
+|===
+|Modality Location |Consistency Model |Guarantee
+
+|**Local (standalone)**
+|Strong (ACID per modality)
+|Read-your-writes within same modality
+
+|**Remote (federated)**
+|Eventual (drift-tolerant)
+|Stale reads possible, bounded by drift detection interval
+
+|**Hybrid (mixed)**
+|**Undefined**
+|Cross-modal queries may observe inconsistent state
+|===
+
+**Example Inconsistency Scenario:**
+[source,text]
+----
+T=0:   Client writes Hexad update (Document + Vector)
+T=1:   Local Vector modality updates immediately
+T=5:   Remote Document modality still processing (network delay)
+T=6:   Client queries: Vector reflects new data, Document shows old data
+Result: Inconsistent cross-modal view
+----
+
+**Consequences:**
+- **Anomalous Query Results:** Joins across local/remote modalities return incomplete data
+- **Debugging Difficulty:** Inconsistencies appear non-deterministically depending on network timing
+- **Semantic Violations:** Business logic assumptions (e.g., "Vector embedding always matches Document text") break
+
+**Mitigation:**
+- **Causal Consistency:** Implement **vector clocks** or **hybrid logical clocks** to track causality across local/remote boundary
+- **Read Repair:** On query, check if remote modality is stale, trigger **on-demand sync** before returning results
+- **Timestamp Bounds:** Return query results with **timestamp range** indicating freshness (e.g., "data as of T=5 ± 30s")
+
+=== 1.4. Configuration Explosion
+
+**Problem:** Hybrid mode requires **per-modality configuration** specifying local vs remote.
+
+**Configuration File Complexity:**
+[source,elixir]
+----
+# config/hybrid.exs
+config :verisim,
+  deployment_mode: :hybrid,
+  local_modalities: [
+    graph: %{
+      crate: "verisim-graph-rs",
+      resources: %{ram: "32GB", cpu: "4 cores"}
+    },
+    vector: %{
+      crate: "verisim-vector-rs",
+      resources: %{ram: "64GB", cpu: "8 cores"}
+    },
+    tensor: %{
+      crate: "verisim-tensor-rs",
+      resources: %{ram: "16GB", gpu: "4x A100"}
+    }
+  ],
+  federated_modalities: [
+    document: %{
+      store_endpoint: "https://archive.org/verisim",
+      backup_endpoint: "https://mirror.archive.org/verisim",
+      timeout: 5000,
+      retry_policy: %{max_attempts: 3, backoff: :exponential}
+    },
+    temporal: %{
+      store_endpoint: "https://uni-b.edu/verisim",
+      backup_endpoint: nil,
+      timeout: 10_000,
+      retry_policy: %{max_attempts: 1, backoff: :none}
+    },
+    semantic: %{
+      store_endpoint: "https://zkp-service.org/verisim",
+      backup_endpoint: "https://zkp-backup.org/verisim",
+      timeout: 2000,
+      retry_policy: %{max_attempts: 5, backoff: :constant}
+    }
+  ],
+  drift_detection: %{
+    local_interval: 60_000,   # 1 minute for local
+    remote_interval: 300_000, # 5 minutes for remote
+    cross_boundary_check: true
+  }
+----
+
+**Operational Burden:**
+- **Environment-Specific:** Dev/staging/prod likely have **different** hybrid configurations
+- **Drift Risk:** Config files diverge across environments → "works in staging, fails in prod"
+- **Testing Complexity:** Must test all combinations of local/remote modality placement
+
+**Mitigation:**
+- **Config Validation:** Add Elixir schema validation to catch errors at compile time
+- **Infrastructure as Code:** Use Terraform/Pulumi to generate hybrid configs from **single source of truth**
+- **Config Testing:** Add integration tests that verify all declared modalities are reachable
+
+== 2. Performance Challenges
+
+=== 2.1. Mixed Latency Profiles
+
+**Problem:** Queries that touch both local and remote modalities have **unpredictable latency**.
+
+**Latency Distribution:**
+[source,text]
+----
+Pure Local Query:
+  p50: 5ms, p99: 20ms, p999: 50ms  ✓ Predictable
+
+Pure Remote Query:
+  p50: 80ms, p99: 500ms, p999: 5000ms  ✗ High tail latency
+
+Hybrid Query (Local Vector + Remote Document):
+  p50: 85ms, p99: 520ms, p999: 5050ms  ✗✗ Dominated by remote
+----
+
+**User Impact:**
+- **Inconsistent UX:** Some queries feel instant, others sluggish
+- **Timeout Tuning Difficulty:** Single timeout value fails (too short → false timeouts, too long → hangs)
+- **SLA Violation Risk:** Cannot commit to p99 < 100ms when remote stores involved
+
+**Mitigation:**
+- **Query Planning:** Analyze query to determine if local-only path exists, use it
+- **Adaptive Timeouts:** Adjust timeout dynamically based on query plan (local-only: 100ms, hybrid: 5s)
+- **Caching:** Cache remote query results locally (invalidate on drift detection event)
+
+=== 2.2. Cross-Boundary Drift Detection Overhead
+
+**Problem:** Detecting drift across local/remote boundary requires **network round-trips**.
+
+**Drift Detection Protocol (Simplified):**
+[source,text]
+----
+1. Orchestrator queries local Vector modality → embedding_local
+2. Orchestrator queries remote Document modality → embedding_remote (via HTTP)
+3. Compute cosine_similarity(embedding_local, embedding_remote)
+4. If similarity < threshold → trigger drift alert
+----
+
+**Overhead:**
+- **Network Cost:** Each drift check = 1 HTTP request to remote store
+- **Frequency Tradeoff:** Check often (fresh data) vs rarely (low overhead)
+- **False Positives:** Network latency variance causes spurious drift alerts
+
+**Quantitative Impact:**
+- Drift checks every 60s × 1000 Hexads = **16.6 qps to remote stores** (just for monitoring)
+- At scale (100k Hexads), drift monitoring alone consumes **1.6k qps**
+
+**Mitigation:**
+- **Sampling:** Only check drift for **subset** of Hexads per interval (e.g., 1% sample)
+- **Push-Based Updates:** Remote stores **push** drift events to orchestrator (avoid polling)
+- **Bloom Filters:** Use probabilistic data structures to quickly identify unchanged Hexads
+
+=== 2.3. Write Propagation Delay
+
+**Problem:** Writes to local modalities propagate **instantly**, writes to remote modalities are **eventually consistent**.
+
+**Example Timeline:**
+[source,text]
+----
+T=0:   Client writes Hexad (updates Vector + Document)
+T=1:   Local Vector modality persists immediately
+T=50:  Network delay to remote Document store
+T=100: Remote Document store persists
+T=150: Drift detection discovers propagation lag
+T=200: Drift repair job enqueued (if policy requires sync)
+----
+
+**Consequences:**
+- **Read-After-Write Inconsistency:** Client reads back Hexad immediately, sees old Document content
+- **Cross-Modal Queries Fail:** Join between Vector (updated) and Document (stale) returns partial results
+- **Audit Log Ambiguity:** Temporal log shows write at T=0, but Document not updated until T=100
+
+**Mitigation:**
+- **Write-Through Cache:** Orchestrator caches pending writes, serves from cache until remote ack
+- **Versioning:** Tag each modality update with **vector clock**, expose version in query API
+- **Async Writes with Callback:** Return write receipt immediately, notify client when remote persisted
+
+=== 2.4. Hot Modality Cannot Scale Independently
+
+**Problem:** If local Vector modality is hot, cannot add **Vector-only replicas** without duplicating other local modalities.
+
+**Scaling Constraint:**
+- Standalone mode limitation: scaling hot modality requires scaling entire node
+- Hybrid mode partially helps: can **move cold modalities to remote**, leaving local resources for hot modality
+- But: still cannot add **multiple local Vector instances** without multiple orchestrator nodes
+
+**Workaround:**
+- **Read Replicas:** Deploy read-only Vector replicas behind load balancer (but: replication lag!)
+- **Cache Layer:** Add Redis cache in front of Vector modality (but: cache invalidation!)
+- **Migrate to Full Federation:** Split Vector modality across multiple federated stores (but: loses hybrid simplicity!)
+
+== 3. Operational Challenges
+
+=== 3.1. Monitoring Across Boundaries
+
+**Problem:** Must monitor **both local and remote** modalities with different tools/access patterns.
+
+**Monitoring Requirements:**
+[cols="1,2,2"]
+|===
+|Aspect |Local Modalities |Remote Modalities
+
+|**Metrics Collection**
+|Direct Prometheus scrape from localhost
+|Must scrape remote store's `/metrics` (may not expose)
+
+|**Logging**
+|Local syslog/journald
+|Remote store logs (may not have access)
+
+|**Tracing**
+|Direct OpenTelemetry instrumentation
+|Requires remote store to export spans (may not support)
+
+|**Alerting**
+|Orchestrator can detect crashes immediately
+|Must rely on **health checks** (delayed detection)
+|===
+
+**Operational Complexity:**
+- **Dual Dashboards:** Need separate Grafana dashboards for local vs remote
+- **Alerting Gaps:** May not detect remote store issues until queries time out
+- **Root Cause Analysis:** Difficult to determine if issue is local, network, or remote
+
+**Mitigation:**
+- **Unified Observability:** Require remote stores to export metrics/logs/traces to **central collector**
+- **Synthetic Monitoring:** Run continuous health checks from orchestrator to remote stores
+- **Federated Prometheus:** Use Prometheus federation to scrape remote store metrics
+
+=== 3.2. Backup Strategy Divergence
+
+**Problem:** Local and remote modalities require **different backup approaches**.
+
+**Backup Strategies:**
+[cols="1,2,2"]
+|===
+|Modality Location |Backup Method |Responsibility
+
+|**Local**
+|Snapshot to S3 every 1 hour
+|Orchestrator operator
+
+|**Remote**
+|Archive.org's internal backup (unknown schedule)
+|Remote store operator (out of your control)
+
+|**Hybrid**
+|**Inconsistent:** Local backed up hourly, remote maybe daily?
+|**Split responsibility** → coordination overhead
+|===
+
+**Risk Scenarios:**
+1. **Partial Restore:** Restore local modalities from backup, but remote modalities have newer data → drift
+2. **Remote Store Disaster:** Archive.org loses data, your backups don't include Document modality
+3. **RPO Mismatch:** Local modalities have 1-hour RPO, remote have 24-hour RPO → uneven data loss
+
+**Mitigation:**
+- **SLA Requirements:** Contractually require remote stores to meet **minimum backup SLAs**
+- **Local Caching:** Cache remote modality data locally (stale copy better than no copy)
+- **Disaster Recovery Testing:** Quarterly DR drills that simulate remote store failure
+
+=== 3.3. Dependency on External Services
+
+**Problem:** Hybrid mode **depends on remote stores** being available and performant.
+
+**Failure Modes:**
+1. **Remote Store Downtime:** Archive.org goes down → Document queries fail
+2. **Network Partition:** Internet link fails → remote modalities unreachable
+3. **Remote Store Overload:** Archive.org rate-limits your requests → queries timeout
+4. **Remote Store Deprecation:** Archive.org shuts down VeriSimDB API → forced migration
+
+**Blast Radius:**
+- Partial system outage (remote modalities unavailable)
+- Degraded query results (cross-modal queries incomplete)
+- Reputation damage (users perceive VeriSimDB as unreliable)
+
+**Mitigation:**
+- **Fallback Stores:** Configure **backup remote stores** for each modality
+- **Circuit Breakers:** Automatically fail over to backup if primary remote store unhealthy
+- **Local Fallback Cache:** Serve stale data from local cache during remote outage (with staleness warning)
+- **Contractual SLAs:** Negotiate **uptime SLAs** with remote store operators (99.9%+)
+
+=== 3.4. Cross-Boundary Security Policies
+
+**Problem:** Local modalities enforce **local policies**, remote modalities enforce **their own policies** → coordination required.
+
+**Policy Conflict Example:**
+[source,text]
+----
+Hexad 550e8400-... access policy:
+  Local Vector: "Allow all authenticated users"
+  Remote Document: "Allow only .edu domains"
+
+Query from user@gmail.com:
+  ✓ Allowed to read Vector embedding
+  ✗ Denied access to Document content
+  Result: Partial query result (confusing UX)
+----
+
+**Consequences:**
+- **Inconsistent Access Control:** User can access some modalities but not others
+- **Policy Drift:** Local and remote policies diverge over time (no sync mechanism)
+- **Audit Complexity:** Must trace authorization across multiple policy engines
+
+**Mitigation:**
+- **Unified Policy Registry:** Store **global policy hash** in ReScript registry, both local and remote enforce same policy
+- **Policy Synchronization:** Orchestrator **pushes policy updates** to remote stores when changed
+- **Fail-Secure Mode:** If policies conflict, deny access (prefer security over availability)
+
+== 4. Scaling Challenges
+
+=== 4.1. Asymmetric Scaling
+
+**Problem:** Local and remote modalities scale **independently** → resource imbalance.
+
+**Scaling Scenarios:**
+[cols="1,2,2,2"]
+|===
+|Scenario |Local Modalities |Remote Modalities |Impact
+
+|**Query Spike**
+|Hit vertical limit (maxed out)
+|Scale horizontally (remote adds nodes)
+|**Asymmetry:** Local becomes bottleneck
+
+|**Data Growth**
+|Disk fills up (must upgrade)
+|Remote scales seamlessly
+|**Cost:** Forced hardware upgrade for local
+
+|**Regional Expansion**
+|Cannot replicate (single node)
+|Remote has CDN-like distribution
+|**Latency:** Remote users slow despite remote stores nearby
+|===
+
+**Operational Complexity:**
+- Must **separately** plan capacity for local vs remote
+- Cannot leverage remote scalability for local workloads
+- May need to **migrate local → remote** dynamically as load increases
+
+**Mitigation:**
+- **Autoscaling Local:** Use VM autoscaling to add local capacity (requires migration to cloud)
+- **Overflow to Remote:** When local capacity exhausted, temporarily route queries to remote (degraded latency)
+- **Hybrid-to-Federated Migration:** Prepare to move all modalities to federated if scaling pain exceeds hybrid benefits
+
+=== 4.2. Hot Data Migration
+
+**Problem:** If "cold" remote modality becomes "hot", must **migrate to local** → data transfer cost and downtime.
+
+**Migration Steps:**
+1. **Identify Hot Data:** Query logs show Remote Document now 500 qps (was 50 qps)
+2. **Provision Local Capacity:** Add 2TB disk for Tantivy index
+3. **Export from Remote:** Request data dump from Archive.org (may take days)
+4. **Import to Local:** Load data into local Document modality (hours)
+5. **Cutover:** Update orchestrator config to route Document queries locally
+6. **Deregister Remote:** Remove Archive.org Document endpoint from registry
+
+**Downtime:** Potentially 6-48 hours depending on data volume and remote store cooperation
+
+**Cost:**
+- **Data Transfer:** Egress fees from remote store (can be $$$)
+- **Dual Storage:** Temporarily storing data both locally and remotely during migration
+- **Engineering Time:** Migration is manual, error-prone process
+
+**Mitigation:**
+- **Pre-Emptive Caching:** Cache hot data locally **before** fully migrating (reduces cutover time)
+- **Gradual Migration:** Migrate data in **chunks** (e.g., 10% per day) while dual-running
+- **Remote Store API:** Negotiate **incremental export API** with remote stores (avoid full dumps)
+
+=== 4.3. Network Bandwidth Bottleneck
+
+**Problem:** High query volume to remote modalities saturates **network link**.
+
+**Bandwidth Analysis:**
+[source,text]
+----
+Assumption:
+  - 500 qps to remote Document modality
+  - Avg response size: 100 KB
+  - Bandwidth required: 500 qps × 100 KB = 50 MB/s = 400 Mbps
+
+Constraint:
+  - Orchestrator has 1 Gbps uplink
+  - Other services share link (Elixir orchestrator, monitoring, etc.)
+  - Effective available: ~600 Mbps
+
+Risk: At 750 qps, network saturates → queries timeout
+----
+
+**Consequences:**
+- **Query Timeouts:** Network congestion causes packet loss
+- **Cascading Failures:** Retries amplify bandwidth usage
+- **Noisy Neighbor:** Remote queries starve local traffic (monitoring, SSH, etc.)
+
+**Mitigation:**
+- **Response Compression:** Enable gzip/brotli for HTTP responses (reduce size by ~70%)
+- **CDN/Caching:** Place CDN (e.g., Cloudflare) in front of remote stores (cache hot data near orchestrator)
+- **QoS:** Configure Quality of Service to prioritize critical traffic over bulk transfers
+- **Upgrade Link:** Negotiate 10 Gbps uplink if remote query volume critical
+
+== 5. Drift Detection Challenges
+
+=== 5.1. Cross-Boundary Drift Semantics
+
+**Problem:** Drift between **local modalities** has different semantics than drift **across local/remote boundary**.
+
+**Drift Types:**
+[cols="1,2,2"]
+|===
+|Drift Type |Example |Severity
+
+|**Local-Local Drift**
+|Local Vector embedding diverges from local Graph edges
+|**High** (same system, should stay in sync)
+
+|**Local-Remote Drift**
+|Local Vector embedding diverges from remote Document text
+|**Medium** (expected due to eventual consistency)
+
+|**Remote-Remote Drift**
+|Remote Document (Archive.org) diverges from remote Temporal (Uni-B)
+|**Low** (different operators, expected lag)
+|===
+
+**Challenge:** Drift detection policy must distinguish between expected (remote lag) and anomalous (local desync) drift.
+
+**Mitigation:**
+- **Separate Thresholds:** Use different drift thresholds for local-local vs local-remote
+- **Time-Windowed Detection:** Only alert on remote drift if lag exceeds **expected propagation time**
+- **Manual Review Required:** Flag cross-boundary drift for human review (don't auto-repair blindly)
+
+=== 5.2. Network Overhead of Continuous Monitoring
+
+**Problem:** Drift detection requires **continuous sampling** of remote modalities → network cost.
+
+**Monitoring Load:**
+[source,text]
+----
+Scenario: 10,000 Hexads, drift check every 5 minutes
+
+Checks per hour: 10,000 × (60 / 5) = 120,000 checks/hour
+If each check = 1 HTTP request of 1 KB:
+  Network: 120,000 × 1 KB = 120 MB/hour = 2.8 GB/day
+
+At scale (1M Hexads): 280 GB/day just for drift monitoring
+----
+
+**Consequence:** Drift monitoring becomes **major cost driver** (bandwidth, remote store load)
+
+**Mitigation:**
+- **Adaptive Sampling:** Only check drift for Hexads recently accessed (others assumed stable)
+- **Event-Driven Updates:** Remote stores **push** change notifications instead of pull-based polling
+- **Batching:** Batch multiple drift checks into single HTTP request (reduce overhead)
+
+=== 5.3. Repair Policy Coordination
+
+**Problem:** Repairing drift across local/remote boundary requires **coordination** with remote store operator.
+
+**Repair Workflow (Complex):**
+[source,text]
+----
+1. Orchestrator detects drift: Local Vector ≠ Remote Document
+2. Determine repair direction:
+   - Option A: Update local to match remote (download from remote)
+   - Option B: Update remote to match local (push to remote)
+   - Option C: Manual review required (conflict)
+3. If Option B:
+   - Orchestrator generates signed update request
+   - Sends to remote store's /update endpoint
+   - Remote store validates signature, applies update
+   - Remote store returns ack
+   - Orchestrator confirms drift resolved
+4. If Option C:
+   - Orchestrator creates "drift alert" Hexad
+   - Sends notification to domain custodians
+   - Waits for manual resolution
+   - Custodian signs resolution decision
+   - Orchestrator applies resolution
+----
+
+**Complexity:**
+- **Multi-Party Coordination:** Requires cooperation from remote store (may not respond)
+- **Policy Conflicts:** Local policy may say "auto-repair", remote policy may say "manual review"
+- **Repair Latency:** Manual review can take hours-to-days
+
+**Mitigation:**
+- **Pre-Negotiated Policies:** Establish **repair SLAs** with remote stores before federation
+- **Automated Escalation:** If remote store doesn't respond within N hours, escalate to manual review
+- **Repair Auditing:** Log all repair actions to immutable Temporal log (accountability)
+
+== 6. Security Challenges
+
+=== 6.1. Expanded Attack Surface
+
+**Problem:** Hybrid mode exposes orchestrator to **both local and internet-based attacks**.
+
+**Attack Vectors:**
+[cols="1,2,2"]
+|===
+|Vector |Local (Standalone) |Hybrid
+
+|**Container Escape**
+|✓ Risk exists
+|✓ Same risk
+
+|**Remote Store Compromise**
+|✗ N/A
+|✓ **New risk:** Remote store breached → sends malicious responses
+
+|**Man-in-the-Middle**
+|✗ N/A (localhost only)
+|✓ **New risk:** HTTPS connection to remote store intercepted
+
+|**DDoS**
+|✗ Limited (internal network)
+|✓ **New risk:** Remote store DDoSed → cascading failure
+|===
+
+**Mitigation:**
+- **mTLS:** Use mutual TLS for orchestrator ↔ remote store communication (prevent MITM)
+- **Response Validation:** Verify signatures on **all** remote responses (detect tampering)
+- **Rate Limiting:** Limit queries to remote stores (prevent amplification attacks)
+- **Zero-Trust:** Treat remote stores as untrusted (validate all data before use)
+
+=== 6.2. Policy Enforcement at Boundary
+
+**Problem:** Orchestrator must enforce **global access policies** while remote stores enforce **local policies**.
+
+**Policy Layering:**
+[source,text]
+----
+User Query: "Read Hexad 550e8400-..."
+
+Layer 1 (Orchestrator): Check global policy
+  - Is user authenticated? ✓
+  - Does user have read permission for Hexad? ✓
+  - Forward to remote Document store
+
+Layer 2 (Remote Store): Check local policy
+  - Is orchestrator authorized? ✓
+  - Does user meet remote's domain restrictions (.edu)? ✗
+  - Return 403 Forbidden
+
+Result: Query denied at Layer 2 despite passing Layer 1
+----
+
+**Consequences:**
+- **Inconsistent UX:** Users confused why some modalities accessible, others not
+- **Debugging Difficulty:** Must check **two** policy engines to understand denial
+- **Security Gaps:** If Layer 2 fails open, global policy bypassed
+
+**Mitigation:**
+- **Policy Synchronization:** Push orchestrator's global policy to remote stores (enforce consistently)
+- **Pre-Flight Checks:** Orchestrator queries remote store's policy **before** forwarding request
+- **Fail-Secure:** If policies conflict, deny access (prefer security over availability)
+
+== 7. Cost Challenges
+
+=== 7.1. Dual Infrastructure Costs
+
+**Problem:** Hybrid mode requires **both local and remote** infrastructure → double the cost?
+
+**Cost Breakdown:**
+[cols="1,2,2,2"]
+|===
+|Component |Standalone |Hybrid |Increase
+
+|**Local Hardware**
+|$10k/month (all modalities)
+|$6k/month (3 modalities)
+|**-40%** ✓
+
+|**Remote Store Fees**
+|$0
+|$3k/month (3 modalities)
+|**+$3k** ✗
+
+|**Network Egress**
+|$0 (localhost)
+|$1k/month (to remote)
+|**+$1k** ✗
+
+|**Total**
+|$10k/month
+|$10k/month
+|**Break-even**
+|===
+
+**Reality:** Hybrid is **not cheaper** unless:
+- Remote stores offer significantly cheaper storage (e.g., Archive.org free tier)
+- Local hardware would require expensive upgrade to support all modalities
+- Network egress is negligible (e.g., colocated datacenters)
+
+**Mitigation:**
+- **Cost Analysis:** Model costs before migrating to hybrid (may not save money)
+- **Negotiate Pricing:** Bulk discounts from remote stores for sustained usage
+- **Regional Optimization:** Use remote stores in same datacenter (reduce egress)
+
+=== 7.2. Operational Overhead
+
+**Problem:** Hybrid mode requires **more operational expertise** than standalone.
+
+**Skills Required:**
+- **Standalone:** Understand 6 modality stores + Elixir orchestrator (7 components)
+- **Hybrid:** All above + Network troubleshooting + Remote store APIs + Policy coordination (10+ components)
+
+**Hiring Impact:** May need to hire **DevOps specialist** for hybrid management (+$150k/year salary)
+
+**Mitigation:**
+- **Managed Services:** Use managed VeriSimDB-as-a-Service (offload operational burden)
+- **Documentation:** Invest in runbooks and troubleshooting guides
+- **Monitoring:** Heavy monitoring investment to reduce MTTR (Mean Time To Repair)
+
+== 8. Summary of Challenges
+
+[cols="1,2,1"]
+|===
+|Challenge Category |Key Issues |Severity
+
+|**Architecture**
+|Hot/cold boundary design, network topology, partial consistency, config explosion
+|HIGH
+
+|**Performance**
+|Mixed latency, drift detection overhead, write propagation delay
+|HIGH
+
+|**Operations**
+|Cross-boundary monitoring, backup divergence, external dependencies, policy coordination
+|MEDIUM
+
+|**Scaling**
+|Asymmetric scaling, hot data migration, network bandwidth bottleneck
+|MEDIUM
+
+|**Drift**
+|Cross-boundary semantics, monitoring overhead, repair coordination
+|HIGH
+
+|**Security**
+|Expanded attack surface, dual policy enforcement
+|MEDIUM
+
+|**Cost**
+|Dual infrastructure, operational overhead
+|LOW (situational)
+|===
+
+== 9. When to Choose Hybrid Despite Challenges
+
+Hybrid deployment is appropriate when:
+
+1. **Clear Hot/Cold Split:** 80% queries to 2-3 "hot" modalities, rest are cold
+2. **Cost Pressure:** Local hardware expensive, remote storage cheap (e.g., archival)
+3. **Institutional Requirements:** Must federate certain modalities (e.g., Document with university archives) while keeping others local (e.g., Vector for performance)
+4. **Growth Path:** Starting standalone, planning eventual full federation (hybrid is stepping stone)
+5. **Team Capacity:** DevOps team skilled in distributed systems (can manage complexity)
+
+For simpler deployments, **standalone** may be better. For full-scale federation, skip hybrid and go **directly to federated** mode.
+
+== See Also
+
+- link:deployment-modes.adoc[Deployment Modes Overview]
+- link:challenges-standalone.adoc[Challenges: Standalone Mode]
+- link:challenges-federated.adoc[Challenges: Federated Mode]
+- link:../WHITEPAPER.md[VeriSimDB White Paper]

@@ -1,0 +1,162 @@
+{
+  "program_path": ".",
+  "language": "julia",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "UnsafeFFI",
+      "location": "src/primitives/ffi_wrappers.jl",
+      "severity": "Medium",
+      "description": "4 ccall/FFI calls in src/primitives/ffi_wrappers.jl",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 4278,
+    "unsafe_blocks": 17,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 1,
+    "io_operations": 12,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/primitives/ffi_wrappers.jl",
+      "lines": 239,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/backends/advanced_hardware.jl",
+      "lines": 304,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/backends/hardware.jl",
+      "lines": 270,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verification/proof_export.jl",
+      "lines": 268,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test/runtests.jl",
+      "lines": 159,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "disk",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/backends/advanced_hardware.jl",
+        "to": "src/backends/hardware.jl",
+        "relation": "shared_dir:src/backends",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeFFI",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/primitives/ffi_wrappers.jl"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeFFI->Memory"
+      }
+    ]
+  }
+}

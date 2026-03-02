@@ -1,0 +1,19 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- 02-vector-similarity.vql
+-- Vector similarity: find entities with embeddings close to entity-001
+--
+-- Uses HNSW (Hierarchical Navigable Small World) approximate nearest-
+-- neighbour search over the vector modality. VeriSimDB stores embeddings
+-- in an HNSW index for sub-millisecond similarity queries even at
+-- million-entity scale.
+--
+-- The SIMILAR TO ENTITY clause looks up the target entity's embedding
+-- and uses it as the query vector. You can also supply a raw vector
+-- with SIMILAR TO VECTOR([0.91, 0.23, ...]).
+--
+-- Expected results: entity-008 (VQL paper, same lead author), entity-003
+-- (hexad embeddings, same lab), and other entities with nearby embeddings.
+
+SEARCH VECTOR SIMILAR TO ENTITY 'entity-001'
+LIMIT 5

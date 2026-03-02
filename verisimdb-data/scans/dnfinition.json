@@ -1,0 +1,899 @@
+{
+  "program_path": ".",
+  "language": "ada",
+  "frameworks": [
+    "Networking",
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "AtomExhaustion",
+      "location": "src/data_layer/lib/dnfinition/mirror/list_manager.ex",
+      "severity": "High",
+      "description": "3 String.to_atom calls in src/data_layer/lib/dnfinition/mirror/list_manager.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 23751,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 39,
+    "io_operations": 91,
+    "threading_constructs": 8
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/backends/dnf/dnf_backend.ads",
+      "lines": 173,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/backends/rpm_ostree/rpm_ostree_backend.adb",
+      "lines": 618,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/backends/rpm_ostree/rpm_ostree_backend.ads",
+      "lines": 196,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/backends/language_backend_interface.ads",
+      "lines": 450,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/config/config_parser.adb",
+      "lines": 235,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 36,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/platform/detection.adb",
+      "lines": 672,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 17,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/platform/filesystem_detect.adb",
+      "lines": 337,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 17,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/reversibility/filesystem/btrfs_snapshots.adb",
+      "lines": 284,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/reversibility/filesystem/zfs_snapshots.ads",
+      "lines": 81,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/reversibility/transaction_log.ads",
+      "lines": 125,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/tui/ncurses_bindings.ads",
+      "lines": 248,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/types/package_types.ads",
+      "lines": 184,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/types/snapshot_types.ads",
+      "lines": 154,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/types/transaction_types.ads",
+      "lines": 169,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/cli_commands.adb",
+      "lines": 1629,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/cli_output.adb",
+      "lines": 518,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/command_executor.adb",
+      "lines": 345,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/command_executor.ads",
+      "lines": 130,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/data_layer/lib/dnfinition/download/manager.ex",
+      "lines": 514,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/data_layer/lib/dnfinition/download/worker.ex",
+      "lines": 362,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/data_layer/lib/dnfinition/mirror/list_manager.ex",
+      "lines": 397,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/data_layer/lib/dnfinition/mirror/optimizer.ex",
+      "lines": 430,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/data_layer/lib/dnfinition/port/server.ex",
+      "lines": 735,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/data_layer/lib/dnfinition/security/http_config.ex",
+      "lines": 290,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/data_layer/lib/dnfinition/telemetry.ex",
+      "lines": 224,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/data_layer/data_layer_client.adb",
+      "lines": 602,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/data_layer/data_layer_client.ads",
+      "lines": 311,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/dnfinition.adb",
+      "lines": 470,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/propagate-mirror-workflow.jl",
+      "lines": 257,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/integration/reversibility_chain_test.adb",
+      "lines": 296,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "memory",
+    "concurrency",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/data_layer/lib/dnfinition/download/manager.ex",
+        "to": "src/data_layer/lib/dnfinition/download/worker.ex",
+        "relation": "shared_dir:src/data_layer/lib/dnfinition/download",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cli_commands.adb",
+        "to": "src/cli/cli_output.adb",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cli_output.adb",
+        "to": "src/cli/command_executor.adb",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/command_executor.adb",
+        "to": "src/cli/command_executor.ads",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/mirror/list_manager.ex",
+        "to": "src/data_layer/lib/dnfinition/mirror/optimizer.ex",
+        "relation": "shared_dir:src/data_layer/lib/dnfinition/mirror",
+        "weight": 1.0
+      },
+      {
+        "from": "src/platform/detection.adb",
+        "to": "src/platform/filesystem_detect.adb",
+        "relation": "shared_dir:src/platform",
+        "weight": 1.0
+      },
+      {
+        "from": "src/backends/rpm_ostree/rpm_ostree_backend.adb",
+        "to": "src/backends/rpm_ostree/rpm_ostree_backend.ads",
+        "relation": "shared_dir:src/backends/rpm_ostree",
+        "weight": 1.0
+      },
+      {
+        "from": "src/data_layer/data_layer_client.adb",
+        "to": "src/data_layer/data_layer_client.ads",
+        "relation": "shared_dir:src/data_layer",
+        "weight": 1.0
+      },
+      {
+        "from": "src/reversibility/filesystem/btrfs_snapshots.adb",
+        "to": "src/reversibility/filesystem/zfs_snapshots.ads",
+        "relation": "shared_dir:src/reversibility/filesystem",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types/package_types.ads",
+        "to": "src/types/snapshot_types.ads",
+        "relation": "shared_dir:src/types",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types/snapshot_types.ads",
+        "to": "src/types/transaction_types.ads",
+        "relation": "shared_dir:src/types",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/backends/dnf/dnf_backend.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/backends/dnf/dnf_backend.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/backends/rpm_ostree/rpm_ostree_backend.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/backends/rpm_ostree/rpm_ostree_backend.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/backends/rpm_ostree/rpm_ostree_backend.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/backends/rpm_ostree/rpm_ostree_backend.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/backends/language_backend_interface.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/backends/language_backend_interface.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/config/config_parser.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/config/config_parser.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/platform/detection.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/platform/detection.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/platform/filesystem_detect.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/platform/filesystem_detect.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/reversibility/filesystem/btrfs_snapshots.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/reversibility/filesystem/btrfs_snapshots.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/reversibility/filesystem/zfs_snapshots.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/reversibility/filesystem/zfs_snapshots.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/reversibility/transaction_log.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/reversibility/transaction_log.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tui/ncurses_bindings.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tui/ncurses_bindings.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types/package_types.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types/package_types.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types/snapshot_types.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types/snapshot_types.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types/transaction_types.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types/transaction_types.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cli_commands.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cli_commands.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cli_output.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cli_output.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/command_executor.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/command_executor.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/command_executor.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/command_executor.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/download/manager.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/download/manager.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/download/worker.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/download/worker.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/mirror/list_manager.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/mirror/list_manager.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/mirror/optimizer.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/mirror/optimizer.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/port/server.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/port/server.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/security/http_config.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/security/http_config.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/telemetry.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/data_layer/lib/dnfinition/telemetry.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/data_layer/data_layer_client.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/data_layer/data_layer_client.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/data_layer/data_layer_client.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/data_layer/data_layer_client.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/dnfinition.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/dnfinition.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "scripts/propagate-mirror-workflow.jl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/propagate-mirror-workflow.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/integration/reversibility_chain_test.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/integration/reversibility_chain_test.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "AtomExhaustion",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "src/data_layer/lib/dnfinition/mirror/list_manager.ex"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP"
+        ],
+        "relation": "AtomExhaustion->Memory"
+      }
+    ]
+  }
+}

@@ -1,0 +1,3382 @@
+{
+  "program_path": ".",
+  "language": "elixir",
+  "frameworks": [
+    "Networking",
+    "Cache",
+    "Concurrent",
+    "Phoenix",
+    "OTP",
+    "WebServer"
+  ],
+  "weak_points": [
+    {
+      "category": "HardcodedSecret",
+      "location": "lib/etma_handler/crypto/suite.ex",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in lib/etma_handler/crypto/suite.ex",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "lib/etma_handler/logic/calculator.ex",
+      "severity": "Critical",
+      "description": "Code.eval_string/eval_quoted in lib/etma_handler/logic/calculator.ex",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "lib/etma_handler_web.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in lib/etma_handler_web.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "scripts/install.sh",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in scripts/install.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "mobile/src/crypto.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in mobile/src/crypto.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "native/tma_crypto/src/lib.rs",
+      "severity": "Medium",
+      "description": "21 unwrap/expect calls in native/tma_crypto/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "test/etma_handler/crypto_test.exs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in test/etma_handler/crypto_test.exs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+      "severity": "Critical",
+      "description": "Runtime.exec() in .java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+      "severity": "Medium",
+      "description": "10 HTTP (non-HTTPS) URLs in .java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+      "severity": "Low",
+      "description": "17 TODO/FIXME/HACK markers in .java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in .java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": ".java-modernised-v1/src/EtmaHandlerJ.java",
+      "severity": "Critical",
+      "description": "Runtime.exec() in .java-modernised-v1/src/EtmaHandlerJ.java",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": ".java-modernised-v1/src/EtmaHandlerJ.java",
+      "severity": "Medium",
+      "description": "10 HTTP (non-HTTPS) URLs in .java-modernised-v1/src/EtmaHandlerJ.java",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": ".java-modernised-v1/src/EtmaHandlerJ.java",
+      "severity": "Low",
+      "description": "17 TODO/FIXME/HACK markers in .java-modernised-v1/src/EtmaHandlerJ.java",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": ".java-modernised-v1/src/EtmaHandlerJ.java",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in .java-modernised-v1/src/EtmaHandlerJ.java",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": ".java-modernised-v1/scripts/file-handler.sh",
+      "severity": "Medium",
+      "description": "59 potentially unquoted variable expansions in .java-modernised-v1/scripts/file-handler.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": ".java-modernised-v1/scripts/first-run-setup.sh",
+      "severity": "Medium",
+      "description": "31 potentially unquoted variable expansions in .java-modernised-v1/scripts/first-run-setup.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": ".java-modernised-v1/scripts/sanitise-data.sh",
+      "severity": "Medium",
+      "description": "51 potentially unquoted variable expansions in .java-modernised-v1/scripts/sanitise-data.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/SafeFileService.java",
+      "severity": "Medium",
+      "description": "3 HTTP (non-HTTPS) URLs in .java-modernised-v2/src/main/java/uk/ac/open/etma/service/SafeFileService.java",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+      "severity": "Medium",
+      "description": "4 HTTP (non-HTTPS) URLs in .java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+      "severity": "Medium",
+      "description": "5 HTTP (non-HTTPS) URLs in .etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+      "severity": "Low",
+      "description": "16 TODO/FIXME/HACK markers in .etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in .etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "priv/static/assets/app.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in priv/static/assets/app.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "priv/static/assets/app.js",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in priv/static/assets/app.js",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 72579,
+    "unsafe_blocks": 41,
+    "panic_sites": 0,
+    "unwrap_calls": 28,
+    "allocation_sites": 3916,
+    "io_operations": 105,
+    "threading_constructs": 13
+  },
+  "file_statistics": [
+    {
+      "file_path": "setup.sh",
+      "lines": 236,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "config/default.ncl",
+      "lines": 232,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/crypto/encrypted_storage.ex",
+      "lines": 287,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/marking/document_analyzer.ex",
+      "lines": 909,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/marking/feedback_generator.ex",
+      "lines": 549,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/marking/feedback_library.ex",
+      "lines": 860,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/marking/reference_analyzer.ex",
+      "lines": 775,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/marking/web_source_evaluator.ex",
+      "lines": 1005,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/external/zotero.ex",
+      "lines": 695,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 11,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/scheduling/calendar.ex",
+      "lines": 689,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/bouncer.ex",
+      "lines": 583,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/etma_handler/container.ex",
+      "lines": 564,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/fhi.ex",
+      "lines": 448,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/repo.ex",
+      "lines": 261,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/etma_handler/scanner.ex",
+      "lines": 478,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/etma_handler/settings.ex",
+      "lines": 383,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/etma_handler_web/plugs/rate_limiter.ex",
+      "lines": 206,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/install.sh",
+      "lines": 214,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/App.res",
+      "lines": 125,
+      "unsafe_blocks": 28,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "mobile/src/crypto.rs",
+      "lines": 179,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "mobile/src/main.rs",
+      "lines": 86,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "must/must.ncl",
+      "lines": 239,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "native/tma_crypto/src/lib.rs",
+      "lines": 559,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 21,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v1/src/etmaHandler/Capture.java",
+      "lines": 161,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 18,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+      "lines": 10143,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1257,
+      "io_operations": 13,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v1/src/etmaHandler/SplashDemo.java",
+      "lines": 89,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v1/src/etmaHandler/Suggest.java",
+      "lines": 122,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v1/src/Capture.java",
+      "lines": 161,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 18,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": ".java-modernised-v1/src/EtmaHandlerJ.java",
+      "lines": 10135,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1257,
+      "io_operations": 13,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v1/src/SplashDemo.java",
+      "lines": 89,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v1/src/Suggest.java",
+      "lines": 122,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v1/scripts/first-run-setup.sh",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v1/scripts/install.sh",
+      "lines": 113,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Course.java",
+      "lines": 130,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/PrivacyView.java",
+      "lines": 187,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Student.java",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Submission.java",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 12,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Tutor.java",
+      "lines": 92,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/ui/MarkingPlaylistPanel.java",
+      "lines": 288,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 20,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/FormalSaveProtocol.java",
+      "lines": 413,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/InactivityMonitor.java",
+      "lines": 209,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/Instrumentation.java",
+      "lines": 528,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 18,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/IntegrityStore.java",
+      "lines": 536,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 17,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/MarkingBatchService.java",
+      "lines": 258,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/SafeFileService.java",
+      "lines": 435,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiImporter.java",
+      "lines": 286,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 23,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+      "lines": 354,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 13,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/SaveResult.java",
+      "lines": 221,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/comment-banks/convert-to-adoc.jl",
+      "lines": 196,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+      "lines": 8419,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1170,
+      "io_operations": 17,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Capture.java",
+      "lines": 167,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 18,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Suggest.java",
+      "lines": 119,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "priv/static/assets/app.js",
+      "lines": 8539,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "flake.nix",
+      "lines": 250,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "concurrency",
+    "memory",
+    "network",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": ".java-modernised-v1/scripts/first-run-setup.sh",
+        "to": ".java-modernised-v1/scripts/install.sh",
+        "relation": "shared_dir:.java-modernised-v1/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Capture.java",
+        "to": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+        "relation": "shared_dir:.java-modernised-v1/src/etmaHandler",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+        "to": ".java-modernised-v1/src/etmaHandler/SplashDemo.java",
+        "relation": "shared_dir:.java-modernised-v1/src/etmaHandler",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/SplashDemo.java",
+        "to": ".java-modernised-v1/src/etmaHandler/Suggest.java",
+        "relation": "shared_dir:.java-modernised-v1/src/etmaHandler",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Capture.java",
+        "to": ".java-modernised-v1/src/EtmaHandlerJ.java",
+        "relation": "shared_dir:.java-modernised-v1/src",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/EtmaHandlerJ.java",
+        "to": ".java-modernised-v1/src/SplashDemo.java",
+        "relation": "shared_dir:.java-modernised-v1/src",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/SplashDemo.java",
+        "to": ".java-modernised-v1/src/Suggest.java",
+        "relation": "shared_dir:.java-modernised-v1/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Course.java",
+        "to": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/PrivacyView.java",
+        "relation": "shared_dir:.java-modernised-v2/src/main/java/uk/ac/open/etma/model",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/PrivacyView.java",
+        "to": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Student.java",
+        "relation": "shared_dir:.java-modernised-v2/src/main/java/uk/ac/open/etma/model",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Student.java",
+        "to": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Submission.java",
+        "relation": "shared_dir:.java-modernised-v2/src/main/java/uk/ac/open/etma/model",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Submission.java",
+        "to": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Tutor.java",
+        "relation": "shared_dir:.java-modernised-v2/src/main/java/uk/ac/open/etma/model",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiImporter.java",
+        "to": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+        "relation": "shared_dir:.java-modernised-v2/src/main/java/uk/ac/open/etma/util",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+        "to": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/SaveResult.java",
+        "relation": "shared_dir:.java-modernised-v2/src/main/java/uk/ac/open/etma/util",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/bouncer.ex",
+        "to": "lib/etma_handler/container.ex",
+        "relation": "shared_dir:lib/etma_handler",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/container.ex",
+        "to": "lib/etma_handler/fhi.ex",
+        "relation": "shared_dir:lib/etma_handler",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/fhi.ex",
+        "to": "lib/etma_handler/repo.ex",
+        "relation": "shared_dir:lib/etma_handler",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/repo.ex",
+        "to": "lib/etma_handler/scanner.ex",
+        "relation": "shared_dir:lib/etma_handler",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scanner.ex",
+        "to": "lib/etma_handler/settings.ex",
+        "relation": "shared_dir:lib/etma_handler",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/FormalSaveProtocol.java",
+        "to": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/InactivityMonitor.java",
+        "relation": "shared_dir:.java-modernised-v2/src/main/java/uk/ac/open/etma/service",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/InactivityMonitor.java",
+        "to": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/Instrumentation.java",
+        "relation": "shared_dir:.java-modernised-v2/src/main/java/uk/ac/open/etma/service",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/Instrumentation.java",
+        "to": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/IntegrityStore.java",
+        "relation": "shared_dir:.java-modernised-v2/src/main/java/uk/ac/open/etma/service",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/IntegrityStore.java",
+        "to": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/MarkingBatchService.java",
+        "relation": "shared_dir:.java-modernised-v2/src/main/java/uk/ac/open/etma/service",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/MarkingBatchService.java",
+        "to": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/SafeFileService.java",
+        "relation": "shared_dir:.java-modernised-v2/src/main/java/uk/ac/open/etma/service",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+        "to": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Capture.java",
+        "relation": "shared_dir:.etmaMonitor-modernised/original-decompiled/etmaMonitor",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Capture.java",
+        "to": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Suggest.java",
+        "relation": "shared_dir:.etmaMonitor-modernised/original-decompiled/etmaMonitor",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/document_analyzer.ex",
+        "to": "lib/etma_handler/marking/feedback_generator.ex",
+        "relation": "shared_dir:lib/etma_handler/marking",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_generator.ex",
+        "to": "lib/etma_handler/marking/feedback_library.ex",
+        "relation": "shared_dir:lib/etma_handler/marking",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_library.ex",
+        "to": "lib/etma_handler/marking/reference_analyzer.ex",
+        "relation": "shared_dir:lib/etma_handler/marking",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/reference_analyzer.ex",
+        "to": "lib/etma_handler/marking/web_source_evaluator.ex",
+        "relation": "shared_dir:lib/etma_handler/marking",
+        "weight": 1.0
+      },
+      {
+        "from": "setup.sh",
+        "to": "flake.nix",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "mobile/src/crypto.rs",
+        "to": "mobile/src/main.rs",
+        "relation": "shared_dir:mobile/src",
+        "weight": 1.0
+      },
+      {
+        "from": "setup.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "setup.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "setup.sh",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "setup.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "setup.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "setup.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "config/default.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "config/default.ncl",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "config/default.ncl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "config/default.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "config/default.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "config/default.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/crypto/encrypted_storage.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/crypto/encrypted_storage.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/crypto/encrypted_storage.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/crypto/encrypted_storage.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/crypto/encrypted_storage.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/crypto/encrypted_storage.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/document_analyzer.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/document_analyzer.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/document_analyzer.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/document_analyzer.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/document_analyzer.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/document_analyzer.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_generator.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_generator.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_generator.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_generator.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_generator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_generator.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_library.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_library.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_library.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_library.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_library.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/feedback_library.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/reference_analyzer.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/reference_analyzer.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/reference_analyzer.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/reference_analyzer.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/reference_analyzer.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/reference_analyzer.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/web_source_evaluator.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/web_source_evaluator.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/web_source_evaluator.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/web_source_evaluator.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/web_source_evaluator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/marking/web_source_evaluator.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/external/zotero.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/external/zotero.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/external/zotero.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/external/zotero.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/external/zotero.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/external/zotero.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scheduling/calendar.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scheduling/calendar.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scheduling/calendar.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scheduling/calendar.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scheduling/calendar.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scheduling/calendar.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/bouncer.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/bouncer.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/bouncer.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/bouncer.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/bouncer.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/bouncer.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/container.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/container.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/container.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/container.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/container.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/container.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/fhi.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/fhi.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/fhi.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/fhi.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/fhi.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/fhi.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/repo.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/repo.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/repo.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/repo.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/repo.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/repo.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/scanner.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scanner.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scanner.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scanner.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scanner.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/scanner.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler/settings.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/settings.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/settings.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/settings.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/settings.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler/settings.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/etma_handler_web/plugs/rate_limiter.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler_web/plugs/rate_limiter.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler_web/plugs/rate_limiter.ex",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler_web/plugs/rate_limiter.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler_web/plugs/rate_limiter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/etma_handler_web/plugs/rate_limiter.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install.sh",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/install.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/App.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 84.0
+      },
+      {
+        "from": "src/App.res",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 84.0
+      },
+      {
+        "from": "src/App.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 84.0
+      },
+      {
+        "from": "src/App.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 84.0
+      },
+      {
+        "from": "src/App.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 84.0
+      },
+      {
+        "from": "src/App.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 84.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "mobile/src/crypto.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "mobile/src/crypto.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "mobile/src/crypto.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "mobile/src/crypto.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "mobile/src/crypto.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "mobile/src/crypto.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "mobile/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "mobile/src/main.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "mobile/src/main.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "mobile/src/main.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "mobile/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "mobile/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "must/must.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "must/must.ncl",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "must/must.ncl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "must/must.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "must/must.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "must/must.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "native/tma_crypto/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "native/tma_crypto/src/lib.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "native/tma_crypto/src/lib.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "native/tma_crypto/src/lib.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "native/tma_crypto/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "native/tma_crypto/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Capture.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Capture.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Capture.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Capture.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Capture.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Capture.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/SplashDemo.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/SplashDemo.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/SplashDemo.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/SplashDemo.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/SplashDemo.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/SplashDemo.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Suggest.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Suggest.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Suggest.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Suggest.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Suggest.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/etmaHandler/Suggest.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Capture.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Capture.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Capture.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Capture.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Capture.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Capture.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".java-modernised-v1/src/EtmaHandlerJ.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/EtmaHandlerJ.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/EtmaHandlerJ.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/EtmaHandlerJ.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/EtmaHandlerJ.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/EtmaHandlerJ.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/SplashDemo.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/SplashDemo.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/SplashDemo.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/SplashDemo.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/SplashDemo.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/SplashDemo.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Suggest.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Suggest.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Suggest.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Suggest.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Suggest.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/src/Suggest.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/first-run-setup.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/first-run-setup.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/first-run-setup.sh",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/first-run-setup.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/first-run-setup.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/first-run-setup.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/install.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/install.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/install.sh",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/install.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/install.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v1/scripts/install.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Course.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Course.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Course.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Course.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Course.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Course.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/PrivacyView.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/PrivacyView.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/PrivacyView.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/PrivacyView.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/PrivacyView.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/PrivacyView.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Student.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Student.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Student.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Student.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Student.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Student.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Submission.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Submission.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Submission.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Submission.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Submission.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Submission.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Tutor.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Tutor.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Tutor.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Tutor.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Tutor.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/model/Tutor.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/ui/MarkingPlaylistPanel.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/ui/MarkingPlaylistPanel.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/ui/MarkingPlaylistPanel.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/ui/MarkingPlaylistPanel.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/ui/MarkingPlaylistPanel.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/ui/MarkingPlaylistPanel.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/FormalSaveProtocol.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/FormalSaveProtocol.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/FormalSaveProtocol.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/FormalSaveProtocol.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/FormalSaveProtocol.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/FormalSaveProtocol.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/InactivityMonitor.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/InactivityMonitor.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/InactivityMonitor.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/InactivityMonitor.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/InactivityMonitor.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/InactivityMonitor.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/Instrumentation.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/Instrumentation.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/Instrumentation.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/Instrumentation.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/Instrumentation.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/Instrumentation.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/IntegrityStore.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/IntegrityStore.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/IntegrityStore.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/IntegrityStore.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/IntegrityStore.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/IntegrityStore.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/MarkingBatchService.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/MarkingBatchService.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/MarkingBatchService.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/MarkingBatchService.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/MarkingBatchService.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/MarkingBatchService.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/SafeFileService.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/SafeFileService.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/SafeFileService.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/SafeFileService.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/SafeFileService.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/SafeFileService.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiImporter.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiImporter.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiImporter.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiImporter.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiImporter.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiImporter.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/SaveResult.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/SaveResult.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/SaveResult.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/SaveResult.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/SaveResult.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/SaveResult.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/comment-banks/convert-to-adoc.jl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/comment-banks/convert-to-adoc.jl",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/comment-banks/convert-to-adoc.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/comment-banks/convert-to-adoc.jl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/comment-banks/convert-to-adoc.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/comment-banks/convert-to-adoc.jl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Capture.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Capture.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Capture.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Capture.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Capture.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Capture.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Suggest.java",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Suggest.java",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Suggest.java",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Suggest.java",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Suggest.java",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".etmaMonitor-modernised/original-decompiled/etmaMonitor/Suggest.java",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "priv/static/assets/app.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "priv/static/assets/app.js",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "priv/static/assets/app.js",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "priv/static/assets/app.js",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "priv/static/assets/app.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "priv/static/assets/app.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "lib/etma_handler/crypto/suite.ex",
+          "test/etma_handler/crypto_test.exs"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Concurrent",
+          "Phoenix",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "HardcodedSecret->Network"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "mobile/src/crypto.rs",
+          "native/tma_crypto/src/lib.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Concurrent",
+          "Phoenix",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+          ".java-modernised-v1/src/EtmaHandlerJ.java",
+          ".java-modernised-v1/scripts/file-handler.sh",
+          ".java-modernised-v1/scripts/first-run-setup.sh",
+          ".java-modernised-v1/scripts/sanitise-data.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Concurrent",
+          "Phoenix",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/install.sh",
+          ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+          ".java-modernised-v1/src/EtmaHandlerJ.java",
+          ".java-modernised-v2/src/main/java/uk/ac/open/etma/service/SafeFileService.java",
+          ".java-modernised-v2/src/main/java/uk/ac/open/etma/util/FhiXmlHandler.java",
+          ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java",
+          "priv/static/assets/app.js"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Concurrent",
+          "Phoenix",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+          ".java-modernised-v1/src/EtmaHandlerJ.java"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Concurrent",
+          "Phoenix",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "mobile/src/crypto.rs",
+          "native/tma_crypto/src/lib.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Concurrent",
+          "Phoenix",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+          ".java-modernised-v1/src/EtmaHandlerJ.java",
+          ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Concurrent",
+          "Phoenix",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "lib/etma_handler/logic/calculator.ex",
+          "lib/etma_handler_web.ex"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Concurrent",
+          "Phoenix",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          ".java-modernised-v1/src/etmaHandler/EtmaHandlerJ.java",
+          ".java-modernised-v1/src/EtmaHandlerJ.java",
+          ".etmaMonitor-modernised/original-decompiled/etmaMonitor/EtmaMonitorJ.java"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Concurrent",
+          "Phoenix",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Network"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "lib/etma_handler/logic/calculator.ex"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Concurrent",
+          "Phoenix",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "DynamicCodeExecution->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "priv/static/assets/app.js"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Concurrent",
+          "Phoenix",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "DynamicCodeExecution->Network"
+      }
+    ]
+  }
+}

@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://verisim.db/schema/hexad.json",
+  "$comment": "SPDX-License-Identifier: PMPL-1.0-or-later",
+  "title": "Hexad",
+  "description": "A VeriSimDB octad entity with 8 synchronized modality representations. The hexad is the fundamental unit of VeriSimDB -- each entity exists simultaneously across all eight modalities (Graph, Vector, Tensor, Semantic, Document, Temporal, Provenance, Spatial), maintaining cross-modal consistency through drift detection and self-normalisation.",
+  "type": "object",
+  "required": ["id", "status"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique entity identifier (UUID v4). Serves as the canonical key across all modality stores.",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$|^.+$",
+      "examples": ["550e8400-e29b-41d4-a716-446655440000"]
+    },
+    "status": {
+      "$ref": "hexad-status.json",
+      "description": "Entity status including creation time, modification time, version, and per-modality population flags."
+    },
+    "graph_node": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Graph modality representation. The entity as a node in an RDF / property graph with typed edges to other entities.",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Graph node IRI (derived from the hexad ID and the store's base IRI)."
+            },
+            "labels": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "RDF type IRIs or property-graph labels attached to this node."
+            },
+            "properties": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "description": "Key-value properties stored directly on the graph node."
+            },
+            "edges": {
+              "type": "array",
+              "description": "Outgoing edges from this node to other entities.",
+              "items": {
+                "type": "object",
+                "required": ["predicate", "target"],
+                "properties": {
+                  "predicate": {
+                    "type": "string",
+                    "description": "Edge label / relationship type (IRI or plain string)."
+                  },
+                  "target": {
+                    "type": "string",
+                    "description": "Target node IRI or hexad ID."
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "description": "Graph node data, or null if the graph modality is not populated."
+    },
+    "embedding": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Dense embedding vector (float32 values). Dimensionality matches the store's configured vector_dimension (default: 384)."
+        }
+      ],
+      "description": "Vector modality embedding, or null if not populated."
+    },
+    "tensor": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Multi-dimensional tensor data with shape metadata.",
+          "required": ["shape", "data"],
+          "properties": {
+            "shape": {
+              "type": "array",
+              "items": { "type": "integer", "minimum": 0 },
+              "description": "Tensor dimensions (e.g. [3, 4] for a 3x4 matrix). The product of all shape values must equal the length of the data array."
+            },
+            "data": {
+              "type": "array",
+              "items": { "type": "number" },
+              "description": "Flattened tensor data in row-major order (float64 values)."
+            }
+          }
+        }
+      ],
+      "description": "Tensor modality data, or null if not populated."
+    },
+    "semantic": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Semantic modality annotation. Ontological types and properties with optional proof blobs for formal verification.",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Type IRIs from ontologies (e.g. 'http://schema.org/Person')."
+            },
+            "properties": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "description": "Semantic key-value properties."
+            },
+            "proof": {
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object",
+                  "description": "Cryptographic proof blob (CBOR-encoded verification evidence).",
+                  "properties": {
+                    "proof_type": {
+                      "type": "string",
+                      "description": "Proof system identifier (e.g. 'zkp', 'proven', 'sanctify')."
+                    },
+                    "data": {
+                      "type": "string",
+                      "description": "Base64-encoded proof data."
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "description": "Semantic annotation, or null if not populated."
+    },
+    "document": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Document modality for full-text search. Indexed by Tantivy.",
+          "required": ["title", "body"],
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Document title, used for display and search boosting."
+            },
+            "body": {
+              "type": "string",
+              "description": "Document body content, full-text indexed."
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "description": "Additional searchable fields beyond title and body."
+            }
+          }
+        }
+      ],
+      "description": "Document content, or null if not populated."
+    },
+    "version_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of temporal versions stored for this entity. Each mutation creates a new version."
+    },
+    "provenance_chain_length": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of provenance records in the entity's hash chain. Each lifecycle event (created, modified, imported, normalized, etc.) appends a record."
+    },
+    "spatial_data": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Spatial modality data. Geographic coordinates and geometry in a configurable SRS (default WGS84 / EPSG:4326).",
+          "required": ["coordinates", "geometry_type", "srid"],
+          "properties": {
+            "coordinates": {
+              "type": "object",
+              "required": ["latitude", "longitude"],
+              "properties": {
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90.0,
+                  "maximum": 90.0,
+                  "description": "Latitude in decimal degrees (WGS84). North is positive."
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180.0,
+                  "maximum": 180.0,
+                  "description": "Longitude in decimal degrees (WGS84). East is positive."
+                },
+                "altitude": {
+                  "oneOf": [
+                    { "type": "null" },
+                    { "type": "number" }
+                  ],
+                  "description": "Altitude in metres above the WGS84 ellipsoid. Optional."
+                }
+              }
+            },
+            "geometry_type": {
+              "type": "string",
+              "enum": ["Point", "LineString", "Polygon", "MultiPoint", "MultiPolygon"],
+              "description": "OGC Simple Features geometry type."
+            },
+            "srid": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Spatial Reference System Identifier (default: 4326 for WGS84)."
+            },
+            "properties": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "description": "Arbitrary spatial metadata (address, region, accuracy, etc.)."
+            }
+          }
+        }
+      ],
+      "description": "Spatial data, or null if not populated."
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://verisim.db/schema/provenance-event.json",
+  "$comment": "SPDX-License-Identifier: PMPL-1.0-or-later",
+  "title": "ProvenanceEvent",
+  "description": "A single provenance event in an entity's lineage chain. Provenance records form a SHA-256 hash chain where each record's previous_hash is the content_hash of the preceding record, creating a tamper-evident audit trail. The first record in a chain uses the SHA-256 of the empty string as its previous_hash.",
+  "type": "object",
+  "required": ["event_id", "entity_id", "event_type", "actor", "description", "timestamp", "hash"],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "Unique identifier for this provenance event. Typically the content_hash itself or a separate UUID."
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "Hexad entity identifier that this provenance event belongs to."
+    },
+    "event_type": {
+      "type": "string",
+      "description": "Classification of the provenance event. Standard types cover the entity lifecycle; 'custom:*' allows domain-specific extensions.",
+      "enum": [
+        "created",
+        "modified",
+        "imported",
+        "normalized",
+        "federated",
+        "deleted"
+      ]
+    },
+    "actor": {
+      "type": "string",
+      "description": "Who or what caused this event. May be a user ID, system component name, bot identifier, or service account."
+    },
+    "source": {
+      "type": "string",
+      "description": "Optional source identifier providing context for where the data came from. Can be a URL, file path, upstream entity ID, or external system reference."
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of what happened in this event."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when this provenance event occurred."
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 hex digest of this record's canonical serialisation (the content_hash). Computed over event_type, actor, timestamp, source, description, and previous_hash."
+    },
+    "previous_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 hex digest of the preceding record in the chain (its content_hash). For the first record in a chain, this is the SHA-256 of the empty string: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'."
+    }
+  },
+  "additionalProperties": false
+}

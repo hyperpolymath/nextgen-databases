@@ -1,0 +1,2135 @@
+{
+  "program_path": ".",
+  "language": "wokelang",
+  "frameworks": [
+    "OTP",
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "DynamicCodeExecution",
+      "location": "betlang/repl/shell.rkt",
+      "severity": "High",
+      "description": "eval usage in betlang/repl/shell.rkt",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "betlang/repl/shell.rkt",
+      "severity": "High",
+      "description": "System/process call in betlang/repl/shell.rkt",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "phronesis/lib/phronesis/stdlib/consensus.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in phronesis/lib/phronesis/stdlib/consensus.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "phronesis/lib/phronesis/stdlib/temporal.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in phronesis/lib/phronesis/stdlib/temporal.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnboundedLoop",
+      "location": "scripts/repo-reconcile.py",
+      "severity": "High",
+      "description": "Unbounded while True loop in scripts/repo-reconcile.py",
+      "recommended_attack": [
+        "cpu",
+        "time"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/benches/vm_bench.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in wokelang/benches/vm_bench.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "wokelang/docs/proofs/verification/WokeLang.lean",
+      "severity": "High",
+      "description": "4 sorry (unproven proposition) in wokelang/docs/proofs/verification/WokeLang.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "wokelang/docs/proofs/verification/WokeLang.lean",
+      "severity": "Low",
+      "description": "12 TODO/FIXME/HACK markers in wokelang/docs/proofs/verification/WokeLang.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "wokelang/examples/stdlib_demo.woke",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in wokelang/examples/stdlib_demo.woke",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "wokelang/src/ffi/c_api.rs",
+      "severity": "High",
+      "description": "Raw pointer cast in wokelang/src/ffi/c_api.rs",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/interpreter/mod.rs",
+      "severity": "Medium",
+      "description": "27 unwrap/expect calls in wokelang/src/interpreter/mod.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/interpreter/value.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in wokelang/src/interpreter/value.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/main.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in wokelang/src/main.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/parser/mod.rs",
+      "severity": "Medium",
+      "description": "122 unwrap/expect calls in wokelang/src/parser/mod.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/security/consent.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in wokelang/src/security/consent.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/stdlib/alib.rs",
+      "severity": "Medium",
+      "description": "20 unwrap/expect calls in wokelang/src/stdlib/alib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/stdlib/array.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in wokelang/src/stdlib/array.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/stdlib/chan.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in wokelang/src/stdlib/chan.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/stdlib/io.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in wokelang/src/stdlib/io.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/stdlib/json.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in wokelang/src/stdlib/json.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/stdlib/math.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in wokelang/src/stdlib/math.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "wokelang/src/stdlib/net.rs",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in wokelang/src/stdlib/net.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/stdlib/string.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in wokelang/src/stdlib/string.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/stdlib/time.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in wokelang/src/stdlib/time.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/typechecker/mod.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in wokelang/src/typechecker/mod.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/src/worker/mod.rs",
+      "severity": "Medium",
+      "description": "16 unwrap/expect calls in wokelang/src/worker/mod.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeTypeCoercion",
+      "location": "wokelang/test/test_wokelang.ml",
+      "severity": "Critical",
+      "description": "Obj.magic (unsafe type coercion) in wokelang/test/test_wokelang.ml",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wokelang/tests/lsp_integration_test.rs",
+      "severity": "Medium",
+      "description": "12 unwrap/expect calls in wokelang/tests/lsp_integration_test.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 38664,
+    "unsafe_blocks": 33,
+    "panic_sites": 17,
+    "unwrap_calls": 324,
+    "allocation_sites": 212,
+    "io_operations": 59,
+    "threading_constructs": 13
+  },
+  "file_statistics": [
+    {
+      "file_path": "affinescript/bin/main.ml",
+      "lines": 111,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "phronesis/lib/phronesis.ex",
+      "lines": 115,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "phronesis/lib/phronesis/cli.ex",
+      "lines": 333,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "phronesis/lib/phronesis/stdlib/consensus.ex",
+      "lines": 222,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "scripts/repo-reconcile.py",
+      "lines": 280,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/benches/vm_bench.rs",
+      "lines": 159,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/core/main.ml",
+      "lines": 102,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/docs/proofs/verification/WokeLang.lean",
+      "lines": 334,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/editors/vscode/lib/bs/src/Extension.res",
+      "lines": 111,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/editors/vscode/lib/bs/src/VSCode.res",
+      "lines": 71,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/editors/vscode/lib/ocaml/Extension.res",
+      "lines": 111,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/editors/vscode/lib/ocaml/VSCode.res",
+      "lines": 71,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/editors/vscode/src/Extension.res",
+      "lines": 111,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/editors/vscode/src/VSCode.res",
+      "lines": 71,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/08_consent.woke",
+      "lines": 13,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/10_workers.woke",
+      "lines": 32,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/17_gratitude.woke",
+      "lines": 14,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/22_consent_system.woke",
+      "lines": 13,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/23_consent_auto_grant.woke",
+      "lines": 13,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/24_consent_with_print.woke",
+      "lines": 13,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/25_phase1_complete.woke",
+      "lines": 46,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/27_worker_with_delay.woke",
+      "lines": 24,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/34_worker_with_channel.woke",
+      "lines": 31,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/35_worker_limitation.woke",
+      "lines": 36,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/security.woke",
+      "lines": 81,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/examples/stdlib_demo.woke",
+      "lines": 91,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/include/wokelang.h",
+      "lines": 213,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/lib/wokelang/consent.woke",
+      "lines": 241,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/scripts/install-hooks.sh",
+      "lines": 103,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/abi/Foreign.idr",
+      "lines": 126,
+      "unsafe_blocks": 17,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/ffi/c_api.rs",
+      "lines": 324,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/formatter/mod.rs",
+      "lines": 177,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/interpreter/mod.rs",
+      "lines": 1354,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 27,
+      "allocation_sites": 17,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "wokelang/src/interpreter/value.rs",
+      "lines": 281,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "wokelang/src/lexer/mod.rs",
+      "lines": 121,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/lexer/token.rs",
+      "lines": 381,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/linter/mod.rs",
+      "lines": 337,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/lsp/backend.rs",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "wokelang/src/lsp/handlers/completion.rs",
+      "lines": 138,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/lsp/handlers/diagnostics.rs",
+      "lines": 92,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/lsp/stdlib_metadata.rs",
+      "lines": 238,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/main.rs",
+      "lines": 395,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/parser/mod.rs",
+      "lines": 1585,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 122,
+      "allocation_sites": 43,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/security/consent.rs",
+      "lines": 412,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/security/mod.rs",
+      "lines": 474,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "wokelang/src/stdlib/alib.rs",
+      "lines": 565,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 20,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/stdlib/array.rs",
+      "lines": 513,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/stdlib/chan.rs",
+      "lines": 262,
+      "unsafe_blocks": 0,
+      "panic_sites": 3,
+      "unwrap_calls": 10,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/stdlib/io.rs",
+      "lines": 402,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 11,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/stdlib/json.rs",
+      "lines": 406,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 11,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/stdlib/math.rs",
+      "lines": 231,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/stdlib/net.rs",
+      "lines": 507,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 6,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/stdlib/string.rs",
+      "lines": 385,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/stdlib/time.rs",
+      "lines": 385,
+      "unsafe_blocks": 0,
+      "panic_sites": 4,
+      "unwrap_calls": 8,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "wokelang/src/typechecker/mod.rs",
+      "lines": 1613,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 6,
+      "allocation_sites": 96,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/vm/bytecode.rs",
+      "lines": 243,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/vm/compiler.rs",
+      "lines": 641,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/vm/machine.rs",
+      "lines": 430,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/vm/mod.rs",
+      "lines": 157,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/src/worker/mod.rs",
+      "lines": 388,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 16,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 5
+    },
+    {
+      "file_path": "wokelang/test/test_wokelang.ml",
+      "lines": 372,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/tests/lsp_integration_test.rs",
+      "lines": 157,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 12,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wokelang/zig/wokelang.zig",
+      "lines": 229,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "language-status-tracker.jl",
+      "lines": 200,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "concurrency",
+    "cpu",
+    "memory",
+    "time",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "wokelang/editors/vscode/lib/ocaml/Extension.res",
+        "to": "wokelang/editors/vscode/lib/ocaml/VSCode.res",
+        "relation": "shared_dir:wokelang/editors/vscode/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/security/consent.rs",
+        "to": "wokelang/src/security/mod.rs",
+        "relation": "shared_dir:wokelang/src/security",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/08_consent.woke",
+        "to": "wokelang/examples/10_workers.woke",
+        "relation": "shared_dir:wokelang/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/10_workers.woke",
+        "to": "wokelang/examples/17_gratitude.woke",
+        "relation": "shared_dir:wokelang/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/17_gratitude.woke",
+        "to": "wokelang/examples/22_consent_system.woke",
+        "relation": "shared_dir:wokelang/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/22_consent_system.woke",
+        "to": "wokelang/examples/23_consent_auto_grant.woke",
+        "relation": "shared_dir:wokelang/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/23_consent_auto_grant.woke",
+        "to": "wokelang/examples/24_consent_with_print.woke",
+        "relation": "shared_dir:wokelang/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/24_consent_with_print.woke",
+        "to": "wokelang/examples/25_phase1_complete.woke",
+        "relation": "shared_dir:wokelang/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/25_phase1_complete.woke",
+        "to": "wokelang/examples/27_worker_with_delay.woke",
+        "relation": "shared_dir:wokelang/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/27_worker_with_delay.woke",
+        "to": "wokelang/examples/34_worker_with_channel.woke",
+        "relation": "shared_dir:wokelang/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/34_worker_with_channel.woke",
+        "to": "wokelang/examples/35_worker_limitation.woke",
+        "relation": "shared_dir:wokelang/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/35_worker_limitation.woke",
+        "to": "wokelang/examples/security.woke",
+        "relation": "shared_dir:wokelang/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/security.woke",
+        "to": "wokelang/examples/stdlib_demo.woke",
+        "relation": "shared_dir:wokelang/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/lsp/backend.rs",
+        "to": "wokelang/src/lsp/stdlib_metadata.rs",
+        "relation": "shared_dir:wokelang/src/lsp",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/vm/bytecode.rs",
+        "to": "wokelang/src/vm/compiler.rs",
+        "relation": "shared_dir:wokelang/src/vm",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/vm/compiler.rs",
+        "to": "wokelang/src/vm/machine.rs",
+        "relation": "shared_dir:wokelang/src/vm",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/vm/machine.rs",
+        "to": "wokelang/src/vm/mod.rs",
+        "relation": "shared_dir:wokelang/src/vm",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/stdlib/alib.rs",
+        "to": "wokelang/src/stdlib/array.rs",
+        "relation": "shared_dir:wokelang/src/stdlib",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/stdlib/array.rs",
+        "to": "wokelang/src/stdlib/chan.rs",
+        "relation": "shared_dir:wokelang/src/stdlib",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/stdlib/chan.rs",
+        "to": "wokelang/src/stdlib/io.rs",
+        "relation": "shared_dir:wokelang/src/stdlib",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/stdlib/io.rs",
+        "to": "wokelang/src/stdlib/json.rs",
+        "relation": "shared_dir:wokelang/src/stdlib",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/stdlib/json.rs",
+        "to": "wokelang/src/stdlib/math.rs",
+        "relation": "shared_dir:wokelang/src/stdlib",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/stdlib/math.rs",
+        "to": "wokelang/src/stdlib/net.rs",
+        "relation": "shared_dir:wokelang/src/stdlib",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/stdlib/net.rs",
+        "to": "wokelang/src/stdlib/string.rs",
+        "relation": "shared_dir:wokelang/src/stdlib",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/stdlib/string.rs",
+        "to": "wokelang/src/stdlib/time.rs",
+        "relation": "shared_dir:wokelang/src/stdlib",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/editors/vscode/src/Extension.res",
+        "to": "wokelang/editors/vscode/src/VSCode.res",
+        "relation": "shared_dir:wokelang/editors/vscode/src",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/lexer/mod.rs",
+        "to": "wokelang/src/lexer/token.rs",
+        "relation": "shared_dir:wokelang/src/lexer",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/lsp/handlers/completion.rs",
+        "to": "wokelang/src/lsp/handlers/diagnostics.rs",
+        "relation": "shared_dir:wokelang/src/lsp/handlers",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/editors/vscode/lib/bs/src/Extension.res",
+        "to": "wokelang/editors/vscode/lib/bs/src/VSCode.res",
+        "relation": "shared_dir:wokelang/editors/vscode/lib/bs/src",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/interpreter/mod.rs",
+        "to": "wokelang/src/interpreter/value.rs",
+        "relation": "shared_dir:wokelang/src/interpreter",
+        "weight": 1.0
+      },
+      {
+        "from": "affinescript/bin/main.ml",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "affinescript/bin/main.ml",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "phronesis/lib/phronesis.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "phronesis/lib/phronesis.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "phronesis/lib/phronesis/cli.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "phronesis/lib/phronesis/cli.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "phronesis/lib/phronesis/stdlib/consensus.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "phronesis/lib/phronesis/stdlib/consensus.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "scripts/repo-reconcile.py",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/repo-reconcile.py",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/benches/vm_bench.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "wokelang/benches/vm_bench.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "wokelang/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/core/main.ml",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/core/main.ml",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/docs/proofs/verification/WokeLang.lean",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "wokelang/docs/proofs/verification/WokeLang.lean",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "wokelang/editors/vscode/lib/bs/src/Extension.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/editors/vscode/lib/bs/src/Extension.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/editors/vscode/lib/bs/src/VSCode.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "wokelang/editors/vscode/lib/bs/src/VSCode.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "wokelang/editors/vscode/lib/ocaml/Extension.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/editors/vscode/lib/ocaml/Extension.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/editors/vscode/lib/ocaml/VSCode.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "wokelang/editors/vscode/lib/ocaml/VSCode.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "wokelang/editors/vscode/src/Extension.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/editors/vscode/src/Extension.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/editors/vscode/src/VSCode.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "wokelang/editors/vscode/src/VSCode.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "wokelang/examples/08_consent.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/08_consent.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/10_workers.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/10_workers.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/17_gratitude.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "wokelang/examples/17_gratitude.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "wokelang/examples/22_consent_system.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/22_consent_system.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/23_consent_auto_grant.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/23_consent_auto_grant.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/24_consent_with_print.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/24_consent_with_print.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/25_phase1_complete.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/25_phase1_complete.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/27_worker_with_delay.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/27_worker_with_delay.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/34_worker_with_channel.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/34_worker_with_channel.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/35_worker_limitation.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/35_worker_limitation.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/security.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/security.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/stdlib_demo.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/examples/stdlib_demo.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/include/wokelang.h",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/include/wokelang.h",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/lib/wokelang/consent.woke",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/lib/wokelang/consent.woke",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/scripts/install-hooks.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/scripts/install-hooks.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 51.0
+      },
+      {
+        "from": "wokelang/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 51.0
+      },
+      {
+        "from": "wokelang/src/ffi/c_api.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/ffi/c_api.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/formatter/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/formatter/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/interpreter/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 33.0
+      },
+      {
+        "from": "wokelang/src/interpreter/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 33.0
+      },
+      {
+        "from": "wokelang/src/interpreter/value.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "wokelang/src/interpreter/value.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "wokelang/src/lexer/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "wokelang/src/lexer/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "wokelang/src/lexer/token.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/lexer/token.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/linter/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/linter/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/lsp/backend.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "wokelang/src/lsp/backend.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "wokelang/src/lsp/handlers/completion.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/lsp/handlers/completion.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/lsp/handlers/diagnostics.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/lsp/handlers/diagnostics.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/lsp/stdlib_metadata.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/lsp/stdlib_metadata.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "wokelang/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "wokelang/src/parser/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 124.0
+      },
+      {
+        "from": "wokelang/src/parser/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 124.0
+      },
+      {
+        "from": "wokelang/src/security/consent.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "wokelang/src/security/consent.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "wokelang/src/security/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "wokelang/src/security/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "wokelang/src/stdlib/alib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 20.0
+      },
+      {
+        "from": "wokelang/src/stdlib/alib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 20.0
+      },
+      {
+        "from": "wokelang/src/stdlib/array.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "wokelang/src/stdlib/array.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "wokelang/src/stdlib/chan.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "wokelang/src/stdlib/chan.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "wokelang/src/stdlib/io.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "wokelang/src/stdlib/io.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "wokelang/src/stdlib/json.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 15.0
+      },
+      {
+        "from": "wokelang/src/stdlib/json.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 15.0
+      },
+      {
+        "from": "wokelang/src/stdlib/math.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "wokelang/src/stdlib/math.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "wokelang/src/stdlib/net.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "wokelang/src/stdlib/net.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "wokelang/src/stdlib/string.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "wokelang/src/stdlib/string.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "wokelang/src/stdlib/time.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 20.0
+      },
+      {
+        "from": "wokelang/src/stdlib/time.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 20.0
+      },
+      {
+        "from": "wokelang/src/typechecker/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "wokelang/src/typechecker/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "wokelang/src/vm/bytecode.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "wokelang/src/vm/bytecode.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "wokelang/src/vm/compiler.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/vm/compiler.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/src/vm/machine.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "wokelang/src/vm/machine.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "wokelang/src/vm/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "wokelang/src/vm/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "wokelang/src/worker/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 28.0
+      },
+      {
+        "from": "wokelang/src/worker/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 28.0
+      },
+      {
+        "from": "wokelang/test/test_wokelang.ml",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "wokelang/test/test_wokelang.ml",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "wokelang/tests/lsp_integration_test.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "wokelang/tests/lsp_integration_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "wokelang/zig/wokelang.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wokelang/zig/wokelang.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "language-status-tracker.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "language-status-tracker.jl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "wokelang/examples/stdlib_demo.woke",
+          "wokelang/src/stdlib/net.rs"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "UnboundedLoop",
+        "sink_axis": "time",
+        "severity_value": 3.5,
+        "files": [
+          "scripts/repo-reconcile.py"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "UnboundedLoop->Time"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "wokelang/benches/vm_bench.rs",
+          "wokelang/src/interpreter/mod.rs",
+          "wokelang/src/interpreter/value.rs",
+          "wokelang/src/main.rs",
+          "wokelang/src/parser/mod.rs",
+          "wokelang/src/security/consent.rs",
+          "wokelang/src/stdlib/alib.rs",
+          "wokelang/src/stdlib/array.rs",
+          "wokelang/src/stdlib/chan.rs",
+          "wokelang/src/stdlib/io.rs",
+          "wokelang/src/stdlib/json.rs",
+          "wokelang/src/stdlib/math.rs",
+          "wokelang/src/stdlib/string.rs",
+          "wokelang/src/stdlib/time.rs",
+          "wokelang/src/typechecker/mod.rs",
+          "wokelang/src/worker/mod.rs",
+          "wokelang/tests/lsp_integration_test.rs"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "AtomExhaustion",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "phronesis/lib/phronesis/stdlib/consensus.ex",
+          "phronesis/lib/phronesis/stdlib/temporal.ex"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "AtomExhaustion->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          "betlang/repl/shell.rkt"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "UnboundedLoop",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "scripts/repo-reconcile.py"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "UnboundedLoop->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "wokelang/benches/vm_bench.rs",
+          "wokelang/src/interpreter/mod.rs",
+          "wokelang/src/interpreter/value.rs",
+          "wokelang/src/main.rs",
+          "wokelang/src/parser/mod.rs",
+          "wokelang/src/security/consent.rs",
+          "wokelang/src/stdlib/alib.rs",
+          "wokelang/src/stdlib/array.rs",
+          "wokelang/src/stdlib/chan.rs",
+          "wokelang/src/stdlib/io.rs",
+          "wokelang/src/stdlib/json.rs",
+          "wokelang/src/stdlib/math.rs",
+          "wokelang/src/stdlib/string.rs",
+          "wokelang/src/stdlib/time.rs",
+          "wokelang/src/typechecker/mod.rs",
+          "wokelang/src/worker/mod.rs",
+          "wokelang/tests/lsp_integration_test.rs"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          "wokelang/docs/proofs/verification/WokeLang.lean"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "UnsafeTypeCoercion",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "wokelang/test/test_wokelang.ml"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "UnsafeTypeCoercion->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "betlang/repl/shell.rkt"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "betlang/repl/shell.rkt"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "wokelang/docs/proofs/verification/WokeLang.lean"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "wokelang/src/ffi/c_api.rs"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "betlang/repl/shell.rkt"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "DynamicCodeExecution->Memory"
+      }
+    ]
+  }
+}

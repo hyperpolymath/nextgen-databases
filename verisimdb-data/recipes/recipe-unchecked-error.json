@@ -1,0 +1,23 @@
+{
+  "id": "recipe-unchecked-error",
+  "triangle_tier": "control",
+  "pattern_ids": [
+    "PA018-ignore-calls",
+    "PA018-unchecked-error",
+    "PA018-discarded-result"
+  ],
+  "description": "Replace ignored return values and discarded Results with explicit error handling or documented intentional ignoring",
+  "action": "refactor_pattern",
+  "match": "ignore() calls, _ = result, or discarded error returns without handling",
+  "replacement": "Pattern match on {:ok, _} / {:error, reason}, use |> tap for side effects, or annotate with # INTENTIONAL: reason",
+  "confidence": 0.60,
+  "proven_module": null,
+  "proven_modules": [],
+  "formally_proven": false,
+  "languages": ["rescript", "elixir", "rust", "ocaml", "*"],
+  "auto_fixable": false,
+  "fix_script": null,
+  "successful_fixes": 0,
+  "failed_fixes": 0,
+  "total_attempts": 0
+}

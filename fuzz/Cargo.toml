@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+[package]
+name = "verisimdb-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.verisim-hexad]
+path = "../rust-core/verisim-hexad"
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "fuzz_hexad_id"
+path = "fuzz_targets/fuzz_hexad_id.rs"
+test = false
+doc = false
+
+[profile.release]
+debug = 1

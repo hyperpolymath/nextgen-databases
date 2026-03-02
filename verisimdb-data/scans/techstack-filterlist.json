@@ -1,0 +1,177 @@
+{
+  "program_path": ".",
+  "language": "ada",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "scripts/install-repo-hooks.sh",
+      "severity": "Medium",
+      "description": "25 potentially unquoted variable expansions in scripts/install-repo-hooks.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/install.sh",
+      "severity": "Medium",
+      "description": "32 potentially unquoted variable expansions in scripts/install.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 4432,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 7,
+    "io_operations": 9,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/core/techstack_enforcer.ads",
+      "lines": 96,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/techstack_json_io.adb",
+      "lines": 227,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/techstack_notify.adb",
+      "lines": 227,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/hooks/techstack_hook.adb",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/techstack_main.adb",
+      "lines": 329,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/techstack_enforcer.ads",
+        "to": "src/core/techstack_json_io.adb",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/core/techstack_json_io.adb",
+        "to": "src/core/techstack_notify.adb",
+        "relation": "shared_dir:src/core",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/install-repo-hooks.sh",
+          "scripts/install.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

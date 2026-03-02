@@ -1,0 +1,191 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [],
+  "statistics": {
+    "total_lines": 5355,
+    "unsafe_blocks": 8,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 18,
+    "io_operations": 7,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/es6/src/bindings/Deno.res.js",
+      "lines": 110,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Deno.res",
+      "lines": 91,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Grafana.res",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Jaeger.res",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Loki.res",
+      "lines": 291,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Prometheus.res",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/adapters/Grafana.res",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/adapters/Jaeger.res",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/adapters/Loki.res",
+      "lines": 291,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/adapters/Prometheus.res",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/bindings/Deno.res",
+      "lines": 91,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "memory",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/adapters/Grafana.res",
+        "to": "src/adapters/Jaeger.res",
+        "relation": "shared_dir:src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "src/adapters/Jaeger.res",
+        "to": "src/adapters/Loki.res",
+        "relation": "shared_dir:src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "src/adapters/Loki.res",
+        "to": "src/adapters/Prometheus.res",
+        "relation": "shared_dir:src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Deno.res",
+        "to": "lib/ocaml/Grafana.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Grafana.res",
+        "to": "lib/ocaml/Jaeger.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Jaeger.res",
+        "to": "lib/ocaml/Loki.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Loki.res",
+        "to": "lib/ocaml/Prometheus.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": []
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "UncheckedError",
+      "location": "src/rescript/utils/Encryption.res",
+      "severity": "Medium",
+      "description": "6 ignore() calls in src/rescript/utils/Encryption.res (may discard important results)",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 6313,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 4,
+    "io_operations": 2,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/rescript/core/Injector.res",
+      "lines": 423,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rescript/crdt/Types.res",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rescript/providers/ApiProvider.res",
+      "lines": 317,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": []
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/rescript/utils/Encryption.res"
+        ],
+        "frameworks": [],
+        "relation": "UncheckedError->Memory"
+      }
+    ]
+  }
+}

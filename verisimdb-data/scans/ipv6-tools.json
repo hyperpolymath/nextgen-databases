@@ -1,0 +1,207 @@
+{
+  "program_path": "/var/mnt/eclipse/repos/ipv6-tools",
+  "language": "shell",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "ipv6-only/crates/core/src/lib.rs",
+      "severity": "Medium",
+      "description": "13 unwrap/expect calls in ipv6-only/crates/core/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ipv6-only/crates/subnet/src/lib.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in ipv6-only/crates/subnet/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "ipv6-only/scripts/he-cert-check.sh",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in ipv6-only/scripts/he-cert-check.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "ipv6-only/scripts/he-check-status.sh",
+      "severity": "Medium",
+      "description": "29 potentially unquoted variable expansions in ipv6-only/scripts/he-check-status.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "ipv6-only/scripts/he-tunnel-setup.sh",
+      "severity": "Medium",
+      "description": "44 potentially unquoted variable expansions in ipv6-only/scripts/he-tunnel-setup.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "ipv6-only/scripts/he-tunnel-setup.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in ipv6-only/scripts/he-tunnel-setup.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "ipv6-only/scripts/he-update-endpoint.sh",
+      "severity": "Medium",
+      "description": "28 potentially unquoted variable expansions in ipv6-only/scripts/he-update-endpoint.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "ipv6-only/src/scripts/ipv6-config.sh",
+      "severity": "Critical",
+      "description": "eval usage in ipv6-only/src/scripts/ipv6-config.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "ipv6-only/src/scripts/ipv6-config.sh",
+      "severity": "Medium",
+      "description": "24 potentially unquoted variable expansions in ipv6-only/src/scripts/ipv6-config.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 3934,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 23,
+    "allocation_sites": 0,
+    "io_operations": 19,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "ipv6-only/crates/core/src/lib.rs",
+      "lines": 406,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 13,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ipv6-only/crates/subnet/src/lib.rs",
+      "lines": 216,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ipv6-only/crates/utils/src/lib.rs",
+      "lines": 302,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ipv6-only/scripts/he-cert-check.sh",
+      "lines": 99,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ipv6-only/scripts/he-check-status.sh",
+      "lines": 153,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ipv6-only/scripts/he-tunnel-setup.sh",
+      "lines": 236,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ipv6-only/scripts/he-update-endpoint.sh",
+      "lines": 130,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ipv6-only/src/scripts/ipv6-config.sh",
+      "lines": 314,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu",
+    "network",
+    "memory"
+  ]
+}

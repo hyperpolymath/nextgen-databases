@@ -1,0 +1,707 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= VQL Architecture: Dual-Path Query Router
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+This document describes the **corrected** VQL (VeriSim Query Language) architecture, aligned with link:../design-decisions.adoc[Architecture Design Decisions] and the link:../WHITEPAPER.md[VeriSimDB White Paper].
+
+**Key Corrections from Initial Design:**
+
+* ❌ **NOT** using CockroachDB for query metadata
+* ✅ **Using** ReScript registry + Raft consensus (Elixir)
+* ❌ **NOT** using Fluree for audit trails
+* ✅ **Using** `verisim-temporal` (Merkle trees) for immutable logs
+* ✅ **Integrated** drift detection/repair via Elixir `DriftMonitor`
+
+== 1. Core Architecture: Dual-Path Router
+
+VQL provides two execution paths for queries:
+
+[source,text]
+----
+                 ┌─────────────────┐
+                 │  VQL Query      │
+                 │  (raw string)   │
+                 └────────┬────────┘
+                          │
+            ┌─────────────▼────────────────┐
+            │   Has PROOF clause?          │
+            └──────┬──────────────┬────────┘
+                   │              │
+          YES ◄────┘              └────► NO
+           │                                │
+    ┌──────▼──────────┐         ┌─────────▼──────────┐
+    │ Dependent-Type  │         │   Slipstream       │
+    │ Path            │         │   Path             │
+    │ (Verified)      │         │   (Unverified)     │
+    └──────┬──────────┘         └─────────┬──────────┘
+           │                                │
+           │                                │
+    ┌──────▼──────────────────────┬────────▼─────────┐
+    │                                                  │
+    │         VeriSim Orchestrator (Elixir)           │
+    │                                                  │
+    └──────┬─────────────────────────────┬────────────┘
+           │                              │
+    ┌──────▼────────┐            ┌───────▼───────┐
+    │ Oxigraph      │            │ Milvus        │
+    │ (Graph)       │            │ (Vector)      │
+    └───────────────┘            └───────────────┘
+           │                              │
+    ┌──────▼────────┐            ┌───────▼───────┐
+    │ Tantivy       │            │ Burn          │
+    │ (Document)    │            │ (Tensor)      │
+    └───────────────┘            └───────────────┘
+----
+
+== 2. Component Architecture
+
+=== 2.1. ReScript Core
+
+**Location:** `verisimdb/src/vql/`
+
+**Components:**
+
+[source,text]
+----
+src/vql/
+├── VQLParser.res          # Parses raw query to AST
+├── VQLTypeChecker.res     # Type checks with proven-library
+├── VQLRouter.res          # Main routing logic (dual-path)
+├── VQLResponse.res        # Response formatting
+└── bindings/
+    ├── ProvenLibrary.res  # FFI to proven-library (Rust)
+    └── ElixirRouter.res   # FFI to Elixir orchestrator
+----
+
+**Registry Integration:**
+
+[source,rescript]
+// VQLRouter.res
+module VQL = {
+  type queryMetadata = {
+    queryId: string,
+    timestamp: float,
+    usedDependentTypes: bool,
+    proof: option<ZKP.t>,
+    hexadIds: array<string>,
+  }
+
+  let handleQuery = (rawQuery: string, useDependentTypes: bool) => {
+    // Log to verisim-temporal (NOT Fluree)
+    let queryId = TemporalLog.appendQuery(rawQuery)
+
+    if (useDependentTypes) {
+      // Dependent-Type Path
+      rawQuery
+      -> VQLParser.parseToTypedAST
+      -> TypeChecker.validateWithProvenLibrary
+      -> DriftMonitor.checkConsistency  // Check for drift
+      -> FederatedExecutor.executeWithZKP
+      -> TemporalLog.appendResult(queryId)  // Merkle tree audit trail
+      -> Response.withProof
+    } else {
+      // Slipstream Path
+      rawQuery
+      -> VQLParser.parseToUntypedAST
+      -> FederatedExecutor.executeUnverified
+      -> TemporalLog.appendResult(queryId)  // Still log (no proof)
+      -> Response.withoutProof
+    }
+  }
+
+  // Store metadata in ReScript registry (NOT CockroachDB)
+  let storeQueryMetadata = (metadata: queryMetadata) => {
+    Registry.updateHexadMetadata(metadata.hexadIds, {
+      lastQueried: metadata.timestamp,
+      queryCount: Registry.incrementCounter,
+    })
+  }
+}
+----
+
+=== 2.2. Elixir Orchestration
+
+**Location:** `verisimdb/lib/verisim/`
+
+**Components:**
+
+[source,text]
+----
+lib/verisim/
+├── query_router.ex        # Main query routing GenServer
+├── drift_monitor.ex       # Drift detection/repair
+├── federated_executor.ex  # Distributes queries to stores
+├── raft_metadata.ex       # Raft consensus for metadata
+└── temporal_log.ex        # Audit trail (Merkle trees)
+----
+
+**Query Router (Corrected):**
+
+[source,elixir]
+# lib/verisim/query_router.ex
+defmodule VeriSim.QueryRouter do
+  use GenServer
+
+  @doc """
+  Routes queries to appropriate modality stores.
+  Integrates with DriftMonitor for consistency checks.
+  """
+
+  def handle_query(%{typed: true} = query) do
+    # Dependent-Type Path
+    with {:ok, proof} <- ProvenLibrary.generate_zkp(query.ast),
+         {:ok, _} <- DriftMonitor.check_consistency(query.hexad_ids),
+         {:ok, results} <- distribute_to_stores(query),
+         :ok <- TemporalLog.append(query.id, results, proof) do
+      {:ok, %{data: results, proof: proof, verified: true}}
+    else
+      {:error, :drift_detected} = err ->
+        case query.drift_policy do
+          :strict -> err
+          :repair ->
+            DriftMonitor.repair_and_retry(query)
+          :tolerate ->
+            # Continue despite drift
+            {:ok, results} = distribute_to_stores(query)
+            {:ok, %{data: results, proof: nil, verified: false, warning: "Drift detected"}}
+        end
+      error -> error
+    end
+  end
+
+  def handle_query(%{typed: false} = query) do
+    # Slipstream Path
+    {:ok, results} = distribute_to_stores(query)
+    :ok = TemporalLog.append(query.id, results, nil)  # Log without proof
+    {:ok, %{data: results, proof: nil, verified: false}}
+  end
+
+  defp distribute_to_stores(query) do
+    # Route to Oxigraph, Milvus, Tantivy, etc. based on modalities
+    query.modalities
+    |> Enum.map(&route_to_store(&1, query))
+    |> Task.async_stream(&execute_subquery/1, max_concurrency: 6)
+    |> Enum.reduce({:ok, []}, &aggregate_results/2)
+  end
+
+  defp route_to_store("GRAPH", query), do: {:oxigraph, query.graph_ast}
+  defp route_to_store("VECTOR", query), do: {:milvus, query.vector_ast}
+  defp route_to_store("DOCUMENT", query), do: {:tantivy, query.document_ast}
+  defp route_to_store("TENSOR", query), do: {:burn, query.tensor_ast}
+  defp route_to_store("SEMANTIC", query), do: {:verisim_semantic, query.semantic_ast}
+  defp route_to_store("TEMPORAL", query), do: {:verisim_temporal, query.temporal_ast}
+end
+----
+
+=== 2.3. Metadata Storage (Corrected)
+
+**NOT using CockroachDB.** Instead:
+
+**Registry (ReScript + Raft):**
+
+[source,elixir]
+# lib/verisim/raft_metadata.ex
+defmodule VeriSim.RaftMetadata do
+  @moduledoc """
+  Raft consensus for registry metadata.
+  Stores UUID → store mappings, NOT query results.
+
+  Per design-decisions.adoc:
+  - Use ReScript + Raft for <20 nodes
+  - Only migrate to CockroachDB if >20 nodes AND need SQL queries
+  """
+
+  use GenServer
+
+  # Raft log entries
+  @type log_entry :: %{
+    term: integer(),
+    index: integer(),
+    command: :register_hexad | :update_metadata | :register_node,
+    data: map()
+  }
+
+  def register_hexad(hexad_id, store_id, modalities) do
+    # Append to Raft log (consensus required)
+    entry = %{
+      command: :register_hexad,
+      data: %{hexad_id: hexad_id, store_id: store_id, modalities: modalities}
+    }
+    GenServer.call(__MODULE__, {:append_entry, entry})
+  end
+
+  def lookup_hexad(hexad_id) do
+    # Read from replicated state (no consensus needed)
+    GenServer.call(__MODULE__, {:lookup, hexad_id})
+  end
+end
+----
+
+**Migration Path:**
+
+[source,text]
+----
+Phase 1: ReScript + Raft (in-memory, <20 nodes) ← START HERE
+  ↓
+Phase 2: ReScript + etcd (20-50 nodes)
+  ↓
+Phase 3: CockroachDB (50+ nodes, complex queries)
+----
+
+=== 2.4. Audit Trail (Corrected)
+
+**NOT using Fluree.** Instead:
+
+**verisim-temporal (Merkle Trees):**
+
+[source,rust]
+// verisim-temporal/src/audit_log.rs (Rust crate)
+use blake3::Hasher;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+pub struct QueryLogEntry {
+    pub query_id: String,
+    pub timestamp: i64,
+    pub query_text: String,
+    pub result_hash: [u8; 32],  // Blake3 hash of results
+    pub proof: Option<Vec<u8>>,  // ZKP bytes (if dependent-type)
+    pub parent_hash: [u8; 32],   // Previous entry in Merkle chain
+}
+
+impl QueryLogEntry {
+    pub fn compute_hash(&self) -> [u8; 32] {
+        let mut hasher = Hasher::new();
+        hasher.update(self.query_id.as_bytes());
+        hasher.update(&self.timestamp.to_le_bytes());
+        hasher.update(self.query_text.as_bytes());
+        hasher.update(&self.result_hash);
+        hasher.update(&self.parent_hash);
+        *hasher.finalize().as_bytes()
+    }
+
+    pub fn verify_chain(&self, previous: &QueryLogEntry) -> bool {
+        self.parent_hash == previous.compute_hash()
+    }
+}
+
+// Elixir NIF interface
+#[rustler::nif]
+fn append_query_log(
+    query_id: String,
+    query_text: String,
+    result_hash: Vec<u8>,
+    proof: Option<Vec<u8>>,
+    parent_hash: Vec<u8>,
+) -> Result<Vec<u8>, String> {
+    let entry = QueryLogEntry {
+        query_id,
+        timestamp: chrono::Utc::now().timestamp(),
+        query_text,
+        result_hash: result_hash.try_into().map_err(|_| "Invalid hash")?,
+        proof,
+        parent_hash: parent_hash.try_into().map_err(|_| "Invalid parent hash")?,
+    };
+    Ok(entry.compute_hash().to_vec())
+}
+----
+
+**Elixir Integration:**
+
+[source,elixir]
+# lib/verisim/temporal_log.ex
+defmodule VeriSim.TemporalLog do
+  @moduledoc """
+  Immutable audit trail using Merkle trees.
+  Implemented in verisim-temporal Rust crate (NOT Fluree).
+  """
+
+  use Rustler, otp_app: :verisimdb, crate: "verisim_temporal"
+
+  # NIF functions (implemented in Rust)
+  def append_query_log(_query_id, _query_text, _result_hash, _proof, _parent_hash),
+    do: :erlang.nif_error(:nif_not_loaded)
+
+  def verify_chain(_start_hash, _end_hash, _entries),
+    do: :erlang.nif_error(:nif_not_loaded)
+
+  def append(query_id, results, proof) do
+    result_hash = :crypto.hash(:blake3, :erlang.term_to_binary(results))
+    parent_hash = get_latest_hash()
+
+    case append_query_log(
+      query_id,
+      get_query_text(query_id),
+      result_hash,
+      proof,
+      parent_hash
+    ) do
+      {:ok, new_hash} ->
+        # Store in append-only log file
+        persist_to_disk(query_id, new_hash)
+        :ok
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+end
+----
+
+=== 2.5. Drift Detection Integration
+
+**Elixir DriftMonitor:**
+
+[source,elixir]
+# lib/verisim/drift_monitor.ex
+defmodule VeriSim.DriftMonitor do
+  @moduledoc """
+  Detects and repairs drift across federated nodes.
+  Integrates with VQL query path.
+  """
+
+  use GenServer
+
+  def check_consistency(hexad_ids) do
+    hexad_ids
+    |> Enum.map(&fetch_versions_from_nodes/1)
+    |> detect_drift()
+    |> case do
+      {:ok, :consistent} -> {:ok, :consistent}
+      {:error, :drift_detected, details} -> {:error, :drift_detected, details}
+    end
+  end
+
+  def repair_and_retry(query) do
+    # Statistical drift repair per whitepaper Section 4
+    case apply_repair_policy(query.hexad_ids, query.drift_policy) do
+      {:ok, :repaired} ->
+        # Retry query after repair
+        VeriSim.QueryRouter.handle_query(query)
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  defp fetch_versions_from_nodes(hexad_id) do
+    # Query all nodes in federation for versions
+    nodes = Registry.get_nodes_for_hexad(hexad_id)
+    Enum.map(nodes, fn node ->
+      {node, TemporalLog.get_latest_version(node, hexad_id)}
+    end)
+  end
+
+  defp detect_drift(versions_by_node) do
+    # Check for Merkle tree divergence
+    hashes = Enum.map(versions_by_node, fn {_node, version} -> version.hash end)
+
+    if Enum.uniq(hashes) |> length() == 1 do
+      {:ok, :consistent}
+    else
+      {:error, :drift_detected, %{divergent_hashes: hashes}}
+    end
+  end
+end
+----
+
+== 3. API Endpoint Design
+
+=== 3.1. WASM Proxy Endpoint
+
+**ReScript WASM module behind Cloudflare SDP:**
+
+[source,rescript]
+// src/vql/VQLEndpoint.res
+module Endpoint = {
+  @post("/api/v1/query")
+  let queryEndpoint = (req: {body: string, headers: dict<string>}) => {
+    let useDependentTypes = Dict.get(req.headers, "X-VQL-Safe") == Some("true")
+
+    // Parse and route query
+    let result = VQL.handleQuery(req.body, useDependentTypes)
+
+    // Return with appropriate headers
+    {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "X-VQL-Verified": result.verified ? "true" : "false",
+        "X-Query-ID": result.queryId,
+      },
+      body: JSON.stringify(result),
+    }
+  }
+}
+----
+
+=== 3.2. Client SDK
+
+**ReScript Client:**
+
+[source,rescript]
+// Client SDK for VQL
+module VQLClient = {
+  type queryOptions = {
+    useDependentTypes: bool,
+    driftPolicy: option<[#Strict | #Repair | #Tolerate | #Latest]>,
+    timeout: option<int>,
+  }
+
+  let query = async (vql: string, options: queryOptions) => {
+    let headers = options.useDependentTypes
+      ? {"X-VQL-Safe": "true", "Content-Type": "text/vql"}
+      : {"Content-Type": "text/vql"}
+
+    let response = await fetch("/api/v1/query", {
+      method: "POST",
+      headers: headers,
+      body: vql,
+    })
+
+    let result = await response->Response.json
+
+    if (result.verified) {
+      // Dependent-type response - verify proof
+      let proofValid = await ProvenLibrary.verify(result.proof, result.data)
+      if (!proofValid) {
+        raise(ProofVerificationError("ZKP verification failed"))
+      }
+    } else {
+      Console.warn("Unverified query result (slipstream path)")
+    }
+
+    result
+  }
+}
+
+// Usage example
+let searchPapers = async () => {
+  let vql = `
+    SELECT GRAPH, VECTOR
+    FROM FEDERATION /universities/*
+    WHERE (h)-[:CITES]->(target)
+      AND h.embedding SIMILAR TO [0.1, 0.2, 0.3]
+    PROOF CITATION(CitationContract)
+    LIMIT 100
+  `
+
+  let result = await VQLClient.query(vql, {
+    useDependentTypes: true,
+    driftPolicy: Some(#Repair),
+    timeout: Some(30000),
+  })
+
+  Console.log(result.data)
+}
+----
+
+== 4. Security and Zero Trust
+
+=== 4.1. Dependent-Type Path Security
+
+**Guarantees:**
+
+1. **ZKP Verification** - All queries require valid proofs from `proven-library`
+2. **Drift Detection** - Consistency checked before execution
+3. **Audit Trail** - Immutable Merkle chain in `verisim-temporal`
+4. **Access Control** - Enforced by semantic contracts
+
+**Example Flow:**
+
+[source,text]
+----
+1. Client sends query with PROOF clause
+2. ReScript parser creates typed AST
+3. TypeChecker validates with proven-library
+   ├─ Generates ZKP for query constraints
+   └─ Validates modality compatibility
+4. DriftMonitor checks consistency
+   ├─ If STRICT: Fail on any drift
+   ├─ If REPAIR: Auto-repair and continue
+   └─ If TOLERATE: Continue despite drift
+5. FederatedExecutor distributes to stores
+6. Results aggregated with proof attached
+7. TemporalLog appends to Merkle chain
+8. Response returned with ZKP
+----
+
+=== 4.2. Slipstream Path Security
+
+**Limitations:**
+
+1. **No ZKP** - Results not formally verified
+2. **No Drift Check** - May return inconsistent data
+3. **Rate Limited** - Enforced by Cloudflare SDP
+4. **Scoped to Public Data** - Semantic contracts still enforced
+
+**Use Cases:**
+
+- Exploratory queries
+- Performance-critical applications
+- Internal queries with trusted data
+- Real-time recommendations
+
+== 5. Performance Comparison
+
+|===
+| Metric | Slipstream | Dependent-Type | Notes
+
+| **Parse Time**
+| 5-10ms
+| 20-50ms
+| Typed AST more complex
+
+| **Type Check**
+| N/A
+| 50-100ms
+| proven-library validation
+
+| **Drift Check**
+| N/A
+| 20-200ms
+| Depends on federation size
+
+| **ZKP Generation**
+| N/A
+| 100-500ms
+| Per whitepaper Section 5
+
+| **Query Execution**
+| 50-500ms
+| 50-500ms
+| Same (federated execution)
+
+| **Total Latency**
+| 55-510ms
+| 240-1350ms
+| 4-5x slower for verification
+
+| **Audit Trail**
+| Logged
+| Logged + Proof
+| Both paths logged
+
+| **Guarantees**
+| None
+| Formal
+| Trade-off
+|===
+
+== 6. Implementation Roadmap
+
+=== Phase 1: Grammar & Slipstream Parser (Week 1-2)
+
+- [ ] Finalize VQL grammar (link:vql-grammar.ebnf[])
+- [ ] Implement slipstream parser in ReScript
+- [ ] Add basic AST types
+- [ ] Test with simple queries
+
+=== Phase 2: Type Checker (Week 3-4)
+
+- [ ] Design typed AST with dependent types
+- [ ] Integrate `proven-library` for ZKP
+- [ ] Add modality compatibility rules
+- [ ] Test dependent-type queries
+
+=== Phase 3: Elixir Federation (Week 5-6)
+
+- [ ] Extend `VeriSim.QueryRouter` for dual-path
+- [ ] Integrate `DriftMonitor` checks
+- [ ] Implement result aggregation
+- [ ] Test federated queries
+
+=== Phase 4: WASM Endpoint (Week 7-8)
+
+- [ ] Compile VQL to WASM
+- [ ] Deploy behind Cloudflare SDP
+- [ ] Add rate limiting
+- [ ] Complete audit logging
+
+== 7. References
+
+- link:vql-grammar.ebnf[VQL Grammar (EBNF)]
+- link:vql-examples.adoc[VQL Examples]
+- link:../WHITEPAPER.md[VeriSimDB White Paper]
+- link:../design-decisions.adoc[Architecture Design Decisions]
+- link:technical-specification-kraft-metadata-log.adoc[KRaft Metadata Log]
+- link:challenges-federated.adoc[Federated Deployment Challenges]
+
+== Appendix A: Migration from Initial Design
+
+|===
+| Initial Design | Corrected Design | Justification
+
+| CockroachDB for metadata
+| ReScript + Raft
+| Simpler, sufficient for <20 nodes (link:../design-decisions.adoc:247[])
+
+| Fluree for audit trails
+| verisim-temporal (Merkle trees)
+| Lighter weight, no blockchain overhead (link:../design-decisions.adoc:140[])
+
+| No drift integration
+| DriftMonitor checks
+| Core feature per whitepaper Section 4
+
+| SQL queries on metadata
+| Key-value registry lookups
+| Registry is simple UUID → store mapping
+
+| CockroachDB geo-partitioning
+| Raft quorum
+| Only migrate to CockroachDB if >20 nodes (link:../design-decisions.adoc:224[])
+|===
+
+== Appendix B: Technology Stack
+
+|===
+| Component | Technology | Why
+
+| **Parser**
+| ReScript + parser combinators
+| Type safety, WASM target
+
+| **Registry**
+| ReScript + Raft (Elixir)
+| Whitepaper Section 2.1
+
+| **Orchestration**
+| Elixir GenServers
+| Fault tolerance, distribution
+
+| **ZKP**
+| proven-library (Rust)
+| Your existing ZKP library
+
+| **Audit Trail**
+| verisim-temporal (Rust)
+| Merkle trees, immutability
+
+| **Graph Store**
+| Oxigraph (Rust)
+| SPARQL, RDF compliance
+
+| **Vector Store**
+| Milvus
+| HNSW, GPU support
+
+| **Document Store**
+| Tantivy (Rust)
+| Full-text, inverted indices
+
+| **Tensor Store**
+| Burn (Rust)
+| ndarray, WASM target
+
+| **Semantic Store**
+| verisim-semantic (Rust)
+| CBOR + proven integration
+
+| **Temporal Store**
+| verisim-temporal (Rust)
+| Version trees, drift detection
+|===

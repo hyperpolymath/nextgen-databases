@@ -1,0 +1,22 @@
+{
+  "id": "recipe-deno-least-privilege",
+  "triangle_tier": "substitute",
+  "pattern_ids": [
+    "PA015-deno-a-all-permissions",
+    "PA015-excessive-permissions"
+  ],
+  "description": "Replace Deno -A (all permissions) with least-privilege permission flags (--allow-read, --allow-net, etc.)",
+  "action": "substitute_text",
+  "match": "deno run -A or deno run --allow-all",
+  "replacement": "deno run --allow-read=./src --allow-net=api.example.com (specific grants only)",
+  "confidence": 0.75,
+  "proven_module": null,
+  "proven_modules": [],
+  "formally_proven": false,
+  "languages": ["javascript", "shell", "bash"],
+  "auto_fixable": false,
+  "fix_script": null,
+  "successful_fixes": 0,
+  "failed_fixes": 0,
+  "total_attempts": 0
+}

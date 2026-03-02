@@ -1,0 +1,744 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "UncheckedError",
+      "location": "contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ffi/zig/src/main.zig",
+      "severity": "High",
+      "description": "2 unsafe pointer casts in ffi/zig/src/main.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/presswerk-security/src/audit.rs",
+      "severity": "Medium",
+      "description": "13 unwrap/expect calls in crates/presswerk-security/src/audit.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/presswerk-security/src/certificates.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in crates/presswerk-security/src/certificates.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/presswerk-print/src/ipp_server.rs",
+      "severity": "Medium",
+      "description": "72 unwrap/expect calls in crates/presswerk-print/src/ipp_server.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "ResourceLeak",
+      "location": "crates/presswerk-print/src/ipp_server.rs",
+      "severity": "High",
+      "description": "std::mem::forget usage (potential resource leak) in crates/presswerk-print/src/ipp_server.rs",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/presswerk-print/src/queue.rs",
+      "severity": "Medium",
+      "description": "31 unwrap/expect calls in crates/presswerk-print/src/queue.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "crates/presswerk-bridge/src/ios/mod.rs",
+      "severity": "High",
+      "description": "40 unsafe blocks in crates/presswerk-bridge/src/ios/mod.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "crates/presswerk-bridge/src/ios/mod.rs",
+      "severity": "High",
+      "description": "Raw pointer cast in crates/presswerk-bridge/src/ios/mod.rs",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "crates/presswerk-bridge/src/android/mod.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in crates/presswerk-bridge/src/android/mod.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/presswerk-app/src/services/app_services.rs",
+      "severity": "Medium",
+      "description": "14 unwrap/expect calls in crates/presswerk-app/src/services/app_services.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 13025,
+    "unsafe_blocks": 61,
+    "panic_sites": 1,
+    "unwrap_calls": 152,
+    "allocation_sites": 43,
+    "io_operations": 28,
+    "threading_constructs": 9
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 283,
+      "unsafe_blocks": 17,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 257,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "crates/presswerk-core/src/error.rs",
+      "lines": 69,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-security/src/integrity.rs",
+      "lines": 75,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-security/src/storage.rs",
+      "lines": 126,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-security/src/audit.rs",
+      "lines": 269,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 13,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-security/src/certificates.rs",
+      "lines": 144,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-document/src/pdf/reader.rs",
+      "lines": 377,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-document/src/pdf/writer.rs",
+      "lines": 322,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 9,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-document/src/image/processor.rs",
+      "lines": 284,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-document/src/scan/enhance.rs",
+      "lines": 749,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-document/src/scan/ocr.rs",
+      "lines": 430,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-print/src/discovery.rs",
+      "lines": 292,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "crates/presswerk-print/src/ipp_client.rs",
+      "lines": 277,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-print/src/ipp_server.rs",
+      "lines": 2170,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 72,
+      "allocation_sites": 4,
+      "io_operations": 10,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "crates/presswerk-print/src/queue.rs",
+      "lines": 430,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 31,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-bridge/src/ios/mod.rs",
+      "lines": 866,
+      "unsafe_blocks": 40,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "crates/presswerk-bridge/src/android/mod.rs",
+      "lines": 952,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-bridge/src/lib.rs",
+      "lines": 35,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-app/src/pages/print.rs",
+      "lines": 181,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-app/src/pages/scan.rs",
+      "lines": 196,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-app/src/pages/edit.rs",
+      "lines": 239,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-app/src/main.rs",
+      "lines": 133,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-app/src/state.rs",
+      "lines": 70,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-app/src/services/data_dir.rs",
+      "lines": 36,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/presswerk-app/src/services/app_services.rs",
+      "lines": 358,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 14,
+      "allocation_sites": 1,
+      "io_operations": 4,
+      "threading_constructs": 1
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu",
+    "memory",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "crates/presswerk-document/src/scan/enhance.rs",
+        "to": "crates/presswerk-document/src/scan/ocr.rs",
+        "relation": "shared_dir:crates/presswerk-document/src/scan",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-print/src/discovery.rs",
+        "to": "crates/presswerk-print/src/ipp_client.rs",
+        "relation": "shared_dir:crates/presswerk-print/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-print/src/ipp_client.rs",
+        "to": "crates/presswerk-print/src/ipp_server.rs",
+        "relation": "shared_dir:crates/presswerk-print/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-print/src/ipp_server.rs",
+        "to": "crates/presswerk-print/src/queue.rs",
+        "relation": "shared_dir:crates/presswerk-print/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-app/src/services/data_dir.rs",
+        "to": "crates/presswerk-app/src/services/app_services.rs",
+        "relation": "shared_dir:crates/presswerk-app/src/services",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-document/src/pdf/reader.rs",
+        "to": "crates/presswerk-document/src/pdf/writer.rs",
+        "relation": "shared_dir:crates/presswerk-document/src/pdf",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-security/src/integrity.rs",
+        "to": "crates/presswerk-security/src/storage.rs",
+        "relation": "shared_dir:crates/presswerk-security/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-security/src/storage.rs",
+        "to": "crates/presswerk-security/src/audit.rs",
+        "relation": "shared_dir:crates/presswerk-security/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-security/src/audit.rs",
+        "to": "crates/presswerk-security/src/certificates.rs",
+        "relation": "shared_dir:crates/presswerk-security/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-app/src/pages/print.rs",
+        "to": "crates/presswerk-app/src/pages/scan.rs",
+        "relation": "shared_dir:crates/presswerk-app/src/pages",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-app/src/pages/scan.rs",
+        "to": "crates/presswerk-app/src/pages/edit.rs",
+        "relation": "shared_dir:crates/presswerk-app/src/pages",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-app/src/main.rs",
+        "to": "crates/presswerk-app/src/state.rs",
+        "relation": "shared_dir:crates/presswerk-app/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 51.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "crates/presswerk-core/src/error.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-security/src/integrity.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "crates/presswerk-security/src/storage.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "crates/presswerk-security/src/audit.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "crates/presswerk-security/src/certificates.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "crates/presswerk-document/src/pdf/reader.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-document/src/pdf/writer.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-document/src/image/processor.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-document/src/scan/enhance.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "crates/presswerk-document/src/scan/ocr.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "crates/presswerk-print/src/discovery.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "crates/presswerk-print/src/ipp_client.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-print/src/ipp_server.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 76.0
+      },
+      {
+        "from": "crates/presswerk-print/src/queue.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 31.0
+      },
+      {
+        "from": "crates/presswerk-bridge/src/ios/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 122.0
+      },
+      {
+        "from": "crates/presswerk-bridge/src/android/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "crates/presswerk-bridge/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-app/src/pages/print.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-app/src/pages/scan.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-app/src/pages/edit.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-app/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-app/src/state.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-app/src/services/data_dir.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/presswerk-app/src/services/app_services.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 16.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "ResourceLeak",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "crates/presswerk-print/src/ipp_server.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "ResourceLeak->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "crates/presswerk-bridge/src/ios/mod.rs",
+          "crates/presswerk-bridge/src/android/mod.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Concurrency"
+      },
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          "contractiles/k9/template-hunt.k9.ncl"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "ffi/zig/src/main.zig",
+          "crates/presswerk-bridge/src/ios/mod.rs",
+          "crates/presswerk-bridge/src/ios/mod.rs",
+          "crates/presswerk-bridge/src/android/mod.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "crates/presswerk-security/src/audit.rs",
+          "crates/presswerk-security/src/certificates.rs",
+          "crates/presswerk-print/src/ipp_server.rs",
+          "crates/presswerk-print/src/queue.rs",
+          "crates/presswerk-app/src/services/app_services.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "crates/presswerk-security/src/audit.rs",
+          "crates/presswerk-security/src/certificates.rs",
+          "crates/presswerk-print/src/ipp_server.rs",
+          "crates/presswerk-print/src/queue.rs",
+          "crates/presswerk-app/src/services/app_services.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      }
+    ]
+  }
+}

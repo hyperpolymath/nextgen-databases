@@ -1,0 +1,22 @@
+{
+  "action": "refactor_pattern",
+  "auto_fixable": false,
+  "confidence": 0.70,
+  "description": "Replace panic!/unreachable! macros with Result return types",
+  "failed_fixes": 0,
+  "fix_script": null,
+  "id": "recipe-panic-to-result",
+  "languages": [
+    "rust"
+  ],
+  "match": "panic!() or unreachable!() in non-test code",
+  "pattern_ids": [
+    "PA005-panic-macro",
+    "PA005-unreachable-macro"
+  ],
+  "proven_module": null,
+  "replacement": "Return Result<T, E> or use anyhow::bail!()",
+  "successful_fixes": 0,
+  "total_attempts": 0,
+  "triangle_tier": "substitute"
+}

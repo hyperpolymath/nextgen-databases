@@ -1,0 +1,23 @@
+{
+  "id": "recipe-eval-to-safe-exec",
+  "triangle_tier": "eliminate",
+  "pattern_ids": [
+    "PA011-eval-usage",
+    "PA011-eval-call",
+    "PA011-dynamic-eval"
+  ],
+  "description": "Eliminate eval() and shell eval usage; replace with structured dispatch, AST interpretation, or safe command execution",
+  "action": "refactor_pattern",
+  "match": "eval(), eval, or Function() constructor for dynamic code execution",
+  "replacement": "Structured dispatch table, command pattern, or sandboxed interpreter",
+  "confidence": 0.60,
+  "proven_module": null,
+  "proven_modules": [],
+  "formally_proven": false,
+  "languages": ["javascript", "shell", "bash", "racket", "*"],
+  "auto_fixable": false,
+  "fix_script": null,
+  "successful_fixes": 0,
+  "failed_fixes": 0,
+  "total_attempts": 0
+}

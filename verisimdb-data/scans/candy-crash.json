@@ -1,0 +1,546 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "frontend/src/Api.res",
+      "severity": "Medium",
+      "description": "6 unsafe get calls in frontend/src/Api.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/check-languages.sh",
+      "severity": "Critical",
+      "description": "eval usage in scripts/check-languages.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/check-languages.sh",
+      "severity": "Medium",
+      "description": "30 potentially unquoted variable expansions in scripts/check-languages.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 10932,
+    "unsafe_blocks": 14,
+    "panic_sites": 0,
+    "unwrap_calls": 6,
+    "allocation_sites": 31,
+    "io_operations": 20,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "backend/src/candy_crash/arango/client.gleam",
+      "lines": 324,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "backend/src/candy_crash/handlers/achievements.gleam",
+      "lines": 110,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "backend/src/candy_crash/handlers/auth.gleam",
+      "lines": 230,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "backend/src/candy_crash/handlers/courses.gleam",
+      "lines": 450,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "backend/src/candy_crash/handlers/dashboard.gleam",
+      "lines": 227,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "backend/src/candy_crash/handlers/enrollments.gleam",
+      "lines": 148,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "backend/src/candy_crash/handlers/lessons.gleam",
+      "lines": 308,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "backend/src/candy_crash/handlers/quizzes.gleam",
+      "lines": 462,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "backend/src/candy_crash/handlers/training.gleam",
+      "lines": 612,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "backend/src/candy_crash/middleware/auth.gleam",
+      "lines": 109,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "backend/src/candy_crash/middleware/cors.gleam",
+      "lines": 28,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "backend/src/candy_crash/router.gleam",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/components/CourseCard.res",
+      "lines": 41,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/components/Footer.res",
+      "lines": 32,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/components/Header.res",
+      "lines": 39,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/pages/CourseDetail.res",
+      "lines": 106,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/pages/Dashboard.res",
+      "lines": 114,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/pages/Demo.res",
+      "lines": 378,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/pages/ForgotPassword.res",
+      "lines": 88,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/pages/Home.res",
+      "lines": 73,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/pages/Lesson.res",
+      "lines": 96,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/pages/Login.res",
+      "lines": 53,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/pages/NotFound.res",
+      "lines": 17,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/pages/Quiz.res",
+      "lines": 41,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/pages/Register.res",
+      "lines": 67,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/Api.res",
+      "lines": 578,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "frontend/src/Main.res",
+      "lines": 574,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bootstrap.sh",
+      "lines": 221,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "backend/src/candy_crash/handlers/achievements.gleam",
+        "to": "backend/src/candy_crash/handlers/auth.gleam",
+        "relation": "shared_dir:backend/src/candy_crash/handlers",
+        "weight": 1.0
+      },
+      {
+        "from": "backend/src/candy_crash/handlers/auth.gleam",
+        "to": "backend/src/candy_crash/handlers/courses.gleam",
+        "relation": "shared_dir:backend/src/candy_crash/handlers",
+        "weight": 1.0
+      },
+      {
+        "from": "backend/src/candy_crash/handlers/courses.gleam",
+        "to": "backend/src/candy_crash/handlers/dashboard.gleam",
+        "relation": "shared_dir:backend/src/candy_crash/handlers",
+        "weight": 1.0
+      },
+      {
+        "from": "backend/src/candy_crash/handlers/dashboard.gleam",
+        "to": "backend/src/candy_crash/handlers/enrollments.gleam",
+        "relation": "shared_dir:backend/src/candy_crash/handlers",
+        "weight": 1.0
+      },
+      {
+        "from": "backend/src/candy_crash/handlers/enrollments.gleam",
+        "to": "backend/src/candy_crash/handlers/lessons.gleam",
+        "relation": "shared_dir:backend/src/candy_crash/handlers",
+        "weight": 1.0
+      },
+      {
+        "from": "backend/src/candy_crash/handlers/lessons.gleam",
+        "to": "backend/src/candy_crash/handlers/quizzes.gleam",
+        "relation": "shared_dir:backend/src/candy_crash/handlers",
+        "weight": 1.0
+      },
+      {
+        "from": "backend/src/candy_crash/handlers/quizzes.gleam",
+        "to": "backend/src/candy_crash/handlers/training.gleam",
+        "relation": "shared_dir:backend/src/candy_crash/handlers",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/components/CourseCard.res",
+        "to": "frontend/src/components/Footer.res",
+        "relation": "shared_dir:frontend/src/components",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/components/Footer.res",
+        "to": "frontend/src/components/Header.res",
+        "relation": "shared_dir:frontend/src/components",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "backend/src/candy_crash/middleware/auth.gleam",
+        "to": "backend/src/candy_crash/middleware/cors.gleam",
+        "relation": "shared_dir:backend/src/candy_crash/middleware",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/pages/CourseDetail.res",
+        "to": "frontend/src/pages/Dashboard.res",
+        "relation": "shared_dir:frontend/src/pages",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/pages/Dashboard.res",
+        "to": "frontend/src/pages/Demo.res",
+        "relation": "shared_dir:frontend/src/pages",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/pages/Demo.res",
+        "to": "frontend/src/pages/ForgotPassword.res",
+        "relation": "shared_dir:frontend/src/pages",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/pages/ForgotPassword.res",
+        "to": "frontend/src/pages/Home.res",
+        "relation": "shared_dir:frontend/src/pages",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/pages/Home.res",
+        "to": "frontend/src/pages/Lesson.res",
+        "relation": "shared_dir:frontend/src/pages",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/pages/Lesson.res",
+        "to": "frontend/src/pages/Login.res",
+        "relation": "shared_dir:frontend/src/pages",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/pages/Login.res",
+        "to": "frontend/src/pages/NotFound.res",
+        "relation": "shared_dir:frontend/src/pages",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/pages/NotFound.res",
+        "to": "frontend/src/pages/Quiz.res",
+        "relation": "shared_dir:frontend/src/pages",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/pages/Quiz.res",
+        "to": "frontend/src/pages/Register.res",
+        "relation": "shared_dir:frontend/src/pages",
+        "weight": 1.0
+      },
+      {
+        "from": "frontend/src/Api.res",
+        "to": "frontend/src/Main.res",
+        "relation": "shared_dir:frontend/src",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "scripts/check-languages.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "frontend/src/Api.res"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "scripts/check-languages.sh",
+          "scripts/check-languages.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

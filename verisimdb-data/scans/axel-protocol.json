@@ -1,0 +1,241 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "DynamicCodeExecution",
+      "location": "src/Tea.res.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in src/Tea.res.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "lib/bs/src/Tea.res.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in lib/bs/src/Tea.res.js",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 5199,
+    "unsafe_blocks": 43,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 7,
+    "io_operations": 1,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/Tea.res",
+      "lines": 69,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/AxelApp.res",
+      "lines": 72,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/AxelSts.res",
+      "lines": 90,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/AxelSts.res",
+      "lines": 90,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/AxelApp.res",
+      "lines": 72,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/Tea.res",
+      "lines": 69,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/AxelSts.res",
+      "lines": 90,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/AxelApp.res",
+      "lines": 72,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Tea.res",
+      "lines": 69,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/Tea.res",
+        "to": "src/AxelApp.res",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/AxelApp.res",
+        "to": "src/AxelSts.res",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/AxelSts.res",
+        "to": "lib/ocaml/AxelApp.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/AxelApp.res",
+        "to": "lib/ocaml/Tea.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/src/AxelSts.res",
+        "to": "lib/bs/src/AxelApp.res",
+        "relation": "shared_dir:lib/bs/src",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/src/AxelApp.res",
+        "to": "lib/bs/src/Tea.res",
+        "relation": "shared_dir:lib/bs/src",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "src/Tea.res.js",
+          "lib/bs/src/Tea.res.js"
+        ],
+        "frameworks": [],
+        "relation": "DynamicCodeExecution->Network"
+      }
+    ]
+  }
+}

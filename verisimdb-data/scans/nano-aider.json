@@ -1,0 +1,96 @@
+{
+  "program_path": ".",
+  "language": "ada",
+  "frameworks": [],
+  "weak_points": [],
+  "statistics": {
+    "total_lines": 1695,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 1,
+    "io_operations": 8,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/nano_aider-config.adb",
+      "lines": 188,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/nano_aider-options.adb",
+      "lines": 234,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/nano_aider-profiles.adb",
+      "lines": 150,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/nano_aider.adb",
+      "lines": 98,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/test_options.adb",
+      "lines": 66,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/nano_aider-config.adb",
+        "to": "src/nano_aider-options.adb",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/nano_aider-options.adb",
+        "to": "src/nano_aider-profiles.adb",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/nano_aider-profiles.adb",
+        "to": "src/nano_aider.adb",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": []
+  }
+}

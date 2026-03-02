@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+
+[package]
+name = "verisim-semantic"
+description = "Semantic modality - ontology and type system via CBOR proofs"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+ciborium.workspace = true
+chrono.workspace = true
+regex = { workspace = true, optional = true }
+sha2.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+hex = "0.4"
+
+[features]
+default = ["regex"]
+
+[dev-dependencies]
+proptest.workspace = true

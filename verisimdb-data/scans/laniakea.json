@@ -1,0 +1,367 @@
+{
+  "program_path": ".",
+  "language": "elixir",
+  "frameworks": [
+    "OTP",
+    "WebServer",
+    "Phoenix"
+  ],
+  "weak_points": [
+    {
+      "category": "ExcessivePermissions",
+      "location": "cli/laniakea.ts",
+      "severity": "High",
+      "description": "Deno -A (all permissions) in cli/laniakea.ts",
+      "recommended_attack": [
+        "network",
+        "disk"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "schemas/config.ncl",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in schemas/config.ncl",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "server/lib/mix/tasks/laniakea.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in server/lib/mix/tasks/laniakea.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "server/lib/laniakea_web.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in server/lib/laniakea_web.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 10647,
+    "unsafe_blocks": 30,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 4,
+    "threading_constructs": 3
+  },
+  "file_statistics": [
+    {
+      "file_path": "cli/laniakea.ts",
+      "lines": 1450,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "client/src/adapters/Capabilities.res",
+      "lines": 121,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "client/src/transport/Channel.res",
+      "lines": 192,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "client/lib/bs/src/transport/Channel.res",
+      "lines": 192,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "client/lib/ocaml/Channel.res",
+      "lines": 192,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/lib/laniakea/command/bus.ex",
+      "lines": 264,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "server/lib/laniakea/crdt/registry.ex",
+      "lines": 272,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "server/lib/laniakea/policy/engine.ex",
+      "lines": 245,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "memory",
+    "cpu",
+    "network"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "cli/laniakea.ts",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/laniakea.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/laniakea.ts",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "client/src/adapters/Capabilities.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "client/src/adapters/Capabilities.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "client/src/adapters/Capabilities.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "client/src/transport/Channel.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "client/src/transport/Channel.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "client/src/transport/Channel.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "client/lib/bs/src/transport/Channel.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "client/lib/bs/src/transport/Channel.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "client/lib/bs/src/transport/Channel.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "client/lib/ocaml/Channel.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "client/lib/ocaml/Channel.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "client/lib/ocaml/Channel.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "server/lib/laniakea/command/bus.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/lib/laniakea/command/bus.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/lib/laniakea/command/bus.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/lib/laniakea/crdt/registry.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/lib/laniakea/crdt/registry.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/lib/laniakea/crdt/registry.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/lib/laniakea/policy/engine.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/lib/laniakea/policy/engine.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/lib/laniakea/policy/engine.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "server/lib/laniakea_web.ex"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          "cli/laniakea.ts"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "ExcessivePermissions->Disk"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "cli/laniakea.ts"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "ExcessivePermissions->Network"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "schemas/config.ncl"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "HardcodedSecret->Network"
+      },
+      {
+        "source_category": "AtomExhaustion",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "server/lib/mix/tasks/laniakea.ex"
+        ],
+        "frameworks": [
+          "OTP",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "AtomExhaustion->Memory"
+      }
+    ]
+  }
+}

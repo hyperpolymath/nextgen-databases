@@ -1,0 +1,3350 @@
+{
+  "program_path": ".",
+  "language": "nickel",
+  "frameworks": [
+    "OTP",
+    "Networking",
+    "WebServer",
+    "Phoenix"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "netstack/configs/install.sh",
+      "severity": "Medium",
+      "description": "47 potentially unquoted variable expansions in netstack/configs/install.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "netstack/modules/twingate-helm-deploy/ai-cli-crash-capture/recoverer-setup.sh",
+      "severity": "Medium",
+      "description": "47 potentially unquoted variable expansions in netstack/modules/twingate-helm-deploy/ai-cli-crash-capture/recoverer-setup.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "netstack/modules/twingate-helm-deploy/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in netstack/modules/twingate-helm-deploy/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "netstack/modules/twingate-helm-deploy/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in netstack/modules/twingate-helm-deploy/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "netstack/modules/zerotier-k8s-link/ai-cli-crash-capture/recoverer-setup.sh",
+      "severity": "Medium",
+      "description": "47 potentially unquoted variable expansions in netstack/modules/zerotier-k8s-link/ai-cli-crash-capture/recoverer-setup.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "netstack/modules/zerotier-k8s-link/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in netstack/modules/zerotier-k8s-link/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "netstack/modules/zerotier-k8s-link/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in netstack/modules/zerotier-k8s-link/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "netstack/modules/ipfs-overlay/scripts/connect-peers.sh",
+      "severity": "Medium",
+      "description": "21 potentially unquoted variable expansions in netstack/modules/ipfs-overlay/scripts/connect-peers.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/records.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/records.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/zone.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/zone.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "netstack/modules/bgp-backbone-lab/ai-cli-crash-capture/recoverer-setup.sh",
+      "severity": "Medium",
+      "description": "47 potentially unquoted variable expansions in netstack/modules/bgp-backbone-lab/ai-cli-crash-capture/recoverer-setup.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "netstack/modules/bgp-backbone-lab/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in netstack/modules/bgp-backbone-lab/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "netstack/modules/bgp-backbone-lab/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in netstack/modules/bgp-backbone-lab/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "netstack/modules/poly-k8s-mcp/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in netstack/modules/poly-k8s-mcp/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "ExcessivePermissions",
+      "location": "netstack/modules/poly-k8s-mcp/run-test.sh",
+      "severity": "High",
+      "description": "Deno -A (all permissions) in netstack/modules/poly-k8s-mcp/run-test.sh",
+      "recommended_attack": [
+        "network",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "netstack/modules/poly-secret-mcp/lib/ocaml/SOPS.res",
+      "severity": "High",
+      "description": "2 JSON.parseExn calls in netstack/modules/poly-secret-mcp/lib/ocaml/SOPS.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "netstack/modules/poly-secret-mcp/lib/ocaml/Vault.res",
+      "severity": "High",
+      "description": "7 JSON.parseExn calls in netstack/modules/poly-secret-mcp/lib/ocaml/Vault.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "netstack/modules/poly-secret-mcp/src/adapters/SOPS.res",
+      "severity": "High",
+      "description": "2 JSON.parseExn calls in netstack/modules/poly-secret-mcp/src/adapters/SOPS.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "netstack/modules/poly-secret-mcp/src/adapters/Vault.res",
+      "severity": "High",
+      "description": "7 JSON.parseExn calls in netstack/modules/poly-secret-mcp/src/adapters/Vault.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "netstack/modules/poly-observability-mcp/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in netstack/modules/poly-observability-mcp/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "netstack/orchestrator/lib/flatracoon_orchestrator/health_monitor.ex",
+      "severity": "Medium",
+      "description": "System command execution in netstack/orchestrator/lib/flatracoon_orchestrator/health_monitor.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "netstack/orchestrator/lib/flatracoon_orchestrator/module_discovery.ex",
+      "severity": "Medium",
+      "description": "System command execution in netstack/orchestrator/lib/flatracoon_orchestrator/module_discovery.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "netstack/orchestrator/lib/flatracoon_orchestrator/module_registry.ex",
+      "severity": "Medium",
+      "description": "System command execution in netstack/orchestrator/lib/flatracoon_orchestrator/module_registry.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "netstack/orchestrator/lib/flatracoon_orchestrator_web.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in netstack/orchestrator/lib/flatracoon_orchestrator_web.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "netstack/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in netstack/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "os/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in os/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 36542,
+    "unsafe_blocks": 89,
+    "panic_sites": 18,
+    "unwrap_calls": 20,
+    "allocation_sites": 35,
+    "io_operations": 59,
+    "threading_constructs": 19
+  },
+  "file_statistics": [
+    {
+      "file_path": "netstack/configs/system/flatracoon.ncl",
+      "lines": 131,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/configs/environments.ncl",
+      "lines": 128,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/configs/install.sh",
+      "lines": 166,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/configs/modules.ncl",
+      "lines": 152,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "netstack/interface/src/FlatRacoonClient.res",
+      "lines": 371,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/interface/src/FlatRacoonClient.res.js",
+      "lines": 564,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/twingate-helm-deploy/ai-cli-crash-capture/recoverer-setup.sh",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/twingate-helm-deploy/configs/production.ncl",
+      "lines": 6,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/twingate-helm-deploy/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/twingate-helm-deploy/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/twingate-helm-deploy/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "netstack/modules/twingate-helm-deploy/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/twingate-helm-deploy/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/zerotier-k8s-link/ai-cli-crash-capture/recoverer-setup.sh",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/zerotier-k8s-link/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/zerotier-k8s-link/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/zerotier-k8s-link/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "netstack/modules/zerotier-k8s-link/scripts/authorize-nodes.sh",
+      "lines": 40,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/zerotier-k8s-link/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/zerotier-k8s-link/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/ipfs-overlay/scripts/generate-swarm-key.sh",
+      "lines": 29,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/hesiod-dns-map/configs/hesiod/flatracoon.ncl",
+      "lines": 90,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/hesiod-dns-map/crates/hesinfo/src/main.rs",
+      "lines": 269,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/config.rs",
+      "lines": 137,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/health.rs",
+      "lines": 76,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/records.rs",
+      "lines": 368,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/server.rs",
+      "lines": 205,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 4
+    },
+    {
+      "file_path": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/zone.rs",
+      "lines": 242,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/bgp-backbone-lab/ai-cli-crash-capture/recoverer-setup.sh",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/bgp-backbone-lab/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/bgp-backbone-lab/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/bgp-backbone-lab/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "netstack/modules/bgp-backbone-lab/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/bgp-backbone-lab/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/network-dashboard/lib/network_dashboard/module_poller.ex",
+      "lines": 60,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "netstack/modules/poly-k8s-mcp/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kubectl.res",
+      "lines": 342,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kustomize.res",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-k8s-mcp/lib/bs/src/bindings/Deno.res",
+      "lines": 70,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-k8s-mcp/lib/ocaml/Deno.res",
+      "lines": 70,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kubectl.res",
+      "lines": 342,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kustomize.res",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-k8s-mcp/src/adapters/Kubectl.res",
+      "lines": 342,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-k8s-mcp/src/adapters/Kustomize.res",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-k8s-mcp/src/bindings/Deno.res",
+      "lines": 70,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-secret-mcp/lib/ocaml/Deno.res",
+      "lines": 45,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-secret-mcp/lib/ocaml/SOPS.res",
+      "lines": 233,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-secret-mcp/lib/ocaml/Vault.res",
+      "lines": 260,
+      "unsafe_blocks": 0,
+      "panic_sites": 7,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-secret-mcp/src/adapters/SOPS.res",
+      "lines": 233,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-secret-mcp/src/adapters/Vault.res",
+      "lines": 260,
+      "unsafe_blocks": 0,
+      "panic_sites": 7,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-secret-mcp/src/bindings/Deno.res",
+      "lines": 45,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/lib/es6/src/bindings/Deno.res.js",
+      "lines": 110,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/lib/ocaml/Deno.res",
+      "lines": 91,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/lib/ocaml/Grafana.res",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/lib/ocaml/Jaeger.res",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/lib/ocaml/Loki.res",
+      "lines": 291,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/lib/ocaml/Prometheus.res",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/src/adapters/Grafana.res",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/src/adapters/Jaeger.res",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/src/adapters/Loki.res",
+      "lines": 291,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/src/adapters/Prometheus.res",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/modules/poly-observability-mcp/src/bindings/Deno.res",
+      "lines": 91,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/orchestrator/lib/flatracoon_orchestrator/health_monitor.ex",
+      "lines": 235,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "netstack/orchestrator/lib/flatracoon_orchestrator/module_registry.ex",
+      "lines": 576,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "netstack/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/tui/src/flatracoon-api_client.adb",
+      "lines": 549,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/tui/src/flatracoon-api_client.ads",
+      "lines": 82,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/tui/src/flatracoon-commands.adb",
+      "lines": 248,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/tui/src/flatracoon-commands.ads",
+      "lines": 54,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/tui/src/flatracoon-display.adb",
+      "lines": 123,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "netstack/tui/src/flatracoon_tui.adb",
+      "lines": 59,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "os/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "os/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "os/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "os/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "disk",
+    "memory",
+    "concurrency",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Deno.res",
+        "to": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kubectl.res",
+        "relation": "shared_dir:netstack/modules/poly-k8s-mcp/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kubectl.res",
+        "to": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kustomize.res",
+        "relation": "shared_dir:netstack/modules/poly-k8s-mcp/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/adapters/Kubectl.res",
+        "to": "netstack/modules/poly-k8s-mcp/src/adapters/Kustomize.res",
+        "relation": "shared_dir:netstack/modules/poly-k8s-mcp/src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/src/abi/Foreign.idr",
+        "to": "netstack/src/abi/Types.idr",
+        "relation": "shared_dir:netstack/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/Deno.res",
+        "to": "netstack/modules/poly-secret-mcp/lib/ocaml/SOPS.res",
+        "relation": "shared_dir:netstack/modules/poly-secret-mcp/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/SOPS.res",
+        "to": "netstack/modules/poly-secret-mcp/lib/ocaml/Vault.res",
+        "relation": "shared_dir:netstack/modules/poly-secret-mcp/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Grafana.res",
+        "to": "netstack/modules/poly-observability-mcp/src/adapters/Jaeger.res",
+        "relation": "shared_dir:netstack/modules/poly-observability-mcp/src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Jaeger.res",
+        "to": "netstack/modules/poly-observability-mcp/src/adapters/Loki.res",
+        "relation": "shared_dir:netstack/modules/poly-observability-mcp/src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Loki.res",
+        "to": "netstack/modules/poly-observability-mcp/src/adapters/Prometheus.res",
+        "relation": "shared_dir:netstack/modules/poly-observability-mcp/src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/environments.ncl",
+        "to": "netstack/configs/install.sh",
+        "relation": "shared_dir:netstack/configs",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/install.sh",
+        "to": "netstack/configs/modules.ncl",
+        "relation": "shared_dir:netstack/configs",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/config.rs",
+        "to": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/health.rs",
+        "relation": "shared_dir:netstack/modules/hesiod-dns-map/crates/hesiod-lib/src",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/health.rs",
+        "to": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/records.rs",
+        "relation": "shared_dir:netstack/modules/hesiod-dns-map/crates/hesiod-lib/src",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/records.rs",
+        "to": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/server.rs",
+        "relation": "shared_dir:netstack/modules/hesiod-dns-map/crates/hesiod-lib/src",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/server.rs",
+        "to": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/zone.rs",
+        "relation": "shared_dir:netstack/modules/hesiod-dns-map/crates/hesiod-lib/src",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/adapters/SOPS.res",
+        "to": "netstack/modules/poly-secret-mcp/src/adapters/Vault.res",
+        "relation": "shared_dir:netstack/modules/poly-secret-mcp/src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/src/abi/Foreign.idr",
+        "to": "netstack/modules/zerotier-k8s-link/src/abi/Types.idr",
+        "relation": "shared_dir:netstack/modules/zerotier-k8s-link/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kubectl.res",
+        "to": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kustomize.res",
+        "relation": "shared_dir:netstack/modules/poly-k8s-mcp/lib/bs/src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/interface/src/FlatRacoonClient.res",
+        "to": "netstack/interface/src/FlatRacoonClient.res.js",
+        "relation": "shared_dir:netstack/interface/src",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/src/abi/Foreign.idr",
+        "to": "netstack/modules/bgp-backbone-lab/src/abi/Types.idr",
+        "relation": "shared_dir:netstack/modules/bgp-backbone-lab/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-api_client.adb",
+        "to": "netstack/tui/src/flatracoon-api_client.ads",
+        "relation": "shared_dir:netstack/tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-api_client.ads",
+        "to": "netstack/tui/src/flatracoon-commands.adb",
+        "relation": "shared_dir:netstack/tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-commands.adb",
+        "to": "netstack/tui/src/flatracoon-commands.ads",
+        "relation": "shared_dir:netstack/tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-commands.ads",
+        "to": "netstack/tui/src/flatracoon-display.adb",
+        "relation": "shared_dir:netstack/tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-display.adb",
+        "to": "netstack/tui/src/flatracoon_tui.adb",
+        "relation": "shared_dir:netstack/tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Deno.res",
+        "to": "netstack/modules/poly-observability-mcp/lib/ocaml/Grafana.res",
+        "relation": "shared_dir:netstack/modules/poly-observability-mcp/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Grafana.res",
+        "to": "netstack/modules/poly-observability-mcp/lib/ocaml/Jaeger.res",
+        "relation": "shared_dir:netstack/modules/poly-observability-mcp/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Jaeger.res",
+        "to": "netstack/modules/poly-observability-mcp/lib/ocaml/Loki.res",
+        "relation": "shared_dir:netstack/modules/poly-observability-mcp/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Loki.res",
+        "to": "netstack/modules/poly-observability-mcp/lib/ocaml/Prometheus.res",
+        "relation": "shared_dir:netstack/modules/poly-observability-mcp/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "os/src/abi/Foreign.idr",
+        "to": "os/src/abi/Types.idr",
+        "relation": "shared_dir:os/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/src/abi/Foreign.idr",
+        "to": "netstack/modules/twingate-helm-deploy/src/abi/Types.idr",
+        "relation": "shared_dir:netstack/modules/twingate-helm-deploy/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/orchestrator/lib/flatracoon_orchestrator/health_monitor.ex",
+        "to": "netstack/orchestrator/lib/flatracoon_orchestrator/module_registry.ex",
+        "relation": "shared_dir:netstack/orchestrator/lib/flatracoon_orchestrator",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/system/flatracoon.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/system/flatracoon.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/system/flatracoon.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/system/flatracoon.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/environments.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/environments.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/environments.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/environments.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/install.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/install.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/install.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/install.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/modules.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/modules.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/modules.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/configs/modules.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/ffi/zig/src/main.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/ffi/zig/test/integration_test.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/interface/src/FlatRacoonClient.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "netstack/interface/src/FlatRacoonClient.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "netstack/interface/src/FlatRacoonClient.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "netstack/interface/src/FlatRacoonClient.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "netstack/interface/src/FlatRacoonClient.res.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/interface/src/FlatRacoonClient.res.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/interface/src/FlatRacoonClient.res.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/interface/src/FlatRacoonClient.res.js",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/configs/production.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/configs/production.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/configs/production.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/configs/production.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/contractiles/trust/Trustfile.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ffi/zig/src/main.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/ffi/zig/test/integration_test.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/src/abi/Foreign.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/twingate-helm-deploy/src/abi/Types.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/contractiles/trust/Trustfile.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ffi/zig/src/main.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/ffi/zig/test/integration_test.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/scripts/authorize-nodes.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/scripts/authorize-nodes.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/scripts/authorize-nodes.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/scripts/authorize-nodes.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/src/abi/Foreign.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/zerotier-k8s-link/src/abi/Types.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/ipfs-overlay/scripts/generate-swarm-key.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/ipfs-overlay/scripts/generate-swarm-key.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/ipfs-overlay/scripts/generate-swarm-key.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/ipfs-overlay/scripts/generate-swarm-key.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/configs/hesiod/flatracoon.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/configs/hesiod/flatracoon.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/configs/hesiod/flatracoon.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/configs/hesiod/flatracoon.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesinfo/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesinfo/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesinfo/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesinfo/src/main.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/config.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/config.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/config.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/health.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/health.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/health.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/health.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/records.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/records.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/records.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/records.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/server.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/server.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/server.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/server.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/zone.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/zone.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/zone.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/zone.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ai-cli-crash-capture/recoverer-setup.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/contractiles/trust/Trustfile.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ffi/zig/src/main.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/ffi/zig/test/integration_test.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/src/abi/Foreign.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/bgp-backbone-lab/src/abi/Types.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/network-dashboard/lib/network_dashboard/module_poller.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/modules/network-dashboard/lib/network_dashboard/module_poller.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/modules/network-dashboard/lib/network_dashboard/module_poller.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/modules/network-dashboard/lib/network_dashboard/module_poller.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/contractiles/trust/Trustfile.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kubectl.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kubectl.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kubectl.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kubectl.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kustomize.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kustomize.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kustomize.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/adapters/Kustomize.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/bindings/Deno.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/bindings/Deno.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/bindings/Deno.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/bs/src/bindings/Deno.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Deno.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Deno.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Deno.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Deno.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kubectl.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kubectl.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kubectl.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kubectl.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kustomize.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kustomize.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kustomize.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/lib/ocaml/Kustomize.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/adapters/Kubectl.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/adapters/Kubectl.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/adapters/Kubectl.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/adapters/Kubectl.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/adapters/Kustomize.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/adapters/Kustomize.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/adapters/Kustomize.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/adapters/Kustomize.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/bindings/Deno.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/bindings/Deno.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/bindings/Deno.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-k8s-mcp/src/bindings/Deno.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/Deno.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/Deno.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/Deno.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/Deno.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/SOPS.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/SOPS.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/SOPS.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/SOPS.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/Vault.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/Vault.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/Vault.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/lib/ocaml/Vault.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/adapters/SOPS.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/adapters/SOPS.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/adapters/SOPS.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/adapters/SOPS.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/adapters/Vault.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/adapters/Vault.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/adapters/Vault.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/adapters/Vault.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/bindings/Deno.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/bindings/Deno.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/bindings/Deno.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-secret-mcp/src/bindings/Deno.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/contractiles/trust/Trustfile.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/es6/src/bindings/Deno.res.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/es6/src/bindings/Deno.res.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/es6/src/bindings/Deno.res.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/es6/src/bindings/Deno.res.js",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Deno.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Deno.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Deno.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Deno.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Grafana.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Grafana.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Grafana.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Grafana.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Jaeger.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Jaeger.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Jaeger.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Jaeger.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Loki.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Loki.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Loki.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Loki.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Prometheus.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Prometheus.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Prometheus.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/lib/ocaml/Prometheus.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Grafana.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Grafana.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Grafana.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Grafana.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Jaeger.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Jaeger.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Jaeger.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Jaeger.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Loki.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Loki.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Loki.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Loki.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Prometheus.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Prometheus.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Prometheus.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/adapters/Prometheus.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/bindings/Deno.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/bindings/Deno.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/bindings/Deno.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/modules/poly-observability-mcp/src/bindings/Deno.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "netstack/orchestrator/lib/flatracoon_orchestrator/health_monitor.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/orchestrator/lib/flatracoon_orchestrator/health_monitor.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/orchestrator/lib/flatracoon_orchestrator/health_monitor.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/orchestrator/lib/flatracoon_orchestrator/health_monitor.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/orchestrator/lib/flatracoon_orchestrator/module_registry.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/orchestrator/lib/flatracoon_orchestrator/module_registry.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/orchestrator/lib/flatracoon_orchestrator/module_registry.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/orchestrator/lib/flatracoon_orchestrator/module_registry.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "netstack/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/src/abi/Foreign.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "netstack/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/src/abi/Types.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-api_client.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-api_client.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-api_client.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-api_client.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-api_client.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-api_client.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-api_client.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-api_client.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-commands.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-commands.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-commands.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-commands.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-commands.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-commands.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-commands.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-commands.ads",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-display.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-display.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-display.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon-display.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon_tui.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon_tui.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon_tui.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "netstack/tui/src/flatracoon_tui.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "os/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "os/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "os/ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "os/ffi/zig/src/main.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "os/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "os/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "os/ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "os/ffi/zig/test/integration_test.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "os/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "os/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "os/src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "os/src/abi/Foreign.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "os/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "os/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "os/src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "os/src/abi/Types.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          "netstack/modules/twingate-helm-deploy/contractiles/k9/template-hunt.k9.ncl",
+          "netstack/modules/zerotier-k8s-link/contractiles/k9/template-hunt.k9.ncl",
+          "netstack/modules/bgp-backbone-lab/contractiles/k9/template-hunt.k9.ncl",
+          "netstack/modules/poly-k8s-mcp/contractiles/k9/template-hunt.k9.ncl",
+          "netstack/modules/poly-observability-mcp/contractiles/k9/template-hunt.k9.ncl"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "netstack/modules/poly-k8s-mcp/run-test.sh"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "ExcessivePermissions->Network"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "netstack/orchestrator/lib/flatracoon_orchestrator_web.ex"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "netstack/modules/twingate-helm-deploy/src/abi/Foreign.idr",
+          "netstack/modules/zerotier-k8s-link/src/abi/Foreign.idr",
+          "netstack/modules/bgp-backbone-lab/src/abi/Foreign.idr",
+          "netstack/src/abi/Foreign.idr",
+          "os/src/abi/Foreign.idr"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "netstack/orchestrator/lib/flatracoon_orchestrator/health_monitor.ex",
+          "netstack/orchestrator/lib/flatracoon_orchestrator/module_discovery.ex",
+          "netstack/orchestrator/lib/flatracoon_orchestrator/module_registry.ex"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "netstack/configs/install.sh",
+          "netstack/modules/twingate-helm-deploy/ai-cli-crash-capture/recoverer-setup.sh",
+          "netstack/modules/zerotier-k8s-link/ai-cli-crash-capture/recoverer-setup.sh",
+          "netstack/modules/ipfs-overlay/scripts/connect-peers.sh",
+          "netstack/modules/bgp-backbone-lab/ai-cli-crash-capture/recoverer-setup.sh",
+          "netstack/orchestrator/lib/flatracoon_orchestrator/health_monitor.ex",
+          "netstack/orchestrator/lib/flatracoon_orchestrator/module_discovery.ex",
+          "netstack/orchestrator/lib/flatracoon_orchestrator/module_registry.ex"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "netstack/modules/poly-secret-mcp/lib/ocaml/SOPS.res",
+          "netstack/modules/poly-secret-mcp/lib/ocaml/Vault.res",
+          "netstack/modules/poly-secret-mcp/src/adapters/SOPS.res",
+          "netstack/modules/poly-secret-mcp/src/adapters/Vault.res"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "UnsafeDeserialization->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/records.rs",
+          "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/zone.rs"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          "netstack/modules/poly-k8s-mcp/run-test.sh"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "ExcessivePermissions->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/records.rs",
+          "netstack/modules/hesiod-dns-map/crates/hesiod-lib/src/zone.rs"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "netstack/modules/poly-secret-mcp/lib/ocaml/SOPS.res",
+          "netstack/modules/poly-secret-mcp/lib/ocaml/Vault.res",
+          "netstack/modules/poly-secret-mcp/src/adapters/SOPS.res",
+          "netstack/modules/poly-secret-mcp/src/adapters/Vault.res"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking",
+          "WebServer",
+          "Phoenix"
+        ],
+        "relation": "UnsafeDeserialization->Cpu"
+      }
+    ]
+  }
+}

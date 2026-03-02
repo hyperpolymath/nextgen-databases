@@ -1,0 +1,331 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Concurrent"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/context.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in src/context.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/persistence.rs",
+      "severity": "Medium",
+      "description": "34 unwrap/expect calls in src/persistence.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 5039,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 60,
+    "allocation_sites": 24,
+    "io_operations": 1,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "examples/basic_usage.rs",
+      "lines": 66,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/reservoir_demo.rs",
+      "lines": 85,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/context.rs",
+      "lines": 377,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/main.rs",
+      "lines": 238,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/orchestrator.rs",
+      "lines": 320,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/router.rs",
+      "lines": 438,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/snn.rs",
+      "lines": 319,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/training.rs",
+      "lines": 529,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 12,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/types.rs",
+      "lines": 301,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/mlp.rs",
+      "lines": 379,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/persistence.rs",
+      "lines": 611,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 34,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/reservoir.rs",
+      "lines": 387,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "memory",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/context.rs",
+        "to": "src/main.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "src/orchestrator.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/orchestrator.rs",
+        "to": "src/router.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/router.rs",
+        "to": "src/snn.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/snn.rs",
+        "to": "src/training.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/training.rs",
+        "to": "src/types.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types.rs",
+        "to": "src/mlp.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/mlp.rs",
+        "to": "src/persistence.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/persistence.rs",
+        "to": "src/reservoir.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/basic_usage.rs",
+        "to": "examples/reservoir_demo.rs",
+        "relation": "shared_dir:examples",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/basic_usage.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/reservoir_demo.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/context.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/orchestrator.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/router.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/snn.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/training.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/mlp.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/persistence.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 34.0
+      },
+      {
+        "from": "src/reservoir.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 2.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "src/context.rs",
+          "src/persistence.rs"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/context.rs",
+          "src/persistence.rs"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

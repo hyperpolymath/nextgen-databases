@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!-- SPDX-License-Identifier: PMPL-1.0-or-later -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="VQL Playground — Interactive query editor for VeriSimDB, the octad multimodal database" />
+  <meta name="theme-color" content="#3b82f6" />
+  <title>VQL Playground — VeriSimDB</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="header">
+    <h1><span class="logo">&#9670;</span> VQL Playground</h1>
+    <div class="header-controls">
+      <div class="mode-toggle">
+        <label for="vql-dt-toggle">VQL</label>
+        <div class="toggle-switch" id="vql-dt-toggle" role="switch" aria-checked="false" tabindex="0">
+          <div class="toggle-knob"></div>
+        </div>
+        <label for="vql-dt-toggle">VQL-DT</label>
+        <span class="mode-badge vql" id="mode-badge">VQL</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="editor-panel">
+      <div class="panel-header">
+        <span>Editor</span>
+        <span id="char-count">0 chars</span>
+      </div>
+      <div class="editor-area">
+        <textarea
+          id="editor"
+          spellcheck="false"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          placeholder="-- Enter your VQL query here&#10;SELECT GRAPH, VECTOR&#10;FROM HEXAD&#10;WHERE name = 'example'&#10;LIMIT 10"
+        ></textarea>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-primary" id="run-btn">Run <kbd>Ctrl+Enter</kbd></button>
+        <button class="btn" id="explain-btn">Explain</button>
+        <button class="btn" id="lint-btn">Lint</button>
+        <button class="btn" id="format-btn">Format</button>
+        <button class="btn" id="clear-btn">Clear</button>
+        <button class="btn" id="examples-btn">Examples</button>
+      </div>
+      <div class="lint-bar" id="lint-bar">Ready</div>
+    </section>
+
+    <section class="output-panel">
+      <div class="panel-header">
+        <span>Output</span>
+        <span id="output-format">table</span>
+      </div>
+      <div id="output">
+<span class="output-info">Welcome to the VQL Playground!
+
+VQL (VeriSim Query Language) is the native query interface for VeriSimDB,
+the octad multimodal database with drift detection and self-normalisation.
+
+Octad modalities: GRAPH, VECTOR, TENSOR, SEMANTIC, DOCUMENT, TEMPORAL, PROVENANCE, SPATIAL
+
+When verisim-api is running on localhost:8080, queries execute against the real backend.
+Otherwise, demo mode simulates responses offline.
+
+Toggle VQL-DT mode for dependent-type features including:
+  - PROOF clause (11 types: EXISTENCE, INTEGRITY, CONSISTENCY, PROVENANCE, FRESHNESS, etc.)
+  - THRESHOLD constraints
+  - Multi-proof composition: PROOF A AND B AND C
+  - Formal verification of query results
+
+Try an example query or start typing in the editor.</span>
+      </div>
+    </section>
+  </main>
+
+  <div class="status-bar" id="status-bar">
+    <span id="status-mode">Mode: VQL</span>
+    <span>playground.verisimdb.org</span>
+    <span id="status-connection">Demo mode (offline)</span>
+  </div>
+
+  <script type="module" src="app.js"></script>
+  <script>
+    // Register service worker for PWA offline support
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
+  </script>
+</body>
+</html>

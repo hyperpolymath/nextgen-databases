@@ -1,0 +1,145 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "core/src/notebook.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in core/src/notebook.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "desktop/src/main.rs",
+      "severity": "Medium",
+      "description": "15 unwrap/expect calls in desktop/src/main.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ui/src/View.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in ui/src/View.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 1748,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 27,
+    "allocation_sites": 2,
+    "io_operations": 3,
+    "threading_constructs": 1
+  },
+  "file_statistics": [
+    {
+      "file_path": "core/src/note.rs",
+      "lines": 192,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "core/src/notebook.rs",
+      "lines": 306,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "core/src/storage.rs",
+      "lines": 100,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "desktop/src/main.rs",
+      "lines": 243,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 15,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "ui/src/View.res",
+      "lines": 273,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "core/src/note.rs",
+        "to": "core/src/notebook.rs",
+        "relation": "shared_dir:core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "core/src/notebook.rs",
+        "to": "core/src/storage.rs",
+        "relation": "shared_dir:core/src",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "core/src/notebook.rs",
+          "desktop/src/main.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "core/src/notebook.rs",
+          "desktop/src/main.rs",
+          "ui/src/View.res"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

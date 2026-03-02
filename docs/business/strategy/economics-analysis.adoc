@@ -1,0 +1,441 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB -- Economics Analysis
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-02-28
+:revremark: Macro and micro economics analysis for VeriSimDB commercialisation
+:toc: macro
+:toclevels: 3
+:sectnums:
+:icons: font
+
+[abstract]
+Macro-economic market analysis and micro-economic pricing strategy for VeriSimDB.
+Covers the data quality tools market, the multimodal database segment, competitive
+pricing analysis against Neo4j Enterprise, Pinecone, Weaviate, and others, and
+open-core pricing model design.
+
+toc::[]
+
+== Macro-Economic Analysis
+
+=== Market Landscape
+
+VeriSimDB operates at the intersection of three established and one emerging
+market segment. The following analysis uses industry reports from 2024-2026
+to size the addressable opportunity.
+
+==== Data Quality Tools Market
+
+[cols="1,3"]
+|===
+| Metric | Value
+
+| Global market size (2024) | $1.7 billion
+| Projected market size (2027) | $2.3 billion (MarketsAndMarkets)
+| CAGR | 10.5%
+| Key drivers | AI adoption (data quality as prerequisite), regulatory compliance
+(GDPR, CCPA, FDA 21 CFR Part 11), cloud migration (multi-system architectures)
+| Key players | Informatica, Talend, IBM, Collibra, Great Expectations, Monte Carlo
+|===
+
+VeriSimDB's relevance to this market is through *cross-system consistency* --
+a specific and currently unaddressed category of data quality. Existing tools
+focus on schema validation (Great Expectations), pipeline observability (Monte
+Carlo), or master data management (Informatica). None detect cross-modal drift
+between different representation types of the same entity.
+
+*Addressable sub-segment:* Approximately 20% of data quality spend is related to
+cross-system inconsistency resolution (ETL repair, manual reconciliation, MDM
+maintenance). This yields a sub-segment of approximately *$460 million* by 2027.
+
+==== Graph Database Market
+
+[cols="1,3"]
+|===
+| Metric | Value
+
+| Global market size (2024) | $3.8 billion
+| Projected market size (2028) | $5.6 billion (Grand View Research)
+| CAGR | 10.2%
+| Key drivers | Knowledge graphs, fraud detection, recommendation engines,
+GraphRAG architectures
+| Key players | Neo4j, Amazon Neptune, TigerGraph, ArangoDB, JanusGraph
+|===
+
+VeriSimDB is not a graph database competitor. However, approximately 5% of
+graph database customers operate multi-model architectures (graph + vector +
+document) where cross-modal consistency is a concern. This yields a
+sub-segment of approximately *$280 million* by 2028.
+
+==== Vector Database Market
+
+[cols="1,3"]
+|===
+| Metric | Value
+
+| Global market size (2024) | $800 million
+| Projected market size (2027) | $1.2 billion (estimated, no consensus report)
+| CAGR | 14.9%
+| Key drivers | LLM/RAG architectures, semantic search, recommendation systems
+| Key players | Pinecone, Weaviate, Qdrant, Milvus, Chroma
+|===
+
+The vector database market is the most rapidly growing segment and the most
+directly relevant to VeriSimDB's Phase 1 strategy (GraphRAG community). Teams
+building RAG pipelines combine vector databases with knowledge graphs and
+document stores -- precisely the multimodal architecture where drift detection
+provides value.
+
+*Addressable sub-segment:* Approximately 10% of vector database customers
+operate hybrid vector + graph architectures. This yields a sub-segment of
+approximately *$120 million* by 2027.
+
+==== Emerging: Multimodal Database Segment
+
+[cols="1,3"]
+|===
+| Metric | Value
+
+| Estimated market size (2026) | $800 million (analyst estimates, no formal report)
+| Projected market size (2030) | $2.5 billion
+| CAGR | ~33% (emerging market, high uncertainty)
+| Key drivers | AI/ML infrastructure, multi-model consolidation, data quality
+| Key players | ArangoDB (multi-model), SurrealDB (multi-model), VeriSimDB
+(multimodal with drift detection)
+|===
+
+This segment is nascent and poorly defined. The distinction between
+"multi-model" (multiple query models over a single storage engine) and
+"multimodal" (multiple representation types with consistency guarantees) is
+not yet recognised by analysts. VeriSimDB has an opportunity to define the
+category.
+
+=== Combined Market Opportunity
+
+[cols="2,1,1,1"]
+|===
+| Segment | TAM | SAM (Addressable Sub-Segment) | SOM (1% Serviceable)
+
+| Data Quality Tools | $2.3B | $460M | $23M
+| Graph Databases | $5.6B | $280M | $14M
+| Vector Databases | $1.2B | $120M | $6M
+| Multimodal Databases | $800M | $160M | $8M
+| *Combined* | | | *$51M*
+|===
+
+The *$51 million SOM* represents a conservative 1% capture of the addressable
+sub-segments. This is achievable with 50-100 enterprise customers at an average
+ACV of $40,000-$50,000.
+
+=== Macro Tailwinds
+
+Several macro-economic trends favour VeriSimDB's positioning:
+
+AI adoption driving multi-system architectures::
+  Every AI/ML pipeline adds at least one new data store (vector database for
+  embeddings, graph database for knowledge graphs). This increases the number of
+  systems holding representations of the same entity, making cross-modal drift
+  more likely and more costly.
+
+Regulatory pressure on data consistency::
+  GDPR (right to erasure across all systems), FDA 21 CFR Part 11 (electronic
+  records integrity), SOX (financial data accuracy), and emerging AI regulations
+  (EU AI Act) all create compliance requirements for cross-system data consistency.
+  Organisations that cannot demonstrate consistency face fines and audit failures.
+
+Cloud migration creating data fragmentation::
+  Organisations migrating to cloud adopt specialised managed services (RDS,
+  DynamoDB, Neptune, OpenSearch, Pinecone) rather than consolidating on a single
+  database. This polyglot persistence pattern is the root cause of cross-modal
+  drift.
+
+Open source as default infrastructure::
+  The database market has shifted to open-source-first adoption. PostgreSQL,
+  MongoDB, Elasticsearch, and Redis are all open source or source-available.
+  VeriSimDB's open-core model aligns with this expectation.
+
+=== Macro Headwinds
+
+Market education required::
+  "Cross-modal drift detection" is not a recognised category. Potential customers
+  do not know they have this problem until they see it demonstrated. Category
+  creation is expensive and time-consuming.
+
+Consolidation pressure::
+  Large database vendors (MongoDB, Snowflake, Databricks) are adding multi-model
+  capabilities. They may eventually add drift detection as a feature, competing
+  with VeriSimDB using existing market position.
+
+Economic uncertainty::
+  IT budget constraints during economic downturns delay new infrastructure
+  adoption. Data quality is often deprioritised relative to revenue-generating
+  features.
+
+== Micro-Economic Analysis
+
+=== Competitive Pricing Analysis
+
+[cols="2,2,2,3"]
+|===
+| Product | Free Tier | Commercial Price | Notes
+
+| *Neo4j*
+| Community Edition (GPLv3)
+| Enterprise: from $36,000/year; AuraDB: from $65/month
+| Community Edition lacks clustering, role-based access, and monitoring.
+Enterprise features are gated.
+
+| *Pinecone*
+| Starter: 1 index, 100K vectors
+| Standard: from $70/month; Enterprise: custom pricing (typically $25K+/year)
+| Fully managed, cloud-only. No self-hosted option. Pricing scales with vector
+count and query volume.
+
+| *Weaviate*
+| Open source (BSD-3)
+| Weaviate Cloud: from $25/month; Enterprise: custom pricing
+| Open source is full-featured. Cloud service adds managed infrastructure.
+Enterprise adds SLA and support.
+
+| *ArangoDB*
+| Community Edition (Apache 2.0)
+| ArangoGraph: from $99/month; Enterprise: custom pricing (est. $30K+/year)
+| Community Edition is full-featured. Enterprise adds SmartGraphs, satellite
+collections, and dedicated support.
+
+| *SurrealDB*
+| Open source (BSL 1.1)
+| SurrealDB Cloud: beta (pricing TBD); Enterprise: not yet available
+| BSL restricts commercial use (converts to Apache 2.0 after 3 years).
+Cloud service is in beta.
+
+| *Qdrant*
+| Open source (Apache 2.0)
+| Qdrant Cloud: from $25/month; Enterprise: custom pricing
+| Full-featured open source. Cloud adds managed infrastructure.
+
+| *VeriSimDB*
+| Community Edition (PMPL)
+| Standard: $25,000/year; Professional: $40,000/year; Enterprise: $75,000/year
+| Full-featured community edition. Commercial licence provides support and SLA,
+not additional features.
+|===
+
+=== Pricing Strategy
+
+==== Principle: No Feature Gating
+
+VeriSimDB's commercial licence does *not* add features beyond the community
+edition. All 8 modalities, drift detection, self-normalisation, VQL, VQL-DT,
+and federation ship in the open-source release.
+
+This is a deliberate strategic choice:
+
+1. *Maximises adoption*: Developers can evaluate the full product without hitting
+   artificial limits. There is no "upgrade to Enterprise for clustering" moment
+   that creates friction.
+
+2. *Builds trust*: The open-source community is increasingly sceptical of
+   "open core" models that gate essential features. Full-featured community
+   editions (Weaviate, ArangoDB Community) earn developer trust.
+
+3. *Targets operational value*: Enterprise customers pay for SLAs, priority
+   patches, deployment consulting, and expert access -- not for features. The
+   operational value of "24-hour security patch response" is worth $40,000/year
+   to a financial services firm; the feature itself (the patch) is free.
+
+==== Pricing Tiers
+
+[cols="1,1,4"]
+|===
+| Tier | ACV | Value Proposition
+
+| *Standard*
+| $25,000
+| For teams that need a support safety net. Email support with 48-hour response.
+Security patches within 7 days. Quarterly architecture review call.
+"Insurance policy" positioning.
+
+| *Professional*
+| $40,000
+| For teams running VeriSimDB in production. Priority support with 24-hour
+response. Security patches within 48 hours. Monthly architecture review.
+8 hours/quarter of deployment consulting included.
+"Operational confidence" positioning.
+
+| *Enterprise*
+| $75,000
+| For organisations with strict compliance requirements. Dedicated support
+channel with 4-hour response. Security patches within 24 hours. Weekly
+architecture review. Unlimited consulting. On-site training (2 days/year).
+"Compliance-grade support" positioning.
+|===
+
+==== Pricing Rationale
+
+The $40,000 Professional tier is the target ACV, positioned as follows:
+
+* *Below* Neo4j Enterprise ($36K+ but typically $50K-$100K with all modules),
+  making it easy for prospects to justify budget
+* *Above* Weaviate Cloud and ArangoDB Cloud managed service costs, reflecting
+  the additional value of drift detection and formal verification
+* *Competitive* with Pinecone Enterprise pricing ($25K+/year), which provides
+  only vector search (1 modality) versus VeriSimDB's 8 modalities
+* *Aligned* with industry benchmarks for open-source database support (Red Hat
+  OpenShift subscriptions, Canonical Ubuntu Pro, Elastic subscriptions)
+
+=== Unit Economics
+
+[cols="2,1,3"]
+|===
+| Metric | Value | Derivation
+
+| *Average Contract Value (ACV)*
+| $40,000
+| Professional tier, most common entry point
+
+| *Customer Acquisition Cost (CAC)*
+| $8,000
+| Developer-led adoption reduces traditional enterprise sales cost; estimated
+as 3 months of DevRel + content costs per conversion
+
+| *LTV:CAC Ratio*
+| 15:1
+| 3-year average retention at $40K ACV = $120K LTV; $120K / $8K = 15:1.
+Target > 3:1 is considered healthy.
+
+| *Payback Period*
+| 2.4 months
+| $8K CAC / ($40K ACV / 12 months) = 2.4 months. Target < 12 months.
+
+| *Gross Margin*
+| 85%
+| Software + support. COGS is primarily support engineer time (15% of ACV).
+
+| *Net Revenue Retention (NRR)*
+| 115%
+| Expansion from Standard to Professional to Enterprise, plus consulting
+add-ons. 5% annual churn offset by 20% expansion.
+
+| *Annual Churn*
+| 5%
+| Conservative estimate. Open-source databases have lower churn than proprietary
+because customers continue using the free edition even if they cancel support.
+
+| *Customer Lifetime*
+| 3 years
+| Average enterprise support contract duration.
+|===
+
+=== Break-Even Analysis
+
+[cols="1,2,2"]
+|===
+| Scenario | Customers Needed | Revenue
+
+| *Minimum viable* (1 employee + founder)
+| 3 Professional contracts
+| $120,000 (covers 1 DevRel hire + infrastructure)
+
+| *Stage 1 team* (3-5 people)
+| 8-10 mixed contracts
+| $300,000-$400,000 (covers core team compensation)
+
+| *Self-sustaining* (10-15 people)
+| 20-25 mixed contracts
+| $800,000-$1,000,000 (covers full org + overhead)
+|===
+
+=== Revenue Projection
+
+[cols="1,1,1,1,1"]
+|===
+| | Year 1 | Year 2 | Year 3 | Year 4
+
+| *Community users* | 500 | 2,000 | 5,000 | 10,000
+| *Standard contracts* | 0 | 2 | 5 | 10
+| *Professional contracts* | 0 | 1 | 5 | 15
+| *Enterprise contracts* | 0 | 0 | 1 | 3
+| *Consulting engagements* | 0 | 3 | 5 | 8
+| *Consulting revenue* | $0 | $45,000 | $75,000 | $120,000
+| *Licence revenue* | $0 | $90,000 | $325,000 | $775,000
+| *Total revenue* | $0 | $135,000 | $400,000 | $895,000
+| *Total costs* | $3,000 | $104,000 | $365,000 | $700,000
+| *Operating profit* | -$3,000 | $31,000 | $35,000 | $195,000
+|===
+
+The conservative projection reaches *operating profitability in Year 2* through
+consulting revenue, with licence revenue becoming the primary driver by Year 3.
+
+== Sensitivity Analysis
+
+=== Best Case
+
+* Community adoption exceeds expectations (GitHub trending, viral blog post)
+* First enterprise customer acquired in Year 1
+* Year 3 revenue: $800,000 (double the conservative projection)
+
+=== Worst Case
+
+* Community adoption is slow (< 200 stars in Year 1)
+* No enterprise customers until Year 3
+* Year 3 revenue: $100,000 (consulting only)
+* Mitigation: VeriSimDB remains a viable open-source project even without
+  commercial revenue; the founder's academic position provides baseline income
+
+=== Key Variables
+
+[cols="2,3,1"]
+|===
+| Variable | Impact | Sensitivity
+
+| Community adoption rate
+| Determines pipeline for enterprise conversion
+| High
+
+| Enterprise sales cycle length
+| 6-12 months typical; longer delays revenue
+| High
+
+| Competitor response (Neo4j adds drift detection)
+| Reduces differentiation but VeriSimDB has
+architectural depth advantage (octad + VQL-DT)
+| Medium
+
+| Pricing acceptance ($40K ACV)
+| May need to lower to $25K for early adopters
+| Medium
+
+| Churn rate
+| 5% assumed; 10% would reduce LTV by 33%
+| Medium
+|===
+
+== Investment Considerations
+
+=== Self-Funded Path
+
+VeriSimDB can reach sustainability without external investment:
+
+* Year 1: Self-funded ($3,000 budget)
+* Year 2: First revenue from consulting ($135,000); hire DevRel lead
+* Year 3: Licence revenue begins ($400,000); hire core engineering team
+* Year 4: Self-sustaining ($895,000 revenue, $195,000 operating profit)
+
+This path is slower but preserves full ownership and avoids the pressure to
+scale prematurely.
+
+=== External Funding (If Pursued)
+
+If external funding is sought, the appropriate stage would be:
+
+* *Pre-seed / Angel* ($100K-$250K, Year 1-2): Accelerate community building,
+  hire DevRel lead 6 months earlier, attend more conferences
+* *Seed* ($500K-$1M, Year 2-3): Hire full Stage 1 team, accelerate enterprise
+  sales, develop managed service
+* *Series A* ($3M-$5M, Year 3-4): Scale to Stage 3 organisation, launch
+  managed service, expand internationally
+
+The self-funded path is the current plan. External funding is documented here
+for completeness, not as a recommendation.

@@ -1,0 +1,583 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= VeriSimDB Getting Started Guide
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc: left
+:toclevels: 3
+:icons: font
+:source-highlighter: rouge
+
+== What Is VeriSimDB?
+
+VeriSimDB is a *cross-system entity consistency engine* with drift detection
+and self-normalisation. It treats every entity as an **octad** -- eight
+simultaneous representations (modalities) that are continuously monitored
+for consistency:
+
+[cols="1,3"]
+|===
+| Modality | What It Stores
+
+| *Graph* | RDF triples, property graph edges, relationships
+| *Vector* | Embedding vectors for similarity search (HNSW)
+| *Tensor* | Multi-dimensional numerical arrays (ndarray/Burn)
+| *Semantic* | Type annotations, ontology terms, proof blobs (CBOR)
+| *Document* | Full-text searchable content (Tantivy)
+| *Temporal* | Version history, time-series data
+| *Provenance* | Origin tracking, transformation chains, actor trails
+| *Spatial* | Geospatial coordinates, geometries (R-tree)
+|===
+
+When any modality drifts from the others -- an embedding no longer matches
+its source text, a graph edge references a deleted document, a provenance
+chain's hash integrity breaks -- VeriSimDB detects it and can automatically
+repair it.
+
+=== Architecture Overview
+
+[source]
+----
+┌──────────────────────────────────────────────────────┐
+│  Elixir/OTP Orchestration Layer                      │
+│    ├── EntityServer    (GenServer per entity)         │
+│    ├── DriftMonitor    (continuous consistency check)  │
+│    ├── QueryRouter     (distributes VQL queries)     │
+│    ├── SchemaRegistry  (type system coordination)    │
+│    └── Federation      (heterogeneous peer queries)  │
+│              ↕ HTTP / NIF                            │
+├──────────────────────────────────────────────────────┤
+│  Rust Core Engine                                    │
+│    ├── 8 modality stores (graph, vector, tensor...)  │
+│    ├── Drift detection (per-modality scoring)        │
+│    ├── Normaliser (5 regeneration strategies)        │
+│    ├── WAL (write-ahead log for durability)          │
+│    └── HTTP API (Axum, TLS, IPv6, Prometheus)        │
+└──────────────────────────────────────────────────────┘
+----
+
+== Prerequisites
+
+=== System Requirements
+
+* **Rust** 1.80+ (stable)
+* **Elixir** 1.17+ with OTP 27+
+* **Podman** (for container deployment) or Docker
+
+=== Optional Dependencies
+
+* **Deno** 2.0+ (for VQL parser bridge -- falls back to built-in parser)
+* **pgvector**, **PostGIS** (if federating with PostgreSQL)
+
+== Installation
+
+=== From Source
+
+[source,bash]
+----
+# Clone the repository
+git clone https://gitlab.com/hyperpolymath/verisimdb.git
+cd verisimdb
+
+# Build the Rust core
+cargo build --release
+
+# Set up the Elixir orchestration layer
+cd elixir-orchestration
+mix deps.get
+mix compile
+
+# Start the Rust API server
+cd .. && cargo run --release -p verisim-api &
+
+# Start the Elixir orchestration
+cd elixir-orchestration && mix run --no-halt
+----
+
+=== Container Deployment
+
+[source,bash]
+----
+# Build the container image (in-memory, default)
+podman build -t verisimdb:latest -f container/Containerfile .
+
+# Run VeriSimDB (in-memory -- data lost on restart)
+podman run -d \
+  --name verisimdb \
+  -p 8080:8080 \
+  verisimdb:latest
+
+# Verify it's running
+curl http://localhost:8080/api/v1/health
+----
+
+=== Persistent Storage
+
+To persist data across restarts, build with the `persistent` feature:
+
+[source,bash]
+----
+# Build with persistent storage (redb graph + file-backed Tantivy + WAL)
+podman build -t verisimdb:persistent \
+  --build-arg FEATURES=persistent \
+  -f container/Containerfile .
+
+# Run with a named volume for data persistence
+podman run -d \
+  --name verisimdb \
+  -p 8080:8080 \
+  -v verisimdb-data:/data \
+  verisimdb:persistent
+----
+
+Persistent mode stores data at `VERISIM_PERSISTENCE_DIR` (defaults to `/data`
+in the container, `/var/lib/verisimdb` outside containers):
+
+* `graph.redb` -- redb B-tree database for graph triples (pure Rust, ACID)
+* `documents/` -- Tantivy full-text index (mmap-backed)
+* `wal/` -- Write-ahead log for crash recovery
+
+Other modalities (vector, tensor, semantic, temporal, provenance, spatial)
+remain in-memory. Graph and document persistence covers the two most
+query-intensive modalities.
+
+=== Verified Container Deployment (stapeln)
+
+For supply-chain-verified deployment using the
+link:https://github.com/hyperpolymath/stapeln[stapeln] container ecosystem:
+
+[source,bash]
+----
+# Build and sign as a .ctp (Cerro Torre Package) bundle
+cd container && ./ct-build.sh persistent --push
+
+# Deploy the full stack with selur-compose
+selur-compose verify                    # Verify all .ctp signatures
+selur-compose up --detach               # Start: rust-core + elixir + svalinn
+selur-compose ps                        # Check status
+selur-compose logs -f rust-core         # Stream logs
+----
+
+The `compose.toml` orchestrates three services:
+
+* **rust-core** -- Modality stores, drift detection, HTTP/gRPC API (port 8080)
+* **elixir-orchestration** -- Entity servers, drift monitor, federation (port 4000)
+* **svalinn** -- Edge gateway with JWT auth, rate limiting, policy enforcement (port 443)
+
+The `.gatekeeper.yaml` policy controls authentication, rate limits, and
+trust requirements. All `.ctp` bundles are cryptographically signed via
+cerro-torre (Ed25519) and verified before deployment.
+
+== Quick Start: Your First Hexad
+
+A **hexad** (historical name; now an octad) is an entity with up to 8
+modality representations. Let's create one.
+
+=== Step 1: Create an Entity
+
+[source,bash]
+----
+curl -X POST http://localhost:8080/api/v1/hexads \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Douglas Adams",
+    "body": "English author, best known for The Hitchhiker'\''s Guide to the Galaxy",
+    "types": ["http://schema.org/Person", "http://schema.org/Author"],
+    "embedding": [0.12, -0.34, 0.56, 0.78, -0.91, 0.23, -0.45, 0.67],
+    "relationships": [
+      {"predicate": "wrote", "object": "hitchhikers-guide"},
+      {"predicate": "bornIn", "object": "cambridge-uk"}
+    ]
+  }'
+----
+
+Response:
+
+[source,json]
+----
+{
+  "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+  "status": "created",
+  "modalities": {
+    "document": true,
+    "vector": true,
+    "graph": true,
+    "semantic": true,
+    "tensor": false,
+    "temporal": true,
+    "provenance": true,
+    "spatial": false
+  }
+}
+----
+
+=== Step 2: Retrieve the Entity
+
+[source,bash]
+----
+curl http://localhost:8080/api/v1/hexads/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+----
+
+=== Step 3: Check Drift Status
+
+[source,bash]
+----
+curl http://localhost:8080/api/v1/drift/entity/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+----
+
+Response:
+
+[source,json]
+----
+{
+  "entity_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+  "graph": 0.0,
+  "vector": 0.0,
+  "tensor": 0.0,
+  "semantic": 0.0,
+  "document": 0.0,
+  "temporal": 0.0,
+  "provenance": 0.0,
+  "spatial": 0.0,
+  "overall": 0.0
+}
+----
+
+All zeros -- no drift detected. The entity is consistent across all
+populated modalities.
+
+=== Step 4: Simulate Drift
+
+Now deliberately break consistency by updating the embedding without
+updating the document:
+
+[source,bash]
+----
+# Update ONLY the vector embedding (not the document text)
+curl -X PUT http://localhost:8080/api/v1/hexads/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d \
+  -H "Content-Type: application/json" \
+  -d '{
+    "embedding": [0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]
+  }'
+
+# Check drift again
+curl http://localhost:8080/api/v1/drift/entity/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+----
+
+Response:
+
+[source,json]
+----
+{
+  "entity_id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+  "vector": 0.87,
+  "document": 0.0,
+  "overall": 0.43,
+  "...": "..."
+}
+----
+
+The vector modality is now 87% drifted from the document. VeriSimDB
+detected that the embedding no longer corresponds to the text.
+
+=== Step 5: Trigger Self-Normalisation
+
+[source,bash]
+----
+curl -X POST http://localhost:8080/api/v1/normalizer/trigger/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+----
+
+VeriSimDB identifies the document as the authoritative modality and
+regenerates the vector embedding to match. Re-checking drift will
+show all scores back near zero.
+
+== Querying with VQL
+
+VeriSimDB uses its own query language, *VQL* (VeriSim Query Language),
+designed for cross-modal queries. VQL is not SQL -- it natively
+understands modalities and drift.
+
+=== Basic Queries
+
+[source,sql]
+----
+-- Get all modalities for an entity
+SELECT * FROM HEXAD 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'
+
+-- Get specific modalities
+SELECT GRAPH.*, DOCUMENT.*, VECTOR.* FROM HEXAD 'entity-id'
+
+-- Full-text search across documents
+SELECT DOCUMENT.* FROM FEDERATION /* WHERE DOCUMENT CONTAINS 'galaxy'
+
+-- Vector similarity search
+SELECT VECTOR.* FROM FEDERATION /* WHERE VECTOR SIMILAR TO [0.1, 0.2, ...]
+
+-- Drift-aware query
+SELECT * FROM FEDERATION /* WHERE DRIFT(VECTOR, DOCUMENT) > 0.3
+----
+
+=== Cross-Modal Conditions
+
+[source,sql]
+----
+-- Find entities where graph structure contradicts document
+SELECT GRAPH.*, DOCUMENT.*
+FROM FEDERATION /*
+WHERE DRIFT(GRAPH, DOCUMENT) > 0.5
+
+-- Modality existence checks
+SELECT * FROM FEDERATION /*
+WHERE PROVENANCE EXISTS AND SPATIAL EXISTS
+
+-- Cross-modal field comparison
+SELECT * FROM FEDERATION /*
+WHERE DOCUMENT.severity > GRAPH.importance
+----
+
+=== VQL-DT (Formally Verified Queries)
+
+VQL-DT extends VQL with proof certificates. Every result includes a
+cryptographic proof that the data satisfies stated constraints:
+
+[source,sql]
+----
+SELECT DOCUMENT.*, GRAPH.*
+FROM HEXAD 'entity-id'
+PROOF EXISTENCE(entity-id), PROVENANCE(entity-id)
+----
+
+NOTE: VQL-DT proof generation is under active development. The syntax
+parses correctly and proof obligations are extracted, but end-to-end
+verifiable certificates require the Lean type checker integration
+(planned for Q2 2026).
+
+== Federation
+
+VeriSimDB can federate queries across heterogeneous databases. A single
+VQL query can transparently route to PostgreSQL, ArangoDB, Elasticsearch,
+and other VeriSimDB instances.
+
+=== Registering Peers
+
+[source,elixir]
+----
+# Register another VeriSimDB instance
+VeriSim.Federation.Resolver.register_peer(
+  "verisim-prod",
+  "http://verisim-prod:8080/api/v1",
+  [:graph, :vector, :document]
+)
+
+# Register an ArangoDB instance
+VeriSim.Federation.Resolver.register_peer("arango-archive", %{
+  endpoint: "http://arango.internal:8529",
+  adapter_type: :arangodb,
+  adapter_config: %{
+    database: "research_archive",
+    collection: "entities",
+    graph_name: "entity_graph",
+    auth: {:basic, "readonly", "password"}
+  },
+  modalities: [:graph, :document, :semantic, :spatial]
+})
+
+# Register a PostgreSQL instance with pgvector
+VeriSim.Federation.Resolver.register_peer("pg-analytics", %{
+  endpoint: "http://postgrest.internal:3000",
+  adapter_type: :postgresql,
+  adapter_config: %{
+    database: "analytics",
+    table: "entities",
+    schema: "public",
+    extensions: [:pgvector, :postgis],
+    auth: {:basic, "reader", "password"}
+  },
+  modalities: [:document, :vector, :spatial, :temporal]
+})
+
+# Register an Elasticsearch cluster
+VeriSim.Federation.Resolver.register_peer("es-search", %{
+  endpoint: "http://elastic.internal:9200",
+  adapter_type: :elasticsearch,
+  adapter_config: %{
+    index: "entities",
+    version: 8,
+    auth: {:basic, "elastic", "password"}
+  },
+  modalities: [:document, :vector]
+})
+----
+
+=== Federated Queries
+
+[source,sql]
+----
+-- Query all registered peers
+SELECT DOCUMENT.* FROM FEDERATION /* WHERE DOCUMENT CONTAINS 'climate data'
+
+-- Query only production peers
+SELECT * FROM FEDERATION /prod/* WHERE VECTOR SIMILAR TO [0.1, ...]
+
+-- Strict drift policy: exclude untrusted peers
+SELECT * FROM FEDERATION /* DRIFT POLICY STRICT
+
+-- Repair policy: trigger normalisation on drifted peers
+SELECT * FROM FEDERATION /* DRIFT POLICY REPAIR
+----
+
+=== Adapter Capabilities
+
+[cols="1,1,1,1,1"]
+|===
+| Modality | VeriSimDB | ArangoDB | PostgreSQL | Elasticsearch
+
+| Graph | Native | AQL traversal | Recursive CTE | --
+| Vector | HNSW | -- | pgvector | dense_vector kNN
+| Tensor | ndarray/Burn | -- | -- | --
+| Semantic | CBOR proofs | Document fields | JSONB | Nested objects
+| Document | Tantivy FTS | Fulltext index | tsvector/GIN | Full-text
+| Temporal | Native | Date fields | tstzrange | date_range
+| Provenance | Hash-chain | Edge collections | Audit table | --
+| Spatial | R-tree | GeoJSON index | PostGIS | geo_shape
+|===
+
+== NIF Transport (Same-Node Deployment)
+
+For Elixir applications running on the same node as the Rust core,
+the NIF transport bypasses HTTP entirely for 10-100x lower latency:
+
+[source,bash]
+----
+# Enable NIF transport
+export VERISIM_TRANSPORT=nif    # Direct NIF calls
+# or
+export VERISIM_TRANSPORT=auto   # NIF if available, HTTP fallback
+----
+
+The NIF bridge is loaded automatically from `priv/native/libverisim_nif.so`.
+All operations use the same API -- only the transport layer changes.
+
+== Drift Detection Deep Dive
+
+=== How Drift Is Measured
+
+Each modality pair has a drift score from 0.0 (perfectly consistent) to
+1.0 (completely diverged):
+
+* *semantic_vector_drift*: Embedding doesn't match semantic content
+* *graph_document_drift*: Graph structure doesn't match document text
+* *temporal_consistency_drift*: Version history has gaps or contradictions
+* *tensor_drift*: Tensor representation diverged from source data
+* *schema_drift*: Type constraint violations in semantic modality
+* *quality_drift*: Overall data quality score
+
+=== Configuring Thresholds
+
+[source,elixir]
+----
+# In config/config.exs
+config :verisim, :drift,
+  detection_interval_ms: 30_000,     # Check every 30 seconds
+  warning_threshold: 0.3,            # Log warning above 0.3
+  critical_threshold: 0.7,           # Trigger normalisation above 0.7
+  auto_normalise: true               # Automatically repair drifted entities
+----
+
+=== Self-Normalisation Strategies
+
+When drift exceeds the critical threshold, the normaliser selects a
+repair strategy:
+
+[cols="1,3"]
+|===
+| Strategy | Description
+
+| *Authoritative Source* | Identify the most trusted modality and regenerate others from it
+| *Consensus* | Use majority agreement across modalities to determine correct state
+| *Temporal Rewind* | Roll back to the last consistent version
+| *Selective Repair* | Only regenerate the specific drifted modality
+| *Full Rebuild* | Regenerate all modalities from the primary source of truth
+|===
+
+== API Reference
+
+=== REST Endpoints
+
+[cols="1,1,3"]
+|===
+| Method | Endpoint | Description
+
+| `GET` | `/api/v1/health` | Health check
+| `POST` | `/api/v1/hexads` | Create a new entity
+| `GET` | `/api/v1/hexads/:id` | Retrieve entity by ID
+| `PUT` | `/api/v1/hexads/:id` | Update entity
+| `DELETE` | `/api/v1/hexads/:id` | Delete entity
+| `GET` | `/api/v1/search/text?q=...&limit=10` | Full-text search
+| `POST` | `/api/v1/search/vector` | Vector similarity search
+| `GET` | `/api/v1/search/related/:id` | Graph traversal
+| `POST` | `/api/v1/spatial/search/radius` | Spatial radius search
+| `POST` | `/api/v1/spatial/search/bounds` | Spatial bounding box
+| `POST` | `/api/v1/spatial/search/nearest` | k-nearest spatial
+| `GET` | `/api/v1/drift/entity/:id` | Entity drift scores
+| `GET` | `/api/v1/drift/status` | Overall drift status
+| `POST` | `/api/v1/normalizer/trigger/:id` | Trigger normalisation
+| `GET` | `/api/v1/normalizer/status` | Normaliser status
+| `GET` | `/api/v1/provenance/:id` | Provenance chain
+| `GET` | `/api/v1/provenance/:id/verify` | Verify provenance integrity
+| `POST` | `/api/v1/federation/register` | Register federation peer
+| `POST` | `/api/v1/federation/query` | Execute federated query
+| `GET` | `/api/v1/federation/peers` | List federation peers
+|===
+
+== Running the Test Suite
+
+[source,bash]
+----
+# Rust tests (510+ tests)
+cd rust-core && cargo test
+
+# Elixir tests (152+ tests, excluding integration)
+cd elixir-orchestration && mix test --exclude integration
+
+# Integration tests (requires Rust core running)
+cd elixir-orchestration && mix test
+----
+
+== Troubleshooting
+
+=== Rust core won't build
+
+The default build requires only a Rust toolchain (no C/C++ compiler, no protoc,
+no external system libraries). If you enable the optional `oxigraph-backend`
+feature flag, you will need clang and cmake:
+
+[source,bash]
+----
+# Only needed for --features oxigraph-backend (NOT the default)
+sudo dnf install clang cmake  # Fedora
+sudo apt install clang cmake   # Debian/Ubuntu
+----
+
+=== Elixir can't connect to Rust core
+
+[source,bash]
+----
+# Check the Rust API is running
+curl http://localhost:8080/api/v1/health
+
+# Set the correct URL in Elixir config
+export VERISIM_RUST_CORE_URL=http://localhost:8080/api/v1
+----
+
+=== VQL parser falls back to built-in
+
+This is normal. The external Deno-based VQL parser provides richer
+error messages but the built-in Elixir parser handles all standard
+queries. The fallback warning can be safely ignored.
+
+== Next Steps
+
+* Read the link:VQL-SPEC.adoc[VQL Specification] for the full query language
+* See link:vql-examples.adoc[VQL Examples] for more query patterns
+* Review link:federation-readiness.adoc[Federation Readiness] for deployment planning
+* Explore link:drift-handling.adoc[Drift Handling] for advanced configuration
+* Check link:deployment-modes.adoc[Deployment Modes] for production setup

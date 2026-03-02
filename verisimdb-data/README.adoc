@@ -1,0 +1,80 @@
+= VeriSimDB Data Repository
+
+Git-backed flat-file storage for scan results and drift detection data.
+
+== Structure
+
+- `scans/` - panic-attack scan results per repo
+- `hardware/` - hardware-crash-team findings
+- `drift/` - drift detection snapshots
+- `index.json` - Master index of all stored data
+
+== Usage
+
+This repo receives scan results via GitHub Actions workflow_dispatch events
+and stores them as JSON files. The ingest workflow updates the index
+automatically.
+
+== Integration
+
+=== Sending Scan Results
+
+Other repos can send scan results using the reusable workflow:
+
+[source,yaml]
+----
+name: Security Scan
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly
+
+jobs:
+  scan:
+    uses: hyperpolymath/panic-attacker/.github/workflows/scan-and-report.yml@main
+----
+
+=== Querying Results
+
+Clone this repo and read the JSON files:
+
+[source,bash]
+----
+git clone https://github.com/hyperpolymath/verisimdb-data
+cd verisimdb-data
+cat scans/echidna.json  # View specific repo results
+jq '.repos' index.json   # View all scan summaries
+----
+
+== File Format
+
+Each scan result in `scans/` is a JSON file with the structure:
+
+[source,json]
+----
+{
+  "repo": "echidna",
+  "scanned_at": "2026-02-08T12:00:00Z",
+  "weak_points": [
+    {
+      "file": "src/main.rs",
+      "line": 42,
+      "category": "unwrap",
+      "severity": "medium",
+      "code": "let x = foo.unwrap();"
+    }
+  ],
+  "summary": {
+    "total": 15,
+    "critical": 0,
+    "high": 3,
+    "medium": 8,
+    "low": 4
+  }
+}
+----
+
+== License
+
+SPDX-License-Identifier: PMPL-1.0-or-later

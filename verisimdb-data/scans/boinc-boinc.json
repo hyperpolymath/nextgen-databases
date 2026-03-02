@@ -1,0 +1,549 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "DynamicCodeExecution",
+      "location": "deployment/arangodb/init-db.js",
+      "severity": "Critical",
+      "description": "eval() usage in deployment/arangodb/init-db.js",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "lean-proofs/Oblibeny/Properties/PhaseSeparation.lean",
+      "severity": "High",
+      "description": "2 sorry (unproven proposition) in lean-proofs/Oblibeny/Properties/PhaseSeparation.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "lean-proofs/Oblibeny/Properties/ResourceBounds.lean",
+      "severity": "High",
+      "description": "1 sorry (unproven proposition) in lean-proofs/Oblibeny/Properties/ResourceBounds.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "lean-proofs/Oblibeny/Properties/Termination.lean",
+      "severity": "High",
+      "description": "3 sorry (unproven proposition) in lean-proofs/Oblibeny/Properties/Termination.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust-parser/src/parser/parser.rs",
+      "severity": "Medium",
+      "description": "50 unwrap/expect calls in rust-parser/src/parser/parser.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 6489,
+    "unsafe_blocks": 19,
+    "panic_sites": 0,
+    "unwrap_calls": 52,
+    "allocation_sites": 49,
+    "io_operations": 5,
+    "threading_constructs": 7
+  },
+  "file_statistics": [
+    {
+      "file_path": "elixir-coordinator/lib/coordinator/database.ex",
+      "lines": 143,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir-coordinator/lib/coordinator/proof_tracker.ex",
+      "lines": 190,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir-coordinator/lib/coordinator/property_manager.ex",
+      "lines": 101,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir-coordinator/lib/coordinator/result_validator.ex",
+      "lines": 196,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir-coordinator/lib/coordinator/work_generator.ex",
+      "lines": 305,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lean-proofs/Oblibeny/Properties/PhaseSeparation.lean",
+      "lines": 58,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lean-proofs/Oblibeny/Properties/ResourceBounds.lean",
+      "lines": 39,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lean-proofs/Oblibeny/Properties/Termination.lean",
+      "lines": 67,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-parser/src/analyzer/call_graph.rs",
+      "lines": 199,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-parser/src/analyzer/termination.rs",
+      "lines": 204,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-parser/src/ast/pretty_print.rs",
+      "lines": 205,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-parser/src/ast/visitor.rs",
+      "lines": 137,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-parser/src/lib.rs",
+      "lines": 95,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-parser/src/parser/parser.rs",
+      "lines": 429,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 50,
+      "allocation_sites": 35,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust-parser/src/phases/separator.rs",
+      "lines": 217,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/deploy/production.sh",
+      "lines": 94,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/setup/dev-setup.sh",
+      "lines": 106,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "concurrency",
+    "memory",
+    "disk",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "lean-proofs/Oblibeny/Properties/PhaseSeparation.lean",
+        "to": "lean-proofs/Oblibeny/Properties/ResourceBounds.lean",
+        "relation": "shared_dir:lean-proofs/Oblibeny/Properties",
+        "weight": 1.0
+      },
+      {
+        "from": "lean-proofs/Oblibeny/Properties/ResourceBounds.lean",
+        "to": "lean-proofs/Oblibeny/Properties/Termination.lean",
+        "relation": "shared_dir:lean-proofs/Oblibeny/Properties",
+        "weight": 1.0
+      },
+      {
+        "from": "rust-parser/src/ast/pretty_print.rs",
+        "to": "rust-parser/src/ast/visitor.rs",
+        "relation": "shared_dir:rust-parser/src/ast",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-coordinator/lib/coordinator/database.ex",
+        "to": "elixir-coordinator/lib/coordinator/proof_tracker.ex",
+        "relation": "shared_dir:elixir-coordinator/lib/coordinator",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-coordinator/lib/coordinator/proof_tracker.ex",
+        "to": "elixir-coordinator/lib/coordinator/property_manager.ex",
+        "relation": "shared_dir:elixir-coordinator/lib/coordinator",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-coordinator/lib/coordinator/property_manager.ex",
+        "to": "elixir-coordinator/lib/coordinator/result_validator.ex",
+        "relation": "shared_dir:elixir-coordinator/lib/coordinator",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-coordinator/lib/coordinator/result_validator.ex",
+        "to": "elixir-coordinator/lib/coordinator/work_generator.ex",
+        "relation": "shared_dir:elixir-coordinator/lib/coordinator",
+        "weight": 1.0
+      },
+      {
+        "from": "rust-parser/src/analyzer/call_graph.rs",
+        "to": "rust-parser/src/analyzer/termination.rs",
+        "relation": "shared_dir:rust-parser/src/analyzer",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-coordinator/lib/coordinator/database.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir-coordinator/lib/coordinator/proof_tracker.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir-coordinator/lib/coordinator/property_manager.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir-coordinator/lib/coordinator/result_validator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir-coordinator/lib/coordinator/work_generator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lean-proofs/Oblibeny/Properties/PhaseSeparation.lean",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lean-proofs/Oblibeny/Properties/ResourceBounds.lean",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "lean-proofs/Oblibeny/Properties/Termination.lean",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "rust-parser/src/analyzer/call_graph.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rust-parser/src/analyzer/termination.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rust-parser/src/ast/pretty_print.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rust-parser/src/ast/visitor.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rust-parser/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "rust-parser/src/parser/parser.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 50.0
+      },
+      {
+        "from": "rust-parser/src/phases/separator.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/deploy/production.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/setup/dev-setup.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "deployment/arangodb/init-db.js"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "DynamicCodeExecution->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "deployment/arangodb/init-db.js"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "rust-parser/src/parser/parser.rs"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "rust-parser/src/parser/parser.rs"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "lean-proofs/Oblibeny/Properties/PhaseSeparation.lean",
+          "lean-proofs/Oblibeny/Properties/ResourceBounds.lean",
+          "lean-proofs/Oblibeny/Properties/Termination.lean"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeCode->Cpu"
+      }
+    ]
+  }
+}

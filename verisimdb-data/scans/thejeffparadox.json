@@ -1,0 +1,209 @@
+{
+  "program_path": ".",
+  "language": "shell",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "scripts/infinite_loop.sh",
+      "severity": "Medium",
+      "description": "23 potentially unquoted variable expansions in scripts/infinite_loop.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 5616,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 1,
+    "io_operations": 17,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "engine/scripts/execute_turn.jl",
+      "lines": 134,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/scripts/generate_report.jl",
+      "lines": 71,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/src/llm_client.jl",
+      "lines": 486,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/src/JeffEngine.jl",
+      "lines": 437,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/infinite_loop.sh",
+      "lines": 75,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/game_state.adb",
+      "lines": 198,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/jeff_tui.adb",
+      "lines": 35,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/tui.adb",
+      "lines": 351,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "engine/src/llm_client.jl",
+        "to": "engine/src/JeffEngine.jl",
+        "relation": "shared_dir:engine/src",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/scripts/execute_turn.jl",
+        "to": "engine/scripts/generate_report.jl",
+        "relation": "shared_dir:engine/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/game_state.adb",
+        "to": "tui/src/jeff_tui.adb",
+        "relation": "shared_dir:tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/jeff_tui.adb",
+        "to": "tui/src/tui.adb",
+        "relation": "shared_dir:tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "src/abi/Types.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/infinite_loop.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

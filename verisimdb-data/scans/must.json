@@ -1,0 +1,179 @@
+{
+  "program_path": ".",
+  "language": "ada",
+  "frameworks": [],
+  "weak_points": [],
+  "statistics": {
+    "total_lines": 3537,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 42,
+    "io_operations": 17,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/cli/cli_parser.adb",
+      "lines": 228,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/config/mustfile_loader.adb",
+      "lines": 250,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/config/toml_parser.adb",
+      "lines": 516,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/config/toml_parser.ads",
+      "lines": 109,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/deploy/deployer.adb",
+      "lines": 223,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 19,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/requirements/requirement_checker.adb",
+      "lines": 271,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/requirements/requirement_checker.ads",
+      "lines": 57,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/tasks/task_runner.adb",
+      "lines": 287,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/templates/mustache_engine.adb",
+      "lines": 458,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/must.adb",
+      "lines": 222,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/must_types.ads",
+      "lines": 205,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 11,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/state.rs",
+      "lines": 64,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "memory",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/requirements/requirement_checker.adb",
+        "to": "src/requirements/requirement_checker.ads",
+        "relation": "shared_dir:src/requirements",
+        "weight": 1.0
+      },
+      {
+        "from": "src/must.adb",
+        "to": "src/must_types.ads",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/must_types.ads",
+        "to": "src/state.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/config/mustfile_loader.adb",
+        "to": "src/config/toml_parser.adb",
+        "relation": "shared_dir:src/config",
+        "weight": 1.0
+      },
+      {
+        "from": "src/config/toml_parser.adb",
+        "to": "src/config/toml_parser.ads",
+        "relation": "shared_dir:src/config",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": []
+  }
+}

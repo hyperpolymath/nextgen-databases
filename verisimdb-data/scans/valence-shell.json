@@ -1,0 +1,2404 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "impl/elixir/lib/vsh/secure_erase.ex",
+      "severity": "Medium",
+      "description": "System command execution in impl/elixir/lib/vsh/secure_erase.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "impl/zig/src/daemon_client.zig",
+      "severity": "High",
+      "description": "2 unsafe pointer casts in impl/zig/src/daemon_client.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "impl/zig/src/lib.zig",
+      "severity": "High",
+      "description": "10 unsafe pointer casts in impl/zig/src/lib.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "impl/zig/.zig-cache/o/39778ac9cf948956a1362d33f708b2a9/cimport.zig",
+      "severity": "High",
+      "description": "65 unsafe pointer casts in impl/zig/.zig-cache/o/39778ac9cf948956a1362d33f708b2a9/cimport.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "impl/zig/lean_wrapper.zig",
+      "severity": "High",
+      "description": "1 unsafe pointer casts in impl/zig/lean_wrapper.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "impl/rust-cli/src/commands.rs",
+      "severity": "High",
+      "description": "8 unsafe blocks in impl/rust-cli/src/commands.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/src/state.rs",
+      "severity": "Medium",
+      "description": "24 unwrap/expect calls in impl/rust-cli/src/state.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/src/external.rs",
+      "severity": "Medium",
+      "description": "32 unwrap/expect calls in impl/rust-cli/src/external.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/src/redirection.rs",
+      "severity": "Medium",
+      "description": "29 unwrap/expect calls in impl/rust-cli/src/redirection.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "impl/rust-cli/src/process_sub.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in impl/rust-cli/src/process_sub.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/src/process_sub.rs",
+      "severity": "Medium",
+      "description": "14 unwrap/expect calls in impl/rust-cli/src/process_sub.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/src/arith.rs",
+      "severity": "Medium",
+      "description": "97 unwrap/expect calls in impl/rust-cli/src/arith.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/src/job.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in impl/rust-cli/src/job.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/src/quotes.rs",
+      "severity": "Medium",
+      "description": "37 unwrap/expect calls in impl/rust-cli/src/quotes.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/src/test_command.rs",
+      "severity": "Medium",
+      "description": "37 unwrap/expect calls in impl/rust-cli/src/test_command.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/src/audit_log.rs",
+      "severity": "Medium",
+      "description": "13 unwrap/expect calls in impl/rust-cli/src/audit_log.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/src/commands/secure_deletion.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in impl/rust-cli/src/commands/secure_deletion.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/src/parser.rs",
+      "severity": "Medium",
+      "description": "103 unwrap/expect calls in impl/rust-cli/src/parser.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/tests/integration_test.rs",
+      "severity": "Medium",
+      "description": "137 unwrap/expect calls in impl/rust-cli/tests/integration_test.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/tests/property_tests.rs",
+      "severity": "Medium",
+      "description": "157 unwrap/expect calls in impl/rust-cli/tests/property_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "impl/rust-cli/tests/manual_redirect_test.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in impl/rust-cli/tests/manual_redirect_test.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/tests/correspondence_tests.rs",
+      "severity": "Medium",
+      "description": "57 unwrap/expect calls in impl/rust-cli/tests/correspondence_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/tests/property_correspondence_tests.rs",
+      "severity": "Medium",
+      "description": "80 unwrap/expect calls in impl/rust-cli/tests/property_correspondence_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/tests/stress_tests.rs",
+      "severity": "Medium",
+      "description": "59 unwrap/expect calls in impl/rust-cli/tests/stress_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "impl/rust-cli/tests/security_tests.rs",
+      "severity": "High",
+      "description": "1 unsafe blocks in impl/rust-cli/tests/security_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/tests/security_tests.rs",
+      "severity": "Medium",
+      "description": "33 unwrap/expect calls in impl/rust-cli/tests/security_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/tests/extended_test_tests.rs",
+      "severity": "Medium",
+      "description": "57 unwrap/expect calls in impl/rust-cli/tests/extended_test_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/tests/lean4_proptest_correspondence.rs",
+      "severity": "Medium",
+      "description": "47 unwrap/expect calls in impl/rust-cli/tests/lean4_proptest_correspondence.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/benches/performance_benchmarks.rs",
+      "severity": "Medium",
+      "description": "58 unwrap/expect calls in impl/rust-cli/benches/performance_benchmarks.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-cli/benches/operation_benchmarks.rs",
+      "severity": "Medium",
+      "description": "23 unwrap/expect calls in impl/rust-cli/benches/operation_benchmarks.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "impl/mcp/src/Server.res",
+      "severity": "High",
+      "description": "1 JSON.parseExn calls in impl/mcp/src/Server.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "impl/rust-ffi/src/audit.rs",
+      "severity": "High",
+      "description": "1 unsafe blocks in impl/rust-ffi/src/audit.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-ffi/src/audit.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in impl/rust-ffi/src/audit.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-ffi/src/lib.rs",
+      "severity": "Medium",
+      "description": "14 unwrap/expect calls in impl/rust-ffi/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "impl/rust-ffi/src/operations.rs",
+      "severity": "High",
+      "description": "1 unsafe blocks in impl/rust-ffi/src/operations.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-ffi/src/operations.rs",
+      "severity": "Medium",
+      "description": "17 unwrap/expect calls in impl/rust-ffi/src/operations.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "impl/rust-ffi/src/rmo.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in impl/rust-ffi/src/rmo.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "proofs/lean4/FileContentOperations.lean",
+      "severity": "High",
+      "description": "1 sorry (unproven proposition) in proofs/lean4/FileContentOperations.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "proofs/lean4/RMOOperations.lean",
+      "severity": "High",
+      "description": "3 sorry (unproven proposition) in proofs/lean4/RMOOperations.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/demo_verified_operations.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/demo_verified_operations.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/verify-proofs.sh",
+      "severity": "Critical",
+      "description": "eval usage in scripts/verify-proofs.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/validate-correspondence.sh",
+      "severity": "Medium",
+      "description": "36 potentially unquoted variable expansions in scripts/validate-correspondence.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/security-audit.sh",
+      "severity": "Medium",
+      "description": "44 potentially unquoted variable expansions in scripts/security-audit.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/validate-with-echidna.sh",
+      "severity": "Medium",
+      "description": "33 potentially unquoted variable expansions in scripts/validate-with-echidna.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "tests/integration_test.sh",
+      "severity": "Medium",
+      "description": "117 potentially unquoted variable expansions in tests/integration_test.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "tests/integration_test.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in tests/integration_test.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ffi/rust/src/audit.rs",
+      "severity": "High",
+      "description": "1 unsafe blocks in ffi/rust/src/audit.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ffi/rust/src/audit.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in ffi/rust/src/audit.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ffi/rust/src/lib.rs",
+      "severity": "Medium",
+      "description": "14 unwrap/expect calls in ffi/rust/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ffi/rust/src/operations.rs",
+      "severity": "High",
+      "description": "1 unsafe blocks in ffi/rust/src/operations.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ffi/rust/src/operations.rs",
+      "severity": "Medium",
+      "description": "17 unwrap/expect calls in ffi/rust/src/operations.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ffi/rust/src/rmo.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in ffi/rust/src/rmo.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 52810,
+    "unsafe_blocks": 111,
+    "panic_sites": 62,
+    "unwrap_calls": 1249,
+    "allocation_sites": 159,
+    "io_operations": 169,
+    "threading_constructs": 14
+  },
+  "file_statistics": [
+    {
+      "file_path": "impl/elixir/lib/vsh/daemon.ex",
+      "lines": 838,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "impl/elixir/lib/vsh/filesystem.ex",
+      "lines": 790,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/elixir/lib/vsh/state.ex",
+      "lines": 348,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "impl/elixir/lib/vsh/.Elixir.VSH.NIF.zig",
+      "lines": 223,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/ocaml/filesystem_ffi.ml",
+      "lines": 269,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/ocaml/lean_wrapper.c",
+      "lines": 293,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/zig/src/valence_ffi.h",
+      "lines": 196,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/zig/src/audit.zig",
+      "lines": 284,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/zig/src/daemon_client.zig",
+      "lines": 134,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/zig/src/demo.zig",
+      "lines": 171,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/zig/src/lib.zig",
+      "lines": 720,
+      "unsafe_blocks": 10,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/zig/src/prover_integration.zig",
+      "lines": 275,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/zig/src/root.zig",
+      "lines": 23,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/zig/src/lean_bindings.zig",
+      "lines": 363,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/zig/src/main.zig",
+      "lines": 545,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/zig/.zig-cache/o/39778ac9cf948956a1362d33f708b2a9/cimport.zig",
+      "lines": 6628,
+      "unsafe_blocks": 65,
+      "panic_sites": 3,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/zig/lean_wrapper.zig",
+      "lines": 253,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/commands.rs",
+      "lines": 1239,
+      "unsafe_blocks": 8,
+      "panic_sites": 5,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/repl.rs",
+      "lines": 269,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/state.rs",
+      "lines": 1059,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 24,
+      "allocation_sites": 7,
+      "io_operations": 1,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "impl/rust-cli/src/external.rs",
+      "lines": 780,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 32,
+      "allocation_sites": 3,
+      "io_operations": 4,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "impl/rust-cli/src/executable.rs",
+      "lines": 743,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/redirection.rs",
+      "lines": 905,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 29,
+      "allocation_sites": 3,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/process_sub.rs",
+      "lines": 275,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 14,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/arith.rs",
+      "lines": 804,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 97,
+      "allocation_sites": 29,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/job.rs",
+      "lines": 342,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/signals.rs",
+      "lines": 29,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "impl/rust-cli/src/enhanced_repl.rs",
+      "lines": 305,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 8,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/confirmation.rs",
+      "lines": 289,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/glob.rs",
+      "lines": 333,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/quotes.rs",
+      "lines": 480,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 37,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/test_command.rs",
+      "lines": 753,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 37,
+      "allocation_sites": 21,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/correction.rs",
+      "lines": 250,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/friendly_errors.rs",
+      "lines": 332,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/audit_log.rs",
+      "lines": 340,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 13,
+      "allocation_sites": 1,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/commands/secure_deletion.rs",
+      "lines": 329,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 1,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/highlighter.rs",
+      "lines": 408,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/pager.rs",
+      "lines": 321,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "impl/rust-cli/src/help.rs",
+      "lines": 465,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/src/parser.rs",
+      "lines": 3699,
+      "unsafe_blocks": 0,
+      "panic_sites": 43,
+      "unwrap_calls": 103,
+      "allocation_sites": 39,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/integration_test.rs",
+      "lines": 917,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 137,
+      "allocation_sites": 1,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/property_tests.rs",
+      "lines": 1081,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 157,
+      "allocation_sites": 2,
+      "io_operations": 10,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/fixtures/mod.rs",
+      "lines": 58,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/manual_redirect_test.sh",
+      "lines": 64,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/manual_sigint_test.sh",
+      "lines": 73,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/correspondence_tests.rs",
+      "lines": 689,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 57,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/property_correspondence_tests.rs",
+      "lines": 410,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 80,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/stress_tests.rs",
+      "lines": 435,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 59,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "impl/rust-cli/tests/security_tests.rs",
+      "lines": 354,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 33,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/integration_tests.rs",
+      "lines": 261,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/parameter_expansion_tests.rs",
+      "lines": 604,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/extended_test_tests.rs",
+      "lines": 542,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 57,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/tests/lean4_proptest_correspondence.rs",
+      "lines": 400,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 47,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/fuzz/fuzz_targets/fuzz_path_operations.rs",
+      "lines": 63,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/fuzz/fuzz_targets/fuzz_state_machine.rs",
+      "lines": 108,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/benches/performance_benchmarks.rs",
+      "lines": 524,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 58,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-cli/benches/operation_benchmarks.rs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 23,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/mcp/src/Server.res",
+      "lines": 603,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-ffi/src/audit.rs",
+      "lines": 294,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 1,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-ffi/src/errors.rs",
+      "lines": 206,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-ffi/src/lib.rs",
+      "lines": 407,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 14,
+      "allocation_sites": 1,
+      "io_operations": 11,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-ffi/src/operations.rs",
+      "lines": 509,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 17,
+      "allocation_sites": 2,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-ffi/src/preconditions.rs",
+      "lines": 452,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-ffi/src/rmo.rs",
+      "lines": 411,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 11,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "impl/rust-ffi/src/sandbox.rs",
+      "lines": 273,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "proofs/lean4/FileContentOperations.lean",
+      "lines": 414,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "proofs/lean4/RMOOperations.lean",
+      "lines": 197,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/generate-verification-report.sh",
+      "lines": 298,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/rust/src/audit.rs",
+      "lines": 294,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 1,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/rust/src/errors.rs",
+      "lines": 206,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/rust/src/lib.rs",
+      "lines": 443,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 14,
+      "allocation_sites": 1,
+      "io_operations": 11,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/rust/src/operations.rs",
+      "lines": 509,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 17,
+      "allocation_sites": 2,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/rust/src/preconditions.rs",
+      "lines": 452,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/rust/src/rmo.rs",
+      "lines": 411,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 11,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/rust/src/sandbox.rs",
+      "lines": 273,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/rust/src/verification.rs",
+      "lines": 462,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "disk",
+    "concurrency",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "proofs/lean4/FileContentOperations.lean",
+        "to": "proofs/lean4/RMOOperations.lean",
+        "relation": "shared_dir:proofs/lean4",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/ocaml/filesystem_ffi.ml",
+        "to": "impl/ocaml/lean_wrapper.c",
+        "relation": "shared_dir:impl/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/benches/performance_benchmarks.rs",
+        "to": "impl/rust-cli/benches/operation_benchmarks.rs",
+        "relation": "shared_dir:impl/rust-cli/benches",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-ffi/src/audit.rs",
+        "to": "impl/rust-ffi/src/errors.rs",
+        "relation": "shared_dir:impl/rust-ffi/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-ffi/src/errors.rs",
+        "to": "impl/rust-ffi/src/lib.rs",
+        "relation": "shared_dir:impl/rust-ffi/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-ffi/src/lib.rs",
+        "to": "impl/rust-ffi/src/operations.rs",
+        "relation": "shared_dir:impl/rust-ffi/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-ffi/src/operations.rs",
+        "to": "impl/rust-ffi/src/preconditions.rs",
+        "relation": "shared_dir:impl/rust-ffi/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-ffi/src/preconditions.rs",
+        "to": "impl/rust-ffi/src/rmo.rs",
+        "relation": "shared_dir:impl/rust-ffi/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-ffi/src/rmo.rs",
+        "to": "impl/rust-ffi/src/sandbox.rs",
+        "relation": "shared_dir:impl/rust-ffi/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/valence_ffi.h",
+        "to": "impl/zig/src/audit.zig",
+        "relation": "shared_dir:impl/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/audit.zig",
+        "to": "impl/zig/src/daemon_client.zig",
+        "relation": "shared_dir:impl/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/daemon_client.zig",
+        "to": "impl/zig/src/demo.zig",
+        "relation": "shared_dir:impl/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/demo.zig",
+        "to": "impl/zig/src/lib.zig",
+        "relation": "shared_dir:impl/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/lib.zig",
+        "to": "impl/zig/src/prover_integration.zig",
+        "relation": "shared_dir:impl/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/prover_integration.zig",
+        "to": "impl/zig/src/root.zig",
+        "relation": "shared_dir:impl/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/root.zig",
+        "to": "impl/zig/src/lean_bindings.zig",
+        "relation": "shared_dir:impl/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/lean_bindings.zig",
+        "to": "impl/zig/src/main.zig",
+        "relation": "shared_dir:impl/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/rust/src/audit.rs",
+        "to": "ffi/rust/src/errors.rs",
+        "relation": "shared_dir:ffi/rust/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/rust/src/errors.rs",
+        "to": "ffi/rust/src/lib.rs",
+        "relation": "shared_dir:ffi/rust/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/rust/src/lib.rs",
+        "to": "ffi/rust/src/operations.rs",
+        "relation": "shared_dir:ffi/rust/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/rust/src/operations.rs",
+        "to": "ffi/rust/src/preconditions.rs",
+        "relation": "shared_dir:ffi/rust/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/rust/src/preconditions.rs",
+        "to": "ffi/rust/src/rmo.rs",
+        "relation": "shared_dir:ffi/rust/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/rust/src/rmo.rs",
+        "to": "ffi/rust/src/sandbox.rs",
+        "relation": "shared_dir:ffi/rust/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/rust/src/sandbox.rs",
+        "to": "ffi/rust/src/verification.rs",
+        "relation": "shared_dir:ffi/rust/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/integration_test.rs",
+        "to": "impl/rust-cli/tests/property_tests.rs",
+        "relation": "shared_dir:impl/rust-cli/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/property_tests.rs",
+        "to": "impl/rust-cli/tests/manual_redirect_test.sh",
+        "relation": "shared_dir:impl/rust-cli/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/manual_redirect_test.sh",
+        "to": "impl/rust-cli/tests/manual_sigint_test.sh",
+        "relation": "shared_dir:impl/rust-cli/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/manual_sigint_test.sh",
+        "to": "impl/rust-cli/tests/correspondence_tests.rs",
+        "relation": "shared_dir:impl/rust-cli/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/correspondence_tests.rs",
+        "to": "impl/rust-cli/tests/property_correspondence_tests.rs",
+        "relation": "shared_dir:impl/rust-cli/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/property_correspondence_tests.rs",
+        "to": "impl/rust-cli/tests/stress_tests.rs",
+        "relation": "shared_dir:impl/rust-cli/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/stress_tests.rs",
+        "to": "impl/rust-cli/tests/security_tests.rs",
+        "relation": "shared_dir:impl/rust-cli/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/security_tests.rs",
+        "to": "impl/rust-cli/tests/integration_tests.rs",
+        "relation": "shared_dir:impl/rust-cli/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/integration_tests.rs",
+        "to": "impl/rust-cli/tests/parameter_expansion_tests.rs",
+        "relation": "shared_dir:impl/rust-cli/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/parameter_expansion_tests.rs",
+        "to": "impl/rust-cli/tests/extended_test_tests.rs",
+        "relation": "shared_dir:impl/rust-cli/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/extended_test_tests.rs",
+        "to": "impl/rust-cli/tests/lean4_proptest_correspondence.rs",
+        "relation": "shared_dir:impl/rust-cli/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/commands.rs",
+        "to": "impl/rust-cli/src/repl.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/repl.rs",
+        "to": "impl/rust-cli/src/state.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/state.rs",
+        "to": "impl/rust-cli/src/external.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/external.rs",
+        "to": "impl/rust-cli/src/executable.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/executable.rs",
+        "to": "impl/rust-cli/src/redirection.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/redirection.rs",
+        "to": "impl/rust-cli/src/process_sub.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/process_sub.rs",
+        "to": "impl/rust-cli/src/arith.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/arith.rs",
+        "to": "impl/rust-cli/src/job.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/job.rs",
+        "to": "impl/rust-cli/src/signals.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/signals.rs",
+        "to": "impl/rust-cli/src/enhanced_repl.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/enhanced_repl.rs",
+        "to": "impl/rust-cli/src/confirmation.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/confirmation.rs",
+        "to": "impl/rust-cli/src/glob.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/glob.rs",
+        "to": "impl/rust-cli/src/quotes.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/quotes.rs",
+        "to": "impl/rust-cli/src/test_command.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/test_command.rs",
+        "to": "impl/rust-cli/src/correction.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/correction.rs",
+        "to": "impl/rust-cli/src/friendly_errors.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/friendly_errors.rs",
+        "to": "impl/rust-cli/src/audit_log.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/audit_log.rs",
+        "to": "impl/rust-cli/src/highlighter.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/highlighter.rs",
+        "to": "impl/rust-cli/src/pager.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/pager.rs",
+        "to": "impl/rust-cli/src/help.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/help.rs",
+        "to": "impl/rust-cli/src/parser.rs",
+        "relation": "shared_dir:impl/rust-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/fuzz/fuzz_targets/fuzz_path_operations.rs",
+        "to": "impl/rust-cli/fuzz/fuzz_targets/fuzz_state_machine.rs",
+        "relation": "shared_dir:impl/rust-cli/fuzz/fuzz_targets",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/elixir/lib/vsh/daemon.ex",
+        "to": "impl/elixir/lib/vsh/filesystem.ex",
+        "relation": "shared_dir:impl/elixir/lib/vsh",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/elixir/lib/vsh/filesystem.ex",
+        "to": "impl/elixir/lib/vsh/state.ex",
+        "relation": "shared_dir:impl/elixir/lib/vsh",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/elixir/lib/vsh/state.ex",
+        "to": "impl/elixir/lib/vsh/.Elixir.VSH.NIF.zig",
+        "relation": "shared_dir:impl/elixir/lib/vsh",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/elixir/lib/vsh/daemon.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "impl/elixir/lib/vsh/filesystem.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/elixir/lib/vsh/state.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "impl/elixir/lib/vsh/.Elixir.VSH.NIF.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/ocaml/filesystem_ffi.ml",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/ocaml/lean_wrapper.c",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/valence_ffi.h",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/audit.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/daemon_client.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "impl/zig/src/demo.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/lib.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 34.0
+      },
+      {
+        "from": "impl/zig/src/prover_integration.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/root.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/src/lean_bindings.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "impl/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/zig/.zig-cache/o/39778ac9cf948956a1362d33f708b2a9/cimport.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 201.0
+      },
+      {
+        "from": "impl/zig/lean_wrapper.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "impl/rust-cli/src/commands.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "impl/rust-cli/src/repl.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/state.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 34.0
+      },
+      {
+        "from": "impl/rust-cli/src/external.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 38.0
+      },
+      {
+        "from": "impl/rust-cli/src/executable.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/redirection.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 29.0
+      },
+      {
+        "from": "impl/rust-cli/src/process_sub.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 20.0
+      },
+      {
+        "from": "impl/rust-cli/src/arith.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 99.0
+      },
+      {
+        "from": "impl/rust-cli/src/job.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "impl/rust-cli/src/signals.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "impl/rust-cli/src/enhanced_repl.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "impl/rust-cli/src/confirmation.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/glob.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "impl/rust-cli/src/quotes.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "impl/rust-cli/src/test_command.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 37.0
+      },
+      {
+        "from": "impl/rust-cli/src/correction.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/friendly_errors.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/audit_log.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "impl/rust-cli/src/commands/secure_deletion.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "impl/rust-cli/src/highlighter.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/pager.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "impl/rust-cli/src/help.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/src/parser.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 189.0
+      },
+      {
+        "from": "impl/rust-cli/tests/integration_test.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 137.0
+      },
+      {
+        "from": "impl/rust-cli/tests/property_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 157.0
+      },
+      {
+        "from": "impl/rust-cli/tests/fixtures/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "impl/rust-cli/tests/manual_redirect_test.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/manual_sigint_test.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/tests/correspondence_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "impl/rust-cli/tests/property_correspondence_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 80.0
+      },
+      {
+        "from": "impl/rust-cli/tests/stress_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 61.0
+      },
+      {
+        "from": "impl/rust-cli/tests/security_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "impl/rust-cli/tests/integration_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "impl/rust-cli/tests/parameter_expansion_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "impl/rust-cli/tests/extended_test_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "impl/rust-cli/tests/lean4_proptest_correspondence.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 47.0
+      },
+      {
+        "from": "impl/rust-cli/fuzz/fuzz_targets/fuzz_path_operations.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-cli/fuzz/fuzz_targets/fuzz_state_machine.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "impl/rust-cli/benches/performance_benchmarks.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 58.0
+      },
+      {
+        "from": "impl/rust-cli/benches/operation_benchmarks.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 23.0
+      },
+      {
+        "from": "impl/mcp/src/Server.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "impl/rust-ffi/src/audit.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "impl/rust-ffi/src/errors.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "impl/rust-ffi/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "impl/rust-ffi/src/operations.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 20.0
+      },
+      {
+        "from": "impl/rust-ffi/src/preconditions.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "impl/rust-ffi/src/rmo.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "impl/rust-ffi/src/sandbox.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "proofs/lean4/FileContentOperations.lean",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "proofs/lean4/RMOOperations.lean",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "scripts/generate-verification-report.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/rust/src/audit.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "ffi/rust/src/errors.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/rust/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "ffi/rust/src/operations.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 20.0
+      },
+      {
+        "from": "ffi/rust/src/preconditions.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "ffi/rust/src/rmo.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "ffi/rust/src/sandbox.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "ffi/rust/src/verification.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "impl/elixir/lib/vsh/secure_erase.ex",
+          "scripts/verify-proofs.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "impl/mcp/src/Server.res"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeDeserialization->Cpu"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "impl/mcp/src/Server.res"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeDeserialization->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "impl/zig/src/daemon_client.zig",
+          "impl/zig/src/lib.zig",
+          "impl/zig/.zig-cache/o/39778ac9cf948956a1362d33f708b2a9/cimport.zig",
+          "impl/zig/lean_wrapper.zig",
+          "impl/rust-cli/src/commands.rs",
+          "impl/rust-cli/src/process_sub.rs",
+          "impl/rust-cli/tests/security_tests.rs",
+          "impl/rust-ffi/src/audit.rs",
+          "impl/rust-ffi/src/operations.rs",
+          "ffi/rust/src/audit.rs",
+          "ffi/rust/src/operations.rs"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "proofs/lean4/FileContentOperations.lean",
+          "proofs/lean4/RMOOperations.lean"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeCode->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "impl/rust-cli/src/commands.rs",
+          "impl/rust-cli/src/process_sub.rs",
+          "impl/rust-cli/tests/security_tests.rs",
+          "impl/rust-ffi/src/audit.rs",
+          "impl/rust-ffi/src/operations.rs",
+          "ffi/rust/src/audit.rs",
+          "ffi/rust/src/operations.rs"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeCode->Concurrency"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "impl/rust-cli/tests/manual_redirect_test.sh",
+          "scripts/demo_verified_operations.sh",
+          "tests/integration_test.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "impl/elixir/lib/vsh/secure_erase.ex",
+          "scripts/verify-proofs.sh",
+          "scripts/validate-correspondence.sh",
+          "scripts/security-audit.sh",
+          "scripts/validate-with-echidna.sh",
+          "tests/integration_test.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "impl/rust-cli/src/state.rs",
+          "impl/rust-cli/src/external.rs",
+          "impl/rust-cli/src/redirection.rs",
+          "impl/rust-cli/src/process_sub.rs",
+          "impl/rust-cli/src/arith.rs",
+          "impl/rust-cli/src/job.rs",
+          "impl/rust-cli/src/quotes.rs",
+          "impl/rust-cli/src/test_command.rs",
+          "impl/rust-cli/src/audit_log.rs",
+          "impl/rust-cli/src/commands/secure_deletion.rs",
+          "impl/rust-cli/src/parser.rs",
+          "impl/rust-cli/tests/integration_test.rs",
+          "impl/rust-cli/tests/property_tests.rs",
+          "impl/rust-cli/tests/correspondence_tests.rs",
+          "impl/rust-cli/tests/property_correspondence_tests.rs",
+          "impl/rust-cli/tests/stress_tests.rs",
+          "impl/rust-cli/tests/security_tests.rs",
+          "impl/rust-cli/tests/extended_test_tests.rs",
+          "impl/rust-cli/tests/lean4_proptest_correspondence.rs",
+          "impl/rust-cli/benches/performance_benchmarks.rs",
+          "impl/rust-cli/benches/operation_benchmarks.rs",
+          "impl/rust-ffi/src/audit.rs",
+          "impl/rust-ffi/src/lib.rs",
+          "impl/rust-ffi/src/operations.rs",
+          "impl/rust-ffi/src/rmo.rs",
+          "ffi/rust/src/audit.rs",
+          "ffi/rust/src/lib.rs",
+          "ffi/rust/src/operations.rs",
+          "ffi/rust/src/rmo.rs"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "impl/rust-cli/src/state.rs",
+          "impl/rust-cli/src/external.rs",
+          "impl/rust-cli/src/redirection.rs",
+          "impl/rust-cli/src/process_sub.rs",
+          "impl/rust-cli/src/arith.rs",
+          "impl/rust-cli/src/job.rs",
+          "impl/rust-cli/src/quotes.rs",
+          "impl/rust-cli/src/test_command.rs",
+          "impl/rust-cli/src/audit_log.rs",
+          "impl/rust-cli/src/commands/secure_deletion.rs",
+          "impl/rust-cli/src/parser.rs",
+          "impl/rust-cli/tests/integration_test.rs",
+          "impl/rust-cli/tests/property_tests.rs",
+          "impl/rust-cli/tests/correspondence_tests.rs",
+          "impl/rust-cli/tests/property_correspondence_tests.rs",
+          "impl/rust-cli/tests/stress_tests.rs",
+          "impl/rust-cli/tests/security_tests.rs",
+          "impl/rust-cli/tests/extended_test_tests.rs",
+          "impl/rust-cli/tests/lean4_proptest_correspondence.rs",
+          "impl/rust-cli/benches/performance_benchmarks.rs",
+          "impl/rust-cli/benches/operation_benchmarks.rs",
+          "impl/rust-ffi/src/audit.rs",
+          "impl/rust-ffi/src/lib.rs",
+          "impl/rust-ffi/src/operations.rs",
+          "impl/rust-ffi/src/rmo.rs",
+          "ffi/rust/src/audit.rs",
+          "ffi/rust/src/lib.rs",
+          "ffi/rust/src/operations.rs",
+          "ffi/rust/src/rmo.rs"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PanicPath->Disk"
+      }
+    ]
+  }
+}

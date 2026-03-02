@@ -1,0 +1,75 @@
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Dataset Description
+<https://verisimdb.dev/dataset> a void:Dataset ;
+    dcterms:title "verisimdb Dataset" ;
+    dcterms:description "Linked data from verisimdb project" ;
+    dcterms:creator <https://verisimdb.dev#creator> ;
+    dcterms:publisher <https://verisimdb.dev#publisher> ;
+    dcterms:license <https://palimpsest.spdx.dev> ;
+    dcterms:created "2026-01-31T16:49:57Z"^^xsd:dateTime ;
+    dcterms:modified "2026-01-31T16:49:57Z"^^xsd:dateTime ;
+
+    # Dataset statistics (update these based on actual data)
+    void:triples 0 ;
+    void:entities 0 ;
+    void:distinctSubjects 0 ;
+    void:distinctObjects 0 ;
+
+    # Access methods
+    void:sparqlEndpoint <https://verisimdb.dev/sparql> ;
+    void:dataDump <https://verisimdb.dev/dataset.ttl> ;
+    void:dataDump <https://verisimdb.dev/dataset.nt> ;
+    void:dataDump <https://verisimdb.dev/dataset.rdf> ;
+
+    # Technical details
+    void:feature <http://www.w3.org/ns/formats/Turtle> ;
+    void:feature <http://www.w3.org/ns/formats/N-Triples> ;
+    void:feature <http://www.w3.org/ns/formats/RDF_XML> ;
+
+    # Vocabulary usage (customize based on your data model)
+    void:vocabulary <http://xmlns.com/foaf/0.1/> ;
+    void:vocabulary <http://purl.org/dc/terms/> ;
+    void:vocabulary <http://www.w3.org/2002/07/owl#> ;
+    void:vocabulary <http://www.w3.org/2004/02/skos/core#> ;
+
+    # Example linksets (connections to other datasets)
+    # void:subset <https://verisimdb.dev/dataset#linkset-dbpedia> ;
+    # void:subset <https://verisimdb.dev/dataset#linkset-wikidata> ;
+.
+
+# Creator information
+<https://verisimdb.dev#creator> a foaf:Person ;
+    foaf:name "Jonathan D.A. Jewell" ;
+    foaf:mbox <mailto:jonathan.jewell@open.ac.uk> ;
+    foaf:homepage <https://jonathanjewell.dev> ;
+    foaf:account <https://github.com/hyperpolymath> ;
+.
+
+# Publisher information
+<https://verisimdb.dev#publisher> a foaf:Organization ;
+    foaf:name "hyperpolymath" ;
+    foaf:homepage <https://verisimdb.dev> ;
+.
+
+# Example linkset to DBpedia (uncomment and customize)
+# <https://verisimdb.dev/dataset#linkset-dbpedia> a void:Linkset ;
+#     void:linkPredicate owl:sameAs ;
+#     void:target <https://verisimdb.dev/dataset> ;
+#     void:target <http://dbpedia.org> ;
+#     void:triples 0 ;
+# .
+
+# Example linkset to Wikidata (uncomment and customize)
+# <https://verisimdb.dev/dataset#linkset-wikidata> a void:Linkset ;
+#     void:linkPredicate owl:sameAs ;
+#     void:target <https://verisimdb.dev/dataset> ;
+#     void:target <https://www.wikidata.org/> ;
+#     void:triples 0 ;
+# .

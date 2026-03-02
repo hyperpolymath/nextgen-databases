@@ -1,0 +1,69 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= KRaft vs VeriSimDB Comparison
+
+Comparison of Apache Kafka's KRaft (Kafka Raft) metadata management with VeriSimDB's federated registry approach.
+
+[cols="1,2,2",options="header"]
+|===
+|Feature |KRaft (Kafka) |VeriSimDB (Proposed)
+
+|**The "Brain"**
+|Metadata Quorum (3-5 nodes)
+|Federated Registry Quorum
+
+|**Consistency**
+|Strong (via Raft)
+|Strong (via Paxos/Raft Integration)
+
+|**Data Format**
+|Event-sourced Log
+|Merkle Search Tree (MST)
+
+|**Scalability**
+|Millions of partitions
+|Millions of Hexads
+
+|**Addressing**
+|Broker/Topic Mapping
+|UUID/Modality Mapping
+|===
+
+== Key Similarities
+
+Both KRaft and VeriSimDB:
+
+- Use consensus protocols for strong consistency
+- Replicate metadata across multiple nodes
+- Support horizontal scalability
+- Provide fault-tolerant coordination
+
+== Key Differences
+
+**KRaft:**
+
+- Designed for streaming platform coordination
+- Event log as primary data structure
+- Broker-centric addressing
+- Partition assignment management
+
+**VeriSimDB:**
+
+- Designed for federated knowledge stores
+- Merkle Search Tree for verifiable state
+- UUID-centric addressing (content-addressable)
+- Modality store routing
+
+== Integration Opportunities
+
+VeriSimDB's federated registry could potentially:
+
+1. Use KRaft as a consensus backend (alternative to custom Raft implementation)
+2. Leverage Kafka's mature Raft implementation
+3. Benefit from Kafka's operational tooling
+4. Reuse broker coordination patterns for store coordination
+
+== References
+
+- link:docs/technical-specification-kraft-metadata-log.adoc[VeriSimDB KRaft Integration Spec]
+- https://cwiki.apache.org/confluence/display/KAFKA/KIP-500%3A+Replace+ZooKeeper+with+a+Self-Managed+Metadata+Quorum[KIP-500: Replace ZooKeeper with a Self-Managed Metadata Quorum]

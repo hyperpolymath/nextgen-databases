@@ -1,0 +1,522 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB Use Cases — 7 Target Domains
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-02-28
+:revremark: Detailed use case descriptions for target market segments
+:toc: macro
+:toclevels: 2
+:sectnums:
+:icons: font
+
+[abstract]
+This document describes seven target domains where VeriSimDB's unique
+cross-modal drift detection and multimodal storage capabilities address
+critical, currently unsolved data infrastructure challenges. Each use case
+includes the domain context, the specific problem, how VeriSimDB solves it,
+example queries, and the business value.
+
+toc::[]
+
+== Use Case 1: GraphRAG / AI Knowledge Graphs
+
+=== Domain Context
+
+Retrieval-Augmented Generation (RAG) enhances large language models (LLMs) by
+retrieving relevant context from external knowledge bases before generating
+responses. *GraphRAG* extends this by using knowledge graphs rather than flat
+document chunks, enabling structured reasoning over entity relationships.
+
+GraphRAG systems typically maintain:
+
+* A *knowledge graph* (entities and relationships)
+* *Vector embeddings* of entity descriptions and document chunks
+* *Source documents* from which the graph was extracted
+* *Temporal metadata* tracking when entities were extracted or updated
+
+=== The Problem
+
+GraphRAG systems suffer from a critical but invisible failure mode: *embedding
+drift*. When the knowledge graph is updated (new entities, changed relationships),
+the vector embeddings computed from the old graph state are not re-computed. The
+graph says one thing; the vectors say another. LLM retrieval uses the stale
+embeddings, producing answers that contradict the current graph state.
+
+No existing GraphRAG framework detects this. Developers discover the problem only
+when an end user reports a hallucinated or contradictory response.
+
+=== How VeriSimDB Solves It
+
+VeriSimDB stores knowledge graph entities with their graph relationships, vector
+embeddings, source documents, and temporal metadata as a single octad entity. When
+a graph relationship changes, VeriSimDB's drift detection engine flags that the
+vector embedding's coherence score has dropped below the configured threshold.
+
+The system can then:
+
+* *Alert* the GraphRAG pipeline to re-embed the affected entities
+* *Quarantine* the drifted entities so they are excluded from retrieval until
+  re-embedded
+* *Self-normalise* by triggering an automatic re-embedding pipeline
+
+=== Example VQL Query
+
+[source]
+----
+-- Find entities where graph and vector representations have drifted
+SELECT entity.id, entity.graph.relationships, coherence(graph, vector)
+FROM knowledge_base
+WHERE coherence(graph, vector) < 0.85
+ORDER BY coherence(graph, vector) ASC
+LIMIT 100
+----
+
+=== Business Value
+
+* *Eliminate silent hallucinations* caused by stale embeddings
+* *Reduce manual debugging time* for GraphRAG pipeline engineers
+* *Increase retrieval accuracy* by ensuring graph-vector consistency
+* *Enable real-time GraphRAG updates* with confidence that embeddings are current
+
+== Use Case 2: Biomedical Research Data
+
+=== Domain Context
+
+Biomedical research generates data across many modalities: patient records
+(documents), drug interaction networks (graphs), genomic feature tensors, spatial
+pathology images, temporal clinical trial timelines, and provenance chains
+tracking data from sample collection through analysis to publication.
+
+Regulatory requirements (FDA 21 CFR Part 11, EU MDR, GDPR) mandate complete
+traceability and data integrity. A single inconsistency between a clinical trial
+result and its provenance chain can trigger a regulatory audit.
+
+=== The Problem
+
+Biomedical data integration is currently achieved through bespoke ETL pipelines
+that move data between specialised databases (Neo4j for drug interactions,
+PostgreSQL for clinical records, image databases for pathology, etc.). These
+pipelines are brittle, slow, and have no mechanism to verify that a patient
+entity's graph representation (drug interactions) is consistent with their
+document representation (clinical notes) or their temporal representation (trial
+timeline).
+
+When a clinical trial protocol amendment changes a patient's treatment, the graph,
+document, and timeline representations must all be updated. If the graph update
+succeeds but the document update fails, the patient's record is inconsistent, and
+no system detects this until a manual audit.
+
+=== How VeriSimDB Solves It
+
+VeriSimDB stores each biomedical entity (patient, drug, gene, trial) with all its
+representations in a single octad. Drift detection continuously monitors
+consistency across modalities. When a protocol amendment updates one representation,
+VeriSimDB verifies that all other representations are updated within the configured
+consistency window.
+
+The provenance modality provides an immutable audit trail of every change, who made
+it, and from what source -- satisfying regulatory traceability requirements.
+
+=== Example VQL Query
+
+[source]
+----
+-- Find patients whose clinical notes disagree with their trial timeline
+SELECT patient.id,
+       coherence(document, temporal) AS doc_time_coherence,
+       provenance.last_update
+FROM clinical_trial
+WHERE trial.id = "NCT-2026-0042"
+  AND coherence(document, temporal) < 0.95
+----
+
+=== Business Value
+
+* *Regulatory compliance:* Continuous consistency monitoring satisfies FDA/EU MDR
+  data integrity requirements without manual audits
+* *Patient safety:* Prevent treatment decisions based on inconsistent records
+* *Audit readiness:* Provenance modality provides complete, immutable lineage
+* *Reduced integration cost:* Replace bespoke ETL pipelines with federated
+  drift detection
+
+== Use Case 3: Financial Risk and Compliance
+
+=== Domain Context
+
+Financial institutions maintain customer and transaction data across dozens of
+systems: core banking (relational), fraud detection (graph), risk scoring
+(vector/ML), regulatory reporting (documents), transaction history (temporal),
+and geographic compliance (spatial -- sanctions, jurisdiction).
+
+Regulations including Basel III, MiFID II, AML directives, and KYC requirements
+demand that customer data be consistent across all systems at all times. A
+customer's risk score in the ML system must agree with their transaction graph in
+the fraud detection system and their geographic profile in the compliance system.
+
+=== The Problem
+
+Financial data inconsistency creates two categories of risk:
+
+1. *Regulatory risk:* If a customer's risk classification differs between the AML
+   system and the core banking system, regulators may impose fines for inadequate
+   controls. Fines for AML violations have exceeded $10 billion globally since 2020.
+
+2. *Operational risk:* If a customer's transaction graph shows suspicious activity
+   but their risk score has not been updated, fraud goes undetected. Conversely, if
+   the risk score is elevated but the graph is stale, legitimate customers are
+   blocked.
+
+Current solutions rely on periodic batch reconciliation (nightly or weekly), which
+means inconsistencies persist for hours or days.
+
+=== How VeriSimDB Solves It
+
+VeriSimDB stores each customer entity with graph (relationships, transaction
+networks), vector (risk embeddings), document (KYC records), temporal (transaction
+history), provenance (data lineage for audit), and spatial (jurisdiction, sanctions
+geography) representations. Drift detection runs in real time, flagging any
+customer whose representations disagree.
+
+Federation allows VeriSimDB to connect to the existing core banking, fraud
+detection, and compliance systems, bringing cross-modal consistency checking to
+current infrastructure without data migration.
+
+=== Example VQL Query
+
+[source]
+----
+-- Find customers with inconsistent risk profiles across modalities
+SELECT customer.id,
+       coherence(vector, graph) AS risk_graph_coherence,
+       coherence(document, spatial) AS kyc_geo_coherence,
+       temporal.last_transaction,
+       provenance.source_systems
+FROM customers
+WHERE coherence(vector, graph) < 0.90
+   OR coherence(document, spatial) < 0.90
+ORDER BY LEAST(coherence(vector, graph), coherence(document, spatial)) ASC
+----
+
+=== Business Value
+
+* *Regulatory compliance:* Real-time cross-system consistency satisfies AML/KYC
+  requirements with auditable coherence scores
+* *Fraud detection:* Eliminate the window between graph update and risk score
+  update where fraud can go undetected
+* *Reduced fines:* Continuous monitoring vs. periodic batch reconciliation
+  demonstrates "reasonable controls" to regulators
+* *Audit efficiency:* Provenance modality provides complete lineage for every
+  customer data element
+
+== Use Case 4: Supply Chain Traceability
+
+=== Domain Context
+
+Modern supply chains involve hundreds of entities (suppliers, manufacturers,
+distributors, retailers) connected by complex logistics networks. Regulations
+including the EU Digital Product Passport, the US FSMA (Food Safety Modernization
+Act), and ESG reporting requirements demand end-to-end traceability.
+
+Supply chain data is inherently multimodal:
+
+* *Graph:* Supplier-manufacturer-distributor relationships
+* *Document:* Purchase orders, invoices, certificates of origin
+* *Temporal:* Shipment timelines, temperature logs, shelf-life tracking
+* *Spatial:* Geographic location of goods in transit
+* *Provenance:* Chain of custody, certifications, audits
+
+=== The Problem
+
+Supply chain transparency initiatives fail because the data is fragmented across
+disconnected systems. A manufacturer's certificate of origin (document) may list
+materials from a compliant supplier, but the supplier relationship graph has not
+been updated to reflect that the supplier's certification expired. The geographic
+tracking shows goods in transit through a sanctioned region, but the compliance
+document still shows the old routing.
+
+These inconsistencies are invisible until a physical audit, a product recall, or
+a regulatory investigation.
+
+=== How VeriSimDB Solves It
+
+VeriSimDB's octad model stores each supply chain entity (product, shipment,
+supplier) with all its representations. When a supplier's certification expires,
+the document modality is updated, and drift detection immediately flags that the
+graph modality (which still shows the supplier as "certified") is inconsistent.
+
+The spatial modality tracks goods in real time and cross-checks against compliance
+documents. The temporal modality provides a complete timeline of every change. The
+provenance modality establishes an immutable chain of custody.
+
+=== Example VQL Query
+
+[source]
+----
+-- Find products whose supplier certifications have drifted
+SELECT product.id,
+       graph.supplier,
+       document.certification_status,
+       coherence(graph, document) AS cert_coherence,
+       spatial.current_location,
+       temporal.last_audit
+FROM supply_chain
+WHERE coherence(graph, document) < 0.90
+  AND temporal.last_audit < NOW() - INTERVAL '90 days'
+----
+
+=== Business Value
+
+* *Regulatory compliance:* Continuous traceability for EU Digital Product Passport,
+  FSMA, ESG reporting
+* *Risk reduction:* Detect expired certifications, non-compliant routing, and
+  chain-of-custody gaps before they cause product recalls
+* *Audit efficiency:* Provenance modality eliminates manual chain-of-custody
+  reconstruction
+* *Consumer trust:* Verified, consistent supply chain data for end-to-end
+  transparency
+
+== Use Case 5: Digital Humanities and Cultural Heritage
+
+=== Domain Context
+
+Cultural heritage institutions (museums, archives, libraries) manage collections
+of artefacts that are described across multiple modalities:
+
+* *Graph:* Relationships between artefacts, creators, historical periods, and
+  exhibition histories
+* *Document:* Catalogue records, conservation reports, scholarly annotations
+* *Semantic:* Ontological classification (e.g., CIDOC-CRM, Dublin Core)
+* *Temporal:* Provenance timelines (creation, ownership history, exhibition dates)
+* *Spatial:* Geographic origin, current location, excavation site coordinates
+* *Vector:* Image embeddings for visual similarity search
+* *Provenance:* Acquisition history, legal ownership chain
+
+=== The Problem
+
+Cultural heritage data is notoriously inconsistent. A catalogue record (document)
+may describe an artefact as "Roman, 2nd century CE" while the ontological
+classification (semantic) says "Hellenistic" and the temporal timeline shows a
+creation date in the 3rd century BCE. These inconsistencies arise from decades of
+cataloguing by different scholars with different conventions, and no system
+detects them.
+
+Digital humanities researchers spend enormous amounts of time manually
+reconciling conflicting descriptions across catalogues, ontologies, and timelines
+before they can begin analysis.
+
+=== How VeriSimDB Solves It
+
+VeriSimDB stores each artefact with all its modalities in a single octad entity.
+Drift detection flags inconsistencies between catalogue records and ontological
+classifications, between temporal timelines and scholarly annotations, and between
+image embeddings and textual descriptions.
+
+Federation allows VeriSimDB to connect to existing collection management systems
+(MuseumPlus, TMS, ArchivesSpace) and bring cross-modal consistency checking to
+existing catalogues without requiring data migration.
+
+=== Example VQL Query
+
+[source]
+----
+-- Find artefacts with inconsistent date attributions across modalities
+SELECT artefact.id,
+       document.period_attribution,
+       semantic.ontology_class,
+       temporal.creation_date,
+       coherence(document, semantic, temporal) AS date_coherence
+FROM collection
+WHERE coherence(document, semantic, temporal) < 0.80
+ORDER BY date_coherence ASC
+----
+
+=== Business Value
+
+* *Research efficiency:* Eliminate manual reconciliation of conflicting catalogue
+  records, freeing researchers for analysis
+* *Data quality:* Systematically identify and resolve decades of cataloguing
+  inconsistencies
+* *Cross-institutional collaboration:* Federation enables consistency checking
+  across multiple institutions' collections
+* *Grant competitiveness:* Demonstrable data quality infrastructure strengthens
+  research grant applications
+
+== Use Case 6: Scientific Data Management
+
+=== Domain Context
+
+Scientific research produces multimodal datasets: experimental measurements
+(tensors), instrument metadata (documents), collaboration networks (graphs),
+publication timelines (temporal), methodological lineage (provenance), and
+geographic data (field sites, observatories).
+
+Reproducibility is the cornerstone of the scientific method, yet the
+"reproducibility crisis" affects 52% of scientific fields (Baker, Nature 2016).
+A significant contributor is data inconsistency between published results and
+underlying datasets.
+
+=== The Problem
+
+A published paper (document) reports results derived from a dataset (tensor).
+When the dataset is corrected (e.g., an instrument calibration error is
+discovered), the tensor is updated, but the published paper is not retracted or
+amended. The methodology provenance chain shows the old calibration, but the
+instrument metadata document now shows the corrected calibration. These
+representations have drifted, and no system detects it.
+
+Similarly, when a collaboration network changes (a co-author retracts their
+contribution), the graph representation must be updated, but the document
+(published paper) and provenance (author contribution records) may not be.
+
+=== How VeriSimDB Solves It
+
+VeriSimDB stores each scientific entity (dataset, publication, experiment,
+researcher) with all its modalities. When a dataset is corrected, drift detection
+flags that the published paper's document representation is now inconsistent with
+the tensor (corrected data) and provenance (updated methodology).
+
+This does not automatically retract papers -- it surfaces the inconsistency so
+that researchers, journal editors, and data stewards can take appropriate action.
+
+=== Example VQL Query
+
+[source]
+----
+-- Find publications whose cited datasets have been corrected
+SELECT publication.doi,
+       tensor.dataset_version,
+       provenance.calibration_date,
+       coherence(document, tensor, provenance) AS data_coherence
+FROM research_outputs
+WHERE coherence(document, tensor, provenance) < 0.90
+  AND tensor.dataset_version > document.cited_version
+----
+
+=== Business Value
+
+* *Reproducibility:* Systematically detect when published results no longer match
+  their underlying data
+* *Research integrity:* Provenance modality provides complete methodological
+  lineage
+* *Data management compliance:* Satisfies FAIR data principles (Findable,
+  Accessible, Interoperable, Reusable) with cross-modal consistency
+* *Institutional reputation:* Proactive detection of data inconsistencies before
+  external challenges
+
+== Use Case 7: Cybersecurity Threat Intelligence
+
+=== Domain Context
+
+Cybersecurity threat intelligence (CTI) involves aggregating and correlating
+indicators of compromise (IoCs), threat actor profiles, attack patterns, and
+vulnerability data from multiple sources. This data is inherently multimodal:
+
+* *Graph:* Threat actor relationships, attack infrastructure networks, malware
+  family trees
+* *Vector:* Similarity embeddings for malware samples, phishing emails, network
+  traffic patterns
+* *Document:* Threat reports, vulnerability advisories (CVEs), incident reports
+* *Temporal:* Attack timelines, vulnerability disclosure dates, patch release
+  schedules
+* *Provenance:* Intelligence source attribution, confidence levels, corroboration
+  chains
+* *Spatial:* Geographic attribution, IP geolocation, infrastructure mapping
+
+=== The Problem
+
+CTI platforms aggregate intelligence from dozens of feeds (MITRE ATT&CK, STIX/TAXII,
+open-source feeds, commercial feeds, internal detections). The same threat actor or
+malware family may be described differently across sources. When one feed updates
+a threat actor's tactics, techniques, and procedures (TTPs), the graph is updated,
+but the vector embeddings (used for similarity matching) still reflect the old
+behaviour profile. Temporal timelines may show campaign activity that contradicts
+the current graph state.
+
+These inconsistencies cause false negatives (real threats are missed because
+embeddings are stale) and false positives (old indicators trigger alerts for
+threats that have evolved).
+
+=== How VeriSimDB Solves It
+
+VeriSimDB stores each CTI entity (threat actor, malware, vulnerability, campaign)
+with all its modalities. When a STIX feed updates a threat actor's TTPs, drift
+detection flags that the vector embeddings and document representations have not
+been updated to reflect the new behaviour.
+
+Federation allows VeriSimDB to connect to existing SIEM, SOAR, and TIP platforms,
+bringing cross-modal consistency to current CTI infrastructure.
+
+=== Example VQL Query
+
+[source]
+----
+-- Find threat actors whose behaviour profiles have drifted across sources
+SELECT actor.id,
+       graph.ttp_count,
+       vector.similarity_cluster,
+       temporal.last_campaign,
+       coherence(graph, vector, document) AS intel_coherence,
+       provenance.source_feeds
+FROM threat_actors
+WHERE coherence(graph, vector, document) < 0.85
+  AND temporal.last_campaign > NOW() - INTERVAL '30 days'
+ORDER BY intel_coherence ASC
+----
+
+=== Business Value
+
+* *Reduced false negatives:* Ensure detection rules are based on current, consistent
+  threat intelligence
+* *Reduced false positives:* Stale indicators are flagged and updated, reducing
+  alert fatigue
+* *Source correlation:* Provenance modality tracks which feeds contributed to each
+  intelligence element and whether they agree
+* *Audit trail:* Complete lineage of every intelligence assessment for incident
+  response and post-mortem analysis
+
+== Cross-Domain Summary
+
+[cols="1,3,3,2"]
+|===
+| Domain | Primary Modalities | Key Drift Risk | Business Impact
+
+| GraphRAG / AI
+| Graph, Vector, Document
+| Embedding diverges from graph state
+| Silent hallucinations
+
+| Biomedical
+| Document, Temporal, Provenance
+| Clinical record inconsistency
+| Patient safety, regulatory fines
+
+| Financial
+| Vector, Graph, Spatial
+| Risk score vs. transaction graph
+| Regulatory fines, fraud exposure
+
+| Supply Chain
+| Graph, Document, Spatial
+| Expired certifications undetected
+| Product recalls, compliance failures
+
+| Cultural Heritage
+| Document, Semantic, Temporal
+| Conflicting catalogue attributions
+| Research wasted on reconciliation
+
+| Scientific
+| Document, Tensor, Provenance
+| Published results vs. corrected data
+| Reproducibility failures
+
+| Cybersecurity
+| Graph, Vector, Document
+| Stale threat behaviour profiles
+| False negatives, missed threats
+|===
+
+All seven domains share the same fundamental problem: *data exists in multiple
+representations that inevitably diverge, and no existing system detects the
+divergence*. VeriSimDB's cross-modal drift detection addresses this root cause
+across every domain where multimodal data consistency matters.

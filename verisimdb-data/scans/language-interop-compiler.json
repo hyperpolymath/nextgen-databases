@@ -1,0 +1,189 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "examples/user.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in examples/user.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "examples/user.rs",
+      "severity": "High",
+      "description": "Raw pointer cast in examples/user.rs",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 3260,
+    "unsafe_blocks": 15,
+    "panic_sites": 0,
+    "unwrap_calls": 6,
+    "allocation_sites": 2,
+    "io_operations": 1,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/user.rs",
+      "lines": 129,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzers/rescript_analyzer.rs",
+      "lines": 184,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzers/rust_analyzer.rs",
+      "lines": 252,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzers/mod.rs",
+      "lines": 94,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/lib.rs",
+      "lines": 65,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "concurrency",
+    "cpu",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "src/abi/Types.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/rescript_analyzer.rs",
+        "to": "src/analyzers/rust_analyzer.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/rust_analyzer.rs",
+        "to": "src/analyzers/mod.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "examples/user.rs",
+          "examples/user.rs"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "examples/user.rs"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Concurrency"
+      }
+    ]
+  }
+}

@@ -1,0 +1,307 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "WebServer"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "validator/src/registry.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in validator/src/registry.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "validator/src/validators.rs",
+      "severity": "Medium",
+      "description": "18 unwrap/expect calls in validator/src/validators.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "validator/src/validators.rs",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in validator/src/validators.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 6318,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 28,
+    "allocation_sites": 10,
+    "io_operations": 4,
+    "threading_constructs": 3
+  },
+  "file_statistics": [
+    {
+      "file_path": "templates/rust-axum/well_known.rs",
+      "lines": 264,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "validator/src/contract.rs",
+      "lines": 179,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "validator/src/main.rs",
+      "lines": 384,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "validator/src/registry.rs",
+      "lines": 416,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "validator/src/rules.rs",
+      "lines": 331,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "validator/src/validators.rs",
+      "lines": 660,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 18,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "memory",
+    "disk",
+    "network"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "validator/src/contract.rs",
+        "to": "validator/src/main.rs",
+        "relation": "shared_dir:validator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "validator/src/main.rs",
+        "to": "validator/src/registry.rs",
+        "relation": "shared_dir:validator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "validator/src/registry.rs",
+        "to": "validator/src/rules.rs",
+        "relation": "shared_dir:validator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "validator/src/rules.rs",
+        "to": "validator/src/validators.rs",
+        "relation": "shared_dir:validator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "templates/rust-axum/well_known.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "validator/src/contract.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "validator/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "validator/src/registry.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "validator/src/rules.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "validator/src/validators.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 36.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "validator/src/registry.rs",
+          "validator/src/validators.rs"
+        ],
+        "frameworks": [
+          "WebServer"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "validator/src/validators.rs"
+        ],
+        "frameworks": [
+          "WebServer"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "validator/src/registry.rs",
+          "validator/src/validators.rs"
+        ],
+        "frameworks": [
+          "WebServer"
+        ],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

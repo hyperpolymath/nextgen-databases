@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+
+[package]
+name = "verisim-graph"
+description = "Graph modality - RDF and property graph storage (pure Rust default, Oxigraph optional)"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[features]
+default = []
+# Enable the Oxigraph backend for full RDF/SPARQL support.
+# Requires a C++ linker (oxigraph → oxrocksdb-sys transitive dependency).
+oxigraph-backend = ["dep:oxigraph"]
+# Enable the redb backend for persistent graph storage (pure Rust, no C/C++).
+redb-backend = ["dep:redb", "dep:serde_json"]
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+
+# Optional: Oxigraph for full RDF/SPARQL (pulls in C++ via oxrocksdb-sys)
+oxigraph = { workspace = true, optional = true }
+
+# Optional: redb for pure-Rust persistent graph storage (B-tree, ACID)
+redb = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile = "3"

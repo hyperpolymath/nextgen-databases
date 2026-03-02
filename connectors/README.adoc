@@ -1,0 +1,310 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)
+= VeriSimDB Connectors -- Federation Adapters & Client SDKs
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:source-highlighter: rouge
+
+toc::[]
+
+== Overview
+
+VeriSimDB connectors provide a two-direction integration architecture:
+
+**Outbound (Federation Adapters)**:: VeriSimDB reaches _out_ to external
+databases, normalising their data into the octad model and maintaining
+cross-modal consistency via drift detection.  Federation adapters translate
+VeriSimDB federation protocol queries into the native query language of each
+target store.
+
+**Inbound (Client SDKs)**:: External applications reach _in_ to VeriSimDB
+through idiomatic client libraries.  Each SDK wraps the REST / gRPC API,
+handles authentication, connection pooling, and provides type-safe access to
+hexad entities, VQL queries, and drift reports.
+
+=== Architecture Diagram
+
+[source,text]
+----
+                          ┌──────────────────────────────────────┐
+                          │           VeriSimDB Core             │
+                          │                                      │
+                          │  ┌──────────────────────────────┐    │
+                          │  │       Rust Core Engine        │    │
+                          │  │  Graph | Vector | Tensor      │    │
+                          │  │  Semantic | Document           │    │
+                          │  │  Temporal | Provenance | Spatial│   │
+                          │  └──────────────┬───────────────┘    │
+                          │                 │                     │
+                          │  ┌──────────────┴───────────────┐    │
+                          │  │     REST / gRPC API Layer     │    │
+                          │  └──┬────────────────────────┬──┘    │
+                          └─────┼────────────────────────┼───────┘
+                                │                        │
+              ┌─────────────────┘                        └─────────────────┐
+              │  Inbound (Client SDKs)               Outbound (Federation) │
+              │                                                            │
+   ┌──────────┴──────────┐                              ┌──────────────────┴─────────┐
+   │                     │                              │                            │
+   │  External Apps      │                              │   External Databases       │
+   │                     │                              │                            │
+   │  ┌───────────────┐  │                              │  ┌──────────────────────┐  │
+   │  │ Rust SDK      │  │     Federation Protocol      │  │ PostgreSQL Adapter   │  │
+   │  │ Elixir SDK    │  │     (gRPC / REST)            │  │ Neo4j Adapter        │  │
+   │  │ ReScript SDK  │  │   ◄─────────────────────►    │  │ Elasticsearch Adapter│  │
+   │  │ Gleam SDK     │  │                              │  │ Qdrant Adapter       │  │
+   │  │ Julia SDK     │  │                              │  │ MongoDB Adapter      │  │
+   │  │ Zig SDK       │  │                              │  │ Redis Adapter        │  │
+   │  └───────────────┘  │                              │  │ DuckDB Adapter       │  │
+   │                     │                              │  │ ClickHouse Adapter   │  │
+   └─────────────────────┘                              │  │ Weaviate Adapter     │  │
+                                                        │  │ Milvus Adapter       │  │
+                                                        │  │ SurrealDB Adapter    │  │
+                                                        │  │ InfluxDB Adapter     │  │
+                                                        │  │ TigerGraph Adapter   │  │
+                                                        │  │ Pinecone Adapter     │  │
+                                                        │  └──────────────────────┘  │
+                                                        └────────────────────────────┘
+----
+
+== Federation Adapters
+
+Federation adapters allow VeriSimDB to coordinate with external databases,
+treating them as modality-specialised peers in a federated mesh.  Each adapter
+translates the VeriSimDB federation protocol into the native query language of
+the target store, maps results back into octad hexad entities, and reports drift
+scores so the normaliser can maintain cross-modal consistency.
+
+All adapters implement the `FederationAdapter` trait (Rust) or the
+`FederationService` gRPC service (for language-agnostic integration).
+
+=== Existing Adapters (4)
+
+[cols="1,1,2,1"]
+|===
+| Adapter | Target Store | Primary Modalities | Status
+
+| `postgres`
+| PostgreSQL 15+
+| Document, Temporal, Spatial (PostGIS)
+| Implemented
+
+| `neo4j`
+| Neo4j 5.x
+| Graph
+| Implemented
+
+| `elasticsearch`
+| Elasticsearch 8.x / OpenSearch 2.x
+| Document, Vector (kNN)
+| Implemented
+
+| `qdrant`
+| Qdrant 1.x
+| Vector
+| Implemented
+|===
+
+=== New Adapters (10)
+
+[cols="1,1,2,1"]
+|===
+| Adapter | Target Store | Primary Modalities | Status
+
+| `mongodb`
+| MongoDB 7.x
+| Document, Graph (aggregation pipelines), Spatial (GeoJSON)
+| Planned
+
+| `redis`
+| Redis 7.x / Valkey
+| Vector (RediSearch), Document, Graph (RedisGraph)
+| Planned
+
+| `duckdb`
+| DuckDB 1.x
+| Tensor (columnar), Document, Temporal
+| Planned
+
+| `clickhouse`
+| ClickHouse 24.x
+| Temporal (time-series), Tensor (columnar arrays)
+| Planned
+
+| `weaviate`
+| Weaviate 1.x
+| Vector, Semantic (schema-driven)
+| Planned
+
+| `milvus`
+| Milvus 2.x
+| Vector, Tensor
+| Planned
+
+| `surrealdb`
+| SurrealDB 2.x
+| Graph, Document, Spatial, Vector
+| Planned
+
+| `influxdb`
+| InfluxDB 3.x
+| Temporal (time-series), Provenance (audit events)
+| Planned
+
+| `tigergraph`
+| TigerGraph 4.x
+| Graph (distributed), Semantic (GSQL type system)
+| Planned
+
+| `pinecone`
+| Pinecone (cloud)
+| Vector
+| Planned
+|===
+
+== Client SDKs
+
+Client SDKs provide idiomatic language bindings for applications that need to
+read, write, and query VeriSimDB hexad entities.  Each SDK wraps the REST API
+(and optionally gRPC for streaming) with connection pooling, retry logic,
+serialisation, and type-safe hexad construction.
+
+[cols="1,2,1"]
+|===
+| SDK | Language / Runtime | Status
+
+| `verisim-rs`
+| Rust (native, via `reqwest` + `tonic`)
+| Planned
+
+| `verisim-ex`
+| Elixir (via `Req` + `GRPC`)
+| Planned
+
+| `verisim-rescript`
+| ReScript (via `Fetch` API, Deno runtime)
+| Planned
+
+| `verisim-gleam`
+| Gleam (via `gleam_http`, BEAM or JS target)
+| Planned
+
+| `verisim-jl`
+| Julia (via `HTTP.jl`)
+| Planned
+
+| `verisim-zig`
+| Zig (via `std.http`, C ABI compatible)
+| Planned
+|===
+
+== Octad Modality Mapping
+
+Every hexad entity in VeriSimDB maintains up to 8 synchronized modality
+representations.  Federation adapters map between these canonical modalities and
+the capabilities of each external store.
+
+[cols="1,3,2"]
+|===
+| Modality | Description | Canonical Type
+
+| `graph`
+| RDF triples and property-graph edges.  Relationships between entities are
+  stored as directed labelled edges.
+| `GraphNode` / `GraphEdge`
+
+| `vector`
+| Dense embedding vector for similarity search (cosine, dot-product, L2).
+  Dimensionality is configurable per store.
+| `Embedding` (Vec<f32>)
+
+| `tensor`
+| Multi-dimensional numeric array.  Shape and data are stored together.
+  Used for ML feature tensors, matrices, and higher-order data.
+| `Tensor` (shape: Vec<usize>, data: Vec<f64>)
+
+| `semantic`
+| Ontological type annotations and property maps.  Types are IRIs; properties
+  are key-value pairs.  Proof blobs attach formal verification evidence.
+| `SemanticAnnotation`
+
+| `document`
+| Full-text searchable content with title, body, and arbitrary fields.
+  Backed by Tantivy for indexing.
+| `Document`
+
+| `temporal`
+| Version history and time-travel queries.  Every mutation creates a new
+  version with a timestamp, enabling point-in-time reconstruction.
+| `Version` / `TimeRange`
+
+| `provenance`
+| Origin tracking, transformation chain, and actor trail.  Records form a
+  SHA-256 hash chain for tamper-evident audit logging.
+| `ProvenanceRecord` / `ProvenanceChain`
+
+| `spatial`
+| Geospatial coordinates (WGS84), geometry types (Point, Polygon, etc.),
+  SRID, and proximity queries (radius, bounding box, k-nearest).
+| `SpatialData` / `Coordinates`
+|===
+
+== Shared Definitions
+
+The `shared/` directory contains canonical type definitions used by all
+connectors.  These are the single source of truth for the VeriSimDB wire
+format.
+
+[source,text]
+----
+shared/
+├── json-schema/               # JSON Schema (2020-12) definitions
+│   ├── hexad.json             # Full hexad entity
+│   ├── hexad-input.json       # Create/update input
+│   ├── hexad-status.json      # Entity status across modalities
+│   ├── modality.json          # Modality enum
+│   ├── query-params.json      # Federation query parameters
+│   ├── federation-result.json # Normalised federation result
+│   ├── drift-score.json       # Drift measurement per entity
+│   ├── provenance-event.json  # Single provenance event
+│   └── error.json             # Error response envelope
+├── openapi/
+│   └── verisim-api-v1.yaml    # OpenAPI 3.1 specification
+└── proto/
+    └── verisim_federation.proto  # Protobuf/gRPC service definitions
+----
+
+All JSON schemas use the `https://verisim.db/schema/` namespace.  OpenAPI and
+Protobuf definitions reference the same canonical types to ensure consistency
+across REST, gRPC, and SDK code generation.
+
+== Development
+
+=== Adding a New Federation Adapter
+
+1. Create a new directory under `connectors/federation/<store-name>/`.
+2. Implement the `FederationAdapter` trait (Rust) or generate a gRPC client
+   from `verisim_federation.proto`.
+3. Map the target store's native types to the appropriate octad modalities.
+4. Implement drift detection by comparing local and remote representations.
+5. Add integration tests using a containerised instance of the target store.
+6. Register the adapter in the federation registry.
+
+=== Adding a New Client SDK
+
+1. Create a new directory under `connectors/sdks/<language>/`.
+2. Generate types from the JSON schemas in `shared/json-schema/`.
+3. Implement HTTP client calls against the OpenAPI spec.
+4. Optionally implement gRPC streaming from `verisim_federation.proto`.
+5. Add connection pooling, retry logic, and error handling.
+6. Publish to the appropriate package registry.
+
+== Related Documentation
+
+* link:../README.adoc[VeriSimDB README] -- project overview and quick start
+* link:../WHITEPAPER.md[Whitepaper] -- formal description of the octad model
+* link:../docs/[docs/] -- design documents and architecture decisions
+* link:../rust-core/verisim-api/src/federation.rs[federation.rs] -- Rust federation implementation
+* link:../rust-core/verisim-hexad/src/lib.rs[hexad lib.rs] -- canonical Hexad type definitions

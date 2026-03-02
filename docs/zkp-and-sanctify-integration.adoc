@@ -1,0 +1,65 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= ZK-Historiography: Proven & Sactify-PHP Integration
+
+This specification details the generation and verification of Non-Interactive Zero-Knowledge Proofs (NIZKs) within the VeriSimDB ecosystem. This allows for "Privacy-Preserving Veracity," where a third party can verify the logical integrity of a Hexad without accessing the underlying data.
+
+== 1. The ZKP Generation Workflow
+
+The integration relies on `proven` to act as the arithmetic circuit generator and `sactify-php` to act as the secure transport and identity layer.
+
+*Circuit Definition*:: The `proven` contract (e.g., `CitationContract`) defines the constraints.
+
+*Witness Generation*:: The store-side logic provides the private data (the "witness") to the `proven` engine.
+
+*Proof Computation*:: `proven` generates a proof π that the private data satisfies the contract constraints.
+
+*Sactify Wrapping*:: The proof π is packaged into a `sactify-php` signature block.
+
+== 2. Technical Specification
+
+=== A. The Proven Witness
+
+The `proven` engine generates a succinct witness hash that represents the logical state of the Hexad at the moment of verification.
+
+[source,javascript]
+----
+// Witness generation logic
+witness CitationWitness(h: Hexad) {
+    apply CitationContract(h);
+    return extract_proof_witness();
+}
+----
+
+=== B. The Sactify Signature Structure
+
+`sactify-php` wraps the witness hash with the signer's identity and a timestamp to prevent replay attacks.
+
+[source,php]
+----
+// sactify-php pseudo-implementation
+$payload = [
+    'hexad_id' => '0x12AB...',
+    'contract_hash' => 'sha256(...)',
+    'zk_witness' => $provenWitness, // The NIZK from proven
+    'timestamp' => time()
+];
+
+$signature = Sactify::sign($payload, $privateKey);
+----
+
+== 3. Verification Without Data Access
+
+A consumer (e.g., a peer researcher or an automated auditor) receives the signed package. They can verify the claim as follows:
+
+. *Identity Check*: Use `sactify-php` to verify the signature against the custodian's public key in the ReScript Registry.
+. *Logic Check*: Pass the `zk_witness` to the `proven` verification function.
+. *Conclusion*: If both pass, the consumer is mathematically certain the data is valid according to the contract, despite never seeing the data itself.
+
+== 4. Security Considerations
+
+*Soundness*:: `proven` ensures that a false claim cannot generate a valid witness.
+
+*Zero-Knowledge*:: No information about the specific references or the text of the claim is leaked in the `zk_witness`.
+
+*Non-Repudiation*:: The `sactify-php` layer ensures the custodian cannot deny having verified the proof.

@@ -1,0 +1,577 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Database"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "security/gitforge-protection.sh",
+      "severity": "Medium",
+      "description": "34 potentially unquoted variable expansions in security/gitforge-protection.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "vault-core-ats/zig/tests/crypto_test.zig",
+      "severity": "High",
+      "description": "1 unsafe pointer casts in vault-core-ats/zig/tests/crypto_test.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "vault-core/src/armor.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in vault-core/src/armor.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "vault-core/src/crypto.rs",
+      "severity": "Medium",
+      "description": "13 unwrap/expect calls in vault-core/src/crypto.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "vault-core/src/password_policy.rs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in vault-core/src/password_policy.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "vault-core/src/polymorphic.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in vault-core/src/polymorphic.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "vault-core/src/primes.rs",
+      "severity": "Medium",
+      "description": "21 unwrap/expect calls in vault-core/src/primes.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "vault-core/src/vault.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in vault-core/src/vault.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 10565,
+    "unsafe_blocks": 1,
+    "panic_sites": 2,
+    "unwrap_calls": 72,
+    "allocation_sites": 32,
+    "io_operations": 7,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "ada-cli/src/svalinn-identity.ads",
+      "lines": 59,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada-cli/src/svalinn-vault.ads",
+      "lines": 59,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada-cli/src/svalinn_main.adb",
+      "lines": 253,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "security/gitforge-protection.sh",
+      "lines": 235,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core-ats/zig/tests/crypto_test.zig",
+      "lines": 138,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core-ats/zig/crypto_bindings.zig",
+      "lines": 300,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/armor.rs",
+      "lines": 307,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/auth_protection.rs",
+      "lines": 518,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/crypto.rs",
+      "lines": 474,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 13,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/identity.rs",
+      "lines": 444,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/lockdown.rs",
+      "lines": 382,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/mfa.rs",
+      "lines": 457,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/password_policy.rs",
+      "lines": 577,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/polymorphic.rs",
+      "lines": 430,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/primes.rs",
+      "lines": 280,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 21,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/qrng.rs",
+      "lines": 557,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/vault.rs",
+      "lines": 691,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vault-core/src/versioning.rs",
+      "lines": 438,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "flake.nix",
+      "lines": 163,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "network",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "ada-cli/src/svalinn-identity.ads",
+        "to": "ada-cli/src/svalinn-vault.ads",
+        "relation": "shared_dir:ada-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ada-cli/src/svalinn-vault.ads",
+        "to": "ada-cli/src/svalinn_main.adb",
+        "relation": "shared_dir:ada-cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/armor.rs",
+        "to": "vault-core/src/auth_protection.rs",
+        "relation": "shared_dir:vault-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/auth_protection.rs",
+        "to": "vault-core/src/crypto.rs",
+        "relation": "shared_dir:vault-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/crypto.rs",
+        "to": "vault-core/src/identity.rs",
+        "relation": "shared_dir:vault-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/identity.rs",
+        "to": "vault-core/src/lockdown.rs",
+        "relation": "shared_dir:vault-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/lockdown.rs",
+        "to": "vault-core/src/mfa.rs",
+        "relation": "shared_dir:vault-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/mfa.rs",
+        "to": "vault-core/src/password_policy.rs",
+        "relation": "shared_dir:vault-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/password_policy.rs",
+        "to": "vault-core/src/polymorphic.rs",
+        "relation": "shared_dir:vault-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/polymorphic.rs",
+        "to": "vault-core/src/primes.rs",
+        "relation": "shared_dir:vault-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/primes.rs",
+        "to": "vault-core/src/qrng.rs",
+        "relation": "shared_dir:vault-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/qrng.rs",
+        "to": "vault-core/src/vault.rs",
+        "relation": "shared_dir:vault-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/vault.rs",
+        "to": "vault-core/src/versioning.rs",
+        "relation": "shared_dir:vault-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ada-cli/src/svalinn-identity.ads",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada-cli/src/svalinn-vault.ads",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada-cli/src/svalinn_main.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "security/gitforge-protection.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core-ats/zig/tests/crypto_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "vault-core-ats/zig/crypto_bindings.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/armor.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "vault-core/src/auth_protection.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "vault-core/src/crypto.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "vault-core/src/identity.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/lockdown.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "vault-core/src/mfa.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "vault-core/src/password_policy.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vault-core/src/polymorphic.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "vault-core/src/primes.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "vault-core/src/qrng.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "vault-core/src/vault.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "vault-core/src/versioning.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "vault-core/src/armor.rs",
+          "vault-core/src/crypto.rs",
+          "vault-core/src/polymorphic.rs",
+          "vault-core/src/primes.rs",
+          "vault-core/src/vault.rs"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "vault-core/src/password_policy.rs"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "HardcodedSecret->Network"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "vault-core-ats/zig/tests/crypto_test.zig"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "vault-core/src/armor.rs",
+          "vault-core/src/crypto.rs",
+          "vault-core/src/polymorphic.rs",
+          "vault-core/src/primes.rs",
+          "vault-core/src/vault.rs"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "security/gitforge-protection.sh"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

@@ -1,0 +1,137 @@
+;; SPDX-License-Identifier: PMPL-1.0-or-later
+;; Trustfile — Cryptographic trust and proof verification policy for VeriSimDB
+;;
+;; This file defines the zero-knowledge proof (ZKP) scheme selection,
+;; cryptographic verification policies, and trust boundaries.
+
+;; ============================================================================
+;; ZKP Scheme Selection for VQL-DT PROOF Clause
+;; ============================================================================
+;;
+;; Decision: PLONK (Permutations over Lagrange-bases for Oecumenical
+;;           Noninteractive arguments of Knowledge)
+;;
+;; Rationale: PLONK is the best fit for VeriSimDB's proof obligations:
+;;
+;; | Criterion                | PLONK        | STARKs       | Bulletproofs | Groth16      |
+;; |--------------------------|-------------|--------------|--------------|--------------|
+;; | Trusted setup            | Universal¹  | None (trans) | None (trans) | Per-circuit  |
+;; | Proof size               | ~400 bytes  | ~45 KB       | ~700 bytes   | ~200 bytes   |
+;; | Verification time        | ~5ms        | ~10ms        | ~50ms        | ~3ms         |
+;; | Prover time              | ~1s         | ~2s          | ~5s          | ~1s          |
+;; | Updatable                | Yes         | N/A          | N/A          | No           |
+;; | Post-quantum             | No          | Yes          | No           | No           |
+;; | Recursive proofs         | Yes         | Yes (harder) | No           | No           |
+;; | Circuit flexibility      | High        | High         | Limited      | Fixed        |
+;;
+;; ¹ PLONK uses a Universal Structured Reference String (SRS) — one trusted
+;;   setup ceremony for ALL circuits, not per-circuit like Groth16.
+;;
+;; Why PLONK over alternatives:
+;;
+;; 1. vs Groth16: Groth16 has the smallest proofs and fastest verification,
+;;    but requires a NEW trusted setup for every circuit change. VeriSimDB's
+;;    proof contracts change frequently (new types, new properties). PLONK's
+;;    universal SRS means one setup covers all VQL-DT contracts forever.
+;;
+;; 2. vs STARKs: STARKs are transparent (no trusted setup) and post-quantum,
+;;    but proof sizes are ~100x larger (45KB vs 400B). For VeriSimDB where
+;;    proofs are stored in the semantic modality and transmitted over gRPC,
+;;    proof size matters. STARKs are better for on-chain verification where
+;;    transparency is paramount — that's not our use case.
+;;
+;; 3. vs Bulletproofs: Bulletproofs are transparent and compact, but
+;;    verification time is O(n) — too slow for interactive query verification.
+;;    PLONK verification is constant-time regardless of circuit size.
+;;
+;; Future: If post-quantum resistance becomes critical, migrate to STARKs
+;; for the most sensitive proof types (Integrity, Custom) while keeping
+;; PLONK for lightweight proofs (Existence, Citation, Access). The proof
+;; infrastructure should abstract over the backend scheme.
+
+;; ============================================================================
+;; Proof Type → Circuit Mapping
+;; ============================================================================
+;;
+;; (proof-type "existence"
+;;   :scheme :plonk
+;;   :circuit "hexad-exists"
+;;   :description "Verify hexad exists and is accessible"
+;;   :estimated-verify-ms 1
+;;   :estimated-prove-ms 50)
+;;
+;; (proof-type "citation"
+;;   :scheme :plonk
+;;   :circuit "contract-registry-lookup"
+;;   :description "Verify contract exists in semantic registry"
+;;   :estimated-verify-ms 5
+;;   :estimated-prove-ms 200)
+;;
+;; (proof-type "access"
+;;   :scheme :plonk
+;;   :circuit "rbac-check"
+;;   :description "Verify caller has rights to modality/entity"
+;;   :estimated-verify-ms 15
+;;   :estimated-prove-ms 500)
+;;
+;; (proof-type "integrity"
+;;   :scheme :plonk
+;;   :circuit "merkle-membership"
+;;   :description "Verify data integrity via Merkle proof"
+;;   :estimated-verify-ms 50
+;;   :estimated-prove-ms 1000
+;;   :notes "Uses Merkle tree optimization for n>100 results (O(log n) proof size)")
+;;
+;; (proof-type "provenance"
+;;   :scheme :plonk
+;;   :circuit "lineage-chain"
+;;   :description "Verify data lineage/audit trail"
+;;   :estimated-verify-ms 30
+;;   :estimated-prove-ms 800
+;;   :sequential true)  ;; Chain walk cannot be parallelized
+;;
+;; (proof-type "custom"
+;;   :scheme :plonk
+;;   :circuit "user-defined"
+;;   :description "User-defined proof contract"
+;;   :estimated-verify-ms 200
+;;   :estimated-prove-ms 2000)
+
+;; ============================================================================
+;; Rust Implementation
+;; ============================================================================
+;;
+;; Recommended crate: `ark-plonk` (arkworks ecosystem)
+;;   - ark-poly-commit: polynomial commitment schemes
+;;   - ark-serialize: proof serialization
+;;   - ark-bn254: BN254 curve (128-bit security)
+;;   - ark-bls12-381: BLS12-381 curve (alternative, wider adoption)
+;;
+;; Curve selection: BN254 for speed, BLS12-381 for wider ecosystem compatibility.
+;; Start with BN254, offer BLS12-381 as configuration option.
+;;
+;; SRS ceremony: Use Zcash Powers of Tau ceremony artifacts or generate
+;; project-specific SRS with auditable randomness.
+
+;; ============================================================================
+;; Existing Cryptographic Infrastructure (from Trustfile.hs)
+;; ============================================================================
+;;
+;; The following are RETAINED from the existing Trustfile:
+;; - Policy hash verification: SHA-256 (policy/policy.ncl)
+;; - Schema signatures: OpenSSL RSA/ECDSA (schema/schema.json)
+;; - Driver signatures: Kyber-1024 post-quantum (drivers/*.bin)
+;; - Migration provenance: OpenSSL RSA/ECDSA (migrations/provenance.json)
+;;
+;; These are ORTHOGONAL to ZKP — they protect infrastructure integrity,
+;; while ZKP protects query-time proof obligations.
+
+;; ============================================================================
+;; Trust Boundaries
+;; ============================================================================
+;;
+;; 1. Hexad Store → Semantic Store: proof blobs stored as CBOR in semantic modality
+;; 2. VQL Parser → Planner: PROOF clause extracted, cost estimated
+;; 3. Planner → Executor: proof verification dispatched before/after query
+;; 4. Executor → ZKP Backend: circuit evaluated, proof generated/verified
+;; 5. Client → API: proof result included in response (pass/fail + proof bytes)

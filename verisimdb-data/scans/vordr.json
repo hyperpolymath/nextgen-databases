@@ -1,0 +1,1883 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Networking",
+    "WebServer",
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "src/rust/engine/config.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in src/rust/engine/config.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/rust/engine/config.rs",
+      "severity": "Medium",
+      "description": "15 unwrap/expect calls in src/rust/engine/config.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/rust/engine/lifecycle.rs",
+      "severity": "High",
+      "description": "5 unsafe blocks in src/rust/engine/lifecycle.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/rust/engine/lifecycle.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in src/rust/engine/lifecycle.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/rust/engine/state.rs",
+      "severity": "High",
+      "description": "1 unsafe blocks in src/rust/engine/state.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/rust/engine/state.rs",
+      "severity": "Medium",
+      "description": "19 unwrap/expect calls in src/rust/engine/state.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/rust/ffi/gatekeeper.rs",
+      "severity": "High",
+      "description": "6 unsafe blocks in src/rust/ffi/gatekeeper.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/rust/ffi/gatekeeper.rs",
+      "severity": "High",
+      "description": "Raw pointer cast in src/rust/ffi/gatekeeper.rs",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/rust/registry/mod.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in src/rust/registry/mod.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/rust/tests/cli_integration.rs",
+      "severity": "Medium",
+      "description": "14 unwrap/expect calls in src/rust/tests/cli_integration.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/rust/tests/cli_expanded.rs",
+      "severity": "Medium",
+      "description": "57 unwrap/expect calls in src/rust/tests/cli_expanded.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/rust/benches/container_lifecycle.rs",
+      "severity": "Medium",
+      "description": "13 unwrap/expect calls in src/rust/benches/container_lifecycle.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/idris2/SBOM.idr",
+      "severity": "Critical",
+      "description": "2 believe_me (type checker bypass) in src/idris2/SBOM.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "src/elixir/lib/vordr/reversibility.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in src/elixir/lib/vordr/reversibility.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "src/mcp-adapter/src/Main.res",
+      "severity": "High",
+      "description": "1 JSON.parseExn calls in src/mcp-adapter/src/Main.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "src/mcp-adapter/src/HttpMain.res",
+      "severity": "High",
+      "description": "1 JSON.parseExn calls in src/mcp-adapter/src/HttpMain.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/mcp-adapter/src/HttpServer.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/mcp-adapter/src/HttpServer.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": ".machine_readable/PLAYBOOK.scm",
+      "severity": "High",
+      "description": "System/process call in .machine_readable/PLAYBOOK.scm",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 25282,
+    "unsafe_blocks": 38,
+    "panic_sites": 4,
+    "unwrap_calls": 148,
+    "allocation_sites": 39,
+    "io_operations": 67,
+    "threading_constructs": 12
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/ada/src/threshold_signatures.ads",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/src/threshold_signatures.adb",
+      "lines": 107,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/src/gatekeeper.ads",
+      "lines": 109,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/src/gatekeeper.adb",
+      "lines": 140,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/cli/auth.rs",
+      "lines": 326,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/cli/compose.rs",
+      "lines": 761,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/cli/doctor.rs",
+      "lines": 684,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/cli/network.rs",
+      "lines": 245,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/cli/profile.rs",
+      "lines": 618,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/cli/run.rs",
+      "lines": 311,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/cli/system.rs",
+      "lines": 454,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/cli/volume.rs",
+      "lines": 237,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/cli/monitor.rs",
+      "lines": 491,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/engine/config.rs",
+      "lines": 609,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 15,
+      "allocation_sites": 5,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/engine/lifecycle.rs",
+      "lines": 439,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/rust/engine/state.rs",
+      "lines": 875,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 19,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/ffi/gatekeeper.rs",
+      "lines": 380,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "src/rust/mcp/mod.rs",
+      "lines": 334,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/mcp/server.rs",
+      "lines": 1345,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 6,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "src/rust/network/netavark.rs",
+      "lines": 337,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/registry/mod.rs",
+      "lines": 443,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/runtime/shim.rs",
+      "lines": 334,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/runtime/ttrpc.rs",
+      "lines": 151,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/build.rs",
+      "lines": 200,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/main.rs",
+      "lines": 66,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/ebpf/mod.rs",
+      "lines": 384,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/rust/ebpf/syscall.rs",
+      "lines": 339,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/ebpf/anomaly.rs",
+      "lines": 196,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/ebpf/probes.rs",
+      "lines": 297,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/rust/tests/cli_integration.rs",
+      "lines": 241,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 14,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/tests/cli_expanded.rs",
+      "lines": 695,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 57,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/tests/ebpf_unit_tests.rs",
+      "lines": 468,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rust/benches/container_lifecycle.rs",
+      "lines": 175,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 13,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/idris2/SBOM.idr",
+      "lines": 267,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/elixir/lib/vordr/reversibility/journal.ex",
+      "lines": 234,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/elixir/lib/vordr/borg.ex",
+      "lines": 283,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/elixir/lib/vordr/mcp_client.ex",
+      "lines": 238,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/elixir/mix.exs",
+      "lines": 73,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/elixir/test/mcp_client_integration_test.exs",
+      "lines": 258,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/mcp-adapter/src/Main.res",
+      "lines": 99,
+      "unsafe_blocks": 1,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/mcp-adapter/src/HttpMain.res",
+      "lines": 123,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/mcp-adapter/src/HttpServer.res",
+      "lines": 403,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/lsp/transport/http/HttpTransport.res",
+      "lines": 62,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/lsp/transport/stdio/StdioTransport.res",
+      "lines": 161,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 224,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "memory",
+    "concurrency",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/rust/mcp/mod.rs",
+        "to": "src/rust/mcp/server.rs",
+        "relation": "shared_dir:src/rust/mcp",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/tests/cli_integration.rs",
+        "to": "src/rust/tests/cli_expanded.rs",
+        "relation": "shared_dir:src/rust/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/tests/cli_expanded.rs",
+        "to": "src/rust/tests/ebpf_unit_tests.rs",
+        "relation": "shared_dir:src/rust/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/runtime/shim.rs",
+        "to": "src/rust/runtime/ttrpc.rs",
+        "relation": "shared_dir:src/rust/runtime",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/ebpf/mod.rs",
+        "to": "src/rust/ebpf/syscall.rs",
+        "relation": "shared_dir:src/rust/ebpf",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/ebpf/syscall.rs",
+        "to": "src/rust/ebpf/anomaly.rs",
+        "relation": "shared_dir:src/rust/ebpf",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/ebpf/anomaly.rs",
+        "to": "src/rust/ebpf/probes.rs",
+        "relation": "shared_dir:src/rust/ebpf",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/auth.rs",
+        "to": "src/rust/cli/compose.rs",
+        "relation": "shared_dir:src/rust/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/compose.rs",
+        "to": "src/rust/cli/doctor.rs",
+        "relation": "shared_dir:src/rust/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/doctor.rs",
+        "to": "src/rust/cli/network.rs",
+        "relation": "shared_dir:src/rust/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/network.rs",
+        "to": "src/rust/cli/profile.rs",
+        "relation": "shared_dir:src/rust/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/profile.rs",
+        "to": "src/rust/cli/run.rs",
+        "relation": "shared_dir:src/rust/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/run.rs",
+        "to": "src/rust/cli/system.rs",
+        "relation": "shared_dir:src/rust/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/system.rs",
+        "to": "src/rust/cli/volume.rs",
+        "relation": "shared_dir:src/rust/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/volume.rs",
+        "to": "src/rust/cli/monitor.rs",
+        "relation": "shared_dir:src/rust/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/threshold_signatures.ads",
+        "to": "src/ada/src/threshold_signatures.adb",
+        "relation": "shared_dir:src/ada/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/threshold_signatures.adb",
+        "to": "src/ada/src/gatekeeper.ads",
+        "relation": "shared_dir:src/ada/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/gatekeeper.ads",
+        "to": "src/ada/src/gatekeeper.adb",
+        "relation": "shared_dir:src/ada/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/build.rs",
+        "to": "src/rust/main.rs",
+        "relation": "shared_dir:src/rust",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/engine/config.rs",
+        "to": "src/rust/engine/lifecycle.rs",
+        "relation": "shared_dir:src/rust/engine",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/engine/lifecycle.rs",
+        "to": "src/rust/engine/state.rs",
+        "relation": "shared_dir:src/rust/engine",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/lib/vordr/borg.ex",
+        "to": "src/elixir/lib/vordr/mcp_client.ex",
+        "relation": "shared_dir:src/elixir/lib/vordr",
+        "weight": 1.0
+      },
+      {
+        "from": "src/mcp-adapter/src/Main.res",
+        "to": "src/mcp-adapter/src/HttpMain.res",
+        "relation": "shared_dir:src/mcp-adapter/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/mcp-adapter/src/HttpMain.res",
+        "to": "src/mcp-adapter/src/HttpServer.res",
+        "relation": "shared_dir:src/mcp-adapter/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/threshold_signatures.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/threshold_signatures.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/threshold_signatures.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/threshold_signatures.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/threshold_signatures.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/threshold_signatures.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/gatekeeper.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/gatekeeper.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/gatekeeper.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/gatekeeper.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/gatekeeper.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/src/gatekeeper.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/auth.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/auth.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/auth.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/compose.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/compose.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/compose.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/doctor.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/doctor.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/doctor.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/network.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/network.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/network.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/profile.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/profile.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/profile.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/run.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/run.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/run.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/system.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/system.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/system.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/volume.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/rust/cli/volume.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/rust/cli/volume.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/rust/cli/monitor.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/monitor.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/cli/monitor.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/engine/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "src/rust/engine/config.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "src/rust/engine/config.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "src/rust/engine/lifecycle.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 23.0
+      },
+      {
+        "from": "src/rust/engine/lifecycle.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 23.0
+      },
+      {
+        "from": "src/rust/engine/lifecycle.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 23.0
+      },
+      {
+        "from": "src/rust/engine/state.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 22.0
+      },
+      {
+        "from": "src/rust/engine/state.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 22.0
+      },
+      {
+        "from": "src/rust/engine/state.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 22.0
+      },
+      {
+        "from": "src/rust/ffi/gatekeeper.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 25.0
+      },
+      {
+        "from": "src/rust/ffi/gatekeeper.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 25.0
+      },
+      {
+        "from": "src/rust/ffi/gatekeeper.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 25.0
+      },
+      {
+        "from": "src/rust/mcp/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/mcp/mod.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/mcp/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/mcp/server.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/rust/mcp/server.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/rust/mcp/server.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/rust/network/netavark.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/network/netavark.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/network/netavark.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/registry/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/rust/registry/mod.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/rust/registry/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/rust/runtime/shim.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/runtime/shim.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/runtime/shim.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/runtime/ttrpc.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/runtime/ttrpc.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/runtime/ttrpc.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/build.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/rust/build.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/rust/build.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/rust/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/ebpf/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/rust/ebpf/mod.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/rust/ebpf/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/rust/ebpf/syscall.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/ebpf/syscall.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/ebpf/syscall.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/ebpf/anomaly.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/ebpf/anomaly.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/ebpf/anomaly.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rust/ebpf/probes.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/rust/ebpf/probes.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/rust/ebpf/probes.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/rust/tests/cli_integration.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "src/rust/tests/cli_integration.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "src/rust/tests/cli_integration.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "src/rust/tests/cli_expanded.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "src/rust/tests/cli_expanded.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "src/rust/tests/cli_expanded.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "src/rust/tests/ebpf_unit_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/rust/tests/ebpf_unit_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/rust/tests/ebpf_unit_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/rust/benches/container_lifecycle.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "src/rust/benches/container_lifecycle.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "src/rust/benches/container_lifecycle.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "src/idris2/SBOM.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/idris2/SBOM.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/idris2/SBOM.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/elixir/lib/vordr/reversibility/journal.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/elixir/lib/vordr/reversibility/journal.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/elixir/lib/vordr/reversibility/journal.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/elixir/lib/vordr/borg.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/lib/vordr/borg.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/lib/vordr/borg.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/lib/vordr/mcp_client.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/lib/vordr/mcp_client.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/lib/vordr/mcp_client.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/mix.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/mix.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/mix.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/test/mcp_client_integration_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/test/mcp_client_integration_test.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/elixir/test/mcp_client_integration_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/mcp-adapter/src/Main.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/mcp-adapter/src/Main.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/mcp-adapter/src/Main.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/mcp-adapter/src/HttpMain.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/mcp-adapter/src/HttpMain.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/mcp-adapter/src/HttpMain.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/mcp-adapter/src/HttpServer.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/mcp-adapter/src/HttpServer.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/mcp-adapter/src/HttpServer.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/lsp/transport/http/HttpTransport.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/lsp/transport/http/HttpTransport.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/lsp/transport/http/HttpTransport.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/lsp/transport/stdio/StdioTransport.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "src/lsp/transport/stdio/StdioTransport.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "src/lsp/transport/stdio/StdioTransport.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "src/rust/engine/config.rs",
+          "src/rust/engine/lifecycle.rs",
+          "src/rust/engine/state.rs",
+          "src/rust/registry/mod.rs",
+          "src/rust/tests/cli_integration.rs",
+          "src/rust/tests/cli_expanded.rs",
+          "src/rust/benches/container_lifecycle.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "src/elixir/lib/vordr/reversibility.ex"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "src/rust/engine/config.rs",
+          "src/rust/engine/lifecycle.rs",
+          "src/rust/engine/state.rs",
+          "src/rust/ffi/gatekeeper.rs",
+          "src/rust/ffi/gatekeeper.rs",
+          "src/idris2/SBOM.idr"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "src/mcp-adapter/src/Main.res",
+          "src/mcp-adapter/src/HttpMain.res"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "UnsafeDeserialization->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          ".machine_readable/PLAYBOOK.scm"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "src/rust/engine/config.rs",
+          "src/rust/engine/lifecycle.rs",
+          "src/rust/engine/state.rs",
+          "src/rust/ffi/gatekeeper.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "UnsafeCode->Concurrency"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/rust/engine/config.rs",
+          "src/rust/engine/lifecycle.rs",
+          "src/rust/engine/state.rs",
+          "src/rust/registry/mod.rs",
+          "src/rust/tests/cli_integration.rs",
+          "src/rust/tests/cli_expanded.rs",
+          "src/rust/benches/container_lifecycle.rs",
+          "src/mcp-adapter/src/HttpServer.res"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "src/mcp-adapter/src/Main.res",
+          "src/mcp-adapter/src/HttpMain.res"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "UnsafeDeserialization->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          ".machine_readable/PLAYBOOK.scm"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer",
+          "OTP"
+        ],
+        "relation": "CommandInjection->Disk"
+      }
+    ]
+  }
+}

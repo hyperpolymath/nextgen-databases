@@ -1,0 +1,554 @@
+{
+  "program_path": ".",
+  "language": "shell",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "examples/ada/balanced_ops.adb",
+      "severity": "High",
+      "description": "pragma Suppress (runtime checks disabled) in examples/ada/balanced_ops.adb",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "examples/haskell/Nop.hs",
+      "severity": "High",
+      "description": "6 error/undefined in examples/haskell/Nop.hs",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "ResourceLeak",
+      "location": "examples/scheme/nop.scm",
+      "severity": "Medium",
+      "description": "6 call/cc usage in examples/scheme/nop.scm",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "proofs/lean4/CNOCategory.lean",
+      "severity": "High",
+      "description": "5 sorry (unproven proposition) in proofs/lean4/CNOCategory.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "proofs/lean4/FilesystemCNO.lean",
+      "severity": "High",
+      "description": "1 sorry (unproven proposition) in proofs/lean4/FilesystemCNO.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "proofs/lean4/LambdaCNO.lean",
+      "severity": "High",
+      "description": "6 sorry (unproven proposition) in proofs/lean4/LambdaCNO.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "proofs/lean4/QuantumCNO.lean",
+      "severity": "High",
+      "description": "4 sorry (unproven proposition) in proofs/lean4/QuantumCNO.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "proofs/lean4/StatMech.lean",
+      "severity": "High",
+      "description": "3 sorry (unproven proposition) in proofs/lean4/StatMech.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "run-local-verification.sh",
+      "severity": "Critical",
+      "description": "eval usage in run-local-verification.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "run-local-verification.sh",
+      "severity": "Medium",
+      "description": "21 potentially unquoted variable expansions in run-local-verification.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "run-local-verification.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in run-local-verification.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "setup-and-verify.sh",
+      "severity": "Medium",
+      "description": "26 potentially unquoted variable expansions in setup-and-verify.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/whitespace/src/lib.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in src/whitespace/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/abi/Layout.idr",
+      "severity": "Critical",
+      "description": "6 believe_me (type checker bypass) in src/abi/Layout.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "verify-proofs.sh",
+      "severity": "Critical",
+      "description": "eval usage in verify-proofs.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "verify-proofs.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in verify-proofs.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 10947,
+    "unsafe_blocks": 41,
+    "panic_sites": 6,
+    "unwrap_calls": 8,
+    "allocation_sites": 7,
+    "io_operations": 12,
+    "threading_constructs": 9
+  },
+  "file_statistics": [
+    {
+      "file_path": "examples/elixir/nop.ex",
+      "lines": 399,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "examples/erlang/nop.erl",
+      "lines": 276,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "examples/go/nop.go",
+      "lines": 39,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "examples/haskell/Nop.hs",
+      "lines": 136,
+      "unsafe_blocks": 0,
+      "panic_sites": 6,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/rust/nop.rs",
+      "lines": 85,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/special-ops/os/ioctl_nop.c",
+      "lines": 456,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/special-ops/os/sched_yield.c",
+      "lines": 385,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 4
+    },
+    {
+      "file_path": "proofs/lean4/CNOCategory.lean",
+      "lines": 168,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "proofs/lean4/FilesystemCNO.lean",
+      "lines": 301,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "proofs/lean4/LambdaCNO.lean",
+      "lines": 195,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "proofs/lean4/QuantumCNO.lean",
+      "lines": 254,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "proofs/lean4/StatMech.lean",
+      "lines": 154,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "setup-and-verify.sh",
+      "lines": 314,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/AuditTrail.res",
+      "lines": 49,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/brainfuck/src/lib.rs",
+      "lines": 281,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/whitespace/src/lib.rs",
+      "lines": 315,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Layout.idr",
+      "lines": 294,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verify-proofs.sh",
+      "lines": 226,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "concurrency",
+    "memory",
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "examples/special-ops/os/ioctl_nop.c",
+        "to": "examples/special-ops/os/sched_yield.c",
+        "relation": "shared_dir:examples/special-ops/os",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Layout.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "setup-and-verify.sh",
+        "to": "verify-proofs.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "proofs/lean4/CNOCategory.lean",
+        "to": "proofs/lean4/FilesystemCNO.lean",
+        "relation": "shared_dir:proofs/lean4",
+        "weight": 1.0
+      },
+      {
+        "from": "proofs/lean4/FilesystemCNO.lean",
+        "to": "proofs/lean4/LambdaCNO.lean",
+        "relation": "shared_dir:proofs/lean4",
+        "weight": 1.0
+      },
+      {
+        "from": "proofs/lean4/LambdaCNO.lean",
+        "to": "proofs/lean4/QuantumCNO.lean",
+        "relation": "shared_dir:proofs/lean4",
+        "weight": 1.0
+      },
+      {
+        "from": "proofs/lean4/QuantumCNO.lean",
+        "to": "proofs/lean4/StatMech.lean",
+        "relation": "shared_dir:proofs/lean4",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "ResourceLeak",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "examples/scheme/nop.scm"
+        ],
+        "frameworks": [],
+        "relation": "ResourceLeak->Cpu"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "run-local-verification.sh",
+          "verify-proofs.sh"
+        ],
+        "frameworks": [],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "examples/ada/balanced_ops.adb",
+          "src/abi/Layout.idr"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "examples/ada/balanced_ops.adb",
+          "proofs/lean4/CNOCategory.lean",
+          "proofs/lean4/FilesystemCNO.lean",
+          "proofs/lean4/LambdaCNO.lean",
+          "proofs/lean4/QuantumCNO.lean",
+          "proofs/lean4/StatMech.lean"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/whitespace/src/lib.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "src/whitespace/src/lib.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "ResourceLeak",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "examples/scheme/nop.scm"
+        ],
+        "frameworks": [],
+        "relation": "ResourceLeak->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "run-local-verification.sh",
+          "run-local-verification.sh",
+          "setup-and-verify.sh",
+          "verify-proofs.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "examples/haskell/Nop.hs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "run-local-verification.sh",
+          "verify-proofs.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Disk"
+      }
+    ]
+  }
+}

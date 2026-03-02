@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+
+[package]
+name = "verisimdb-debugger"
+version = "0.1.0"
+edition = "2024"
+authors = ["Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"]
+license = "PMPL-1.0-or-later"
+description = "Interactive debugger and visualization tool for VeriSimDB"
+repository = "https://github.com/hyperpolymath/verisimdb-debugger"
+keywords = ["database", "debugger", "tui", "multimodal", "zkp"]
+categories = ["command-line-utilities", "development-tools::debugging"]
+
+[dependencies]
+# TUI framework
+ratatui = "0.29"
+crossterm = "0.28"
+
+# Async runtime
+tokio = { version = "1.42", features = ["full"] }
+async-trait = "0.1"
+
+# HTTP client (for VeriSimDB API)
+reqwest = { version = "0.12", features = ["json"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# CLI
+clap = { version = "4.5", features = ["derive", "cargo"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "2.0"
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID
+uuid = { version = "1.11", features = ["serde", "v4"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[[bin]]
+name = "verisimdb-debugger"
+path = "src/main.rs"

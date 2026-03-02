@@ -1,0 +1,181 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Networking",
+    "Database",
+    "Cache",
+    "Concurrent",
+    "MessageQueue",
+    "WebServer"
+  ],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "src/xray/analyzer.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in src/xray/analyzer.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "examples/vulnerable_program.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in examples/vulnerable_program.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "examples/vulnerable_program.rs",
+      "severity": "Medium",
+      "description": "9 unwrap/expect calls in examples/vulnerable_program.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "tests/analyzer_tests.rs",
+      "severity": "High",
+      "description": "3 unsafe blocks in tests/analyzer_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/analyzer_tests.rs",
+      "severity": "Medium",
+      "description": "26 unwrap/expect calls in tests/analyzer_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 3231,
+    "unsafe_blocks": 7,
+    "panic_sites": 4,
+    "unwrap_calls": 45,
+    "allocation_sites": 23,
+    "io_operations": 4,
+    "threading_constructs": 3
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/main.rs",
+      "lines": 293,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/xray/analyzer.rs",
+      "lines": 524,
+      "unsafe_blocks": 2,
+      "panic_sites": 2,
+      "unwrap_calls": 3,
+      "allocation_sites": 7,
+      "io_operations": 2,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/xray/patterns.rs",
+      "lines": 159,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/attack/executor.rs",
+      "lines": 345,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/signatures/engine.rs",
+      "lines": 358,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/report/generator.rs",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/vulnerable_program.rs",
+      "lines": 118,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 9,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "tests/integration.rs",
+      "lines": 79,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/analyzer_tests.rs",
+      "lines": 213,
+      "unsafe_blocks": 3,
+      "panic_sites": 2,
+      "unwrap_calls": 26,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/regression_tests.rs",
+      "lines": 120,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "concurrency",
+    "cpu",
+    "memory"
+  ]
+}

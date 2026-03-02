@@ -1,0 +1,23 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- 07-spatial-radius.vql
+-- Spatial radius: find entities within 5km of central London
+--
+-- The spatial modality stores latitude/longitude coordinates and an
+-- optional label for each hexad entity. VeriSimDB indexes spatial data
+-- using an R-tree (specifically the Hexad R-tree variant described in
+-- entity-007) for efficient radius and bounding-box queries.
+--
+-- The WITHIN RADIUS clause takes three arguments:
+--   1. Latitude of the centre point (decimal degrees)
+--   2. Longitude of the centre point (decimal degrees)
+--   3. Radius in metres
+--
+-- Central London coordinates (51.5074, -0.1278) with a 5km radius
+-- should capture entities at Imperial College, UCL, KCL, the Turing
+-- Institute, and the Skills Matter venue, but exclude Edinburgh,
+-- Oxford, Cambridge, and international locations.
+
+SELECT spatial, document.title FROM hexads
+WHERE spatial WITHIN RADIUS(51.5074, -0.1278, 5000)
+LIMIT 15

@@ -1,0 +1,405 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= VeriSimDB External Adoption Strategy
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc: left
+:toclevels: 3
+:icons: font
+
+== Executive Summary
+
+VeriSimDB's strongest market position is as a *data quality platform* that
+detects and repairs cross-system entity drift -- not as a database competitor.
+The lead pitch is:
+
+[quote]
+Your data drifts silently across 8 systems. We detect it continuously and
+fix it automatically. Here's a demo: 1000 entities, 50 corrupted, 100%
+detection and repair rate.
+
+This document identifies seven target domains for external adoption, ordered
+by alignment strength, and provides a concrete outreach plan for each.
+
+== Positioning
+
+=== What VeriSimDB Is
+
+* A *cross-system entity consistency engine* -- sits alongside your existing
+  databases, not replacing them
+* *Drift detection + auto-repair* across 8 modality representations
+* *Heterogeneous federation* -- unified queries across PostgreSQL, ArangoDB,
+  Elasticsearch, and VeriSimDB instances
+* *Formally verifiable queries* (VQL-DT) with proof certificates
+
+=== What VeriSimDB Is Not
+
+* Not a replacement for PostgreSQL, MongoDB, or Elasticsearch
+* Not an ETL pipeline (it monitors consistency, not transforms data)
+* Not a data warehouse or analytics platform
+
+=== Competitive Landscape
+
+[cols="1,3,3"]
+|===
+| Tool | What It Does | How VeriSimDB Differs
+
+| *Great Expectations* | Post-hoc data validation (schema, distribution)
+| VeriSimDB detects drift *continuously* across *cross-system* representations,
+  not just single-table validation
+
+| *Monte Carlo* | Data observability (freshness, volume, schema changes)
+| VeriSimDB measures *semantic* drift (embedding vs. text, graph vs. document),
+  not just statistical drift
+
+| *Evidently AI* | ML model + data drift detection for tabular/embedding data
+| VeriSimDB detects drift across *8 modality types simultaneously* and
+  *automatically repairs* it, not just reports
+
+| *Apache Atlas* | Metadata governance and lineage tracking
+| VeriSimDB tracks lineage *and* enforces consistency. Atlas catalogues but
+  doesn't detect cross-modal drift
+
+| *DataHub* | Data catalog with multi-backend search
+| VeriSimDB federates *queries* (not just metadata) across heterogeneous
+  backends with drift-aware result aggregation
+|===
+
+== Target Domains
+
+=== 1. GraphRAG / Hybrid Retrieval Systems
+
+*Alignment: Strongest*
+
+==== The Problem
+
+Production GraphRAG architectures combine Neo4j (graph traversal) with
+Qdrant/Weaviate (vector similarity) and document stores. They must maintain
+consistency between three representations of the same entity: source
+document, embedding, and graph node. When source documents change, embeddings
+go stale. LangChain explicitly acknowledges that syncing data sources to
+vector stores requires dedicated indexing APIs with cleanup processes.
+
+==== Why VeriSimDB
+
+This is VeriSimDB's exact architecture. A single entity exists as a document,
+a vector embedding, and a graph node. Drift detection catches when an
+embedding no longer corresponds to its source text -- the precise failure
+mode that causes RAG hallucinations. Self-normalisation triggers re-embedding
+automatically. Federation queries traverse Neo4j relationships AND retrieve
+vector store results transparently.
+
+==== Features Used
+
+* Drift detection (embedding vs. source text)
+* Multi-modal storage (document + vector + graph + semantic)
+* Heterogeneous federation
+* Self-normalisation
+
+==== Outreach Targets
+
+* LangChain community (Python/JS -- integration guide needed)
+* LlamaIndex community (similar architecture pattern)
+* Qdrant users running hybrid Neo4j+Qdrant setups
+* Teams building production RAG pipelines who've hit stale embedding bugs
+
+==== Getting Started Hook
+
+[source,bash]
+----
+# Demo: Create entity, change document, detect embedding drift
+curl -X POST http://localhost:8080/api/v1/hexads -d '{"title":"AI Safety","body":"...",...}'
+# ... modify document without updating embedding ...
+curl http://localhost:8080/api/v1/drift/entity/$ID
+# Result: vector drift = 0.87 (embedding no longer matches text)
+----
+
+---
+
+=== 2. Biomedical Multi-Omics Data Integration
+
+*Alignment: Very Strong*
+
+==== The Problem
+
+Integrating genomic, proteomic, transcriptomic, and metabolomic data is one
+of the hardest data consistency problems in science. The same gene may appear
+in a genomics database (sequence), proteomics database (protein structure),
+literature database (text), and pathway database (graph node). Cross-level
+consistency -- verifying that ChIP-Seq data aligns with mRNA expression --
+requires specialised platforms. There is no ground truth to calibrate against.
+
+==== Why VeriSimDB
+
+A gene entity uses 6 of 8 modalities: graph (pathway relationships), vector
+(sequence embeddings), semantic (Gene Ontology terms), document (literature),
+tensor (expression matrices), provenance (lab, sequencing run, pipeline
+version). Drift detection flags when a gene's pathway position contradicts
+its expression profile. VQL-DT provides reproducibility guarantees. Provenance
+tracking satisfies FDA/EMA regulatory compliance.
+
+==== Features Used
+
+* All 8 modalities
+* Drift detection (cross-omics consistency)
+* Provenance tracking (regulatory compliance)
+* VQL-DT (reproducible queries)
+
+==== Outreach Targets
+
+* Bioinformatics labs doing multi-omics integration
+* ELIXIR infrastructure network (European bioinformatics)
+* NIH-funded data commons projects
+* Precision medicine platforms
+
+---
+
+=== 3. Healthcare FHIR Interoperability
+
+*Alignment: High (Safety-Critical)*
+
+==== The Problem
+
+Despite the FHIR standard, healthcare data consistency is severely broken.
+Vendor-specific interpretations create translation gaps. The same patient
+exists in an EHR (structured records), PACS (images), lab system (results),
+genomics database, and pharmacy system. Data from EHRs, remote monitors, and
+patient-reported tools arrives with uneven quality and inconsistent codes.
+
+==== Why VeriSimDB
+
+A patient entity spans document (clinical notes), tensor (medical images),
+graph (care team relationships), temporal (longitudinal records), spatial
+(facility locations), and provenance (clinician, device, lab attribution).
+Drift detection catches when a medication list in the pharmacy system diverges
+from the EHR -- a life-safety issue. VQL-DT proof certificates satisfy audit
+requirements.
+
+==== Features Used
+
+* Drift detection (medication/allergy discrepancies)
+* Multi-modal storage (6+ modalities)
+* Heterogeneous federation (EHR + pharmacy + lab databases)
+* VQL-DT (audit-grade queries)
+
+==== Outreach Targets
+
+* Health IT interoperability working groups
+* OpenHIE community
+* Academic medical centres with multi-system architectures
+* FHIR implementer community
+
+---
+
+=== 4. Digital Twin Synchronisation
+
+*Alignment: High (Drift Is the Value Proposition)*
+
+==== The Problem
+
+Digital twins must maintain real-time consistency between the physical world
+(sensor data), simulation model (computed state), and historical record
+(time series). Synchronisation and scalability challenges are documented
+across 11 distinct patterns. Multi-sensor data faces spatio-temporal
+misalignment and domain shifts.
+
+==== Why VeriSimDB
+
+A digital twin entity exists as sensor time-series (temporal), 3D model
+(tensor/spatial), component graph (graph), simulation parameters (document),
+and provenance chain (sensor firmware, calibration, simulation version).
+Drift detection IS the purpose -- catching when simulated state diverges
+from physical state. Self-normalisation triggers model recalibration.
+
+==== Features Used
+
+* Drift detection (simulation vs. physical state)
+* Temporal + spatial + tensor modalities
+* Provenance tracking (sensor calibration history)
+* Self-normalisation (recalibration triggers)
+
+==== Outreach Targets
+
+* Eclipse Digital Twin working group
+* Azure Digital Twins / AWS IoT TwinMaker users hitting sync issues
+* Industrial IoT platforms (Siemens, GE)
+* Smart city / building management platforms
+
+---
+
+=== 5. Data Mesh / Data Catalog Consistency
+
+*Alignment: High*
+
+==== The Problem
+
+Data mesh architectures distribute ownership across domain teams. Data
+catalogs like DataHub use relational databases for storage, Elasticsearch
+for search, and graph databases for relationships -- all connected via
+Kafka streams. Entity "customer" might be defined differently in Sales
+(PostgreSQL), Analytics (Snowflake), Search (Elasticsearch), and ML (feature
+store). Definition drift breaks downstream analytics silently.
+
+==== Why VeriSimDB
+
+VeriSimDB sits as a consistency layer above the data mesh. Each shared
+entity's definition becomes a VeriSimDB entity with representations across
+domains. Drift detection catches when Sales' definition of "active customer"
+diverges from Analytics' -- before it corrupts dashboards. Heterogeneous
+federation (PostgreSQL + Elasticsearch) queries across domain boundaries.
+The semantic modality stores authoritative business glossary definitions.
+
+==== Features Used
+
+* Drift detection (cross-domain entity definition divergence)
+* Heterogeneous federation (PostgreSQL + Elasticsearch + ArangoDB)
+* Semantic modality (business glossary / ontology)
+* Provenance (domain team attribution)
+
+==== Outreach Targets
+
+* Data mesh practitioners (Zhamak Dehghani's community)
+* DataHub / OpenMetadata users
+* Enterprise data governance teams
+* Data platform teams at mid-large companies
+
+---
+
+=== 6. Knowledge Graph Quality Assurance (Wikidata Scale)
+
+*Alignment: Strong*
+
+==== The Problem
+
+Wikidata has 120M+ entities with documented "large-scale conceptual disarray"
+-- entities simultaneously treated as both instances and classes. The predicates
+P31 (instance of) and P279 (subclass of) suffer systematic inconsistencies.
+Research explicitly focuses on detecting inconsistencies, errors, and biases.
+
+==== Why VeriSimDB
+
+A Wikidata entity exists as graph relationships, document text (300+
+languages), vector embeddings, semantic annotations, and provenance (editor,
+bot, source attribution). Drift detection catches when an entity's graph
+classification contradicts its textual description -- precisely the documented
+"conceptual disarray". VQL-DT formally verifies ontological constraints.
+
+==== Features Used
+
+* Drift detection (graph structure vs. semantic classification)
+* Multi-modal storage (graph + document + vector + semantic + provenance)
+* VQL-DT (ontological constraint verification)
+* Self-normalisation (automated deduplication and constraint repair)
+
+==== Outreach Targets
+
+* Wikidata community (Wikidata Workshop contributors)
+* DBpedia maintainers
+* ConceptNet team
+* OpenAlex / Semantic Scholar teams
+
+---
+
+=== 7. Earth Observation / Climate Science
+
+*Alignment: Strong (Exercises All 8 Modalities)*
+
+==== The Problem
+
+ESA's Copernicus programme integrates 18.7M aligned images across multiple
+satellite sensors. The same climate observation (e.g., sea surface temperature)
+has representations as a satellite image pixel, a numerical value in NetCDF,
+a time-series point, a geospatial coordinate, and a provenance chain from raw
+Level-0 data to derived Level-3 products. Cross-sensor calibration verification
+and processing chain reproducibility are critical challenges.
+
+==== Why VeriSimDB
+
+A climate observation entity uses all 8 modalities: tensor (imagery), temporal
+(time series), spatial (geolocation), provenance (processing chain), vector
+(derived embeddings), graph (sensor/platform relationships), document (metadata),
+semantic (climate ontology terms). Drift detection catches cross-sensor
+calibration divergence. Heterogeneous federation enables cross-archive queries
+(NASA Earthdata, ESA CCI, national meteorological services).
+
+==== Features Used
+
+* All 8 modalities
+* Drift detection (cross-sensor calibration verification)
+* Heterogeneous federation (multi-archive queries)
+* Provenance (full processing chain from L0 to L3)
+
+==== Outreach Targets
+
+* ESA Climate Change Initiative (CCI)
+* Pangeo community (Python earth science stack)
+* CERN Rucio team (analogous data management challenges)
+* NOAA / NASA Earthdata teams
+
+== Adoption Priority Matrix
+
+[cols="1,1,1,1,1,1"]
+|===
+| Domain | Drift Detection | Federation | VQL-DT | Readiness | Priority
+
+| GraphRAG | Critical | High | Medium | *Ship today* | *1*
+| Biomedical | Critical | High | Critical | Q2 2026 | 2
+| Healthcare FHIR | Critical (safety) | High | Critical (audit) | Q3 2026 | 3
+| Digital Twin | Critical (purpose) | Medium | Medium | *Ship today* | 4
+| Data Mesh | High | Critical | Medium | *Ship today* | 5
+| Knowledge Graphs | High | Medium | Critical | Q2 2026 | 6
+| Earth Observation | High | High | High | Q3 2026 | 7
+|===
+
+== Outreach Plan
+
+=== Phase 1: GraphRAG Community (Immediate)
+
+1. Write a blog post: "Detecting Embedding Drift in RAG Pipelines with VeriSimDB"
+2. Create a demo integration: VeriSimDB + LangChain + Qdrant
+3. Submit to the LangChain community showcase
+4. Post in vector database communities (Qdrant Discord, Weaviate Slack)
+
+=== Phase 2: Data Quality / Data Mesh (Month 2)
+
+1. Write a comparison post: "VeriSimDB vs. Great Expectations vs. Monte Carlo"
+2. Create a DataHub integration showing drift-aware data catalog
+3. Present at a data engineering meetup (Data Council, dbt Community)
+
+=== Phase 3: Scientific Computing (Month 3-4)
+
+1. Submit an abstract to a bioinformatics conference (ISMB, BOSC)
+2. Create a tutorial: "Multi-Omics Entity Consistency with VeriSimDB"
+3. Engage with ELIXIR infrastructure network
+
+=== Phase 4: Conference Presence (Month 4-6)
+
+1. Submit to Strange Loop / FOSDEM database devroom
+2. Prepare a live demo: 1000 entities, 50 corrupted, 100% detection and repair
+3. Create a 5-minute screencast for the project README
+
+== Honest Gaps for External Users
+
+Any external adopter should know:
+
+[cols="1,3"]
+|===
+| Gap | Impact
+
+| VQL-DT proofs incomplete | PROOF clauses parse but don't generate verifiable
+  certificates yet. Lean type checker integration planned Q2 2026.
+
+| No SQL dialect | VQL is intentionally not SQL. Users wanting familiar syntax
+  need to learn VQL (comprehensive docs provided).
+
+| Query planner is basic | Queries using all 8 modalities may not be optimally
+  planned. Single-modality queries perform well.
+
+| ~~C++ dependency in graph store~~ | *Resolved.* Oxigraph is optional (feature-flagged,
+  off by default). Default and persistent graph backends are pure Rust (redb).
+  Container builds require zero C/C++ toolchain.
+
+| No distributed consensus | Single-instance deployments are safe. Multi-node
+  requires application-level coordination.
+|===
+
+These are documented honestly in `KNOWN-ISSUES.adoc` and the
+link:getting-started.adoc[Getting Started Guide].

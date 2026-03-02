@@ -1,0 +1,22 @@
+{
+  "action": "substitute_text",
+  "auto_fixable": true,
+  "confidence": 0.90,
+  "description": "Replace String.to_atom() with String.to_existing_atom() to prevent atom table exhaustion",
+  "failed_fixes": 0,
+  "fix_script": "fix-atom-exhaustion.sh",
+  "id": "recipe-atom-exhaustion",
+  "languages": [
+    "elixir"
+  ],
+  "match": "String.to_atom(input)",
+  "pattern_ids": [
+    "PA013-string-to-atom",
+    "PA013-atom-exhaustion"
+  ],
+  "proven_module": null,
+  "replacement": "String.to_existing_atom(input)",
+  "successful_fixes": 0,
+  "total_attempts": 0,
+  "triangle_tier": "eliminate"
+}

@@ -1,0 +1,967 @@
+{
+  "program_path": "/var/mnt/eclipse/repos/czech-file-knife",
+  "language": "rust",
+  "frameworks": [
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "InsecureProtocol",
+      "location": "cfk-core/src/path.rs",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in cfk-core/src/path.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "ResourceLeak",
+      "location": "cfk-ios/src/ffi.rs",
+      "severity": "High",
+      "description": "std::mem::forget usage (potential resource leak) in cfk-ios/src/ffi.rs",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "cfk-ios/src/ffi.rs",
+      "severity": "High",
+      "description": "Raw pointer cast in cfk-ios/src/ffi.rs",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "cfk-providers/src/local.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in cfk-providers/src/local.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "cfk-providers/src/local.rs",
+      "severity": "Medium",
+      "description": "34 unwrap/expect calls in cfk-providers/src/local.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 18333,
+    "unsafe_blocks": 15,
+    "panic_sites": 0,
+    "unwrap_calls": 76,
+    "allocation_sites": 54,
+    "io_operations": 13,
+    "threading_constructs": 19
+  },
+  "file_statistics": [
+    {
+      "file_path": "cfk-cache/src/blob_store.rs",
+      "lines": 449,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-cache/src/lib.rs",
+      "lines": 177,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-cache/src/metadata_cache.rs",
+      "lines": 534,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-cache/src/policy.rs",
+      "lines": 423,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-cli/src/commands.rs",
+      "lines": 401,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-core/src/error.rs",
+      "lines": 147,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-core/src/path.rs",
+      "lines": 234,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-core/src/platform.rs",
+      "lines": 219,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-integrations/src/agrep.rs",
+      "lines": 101,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-integrations/src/aria2.rs",
+      "lines": 76,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-integrations/src/pandoc.rs",
+      "lines": 110,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-ios/src/domain.rs",
+      "lines": 194,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-ios/src/ffi.rs",
+      "lines": 474,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-ios/src/lib.rs",
+      "lines": 91,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-ios/src/provider.rs",
+      "lines": 499,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-ios/swift/CfkBridge.h",
+      "lines": 239,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-providers/src/afs.rs",
+      "lines": 530,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-providers/src/box_com.rs",
+      "lines": 721,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-providers/src/dropbox.rs",
+      "lines": 582,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-providers/src/gdrive.rs",
+      "lines": 731,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-providers/src/ipfs.rs",
+      "lines": 802,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-providers/src/lib.rs",
+      "lines": 137,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-providers/src/ninep.rs",
+      "lines": 960,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "cfk-providers/src/onedrive.rs",
+      "lines": 620,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-providers/src/protocols.rs",
+      "lines": 265,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-providers/src/s3.rs",
+      "lines": 711,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-providers/src/sftp.rs",
+      "lines": 325,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-providers/src/smb.rs",
+      "lines": 494,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-providers/src/syncthing.rs",
+      "lines": 531,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-providers/src/transport.rs",
+      "lines": 307,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-providers/src/webdav.rs",
+      "lines": 611,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "cfk-providers/src/local.rs",
+      "lines": 484,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 34,
+      "allocation_sites": 6,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-search/src/lib.rs",
+      "lines": 185,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-tui/src/cfk_tui_main.adb",
+      "lines": 36,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cfk-vfs/src/lib.rs",
+      "lines": 138,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "flake.nix",
+      "lines": 135,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu",
+    "memory",
+    "network",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "cfk-providers/src/afs.rs",
+        "to": "cfk-providers/src/box_com.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/box_com.rs",
+        "to": "cfk-providers/src/dropbox.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/dropbox.rs",
+        "to": "cfk-providers/src/gdrive.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/gdrive.rs",
+        "to": "cfk-providers/src/ipfs.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/ipfs.rs",
+        "to": "cfk-providers/src/lib.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/lib.rs",
+        "to": "cfk-providers/src/ninep.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/ninep.rs",
+        "to": "cfk-providers/src/onedrive.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/onedrive.rs",
+        "to": "cfk-providers/src/protocols.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/protocols.rs",
+        "to": "cfk-providers/src/s3.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/s3.rs",
+        "to": "cfk-providers/src/sftp.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/sftp.rs",
+        "to": "cfk-providers/src/smb.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/smb.rs",
+        "to": "cfk-providers/src/syncthing.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/syncthing.rs",
+        "to": "cfk-providers/src/transport.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/transport.rs",
+        "to": "cfk-providers/src/webdav.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/webdav.rs",
+        "to": "cfk-providers/src/local.rs",
+        "relation": "shared_dir:cfk-providers/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-cache/src/blob_store.rs",
+        "to": "cfk-cache/src/lib.rs",
+        "relation": "shared_dir:cfk-cache/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-cache/src/lib.rs",
+        "to": "cfk-cache/src/metadata_cache.rs",
+        "relation": "shared_dir:cfk-cache/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-cache/src/metadata_cache.rs",
+        "to": "cfk-cache/src/policy.rs",
+        "relation": "shared_dir:cfk-cache/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-integrations/src/agrep.rs",
+        "to": "cfk-integrations/src/aria2.rs",
+        "relation": "shared_dir:cfk-integrations/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-integrations/src/aria2.rs",
+        "to": "cfk-integrations/src/pandoc.rs",
+        "relation": "shared_dir:cfk-integrations/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-core/src/error.rs",
+        "to": "cfk-core/src/path.rs",
+        "relation": "shared_dir:cfk-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-core/src/path.rs",
+        "to": "cfk-core/src/platform.rs",
+        "relation": "shared_dir:cfk-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-ios/src/domain.rs",
+        "to": "cfk-ios/src/ffi.rs",
+        "relation": "shared_dir:cfk-ios/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-ios/src/ffi.rs",
+        "to": "cfk-ios/src/lib.rs",
+        "relation": "shared_dir:cfk-ios/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-ios/src/lib.rs",
+        "to": "cfk-ios/src/provider.rs",
+        "relation": "shared_dir:cfk-ios/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-cache/src/blob_store.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cfk-cache/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-cache/src/metadata_cache.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cfk-cache/src/policy.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-cli/src/commands.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cfk-core/src/error.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-core/src/path.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cfk-core/src/platform.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-integrations/src/agrep.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-integrations/src/aria2.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cfk-integrations/src/pandoc.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cfk-ios/src/domain.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cfk-ios/src/ffi.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cfk-ios/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cfk-ios/src/provider.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cfk-ios/swift/CfkBridge.h",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/afs.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cfk-providers/src/box_com.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "cfk-providers/src/dropbox.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "cfk-providers/src/gdrive.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "cfk-providers/src/ipfs.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cfk-providers/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cfk-providers/src/ninep.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cfk-providers/src/onedrive.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "cfk-providers/src/protocols.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/s3.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cfk-providers/src/sftp.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/smb.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/syncthing.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "cfk-providers/src/transport.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-providers/src/webdav.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "cfk-providers/src/local.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 40.0
+      },
+      {
+        "from": "cfk-search/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-tui/src/cfk_tui_main.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cfk-vfs/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "cfk-ios/src/ffi.rs",
+          "cfk-providers/src/local.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "cfk-core/src/path.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "cfk-providers/src/local.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "cfk-providers/src/local.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Concurrency"
+      },
+      {
+        "source_category": "ResourceLeak",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "cfk-ios/src/ffi.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "ResourceLeak->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "cfk-providers/src/local.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+# AI Assistant Instructions
+
+# Machine-Readable Metadata
+
+Project metadata and AI agent configuration files are located in `.machine_readable/`:
+
+- **STATE.scm** - Current project state, progress, blockers, next actions
+- **ECOSYSTEM.scm** - Position in ecosystem, relationships to other projects
+- **META.scm** - Architecture decisions, governance, development practices
+- **PLAYBOOK.scm** - Operational runbook, procedures, alerts
+- **AGENTIC.scm** - AI agent interaction patterns and constraints
+- **NEUROSYM.scm** - Neurosymbolic integration configuration
+
+**These files are the canonical source of truth for project metadata.**
+
+## Workflow
+
+1. Read `.machine_readable/*.scm` files at session start
+2. Check STATE.scm for current phase, blockers, next actions
+3. Follow patterns and constraints from AGENTIC.scm
+4. Update STATE.scm after completing work
+5. Sync to database: `~/sync-language-tracker.sh`

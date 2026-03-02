@@ -1,0 +1,588 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB Business Case
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-02-28
+:revremark: Initial business case document
+:toc: macro
+:toclevels: 3
+:sectnums:
+:icons: font
+
+[abstract]
+VeriSimDB is the world's first multimodal database with cross-modal drift detection
+and self-normalisation. This business case document establishes the strategic
+rationale, market opportunity, revenue model, financial projections, and risk
+analysis for VeriSimDB's commercialisation under an open-core model.
+
+toc::[]
+
+== Executive Summary
+
+VeriSimDB addresses a fundamental unsolved problem in data infrastructure: when the
+same entity is represented across multiple data modalities (graph, vector, document,
+temporal, etc.), those representations inevitably diverge. No existing database
+detects, quantifies, or repairs this divergence. VeriSimDB does -- automatically.
+
+The database stores entities across 8 simultaneous representations (the "octad":
+graph, vector, tensor, semantic, document, temporal, provenance, spatial) and
+continuously monitors cross-modal consistency. When representations drift apart,
+VeriSimDB detects the divergence and can self-normalise -- repairing data before
+downstream systems consume stale or contradictory information.
+
+This capability positions VeriSimDB at the intersection of three high-growth
+markets: data quality tools ($2.3B by 2027), graph databases ($5.6B), and the
+emerging multimodal database segment ($800M+). The open-core business model
+provides a free, full-featured community edition under the Palimpsest License
+(PMPL-1.0-or-later), with revenue generated through commercial support licenses,
+enterprise SLAs, and deployment consulting.
+
+== Problem Statement
+
+=== The Data Quality Crisis
+
+According to Gartner, poor data quality costs organisations an average of *$12.9
+million per year*. The IBM Global AI Adoption Index found that 35% of enterprises
+cite data quality as their primary barrier to AI adoption. McKinsey estimates that
+data workers spend up to 80% of their time on data cleaning and reconciliation
+rather than analysis.
+
+=== Root Cause: Cross-System Inconsistency
+
+The root cause is not dirty data at the point of entry. It is *cross-system
+inconsistency* -- the same real-world entity represented differently across
+multiple systems, with no mechanism to detect when those representations diverge.
+
+Consider a customer record that exists simultaneously as:
+
+* A *graph node* in a relationship database (Neo4j)
+* A *vector embedding* in a search index (Pinecone)
+* A *document* in an operational store (MongoDB)
+* A *row* in a relational database (PostgreSQL)
+* A *temporal snapshot* in an audit trail
+
+When the customer's address changes in the relational database, the graph node
+may be updated, but the vector embedding is not re-computed, the document store
+retains the old address, and the temporal trail shows a gap. These systems have
+*no shared model of consistency*. The representations have drifted.
+
+=== Why Existing Solutions Fail
+
+Current approaches to this problem are reactive and manual:
+
+[cols="2,3,3"]
+|===
+| Approach | Description | Limitation
+
+| ETL pipelines
+| Periodic batch synchronisation between systems
+| Latency (hours to days), brittle, no drift detection
+
+| Change Data Capture (CDC)
+| Stream changes from source to downstream systems
+| One-directional, no cross-modal awareness
+
+| Master Data Management (MDM)
+| Centralised golden record
+| Expensive, slow to implement, does not handle multimodal representations
+
+| Data observability tools
+| Monitor data pipelines for anomalies
+| Detect pipeline failures, not semantic drift between modalities
+
+| Multi-model databases
+| Store multiple models in one database (ArangoDB, SurrealDB)
+| No cross-modal consistency checking, no drift detection
+|===
+
+None of these solutions address the fundamental problem: *no system tracks whether
+multiple representations of the same entity are consistent with each other*.
+
+== Solution: VeriSimDB
+
+=== The Octad Model
+
+VeriSimDB introduces the *octad model* -- every entity can be simultaneously
+represented across 8 modalities:
+
+[cols="1,3,3"]
+|===
+| # | Modality | Purpose
+
+| 1 | *Graph* | Relationships, connections, topology
+| 2 | *Vector* | Semantic similarity, embeddings, nearest-neighbour search
+| 3 | *Tensor* | Multi-dimensional numerical data, ML feature stores
+| 4 | *Semantic* | Ontological meaning, RDF triples, knowledge representation
+| 5 | *Document* | Schemaless structured data, JSON/BSON documents
+| 6 | *Temporal* | Time-versioned state, bitemporal queries, audit trails
+| 7 | *Provenance* | Origin tracking, transformation lineage, trust chains
+| 8 | *Spatial* | Geographic and geometric data, GIS operations
+|===
+
+=== Cross-Modal Drift Detection
+
+VeriSimDB continuously monitors the consistency of an entity's representations
+across all active modalities. The drift detection engine computes a *coherence
+score* for each entity -- a quantified measure of how well its representations
+agree with each other.
+
+When drift exceeds configurable thresholds, VeriSimDB can:
+
+1. *Alert* -- notify downstream systems that data may be inconsistent
+2. *Quarantine* -- mark the entity as potentially drifted until resolved
+3. *Self-normalise* -- automatically reconcile representations using
+   configurable resolution strategies
+
+=== Formal Verification: VQL-DT
+
+VeriSimDB's query language, VQL (Verisimilitude Query Language), includes an
+optional dependent-type layer (VQL-DT) that provides *compile-time proofs* of
+query correctness. This means:
+
+* Type errors in queries are caught before execution
+* Cross-modal joins are verified for semantic compatibility
+* Drift thresholds can be encoded as type-level constraints
+
+=== Federation
+
+VeriSimDB can federate across heterogeneous database backends (PostgreSQL,
+ArangoDB, Elasticsearch, Neo4j, etc.), bringing drift detection to existing
+infrastructure without requiring data migration.
+
+== Market Analysis
+
+=== Market Sizing
+
+[cols="2,1,1,1,3"]
+|===
+| Segment | TAM | SAM | SOM | Notes
+
+| Data Quality Tools
+| $2.3B
+| $460M
+| $23M
+| MarketsAndMarkets 2027 projection; 20% addressable multimodal segment; 1% serviceable
+
+| Graph Databases
+| $5.6B
+| $280M
+| $14M
+| Grand View Research; 5% multimodal sub-segment; 1% serviceable
+
+| Vector Databases
+| $1.2B
+| $120M
+| $6M
+| Emerging market; 10% enterprise segment; 1% serviceable
+
+| Multimodal Databases
+| $800M
+| $160M
+| $8M
+| Nascent market; 20% addressable early adopters; 1% serviceable
+
+| *Combined*
+|
+|
+| *$51M*
+| Total serviceable obtainable market across segments
+|===
+
+=== Target Segments
+
+*Primary (Years 1-2):*
+
+* GraphRAG / AI knowledge graph engineers building retrieval-augmented generation
+  systems that combine graph and vector modalities
+* Biomedical researchers managing multi-modal clinical and research data
+
+*Secondary (Years 2-4):*
+
+* Financial services firms requiring cross-system consistency for regulatory compliance
+* Supply chain organisations tracking provenance across complex networks
+
+*Tertiary (Years 3-5+):*
+
+* Enterprise platform teams standardising multimodal data infrastructure
+* OEM partners embedding VeriSimDB as a backend for vertical SaaS products
+
+== Competitive Landscape
+
+=== Feature Comparison
+
+[cols="3,1,1,1,1,1,1"]
+|===
+| Feature | VeriSimDB | Neo4j | Pinecone | Weaviate | ArangoDB | SurrealDB
+
+| Graph queries
+| Yes
+| Yes
+| No
+| No
+| Yes
+| Yes
+
+| Vector search
+| Yes
+| Limited
+| Yes
+| Yes
+| No
+| Yes
+
+| Full-text search
+| Yes
+| Yes
+| No
+| Yes
+| Yes
+| Yes
+
+| Tensor operations
+| Yes
+| No
+| No
+| No
+| No
+| No
+
+| Temporal versioning
+| Yes
+| No
+| No
+| No
+| No
+| No
+
+| Provenance tracking
+| Yes
+| No
+| No
+| No
+| No
+| No
+
+| Spatial queries
+| Yes
+| Yes
+| No
+| No
+| Yes
+| No
+
+| *Cross-modal drift detection*
+| *Yes*
+| No
+| No
+| No
+| No
+| No
+
+| *Self-normalisation*
+| *Yes*
+| No
+| No
+| No
+| No
+| No
+
+| *Formal proofs (VQL-DT)*
+| *Yes*
+| No
+| No
+| No
+| No
+| No
+
+| Federation
+| Yes
+| No
+| No
+| No
+| No
+| No
+
+| Multiple modalities per entity
+| 8
+| 1
+| 1
+| 2
+| 3
+| 3
+
+| Open source
+| PMPL
+| GPLv3
+| No
+| BSD-3
+| Apache 2.0
+| BSL
+|===
+
+=== Competitive Positioning
+
+VeriSimDB does not compete directly with single-modality databases. Instead, it
+occupies a new category: *cross-modal consistency infrastructure*. The competitive
+dynamics are:
+
+* *Neo4j* excels at graph traversals but has no vector, tensor, temporal, or
+  provenance modalities, and no drift detection
+* *Pinecone* excels at vector similarity search but is purely vector-only with no
+  cross-modal awareness
+* *Weaviate* combines vector search with some text/object capabilities but lacks
+  drift detection, temporal versioning, and formal query verification
+* *ArangoDB* is the closest multi-model competitor but has no cross-modal
+  consistency checking, no drift detection, and no self-normalisation
+* *SurrealDB* offers multi-model storage but focuses on developer ergonomics
+  rather than data consistency guarantees
+
+== Revenue Model
+
+=== Open Core Structure
+
+[cols="2,4"]
+|===
+| Tier | Description
+
+| *Community Edition (PMPL)*
+| Full-featured VeriSimDB with all 8 modalities, drift detection,
+  self-normalisation, VQL, and federation. Free, open source under PMPL-1.0-or-later.
+
+| *Commercial Support License*
+| Enterprise SLA (99.9% uptime guarantee), priority security patches (24-hour
+  response), dedicated support channel, deployment consulting, training.
+  Annual subscription.
+
+| *OEM License*
+| Embedding VeriSimDB as a component within third-party products.
+  Per-deployment royalty or flat annual fee.
+|===
+
+=== Pricing Strategy
+
+The community edition is intentionally full-featured. Revenue comes from the
+*operational value* of enterprise support, not from feature gating. This approach:
+
+* Maximises adoption and community growth
+* Creates a large funnel of users who may convert to commercial support
+* Avoids the "open core bait-and-switch" perception that damages developer trust
+* Aligns with the PMPL license philosophy
+
+=== Revenue Streams
+
+1. *Commercial support subscriptions* -- annual contracts, tiered by
+   organisation size and SLA level
+2. *Deployment consulting* -- architecture review, migration planning,
+   performance tuning, integration with existing infrastructure
+3. *Training and certification* -- VQL/VQL-DT training for development teams
+4. *OEM licensing* -- for vendors embedding VeriSimDB in their products
+
+== Financial Projections
+
+=== 5-Year Revenue Forecast (Conservative Scenario)
+
+[cols="1,2,4"]
+|===
+| Year | Revenue | Activities
+
+| 1 | $0
+| Community building, conference presentations, open-source adoption,
+  documentation, academic paper publication
+
+| 2 | $150,000
+| First enterprise consulting contracts, early adopter programme,
+  pilot deployments with 2-3 organisations
+
+| 3 | $500,000
+| Enterprise support license revenue begins, 5-10 paying customers,
+  community exceeds 1,000 active users
+
+| 4 | $1,500,000
+| Market expansion, partnership deals with system integrators,
+  15-25 paying customers, OEM discussions
+
+| 5 | $3,000,000
+| Scale: self-serve support tiers, 40+ enterprise customers,
+  OEM revenue, managed service pilot
+|===
+
+=== Cost Structure (Annual)
+
+[cols="2,1,1,1,1,1"]
+|===
+| Category | Year 1 | Year 2 | Year 3 | Year 4 | Year 5
+
+| Engineering
+| $0
+| $80,000
+| $250,000
+| $600,000
+| $1,200,000
+
+| Infrastructure
+| $500
+| $2,000
+| $10,000
+| $50,000
+| $150,000
+
+| Marketing
+| $1,000
+| $5,000
+| $30,000
+| $100,000
+| $250,000
+
+| Legal
+| $500
+| $2,000
+| $5,000
+| $15,000
+| $30,000
+
+| Support
+| $0
+| $10,000
+| $50,000
+| $150,000
+| $400,000
+
+| Operations
+| $0
+| $5,000
+| $20,000
+| $80,000
+| $200,000
+
+| *Total*
+| *$2,000*
+| *$104,000*
+| *$365,000*
+| *$995,000*
+| *$2,230,000*
+|===
+
+=== Path to Profitability
+
+Under the conservative scenario, VeriSimDB reaches *cash-flow positive in Year 3*
+($500K revenue vs. $365K costs) and generates *$770K operating profit by Year 5*
+($3M revenue vs. $2.23M costs). The moderate and aggressive scenarios reach
+profitability faster and at higher margins.
+
+=== Unit Economics
+
+[cols="2,1,3"]
+|===
+| Metric | Value | Notes
+
+| Customer Acquisition Cost (CAC)
+| $8,000
+| Enterprise B2B, developer-led adoption reduces traditional sales costs
+
+| Lifetime Value (LTV)
+| $120,000
+| 3-year average contract at $40K ACV
+
+| Annual Contract Value (ACV)
+| $40,000
+| Enterprise support license
+
+| LTV:CAC Ratio
+| 15:1
+| Target: >3:1 is considered healthy
+
+| Payback Period
+| 3 months
+| CAC recovered in approximately 3 months of ACV
+
+| Gross Margin
+| 85%
+| Software + support, minimal cost of goods sold
+
+| Net Revenue Retention
+| 115%
+| Expansion revenue from existing customers
+|===
+
+== Risks and Mitigations
+
+=== Technical Risks
+
+[cols="3,3,3"]
+|===
+| Risk | Impact | Mitigation
+
+| Performance at scale (8 modalities per entity)
+| High latency or resource consumption could limit enterprise adoption
+| Rust core provides near-C performance; Elixir/OTP orchestration provides
+  fault-tolerant concurrency; extensive benchmark suite (510 Rust tests + 152
+  Elixir tests, 0 failures)
+
+| VQL-DT complexity deters adoption
+| Developers find dependent-type proofs intimidating
+| VQL (without DT) is the default; VQL-DT is opt-in for teams that want formal
+  guarantees. Progressive disclosure: start simple, add proofs when ready.
+
+| Federation reliability across heterogeneous backends
+| Connector bugs or performance variance across backends
+| Each federation connector is independently tested; fallback to local-only
+  mode if federation fails; comprehensive error handling strategy documented
+|===
+
+=== Market Risks
+
+[cols="3,3,3"]
+|===
+| Risk | Impact | Mitigation
+
+| Neo4j or ArangoDB adds drift detection
+| Reduces differentiation
+| VeriSimDB's octad model and VQL-DT provide deep moat; 8-modality consistency
+  is architecturally difficult to retrofit onto existing databases
+
+| Market education required (new category)
+| Longer sales cycles, higher CAC
+| Developer advocacy, academic publications, conference talks, and open-source
+  community build awareness; category creation is expensive but defensible
+
+| Enterprise procurement cycles
+| Revenue delayed by 6-12 month procurement processes
+| Start with developer-led adoption (bottom-up); consulting engagements provide
+  revenue during procurement cycles
+|===
+
+=== Business Risks
+
+[cols="3,3,3"]
+|===
+| Risk | Impact | Mitigation
+
+| Single founder risk
+| Bus factor of 1
+| Community contributions, comprehensive documentation, and CI/CD automation
+  reduce dependency on any individual; early revenue funds additional contributors
+
+| Open-source sustainability
+| Community expects everything free; conversion to commercial support is low
+| Full-featured community edition builds trust; commercial support addresses
+  operational needs (SLA, priority patches) that free users do not require
+
+| PMPL license unfamiliarity
+| Enterprise legal teams may hesitate on non-OSI license
+| PMPL is permissive and well-documented; MPL-2.0 fallback available where
+  required; commercial license option for enterprises that require it
+|===
+
+== Conclusion
+
+VeriSimDB addresses a $51M serviceable market at the intersection of data quality,
+multimodal databases, and AI infrastructure. Its unique cross-modal drift detection
+capability has no direct competitor. The open-core model provides a clear path to
+revenue while maintaining open-source community trust. Conservative financial
+projections show profitability by Year 3 with healthy unit economics (15:1
+LTV:CAC ratio, 85% gross margin).
+
+The primary investment needed is in community building (Year 1), followed by a
+small engineering team (Year 2-3) to accelerate development and support early
+enterprise customers. The technology foundation is sound: Rust core + Elixir/OTP
+orchestration, 662 tests with 0 failures, and a formally verified query language.

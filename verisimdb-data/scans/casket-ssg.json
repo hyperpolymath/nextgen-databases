@@ -1,0 +1,183 @@
+{
+  "program_path": ".",
+  "language": "haskell",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "Casket.hs",
+      "severity": "High",
+      "description": "2 error/undefined in Casket.hs",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 4357,
+    "unsafe_blocks": 13,
+    "panic_sites": 2,
+    "unwrap_calls": 9,
+    "allocation_sites": 1,
+    "io_operations": 15,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/Casket.hs",
+      "lines": 477,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Gnosis/Paxos.hs",
+      "lines": 112,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Gnosis/SixSCM.hs",
+      "lines": 113,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Gnosis/DAX.hs",
+      "lines": 255,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/CasketGnosis.hs",
+      "lines": 178,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "Casket.hs",
+      "lines": 651,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/Casket.hs",
+        "to": "src/CasketGnosis.hs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Gnosis/Paxos.hs",
+        "to": "src/Gnosis/SixSCM.hs",
+        "relation": "shared_dir:src/Gnosis",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Gnosis/SixSCM.hs",
+        "to": "src/Gnosis/DAX.hs",
+        "relation": "shared_dir:src/Gnosis",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "Casket.hs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Cpu"
+      }
+    ]
+  }
+}

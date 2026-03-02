@@ -1,0 +1,18 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- 01-basic-search.vql
+-- Basic text search: find entities mentioning "drift detection"
+--
+-- This searches the document modality's full-text index (Tantivy).
+-- VeriSimDB indexes the 'content' and 'title' fields of each hexad's
+-- document modality using Tantivy, a Rust-native full-text search engine.
+-- The CONTAINS clause performs a phrase search by default; use OR/AND
+-- operators for boolean queries.
+--
+-- Expected results: entity-001 (VeriSimDB paper), entity-005 (semantic
+-- drift paper), entity-040 (DriftSeed dataset), entity-047 (meetup),
+-- and others mentioning drift detection in their document content.
+
+SELECT document, semantic FROM hexads
+WHERE document CONTAINS 'drift detection'
+LIMIT 10

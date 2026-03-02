@@ -1,0 +1,1709 @@
+{
+  "program_path": ".",
+  "language": "nickel",
+  "frameworks": [
+    "Database",
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "vexometer/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in vexometer/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "vexometer-satellites/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in vexometer-satellites/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "satellite-template/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in satellite-template/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "lazy-eliminator/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in lazy-eliminator/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "lazy-eliminator/src/patterns.rs",
+      "severity": "Medium",
+      "description": "19 unwrap/expect calls in lazy-eliminator/src/patterns.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "vext/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in vext/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "vext/vext-tools/src/hooks/Git.res",
+      "severity": "Medium",
+      "description": "12 unsafe get calls in vext/vext-tools/src/hooks/Git.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "vext-email-gateway/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in vext-email-gateway/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "vext-email-gateway/src/main.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in vext-email-gateway/src/main.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "vext-email-gateway/src/types.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in vext-email-gateway/src/types.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 20122,
+    "unsafe_blocks": 94,
+    "panic_sites": 0,
+    "unwrap_calls": 62,
+    "allocation_sites": 71,
+    "io_operations": 24,
+    "threading_constructs": 18
+  },
+  "file_statistics": [
+    {
+      "file_path": "vexometer/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "vexometer/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/src/vexometer-cii.ads",
+      "lines": 117,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/src/vexometer-core.ads",
+      "lines": 321,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/src/vexometer-metrics.ads",
+      "lines": 126,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/src/vexometer-patterns.ads",
+      "lines": 215,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 37,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/src/vexometer-probes.ads",
+      "lines": 206,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/src/vexometer-rci.ads",
+      "lines": 153,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/src/vexometer-sfr.ads",
+      "lines": 157,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/src/vexometer-srs.ads",
+      "lines": 134,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer/src/vexometer.adb",
+      "lines": 132,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer-satellites/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer-satellites/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer-satellites/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "vexometer-satellites/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vexometer-satellites/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellite-template/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellite-template/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellite-template/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "satellite-template/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellite-template/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellite-template/tests/test_intervention.adb",
+      "lines": 51,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lazy-eliminator/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lazy-eliminator/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lazy-eliminator/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "lazy-eliminator/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lazy-eliminator/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lazy-eliminator/src/analyzer.rs",
+      "lines": 116,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lazy-eliminator/src/config.rs",
+      "lines": 101,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lazy-eliminator/src/lib.rs",
+      "lines": 46,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lazy-eliminator/src/main.rs",
+      "lines": 164,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lazy-eliminator/src/patterns.rs",
+      "lines": 158,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 19,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lazy-eliminator/src/trace.rs",
+      "lines": 111,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "vext/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/vext-core/src/bin/send.rs",
+      "lines": 99,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/vext-core/src/config.rs",
+      "lines": 184,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/vext-core/src/error.rs",
+      "lines": 64,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/vext-core/src/i18n.rs",
+      "lines": 122,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/vext-core/src/irc_client.rs",
+      "lines": 275,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "vext/vext-core/src/listener.rs",
+      "lines": 189,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "vext/vext-core/src/main.rs",
+      "lines": 114,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "vext/vext-core/src/pool.rs",
+      "lines": 228,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "vext/vext-core/src/protocol.rs",
+      "lines": 235,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/vext-core/tests/integration.rs",
+      "lines": 191,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/vext-tools/src/bindings/Deno.res",
+      "lines": 81,
+      "unsafe_blocks": 10,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/vext-tools/src/hooks/Git.res",
+      "lines": 394,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 12,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/vext-tools/src/hooks/Install.res",
+      "lines": 166,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext/COMMIT-AND-PUSH.sh",
+      "lines": 220,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext-email-gateway/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext-email-gateway/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext-email-gateway/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "vext-email-gateway/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext-email-gateway/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vext-email-gateway/src/main.rs",
+      "lines": 371,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "vext-email-gateway/src/types.rs",
+      "lines": 468,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu",
+    "memory",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "vexometer/src/abi/Foreign.idr",
+        "to": "vexometer/src/abi/Types.idr",
+        "relation": "shared_dir:vexometer/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/abi/Foreign.idr",
+        "to": "lazy-eliminator/src/abi/Types.idr",
+        "relation": "shared_dir:lazy-eliminator/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "satellite-template/src/abi/Foreign.idr",
+        "to": "satellite-template/src/abi/Types.idr",
+        "relation": "shared_dir:satellite-template/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer-satellites/src/abi/Foreign.idr",
+        "to": "vexometer-satellites/src/abi/Types.idr",
+        "relation": "shared_dir:vexometer-satellites/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/analyzer.rs",
+        "to": "lazy-eliminator/src/config.rs",
+        "relation": "shared_dir:lazy-eliminator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/config.rs",
+        "to": "lazy-eliminator/src/lib.rs",
+        "relation": "shared_dir:lazy-eliminator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/lib.rs",
+        "to": "lazy-eliminator/src/main.rs",
+        "relation": "shared_dir:lazy-eliminator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/main.rs",
+        "to": "lazy-eliminator/src/patterns.rs",
+        "relation": "shared_dir:lazy-eliminator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/patterns.rs",
+        "to": "lazy-eliminator/src/trace.rs",
+        "relation": "shared_dir:lazy-eliminator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/src/abi/Foreign.idr",
+        "to": "vext/src/abi/Types.idr",
+        "relation": "shared_dir:vext/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "vext-email-gateway/src/abi/Foreign.idr",
+        "to": "vext-email-gateway/src/abi/Types.idr",
+        "relation": "shared_dir:vext-email-gateway/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-tools/src/hooks/Git.res",
+        "to": "vext/vext-tools/src/hooks/Install.res",
+        "relation": "shared_dir:vext/vext-tools/src/hooks",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-cii.ads",
+        "to": "vexometer/src/vexometer-core.ads",
+        "relation": "shared_dir:vexometer/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-core.ads",
+        "to": "vexometer/src/vexometer-metrics.ads",
+        "relation": "shared_dir:vexometer/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-metrics.ads",
+        "to": "vexometer/src/vexometer-patterns.ads",
+        "relation": "shared_dir:vexometer/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-patterns.ads",
+        "to": "vexometer/src/vexometer-probes.ads",
+        "relation": "shared_dir:vexometer/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-probes.ads",
+        "to": "vexometer/src/vexometer-rci.ads",
+        "relation": "shared_dir:vexometer/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-rci.ads",
+        "to": "vexometer/src/vexometer-sfr.ads",
+        "relation": "shared_dir:vexometer/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-sfr.ads",
+        "to": "vexometer/src/vexometer-srs.ads",
+        "relation": "shared_dir:vexometer/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-srs.ads",
+        "to": "vexometer/src/vexometer.adb",
+        "relation": "shared_dir:vexometer/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vext-email-gateway/src/main.rs",
+        "to": "vext-email-gateway/src/types.rs",
+        "relation": "shared_dir:vext-email-gateway/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/config.rs",
+        "to": "vext/vext-core/src/error.rs",
+        "relation": "shared_dir:vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/error.rs",
+        "to": "vext/vext-core/src/i18n.rs",
+        "relation": "shared_dir:vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/i18n.rs",
+        "to": "vext/vext-core/src/irc_client.rs",
+        "relation": "shared_dir:vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/irc_client.rs",
+        "to": "vext/vext-core/src/listener.rs",
+        "relation": "shared_dir:vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/listener.rs",
+        "to": "vext/vext-core/src/main.rs",
+        "relation": "shared_dir:vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/main.rs",
+        "to": "vext/vext-core/src/pool.rs",
+        "relation": "shared_dir:vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/pool.rs",
+        "to": "vext/vext-core/src/protocol.rs",
+        "relation": "shared_dir:vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vexometer/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vexometer/src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "vexometer/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "vexometer/src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "vexometer/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "vexometer/src/vexometer-cii.ads",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-cii.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-core.ads",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-core.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-metrics.ads",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-metrics.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-patterns.ads",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-patterns.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-probes.ads",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-probes.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-rci.ads",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-rci.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-sfr.ads",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-sfr.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-srs.ads",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer-srs.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer/src/vexometer.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer-satellites/contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer-satellites/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer-satellites/ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer-satellites/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vexometer-satellites/ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vexometer-satellites/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vexometer-satellites/src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "vexometer-satellites/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "vexometer-satellites/src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "vexometer-satellites/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellite-template/contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellite-template/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellite-template/ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellite-template/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellite-template/ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellite-template/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellite-template/src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "satellite-template/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "satellite-template/src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellite-template/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellite-template/tests/test_intervention.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellite-template/tests/test_intervention.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "lazy-eliminator/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "lazy-eliminator/src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "lazy-eliminator/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "lazy-eliminator/src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "lazy-eliminator/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "lazy-eliminator/src/analyzer.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "lazy-eliminator/src/analyzer.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "lazy-eliminator/src/config.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/lib.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/patterns.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "lazy-eliminator/src/patterns.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "lazy-eliminator/src/trace.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lazy-eliminator/src/trace.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vext/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vext/src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "vext/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "vext/src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "vext/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "vext/vext-core/src/bin/send.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/bin/send.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/config.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/error.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/error.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-core/src/i18n.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "vext/vext-core/src/i18n.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "vext/vext-core/src/irc_client.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "vext/vext-core/src/irc_client.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "vext/vext-core/src/listener.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vext/vext-core/src/listener.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vext/vext-core/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "vext/vext-core/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "vext/vext-core/src/pool.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "vext/vext-core/src/pool.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "vext/vext-core/src/protocol.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "vext/vext-core/src/protocol.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "vext/vext-core/tests/integration.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vext/vext-core/tests/integration.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vext/vext-tools/src/bindings/Deno.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "vext/vext-tools/src/bindings/Deno.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "vext/vext-tools/src/hooks/Git.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "vext/vext-tools/src/hooks/Git.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "vext/vext-tools/src/hooks/Install.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/vext-tools/src/hooks/Install.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/COMMIT-AND-PUSH.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext/COMMIT-AND-PUSH.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext-email-gateway/contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext-email-gateway/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext-email-gateway/ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext-email-gateway/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vext-email-gateway/ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vext-email-gateway/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "vext-email-gateway/src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "vext-email-gateway/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "vext-email-gateway/src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "vext-email-gateway/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "vext-email-gateway/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "vext-email-gateway/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "vext-email-gateway/src/types.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "vext-email-gateway/src/types.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 10.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "lazy-eliminator/src/patterns.rs",
+          "vext/vext-tools/src/hooks/Git.res",
+          "vext-email-gateway/src/main.rs",
+          "vext-email-gateway/src/types.rs"
+        ],
+        "frameworks": [
+          "Database",
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "vexometer/src/abi/Foreign.idr",
+          "vexometer-satellites/src/abi/Foreign.idr",
+          "satellite-template/src/abi/Foreign.idr",
+          "lazy-eliminator/src/abi/Foreign.idr",
+          "vext/src/abi/Foreign.idr",
+          "vext-email-gateway/src/abi/Foreign.idr"
+        ],
+        "frameworks": [
+          "Database",
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "lazy-eliminator/src/patterns.rs",
+          "vext-email-gateway/src/main.rs",
+          "vext-email-gateway/src/types.rs"
+        ],
+        "frameworks": [
+          "Database",
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      }
+    ]
+  }
+}

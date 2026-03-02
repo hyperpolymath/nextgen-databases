@@ -1,0 +1,718 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "WebServer",
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "UnsafeFFI",
+      "location": "ephapax/bridge.eph",
+      "severity": "Medium",
+      "description": "7 FFI/external bindings in ephapax/bridge.eph",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "zig/runtime.zig",
+      "severity": "High",
+      "description": "1 unsafe pointer casts in zig/runtime.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeFFI",
+      "location": "dist/selur-1.0.0/ephapax/bridge.eph",
+      "severity": "Medium",
+      "description": "7 FFI/external bindings in dist/selur-1.0.0/ephapax/bridge.eph",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "dist/selur-1.0.0/zig/runtime.zig",
+      "severity": "High",
+      "description": "1 unsafe pointer casts in dist/selur-1.0.0/zig/runtime.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 9561,
+    "unsafe_blocks": 16,
+    "panic_sites": 0,
+    "unwrap_calls": 11,
+    "allocation_sites": 29,
+    "io_operations": 10,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "ephapax/bridge.eph",
+      "lines": 152,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ephapax/types.eph",
+      "lines": 136,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zig/runtime.zig",
+      "lines": 118,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/lib.rs",
+      "lines": 222,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/basic/main.rs",
+      "lines": 75,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/error_handling/main.rs",
+      "lines": 87,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "benches/ipc_benchmark.rs",
+      "lines": 64,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dist/selur-1.0.0/examples/error_handling/main.rs",
+      "lines": 87,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dist/selur-1.0.0/examples/basic/main.rs",
+      "lines": 75,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dist/selur-1.0.0/ephapax/bridge.eph",
+      "lines": 152,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dist/selur-1.0.0/ephapax/types.eph",
+      "lines": 136,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dist/selur-1.0.0/zig/runtime.zig",
+      "lines": 118,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dist/selur-1.0.0/src/lib.rs",
+      "lines": 222,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dist/selur-1.0.0/benches/ipc_benchmark.rs",
+      "lines": 64,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "integrations/vordr/native/src/lib.rs",
+      "lines": 323,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 15,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compose/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compose/src/commands/build.rs",
+      "lines": 117,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compose/src/commands/run.rs",
+      "lines": 186,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compose/src/commands/scale.rs",
+      "lines": 268,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compose/src/commands/top.rs",
+      "lines": 112,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compose/src/commands/up.rs",
+      "lines": 292,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compose/src/compose.rs",
+      "lines": 341,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compose/src/graph.rs",
+      "lines": 99,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compose/src/vordr_mcp.rs",
+      "lines": 104,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "compose/tests/parity_stack.rs",
+      "lines": 193,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "memory",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "ephapax/bridge.eph",
+        "to": "ephapax/types.eph",
+        "relation": "shared_dir:ephapax",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/build.rs",
+        "to": "compose/src/commands/run.rs",
+        "relation": "shared_dir:compose/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/run.rs",
+        "to": "compose/src/commands/scale.rs",
+        "relation": "shared_dir:compose/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/scale.rs",
+        "to": "compose/src/commands/top.rs",
+        "relation": "shared_dir:compose/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/top.rs",
+        "to": "compose/src/commands/up.rs",
+        "relation": "shared_dir:compose/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "dist/selur-1.0.0/ephapax/bridge.eph",
+        "to": "dist/selur-1.0.0/ephapax/types.eph",
+        "relation": "shared_dir:dist/selur-1.0.0/ephapax",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/compose.rs",
+        "to": "compose/src/graph.rs",
+        "relation": "shared_dir:compose/src",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/graph.rs",
+        "to": "compose/src/vordr_mcp.rs",
+        "relation": "shared_dir:compose/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ephapax/bridge.eph",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "ephapax/bridge.eph",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "ephapax/types.eph",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ephapax/types.eph",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "zig/runtime.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "zig/runtime.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/basic/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/basic/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/error_handling/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/error_handling/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "benches/ipc_benchmark.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "benches/ipc_benchmark.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dist/selur-1.0.0/examples/error_handling/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dist/selur-1.0.0/examples/error_handling/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dist/selur-1.0.0/examples/basic/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dist/selur-1.0.0/examples/basic/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dist/selur-1.0.0/ephapax/bridge.eph",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "dist/selur-1.0.0/ephapax/bridge.eph",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "dist/selur-1.0.0/ephapax/types.eph",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dist/selur-1.0.0/ephapax/types.eph",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dist/selur-1.0.0/zig/runtime.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "dist/selur-1.0.0/zig/runtime.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "dist/selur-1.0.0/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dist/selur-1.0.0/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dist/selur-1.0.0/benches/ipc_benchmark.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dist/selur-1.0.0/benches/ipc_benchmark.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "integrations/vordr/native/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "integrations/vordr/native/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/build.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/build.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/run.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/run.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/scale.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/scale.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/top.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/top.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/commands/up.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "compose/src/commands/up.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "compose/src/compose.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "compose/src/compose.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "compose/src/graph.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/graph.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/src/vordr_mcp.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "compose/src/vordr_mcp.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "compose/tests/parity_stack.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "compose/tests/parity_stack.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeFFI",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "ephapax/bridge.eph",
+          "dist/selur-1.0.0/ephapax/bridge.eph"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "UnsafeFFI->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "zig/runtime.zig",
+          "dist/selur-1.0.0/zig/runtime.zig"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Memory"
+      }
+    ]
+  }
+}

@@ -1,0 +1,105 @@
+version: "1.0"
+# svalinn-compose.yaml
+# Orchestration for WordPress with OpenLiteSpeed, Varnish, MariaDB, verisimdb, and V-lang Connector
+
+# This file defines the services for the NUJ London Central Branch website.
+
+services:
+  wordpress:
+    image: /var/mnt/eclipse/repos/branch-website/dist/wordpress-litespeed-varnish.ctp.ctp
+    container_name: nuj-lcb-wordpress
+    hostname: wordpress
+    ports:
+      - "80:80"   # Varnish HTTP
+      - "443:443" # OpenLiteSpeed HTTPS (Svalinn will handle TLS termination)
+    environment:
+      - WORDPRESS_DB_HOST=mariadb
+      - WORDPRESS_DB_USER=wordpress_user
+      - WORDPRESS_DB_PASSWORD=YOUR_WORDPRESS_PASSWORD
+      - WORDPRESS_DB_NAME=wordpress_db
+      - WORDPRESS_DEBUG=false
+      - WORDPRESS_URL=https://nuj-lcb.org.uk
+    volumes:
+      - wordpress_data:/usr/local/lsws/html/wordpress/wp-content # Persistent wp-content
+      - wordpress_logs:/usr/local/lsws/logs                      # Persistent OLS logs
+    networks:
+      - internal_network
+    restart: unless-stopped
+    x-svalinn:
+      policy: strict
+      verify: true
+
+  mariadb:
+    image: /var/mnt/eclipse/repos/branch-website/dist/mariadb.ctp.ctp
+    container_name: nuj-lcb-mariadb
+    hostname: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=YOUR_MARIADB_ROOT_PASSWORD
+      - MYSQL_DATABASE=wordpress_db
+      - MYSQL_USER=wordpress_user
+      - MYSQL_PASSWORD=YOUR_WORDPRESS_PASSWORD
+    volumes:
+      - mariadb_data:/var/lib/mysql # Persistent database data
+      - mariadb_logs:/var/log/mysql  # Persistent database logs
+    networks:
+      - internal_network
+    restart: unless-stopped
+    x-svalinn:
+      policy: strict
+      verify: true
+
+  verisimdb:
+    image: /var/mnt/eclipse/repos/branch-website/dist/verisimdb.ctp.ctp
+    container_name: nuj-lcb-verisimdb
+    hostname: verisimdb
+    ports:
+      - "8080:8080" # verisimdb API
+    environment:
+      - RUST_LOG=info
+      - VERISIM_HOST=0.0.0.0
+      - VERISIM_PORT=8080
+    volumes:
+      - verisimdb_data:/app/data # Persistent data for verisimdb
+    networks:
+      - internal_network
+    restart: unless-stopped
+    x-svalinn:
+      policy: strict
+      verify: true
+
+  connector:
+    image: /var/mnt/eclipse/repos/branch-website/dist/verisimdb-connector.ctp.ctp
+    container_name: nuj-lcb-connector
+    hostname: connector
+    environment:
+          - MARIADB_HOST=mariadb
+          - MARIADB_PORT=3306
+          - MARIADB_USER=wordpress_user
+          - MARIADB_PASSWORD=YOUR_WORDPRESS_PASSWORD
+          - VERISIMDB_HOST=verisimdb
+          - VERISIMDB_PORT=8080
+          - SYNC_MODE=continuous
+    networks:
+      - internal_network
+    restart: unless-stopped
+    x-svalinn:
+      policy: strict
+      verify: true
+
+networks:
+  internal_network:
+    driver: bridge # Or custom driver if svalinn/vordr provides one
+
+volumes:
+  wordpress_data:
+  wordpress_logs:
+  mariadb_data:
+  mariadb_logs:
+  verisimdb_data:
+
+x-svalinn:
+  # Global svalinn policies if any apply to the entire stack
+  policy: standard
+  attestations:
+    require-sbom: true
+    require-signature: true

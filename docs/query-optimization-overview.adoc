@@ -1,0 +1,483 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= VQL Query Optimization: Complete Guide
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+VeriSimDB provides comprehensive query optimization through three integrated systems:
+
+1. **Query Planning** - Cost-based optimization with selectivity estimation
+2. **Bidirectional Propagation** - Forward (predicate pushdown) + backward (store capabilities)
+3. **Tunable Modes** - Conservative/Balanced/Aggressive with adaptive learning
+4. **EXPLAIN Support** - Visual query plans with performance hints
+5. **Reversibility** - Time-travel queries and undo operations
+
+== Quick Start: EXPLAIN
+
+To understand how your query will execute:
+
+[source,vql]
+----
+EXPLAIN
+SELECT GRAPH, VECTOR
+FROM FEDERATION /universities/*
+WHERE (h)-[:CITES]->(target)
+  AND h.embedding SIMILAR TO [0.1, 0.2, 0.3] WITHIN 0.9
+LIMIT 10
+----
+
+**Output:**
+[source,text]
+----
+╔════════════════════════════════════════════════════════════════╗
+║              VQL QUERY EXECUTION PLAN                          ║
+╚════════════════════════════════════════════════════════════════╝
+
+Strategy: Sequential Pipeline (operations run in series)
+Optimization Mode: Balanced
+Bidirectional Optimization: Enabled
+Estimated Total Cost: 180ms
+
+─────────────────────────────────────────────────────────────────
+
+Step 1: Query (VECTOR)
+  Cost: 80ms
+  Selectivity: 5.0% of data
+  Optimization: Using HNSW index
+  Pushed predicates:
+    - LIMIT 10
+    - WITHIN 0.9
+
+Step 2: Query (GRAPH)
+  Cost: 60ms
+  Selectivity: 2.0% of data
+  Optimization: Using edge_type_index
+  Pushed predicates:
+    - Filter by Step 1 UUIDs
+
+Step 3: Query (DOCUMENT)
+  Cost: 40ms
+  Selectivity: 1.0% of data
+
+─────────────────────────────────────────────────────────────────
+
+Cost Breakdown by Modality:
+  VECTOR: 80ms (44%)
+  GRAPH: 60ms (33%)
+  DOCUMENT: 40ms (22%)
+
+Performance Hints:
+  ✓ Query plan is optimal
+----
+
+== Query Planner Modes
+
+=== Three Optimization Modes
+
+[cols="1,2,2,2"]
+|===
+|Mode |Selectivity Estimate |Cost Estimate |Best For
+
+|**Conservative**
+|2x (assume more results)
+|1.5x (add safety buffer)
+|Production, compliance, first-time queries
+
+|**Balanced**
+|1x (use historical averages)
+|1x (realistic estimates)
+|Most workloads, general use
+
+|**Aggressive**
+|0.5x (assume fewer results)
+|0.8x (optimistic)
+|Development, exploratory queries, known-selective queries
+|===
+
+=== Configuration API
+
+**Global Mode:**
+[source,elixir]
+----
+# Set for all queries
+VeriSim.QueryPlannerConfig.set_global_mode(:balanced)
+----
+
+**Per-Modality Override:**
+[source,elixir]
+----
+# Vector searches are predictable → aggressive
+VeriSim.QueryPlannerConfig.set_modality_mode("VECTOR", :aggressive)
+
+# Graph traversal is unpredictable → conservative
+VeriSim.QueryPlannerConfig.set_modality_mode("GRAPH", :conservative)
+
+# Semantic ZKP verification is expensive → conservative
+VeriSim.QueryPlannerConfig.set_modality_mode("SEMANTIC", :conservative)
+----
+
+**Adaptive Tuning:**
+[source,elixir]
+----
+# Enable automatic mode adjustment based on query performance
+VeriSim.QueryPlannerConfig.set_adaptive(true)
+----
+
+When enabled, the system:
+1. Tracks actual query costs vs. estimates
+2. If consistently wrong (>30% error), adjusts mode
+3. Logs mode changes for transparency
+
+=== Default Configuration
+
+[source,elixir]
+----
+%{
+  global_mode: :balanced,
+  modality_overrides: %{
+    "VECTOR" => :aggressive,    # Predictable (HNSW)
+    "GRAPH" => :conservative,   # Unpredictable (traversal)
+    "SEMANTIC" => :conservative # Expensive (ZKP)
+  },
+  statistics_weight: 0.7,  # 70% historical, 30% estimates
+  enable_adaptive: true
+}
+----
+
+== Bidirectional Optimization
+
+=== Forward Propagation (Top-Down)
+
+**Push optimizations from query to stores:**
+
+1. **Predicate Pushdown**
+   [source,vql]
+   ----
+   -- Query
+   SELECT VECTOR, DOCUMENT
+   WHERE h.embedding SIMILAR TO [0.1, 0.2]
+     AND FULLTEXT CONTAINS "machine learning"
+   LIMIT 10
+
+   -- Optimization: Push predicates to stores
+   Milvus:   "SIMILAR TO [0.1, 0.2] LIMIT 20"  (2x buffer)
+   Tantivy:  "CONTAINS 'machine learning'"
+   ----
+
+2. **Projection Pushdown**
+   [source,vql]
+   ----
+   -- Only request needed fields
+   SELECT GRAPH(nodes, edges)  -- Don't fetch properties
+   ----
+
+3. **LIMIT Pushdown**
+   [source,vql]
+   ----
+   -- Tell stores to limit results early
+   LIMIT 10 → Each store returns ~20 (buffer for joins)
+   ----
+
+=== Backward Propagation (Bottom-Up)
+
+**Pull store capabilities into query plan:**
+
+1. **Index Detection**
+   - Query Oxigraph: "Do you have edge_type_index?"
+   - If yes → Reorder to use indexed operation first
+
+2. **Cache Awareness**
+   - Query verisim-temporal: "Is version cached?"
+   - If yes → Execute early (instant)
+
+3. **GPU Availability**
+   - Query Burn: "GPU available?"
+   - If yes → Prioritize tensor operations
+
+4. **Partition Hints**
+   - Query Milvus: "Which partitions match this filter?"
+   - If subset → Only query relevant partitions
+
+=== Example Optimization Flow
+
+**Initial Query:**
+[source,vql]
+----
+SELECT GRAPH, VECTOR, DOCUMENT
+FROM FEDERATION /universities/*
+WHERE (h)-[:CITES]->(target)
+  AND h.embedding SIMILAR TO [0.1, 0.2, 0.3]
+  AND FULLTEXT CONTAINS "quantum computing"
+LIMIT 10
+----
+
+**Step 1: Forward Propagation**
+- Push LIMIT 10 → stores return 20 (buffer)
+- Push VECTOR predicate to Milvus
+- Push GRAPH predicate to Oxigraph
+- Push DOCUMENT predicate to Tantivy
+
+**Step 2: Backward Propagation**
+- Milvus reports: "HNSW index available, estimated 50 results"
+- Oxigraph reports: "No edge_type_index, estimated 10,000 results"
+- Tantivy reports: "'quantum computing' is rare, estimated 100 results"
+
+**Step 3: Reorder Based on Hints**
+1. Execute Tantivy first (most selective: 100 results)
+2. Filter Milvus by Tantivy UUIDs (50 → 20 results)
+3. Filter Oxigraph by Milvus UUIDs (10,000 → 10 results)
+
+**Result:** 180ms instead of 2000ms (10x faster!)
+
+== Reversibility: Time-Travel Queries
+
+=== What You Get For Free
+
+VeriSimDB's architecture provides **80% reversibility with zero overhead:**
+
+[cols="1,2,1"]
+|===
+|Component |Reversibility Support |Overhead
+
+|**Temporal Modality**
+|✅ Full (Merkle trees)
+|0% (already designed for versioning)
+
+|**Semantic Modality**
+|✅ Full (ZKP proofs immutable)
+|0% (proofs are versioned)
+
+|**Metadata Registry**
+|✅ Full (KRaft append-only log)
+|0% (log truncation optional)
+|===
+
+=== Time-Travel Query Syntax
+
+[source,vql]
+----
+-- Query historical state
+SELECT *
+FROM HEXAD abc-123
+WHERE AS OF '2026-01-22T12:00:00Z'
+
+-- Compare current vs historical
+SELECT *
+FROM HEXAD abc-123
+WHERE BETWEEN '2026-01-22T00:00:00Z' AND '2026-01-22T23:59:59Z'
+
+-- Get specific version
+SELECT *
+FROM HEXAD abc-123
+WHERE VERSION v3-final
+----
+
+=== Undo Operations
+
+[source,elixir]
+----
+# Create checkpoint before risky operation
+checkpoint = VeriSim.Reversibility.create_checkpoint(hexad_id)
+
+# Try operation
+case apply_operation(hexad_id) do
+  {:ok, result} ->
+    # Success → commit
+    VeriSim.Reversibility.commit_checkpoint(checkpoint)
+    {:ok, result}
+
+  {:error, reason} ->
+    # Failure → undo
+    VeriSim.Reversibility.revert_to_checkpoint(checkpoint)
+    {:error, reason}
+end
+----
+
+=== Drift Repair Validation
+
+**Before (No Reversibility):**
+[source,text]
+----
+1. Detect drift
+2. Apply repair
+3. Hope it works ❌
+----
+
+**After (With Reversibility):**
+[source,text]
+----
+1. Detect drift
+2. Checkpoint current state
+3. Apply repair
+4. Validate repair
+5. If bad → REVERT ✅
+6. If good → COMMIT ✅
+----
+
+[source,elixir]
+----
+defmodule VeriSim.DriftMonitor do
+  def repair_with_validation(hexad_id, policy) do
+    checkpoint = Reversibility.create_checkpoint(hexad_id)
+
+    case apply_repair(hexad_id, policy) do
+      {:ok, new_state} ->
+        if validate_consistency(new_state) do
+          Reversibility.commit_checkpoint(checkpoint)
+          {:ok, new_state}
+        else
+          Reversibility.revert_to_checkpoint(checkpoint)
+          {:error, :repair_failed_validation}
+        end
+
+      {:error, reason} ->
+        Reversibility.revert_to_checkpoint(checkpoint)
+        {:error, reason}
+    end
+  end
+end
+----
+
+== Performance Best Practices
+
+=== 1. Use EXPLAIN for Slow Queries
+
+[source,vql]
+----
+-- If query is slow, explain it
+EXPLAIN SELECT ...
+
+-- Look for hints like:
+-- "First step has low selectivity"
+-- "Operation not using indexes"
+-- "Query might benefit from parallel execution"
+----
+
+=== 2. Tune Per-Modality
+
+[source,elixir]
+----
+# Vector searches are fast and predictable
+QueryPlannerConfig.set_modality_mode("VECTOR", :aggressive)
+
+# Graph traversal can explode
+QueryPlannerConfig.set_modality_mode("GRAPH", :conservative)
+----
+
+=== 3. Enable Adaptive Tuning
+
+[source,elixir]
+----
+# Let system learn from your workload
+QueryPlannerConfig.set_adaptive(true)
+----
+
+=== 4. Use Time-Travel for Debugging
+
+[source,vql]
+----
+-- Query was working yesterday, broken today?
+-- Compare states
+SELECT * FROM HEXAD abc-123 WHERE AS OF 'yesterday'
+----
+
+=== 5. Add Indexes to Stores
+
+[source,bash]
+----
+# Oxigraph: Create edge type index
+curl -X POST /oxigraph/indexes -d '{"type": "edge_type"}'
+
+# Milvus: Use HNSW for high recall
+curl -X POST /milvus/indexes -d '{"type": "HNSW", "M": 16}'
+
+# Tantivy: Index frequently queried fields
+curl -X POST /tantivy/schema -d '{"indexed_fields": ["title", "author"]}'
+----
+
+== Integration Example
+
+**Complete workflow showing all features:**
+
+[source,vql]
+----
+-- 1. Check query plan
+EXPLAIN
+SELECT GRAPH, VECTOR
+FROM FEDERATION /universities/*
+WHERE (h)-[:CITES]->(target)
+  AND h.embedding SIMILAR TO [0.1, 0.2, 0.3]
+LIMIT 10
+
+-- 2. If slow, tune to aggressive
+-- (via API: QueryPlannerConfig.set_global_mode(:aggressive))
+
+-- 3. Create checkpoint before executing
+-- (via API: checkpoint = Reversibility.create_checkpoint())
+
+-- 4. Execute query
+SELECT GRAPH, VECTOR
+FROM FEDERATION /universities/*
+WHERE (h)-[:CITES]->(target)
+  AND h.embedding SIMILAR TO [0.1, 0.2, 0.3]
+LIMIT 10
+
+-- 5. If results wrong, revert
+-- (via API: Reversibility.revert_to_checkpoint(checkpoint))
+
+-- 6. Or compare with historical state
+SELECT GRAPH, VECTOR
+FROM FEDERATION /universities/*
+WHERE (h)-[:CITES]->(target)
+  AND h.embedding SIMILAR TO [0.1, 0.2, 0.3]
+  AND AS OF '2026-01-22T12:00:00Z'
+LIMIT 10
+----
+
+== Cost Summary
+
+|===
+|Feature |Storage Cost |CPU Cost |Benefit
+
+|**Query Planning**
+|0%
+|2%
+|10x faster queries
+
+|**Bidirectional Optimization**
+|0%
+|3%
+|Automatic index usage
+
+|**Tunable Modes**
+|0%
+|0%
+|Flexibility
+
+|**EXPLAIN**
+|0%
+|0%
+|Debugging
+
+|**Reversibility (Temporal/Semantic)**
+|0%
+|0%
+|Time-travel, undo
+
+|**Reversibility (Full)**
+|20%
+|10%
+|Drift validation, A/B testing
+|===
+
+== References
+
+- link:vql-architecture.adoc[VQL Architecture] - Dual-path router design
+- link:vql-examples.adoc[VQL Examples] - 35+ example queries
+- link:reversibility-design.adoc[Reversibility Design] - Full technical specification
+- link:../lib/verisim/query_planner_config.ex[Query Planner Config] - Source code
+- link:../lib/verisim/query_planner_bidirectional.ex[Bidirectional Optimization] - Source code
+- link:../src/vql/VQLExplain.res[EXPLAIN Implementation] - Source code

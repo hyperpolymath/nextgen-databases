@@ -1,0 +1,1475 @@
+{
+  "program_path": ".",
+  "language": "shell",
+  "frameworks": [
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "UnsafeFFI",
+      "location": "monitoring/systems-observatory/src/diagnostics_integration.jl",
+      "severity": "Medium",
+      "description": "6 ccall/FFI calls in monitoring/systems-observatory/src/diagnostics_integration.jl",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "ambulances/disk/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in ambulances/disk/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ambulances/disk/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in ambulances/disk/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ambulances/network/src-tauri/src/main.rs",
+      "severity": "High",
+      "description": "1 unsafe blocks in ambulances/network/src-tauri/src/main.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "ambulances/network/src/diagnostics/connectivity.sh",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in ambulances/network/src/diagnostics/connectivity.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "ambulances/network/src/repairs/dns.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in ambulances/network/src/repairs/dns.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "ambulances/security/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in ambulances/security/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ffi/systemd/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in ffi/systemd/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ffi/systemd/src/main.zig",
+      "severity": "High",
+      "description": "1 unsafe pointer casts in ffi/systemd/src/main.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ffi/systemd/shim/src/lib.rs",
+      "severity": "High",
+      "description": "Raw pointer cast in ffi/systemd/shim/src/lib.rs",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ffi/fuse/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in ffi/fuse/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ffi/fuse/src/cloud/cloud_fs.zig",
+      "severity": "High",
+      "description": "4 unsafe pointer casts in ffi/fuse/src/cloud/cloud_fs.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 33744,
+    "unsafe_blocks": 74,
+    "panic_sites": 0,
+    "unwrap_calls": 2,
+    "allocation_sites": 10,
+    "io_operations": 148,
+    "threading_constructs": 11
+  },
+  "file_statistics": [
+    {
+      "file_path": "monitoring/observatory/lib/system_observatory/metrics/store.ex",
+      "lines": 195,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "monitoring/observatory/lib/system_observatory/bundle_ingestion.ex",
+      "lines": 187,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/observatory/lib/system_observatory/correlator.ex",
+      "lines": 210,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "monitoring/systems-observatory/benchmarks/benchmark_database.jl",
+      "lines": 406,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 20,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/examples/example_advanced_analysis.jl",
+      "lines": 291,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/examples/example_database_stats.jl",
+      "lines": 330,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/src-diagnostics/d/developer_diagnostics.d",
+      "lines": 548,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/src-diagnostics/d/diagnostics.d",
+      "lines": 801,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/src/alternatives.jl",
+      "lines": 445,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/src/ambient.jl",
+      "lines": 293,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/src/automate.jl",
+      "lines": 498,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/src/core.jl",
+      "lines": 461,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/src/diagnostics_integration.jl",
+      "lines": 383,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/src/io.jl",
+      "lines": 503,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/src/reports.jl",
+      "lines": 362,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/src/security.jl",
+      "lines": 558,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/test/runtests.jl",
+      "lines": 187,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/test/test_database.jl",
+      "lines": 305,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 14,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/tools/compare_alternatives.jl",
+      "lines": 425,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/tools/generate_html_report.jl",
+      "lines": 581,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/tools/migration_planner.jl",
+      "lines": 406,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "monitoring/systems-observatory/tools/rsr_verify.jl",
+      "lines": 382,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "recovery/operating-theatre/src/core/ecosystem.d",
+      "lines": 251,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "recovery/operating-theatre/src/core/engine.d",
+      "lines": 289,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "recovery/operating-theatre/src/core/security.d",
+      "lines": 173,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "recovery/operating-theatre/src/packs/cleanup.d",
+      "lines": 200,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "recovery/operating-theatre/src/packs/diagnostics.d",
+      "lines": 507,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "recovery/operating-theatre/src/packs/repos.d",
+      "lines": 242,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "recovery/operating-theatre/src/packs/system.d",
+      "lines": 175,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "recovery/operating-theatre/src/main.d",
+      "lines": 748,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/disk/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/disk/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/disk/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "ambulances/disk/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/disk/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src-tauri/src/main.rs",
+      "lines": 125,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/ada/tui/network_ambulance_tui.adb",
+      "lines": 154,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/ada/tui/tui_display.adb",
+      "lines": 254,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/d/cli/main.d",
+      "lines": 507,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/d/core/repairs/dns_repair.d",
+      "lines": 181,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/d/core/repairs/interface_repair.d",
+      "lines": 163,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/d/platform/iface.d",
+      "lines": 49,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/d/platform/linux.d",
+      "lines": 277,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/d/platform/package.d",
+      "lines": 31,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/diagnostics/connectivity.sh",
+      "lines": 245,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/diagnostics/interfaces.sh",
+      "lines": 231,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/repairs/dns.sh",
+      "lines": 280,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/utils/system.sh",
+      "lines": 148,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/src/main.sh",
+      "lines": 552,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/tests/lib/netns.sh",
+      "lines": 219,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/tests/run-container-tests.sh",
+      "lines": 319,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/network/install.sh",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ambulances/security/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/systemd/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/systemd/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "ffi/systemd/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/systemd/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/systemd/src/main.zig",
+      "lines": 291,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/fuse/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/fuse/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "ffi/fuse/src/c.zig",
+      "lines": 8,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/fuse/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/fuse/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/fuse/src/cloud/cache.zig",
+      "lines": 111,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "ffi/fuse/src/cloud/cloud_fs.zig",
+      "lines": 111,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/fuse/src/cloud/prefetch.zig",
+      "lines": 68,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "ffi/fuse/src/cloud/rate_limiter.zig",
+      "lines": 52,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "memory",
+    "disk",
+    "cpu",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "recovery/operating-theatre/src/core/ecosystem.d",
+        "to": "recovery/operating-theatre/src/core/engine.d",
+        "relation": "shared_dir:recovery/operating-theatre/src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/core/engine.d",
+        "to": "recovery/operating-theatre/src/core/security.d",
+        "relation": "shared_dir:recovery/operating-theatre/src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/ada/tui/network_ambulance_tui.adb",
+        "to": "ambulances/network/src/ada/tui/tui_display.adb",
+        "relation": "shared_dir:ambulances/network/src/ada/tui",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/packs/cleanup.d",
+        "to": "recovery/operating-theatre/src/packs/diagnostics.d",
+        "relation": "shared_dir:recovery/operating-theatre/src/packs",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/packs/diagnostics.d",
+        "to": "recovery/operating-theatre/src/packs/repos.d",
+        "relation": "shared_dir:recovery/operating-theatre/src/packs",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/packs/repos.d",
+        "to": "recovery/operating-theatre/src/packs/system.d",
+        "relation": "shared_dir:recovery/operating-theatre/src/packs",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/d/platform/iface.d",
+        "to": "ambulances/network/src/d/platform/linux.d",
+        "relation": "shared_dir:ambulances/network/src/d/platform",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/d/platform/linux.d",
+        "to": "ambulances/network/src/d/platform/package.d",
+        "relation": "shared_dir:ambulances/network/src/d/platform",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/systemd/src/abi/Foreign.idr",
+        "to": "ffi/systemd/src/abi/Types.idr",
+        "relation": "shared_dir:ffi/systemd/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/test/runtests.jl",
+        "to": "monitoring/systems-observatory/test/test_database.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/test",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/disk/src/abi/Foreign.idr",
+        "to": "ambulances/disk/src/abi/Types.idr",
+        "relation": "shared_dir:ambulances/disk/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/diagnostics/connectivity.sh",
+        "to": "ambulances/network/src/diagnostics/interfaces.sh",
+        "relation": "shared_dir:ambulances/network/src/diagnostics",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src-diagnostics/d/developer_diagnostics.d",
+        "to": "monitoring/systems-observatory/src-diagnostics/d/diagnostics.d",
+        "relation": "shared_dir:monitoring/systems-observatory/src-diagnostics/d",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/observatory/lib/system_observatory/bundle_ingestion.ex",
+        "to": "monitoring/observatory/lib/system_observatory/correlator.ex",
+        "relation": "shared_dir:monitoring/observatory/lib/system_observatory",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/tools/compare_alternatives.jl",
+        "to": "monitoring/systems-observatory/tools/generate_html_report.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/tools",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/tools/generate_html_report.jl",
+        "to": "monitoring/systems-observatory/tools/migration_planner.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/tools",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/tools/migration_planner.jl",
+        "to": "monitoring/systems-observatory/tools/rsr_verify.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/tools",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/fuse/src/cloud/cache.zig",
+        "to": "ffi/fuse/src/cloud/cloud_fs.zig",
+        "relation": "shared_dir:ffi/fuse/src/cloud",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/fuse/src/cloud/cloud_fs.zig",
+        "to": "ffi/fuse/src/cloud/prefetch.zig",
+        "relation": "shared_dir:ffi/fuse/src/cloud",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/fuse/src/cloud/prefetch.zig",
+        "to": "ffi/fuse/src/cloud/rate_limiter.zig",
+        "relation": "shared_dir:ffi/fuse/src/cloud",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/examples/example_advanced_analysis.jl",
+        "to": "monitoring/systems-observatory/examples/example_database_stats.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/examples",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/alternatives.jl",
+        "to": "monitoring/systems-observatory/src/ambient.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/src",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/ambient.jl",
+        "to": "monitoring/systems-observatory/src/automate.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/src",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/automate.jl",
+        "to": "monitoring/systems-observatory/src/core.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/src",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/core.jl",
+        "to": "monitoring/systems-observatory/src/diagnostics_integration.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/src",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/diagnostics_integration.jl",
+        "to": "monitoring/systems-observatory/src/io.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/src",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/io.jl",
+        "to": "monitoring/systems-observatory/src/reports.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/src",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/reports.jl",
+        "to": "monitoring/systems-observatory/src/security.jl",
+        "relation": "shared_dir:monitoring/systems-observatory/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/d/core/repairs/dns_repair.d",
+        "to": "ambulances/network/src/d/core/repairs/interface_repair.d",
+        "relation": "shared_dir:ambulances/network/src/d/core/repairs",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/fuse/src/abi/Foreign.idr",
+        "to": "ffi/fuse/src/abi/Types.idr",
+        "relation": "shared_dir:ffi/fuse/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/observatory/lib/system_observatory/metrics/store.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "monitoring/observatory/lib/system_observatory/bundle_ingestion.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/observatory/lib/system_observatory/correlator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "monitoring/systems-observatory/benchmarks/benchmark_database.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/examples/example_advanced_analysis.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/examples/example_database_stats.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src-diagnostics/d/developer_diagnostics.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src-diagnostics/d/diagnostics.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/alternatives.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/ambient.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/automate.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/core.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/diagnostics_integration.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/io.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/reports.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/src/security.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/test/runtests.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/test/test_database.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/tools/compare_alternatives.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/tools/generate_html_report.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/tools/migration_planner.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "monitoring/systems-observatory/tools/rsr_verify.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/core/ecosystem.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/core/engine.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/core/security.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/packs/cleanup.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/packs/diagnostics.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/packs/repos.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/packs/system.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "recovery/operating-theatre/src/main.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/disk/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/disk/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/disk/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ambulances/disk/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "ambulances/disk/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "ambulances/network/src-tauri/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "ambulances/network/src/ada/tui/network_ambulance_tui.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/ada/tui/tui_display.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/d/cli/main.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/d/core/repairs/dns_repair.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "ambulances/network/src/d/core/repairs/interface_repair.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "ambulances/network/src/d/platform/iface.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/d/platform/linux.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "ambulances/network/src/d/platform/package.d",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/diagnostics/connectivity.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/diagnostics/interfaces.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/repairs/dns.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/utils/system.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/src/main.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/tests/lib/netns.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/tests/run-container-tests.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/network/install.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ambulances/security/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/systemd/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/systemd/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/systemd/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "ffi/systemd/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "ffi/systemd/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "ffi/fuse/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/fuse/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/fuse/src/c.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "ffi/fuse/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "ffi/fuse/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "ffi/fuse/src/cloud/cache.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "ffi/fuse/src/cloud/cloud_fs.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "ffi/fuse/src/cloud/prefetch.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "ffi/fuse/src/cloud/rate_limiter.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "ambulances/network/src-tauri/src/main.rs"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeCode->Concurrency"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "ambulances/network/src/diagnostics/connectivity.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "ambulances/network/src/repairs/dns.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          "ambulances/disk/contractiles/k9/template-hunt.k9.ncl",
+          "ambulances/security/contractiles/k9/template-hunt.k9.ncl"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "UnsafeFFI",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "monitoring/systems-observatory/src/diagnostics_integration.jl"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeFFI->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "ambulances/disk/src/abi/Foreign.idr",
+          "ambulances/network/src-tauri/src/main.rs",
+          "ffi/systemd/src/abi/Foreign.idr",
+          "ffi/systemd/src/main.zig",
+          "ffi/systemd/shim/src/lib.rs",
+          "ffi/fuse/src/abi/Foreign.idr",
+          "ffi/fuse/src/cloud/cloud_fs.zig"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeCode->Memory"
+      }
+    ]
+  }
+}

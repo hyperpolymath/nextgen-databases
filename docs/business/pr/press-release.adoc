@@ -1,0 +1,102 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB Launch Press Release
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-02-28
+:revremark: Launch announcement draft — standard press release format
+
+== FOR IMMEDIATE RELEASE
+
+=== VeriSimDB: World's First Multimodal Database with Cross-Modal Drift Detection Launches as Open Source
+
+_New database category addresses the $12.9M annual cost of data inconsistency
+by detecting and repairing divergent data representations automatically_
+
+*[City, Date]* -- hyperpolymath today announced the open-source release of
+*VeriSimDB*, the world's first multimodal database with cross-modal drift
+detection and self-normalisation. VeriSimDB stores entities across 8 simultaneous
+data representations -- graph, vector, tensor, semantic, document, temporal,
+provenance, and spatial -- and continuously monitors whether those representations
+are consistent with each other.
+
+Unlike existing databases that store data in a single modality (Neo4j for graphs,
+Pinecone for vectors) or multiple models without consistency checking (ArangoDB,
+SurrealDB), VeriSimDB introduces *coherence scoring*: a quantified measure of
+cross-modal consistency for every entity. When an entity's representations
+diverge -- a condition called "drift" -- VeriSimDB detects the divergence and can
+automatically reconcile the data through configurable self-normalisation
+strategies.
+
+"Every enterprise I have spoken with has the same problem: the same customer,
+product, or transaction is represented differently across five or ten systems, and
+nobody knows when those representations disagree," said *Jonathan D.A. Jewell*,
+creator of VeriSimDB and researcher at The Open University. "Gartner estimates
+this costs organisations $12.9 million per year. VeriSimDB is the first database
+designed from the ground up to detect and repair this kind of inconsistency."
+
+=== Technical Foundation
+
+VeriSimDB is built on a *Rust core* for performance and memory safety, with
+*Elixir/OTP orchestration* for fault-tolerant concurrency. The database includes
+VQL (Verisimilitude Query Language), a purpose-built query language for
+cross-modal operations, and an optional dependent-type layer (VQL-DT) that
+provides compile-time proofs of query correctness using Idris2.
+
+The project's engineering maturity is demonstrated by a test suite of *662 tests*
+(510 Rust + 152 Elixir) with *0 failures*, comprehensive documentation
+including formal semantics, and a CI/CD pipeline with SLSA provenance and SBOM
+generation.
+
+VeriSimDB also supports *federation* across heterogeneous database backends
+including PostgreSQL, ArangoDB, and Elasticsearch, allowing organisations to
+bring drift detection to their existing data infrastructure without requiring
+data migration.
+
+=== Availability and Licensing
+
+VeriSimDB is available immediately as open source under the *Palimpsest License
+(PMPL-1.0-or-later)*, a permissive open-source license. The community edition
+is full-featured with no artificial restrictions. Commercial support licenses
+with enterprise SLAs, priority security patches, and deployment consulting are
+available for organisations that require operational guarantees.
+
+The source code, documentation, and getting-started guide are available at:
+https://github.com/hyperpolymath/verisimdb
+
+=== Target Use Cases
+
+VeriSimDB addresses data consistency challenges across multiple domains:
+
+* *GraphRAG / AI Knowledge Graphs:* Detect when vector embeddings drift from
+  knowledge graph state, preventing LLM hallucinations
+* *Biomedical Research:* Ensure clinical records, trial timelines, and
+  provenance chains remain consistent for regulatory compliance
+* *Financial Services:* Real-time cross-system consistency for AML/KYC
+  compliance and fraud detection
+* *Supply Chain:* End-to-end traceability with automatic detection of expired
+  certifications and routing inconsistencies
+* *Cybersecurity:* Maintain consistent threat intelligence across graph, vector,
+  and document representations
+
+=== About hyperpolymath
+
+hyperpolymath is an open-source software organisation led by Jonathan D.A. Jewell,
+a researcher at The Open University (UK). The hyperpolymath ecosystem comprises
+265+ repositories spanning databases, programming languages, developer tools,
+formal verification, and AI infrastructure. VeriSimDB is part of the
+hyperpolymath next-generation database portfolio, which also includes QuandleDB
+(dependent-type graph database) and LithoGlyph (provenance database).
+
+=== Contact
+
+[cols="1,3"]
+|===
+| Name | Jonathan D.A. Jewell
+| Email | j.d.a.jewell@open.ac.uk
+| GitHub | https://github.com/hyperpolymath
+| Project | https://github.com/hyperpolymath/verisimdb
+|===
+
+''''
+
+_###_

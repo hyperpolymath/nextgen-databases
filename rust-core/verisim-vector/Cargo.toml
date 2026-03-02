@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+
+[package]
+name = "verisim-vector"
+description = "Vector modality - HNSW-based similarity search"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+# hnsw_rs removed — we implement HNSW from scratch to avoid
+# the 'b lifetime parameter issue in hnsw_rs 0.3.
+ndarray.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+# bincode removed — not used in crate
+# bincode.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true
+

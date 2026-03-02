@@ -1,0 +1,808 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Networking",
+    "Database"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "unify/tests/e2e_test.sh",
+      "severity": "Medium",
+      "description": "119 potentially unquoted variable expansions in unify/tests/e2e_test.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "unify-core/tests/models.rs",
+      "severity": "Medium",
+      "description": "28 unwrap/expect calls in unify-core/tests/models.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 11822,
+    "unsafe_blocks": 1,
+    "panic_sites": 1,
+    "unwrap_calls": 45,
+    "allocation_sites": 24,
+    "io_operations": 16,
+    "threading_constructs": 1
+  },
+  "file_statistics": [
+    {
+      "file_path": "antidote/src/SemanticReset.res",
+      "lines": 43,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "antidote/tests/test_suite.py",
+      "lines": 361,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "antidote/tools/benchmark.py",
+      "lines": 456,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-cli/src/main.rs",
+      "lines": 428,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-core/src/error.rs",
+      "lines": 28,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-core/src/models.rs",
+      "lines": 124,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-parser/src/chatgpt.rs",
+      "lines": 142,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-parser/src/claude.rs",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-parser/src/copilot.rs",
+      "lines": 392,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-parser/src/gemini.rs",
+      "lines": 325,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-parser/src/lib.rs",
+      "lines": 22,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-search/src/search.rs",
+      "lines": 103,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-storage/src/backup.rs",
+      "lines": 307,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-storage/src/migration.rs",
+      "lines": 145,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-storage/src/repository.rs",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/crates/llm-unify-tui/src/app.rs",
+      "lines": 75,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify/tests/e2e_test.sh",
+      "lines": 270,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify-core/src/error.rs",
+      "lines": 28,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify-core/src/models.rs",
+      "lines": 124,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify-core/tests/conformance.rs",
+      "lines": 514,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "unify-core/tests/models.rs",
+      "lines": 489,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 28,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "verify/app/Main.hs",
+      "lines": 357,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verify/src/ClaudeVerify/Languages/Ada.hs",
+      "lines": 367,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verify/src/ClaudeVerify/Languages/Haskell.hs",
+      "lines": 240,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verify/src/ClaudeVerify/Languages/Rust.hs",
+      "lines": 404,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verify/src/ClaudeVerify/Config.hs",
+      "lines": 222,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verify/src/ClaudeVerify/EchidnaClient.hs",
+      "lines": 326,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verify/src/ClaudeVerify/Report.hs",
+      "lines": 322,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "verify/src/ClaudeVerify.hs",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "unify/crates/llm-unify-storage/src/backup.rs",
+        "to": "unify/crates/llm-unify-storage/src/migration.rs",
+        "relation": "shared_dir:unify/crates/llm-unify-storage/src",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-storage/src/migration.rs",
+        "to": "unify/crates/llm-unify-storage/src/repository.rs",
+        "relation": "shared_dir:unify/crates/llm-unify-storage/src",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/chatgpt.rs",
+        "to": "unify/crates/llm-unify-parser/src/claude.rs",
+        "relation": "shared_dir:unify/crates/llm-unify-parser/src",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/claude.rs",
+        "to": "unify/crates/llm-unify-parser/src/copilot.rs",
+        "relation": "shared_dir:unify/crates/llm-unify-parser/src",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/copilot.rs",
+        "to": "unify/crates/llm-unify-parser/src/gemini.rs",
+        "relation": "shared_dir:unify/crates/llm-unify-parser/src",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/gemini.rs",
+        "to": "unify/crates/llm-unify-parser/src/lib.rs",
+        "relation": "shared_dir:unify/crates/llm-unify-parser/src",
+        "weight": 1.0
+      },
+      {
+        "from": "unify-core/tests/conformance.rs",
+        "to": "unify-core/tests/models.rs",
+        "relation": "shared_dir:unify-core/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Languages/Ada.hs",
+        "to": "verify/src/ClaudeVerify/Languages/Haskell.hs",
+        "relation": "shared_dir:verify/src/ClaudeVerify/Languages",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Languages/Haskell.hs",
+        "to": "verify/src/ClaudeVerify/Languages/Rust.hs",
+        "relation": "shared_dir:verify/src/ClaudeVerify/Languages",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Config.hs",
+        "to": "verify/src/ClaudeVerify/EchidnaClient.hs",
+        "relation": "shared_dir:verify/src/ClaudeVerify",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/EchidnaClient.hs",
+        "to": "verify/src/ClaudeVerify/Report.hs",
+        "relation": "shared_dir:verify/src/ClaudeVerify",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-core/src/error.rs",
+        "to": "unify/crates/llm-unify-core/src/models.rs",
+        "relation": "shared_dir:unify/crates/llm-unify-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "unify-core/src/error.rs",
+        "to": "unify-core/src/models.rs",
+        "relation": "shared_dir:unify-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "antidote/src/SemanticReset.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "antidote/src/SemanticReset.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "antidote/tests/test_suite.py",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "antidote/tests/test_suite.py",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "antidote/tools/benchmark.py",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "antidote/tools/benchmark.py",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-cli/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "unify/crates/llm-unify-cli/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "unify/crates/llm-unify-core/src/error.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-core/src/error.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-core/src/models.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-core/src/models.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/chatgpt.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/chatgpt.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/claude.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/claude.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/copilot.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/copilot.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/gemini.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/gemini.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-parser/src/lib.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-search/src/search.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-search/src/search.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-storage/src/backup.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-storage/src/backup.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-storage/src/migration.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-storage/src/migration.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-storage/src/repository.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-storage/src/repository.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-tui/src/app.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/crates/llm-unify-tui/src/app.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/tests/e2e_test.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify/tests/e2e_test.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify-core/src/error.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify-core/src/error.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify-core/src/models.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify-core/src/models.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "unify-core/tests/conformance.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "unify-core/tests/conformance.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "unify-core/tests/models.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "unify-core/tests/models.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "verify/app/Main.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/app/Main.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Languages/Ada.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Languages/Ada.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Languages/Haskell.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Languages/Haskell.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Languages/Rust.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Languages/Rust.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Config.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Config.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/EchidnaClient.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/EchidnaClient.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Report.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify/Report.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "verify/src/ClaudeVerify.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "unify-core/tests/models.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "Database"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "unify/tests/e2e_test.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "Database"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "unify-core/tests/models.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "Database"
+        ],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1094 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "server/src/abi/Layout.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in server/src/abi/Layout.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeFFI",
+      "location": "server/src/lithoglyph.gleam",
+      "severity": "Medium",
+      "description": "8 @external FFI calls in server/src/lithoglyph.gleam",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeFFI",
+      "location": "server/src/lithoglyph/nif_ffi.gleam",
+      "severity": "Medium",
+      "description": "9 @external FFI calls in server/src/lithoglyph/nif_ffi.gleam",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "server/native/src/lithoglyph_nif.zig",
+      "severity": "High",
+      "description": "11 unsafe pointer casts in server/native/src/lithoglyph_nif.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "server/ffi/zig/src/main.zig",
+      "severity": "High",
+      "description": "2 unsafe pointer casts in server/ffi/zig/src/main.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "server/ffi/zig/src/main.zig",
+      "severity": "Low",
+      "description": "13 TODO/FIXME/HACK markers in server/ffi/zig/src/main.zig",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ui/src/components/Grid.res",
+      "severity": "Medium",
+      "description": "4 unsafe get calls in ui/src/components/Grid.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ui/src/lib/SafeDOM.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in ui/src/lib/SafeDOM.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "ui/src/lib/SafeDOM.res.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in ui/src/lib/SafeDOM.res.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ui/lib/bs/src/components/Grid.res",
+      "severity": "Medium",
+      "description": "4 unsafe get calls in ui/lib/bs/src/components/Grid.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ui/lib/bs/src/lib/SafeDOM.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in ui/lib/bs/src/lib/SafeDOM.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "ui/lib/bs/src/lib/SafeDOM.res.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in ui/lib/bs/src/lib/SafeDOM.res.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ui/lib/ocaml/SafeDOM.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in ui/lib/ocaml/SafeDOM.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "ui/lib/ocaml/Grid.res",
+      "severity": "Medium",
+      "description": "4 unsafe get calls in ui/lib/ocaml/Grid.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "ui/dist/assets/index-ZOVpEuRb.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in ui/dist/assets/index-ZOVpEuRb.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "ui/dist/assets/index-ZOVpEuRb.js",
+      "severity": "High",
+      "description": "dangerouslySetInnerHTML usage (React XSS risk) in ui/dist/assets/index-ZOVpEuRb.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "ui/dist/assets/index-ZOVpEuRb.js",
+      "severity": "Medium",
+      "description": "12 HTTP (non-HTTPS) URLs in ui/dist/assets/index-ZOVpEuRb.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "ui/dist/assets/index-ZOVpEuRb.js",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in ui/dist/assets/index-ZOVpEuRb.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/rebrand-to-lithoglyph.sh",
+      "severity": "Medium",
+      "description": "26 potentially unquoted variable expansions in scripts/rebrand-to-lithoglyph.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 39822,
+    "unsafe_blocks": 82,
+    "panic_sites": 2,
+    "unwrap_calls": 18,
+    "allocation_sites": 13,
+    "io_operations": 55,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "server/src/router.gleam",
+      "lines": 586,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/src/abi/Layout.idr",
+      "lines": 180,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/src/abi/Foreign.idr",
+      "lines": 219,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/src/glyphbase_server.gleam",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/src/lithoglyph.gleam",
+      "lines": 191,
+      "unsafe_blocks": 8,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/src/lithoglyph/client.gleam",
+      "lines": 219,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/src/lithoglyph/nif_ffi.gleam",
+      "lines": 48,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/native/src/lithoglyph_nif.zig",
+      "lines": 524,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/ffi/zig/src/main.zig",
+      "lines": 488,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/ffi/zig/.zig-cache/o/676b01dcffc264e409580d71ef4d5260/cimport.zig",
+      "lines": 2625,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/api/Client.res",
+      "lines": 150,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/api/Client.res.js",
+      "lines": 142,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/components/Grid.res",
+      "lines": 693,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/views/CalendarStore.res",
+      "lines": 160,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/views/GalleryStore.res",
+      "lines": 192,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/views/FormStore.res",
+      "lines": 237,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/views/GalleryStore.res.js",
+      "lines": 236,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/views/CalendarStore.res.js",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/views/FormStore.res.js",
+      "lines": 379,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/stores/KanbanStore.res",
+      "lines": 47,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/stores/CollaborationStore.res",
+      "lines": 196,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/stores/CommentsStore.res",
+      "lines": 123,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/stores/KanbanStore.res.js",
+      "lines": 36,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/bindings/Fetch.res",
+      "lines": 14,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/bindings/Webapi.res",
+      "lines": 30,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/src/lib/SafeDOM.res",
+      "lines": 215,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/views/GalleryStore.res",
+      "lines": 192,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/views/GalleryStore.res.js",
+      "lines": 236,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/views/FormStore.res",
+      "lines": 237,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/views/FormStore.res.js",
+      "lines": 379,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/views/CalendarStore.res",
+      "lines": 160,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/views/CalendarStore.res.js",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/components/Grid.res",
+      "lines": 693,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/stores/CommentsStore.res",
+      "lines": 123,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/stores/KanbanStore.res",
+      "lines": 47,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/stores/KanbanStore.res.js",
+      "lines": 36,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/stores/CollaborationStore.res",
+      "lines": 196,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/bindings/Webapi.res",
+      "lines": 30,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/bindings/Fetch.res",
+      "lines": 14,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/lib/SafeDOM.res",
+      "lines": 215,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/api/Client.res",
+      "lines": 150,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/bs/src/api/Client.res.js",
+      "lines": 142,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/ocaml/Webapi.res",
+      "lines": 30,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/ocaml/CommentsStore.res",
+      "lines": 123,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/ocaml/Fetch.res",
+      "lines": 14,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/ocaml/SafeDOM.res",
+      "lines": 215,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/ocaml/Client.res",
+      "lines": 150,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/ocaml/GalleryStore.res",
+      "lines": 192,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/ocaml/FormStore.res",
+      "lines": 237,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/ocaml/KanbanStore.res",
+      "lines": 47,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/ocaml/CalendarStore.res",
+      "lines": 160,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/ocaml/CollaborationStore.res",
+      "lines": 196,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/lib/ocaml/Grid.res",
+      "lines": 693,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ui/dist/assets/index-ZOVpEuRb.js",
+      "lines": 40,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "network",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "ui/src/views/CalendarStore.res",
+        "to": "ui/src/views/GalleryStore.res",
+        "relation": "shared_dir:ui/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/src/views/GalleryStore.res",
+        "to": "ui/src/views/FormStore.res",
+        "relation": "shared_dir:ui/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/src/views/FormStore.res",
+        "to": "ui/src/views/GalleryStore.res.js",
+        "relation": "shared_dir:ui/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/src/views/GalleryStore.res.js",
+        "to": "ui/src/views/CalendarStore.res.js",
+        "relation": "shared_dir:ui/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/src/views/CalendarStore.res.js",
+        "to": "ui/src/views/FormStore.res.js",
+        "relation": "shared_dir:ui/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/src/api/Client.res",
+        "to": "ui/src/api/Client.res.js",
+        "relation": "shared_dir:ui/src/api",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/router.gleam",
+        "to": "server/src/glyphbase_server.gleam",
+        "relation": "shared_dir:server/src",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/glyphbase_server.gleam",
+        "to": "server/src/lithoglyph.gleam",
+        "relation": "shared_dir:server/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/ocaml/Webapi.res",
+        "to": "ui/lib/ocaml/CommentsStore.res",
+        "relation": "shared_dir:ui/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/ocaml/CommentsStore.res",
+        "to": "ui/lib/ocaml/Fetch.res",
+        "relation": "shared_dir:ui/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/ocaml/Fetch.res",
+        "to": "ui/lib/ocaml/SafeDOM.res",
+        "relation": "shared_dir:ui/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/ocaml/SafeDOM.res",
+        "to": "ui/lib/ocaml/Client.res",
+        "relation": "shared_dir:ui/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/ocaml/Client.res",
+        "to": "ui/lib/ocaml/GalleryStore.res",
+        "relation": "shared_dir:ui/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/ocaml/GalleryStore.res",
+        "to": "ui/lib/ocaml/FormStore.res",
+        "relation": "shared_dir:ui/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/ocaml/FormStore.res",
+        "to": "ui/lib/ocaml/KanbanStore.res",
+        "relation": "shared_dir:ui/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/ocaml/KanbanStore.res",
+        "to": "ui/lib/ocaml/CalendarStore.res",
+        "relation": "shared_dir:ui/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/ocaml/CalendarStore.res",
+        "to": "ui/lib/ocaml/CollaborationStore.res",
+        "relation": "shared_dir:ui/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/ocaml/CollaborationStore.res",
+        "to": "ui/lib/ocaml/Grid.res",
+        "relation": "shared_dir:ui/lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/bs/src/stores/CommentsStore.res",
+        "to": "ui/lib/bs/src/stores/KanbanStore.res",
+        "relation": "shared_dir:ui/lib/bs/src/stores",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/bs/src/stores/KanbanStore.res",
+        "to": "ui/lib/bs/src/stores/KanbanStore.res.js",
+        "relation": "shared_dir:ui/lib/bs/src/stores",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/bs/src/stores/KanbanStore.res.js",
+        "to": "ui/lib/bs/src/stores/CollaborationStore.res",
+        "relation": "shared_dir:ui/lib/bs/src/stores",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/src/stores/KanbanStore.res",
+        "to": "ui/src/stores/CollaborationStore.res",
+        "relation": "shared_dir:ui/src/stores",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/src/stores/CollaborationStore.res",
+        "to": "ui/src/stores/CommentsStore.res",
+        "relation": "shared_dir:ui/src/stores",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/src/stores/CommentsStore.res",
+        "to": "ui/src/stores/KanbanStore.res.js",
+        "relation": "shared_dir:ui/src/stores",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/bs/src/bindings/Webapi.res",
+        "to": "ui/lib/bs/src/bindings/Fetch.res",
+        "relation": "shared_dir:ui/lib/bs/src/bindings",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/bs/src/api/Client.res",
+        "to": "ui/lib/bs/src/api/Client.res.js",
+        "relation": "shared_dir:ui/lib/bs/src/api",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/src/bindings/Fetch.res",
+        "to": "ui/src/bindings/Webapi.res",
+        "relation": "shared_dir:ui/src/bindings",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/abi/Layout.idr",
+        "to": "server/src/abi/Foreign.idr",
+        "relation": "shared_dir:server/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/lithoglyph/client.gleam",
+        "to": "server/src/lithoglyph/nif_ffi.gleam",
+        "relation": "shared_dir:server/src/lithoglyph",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/bs/src/views/GalleryStore.res",
+        "to": "ui/lib/bs/src/views/GalleryStore.res.js",
+        "relation": "shared_dir:ui/lib/bs/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/bs/src/views/GalleryStore.res.js",
+        "to": "ui/lib/bs/src/views/FormStore.res",
+        "relation": "shared_dir:ui/lib/bs/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/bs/src/views/FormStore.res",
+        "to": "ui/lib/bs/src/views/FormStore.res.js",
+        "relation": "shared_dir:ui/lib/bs/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/bs/src/views/FormStore.res.js",
+        "to": "ui/lib/bs/src/views/CalendarStore.res",
+        "relation": "shared_dir:ui/lib/bs/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "ui/lib/bs/src/views/CalendarStore.res",
+        "to": "ui/lib/bs/src/views/CalendarStore.res.js",
+        "relation": "shared_dir:ui/lib/bs/src/views",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "ui/src/lib/SafeDOM.res.js",
+          "ui/lib/bs/src/lib/SafeDOM.res.js",
+          "ui/dist/assets/index-ZOVpEuRb.js",
+          "ui/dist/assets/index-ZOVpEuRb.js"
+        ],
+        "frameworks": [],
+        "relation": "DynamicCodeExecution->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/rebrand-to-lithoglyph.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "ui/src/components/Grid.res",
+          "ui/src/lib/SafeDOM.res",
+          "ui/lib/bs/src/components/Grid.res",
+          "ui/lib/bs/src/lib/SafeDOM.res",
+          "ui/lib/ocaml/SafeDOM.res",
+          "ui/lib/ocaml/Grid.res"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          "server/ffi/zig/src/main.zig"
+        ],
+        "frameworks": [],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "server/src/abi/Layout.idr",
+          "server/native/src/lithoglyph_nif.zig",
+          "server/ffi/zig/src/main.zig"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "UnsafeFFI",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "server/src/lithoglyph.gleam",
+          "server/src/lithoglyph/nif_ffi.gleam"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeFFI->Memory"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "ui/dist/assets/index-ZOVpEuRb.js"
+        ],
+        "frameworks": [],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "ui/dist/assets/index-ZOVpEuRb.js"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Network"
+      }
+    ]
+  }
+}

@@ -1,0 +1,559 @@
+{
+  "program_path": ".",
+  "language": "shell",
+  "frameworks": [
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "scripts/apply-common-files.sh",
+      "severity": "Medium",
+      "description": "97 potentially unquoted variable expansions in scripts/apply-common-files.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/apply-justfiles.sh",
+      "severity": "Medium",
+      "description": "37 potentially unquoted variable expansions in scripts/apply-justfiles.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/bulk-standardize.sh",
+      "severity": "Medium",
+      "description": "47 potentially unquoted variable expansions in scripts/bulk-standardize.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/bulk-standardize.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/bulk-standardize.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/deploy-templates.sh",
+      "severity": "Medium",
+      "description": "29 potentially unquoted variable expansions in scripts/deploy-templates.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/generate-badges.sh",
+      "severity": "Medium",
+      "description": "24 potentially unquoted variable expansions in scripts/generate-badges.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/github-bulk-settings.sh",
+      "severity": "Medium",
+      "description": "29 potentially unquoted variable expansions in scripts/github-bulk-settings.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/mass-apply-templates.sh",
+      "severity": "Critical",
+      "description": "eval usage in scripts/mass-apply-templates.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/mass-apply-templates.sh",
+      "severity": "Medium",
+      "description": "130 potentially unquoted variable expansions in scripts/mass-apply-templates.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/reconcile-wharf-repos.sh",
+      "severity": "Medium",
+      "description": "32 potentially unquoted variable expansions in scripts/reconcile-wharf-repos.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/contract/src/lib.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in src/contract/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "src/contract/src/lib.rs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in src/contract/src/lib.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/main.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in src/main.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/oracle/src/lib.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in src/oracle/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "src/oracle/src/lib.rs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in src/oracle/src/lib.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "templates/rsr-metadata.ncl",
+      "severity": "Medium",
+      "description": "3 HTTP (non-HTTPS) URLs in templates/rsr-metadata.ncl",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 9045,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 26,
+    "allocation_sites": 33,
+    "io_operations": 47,
+    "threading_constructs": 3
+  },
+  "file_statistics": [
+    {
+      "file_path": "config/policy.ncl",
+      "lines": 121,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "nix/flake.nix",
+      "lines": 50,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/apply-common-files.sh",
+      "lines": 227,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/apply-justfiles.sh",
+      "lines": 404,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/mass-apply-templates.sh",
+      "lines": 491,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/reconcile-wharf-repos.sh",
+      "lines": 134,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/arbiter/lib/conative_gating/consensus_arbiter.ex",
+      "lines": 79,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/contract/src/lib.rs",
+      "lines": 1637,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 17,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/main.rs",
+      "lines": 1724,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 8,
+      "io_operations": 13,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/oracle/src/lib.rs",
+      "lines": 737,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 7,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/slm/src/lib.rs",
+      "lines": 80,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk",
+    "network",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "scripts/apply-common-files.sh",
+        "to": "scripts/apply-justfiles.sh",
+        "relation": "shared_dir:scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/apply-justfiles.sh",
+        "to": "scripts/mass-apply-templates.sh",
+        "relation": "shared_dir:scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/mass-apply-templates.sh",
+        "to": "scripts/reconcile-wharf-repos.sh",
+        "relation": "shared_dir:scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "config/policy.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "nix/flake.nix",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/apply-common-files.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/apply-justfiles.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/mass-apply-templates.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/reconcile-wharf-repos.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/arbiter/lib/conative_gating/consensus_arbiter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/contract/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "src/oracle/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/slm/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/contract/src/lib.rs",
+          "src/main.rs",
+          "src/oracle/src/lib.rs"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "src/contract/src/lib.rs",
+          "src/main.rs",
+          "src/oracle/src/lib.rs"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "src/contract/src/lib.rs",
+          "src/oracle/src/lib.rs"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "HardcodedSecret->Network"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "templates/rsr-metadata.ncl"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "scripts/apply-common-files.sh",
+          "scripts/apply-justfiles.sh",
+          "scripts/bulk-standardize.sh",
+          "scripts/deploy-templates.sh",
+          "scripts/generate-badges.sh",
+          "scripts/github-bulk-settings.sh",
+          "scripts/mass-apply-templates.sh",
+          "scripts/mass-apply-templates.sh",
+          "scripts/reconcile-wharf-repos.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/bulk-standardize.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "scripts/mass-apply-templates.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Disk"
+      }
+    ]
+  }
+}

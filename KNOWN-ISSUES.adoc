@@ -1,0 +1,250 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+
+= Known Issues and Honest Gaps
+:toc: left
+:toclevels: 2
+:sectnums:
+
+== Overview
+
+This document lists known issues, incomplete implementations, and honest gaps in VeriSimDB as of 2026-02-13. Each entry describes the current state, why it matters, and what needs to happen to resolve it.
+
+A major 7-phase hardening effort was completed on 2026-02-13, resolving most previously-open issues. The remaining open items are documented below.
+
+VeriSimDB is a working system with real implementations in its core modality stores, but several higher-level features are stubs or partially implemented. This document does not hide behind "future work" euphemisms -- it states plainly what does not work.
+
+== Issues
+
+=== 1. Normalizer Regeneration Strategies Are Stubs — ✅ RESOLVED
+
+**Location:** `rust-core/verisim-normalizer/`
+
+**Resolved:** 2026-02-12. Regeneration strategies now inspect hexad data to select the authoritative modality and derive drifted modality content from it, rather than returning hardcoded placeholder strings. Each of the six modality strategies performs actual data transformation.
+
+**Original issue:** Every regeneration strategy returned a hardcoded `[regenerated]` placeholder string instead of actually regenerating data.
+
+=== 2. Federation Executor Always Returns Empty — ✅ RESOLVED
+
+**Location:** Elixir orchestration layer, `VeriSim.FederationExecutor`
+
+**Resolved:** 2026-02-12. Federation executor now performs parallel HTTP fanout to registered peers via reqwest, decomposes queries into per-peer sub-queries, dispatches them, and merges results. Uses `Task.async_stream` for concurrent peer dispatch with configurable timeouts.
+
+**Original issue:** The federation executor always returned `{:ok, []}` regardless of query content or number of registered peers.
+
+=== 3. Federation Resolver Peer Queries Unimplemented — ✅ RESOLVED
+
+**Location:** Elixir orchestration layer, `VeriSim.Federation.Resolver`
+
+**Resolved:** 2026-02-12. `query_peer/3` now makes real HTTP requests to peer endpoints via `Req` with configurable timeout, parses JSON responses, and returns structured results with source store attribution and response time tracking. Drift policy filtering (strict/repair/tolerate/latest) is implemented.
+
+**Original issue:** The `query_peer/3` function returned `{:error, :not_implemented}`. Peers could be registered but never contacted.
+
+=== 4. Drift Auto-Trigger Missing — ✅ RESOLVED
+
+**Location:** Elixir orchestration layer, `VeriSim.DriftMonitor`
+
+**Resolved:** 2026-02-12. `DriftMonitor.init/1` now schedules a periodic sweep via `Process.send_after` at a configurable interval (default 60s). The `:sweep` handler performs a full drift sweep including pulling aggregate metrics from the Rust core via `RustClient.drift_status/0`, then reschedules itself. The sweep interval is configurable via the `config` option passed to `start_link`.
+
+**Original issue:** Drift detection had to be triggered manually. No scheduled or event-driven trigger existed.
+
+=== 5. VQL-DT Not Connected to VQL PROOF Runtime — ✅ RESOLVED
+
+**Location:** `elixir-orchestration/lib/verisim/query/vql_type_checker.ex`, `vql_executor.ex`, `vql_bridge.ex`
+
+**Resolved:** 2026-02-28. VQL-DT proof pipeline is now fully wired end-to-end with a three-tier type checking strategy:
+
+1. **ReScript bidirectional type checker** (VQLBidir.res, 852 lines) — full formal system with subtyping, invoked via VQLBridge.typecheck/2 when Deno subprocess available
+2. **Elixir-native type checker** (VQLTypeChecker, 320 lines) — validates proof types, modality compatibility, composition rules; generates structured obligations with witness fields and circuit names. Used when ReScript subprocess unavailable.
+3. **Bare AST extraction** — last resort, no longer needed since the native checker handles all cases
+
+Additionally:
+
+- Built-in parser now splits multi-proof specs (`PROOF A(x) AND B(y)` → separate proof specs)
+- Added CONSISTENCY and FRESHNESS proof types (now 11 total: EXISTENCE, INTEGRITY, CONSISTENCY, PROVENANCE, FRESHNESS, ACCESS, CITATION, CUSTOM, ZKP, PROVEN, SANCTIFY)
+- Type checker validates modality compatibility (e.g., INTEGRITY requires semantic modality)
+- Proof obligations carry witness fields, circuit names, and time estimates to Rust endpoints
+- 34 type checker tests + 109 query tests pass
+
+**Original issue:** PROOF clauses were parsed but type checking only worked when the ReScript subprocess was running (which it typically wasn't). Queries silently fell back to unvalidated AST extraction.
+
+=== 6. ZKP / Proven Library Not Integrated
+
+**Location:** `docs/zkp-and-sanctify-integration.adoc` (design), `proven-coherence.md` (notes)
+
+**Current state:** The integration of zero-knowledge proofs via the sanctify library is documented as a consultation paper and design specification. The integration is not implemented. No ZKP circuits are generated, no proofs are created, and no verification occurs at runtime.
+
+**Impact:** Privacy-preserving proofs (where a query result can be verified without revealing the underlying data) are not available. This affects multi-tenant federation and compliance scenarios where data must remain private but provenance must be verifiable.
+
+**Resolution:** Implement sanctify integration after VQL-DT (issue 5) is resolved, since ZKP proof generation depends on the dependent type checking pipeline being functional.
+
+=== 7. ReScript Registry 60% Complete — ✅ RESOLVED
+
+**Location:** `src/registry/Registry.res`, `rescript.json`
+
+**Resolved:** 2026-02-13. All 7 previously stubbed functions now have real implementations:
+
+- `executeFederatedQuery`: HTTP fan-out to eligible peer stores with trust filtering, response mapping, and result aggregation with limit enforcement.
+- `achieveConsensus`: Quorum-based consensus with configurable mode (Strong/Quorum/Eventual), concurrent store fetch, agreement calculation.
+- `replicateHexad`: Fetches hexad from source store via HTTP, pushes to all target stores, reports per-target errors.
+- `checkReplicationStatus`: Examines mapping locations, checks store liveness against maxStoreDowntimeMs, detects trust divergence as data divergence proxy.
+- `detectByzantineFaults`: Computes median trust across stores for a hexad, flags stores deviating >0.3 from median.
+- `serializeRegistry`/`deserializeRegistry`: Full JSON serialization and deserialization of registry state (stores, mappings, config).
+
+Added `rescript.json` for build configuration.
+
+=== 8. `debugger/Cargo.toml` Had Wrong Author
+
+**Location:** `debugger/Cargo.toml`
+
+**Current state:** Fixed. The `debugger/Cargo.toml` previously listed an incorrect author. It now correctly reads `authors = ["Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"]`.
+
+**Impact:** None (resolved). Documented here for audit trail completeness.
+
+=== 9. HNSW Implementation Is Real
+
+**Location:** `rust-core/verisim-vector/src/hnsw.rs`
+
+**Current state:** The HNSW (Hierarchical Navigable Small World) implementation in `verisim-vector` is a genuine, functional implementation at approximately 670 lines of Rust. A previous audit incorrectly claimed this was brute-force search. This is **not** an issue -- it is a correction of a previous mischaracterization.
+
+**Impact:** None (this is a positive clarification). The vector modality store uses a real approximate nearest-neighbor algorithm, not a naive linear scan.
+
+**Note:** This entry exists to prevent future audits from repeating the same incorrect claim.
+
+=== 10. verisim-api Needs Bin Target Fix — ✅ RESOLVED
+
+**Location:** `rust-core/verisim-api/Cargo.toml`
+
+**Resolved:** 2026-02-12. `src/main.rs` now exists with a `main()` function that reads host/port from environment variables (`VERISIM_HOST`/`VERISIM_PORT`) and initializes the HTTP server. `cargo run -p verisim-api` works.
+
+**Original issue:** The crate was missing a `src/main.rs` entry point and could not be run as a standalone binary.
+
+=== 11. No Performance Baselines Established — ✅ RESOLVED
+
+**Location:** `benches/modality_benchmarks.rs`
+
+**Resolved:** 2026-02-13. Criterion benchmarks now cover all 6 modality stores plus cross-modal and drift operations:
+
+- **Document:** create_document, search_text (Tantivy full-text, 1000-doc corpus)
+- **Vector:** insert (128/384/768 dims), search (10k vectors, HNSW)
+- **Graph:** add_node, add_edge (Oxigraph)
+- **Tensor:** store_create_64x64, store_get, reduce_sum_axis0 (ndarray)
+- **Semantic:** register_type, get_type, proof_create_cbor, proof_verify (CBOR + ZKP verification)
+- **Temporal:** version_create, version_get_by_number, version_get_latest, history_10, history_100
+- **Hexad:** create_hexad, get_hexad (unified entity)
+- **Drift:** calculate_drift (semantic vector drift)
+- **Cross-modal:** vector_similarity_search, fulltext_search (1000 multi-modal hexads)
+
+**Original issue:** Only document, vector, graph, hexad, drift, and cross-modal benchmarks existed. Tensor, semantic, and temporal stores had zero benchmarks.
+
+=== 12. Cross-Modal Drift/Consistency Were Stubs — ✅ RESOLVED
+
+**Location:** `elixir-orchestration/lib/verisim/query/vql_executor.ex`
+
+**Resolved:** 2026-02-13. `compute_modality_drift/3` now fetches drift from the Rust drift API when available, falling back to cosine distance between extracted modality embeddings (with content fingerprinting for non-vector modalities). `compute_consistency/4` now computes real scores using the specified metric (COSINE, EUCLIDEAN, DOT_PRODUCT, JACCARD). Both functions previously returned hardcoded constants (0.0 and 0.5).
+
+**Original issue:** Cross-modal correlation queries parsed correctly but evaluation returned fake scores, making WHERE DRIFT(...) and CONSISTENT(...) conditions meaningless.
+
+=== 13. VQL WHERE Condition Routing Was Broken — ✅ RESOLVED
+
+**Location:** `elixir-orchestration/lib/verisim/query/vql_executor.ex`
+
+**Resolved:** 2026-02-13. `has_fulltext_condition?/1`, `has_vector_condition?/1`, and `has_graph_pattern?/1` now walk the AST recursively to detect actual condition types. `extract_text_query/1`, `extract_vector_query/1`, and `extract_graph_query/1` now parse actual values from the AST instead of returning hardcoded placeholders. All queries were previously routed to `:multi` type regardless of conditions.
+
+**Original issue:** All six condition detection and extraction functions were stubs (returning `false` and hardcoded values), causing every query to be routed as a multi-modal query even when a single modality was targeted.
+
+=== 14. Proof Verification Was No-Op — ✅ RESOLVED
+
+**Location:** `elixir-orchestration/lib/verisim/query/vql_executor.ex`
+
+**Resolved:** 2026-02-13. `verify_single_proof/1` now validates proof type, extracts contract names, and checks contract existence against the semantic store. It properly rejects queries with invalid or missing contracts for CITATION, INTEGRITY, and CUSTOM proof types. Previously it always returned `:ok`.
+
+**Original issue:** PROOF clauses in VQL queries were parsed but never verified. All proofs silently passed, making the entire proof system decorative.
+
+=== 15. believe_me in Idris2 ABI Files — ✅ RESOLVED
+
+**Location:** `src/abi/Foreign.idr`, `debugger/src/abi/Foreign.idr`, `practice-mirror/src/abi/Foreign.idr`
+
+**Resolved:** 2026-02-13. FFI declarations changed from `Bits64 -> AnyPtr -> PrimIO Bits32` to `Bits64 -> (Bits64 -> Bits32 -> Bits32) -> PrimIO Bits32`, making the callback type match the declaration and eliminating the need for `believe_me` casts. Zero `believe_me` calls remain in the codebase.
+
+**Original issue:** `registerCallback` used `believe_me` to cast a callback function to `AnyPtr`, a BANNED unsafe pattern that bypasses the type checker.
+
+=== 16. Atom Table Exhaustion Risk in VQL Bridge — ✅ RESOLVED
+
+**Location:** `elixir-orchestration/lib/verisim/query/vql_bridge.ex`
+
+**Resolved:** 2026-02-13. All 8 `String.to_atom` calls replaced with `safe_to_atom/1` helper that uses an explicit allowlist map for the known atom values (6 modalities + 5 aggregate functions + `all`), falling back to `String.to_existing_atom/1`.
+
+**Original issue:** 8 `String.to_atom` calls could theoretically exhaust the BEAM atom table if fed arbitrary input, since the BEAM atom table is finite and atoms are never garbage collected.
+
+=== 17. No ETS Caching in RustClient — ✅ RESOLVED
+
+**Location:** `elixir-orchestration/lib/verisim/rust_client.ex`
+
+**Resolved:** 2026-02-13. Added ETS-based read-through cache with configurable TTL (30s default for hexads, 10s for drift scores). Cache is invalidated on writes (update/delete). Provides `init_cache/0`, `clear_cache/0`, and `invalidate_cache/1` for cache management.
+
+**Original issue:** Every RustClient call made a fresh HTTP request to the Rust core, with no caching. Repeated reads of the same hexad in a query pipeline (e.g., cross-modal evaluation fetching the same entity multiple times) each incurred full HTTP round-trip latency.
+
+=== 18. EXPLAIN Returns Hardcoded Plan — ✅ RESOLVED
+
+**Location:** `elixir-orchestration/lib/verisim/query/vql_executor.ex`
+
+**Resolved:** 2026-02-13. `generate_explain_plan/1` now analyzes the actual query AST to produce cost estimates based on source type, modality count, WHERE clause complexity, cross-modal conditions, GROUP BY presence, and proof obligations. Delegates to the Rust verisim-planner API when available, with local estimation as fallback.
+
+**Original issue:** EXPLAIN returned a static plan with hardcoded step names and costs totalling 71ms, regardless of the actual query structure.
+
+=== 19. VQL Executor Federation Stub — ✅ RESOLVED
+
+**Location:** `elixir-orchestration/lib/verisim/query/vql_executor.ex`, `rust-core/verisim-api/src/federation.rs`
+
+**Resolved:** 2026-02-13. Added `GET /hexads` list endpoint with `?limit=N&offset=M` pagination to the Rust API. The `HexadStore` trait now includes a `list(limit, offset)` method. Federation `query_single_peer()` now falls back to the `/hexads` list endpoint when neither text_query nor vector_query is provided, so bare `SELECT * FROM FEDERATION /pattern/*` returns actual hexad data instead of empty results.
+
+=== 20. Custom Circuit Hardcoding — ✅ RESOLVED
+
+**Location:** `rust-core/verisim-semantic/src/circuit_registry.rs`, `circuit_compiler.rs`, `verification_keys.rs`, `src/vql/VQLCircuit.res`
+
+**Resolved:** 2026-02-13. Full custom circuit infrastructure implemented:
+
+- Circuit Registry: named circuit storage with register/get/verify/list/unregister operations
+- Circuit Compiler: DSL gates (AND, OR, XOR, NOT, LinearCombination) compiled to R1CS constraints
+- Verification Key Store: per-circuit keys with rotation support and federation export/import
+- VQL Circuit DSL: ReScript types for circuit definition with `PROOF CUSTOM "name" WITH (param=value)`
+- 25 semantic tests pass covering circuit operations
+
+**Original issue:** The `CUSTOM` proof type used a hardcoded circuit configuration with no DSL, compiler, or registry.
+
+=== 21. VQL-DT Not Connected to VQL PROOF Runtime — ✅ RESOLVED
+
+**Location:** `elixir-orchestration/lib/verisim/query/vql_type_checker.ex`
+
+**Resolved:** 2026-02-28. Superseded by issue #5 resolution. The VQL-DT pipeline is now wired with an Elixir-native type checker that validates proof types, modality compatibility, and composition rules without requiring the ReScript subprocess or a Lean checker. The Lean formal verification path remains aspirational (no Lean files were ever created); the practical implementation uses the ReScript bidirectional type checker (852 lines) backed by an Elixir fallback (320 lines).
+
+**Note:** Formal verification via Lean/Idris2 would be a future enhancement for mathematical proof certificates. The current system provides structural type checking and real cryptographic proofs (SHA-256 commitments, Merkle proofs, R1CS circuit verification) via the Rust ZKP bridge.
+
+=== 22. proven Library Not Integrated — ✅ RESOLVED
+
+**Location:** `rust-core/verisim-semantic/src/proven_bridge.rs`
+
+**Resolved:** 2026-02-13. Created `proven_bridge.rs` (277 LOC) that parses JSON/CBOR proof certificates from the proven library, verifies signatures, and converts certificates to ProofBlob format for storage in the semantic modality. VQL executor routes `PROOF PROVEN(...)` queries through the bridge. Integration is certificate-based (JSON exchange) rather than direct Idris2 FFI.
+
+=== 23. verisim-repl Has Build Issues — ✅ RESOLVED
+
+**Location:** `rust-core/verisim-repl/`
+
+**Resolved:** 2026-02-13. REPL builds and all 67 tests pass. Fixed by a previous session that resolved rustyline API incompatibilities. Also added `rustls` dependency with ring crypto provider installation for TLS-free HTTP client.
+
+=== 24. oxrocksdb-sys C++ Dependency — ✅ RESOLVED
+
+**Location:** `rust-core/verisim-graph/`
+
+**Resolved:** 2026-02-28. Oxigraph was already feature-flagged as optional (`oxigraph-backend`, off by default) in Phase 6. A pure-Rust persistent graph backend using **redb** (B-tree, ACID, single-file) was added as `redb-backend` feature in verisim-graph. The default graph store is `SimpleGraphStore` (in-memory, zero C/C++ deps). The Containerfile no longer references clang-19 or any C++ toolchain.
+
+**Original issue:** Oxigraph 0.4 unconditionally pulled in `oxrocksdb-sys` (~400K lines of C++), requiring clang-19 and adding ~1GB + ~15 min to container builds.
+
+=== 25. protoc Binary Required at Build Time — ✅ RESOLVED
+
+**Location:** `rust-core/verisim-api/src/proto/verisim.rs`
+
+**Resolved:** 2026-02-28. Protobuf code is now pre-generated and committed at `src/proto/verisim.rs`. The `build.rs` is a no-op. The `prost-build`/`tonic-build` build-dependencies were removed. The Containerfile no longer installs protoc.
+
+**Original issue:** `prost-build` shelled out to the `protoc` binary to compile `verisim.proto`. To regenerate after changing the proto, install protoc and run: `protoc --prost_out=src/proto proto/verisim.proto`.

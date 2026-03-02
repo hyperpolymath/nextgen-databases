@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+[package]
+name = "verisimdb-client"
+version = "0.1.0"
+edition = "2021"
+authors = ["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]
+license = "PMPL-1.0-or-later"
+description = "VeriSimDB client SDK for Rust — octad entity management, drift detection, and federation"
+repository = "https://gitlab.com/hyperpolymath/verisimdb"
+
+[dependencies]
+reqwest = { version = "0.12", features = ["json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+thiserror = "2"
+url = "2"
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+[dev-dependencies]
+tokio-test = "0.4"

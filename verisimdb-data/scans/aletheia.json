@@ -1,0 +1,366 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "benches/verification_benchmark.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in benches/verification_benchmark.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "extraction/rhodibot/tests/integration_tests.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in extraction/rhodibot/tests/integration_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/create-template.sh",
+      "severity": "Medium",
+      "description": "55 potentially unquoted variable expansions in scripts/create-template.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/output.rs",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in src/output.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/integration_tests.rs",
+      "severity": "Medium",
+      "description": "47 unwrap/expect calls in tests/integration_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 9790,
+    "unsafe_blocks": 13,
+    "panic_sites": 4,
+    "unwrap_calls": 69,
+    "allocation_sites": 20,
+    "io_operations": 36,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "benches/verification_benchmark.rs",
+      "lines": 255,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/simple_verification.rs",
+      "lines": 44,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "extraction/rhodibot/src/bot.rs",
+      "lines": 347,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "extraction/rhodibot/src/lib.rs",
+      "lines": 1053,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "extraction/rhodibot/src/main.rs",
+      "lines": 902,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "extraction/rhodibot/tests/integration_tests.rs",
+      "lines": 139,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "extraction/rhodium-pipeline/src/lib.rs",
+      "lines": 561,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "flake.nix",
+      "lines": 114,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/create-template.sh",
+      "lines": 571,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 25,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/main.rs",
+      "lines": 301,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 232,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/types.rs",
+      "lines": 163,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/checks.rs",
+      "lines": 651,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/config.rs",
+      "lines": 311,
+      "unsafe_blocks": 0,
+      "panic_sites": 4,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/output.rs",
+      "lines": 718,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/integration_tests.rs",
+      "lines": 823,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 47,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "network",
+    "disk",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "src/types.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types.rs",
+        "to": "src/checks.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/checks.rs",
+        "to": "src/config.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/config.rs",
+        "to": "src/output.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "extraction/rhodibot/src/bot.rs",
+        "to": "extraction/rhodibot/src/lib.rs",
+        "relation": "shared_dir:extraction/rhodibot/src",
+        "weight": 1.0
+      },
+      {
+        "from": "extraction/rhodibot/src/lib.rs",
+        "to": "extraction/rhodibot/src/main.rs",
+        "relation": "shared_dir:extraction/rhodibot/src",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "src/output.rs"
+        ],
+        "frameworks": [],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/create-template.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "benches/verification_benchmark.rs",
+          "extraction/rhodibot/tests/integration_tests.rs",
+          "tests/integration_tests.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "benches/verification_benchmark.rs",
+          "extraction/rhodibot/tests/integration_tests.rs",
+          "tests/integration_tests.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Disk"
+      }
+    ]
+  }
+}

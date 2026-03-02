@@ -1,0 +1,100 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# VeriSimDB Test Infrastructure — ClickHouse Server
+#
+# Builds ClickHouse server on Chainguard wolfi-base. Used for columnar
+# analytics federation — aggregate drift queries, modality statistics,
+# and cross-entity analytics.
+#
+# Provides:
+#   - HTTP interface on port 8123 (queries, health)
+#   - Native TCP interface on port 9000 (client connections)
+#
+# Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+
+# ---------------------------------------------------------------------------
+# Stage 1: Download ClickHouse static binary
+# ---------------------------------------------------------------------------
+FROM cgr.dev/chainguard/wolfi-base:latest AS builder
+
+RUN apk add --no-cache \
+    curl \
+    tar
+
+# ClickHouse distributes static binaries — no build needed
+ARG CLICKHOUSE_VERSION=24.12.3.47
+RUN curl -fsSL \
+    "https://packages.clickhouse.com/tgz/stable/clickhouse-common-static-${CLICKHOUSE_VERSION}-amd64.tgz" \
+    | tar xz -C /tmp \
+    && install -m 0755 /tmp/clickhouse-common-static-${CLICKHOUSE_VERSION}/usr/bin/clickhouse /usr/local/bin/clickhouse
+
+# ---------------------------------------------------------------------------
+# Stage 2: Runtime image
+# ---------------------------------------------------------------------------
+FROM cgr.dev/chainguard/wolfi-base:latest
+
+RUN apk add --no-cache \
+    libstdc++ \
+    curl
+
+# Copy ClickHouse binary
+COPY --from=builder /usr/local/bin/clickhouse /usr/bin/clickhouse
+
+# Symlinks for server/client/local sub-commands
+RUN ln -s /usr/bin/clickhouse /usr/bin/clickhouse-server \
+    && ln -s /usr/bin/clickhouse /usr/bin/clickhouse-client \
+    && ln -s /usr/bin/clickhouse /usr/bin/clickhouse-local
+
+# Create non-root user
+RUN addgroup -g 1000 clickhouse \
+    && adduser -u 1000 -G clickhouse -D -h /var/lib/clickhouse clickhouse
+
+# Create directories
+RUN mkdir -p \
+    /var/lib/clickhouse \
+    /var/log/clickhouse-server \
+    /etc/clickhouse-server/config.d \
+    /etc/clickhouse-server/users.d \
+    && chown -R clickhouse:clickhouse \
+    /var/lib/clickhouse \
+    /var/log/clickhouse-server \
+    /etc/clickhouse-server
+
+# Minimal server config for testing
+RUN printf '%s\n' \
+    '<clickhouse>' \
+    '  <logger>' \
+    '    <level>information</level>' \
+    '    <console>1</console>' \
+    '  </logger>' \
+    '  <http_port>8123</http_port>' \
+    '  <tcp_port>9000</tcp_port>' \
+    '  <listen_host>0.0.0.0</listen_host>' \
+    '  <path>/var/lib/clickhouse/</path>' \
+    '  <tmp_path>/var/lib/clickhouse/tmp/</tmp_path>' \
+    '  <access_control_path>/var/lib/clickhouse/access/</access_control_path>' \
+    '  <mark_cache_size>5368709120</mark_cache_size>' \
+    '  <max_concurrent_queries>100</max_concurrent_queries>' \
+    '</clickhouse>' \
+    > /etc/clickhouse-server/config.xml
+
+# Allow default user full access for testing
+RUN printf '%s\n' \
+    '<clickhouse>' \
+    '  <users>' \
+    '    <default>' \
+    '      <access_management>1</access_management>' \
+    '    </default>' \
+    '  </users>' \
+    '</clickhouse>' \
+    > /etc/clickhouse-server/users.d/test-access.xml
+
+USER clickhouse
+WORKDIR /var/lib/clickhouse
+
+EXPOSE 8123 9000
+
+HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=15s \
+    CMD curl -sf http://localhost:8123/ping || exit 1
+
+ENTRYPOINT ["clickhouse-server", "--config-file=/etc/clickhouse-server/config.xml"]

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://verisim.db/schema/drift-score.json",
+  "$comment": "SPDX-License-Identifier: PMPL-1.0-or-later",
+  "title": "DriftScore",
+  "description": "Drift measurement for a single hexad entity. Drift quantifies the divergence between an entity's modality representations -- when modalities fall out of sync (e.g. the vector embedding no longer matches the document content), the drift score increases. Scores are per-modality and aggregated into an overall score.",
+  "type": "object",
+  "required": ["entity_id", "overall_score", "modality_scores", "last_checked", "needs_normalization"],
+  "properties": {
+    "entity_id": {
+      "type": "string",
+      "description": "Hexad entity identifier for which drift was measured."
+    },
+    "overall_score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Aggregated drift score across all modalities, normalised to [0.0, 1.0]. 0.0 means perfect cross-modal consistency; 1.0 means complete divergence."
+    },
+    "modality_scores": {
+      "type": "object",
+      "description": "Per-modality drift scores. Each key is a modality name; each value is the drift score for that modality pair comparison.",
+      "properties": {
+        "graph": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Drift score for graph-vs-other modality consistency."
+        },
+        "vector": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Drift score for vector-vs-semantic (semantic_vector_drift)."
+        },
+        "tensor": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Drift score for tensor representation divergence."
+        },
+        "semantic": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Drift score for semantic annotation consistency."
+        },
+        "document": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Drift score for document-vs-graph (graph_document_drift)."
+        },
+        "temporal": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Drift score for temporal version consistency."
+        },
+        "provenance": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Drift score for provenance chain integrity."
+        },
+        "spatial": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Drift score for spatial-vs-document/graph location consistency."
+        }
+      },
+      "required": ["graph", "vector", "tensor", "semantic", "document", "temporal", "provenance", "spatial"],
+      "additionalProperties": false
+    },
+    "last_checked": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when this drift measurement was last performed."
+    },
+    "needs_normalization": {
+      "type": "boolean",
+      "description": "Whether the entity's drift score exceeds the configured threshold and requires normalisation. When true, the normaliser should be triggered to repair cross-modal consistency."
+    }
+  },
+  "additionalProperties": false
+}

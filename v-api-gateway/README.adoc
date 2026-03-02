@@ -1,0 +1,149 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)
+
+= VeriSimDB V API Gateway
+:author: Jonathan D.A. Jewell
+:email: j.d.a.jewell@open.ac.uk
+:revdate: 2026-02-28
+:toc:
+:icons: font
+
+== Overview
+
+A V-language API gateway for VeriSimDB, providing REST, gRPC, and GraphQL
+interfaces. Built using the patterns from the
+https://github.com/hyperpolymath/developer-ecosystem[v-ecosystem]
+`v-api-interfaces` library.
+
+The gateway proxies to:
+
+* **Rust core** (port 8080) — data operations (hexads, search, drift, provenance)
+* **Elixir orchestration** (port 4080) — telemetry, status, consensus
+
+== Architecture
+
+[source,text]
+----
+        Clients (PanLL, CLI, web, external)
+                    │
+           ┌────────┴────────┐
+           │  V API Gateway  │
+           │  port 9090      │
+           │                 │
+           │  ├─ REST   /api/v1/*
+           │  ├─ gRPC   :9091
+           │  └─ GraphQL /graphql
+           └────────┬────────┘
+                    │
+         ┌──────────┼──────────┐
+         ▼          ▼          ▼
+    Rust Core   Elixir Orch   (future)
+    :8080       :4080
+----
+
+== Endpoints
+
+=== REST (`/api/v1/`)
+
+[cols="1,2,3"]
+|===
+| Method | Path | Description
+
+| GET | `/api/v1/health` | Combined health (gateway + Rust + Elixir)
+| GET | `/api/v1/hexads` | List hexad entities
+| GET | `/api/v1/hexads/:id` | Get single hexad
+| POST | `/api/v1/hexads` | Create hexad
+| POST | `/api/v1/vql/execute` | Execute VQL query
+| GET | `/api/v1/drift/entity/:id` | Get drift metrics
+| GET | `/api/v1/telemetry` | Product telemetry (from Elixir)
+| GET | `/api/v1/status` | Orchestration status
+|===
+
+=== GraphQL (`/graphql`)
+
+[source,graphql]
+----
+type Query {
+  hexad(id: ID!): Hexad
+  hexads(limit: Int, offset: Int): [Hexad!]!
+  driftScore(entityId: ID!): DriftScore
+  telemetry: TelemetryReport
+  health: HealthStatus
+}
+
+type Mutation {
+  createHexad(input: HexadInput!): Hexad
+  executeVql(query: String!): VqlResult
+}
+----
+
+=== gRPC (port 50051 — direct to Rust core)
+
+NOTE: gRPC is served **directly by the Rust core** (via tonic on port 50051),
+not proxied through the V gateway. The V gateway cannot proxy HTTP/2 frames
+due to V's HTTP library limitations. Clients should connect to the Rust core
+gRPC endpoint directly.
+
+Defined in `proto/verisimdb.proto`. Services:
+
+* `VeriSimService.Health` — health check
+* `VeriSimService.Query` — execute VQL
+* `VeriSimService.GetHexad` — fetch hexad
+* `VeriSimService.GetDrift` — drift metrics
+
+==== gRPC client examples (grpcurl)
+
+[source,bash]
+----
+# Health check
+grpcurl -plaintext localhost:50051 verisimdb.VeriSimService/Health
+
+# Execute a VQL query
+grpcurl -plaintext -d '{"query": "SELECT * FROM hexads LIMIT 10"}' \
+  localhost:50051 verisimdb.VeriSimService/Query
+
+# Get a specific hexad
+grpcurl -plaintext -d '{"id": "entity-001"}' \
+  localhost:50051 verisimdb.VeriSimService/GetHexad
+
+# Get drift metrics for an entity
+grpcurl -plaintext -d '{"entity_id": "entity-001"}' \
+  localhost:50051 verisimdb.VeriSimService/GetDrift
+
+# List available services
+grpcurl -plaintext localhost:50051 list
+
+# Describe a service
+grpcurl -plaintext localhost:50051 describe verisimdb.VeriSimService
+----
+
+== Configuration
+
+[cols="1,2,1"]
+|===
+| Env Var | Description | Default
+
+| `VERISIM_GATEWAY_PORT` | REST/GraphQL port | 9090
+| `VERISIM_GRPC_PORT` | gRPC port | 9091
+| `VERISIM_RUST_URL` | Rust core URL | `http://localhost:8080/api/v1`
+| `VERISIM_ORCH_URL` | Elixir orchestration URL | `http://localhost:4080`
+|===
+
+== Build
+
+[source,bash]
+----
+cd v-api-gateway
+v run src/main.v
+----
+
+== Relationship to v-ecosystem
+
+This gateway uses the patterns established in `developer-ecosystem/v-ecosystem/v-api-interfaces/`:
+
+* REST server pattern from `v-rest`
+* gRPC server pattern from `v-grpc`
+* GraphQL server pattern from `v-graphql`
+* Unified ApiSuite from `v-api-interfaces`
+
+Adapted for VeriSimDB's specific backend architecture (dual-backend: Rust core + Elixir orchestration).

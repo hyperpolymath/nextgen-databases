@@ -1,0 +1,22 @@
+{
+  "id": "recipe-dynamic-apply-to-dispatch",
+  "triangle_tier": "substitute",
+  "pattern_ids": [
+    "PA011-dynamic-apply",
+    "PA011-dynamic-apply-3"
+  ],
+  "description": "Replace Kernel.apply/3 with explicit module dispatch or behaviour callbacks to prevent arbitrary code execution",
+  "action": "refactor_pattern",
+  "match": "apply(module, function, args) or Kernel.apply/3 with dynamic module/function",
+  "replacement": "Allowlist-based dispatch map or behaviour callback with known implementations",
+  "confidence": 0.65,
+  "proven_module": "SafeDispatch",
+  "proven_modules": ["SafeDispatch"],
+  "formally_proven": false,
+  "languages": ["elixir", "erlang"],
+  "auto_fixable": false,
+  "fix_script": null,
+  "successful_fixes": 0,
+  "failed_fixes": 0,
+  "total_attempts": 0
+}
