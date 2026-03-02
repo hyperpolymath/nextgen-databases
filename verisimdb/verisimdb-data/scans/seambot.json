@@ -1,0 +1,680 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Database",
+    "Networking",
+    "Ecto"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "tests/check_register.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in tests/check_register.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/github_integration.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in tests/github_integration.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "tests/hidden_channels.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in tests/hidden_channels.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/hidden_channels.rs",
+      "severity": "Medium",
+      "description": "61 unwrap/expect calls in tests/hidden_channels.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/drift_detection.rs",
+      "severity": "Medium",
+      "description": "33 unwrap/expect calls in tests/drift_detection.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/report_formats.rs",
+      "severity": "Medium",
+      "description": "12 unwrap/expect calls in tests/report_formats.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 8304,
+    "unsafe_blocks": 2,
+    "panic_sites": 1,
+    "unwrap_calls": 136,
+    "allocation_sites": 23,
+    "io_operations": 79,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/seam.rs",
+      "lines": 316,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/checks.rs",
+      "lines": 657,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/report.rs",
+      "lines": 296,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/register.rs",
+      "lines": 277,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/github.rs",
+      "lines": 756,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/main.rs",
+      "lines": 748,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/hidden_channels.rs",
+      "lines": 816,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/forge/mod.rs",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/fleet.rs",
+      "lines": 261,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/security.rs",
+      "lines": 386,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/check_register.rs",
+      "lines": 163,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/github_integration.rs",
+      "lines": 215,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/hidden_channels.rs",
+      "lines": 373,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 61,
+      "allocation_sites": 1,
+      "io_operations": 44,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "tests/drift_detection.rs",
+      "lines": 263,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 33,
+      "allocation_sites": 0,
+      "io_operations": 17,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/report_formats.rs",
+      "lines": 281,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 12,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "concurrency",
+    "disk",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "tests/check_register.rs",
+        "to": "tests/github_integration.rs",
+        "relation": "shared_dir:tests",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/github_integration.rs",
+        "to": "tests/hidden_channels.rs",
+        "relation": "shared_dir:tests",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/hidden_channels.rs",
+        "to": "tests/drift_detection.rs",
+        "relation": "shared_dir:tests",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/drift_detection.rs",
+        "to": "tests/report_formats.rs",
+        "relation": "shared_dir:tests",
+        "weight": 1.0
+      },
+      {
+        "from": "src/seam.rs",
+        "to": "src/checks.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/checks.rs",
+        "to": "src/report.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/report.rs",
+        "to": "src/register.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/register.rs",
+        "to": "src/github.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/github.rs",
+        "to": "src/main.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "src/hidden_channels.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/hidden_channels.rs",
+        "to": "src/fleet.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/fleet.rs",
+        "to": "src/security.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/seam.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/seam.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/seam.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/checks.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/checks.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/checks.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/report.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/report.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/report.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/register.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/register.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/register.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/github.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/github.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/github.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/hidden_channels.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/hidden_channels.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/hidden_channels.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/forge/mod.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/forge/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/forge/mod.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/fleet.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/fleet.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/fleet.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/security.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/security.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/security.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "tests/check_register.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "tests/check_register.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "tests/check_register.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "tests/github_integration.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "tests/github_integration.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "tests/github_integration.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "tests/hidden_channels.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 71.0
+      },
+      {
+        "from": "tests/hidden_channels.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 71.0
+      },
+      {
+        "from": "tests/hidden_channels.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 71.0
+      },
+      {
+        "from": "tests/drift_detection.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 33.0
+      },
+      {
+        "from": "tests/drift_detection.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 33.0
+      },
+      {
+        "from": "tests/drift_detection.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 33.0
+      },
+      {
+        "from": "tests/report_formats.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "tests/report_formats.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "tests/report_formats.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "tests/check_register.rs",
+          "tests/github_integration.rs",
+          "tests/hidden_channels.rs",
+          "tests/drift_detection.rs",
+          "tests/report_formats.rs"
+        ],
+        "frameworks": [
+          "Database",
+          "Networking",
+          "Ecto"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "tests/check_register.rs",
+          "tests/github_integration.rs",
+          "tests/hidden_channels.rs",
+          "tests/drift_detection.rs",
+          "tests/report_formats.rs"
+        ],
+        "frameworks": [
+          "Database",
+          "Networking",
+          "Ecto"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "tests/hidden_channels.rs"
+        ],
+        "frameworks": [
+          "Database",
+          "Networking",
+          "Ecto"
+        ],
+        "relation": "UnsafeCode->Concurrency"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "tests/hidden_channels.rs"
+        ],
+        "frameworks": [
+          "Database",
+          "Networking",
+          "Ecto"
+        ],
+        "relation": "UnsafeCode->Memory"
+      }
+    ]
+  }
+}

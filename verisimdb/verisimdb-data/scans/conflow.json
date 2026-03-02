@@ -1,0 +1,830 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/cache/filesystem.rs",
+      "severity": "Medium",
+      "description": "17 unwrap/expect calls in src/cache/filesystem.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/pipeline/dag.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in src/pipeline/dag.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/pipeline/definition.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in src/pipeline/definition.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/rsr/compliance.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in src/rsr/compliance.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/rsr/templates.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in src/rsr/templates.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 13986,
+    "unsafe_blocks": 13,
+    "panic_sites": 2,
+    "unwrap_calls": 71,
+    "allocation_sites": 37,
+    "io_operations": 72,
+    "threading_constructs": 4
+  },
+  "file_statistics": [
+    {
+      "file_path": "examples/multi-env/environments/dev.ncl",
+      "lines": 22,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/multi-env/environments/prod.ncl",
+      "lines": 22,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/multi-env/environments/staging.ncl",
+      "lines": 22,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzer/config_detector.rs",
+      "lines": 116,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzer/patterns.rs",
+      "lines": 179,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzer/recommender.rs",
+      "lines": 221,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cache/filesystem.rs",
+      "lines": 382,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 17,
+      "allocation_sites": 1,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cache/hash.rs",
+      "lines": 184,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/rsr.rs",
+      "lines": 427,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/cache.rs",
+      "lines": 113,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/init.rs",
+      "lines": 434,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 13,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/run.rs",
+      "lines": 133,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/validate.rs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/cli/watch.rs",
+      "lines": 165,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/errors/mod.rs",
+      "lines": 304,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/errors/recovery.rs",
+      "lines": 162,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/executors/mod.rs",
+      "lines": 157,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/executors/shell.rs",
+      "lines": 195,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/pipeline/dag.rs",
+      "lines": 364,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/pipeline/definition.rs",
+      "lines": 503,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/pipeline/executor.rs",
+      "lines": 307,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/pipeline/validation.rs",
+      "lines": 355,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rsr/compliance.rs",
+      "lines": 529,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 4,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rsr/hooks.rs",
+      "lines": 506,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rsr/requirements.rs",
+      "lines": 406,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rsr/schemas.rs",
+      "lines": 475,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rsr/config.rs",
+      "lines": 490,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 2,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rsr/diff.rs",
+      "lines": 478,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 2,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rsr/remediation.rs",
+      "lines": 569,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 7,
+      "io_operations": 20,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rsr/templates.rs",
+      "lines": 1119,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/utils/spinner.rs",
+      "lines": 104,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "concurrency",
+    "disk",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/cache/filesystem.rs",
+        "to": "src/cache/hash.rs",
+        "relation": "shared_dir:src/cache",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/rsr.rs",
+        "to": "src/cli/cache.rs",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cache.rs",
+        "to": "src/cli/init.rs",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/init.rs",
+        "to": "src/cli/run.rs",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/run.rs",
+        "to": "src/cli/validate.rs",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/validate.rs",
+        "to": "src/cli/watch.rs",
+        "relation": "shared_dir:src/cli",
+        "weight": 1.0
+      },
+      {
+        "from": "src/errors/mod.rs",
+        "to": "src/errors/recovery.rs",
+        "relation": "shared_dir:src/errors",
+        "weight": 1.0
+      },
+      {
+        "from": "src/pipeline/dag.rs",
+        "to": "src/pipeline/definition.rs",
+        "relation": "shared_dir:src/pipeline",
+        "weight": 1.0
+      },
+      {
+        "from": "src/pipeline/definition.rs",
+        "to": "src/pipeline/executor.rs",
+        "relation": "shared_dir:src/pipeline",
+        "weight": 1.0
+      },
+      {
+        "from": "src/pipeline/executor.rs",
+        "to": "src/pipeline/validation.rs",
+        "relation": "shared_dir:src/pipeline",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr/compliance.rs",
+        "to": "src/rsr/hooks.rs",
+        "relation": "shared_dir:src/rsr",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr/hooks.rs",
+        "to": "src/rsr/requirements.rs",
+        "relation": "shared_dir:src/rsr",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr/requirements.rs",
+        "to": "src/rsr/schemas.rs",
+        "relation": "shared_dir:src/rsr",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr/schemas.rs",
+        "to": "src/rsr/config.rs",
+        "relation": "shared_dir:src/rsr",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr/config.rs",
+        "to": "src/rsr/diff.rs",
+        "relation": "shared_dir:src/rsr",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr/diff.rs",
+        "to": "src/rsr/remediation.rs",
+        "relation": "shared_dir:src/rsr",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr/remediation.rs",
+        "to": "src/rsr/templates.rs",
+        "relation": "shared_dir:src/rsr",
+        "weight": 1.0
+      },
+      {
+        "from": "src/executors/mod.rs",
+        "to": "src/executors/shell.rs",
+        "relation": "shared_dir:src/executors",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/multi-env/environments/dev.ncl",
+        "to": "examples/multi-env/environments/prod.ncl",
+        "relation": "shared_dir:examples/multi-env/environments",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/multi-env/environments/prod.ncl",
+        "to": "examples/multi-env/environments/staging.ncl",
+        "relation": "shared_dir:examples/multi-env/environments",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzer/config_detector.rs",
+        "to": "src/analyzer/patterns.rs",
+        "relation": "shared_dir:src/analyzer",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzer/patterns.rs",
+        "to": "src/analyzer/recommender.rs",
+        "relation": "shared_dir:src/analyzer",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/multi-env/environments/dev.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/multi-env/environments/prod.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/multi-env/environments/staging.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzer/config_detector.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/analyzer/patterns.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzer/recommender.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cache/filesystem.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 17.0
+      },
+      {
+        "from": "src/cache/hash.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/rsr.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/cache.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/init.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/run.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/validate.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/cli/watch.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/errors/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/errors/recovery.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/executors/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/executors/shell.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/pipeline/dag.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "src/pipeline/definition.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "src/pipeline/executor.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/pipeline/validation.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/rsr/compliance.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/rsr/hooks.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/rsr/requirements.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr/schemas.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/rsr/diff.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/rsr/remediation.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/rsr/templates.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/utils/spinner.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "src/cache/filesystem.rs",
+          "src/pipeline/dag.rs",
+          "src/pipeline/definition.rs",
+          "src/rsr/compliance.rs",
+          "src/rsr/templates.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/cache/filesystem.rs",
+          "src/pipeline/dag.rs",
+          "src/pipeline/definition.rs",
+          "src/rsr/compliance.rs",
+          "src/rsr/templates.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+
+[package]
+name = "verisim-nif"
+description = "Rustler NIF bridge for VeriSimDB — enables direct in-process calls from Elixir"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "verisim_nif"
+crate-type = ["cdylib"]
+
+[dependencies]
+# Rustler provides the Elixir NIF interface
+rustler = "0.36"
+
+# Core VeriSimDB crates
+verisim-hexad = { path = "../verisim-hexad" }
+verisim-drift = { path = "../verisim-drift" }
+verisim-graph = { path = "../verisim-graph" }
+verisim-vector = { path = "../verisim-vector" }
+verisim-document = { path = "../verisim-document" }
+verisim-normalizer = { path = "../verisim-normalizer" }
+
+# Serialization for passing data between Elixir and Rust
+serde.workspace = true
+serde_json.workspace = true
+
+# Async runtime (hexad store operations are async)
+tokio.workspace = true

@@ -1,0 +1,1235 @@
+{
+  "program_path": ".",
+  "language": "nickel",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "zoterho/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in zoterho/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "zoterho-template/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in zoterho-template/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "formbd/src/ZoteroFormDB/Journal.lean",
+      "severity": "High",
+      "description": "2 sorry (unproven proposition) in formbd/src/ZoteroFormDB/Journal.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "formbd/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in formbd/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "formbd/install.sh",
+      "severity": "Medium",
+      "description": "126 potentially unquoted variable expansions in formbd/install.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "librarian/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in librarian/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "nesy/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in nesy/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "rescript-templater/scripts/verify-release.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in rescript-templater/scripts/verify-release.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "rescript-templater/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in rescript-templater/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "rescript-templater/tests/bash-tests.sh",
+      "severity": "Critical",
+      "description": "eval usage in rescript-templater/tests/bash-tests.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "rescript-templater/tests/bash-tests.sh",
+      "severity": "Medium",
+      "description": "91 potentially unquoted variable expansions in rescript-templater/tests/bash-tests.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "rescript-templater/init-raczotbuild.rkt",
+      "severity": "High",
+      "description": "System/process call in rescript-templater/init-raczotbuild.rkt",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "rescript-templater/init-raczotbuild.rkt",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in rescript-templater/init-raczotbuild.rkt",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "rescript-templater/init-zotero-plugin.sh",
+      "severity": "Medium",
+      "description": "107 potentially unquoted variable expansions in rescript-templater/init-zotero-plugin.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "rescript-templater/init-zotero-plugin.sh",
+      "severity": "Medium",
+      "description": "3 HTTP (non-HTTPS) URLs in rescript-templater/init-zotero-plugin.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "safe-storage/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in safe-storage/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "voyant-export/accessibility-tools/browser-extension/content.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in voyant-export/accessibility-tools/browser-extension/content.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "voyant-export/accessibility-tools/browser-extension/popup.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in voyant-export/accessibility-tools/browser-extension/popup.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "voyant-export/accessibility-tools/dashboard/scanner.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in voyant-export/accessibility-tools/dashboard/scanner.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "voyant-export/old-src/test/test-format.js",
+      "severity": "Medium",
+      "description": "4 HTTP (non-HTTPS) URLs in voyant-export/old-src/test/test-format.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "voyant-export/old-src/format.js",
+      "severity": "Medium",
+      "description": "5 HTTP (non-HTTPS) URLs in voyant-export/old-src/format.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "voyant-export/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in voyant-export/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "voyant-export/src/Format.res",
+      "severity": "Medium",
+      "description": "9 HTTP (non-HTTPS) URLs in voyant-export/src/Format.res",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "zotpress/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in zotpress/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "zotpress/install.sh",
+      "severity": "Medium",
+      "description": "29 potentially unquoted variable expansions in zotpress/install.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 41465,
+    "unsafe_blocks": 158,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 21,
+    "io_operations": 183,
+    "threading_constructs": 18
+  },
+  "file_statistics": [
+    {
+      "file_path": "zoterho/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zoterho/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zoterho/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "zoterho/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zoterho/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zoterho-template/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zoterho-template/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zoterho-template/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "zoterho-template/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zoterho-template/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zoterho-template/ZoteRhoTemplate.res",
+      "lines": 197,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "formbd/migration/bin/blindspot.jl",
+      "lines": 339,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/migration/bin/doi.jl",
+      "lines": 358,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/migration/bin/publisher.jl",
+      "lines": 439,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/migration/bin/score.jl",
+      "lines": 298,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/migration/src/migrate.jl",
+      "lines": 675,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 11,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/migration/src/server.jl",
+      "lines": 2143,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 75,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/migration/src/sync.jl",
+      "lines": 423,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/src/ZoteroFormDB/Journal.lean",
+      "lines": 122,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "formbd/install.sh",
+      "lines": 591,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 10,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "librarian/bin/normalize.jl",
+      "lines": 126,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "librarian/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "librarian/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "librarian/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "librarian/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "librarian/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "librarian/src/exif.jl",
+      "lines": 204,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 16,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "librarian/src/hash_tracker.jl",
+      "lines": 201,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "librarian/src/zotero_api.jl",
+      "lines": 461,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "nesy/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "nesy/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "nesy/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "nesy/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "nesy/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rescript-templater/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rescript-templater/examples/racket-contracts-example.rkt",
+      "lines": 401,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rescript-templater/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rescript-templater/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "rescript-templater/scripts/generate-sbom.sh",
+      "lines": 630,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rescript-templater/scripts/sign-release.sh",
+      "lines": 276,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rescript-templater/scripts/verify-release.sh",
+      "lines": 256,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rescript-templater/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rescript-templater/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rescript-templater/tests/racket-tests.rkt",
+      "lines": 404,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rescript-templater/init-raczotbuild.rkt",
+      "lines": 224,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rescript-templater/init-zotero-plugin.sh",
+      "lines": 1111,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "safe-storage/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "safe-storage/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "safe-storage/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "safe-storage/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "safe-storage/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "voyant-export/accessibility-tools/adoption-tracker/scanner.js",
+      "lines": 417,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "voyant-export/accessibility-tools/browser-extension/background.js",
+      "lines": 288,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "voyant-export/accessibility-tools/dashboard/scanner.js",
+      "lines": 405,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "voyant-export/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "voyant-export/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "voyant-export/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "voyant-export/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "voyant-export/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "voyant-export/src/Exporter.res",
+      "lines": 230,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "voyant-export/src/Performance.res",
+      "lines": 141,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zotpress/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zotpress/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zotpress/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "zotpress/scripts/build-js.res",
+      "lines": 3,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zotpress/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zotpress/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zotpress/src/js/zotpress.res",
+      "lines": 3,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zotpress/src/rescript/Utils.res",
+      "lines": 178,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zotpress/src/rescript/Zotpress.res",
+      "lines": 522,
+      "unsafe_blocks": 21,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "network",
+    "concurrency",
+    "cpu",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "zotpress/src/rescript/Utils.res",
+        "to": "zotpress/src/rescript/Zotpress.res",
+        "relation": "shared_dir:zotpress/src/rescript",
+        "weight": 1.0
+      },
+      {
+        "from": "voyant-export/src/abi/Foreign.idr",
+        "to": "voyant-export/src/abi/Types.idr",
+        "relation": "shared_dir:voyant-export/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "zoterho-template/src/abi/Foreign.idr",
+        "to": "zoterho-template/src/abi/Types.idr",
+        "relation": "shared_dir:zoterho-template/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "zoterho/src/abi/Foreign.idr",
+        "to": "zoterho/src/abi/Types.idr",
+        "relation": "shared_dir:zoterho/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "rescript-templater/scripts/generate-sbom.sh",
+        "to": "rescript-templater/scripts/sign-release.sh",
+        "relation": "shared_dir:rescript-templater/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "rescript-templater/scripts/sign-release.sh",
+        "to": "rescript-templater/scripts/verify-release.sh",
+        "relation": "shared_dir:rescript-templater/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "formbd/migration/bin/blindspot.jl",
+        "to": "formbd/migration/bin/doi.jl",
+        "relation": "shared_dir:formbd/migration/bin",
+        "weight": 1.0
+      },
+      {
+        "from": "formbd/migration/bin/doi.jl",
+        "to": "formbd/migration/bin/publisher.jl",
+        "relation": "shared_dir:formbd/migration/bin",
+        "weight": 1.0
+      },
+      {
+        "from": "formbd/migration/bin/publisher.jl",
+        "to": "formbd/migration/bin/score.jl",
+        "relation": "shared_dir:formbd/migration/bin",
+        "weight": 1.0
+      },
+      {
+        "from": "rescript-templater/src/abi/Foreign.idr",
+        "to": "rescript-templater/src/abi/Types.idr",
+        "relation": "shared_dir:rescript-templater/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "nesy/src/abi/Foreign.idr",
+        "to": "nesy/src/abi/Types.idr",
+        "relation": "shared_dir:nesy/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "formbd/src/abi/Foreign.idr",
+        "to": "formbd/src/abi/Types.idr",
+        "relation": "shared_dir:formbd/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "voyant-export/src/Exporter.res",
+        "to": "voyant-export/src/Performance.res",
+        "relation": "shared_dir:voyant-export/src",
+        "weight": 1.0
+      },
+      {
+        "from": "zotpress/src/abi/Foreign.idr",
+        "to": "zotpress/src/abi/Types.idr",
+        "relation": "shared_dir:zotpress/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "formbd/migration/src/migrate.jl",
+        "to": "formbd/migration/src/server.jl",
+        "relation": "shared_dir:formbd/migration/src",
+        "weight": 1.0
+      },
+      {
+        "from": "formbd/migration/src/server.jl",
+        "to": "formbd/migration/src/sync.jl",
+        "relation": "shared_dir:formbd/migration/src",
+        "weight": 1.0
+      },
+      {
+        "from": "librarian/src/abi/Foreign.idr",
+        "to": "librarian/src/abi/Types.idr",
+        "relation": "shared_dir:librarian/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "librarian/src/exif.jl",
+        "to": "librarian/src/hash_tracker.jl",
+        "relation": "shared_dir:librarian/src",
+        "weight": 1.0
+      },
+      {
+        "from": "librarian/src/hash_tracker.jl",
+        "to": "librarian/src/zotero_api.jl",
+        "relation": "shared_dir:librarian/src",
+        "weight": 1.0
+      },
+      {
+        "from": "rescript-templater/init-raczotbuild.rkt",
+        "to": "rescript-templater/init-zotero-plugin.sh",
+        "relation": "shared_dir:rescript-templater",
+        "weight": 1.0
+      },
+      {
+        "from": "safe-storage/src/abi/Foreign.idr",
+        "to": "safe-storage/src/abi/Types.idr",
+        "relation": "shared_dir:safe-storage/src/abi",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "formbd/src/ZoteroFormDB/Journal.lean"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "rescript-templater/tests/bash-tests.sh",
+          "rescript-templater/init-raczotbuild.rkt"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "rescript-templater/init-raczotbuild.rkt"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Network"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "zoterho/src/abi/Foreign.idr",
+          "zoterho-template/src/abi/Foreign.idr",
+          "formbd/src/abi/Foreign.idr",
+          "librarian/src/abi/Foreign.idr",
+          "nesy/src/abi/Foreign.idr",
+          "rescript-templater/src/abi/Foreign.idr",
+          "safe-storage/src/abi/Foreign.idr",
+          "voyant-export/src/abi/Foreign.idr",
+          "zotpress/src/abi/Foreign.idr"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "voyant-export/accessibility-tools/browser-extension/content.js",
+          "voyant-export/accessibility-tools/browser-extension/popup.js",
+          "voyant-export/accessibility-tools/dashboard/scanner.js"
+        ],
+        "frameworks": [],
+        "relation": "DynamicCodeExecution->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "formbd/install.sh",
+          "rescript-templater/tests/bash-tests.sh",
+          "rescript-templater/tests/bash-tests.sh",
+          "rescript-templater/init-raczotbuild.rkt",
+          "rescript-templater/init-zotero-plugin.sh",
+          "zotpress/install.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "rescript-templater/scripts/verify-release.sh"
+        ],
+        "frameworks": [],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "rescript-templater/init-zotero-plugin.sh",
+          "voyant-export/old-src/test/test-format.js",
+          "voyant-export/old-src/format.js",
+          "voyant-export/src/Format.res"
+        ],
+        "frameworks": [],
+        "relation": "InsecureProtocol->Network"
+      }
+    ]
+  }
+}

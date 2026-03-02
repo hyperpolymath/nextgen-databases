@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# VeriSimDB Self-Hosted Instance Configuration
+#
+# This instance stores metadata ABOUT the verisimdb repository itself.
+# Dogfooding: the database describes its own development history.
+
+[instance]
+name = "verisimdb-self"
+description = "Self-hosted VeriSimDB instance for repository metadata"
+version = "0.1.0-alpha"
+base_iri = "https://verisim.db/self"
+
+[storage]
+# Flat-file JSON storage (committed to git)
+backend = "flat-json"
+hexad_dir = ".verisimdb/hexads"
+index_file = ".verisimdb/index.json"
+
+[ingest]
+# Sources to ingest automatically
+sources = ["git-log", "known-issues", "panic-attack-scans", "benchmarks"]
+
+[ingest.git-log]
+# Map git commits to hexads
+# Document: commit message + diff stats
+# Graph: file dependencies (which files changed together)
+# Vector: embedding of commit message (placeholder until model integrated)
+# Tensor: [insertions, deletions, files_changed] per commit
+# Semantic: commit type (feat/fix/docs/chore) as typed annotation
+# Temporal: commit timestamp + author
+enabled = true
+
+[ingest.known-issues]
+# Parse KNOWN-ISSUES.adoc entries into hexads
+enabled = true
+
+[ingest.panic-attack]
+# Ingest panic-attack scan results
+scan_dir = "/tmp"
+enabled = false
+
+[ingest.benchmarks]
+# Ingest Criterion benchmark results
+bench_dir = "target/criterion"
+enabled = false
+
+[modalities]
+vector_dimension = 64  # Small dimension for commit embeddings (hash-based)
+
+[display]
+# How to present hexads in CLI/TUI
+date_format = "%Y-%m-%d %H:%M"
+max_title_length = 80

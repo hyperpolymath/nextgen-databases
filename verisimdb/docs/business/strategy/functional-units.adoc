@@ -1,0 +1,362 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB -- Functional Units and Organisational Structure
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-02-28
+:revremark: Organisational structure to support VeriSimDB at each growth stage
+:toc: macro
+:toclevels: 3
+:sectnums:
+:icons: font
+
+[abstract]
+Organisational structure required to develop, market, support, and operate
+VeriSimDB at each growth stage. The structure evolves from a single-developer
+open source project through a small focused team to a sustainable organisation
+capable of supporting enterprise customers.
+
+toc::[]
+
+== Current State (Solo Developer)
+
+VeriSimDB is currently developed and maintained by a single developer
+(Jonathan D.A. Jewell). All functions -- engineering, documentation, testing,
+community engagement, infrastructure, and strategy -- are performed by one
+person.
+
+This is viable for the community-building phase (Phase 1) but will not scale
+to support enterprise customers, multiple pilot deployments, or sustained
+conference presence.
+
+The functional unit plan below describes the minimal team needed at each growth
+stage, not an aspirational org chart. Each role is justified by a specific
+bottleneck that a single developer cannot resolve alone.
+
+== Stage 1: Core Team (3-5 People, Months 12-18)
+
+=== Engineering (2-3 People)
+
+==== Rust Core Engineer (1 person)
+
+*Justification:* The Rust core (storage engine, drift detection, indexing) is
+the most performance-critical and complex subsystem. A dedicated Rust engineer
+enables parallel development of modality stores, query optimisation, and
+federation connectors while the founder focuses on architecture and community.
+
+*Responsibilities:*
+
+* Develop and maintain Rust crates (`verisim-graph`, `verisim-vector`,
+  `verisim-drift`, `verisim-normalizer`, etc.)
+* Performance benchmarking and optimisation
+* Federation connector development (PostgreSQL, ArangoDB, Elasticsearch, Neo4j)
+* CI/CD pipeline maintenance (Rust builds, cross-compilation)
+
+*Skills required:*
+
+* Strong Rust experience (3+ years), including async and FFI
+* Database internals knowledge (indexing, query planning, storage engines)
+* Experience with at least one graph or vector database
+
+*Hiring signal:* When the first external contributor submits a non-trivial Rust
+PR, the candidate pool includes people who already understand the codebase.
+
+==== Elixir/OTP Engineer (1 person)
+
+*Justification:* The Elixir orchestration layer (GenServer-per-entity,
+supervision trees, distributed coordination) requires OTP expertise that is
+distinct from Rust systems programming. An Elixir engineer enables development
+of advanced fault tolerance, distributed consensus, and hot code reloading
+capabilities.
+
+*Responsibilities:*
+
+* Develop and maintain Elixir orchestration layer (`VeriSim.EntityServer`,
+  `VeriSim.DriftMonitor`, `VeriSim.QueryRouter`)
+* Hypatia integration pipeline (`ScanIngester`, `PatternQuery`, `DispatchBridge`)
+* Distributed coordination (multi-node deployment, consensus)
+* Monitoring and observability (Prometheus metrics, Telemetry events)
+
+*Skills required:*
+
+* Elixir/OTP experience (2+ years), including GenServer, Supervisor, and
+  distributed Erlang
+* Understanding of BEAM concurrency model
+* Experience with Phoenix or similar Elixir web frameworks (for HTTP API)
+
+==== Generalist / Zig-Idris2 Specialist (0-1 person, contract)
+
+*Justification:* The ABI/FFI layer (Idris2 definitions, Zig bindings, generated
+C headers) requires a rare skill combination. This role may be filled by a
+contractor or part-time contributor rather than a full-time hire, given the
+narrow scope.
+
+*Responsibilities:*
+
+* Maintain Idris2 ABI definitions and dependent-type proofs
+* Develop and maintain Zig FFI bindings
+* Generate and validate C headers
+* Ensure ABI/FFI compliance across platforms
+
+*Skills required:*
+
+* Idris2 or Agda experience (dependent types)
+* Zig experience (C ABI, cross-compilation)
+* Understanding of FFI patterns and memory management
+
+=== Developer Relations (1 person)
+
+==== DevRel Lead
+
+*Justification:* The single-biggest bottleneck for Phase 2 (institutional
+partnerships) is the founder's time. A DevRel lead handles documentation,
+community engagement, conference submissions, and content creation -- freeing
+the founder for architecture decisions and enterprise conversations.
+
+*Responsibilities:*
+
+* Write and maintain documentation (getting-started guide, tutorials, API
+  reference)
+* Create content (blog posts, conference talks, video tutorials)
+* Manage community channels (GitHub issues, forum discussions, social media)
+* Submit conference talk proposals and prepare presentations
+* Coordinate with academic collaborators on paper submissions
+
+*Skills required:*
+
+* Technical writing ability (can explain database concepts to developers)
+* Conference speaking experience
+* Familiarity with database or data engineering communities
+* Ability to write code examples in at least one of Rust, Elixir, or ReScript
+
+*Hiring signal:* When community engagement (GitHub issues, forum posts) exceeds
+what one person can respond to within 48 hours.
+
+=== Operations (0.5 person, shared with Engineering)
+
+In Stage 1, operations responsibilities are shared across the engineering team:
+
+* CI/CD pipeline maintenance (GitHub Actions, SLSA, SBOM)
+* Container image builds and registry management
+* Infrastructure provisioning (staging environment for demos)
+* Security patching and dependency updates
+
+No dedicated operations hire is needed until enterprise customers require SLA
+guarantees.
+
+== Stage 2: Growth Team (6-10 People, Months 18-30)
+
+=== Engineering (4-5 People)
+
+The Stage 1 engineering team expands with:
+
+==== Query Engine Engineer (1 person)
+
+*Justification:* VQL and VQL-DT require dedicated attention as query complexity
+grows. The query planner (currently basic) needs optimisation for cross-modal
+queries spanning all 8 modalities.
+
+*Responsibilities:*
+
+* VQL parser and query planner development
+* VQL-DT type checker integration (Idris2 bridge)
+* Query performance optimisation (cost-based planning, modality pushdown)
+* Query language evolution (new syntax, new operators)
+
+==== Test and Quality Engineer (1 person)
+
+*Justification:* The test suite (662 tests) needs to scale with the codebase.
+Property-based testing, fuzzing, and integration testing across federation
+targets require dedicated attention.
+
+*Responsibilities:*
+
+* Property-based test development (QuickCheck patterns for Rust + Elixir)
+* Fuzz testing (VQL parser, drift detection algorithm)
+* Integration testing (federation connectors, container deployment)
+* Performance benchmarking (automated regression detection)
+
+=== Support (1 person)
+
+==== Support Engineer
+
+*Justification:* Enterprise pilot customers (Phase 2) require responsive
+support. The 48-hour response SLA cannot be maintained by the engineering team
+while also developing features.
+
+*Responsibilities:*
+
+* Triage and respond to customer support requests
+* Reproduce and document bugs from customer environments
+* Create knowledge base articles from recurring issues
+* Escalate complex issues to engineering with reproduction steps
+
+*Skills required:*
+
+* Database administration experience
+* Comfortable with Rust and Elixir at a reading level
+* Strong written communication
+* Experience with support ticketing systems
+
+=== Marketing (1 person, part-time or contract)
+
+==== Content Marketing Lead
+
+*Justification:* Phase 3 (enterprise expansion) requires professional marketing
+materials: case studies, ROI calculators, compliance guides, and analyst
+briefings. These are distinct from DevRel content and require marketing
+expertise.
+
+*Responsibilities:*
+
+* Create enterprise-facing content (case studies, white papers, compliance guides)
+* Manage website and landing pages
+* Coordinate analyst briefings (Gartner, Forrester, IDC)
+* Event marketing (conference booths, sponsorships)
+
+*Note:* This role may be a contractor or part-time hire in Stage 2, becoming
+full-time in Stage 3.
+
+== Stage 3: Sustainable Organisation (10-15 People, Months 30-48)
+
+=== Engineering (6-8 People)
+
+The Stage 2 engineering team expands with:
+
+* *Second Rust engineer* -- dedicated to federation connectors and new modality
+  backends
+* *Security engineer* -- dedicated to security hardening, vulnerability response,
+  and compliance (SOC 2, ISO 27001)
+* *Infrastructure engineer* -- dedicated to managed service deployment,
+  monitoring, and SRE practices
+
+=== Developer Relations (2 People)
+
+* *DevRel Lead* (from Stage 1)
+* *Developer Advocate* -- focused on community growth, meetup organising,
+  open-source contribution mentorship
+
+=== Support (2 People)
+
+* *Support Engineer* (from Stage 2)
+* *Solutions Engineer* -- pre-sales technical support, architecture reviews,
+  proof-of-concept deployments for enterprise prospects
+
+=== Marketing (1-2 People)
+
+* *Content Marketing Lead* (from Stage 2, now full-time)
+* *Events Coordinator* (0-1 person) -- conference logistics, sponsorship
+  management, analyst relations
+
+=== Operations (1-2 People)
+
+* *SRE / Infrastructure Engineer* -- managed service operations, monitoring,
+  alerting, incident response
+* *Finance and Admin* (0.5-1 person, possibly outsourced) -- invoicing,
+  contracts, compliance documentation
+
+== Functional Unit Summary
+
+[cols="2,1,1,1"]
+|===
+| Function | Stage 1 | Stage 2 | Stage 3
+
+| Engineering | 2-3 | 4-5 | 6-8
+| Developer Relations | 1 | 1 | 2
+| Support | 0 | 1 | 2
+| Marketing | 0 | 0.5-1 | 1-2
+| Operations | 0.5 | 0.5 | 1-2
+| *Total* | *3-5* | *7-8* | *12-16*
+|===
+
+== Compensation Framework
+
+Compensation ranges are based on UK/remote market rates for the required skill
+levels. VeriSimDB competes for talent against well-funded database startups
+(SurrealDB, Qdrant, LanceDB) and established companies (Neo4j, DataStax).
+
+[cols="2,1,3"]
+|===
+| Role | Range (GBP, annual) | Notes
+
+| Rust Core Engineer | 60,000-90,000 | Senior level required; Rust + database internals is a rare combination
+| Elixir/OTP Engineer | 55,000-80,000 | BEAM expertise commands a premium
+| Query Engine Engineer | 65,000-95,000 | PL theory + database systems intersection
+| DevRel Lead | 50,000-75,000 | Technical writing + speaking + community management
+| Support Engineer | 40,000-60,000 | Database admin + communication skills
+| Content Marketing | 45,000-65,000 | B2B SaaS marketing experience
+|===
+
+Early hires may accept below-market compensation in exchange for equity or
+significant open-source contribution credit. However, VeriSimDB should not
+rely on below-market compensation as a strategy -- it creates retention risk
+and signals unsustainability.
+
+== Hiring Priorities
+
+Hiring order is determined by the bottleneck that most constrains growth at
+each stage:
+
+[cols="1,2,3"]
+|===
+| Priority | Role | Bottleneck Addressed
+
+| 1 | DevRel Lead | Founder cannot maintain 48h issue response, write documentation,
+create content, AND develop the core engine simultaneously
+
+| 2 | Rust Core Engineer | Federation connector development and query optimisation
+are blocked by single-developer bandwidth
+
+| 3 | Elixir/OTP Engineer | Distributed coordination and Hypatia integration
+require dedicated OTP expertise
+
+| 4 | Support Engineer | Enterprise pilot customers require responsive support
+that engineering should not be distracted by
+
+| 5 | Content Marketing | Enterprise expansion requires professional marketing
+materials beyond what DevRel produces
+|===
+
+== Reporting Structure
+
+=== Stage 1 (Flat)
+
+....
+Jonathan D.A. Jewell (Founder, Architecture Lead)
+├── Rust Core Engineer
+├── Elixir/OTP Engineer
+└── DevRel Lead
+....
+
+=== Stage 2 (Two Pillars)
+
+....
+Jonathan D.A. Jewell (Founder, CTO)
+├── Engineering Lead (Rust Core Engineer, promoted)
+│   ├── Elixir/OTP Engineer
+│   ├── Query Engine Engineer
+│   └── Test & Quality Engineer
+├── DevRel Lead
+│   └── Content Marketing (contract)
+└── Support Engineer
+....
+
+=== Stage 3 (Functional)
+
+....
+Jonathan D.A. Jewell (Founder, CEO/CTO)
+├── VP Engineering
+│   ├── Rust Core Team (2-3)
+│   ├── Elixir/OTP Engineer
+│   ├── Query Engine Engineer
+│   ├── Security Engineer
+│   └── Test & Quality Engineer
+├── Head of DevRel
+│   ├── Developer Advocate
+│   └── Content Marketing
+├── Head of Customer Success
+│   ├── Support Engineer
+│   └── Solutions Engineer
+└── Operations
+    ├── SRE / Infrastructure
+    └── Finance & Admin (outsourced)
+....

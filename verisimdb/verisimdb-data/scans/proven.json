@@ -1,0 +1,4073 @@
+{
+  "program_path": ".",
+  "language": "idris",
+  "frameworks": [
+    "Database"
+  ],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeCrypto/Hash.idr",
+      "severity": "Critical",
+      "description": "10 believe_me (type checker bypass) in src/Proven/SafeCrypto/Hash.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeCrypto/Proofs.idr",
+      "severity": "Critical",
+      "description": "15 believe_me (type checker bypass) in src/Proven/SafeCrypto/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeCrypto/Random.idr",
+      "severity": "Critical",
+      "description": "4 believe_me (type checker bypass) in src/Proven/SafeCrypto/Random.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeEmail/Proofs.idr",
+      "severity": "Critical",
+      "description": "14 believe_me (type checker bypass) in src/Proven/SafeEmail/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeJson/Parser.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/Proven/SafeJson/Parser.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeJson/Proofs.idr",
+      "severity": "Critical",
+      "description": "11 believe_me (type checker bypass) in src/Proven/SafeJson/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeMath/Proofs.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/Proven/SafeMath/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafePassword/Proofs.idr",
+      "severity": "Critical",
+      "description": "29 believe_me (type checker bypass) in src/Proven/SafePassword/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "src/Proven/SafePassword/Strength.idr",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in src/Proven/SafePassword/Strength.idr",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafePath/Proofs.idr",
+      "severity": "Critical",
+      "description": "23 believe_me (type checker bypass) in src/Proven/SafePath/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeString/Proofs.idr",
+      "severity": "Critical",
+      "description": "7 believe_me (type checker bypass) in src/Proven/SafeString/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeUrl/Proofs.idr",
+      "severity": "Critical",
+      "description": "14 believe_me (type checker bypass) in src/Proven/SafeUrl/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeCrypto.idr",
+      "severity": "Critical",
+      "description": "5 believe_me (type checker bypass) in src/Proven/SafeCrypto.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeDateTime.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/Proven/SafeDateTime.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeCSV.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/Proven/SafeCSV.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafePassword.idr",
+      "severity": "Critical",
+      "description": "8 believe_me (type checker bypass) in src/Proven/SafePassword.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeRegex/Proofs.idr",
+      "severity": "Critical",
+      "description": "28 believe_me (type checker bypass) in src/Proven/SafeRegex/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeSQL/Proofs.idr",
+      "severity": "Critical",
+      "description": "6 believe_me (type checker bypass) in src/Proven/SafeSQL/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "src/Proven/SafeSQL.idr",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in src/Proven/SafeSQL.idr",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeJWT/Validate.idr",
+      "severity": "Critical",
+      "description": "4 believe_me (type checker bypass) in src/Proven/SafeJWT/Validate.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeJWT/Proofs.idr",
+      "severity": "Critical",
+      "description": "18 believe_me (type checker bypass) in src/Proven/SafeJWT/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeBase64/Proofs.idr",
+      "severity": "Critical",
+      "description": "22 believe_me (type checker bypass) in src/Proven/SafeBase64/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeXML/Proofs.idr",
+      "severity": "Critical",
+      "description": "9 believe_me (type checker bypass) in src/Proven/SafeXML/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/Proven/SafeXML/Proofs.idr",
+      "severity": "Medium",
+      "description": "2 HTTP (non-HTTPS) URLs in src/Proven/SafeXML/Proofs.idr",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeYAML/Proofs.idr",
+      "severity": "Critical",
+      "description": "4 believe_me (type checker bypass) in src/Proven/SafeYAML/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeTOML/Proofs.idr",
+      "severity": "Critical",
+      "description": "5 believe_me (type checker bypass) in src/Proven/SafeTOML/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeEnv/Types.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/Proven/SafeEnv/Types.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeEnv/Proofs.idr",
+      "severity": "Critical",
+      "description": "7 believe_me (type checker bypass) in src/Proven/SafeEnv/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeArgs/Proofs.idr",
+      "severity": "Critical",
+      "description": "3 believe_me (type checker bypass) in src/Proven/SafeArgs/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeFile/Types.idr",
+      "severity": "Critical",
+      "description": "4 believe_me (type checker bypass) in src/Proven/SafeFile/Types.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeFile/Proofs.idr",
+      "severity": "Critical",
+      "description": "4 believe_me (type checker bypass) in src/Proven/SafeFile/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeHeader/Parser.idr",
+      "severity": "Critical",
+      "description": "2 believe_me (type checker bypass) in src/Proven/SafeHeader/Parser.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeHeader/Proofs.idr",
+      "severity": "Critical",
+      "description": "4 believe_me (type checker bypass) in src/Proven/SafeHeader/Proofs.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeCookie/Parser.idr",
+      "severity": "Critical",
+      "description": "2 believe_me (type checker bypass) in src/Proven/SafeCookie/Parser.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeContentType/Parser.idr",
+      "severity": "Critical",
+      "description": "6 believe_me (type checker bypass) in src/Proven/SafeContentType/Parser.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/ECHIDNA/Soundness.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/Proven/ECHIDNA/Soundness.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeLRU.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/Proven/SafeLRU.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeCapability.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/Proven/SafeCapability.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeRegistry.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/Proven/SafeRegistry.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeDigest.idr",
+      "severity": "Critical",
+      "description": "5 believe_me (type checker bypass) in src/Proven/SafeDigest.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeFiniteField.idr",
+      "severity": "Critical",
+      "description": "14 believe_me (type checker bypass) in src/Proven/SafeFiniteField.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/Proven/SafeSet.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/Proven/SafeSet.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/SafeHistory.idr",
+      "severity": "Critical",
+      "description": "2 believe_me (type checker bypass) in src/SafeHistory.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "bindings/go/proven/proven_test.go",
+      "severity": "Medium",
+      "description": "2 HTTP (non-HTTPS) URLs in bindings/go/proven/proven_test.go",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "bindings/deno/src/safe_string.ts",
+      "severity": "Critical",
+      "description": "eval() usage in bindings/deno/src/safe_string.ts",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "bindings/julia/test/runtests.jl",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in bindings/julia/test/runtests.jl",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "bindings/elixir/test/proven_test.exs",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in bindings/elixir/test/proven_test.exs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "bindings/zig/src/safe_crypto.zig",
+      "severity": "High",
+      "description": "2 unsafe pointer casts in bindings/zig/src/safe_crypto.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "bindings/ada/src/proven-safe_registry.adb",
+      "severity": "High",
+      "description": "1 Unchecked_* operations in bindings/ada/src/proven-safe_registry.adb",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_math.sh",
+      "severity": "Medium",
+      "description": "56 potentially unquoted variable expansions in bindings/bash/lib/safe_math.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_string.sh",
+      "severity": "Medium",
+      "description": "35 potentially unquoted variable expansions in bindings/bash/lib/safe_string.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_path.sh",
+      "severity": "Medium",
+      "description": "29 potentially unquoted variable expansions in bindings/bash/lib/safe_path.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_email.sh",
+      "severity": "Medium",
+      "description": "23 potentially unquoted variable expansions in bindings/bash/lib/safe_email.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_network.sh",
+      "severity": "Medium",
+      "description": "57 potentially unquoted variable expansions in bindings/bash/lib/safe_network.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_crypto.sh",
+      "severity": "Critical",
+      "description": "eval usage in bindings/bash/lib/safe_crypto.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_crypto.sh",
+      "severity": "Medium",
+      "description": "29 potentially unquoted variable expansions in bindings/bash/lib/safe_crypto.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_uuid.sh",
+      "severity": "Medium",
+      "description": "49 potentially unquoted variable expansions in bindings/bash/lib/safe_uuid.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_currency.sh",
+      "severity": "Medium",
+      "description": "64 potentially unquoted variable expansions in bindings/bash/lib/safe_currency.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_phone.sh",
+      "severity": "Medium",
+      "description": "89 potentially unquoted variable expansions in bindings/bash/lib/safe_phone.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_hex.sh",
+      "severity": "Medium",
+      "description": "58 potentially unquoted variable expansions in bindings/bash/lib/safe_hex.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_url.sh",
+      "severity": "Medium",
+      "description": "57 potentially unquoted variable expansions in bindings/bash/lib/safe_url.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "bindings/bash/lib/safe_url.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in bindings/bash/lib/safe_url.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_json.sh",
+      "severity": "Medium",
+      "description": "50 potentially unquoted variable expansions in bindings/bash/lib/safe_json.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_datetime.sh",
+      "severity": "Medium",
+      "description": "72 potentially unquoted variable expansions in bindings/bash/lib/safe_datetime.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_float.sh",
+      "severity": "Medium",
+      "description": "63 potentially unquoted variable expansions in bindings/bash/lib/safe_float.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_version.sh",
+      "severity": "Medium",
+      "description": "111 potentially unquoted variable expansions in bindings/bash/lib/safe_version.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/bash/lib/safe_color.sh",
+      "severity": "Medium",
+      "description": "108 potentially unquoted variable expansions in bindings/bash/lib/safe_color.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "bindings/racket/safe-phone.rkt",
+      "severity": "Low",
+      "description": "13 TODO/FIXME/HACK markers in bindings/racket/safe-phone.rkt",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "bindings/prolog/safe_string.pl",
+      "severity": "High",
+      "description": "Shell/process_create in bindings/prolog/safe_string.pl",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeFFI",
+      "location": "bindings/purescript/Proven/SafeString.purs",
+      "severity": "Medium",
+      "description": "6 foreign imports in bindings/purescript/Proven/SafeString.purs",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeFFI",
+      "location": "bindings/purescript/Proven/SafeCrypto.purs",
+      "severity": "Medium",
+      "description": "8 foreign imports in bindings/purescript/Proven/SafeCrypto.purs",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeFFI",
+      "location": "bindings/purescript/Proven/SafeDateTime.purs",
+      "severity": "Medium",
+      "description": "11 foreign imports in bindings/purescript/Proven/SafeDateTime.purs",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UncheckedAllocation",
+      "location": "bindings/ephapax/src/stubs.c",
+      "severity": "Critical",
+      "description": "Unchecked malloc in bindings/ephapax/src/stubs.c",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": ".devcontainer/post-create.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in .devcontainer/post-create.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "tests/properties/SafeUrlProps.idr",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in tests/properties/SafeUrlProps.idr",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "tests/properties/SafeXMLProps.idr",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in tests/properties/SafeXMLProps.idr",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "tests/unit/SafeHtmlUnit.idr",
+      "severity": "Medium",
+      "description": "2 HTTP (non-HTTPS) URLs in tests/unit/SafeHtmlUnit.idr",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "tests/unit/SafeUrlUnit.idr",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in tests/unit/SafeUrlUnit.idr",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "build-simple/exec/test_ffi_exports_app/test_ffi_exports.ss",
+      "severity": "High",
+      "description": "eval usage in build-simple/exec/test_ffi_exports_app/test_ffi_exports.ss",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 242819,
+    "unsafe_blocks": 416,
+    "panic_sites": 4,
+    "unwrap_calls": 4,
+    "allocation_sites": 342,
+    "io_operations": 92,
+    "threading_constructs": 10
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/Proven/FFI/Echidna.idr",
+      "lines": 400,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/FFI/LRU.idr",
+      "lines": 75,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/FFI/Buffer.idr",
+      "lines": 56,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/FFI/Resource.idr",
+      "lines": 54,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeCrypto/Hash.idr",
+      "lines": 332,
+      "unsafe_blocks": 20,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeCrypto/Proofs.idr",
+      "lines": 247,
+      "unsafe_blocks": 15,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeCrypto/Random.idr",
+      "lines": 286,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeEmail/Proofs.idr",
+      "lines": 216,
+      "unsafe_blocks": 14,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeJson/Parser.idr",
+      "lines": 370,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeJson/Proofs.idr",
+      "lines": 281,
+      "unsafe_blocks": 11,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeMath/Proofs.idr",
+      "lines": 171,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafePassword/Proofs.idr",
+      "lines": 231,
+      "unsafe_blocks": 29,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafePath/Proofs.idr",
+      "lines": 221,
+      "unsafe_blocks": 23,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeString/Proofs.idr",
+      "lines": 108,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeUrl/Proofs.idr",
+      "lines": 210,
+      "unsafe_blocks": 14,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeCrypto.idr",
+      "lines": 388,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeDateTime.idr",
+      "lines": 548,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeCSV.idr",
+      "lines": 329,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafePassword.idr",
+      "lines": 345,
+      "unsafe_blocks": 8,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeRegex/Proofs.idr",
+      "lines": 342,
+      "unsafe_blocks": 28,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeSQL/Proofs.idr",
+      "lines": 320,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeJWT/Validate.idr",
+      "lines": 416,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeJWT/Proofs.idr",
+      "lines": 348,
+      "unsafe_blocks": 18,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeBase64/Proofs.idr",
+      "lines": 331,
+      "unsafe_blocks": 22,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeXML/Proofs.idr",
+      "lines": 383,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeYAML/Proofs.idr",
+      "lines": 322,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeTOML/Proofs.idr",
+      "lines": 358,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeEnv/Types.idr",
+      "lines": 297,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeEnv/Proofs.idr",
+      "lines": 346,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeArgs/Proofs.idr",
+      "lines": 316,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeFile/Types.idr",
+      "lines": 438,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeFile/Proofs.idr",
+      "lines": 372,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeHeader/Parser.idr",
+      "lines": 348,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeHeader/Proofs.idr",
+      "lines": 317,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeCookie/Parser.idr",
+      "lines": 398,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeContentType/Parser.idr",
+      "lines": 438,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/ECHIDNA/Soundness.idr",
+      "lines": 212,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeLRU.idr",
+      "lines": 167,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeCapability.idr",
+      "lines": 368,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeRegistry.idr",
+      "lines": 294,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeDigest.idr",
+      "lines": 303,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeFiniteField.idr",
+      "lines": 317,
+      "unsafe_blocks": 14,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Proven/SafeSet.idr",
+      "lines": 324,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/SafeHistory.idr",
+      "lines": 205,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 4630,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 46,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/TestSafe.idr",
+      "lines": 92,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/python/proven/safe_lru.py",
+      "lines": 198,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "bindings/python/proven/safe_rate_limiter.py",
+      "lines": 272,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "bindings/python/proven/safe_circuit_breaker.py",
+      "lines": 187,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "bindings/python/proven/safe_monotonic.py",
+      "lines": 271,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 4
+    },
+    {
+      "file_path": "bindings/rust/src/core.rs",
+      "lines": 186,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/rust/src/lib.rs",
+      "lines": 207,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_bloom.go",
+      "lines": 217,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_retry.go",
+      "lines": 252,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_graph.go",
+      "lines": 387,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 21,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_uuid.go",
+      "lines": 269,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_hex.go",
+      "lines": 290,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_network.go",
+      "lines": 94,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_path.go",
+      "lines": 64,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_json.go",
+      "lines": 180,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_password.go",
+      "lines": 241,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_header.go",
+      "lines": 170,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_content_type.go",
+      "lines": 174,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_tensor.go",
+      "lines": 277,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 16,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_ml.go",
+      "lines": 287,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 12,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_buffer.go",
+      "lines": 215,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_queue.go",
+      "lines": 232,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_lru.go",
+      "lines": 262,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_rate_limiter.go",
+      "lines": 283,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_circuit_breaker.go",
+      "lines": 275,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/go/proven/safe_monotonic.go",
+      "lines": 285,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "bindings/go/proven/safe_state_machine.go",
+      "lines": 298,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/rescript/src/Proven_FFI.res",
+      "lines": 170,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/rescript/src/Proven_FFI.res.js",
+      "lines": 118,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/julia/src/SafeHex.jl",
+      "lines": 242,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 10,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/julia/src/SafeString.jl",
+      "lines": 89,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/julia/src/SafeJson.jl",
+      "lines": 524,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 45,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/elixir/native/proven_nif/src/lib.rs",
+      "lines": 515,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 19,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_crypto.zig",
+      "lines": 80,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_uuid.zig",
+      "lines": 226,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_hex.zig",
+      "lines": 260,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_queue.zig",
+      "lines": 168,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_tensor.zig",
+      "lines": 292,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_password.zig",
+      "lines": 346,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_ml.zig",
+      "lines": 293,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_jwt.zig",
+      "lines": 455,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_semaphore.zig",
+      "lines": 481,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_dns.zig",
+      "lines": 514,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_git.zig",
+      "lines": 419,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/zig/src/safe_heap.zig",
+      "lines": 534,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ocaml/lib/safe_crypto.ml",
+      "lines": 32,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ocaml/lib/safe_uuid.ml",
+      "lines": 162,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ada/src/proven-safe_float.adb",
+      "lines": 306,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ada/src/proven-safe_registry.adb",
+      "lines": 191,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ada/src/proven-safe_digest.adb",
+      "lines": 208,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ada/tests/test_proven.adb",
+      "lines": 118,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/c/include/safe_state_machine.h",
+      "lines": 88,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/c/src/safe_uuid.c",
+      "lines": 414,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/cpp/include/proven/safe_color.hpp",
+      "lines": 304,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/cpp/include/proven/safe_angle.hpp",
+      "lines": 355,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/bash/lib/safe_path.sh",
+      "lines": 189,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/bash/lib/safe_hex.sh",
+      "lines": 416,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/d/source/proven/safe_crypto.d",
+      "lines": 253,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/d/source/proven/safe_uuid.d",
+      "lines": 333,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/d/source/proven/safe_float.d",
+      "lines": 301,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/d/source/proven/safe_version.d",
+      "lines": 338,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/odin/proven/safe_string.odin",
+      "lines": 189,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/odin/proven/safe_path.odin",
+      "lines": 170,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/odin/proven/safe_crypto.odin",
+      "lines": 191,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/odin/proven/safe_hex.odin",
+      "lines": 402,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/odin/proven/safe_url.odin",
+      "lines": 261,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/odin/proven/safe_json.odin",
+      "lines": 299,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/odin/proven/safe_version.odin",
+      "lines": 223,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/typescript/src/wasm.ts",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/nickel/proven/safe-config.ncl",
+      "lines": 152,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/nickel/proven.ncl",
+      "lines": 26,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/hyperpolymath/proven/Result.java",
+      "lines": 104,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/hyperpolymath/proven/SafeString.java",
+      "lines": 140,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/hyperpolymath/proven/SafeCrypto.java",
+      "lines": 157,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/ProvenResult.java",
+      "lines": 121,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/SafeMath.java",
+      "lines": 230,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/SafeString.java",
+      "lines": 165,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 11,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/SafePath.java",
+      "lines": 231,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/SafeEmail.java",
+      "lines": 181,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/SafeUrl.java",
+      "lines": 265,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 13,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/SafeNetwork.java",
+      "lines": 297,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/SafeCrypto.java",
+      "lines": 238,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 12,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/SafeUuid.java",
+      "lines": 280,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 12,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/SafeCurrency.java",
+      "lines": 334,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 18,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/SafePhone.java",
+      "lines": 275,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/java/src/main/java/com/proven/SafeHex.java",
+      "lines": 247,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 11,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/Result.purs",
+      "lines": 219,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/Percentage.purs",
+      "lines": 104,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeString.purs",
+      "lines": 120,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafePath.purs",
+      "lines": 100,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeEmail.purs",
+      "lines": 83,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeUrl.purs",
+      "lines": 127,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeNetwork.purs",
+      "lines": 117,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeCrypto.purs",
+      "lines": 87,
+      "unsafe_blocks": 8,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeUUID.purs",
+      "lines": 101,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeCurrency.purs",
+      "lines": 128,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafePhone.purs",
+      "lines": 94,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeHex.purs",
+      "lines": 80,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeJson.purs",
+      "lines": 115,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeDateTime.purs",
+      "lines": 181,
+      "unsafe_blocks": 11,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeFloat.purs",
+      "lines": 120,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeVersion.purs",
+      "lines": 156,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/purescript/Proven/SafeColor.purs",
+      "lines": 164,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ephapax/src/stubs.c",
+      "lines": 159,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ephapax/src/lru_impl.zig",
+      "lines": 112,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ephapax/src/buffer_impl.zig",
+      "lines": 100,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ephapax/src/resource_impl.zig",
+      "lines": 85,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ephapax/examples/lru_cache_dyadic.eph",
+      "lines": 188,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bindings/ephapax/test_simple.c",
+      "lines": 97,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".devcontainer/post-create.sh",
+      "lines": 34,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "nix/shard.nix",
+      "lines": 14,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "memory",
+    "network",
+    "disk",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "bindings/odin/proven/safe_string.odin",
+        "to": "bindings/odin/proven/safe_path.odin",
+        "relation": "shared_dir:bindings/odin/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_path.odin",
+        "to": "bindings/odin/proven/safe_crypto.odin",
+        "relation": "shared_dir:bindings/odin/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_crypto.odin",
+        "to": "bindings/odin/proven/safe_hex.odin",
+        "relation": "shared_dir:bindings/odin/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_hex.odin",
+        "to": "bindings/odin/proven/safe_url.odin",
+        "relation": "shared_dir:bindings/odin/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_url.odin",
+        "to": "bindings/odin/proven/safe_json.odin",
+        "relation": "shared_dir:bindings/odin/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_json.odin",
+        "to": "bindings/odin/proven/safe_version.odin",
+        "relation": "shared_dir:bindings/odin/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_crypto.zig",
+        "to": "bindings/zig/src/safe_uuid.zig",
+        "relation": "shared_dir:bindings/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_uuid.zig",
+        "to": "bindings/zig/src/safe_hex.zig",
+        "relation": "shared_dir:bindings/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_hex.zig",
+        "to": "bindings/zig/src/safe_queue.zig",
+        "relation": "shared_dir:bindings/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_queue.zig",
+        "to": "bindings/zig/src/safe_tensor.zig",
+        "relation": "shared_dir:bindings/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_tensor.zig",
+        "to": "bindings/zig/src/safe_password.zig",
+        "relation": "shared_dir:bindings/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_password.zig",
+        "to": "bindings/zig/src/safe_ml.zig",
+        "relation": "shared_dir:bindings/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_ml.zig",
+        "to": "bindings/zig/src/safe_jwt.zig",
+        "relation": "shared_dir:bindings/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_jwt.zig",
+        "to": "bindings/zig/src/safe_semaphore.zig",
+        "relation": "shared_dir:bindings/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_semaphore.zig",
+        "to": "bindings/zig/src/safe_dns.zig",
+        "relation": "shared_dir:bindings/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_dns.zig",
+        "to": "bindings/zig/src/safe_git.zig",
+        "relation": "shared_dir:bindings/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_git.zig",
+        "to": "bindings/zig/src/safe_heap.zig",
+        "relation": "shared_dir:bindings/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/hyperpolymath/proven/Result.java",
+        "to": "bindings/java/src/main/java/com/hyperpolymath/proven/SafeString.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/hyperpolymath/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/hyperpolymath/proven/SafeString.java",
+        "to": "bindings/java/src/main/java/com/hyperpolymath/proven/SafeCrypto.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/hyperpolymath/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/ProvenResult.java",
+        "to": "bindings/java/src/main/java/com/proven/SafeMath.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeMath.java",
+        "to": "bindings/java/src/main/java/com/proven/SafeString.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeString.java",
+        "to": "bindings/java/src/main/java/com/proven/SafePath.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafePath.java",
+        "to": "bindings/java/src/main/java/com/proven/SafeEmail.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeEmail.java",
+        "to": "bindings/java/src/main/java/com/proven/SafeUrl.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeUrl.java",
+        "to": "bindings/java/src/main/java/com/proven/SafeNetwork.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeNetwork.java",
+        "to": "bindings/java/src/main/java/com/proven/SafeCrypto.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeCrypto.java",
+        "to": "bindings/java/src/main/java/com/proven/SafeUuid.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeUuid.java",
+        "to": "bindings/java/src/main/java/com/proven/SafeCurrency.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeCurrency.java",
+        "to": "bindings/java/src/main/java/com/proven/SafePhone.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafePhone.java",
+        "to": "bindings/java/src/main/java/com/proven/SafeHex.java",
+        "relation": "shared_dir:bindings/java/src/main/java/com/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/cpp/include/proven/safe_color.hpp",
+        "to": "bindings/cpp/include/proven/safe_angle.hpp",
+        "relation": "shared_dir:bindings/cpp/include/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/Result.purs",
+        "to": "bindings/purescript/Proven/Percentage.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/Percentage.purs",
+        "to": "bindings/purescript/Proven/SafeString.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeString.purs",
+        "to": "bindings/purescript/Proven/SafePath.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafePath.purs",
+        "to": "bindings/purescript/Proven/SafeEmail.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeEmail.purs",
+        "to": "bindings/purescript/Proven/SafeUrl.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeUrl.purs",
+        "to": "bindings/purescript/Proven/SafeNetwork.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeNetwork.purs",
+        "to": "bindings/purescript/Proven/SafeCrypto.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeCrypto.purs",
+        "to": "bindings/purescript/Proven/SafeUUID.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeUUID.purs",
+        "to": "bindings/purescript/Proven/SafeCurrency.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeCurrency.purs",
+        "to": "bindings/purescript/Proven/SafePhone.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafePhone.purs",
+        "to": "bindings/purescript/Proven/SafeHex.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeHex.purs",
+        "to": "bindings/purescript/Proven/SafeJson.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeJson.purs",
+        "to": "bindings/purescript/Proven/SafeDateTime.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeDateTime.purs",
+        "to": "bindings/purescript/Proven/SafeFloat.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeFloat.purs",
+        "to": "bindings/purescript/Proven/SafeVersion.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeVersion.purs",
+        "to": "bindings/purescript/Proven/SafeColor.purs",
+        "relation": "shared_dir:bindings/purescript/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeFile/Types.idr",
+        "to": "src/Proven/SafeFile/Proofs.idr",
+        "relation": "shared_dir:src/Proven/SafeFile",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ada/src/proven-safe_float.adb",
+        "to": "bindings/ada/src/proven-safe_registry.adb",
+        "relation": "shared_dir:bindings/ada/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ada/src/proven-safe_registry.adb",
+        "to": "bindings/ada/src/proven-safe_digest.adb",
+        "relation": "shared_dir:bindings/ada/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeCrypto.idr",
+        "to": "src/Proven/SafeDateTime.idr",
+        "relation": "shared_dir:src/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeDateTime.idr",
+        "to": "src/Proven/SafeCSV.idr",
+        "relation": "shared_dir:src/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeCSV.idr",
+        "to": "src/Proven/SafePassword.idr",
+        "relation": "shared_dir:src/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafePassword.idr",
+        "to": "src/Proven/SafeLRU.idr",
+        "relation": "shared_dir:src/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeLRU.idr",
+        "to": "src/Proven/SafeCapability.idr",
+        "relation": "shared_dir:src/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeCapability.idr",
+        "to": "src/Proven/SafeRegistry.idr",
+        "relation": "shared_dir:src/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeRegistry.idr",
+        "to": "src/Proven/SafeDigest.idr",
+        "relation": "shared_dir:src/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeDigest.idr",
+        "to": "src/Proven/SafeFiniteField.idr",
+        "relation": "shared_dir:src/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeFiniteField.idr",
+        "to": "src/Proven/SafeSet.idr",
+        "relation": "shared_dir:src/Proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/julia/src/SafeHex.jl",
+        "to": "bindings/julia/src/SafeString.jl",
+        "relation": "shared_dir:bindings/julia/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/julia/src/SafeString.jl",
+        "to": "bindings/julia/src/SafeJson.jl",
+        "relation": "shared_dir:bindings/julia/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeJson/Parser.idr",
+        "to": "src/Proven/SafeJson/Proofs.idr",
+        "relation": "shared_dir:src/Proven/SafeJson",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ocaml/lib/safe_crypto.ml",
+        "to": "bindings/ocaml/lib/safe_uuid.ml",
+        "relation": "shared_dir:bindings/ocaml/lib",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeEnv/Types.idr",
+        "to": "src/Proven/SafeEnv/Proofs.idr",
+        "relation": "shared_dir:src/Proven/SafeEnv",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/d/source/proven/safe_crypto.d",
+        "to": "bindings/d/source/proven/safe_uuid.d",
+        "relation": "shared_dir:bindings/d/source/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/d/source/proven/safe_uuid.d",
+        "to": "bindings/d/source/proven/safe_float.d",
+        "relation": "shared_dir:bindings/d/source/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/d/source/proven/safe_float.d",
+        "to": "bindings/d/source/proven/safe_version.d",
+        "relation": "shared_dir:bindings/d/source/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/FFI/Echidna.idr",
+        "to": "src/Proven/FFI/LRU.idr",
+        "relation": "shared_dir:src/Proven/FFI",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/FFI/LRU.idr",
+        "to": "src/Proven/FFI/Buffer.idr",
+        "relation": "shared_dir:src/Proven/FFI",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/FFI/Buffer.idr",
+        "to": "src/Proven/FFI/Resource.idr",
+        "relation": "shared_dir:src/Proven/FFI",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeJWT/Validate.idr",
+        "to": "src/Proven/SafeJWT/Proofs.idr",
+        "relation": "shared_dir:src/Proven/SafeJWT",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/rust/src/core.rs",
+        "to": "bindings/rust/src/lib.rs",
+        "relation": "shared_dir:bindings/rust/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeCrypto/Hash.idr",
+        "to": "src/Proven/SafeCrypto/Proofs.idr",
+        "relation": "shared_dir:src/Proven/SafeCrypto",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeCrypto/Proofs.idr",
+        "to": "src/Proven/SafeCrypto/Random.idr",
+        "relation": "shared_dir:src/Proven/SafeCrypto",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/rescript/src/Proven_FFI.res",
+        "to": "bindings/rescript/src/Proven_FFI.res.js",
+        "relation": "shared_dir:bindings/rescript/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/bash/lib/safe_path.sh",
+        "to": "bindings/bash/lib/safe_hex.sh",
+        "relation": "shared_dir:bindings/bash/lib",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ephapax/src/stubs.c",
+        "to": "bindings/ephapax/src/lru_impl.zig",
+        "relation": "shared_dir:bindings/ephapax/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ephapax/src/lru_impl.zig",
+        "to": "bindings/ephapax/src/buffer_impl.zig",
+        "relation": "shared_dir:bindings/ephapax/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ephapax/src/buffer_impl.zig",
+        "to": "bindings/ephapax/src/resource_impl.zig",
+        "relation": "shared_dir:bindings/ephapax/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/SafeHeader/Parser.idr",
+        "to": "src/Proven/SafeHeader/Proofs.idr",
+        "relation": "shared_dir:src/Proven/SafeHeader",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_bloom.go",
+        "to": "bindings/go/proven/safe_retry.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_retry.go",
+        "to": "bindings/go/proven/safe_graph.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_graph.go",
+        "to": "bindings/go/proven/safe_uuid.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_uuid.go",
+        "to": "bindings/go/proven/safe_hex.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_hex.go",
+        "to": "bindings/go/proven/safe_network.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_network.go",
+        "to": "bindings/go/proven/safe_path.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_path.go",
+        "to": "bindings/go/proven/safe_json.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_json.go",
+        "to": "bindings/go/proven/safe_password.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_password.go",
+        "to": "bindings/go/proven/safe_header.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_header.go",
+        "to": "bindings/go/proven/safe_content_type.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_content_type.go",
+        "to": "bindings/go/proven/safe_tensor.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_tensor.go",
+        "to": "bindings/go/proven/safe_ml.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_ml.go",
+        "to": "bindings/go/proven/safe_buffer.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_buffer.go",
+        "to": "bindings/go/proven/safe_queue.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_queue.go",
+        "to": "bindings/go/proven/safe_lru.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_lru.go",
+        "to": "bindings/go/proven/safe_rate_limiter.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_rate_limiter.go",
+        "to": "bindings/go/proven/safe_circuit_breaker.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_circuit_breaker.go",
+        "to": "bindings/go/proven/safe_monotonic.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_monotonic.go",
+        "to": "bindings/go/proven/safe_state_machine.go",
+        "relation": "shared_dir:bindings/go/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/python/proven/safe_lru.py",
+        "to": "bindings/python/proven/safe_rate_limiter.py",
+        "relation": "shared_dir:bindings/python/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/python/proven/safe_rate_limiter.py",
+        "to": "bindings/python/proven/safe_circuit_breaker.py",
+        "relation": "shared_dir:bindings/python/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/python/proven/safe_circuit_breaker.py",
+        "to": "bindings/python/proven/safe_monotonic.py",
+        "relation": "shared_dir:bindings/python/proven",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Proven/FFI/Echidna.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "src/Proven/FFI/LRU.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "src/Proven/FFI/Buffer.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "src/Proven/FFI/Resource.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "src/Proven/SafeCrypto/Hash.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 60.0
+      },
+      {
+        "from": "src/Proven/SafeCrypto/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 45.0
+      },
+      {
+        "from": "src/Proven/SafeCrypto/Random.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "src/Proven/SafeEmail/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 42.0
+      },
+      {
+        "from": "src/Proven/SafeJson/Parser.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/Proven/SafeJson/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 33.0
+      },
+      {
+        "from": "src/Proven/SafeMath/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/Proven/SafePassword/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 87.0
+      },
+      {
+        "from": "src/Proven/SafePath/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 69.0
+      },
+      {
+        "from": "src/Proven/SafeString/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "src/Proven/SafeUrl/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 42.0
+      },
+      {
+        "from": "src/Proven/SafeCrypto.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 15.0
+      },
+      {
+        "from": "src/Proven/SafeDateTime.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/Proven/SafeCSV.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/Proven/SafePassword.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 24.0
+      },
+      {
+        "from": "src/Proven/SafeRegex/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 84.0
+      },
+      {
+        "from": "src/Proven/SafeSQL/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "src/Proven/SafeJWT/Validate.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "src/Proven/SafeJWT/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 54.0
+      },
+      {
+        "from": "src/Proven/SafeBase64/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 66.0
+      },
+      {
+        "from": "src/Proven/SafeXML/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "src/Proven/SafeYAML/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "src/Proven/SafeTOML/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 15.0
+      },
+      {
+        "from": "src/Proven/SafeEnv/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/Proven/SafeEnv/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "src/Proven/SafeArgs/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "src/Proven/SafeFile/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "src/Proven/SafeFile/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "src/Proven/SafeHeader/Parser.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/Proven/SafeHeader/Proofs.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "src/Proven/SafeCookie/Parser.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/Proven/SafeContentType/Parser.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "src/Proven/ECHIDNA/Soundness.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/Proven/SafeLRU.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/Proven/SafeCapability.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/Proven/SafeRegistry.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/Proven/SafeDigest.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 15.0
+      },
+      {
+        "from": "src/Proven/SafeFiniteField.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 42.0
+      },
+      {
+        "from": "src/Proven/SafeSet.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/SafeHistory.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/TestSafe.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "bindings/python/proven/safe_lru.py",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "bindings/python/proven/safe_rate_limiter.py",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "bindings/python/proven/safe_circuit_breaker.py",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "bindings/python/proven/safe_monotonic.py",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "bindings/rust/src/core.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/rust/src/lib.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_bloom.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_retry.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_graph.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_uuid.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_hex.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_network.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_path.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_json.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_password.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_header.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_content_type.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_tensor.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_ml.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_buffer.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_queue.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_lru.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_rate_limiter.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_circuit_breaker.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/go/proven/safe_monotonic.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "bindings/go/proven/safe_state_machine.go",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/rescript/src/Proven_FFI.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "bindings/rescript/src/Proven_FFI.res.js",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/julia/src/SafeHex.jl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/julia/src/SafeString.jl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/julia/src/SafeJson.jl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/elixir/native/proven_nif/src/lib.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "bindings/zig/src/safe_crypto.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "bindings/zig/src/safe_uuid.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_hex.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_queue.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "bindings/zig/src/safe_tensor.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_password.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_ml.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_jwt.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_semaphore.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "bindings/zig/src/safe_dns.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_git.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/src/safe_heap.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "bindings/ocaml/lib/safe_crypto.ml",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ocaml/lib/safe_uuid.ml",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ada/src/proven-safe_float.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ada/src/proven-safe_registry.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "bindings/ada/src/proven-safe_digest.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ada/tests/test_proven.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/c/include/safe_state_machine.h",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/c/src/safe_uuid.c",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/cpp/include/proven/safe_color.hpp",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/cpp/include/proven/safe_angle.hpp",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/bash/lib/safe_path.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/bash/lib/safe_hex.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/d/source/proven/safe_crypto.d",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "bindings/d/source/proven/safe_uuid.d",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "bindings/d/source/proven/safe_float.d",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/d/source/proven/safe_version.d",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_string.odin",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_path.odin",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_crypto.odin",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_hex.odin",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_url.odin",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_json.odin",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/odin/proven/safe_version.odin",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/typescript/src/wasm.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/nickel/proven/safe-config.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/nickel/proven.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/hyperpolymath/proven/Result.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/hyperpolymath/proven/SafeString.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/hyperpolymath/proven/SafeCrypto.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/ProvenResult.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeMath.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeString.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafePath.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeEmail.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeUrl.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeNetwork.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeCrypto.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeUuid.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeCurrency.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafePhone.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/java/src/main/java/com/proven/SafeHex.java",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/purescript/Proven/Result.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "bindings/purescript/Proven/Percentage.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeString.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafePath.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 15.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeEmail.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeUrl.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeNetwork.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeCrypto.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 24.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeUUID.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeCurrency.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafePhone.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeHex.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 15.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeJson.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeDateTime.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 33.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeFloat.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeVersion.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "bindings/purescript/Proven/SafeColor.purs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 15.0
+      },
+      {
+        "from": "bindings/ephapax/src/stubs.c",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ephapax/src/lru_impl.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ephapax/src/buffer_impl.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ephapax/src/resource_impl.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/ephapax/examples/lru_cache_dyadic.eph",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "bindings/ephapax/test_simple.c",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".devcontainer/post-create.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "nix/shard.nix",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          "bindings/racket/safe-phone.rkt"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "bindings/deno/src/safe_string.ts",
+          "build-simple/exec/test_ffi_exports_app/test_ffi_exports.ss"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "DynamicCodeExecution->Memory"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          ".devcontainer/post-create.sh"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "src/Proven/SafeSQL.idr"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "CommandInjection->Network"
+      },
+      {
+        "source_category": "UnsafeFFI",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "bindings/purescript/Proven/SafeString.purs",
+          "bindings/purescript/Proven/SafeCrypto.purs",
+          "bindings/purescript/Proven/SafeDateTime.purs"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "UnsafeFFI->Memory"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "src/Proven/SafePassword/Strength.idr",
+          "bindings/bash/lib/safe_url.sh"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "HardcodedSecret->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "bindings/bash/lib/safe_crypto.sh",
+          "bindings/prolog/safe_string.pl"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "src/Proven/SafeCrypto/Hash.idr",
+          "src/Proven/SafeCrypto/Proofs.idr",
+          "src/Proven/SafeCrypto/Random.idr",
+          "src/Proven/SafeEmail/Proofs.idr",
+          "src/Proven/SafeJson/Parser.idr",
+          "src/Proven/SafeJson/Proofs.idr",
+          "src/Proven/SafeMath/Proofs.idr",
+          "src/Proven/SafePassword/Proofs.idr",
+          "src/Proven/SafePath/Proofs.idr",
+          "src/Proven/SafeString/Proofs.idr",
+          "src/Proven/SafeUrl/Proofs.idr",
+          "src/Proven/SafeCrypto.idr",
+          "src/Proven/SafeDateTime.idr",
+          "src/Proven/SafeCSV.idr",
+          "src/Proven/SafePassword.idr",
+          "src/Proven/SafeRegex/Proofs.idr",
+          "src/Proven/SafeSQL/Proofs.idr",
+          "src/Proven/SafeJWT/Validate.idr",
+          "src/Proven/SafeJWT/Proofs.idr",
+          "src/Proven/SafeBase64/Proofs.idr",
+          "src/Proven/SafeXML/Proofs.idr",
+          "src/Proven/SafeYAML/Proofs.idr",
+          "src/Proven/SafeTOML/Proofs.idr",
+          "src/Proven/SafeEnv/Types.idr",
+          "src/Proven/SafeEnv/Proofs.idr",
+          "src/Proven/SafeArgs/Proofs.idr",
+          "src/Proven/SafeFile/Types.idr",
+          "src/Proven/SafeFile/Proofs.idr",
+          "src/Proven/SafeHeader/Parser.idr",
+          "src/Proven/SafeHeader/Proofs.idr",
+          "src/Proven/SafeCookie/Parser.idr",
+          "src/Proven/SafeContentType/Parser.idr",
+          "src/Proven/ECHIDNA/Soundness.idr",
+          "src/Proven/SafeLRU.idr",
+          "src/Proven/SafeCapability.idr",
+          "src/Proven/SafeRegistry.idr",
+          "src/Proven/SafeDigest.idr",
+          "src/Proven/SafeFiniteField.idr",
+          "src/Proven/SafeSet.idr",
+          "src/SafeHistory.idr",
+          "bindings/zig/src/safe_crypto.zig",
+          "bindings/ada/src/proven-safe_registry.adb"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "bindings/bash/lib/safe_math.sh",
+          "bindings/bash/lib/safe_string.sh",
+          "bindings/bash/lib/safe_path.sh",
+          "bindings/bash/lib/safe_email.sh",
+          "bindings/bash/lib/safe_network.sh",
+          "bindings/bash/lib/safe_crypto.sh",
+          "bindings/bash/lib/safe_crypto.sh",
+          "bindings/bash/lib/safe_uuid.sh",
+          "bindings/bash/lib/safe_currency.sh",
+          "bindings/bash/lib/safe_phone.sh",
+          "bindings/bash/lib/safe_hex.sh",
+          "bindings/bash/lib/safe_url.sh",
+          "bindings/bash/lib/safe_json.sh",
+          "bindings/bash/lib/safe_datetime.sh",
+          "bindings/bash/lib/safe_float.sh",
+          "bindings/bash/lib/safe_version.sh",
+          "bindings/bash/lib/safe_color.sh",
+          "bindings/prolog/safe_string.pl"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "UncheckedAllocation",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "bindings/ephapax/src/stubs.c"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "UncheckedAllocation->Memory"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "src/Proven/SafeXML/Proofs.idr",
+          "bindings/go/proven/proven_test.go",
+          "bindings/julia/test/runtests.jl",
+          "bindings/elixir/test/proven_test.exs",
+          "tests/properties/SafeUrlProps.idr",
+          "tests/properties/SafeXMLProps.idr",
+          "tests/unit/SafeHtmlUnit.idr",
+          "tests/unit/SafeUrlUnit.idr"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "bindings/deno/src/safe_string.ts",
+          "build-simple/exec/test_ffi_exports_app/test_ffi_exports.ss"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      }
+    ]
+  }
+}

@@ -1,0 +1,252 @@
+{
+  "program_path": ".",
+  "language": "shell",
+  "frameworks": [
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "PathTraversal",
+      "location": "examples/axiom-smt-runner/solver-runner.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in examples/axiom-smt-runner/solver-runner.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "vectors/runtime-integration/build-test-bundles.sh",
+      "severity": "Medium",
+      "description": "26 potentially unquoted variable expansions in vectors/runtime-integration/build-test-bundles.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 3625,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 4,
+    "allocation_sites": 3,
+    "io_operations": 19,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "examples/axiom-smt-runner/solver-runner.sh",
+      "lines": 96,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "vectors/runtime-integration/build-test-bundles.sh",
+      "lines": 146,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "implementations/containerd-shim/src/main.rs",
+      "lines": 172,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "implementations/containerd-shim/src/bundle.rs",
+      "lines": 164,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "implementations/containerd-shim/src/verify.rs",
+      "lines": 619,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "implementations/containerd-shim/src/main.rs",
+        "to": "implementations/containerd-shim/src/bundle.rs",
+        "relation": "shared_dir:implementations/containerd-shim/src",
+        "weight": 1.0
+      },
+      {
+        "from": "implementations/containerd-shim/src/bundle.rs",
+        "to": "implementations/containerd-shim/src/verify.rs",
+        "relation": "shared_dir:implementations/containerd-shim/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/axiom-smt-runner/solver-runner.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "vectors/runtime-integration/build-test-bundles.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "implementations/containerd-shim/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "implementations/containerd-shim/src/bundle.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "implementations/containerd-shim/src/verify.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "vectors/runtime-integration/build-test-bundles.sh"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "examples/axiom-smt-runner/solver-runner.sh"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PathTraversal->Disk"
+      }
+    ]
+  }
+}

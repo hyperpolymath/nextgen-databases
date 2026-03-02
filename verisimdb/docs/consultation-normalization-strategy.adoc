@@ -1,0 +1,920 @@
+= Consultation Paper: Normalization Cascade Strategy
+:author: VeriSimDB Design Team
+:date: 2026-01-22
+:toc: left
+:toclevels: 4
+:sectnums:
+:source-highlighter: rouge
+
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+[abstract]
+== Abstract
+
+This consultation paper explores the **most challenging architectural decision in VeriSimDB**: how to manage normalization across five levels of the system (L0: intra-modality → L4: cross-lineage) while balancing consistency, performance, and federation scalability. We present deep technical analysis of push vs pull strategies, Byzantine fault tolerance, and adaptive threshold learning.
+
+**Status**: Open for consultation +
+**Decision Required By**: v1.0 implementation phase +
+**Stakeholders**: Core team, federated store operators, compliance officers
+
+---
+
+== 1. Problem Statement
+
+=== 1.1 The Core Challenge
+
+VeriSimDB's multimodal federation creates **five distinct levels of normalization**, each with different consistency requirements:
+
+[cols="1,2,2,2",options="header"]
+|===
+|Level |Scope |Example Drift |Consistency Requirement
+
+|**L0** |Intra-modality +
+(within single store)
+|Graph edge exists but vector embedding missing
+|**Strong** - should not occur
+
+|**L1** |Cross-modality +
+(across modalities in hexad)
+|Title mismatch: graph says "ML Paper" vs document says "Machine Learning Paper"
+|**Eventually consistent** - cosmetic
+
+|**L2** |Cross-hexad +
+(between related hexads)
+|Author hexad links to paper hexad that doesn't exist yet
+|**Eventually consistent** - temporal ordering
+
+|**L3** |Cross-store +
+(federated stores)
+|University A has version 1.2, University B has version 1.1
+|**Quorum-based** - Byzantine tolerance needed
+
+|**L4** |Cross-lineage +
+(external systems)
+|DOI resolver returns different metadata than our cache
+|**Best-effort** - we don't control external systems
+|===
+
+**The question**: For each level, should normalization be:
+
+- **Pushed** (proactive propagation: detect drift → notify all affected parties → repair immediately)?
+- **Pulled** (reactive repair: detect drift on query → repair locally → cache result)?
+- **Hybrid** (push critical issues, pull optimizations)?
+
+=== 1.2 Why This Matters
+
+**Wrong choice consequences**:
+
+1. **Too much push**: Thundering herd problem, network storms, federated stores overwhelmed with repair messages
+2. **Too much pull**: Stale data, compliance violations (GDPR right-to-forget not propagated), users see inconsistent results
+3. **No strategy**: Drift accumulates until system unusable
+
+**Scale**: At 100 federated stores with 1M hexads each:
+- Push strategy: ~100 billion messages/day (if 1% daily drift)
+- Pull strategy: ~1 billion query-time repairs/day (if 10 queries/hexad/day)
+
+This is not a theoretical problem—it's the **make-or-break architectural decision** for federation scalability.
+
+---
+
+== 2. Deep Technical Analysis
+
+=== 2.1 Push Strategy (Eventual Consistency Model)
+
+==== 2.1.1 How It Works
+
+When drift detected at any level:
+
+```
+┌─────────────┐
+│ Detect Drift│
+└──────┬──────┘
+       │
+       v
+┌─────────────────────┐
+│ Classify Drift Type │
+└──────┬──────────────┘
+       │
+       v
+┌─────────────────────────┐
+│ Broadcast Repair Message│  ← To ALL affected stores
+└──────┬──────────────────┘
+       │
+       v
+┌─────────────────────────┐
+│ Wait for ACK (optional) │
+└──────┬──────────────────┘
+       │
+       v
+┌─────────────────────────┐
+│ Mark as Consistent      │
+└─────────────────────────┘
+```
+
+**Elixir GenServer pseudo-code**:
+
+```elixir
+defmodule VeriSim.DriftMonitor do
+  use GenServer
+
+  @doc "Detected drift at L1 (cross-modality)"
+  def handle_cast({:drift_detected, :l1_cross_modal, drift_details}, state) do
+    # Classify drift severity
+    severity = classify_drift(drift_details)
+
+    case severity do
+      :critical ->
+        # Push immediately to all affected hexads
+        affected_hexads = find_affected_hexads(drift_details)
+        Enum.each(affected_hexads, fn hexad_id ->
+          VeriSim.Hexad.repair(hexad_id, drift_details)
+        end)
+
+        # Broadcast to federation if cross-store impact
+        if affects_federation?(drift_details) do
+          VeriSim.Federation.broadcast_repair(drift_details)
+        end
+
+      :optimization ->
+        # Queue for batch processing (don't push)
+        {:noreply, enqueue_for_batch(state, drift_details)}
+
+      :cosmetic ->
+        # Log only, no action
+        Logger.info("Cosmetic drift detected: #{inspect(drift_details)}")
+        {:noreply, state}
+    end
+  end
+end
+```
+
+==== 2.1.2 Advantages
+
+1. **Strong consistency guarantees**: All stores converge to same state eventually
+2. **Compliance-friendly**: GDPR "right to forget" propagates immediately
+3. **Predictable behavior**: Users see consistent data across federation
+4. **Audit trail**: Push messages create immutable log of all repairs
+
+==== 2.1.3 Disadvantages
+
+1. **Network overhead**: Every drift generates N messages (N = number of affected stores)
+2. **Latency**: Mutations block until repair messages sent (unless async)
+3. **Thundering herd**: If one store detects drift, all stores receive repair messages simultaneously
+4. **Byzantine attacks**: Malicious store can flood federation with fake repair messages
+5. **Cascading failures**: If repair fails at one store, should transaction abort everywhere?
+
+==== 2.1.4 Real-World Measurements
+
+From Kafka's migration to KRaft (similar problem domain):
+
+- **Metadata propagation latency**: 50ms median, 500ms p99 for 10-node cluster
+- **Network amplification**: 1 metadata change → 10× messages (gossip protocol)
+- **Failure mode**: Controller node failure causes 5-10 second unavailability
+
+**Extrapolated to VeriSimDB**:
+- At 100 federated stores, 1% daily drift rate (1M hexads):
+  - **10,000 drift events/day**
+  - **1,000,000 repair messages/day** (100× amplification)
+  - **~12 messages/second** sustained load
+  - **Peak load**: 1000+ messages/second (if drift batches correlate)
+
+=== 2.2 Pull Strategy (Lazy Consistency Model)
+
+==== 2.2.1 How It Works
+
+```
+┌──────────┐
+│ Query    │
+└────┬─────┘
+     │
+     v
+┌─────────────────┐
+│ Detect Drift?   │ ← During query execution
+└────┬────────────┘
+     │ Yes
+     v
+┌─────────────────┐
+│ Repair Locally  │ ← Only for this query
+└────┬────────────┘
+     │
+     v
+┌─────────────────┐
+│ Cache Result    │ ← TTL-based cache
+└────┬────────────┘
+     │
+     v
+┌─────────────────┐
+│ Return to User  │
+└─────────────────┘
+```
+
+**VQL query-time repair**:
+
+```vql
+-- User's query
+SELECT GRAPH, DOCUMENT
+FROM verisim:semantic
+WHERE hexad.types INCLUDES "Paper"
+LIMIT 100;
+
+-- VeriSimDB internally detects: graph title ≠ document title
+-- Applies repair strategy: LATEST_WINS
+-- Returns repaired results to user
+-- Caches repair for TTL duration (adaptive: 5 min → 1 hour)
+```
+
+**Rust store pseudo-code**:
+
+```rust
+impl HexadStore {
+    pub async fn query_with_repair(
+        &self,
+        query: &VQLQuery,
+        repair_policy: RepairPolicy,
+    ) -> Result<QueryResult, VQLError> {
+        // Execute query
+        let raw_results = self.execute_query(query).await?;
+
+        // Detect drift in results
+        let drift_detected = self.detect_drift(&raw_results)?;
+
+        if !drift_detected.is_empty() {
+            // Repair on-the-fly
+            let repaired = match repair_policy {
+                RepairPolicy::LatestWins => self.repair_latest_wins(raw_results, drift_detected),
+                RepairPolicy::Quorum => self.repair_quorum(raw_results, drift_detected).await?,
+                RepairPolicy::Manual => return Err(VQLError::ManualRepairRequired(drift_detected)),
+            };
+
+            // Cache repaired results
+            self.cache.insert(query.cache_key(), repaired.clone(), adaptive_ttl());
+
+            Ok(repaired)
+        } else {
+            Ok(raw_results)
+        }
+    }
+}
+```
+
+==== 2.2.2 Advantages
+
+1. **Low network overhead**: No proactive propagation, repair only when needed
+2. **No thundering herd**: Repairs happen independently per query
+3. **Graceful degradation**: If federation unavailable, local store still works
+4. **Adaptive**: Can increase cache TTL if drift rare, decrease if frequent
+5. **Byzantine-resistant**: Malicious store can't flood network (no broadcast)
+
+==== 2.2.3 Disadvantages
+
+1. **Stale data**: Users may see inconsistent results until query triggers repair
+2. **Query latency**: First query after drift pays repair cost (subsequent queries cached)
+3. **Compliance risk**: GDPR "right to forget" not immediate (depends on query frequency)
+4. **Cache invalidation complexity**: When to invalidate? TTL-based risks stale cache
+5. **Repair inconsistency**: Two simultaneous queries might repair differently
+
+==== 2.2.4 Real-World Measurements
+
+From DNS caching (similar problem domain):
+
+- **Cache hit rate**: 80-95% for popular domains (TTL: 5 min - 24 hours)
+- **Stale data window**: TTL duration (median: 1 hour)
+- **Repair latency**: First query pays full cost, subsequent queries ~1ms (cached)
+
+**Extrapolated to VeriSimDB**:
+- At 100 federated stores, 1% daily drift rate (1M hexads), 10 queries/hexad/day:
+  - **100,000 drift instances/day**
+  - **1,000,000 query-time repairs/day** (if 10 queries hit each drift)
+  - **Cache hit rate**: 90% (if TTL = 1 hour, query distribution even)
+  - **Actual repairs**: 100,000/day (10% cache miss)
+  - **Network messages**: 100,000/day (vs 1,000,000 for push strategy)
+
+=== 2.3 Hybrid Strategy (Recommended)
+
+==== 2.3.1 Core Principle
+
+**Push critical safety issues, pull optimization issues.**
+
+```
+┌─────────────┐
+│ Detect Drift│
+└──────┬──────┘
+       │
+       v
+┌─────────────────┐
+│ Classify Drift  │
+└──────┬──────────┘
+       │
+       ├─ Critical? ──> PUSH (retraction, integrity, access)
+       │
+       └─ Optimization? ──> PULL (title mismatch, cache)
+```
+
+**Classification table**:
+
+[cols="1,1,2,2",options="header"]
+|===
+|Drift Type |Severity |Strategy |Rationale
+
+|**Retraction** +
+(paper retracted)
+|Critical
+|**PUSH** immediately
+|Compliance: must propagate retraction to all cites
+
+|**Integrity violation** +
+(hash mismatch)
+|Critical
+|**PUSH** immediately
+|Security: data corruption must be flagged
+
+|**Access revocation** +
+(permission removed)
+|Critical
+|**PUSH** immediately
+|Privacy: unauthorized access must stop immediately
+
+|**Schema version** +
+(v1.1 vs v1.2)
+|High
+|**ASYNC PUSH** (batched)
+|Federation: stores should converge but not urgent
+
+|**Title mismatch** +
+("ML Paper" vs "Machine Learning Paper")
+|Low
+|**PULL** on query
+|Cosmetic: user sees consistent result, no propagation needed
+
+|**Derived data stale** +
+(citation count cached)
+|Low
+|**PULL** on query
+|Optimization: recompute on demand
+
+|**External sync** +
+(DOI metadata changed)
+|Advisory
+|**PULL** periodically (cron)
+|Best-effort: we don't control external system
+|===
+
+==== 2.3.2 Implementation Strategy
+
+**Elixir adaptive thresholds**:
+
+```elixir
+defmodule VeriSim.AdaptiveLearner do
+  @moduledoc """
+  Learn optimal push/pull thresholds based on observed metrics.
+  """
+
+  def adjust_thresholds(state) do
+    # Observe metrics
+    push_frequency = Metrics.get(:push_messages_per_hour)
+    pull_latency = Metrics.get(:pull_repair_latency_p99)
+    drift_frequency = Metrics.get(:drift_events_per_hour)
+
+    # Adjust push threshold (when does "high severity" become "critical"?)
+    new_push_threshold = cond do
+      push_frequency > 1000 ->
+        # Too many push messages, raise threshold (push less)
+        state.push_threshold + 0.1
+
+      pull_latency > 500 ->
+        # Pull repairs too slow, lower threshold (push more)
+        state.push_threshold - 0.1
+
+      true ->
+        state.push_threshold
+    end
+
+    # Adjust cache TTL (how long to cache pull repairs?)
+    new_cache_ttl = cond do
+      drift_frequency < 10 ->
+        # Drift rare, increase TTL (cache longer)
+        min(state.cache_ttl * 1.5, 3600)
+
+      drift_frequency > 100 ->
+        # Drift frequent, decrease TTL (cache shorter)
+        max(state.cache_ttl * 0.7, 60)
+
+      true ->
+        state.cache_ttl
+    end
+
+    %{state |
+      push_threshold: clamp(new_push_threshold, 0.0, 1.0),
+      cache_ttl: new_cache_ttl
+    }
+  end
+end
+```
+
+==== 2.3.3 Advantages
+
+1. **Best of both worlds**: Safety of push, scalability of pull
+2. **Adaptive**: System learns optimal thresholds from workload
+3. **Predictable critical path**: Compliance issues (retraction, access) always pushed
+4. **Graceful degradation**: If push fails, fall back to pull
+
+==== 2.3.4 Disadvantages
+
+1. **Implementation complexity**: Must classify every drift type
+2. **Classification errors**: Misclassifying critical as optimization = compliance violation
+3. **Threshold tuning**: Initial thresholds may be wrong, takes time to converge
+4. **Hybrid confusion**: Users/operators must understand two consistency models
+
+---
+
+== 3. Byzantine Fault Tolerance
+
+=== 3.1 Threat Model
+
+In federated VeriSimDB, we must assume **Byzantine faults**:
+
+1. **Malicious store**: Intentionally sends fake drift messages ("paper retracted" when it's not)
+2. **Compromised store**: Attacker controls a store, floods network with repair messages
+3. **Network partition**: Store can't reach quorum, must decide: abort or continue?
+
+**Not in threat model** (out of scope):
+- Nation-state attacks
+- Compromise of all stores simultaneously
+- Side-channel attacks (timing, power analysis)
+
+=== 3.2 Quorum-Based Consensus
+
+**For L3 (cross-store) normalization**, use quorum voting:
+
+```
+┌─────────────────────┐
+│ Store A detects     │
+│ drift: title changed│
+└──────┬──────────────┘
+       │
+       v
+┌────────────────────────────┐
+│ Query federation:          │
+│ "What is correct title?"   │
+└──────┬─────────────────────┘
+       │
+       v
+┌────────────────────────────┐
+│ Collect responses:         │
+│ Store A: "ML Paper"        │
+│ Store B: "ML Paper"        │
+│ Store C: "Machine Learning"│
+│ Store D: "ML Paper"        │
+│ Store E: [no response]     │
+└──────┬─────────────────────┘
+       │
+       v
+┌────────────────────────────┐
+│ Quorum (3/5): "ML Paper"   │
+│ → Repair to quorum value   │
+└────────────────────────────┘
+```
+
+**Quorum size**: `2f + 1` for `f` Byzantine faults
+
+- **f=1** (tolerate 1 malicious store): Quorum = 3
+- **f=2** (tolerate 2 malicious stores): Quorum = 5
+
+**Rust implementation**:
+
+```rust
+pub struct FederationQuorum {
+    stores: Vec<StoreEndpoint>,
+    timeout: Duration,
+}
+
+impl FederationQuorum {
+    pub async fn repair_with_quorum(
+        &self,
+        hexad_id: HexadId,
+        field: &str,
+    ) -> Result<String, QuorumError> {
+        // Query all stores in parallel
+        let responses = self.query_all_stores(hexad_id, field).await?;
+
+        // Count responses
+        let mut counts: HashMap<String, usize> = HashMap::new();
+        for response in responses {
+            *counts.entry(response.value).or_insert(0) += 1;
+        }
+
+        // Find quorum value (> 50% of stores)
+        let total_stores = self.stores.len();
+        let quorum_size = (total_stores / 2) + 1;
+
+        for (value, count) in counts {
+            if count >= quorum_size {
+                return Ok(value);
+            }
+        }
+
+        // No quorum reached
+        Err(QuorumError::NoConsensus {
+            hexad_id,
+            field: field.to_string(),
+            responses,
+        })
+    }
+}
+```
+
+=== 3.3 Signature Verification
+
+**All repair messages must be signed** (using sactify-php):
+
+```elixir
+defmodule VeriSim.Federation.RepairMessage do
+  defstruct [
+    :hexad_id,
+    :drift_type,
+    :repair_action,
+    :timestamp,
+    :source_store_id,
+    :signature  # Ed25519 signature from source store
+  ]
+
+  def verify(message) do
+    # Get source store's public key from registry
+    public_key = VeriSim.Registry.get_store_pubkey(message.source_store_id)
+
+    # Verify signature
+    payload = encode_payload(message)
+    case :crypto.verify(:eddsa, :sha512, payload, message.signature, [public_key, :ed25519]) do
+      true -> {:ok, message}
+      false -> {:error, :invalid_signature}
+    end
+  end
+end
+```
+
+**Attack mitigation**:
+- **Fake repair messages**: Rejected (invalid signature)
+- **Replay attacks**: Timestamp checked, messages expire after 5 minutes
+- **Store impersonation**: Public keys registered in immutable registry
+
+---
+
+== 4. Performance Modeling
+
+=== 4.1 Push Strategy Cost Model
+
+Variables:
+- `N` = number of federated stores
+- `H` = number of hexads
+- `D` = daily drift rate (as fraction, e.g., 0.01 = 1%)
+- `M` = message size (bytes)
+
+**Daily network cost**:
+```
+Messages_per_day = H × D × N
+Bytes_per_day = Messages_per_day × M
+```
+
+**Example (conservative)**:
+- N = 100 stores
+- H = 1,000,000 hexads
+- D = 0.01 (1% daily drift)
+- M = 1024 bytes (1 KB message)
+
+```
+Messages_per_day = 1,000,000 × 0.01 × 100 = 1,000,000
+Bytes_per_day = 1,000,000 × 1024 = 1 GB/day
+Network_cost = $0.01/GB × 1 GB × 100 stores = $1/day
+```
+
+**Scaling**:
+- At N = 1,000 stores: $10/day = $3,650/year
+- At N = 10,000 stores: $100/day = $36,500/year
+
+**Break-even analysis**:
+- Pull strategy cost: Query latency × number of queries
+- Push strategy cost: Network bandwidth × number of stores
+- Break-even when query latency savings > network costs
+
+=== 4.2 Pull Strategy Cost Model
+
+Variables:
+- `Q` = queries per hexad per day
+- `L_repair` = repair latency (ms)
+- `L_cache` = cache hit latency (ms)
+- `C` = cache hit rate (as fraction, e.g., 0.9 = 90%)
+
+**Daily query latency cost**:
+```
+Repairs_per_day = H × D × Q
+Cache_hits = Repairs_per_day × C
+Cache_misses = Repairs_per_day × (1 - C)
+
+Latency_cost = Cache_misses × L_repair + Cache_hits × L_cache
+```
+
+**Example (conservative)**:
+- H = 1,000,000 hexads
+- D = 0.01 (1% daily drift)
+- Q = 10 queries/hexad/day
+- L_repair = 100 ms
+- L_cache = 1 ms
+- C = 0.9 (90% cache hit)
+
+```
+Repairs_per_day = 1,000,000 × 0.01 × 10 = 100,000
+Cache_hits = 100,000 × 0.9 = 90,000
+Cache_misses = 100,000 × 0.1 = 10,000
+
+Latency_cost = 10,000 × 100ms + 90,000 × 1ms = 1,090,000 ms = ~18 minutes total
+```
+
+**User experience**:
+- 10,000 users experience 100ms latency (cache miss)
+- 90,000 users experience 1ms latency (cache hit)
+- Average latency: 10.9ms per query
+
+=== 4.3 Hybrid Strategy Cost Model
+
+**Assumptions**:
+- 5% of drift is critical (pushed)
+- 95% of drift is optimization (pulled)
+
+**Push component**:
+```
+Push_messages = H × D × 0.05 × N = 50,000 messages/day
+Push_bytes = 50,000 × 1024 = 51 MB/day
+Push_cost = $0.01/GB × 0.051 GB × 100 stores = $0.05/day
+```
+
+**Pull component**:
+```
+Pull_repairs = H × D × 0.95 × Q = 95,000 repairs/day
+Pull_latency = 9,500 × 100ms + 85,500 × 1ms = 1,035,500 ms = ~17 minutes
+```
+
+**Total cost**: $0.05/day + 17 minutes latency (vs $1/day push-only or 18 minutes pull-only)
+
+**Conclusion**: Hybrid strategy reduces network cost by 95% vs push-only, with only 5% increase in latency vs pull-only.
+
+---
+
+== 5. Open Questions & Consultation Points
+
+=== 5.1 Critical Questions
+
+1. **What constitutes "critical" drift?**
+   - Current classification: retraction, integrity violation, access revocation
+   - Should schema version mismatches be critical? (impacts type safety)
+   - Should citation count mismatches be critical? (impacts research metrics)
+
+2. **What quorum size for Byzantine tolerance?**
+   - f=1 (quorum=3): Fast, but only tolerates 1 malicious store
+   - f=2 (quorum=5): Slower, but tolerates 2 malicious stores
+   - f=3 (quorum=7): Very slow, but very robust
+
+3. **What cache TTL for pulled repairs?**
+   - Short TTL (5 min): Fresh data, high query load
+   - Long TTL (1 hour): Stale data, low query load
+   - Adaptive TTL: Starts at 5 min, increases to 1 hour if hit rate > 90%
+
+4. **Should L4 (external systems) be in scope at all?**
+   - Option A: External sync is advisory only (current recommendation)
+   - Option B: Treat external systems as untrusted federation members (push critical issues)
+   - Option C: No external sync (users must manually import)
+
+=== 5.2 Consultation Questions for Stakeholders
+
+==== For Core Team:
+
+1. Is the classification of critical vs optimization drift correct? Are we missing any critical types?
+2. Should adaptive learning (miniKanren in v3) be allowed to change push/pull classification, or must it be static?
+3. What happens if quorum fails (network partition)? Abort query or return stale data with warning?
+
+==== For Federated Store Operators:
+
+1. What network bandwidth constraints do you have? (Determines max push frequency)
+2. What compliance requirements do you have? (GDPR, HIPAA, FAIR) (Determines minimum push coverage)
+3. Are you willing to participate in quorum voting? (Latency cost for your queries)
+
+==== For Compliance Officers:
+
+1. Is eventual consistency acceptable for non-critical drift? (e.g., title mismatches)
+2. What maximum delay is acceptable for critical drift propagation? (GDPR: 72 hours, our target: 5 seconds)
+3. Must all repair actions be auditable? (Impacts whether pull repairs must be logged)
+
+---
+
+== 6. Recommendation & Next Steps
+
+=== 6.1 Recommended Strategy
+
+**⭐ HYBRID PUSH/PULL WITH ADAPTIVE THRESHOLDS ⭐**
+
+[cols="1,1,2",options="header"]
+|===
+|Level |Strategy |Implementation
+
+|**L0** (Intra-modality)
+|PULL
+|Store-internal consistency on insert
+
+|**L1** (Cross-modality)
+|HYBRID
+|Push: retractions, integrity violations +
+Pull: title mismatches, derived data
+
+|**L2** (Cross-hexad)
+|PULL
+|Validate at query time, cache results
+
+|**L3** (Cross-store)
+|HYBRID
+|Push: retractions, access revocation (signed, quorum-verified) +
+Pull: schema version, optimization
+
+|**L4** (External)
+|ADVISORY
+|Periodic sync (cron), best-effort only
+|===
+
+**Rationale**:
+1. **Scales**: 95% reduction in network cost vs push-only
+2. **Safe**: Critical issues (compliance, security) always pushed
+3. **Fast**: 95% of repairs cached, <10ms latency
+4. **Adaptive**: System learns optimal thresholds from workload
+
+=== 6.2 Implementation Roadmap
+
+**v1.0 (Elixir feedback loops)**:
+1. Static classification (hardcoded critical types)
+2. Fixed cache TTL (15 minutes)
+3. Quorum size f=1 (tolerates 1 Byzantine fault)
+4. Signature verification (sactify-php)
+
+**v2.0 (Adaptive thresholds)**:
+1. Elixir GenServer learns cache TTL from hit rate
+2. Elixir GenServer adjusts push threshold from network metrics
+3. Metrics dashboard (Grafana) for operators
+
+**v3.0 (miniKanren rule synthesis)**:
+1. Learn classification rules from error examples
+2. Synthesize new repair strategies
+3. Optimize quorum selection (which stores to query first?)
+
+=== 6.3 Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Network cost | <$10/day for 100 stores | Bytes sent per day |
+| Query latency (cache hit) | <10ms | p99 latency |
+| Query latency (cache miss) | <100ms | p99 latency |
+| Critical drift propagation | <5 seconds | Time from detection to all stores repaired |
+| Cache hit rate | >90% | Hits / (Hits + Misses) |
+| Byzantine tolerance | Tolerate 1 malicious store | Quorum voting success rate |
+
+---
+
+== 7. References
+
+1. Apache Kafka KRaft design: https://cwiki.apache.org/confluence/display/KAFKA/KIP-500
+2. Raft consensus algorithm: https://raft.github.io/
+3. Byzantine Paxos: Castro & Liskov, "Practical Byzantine Fault Tolerance"
+4. DNS caching best practices: RFC 2181
+5. GDPR compliance timelines: Article 12(3), 72-hour breach notification
+
+---
+
+== Appendix A: Classification Examples
+
+=== A.1 Critical Drift (Push Immediately)
+
+```elixir
+# Example 1: Paper retracted
+%DriftEvent{
+  type: :retraction,
+  severity: :critical,
+  hexad_id: "hexad:550e8400-e29b-41d4-a716-446655440000",
+  field: "semantic.status",
+  old_value: "published",
+  new_value: "retracted",
+  reason: "Fabricated data, journal retraction notice",
+  detected_at: ~U[2026-01-22 14:30:00Z],
+  action: :push_immediately
+}
+
+# Push to all stores that cite this paper
+# Push to all hexads that reference this paper
+# Log in immutable temporal store
+```
+
+```elixir
+# Example 2: Hash mismatch (integrity violation)
+%DriftEvent{
+  type: :integrity_violation,
+  severity: :critical,
+  hexad_id: "hexad:6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+  field: "document.content_hash",
+  old_value: "sha256:abc123...",
+  new_value: "sha256:def456...",
+  reason: "Document content changed but hash not updated",
+  detected_at: ~U[2026-01-22 14:35:00Z],
+  action: :push_immediately
+}
+
+# Push to all federation members
+# Quarantine hexad until resolved
+```
+
+=== A.2 Optimization Drift (Pull on Query)
+
+```elixir
+# Example 3: Title mismatch (cosmetic)
+%DriftEvent{
+  type: :title_mismatch,
+  severity: :low,
+  hexad_id: "hexad:7c9e6679-7425-40de-944b-e07fc1f90ae7",
+  field: "graph.title vs document.title",
+  old_value: "ML Paper",
+  new_value: "Machine Learning Paper",
+  reason: "Different abbreviation styles",
+  detected_at: ~U[2026-01-22 14:40:00Z],
+  action: :pull_on_query
+}
+
+# Don't push (cosmetic difference)
+# Repair when user queries this hexad
+# Cache repaired result for 1 hour
+```
+
+```elixir
+# Example 4: Stale derived data
+%DriftEvent{
+  type: :derived_stale,
+  severity: :low,
+  hexad_id: "hexad:8d8a8b4c-5d3e-4f5a-9b6c-7e8f9a0b1c2d",
+  field: "semantic.citation_count",
+  old_value: 42,
+  new_value: 45,
+  reason: "New citations added, cached count not updated",
+  detected_at: ~U[2026-01-22 14:45:00Z],
+  action: :pull_on_query
+}
+
+# Don't push (expensive to recompute for all hexads)
+# Recompute when user queries citation count
+# Cache for 1 day (citations change slowly)
+```
+
+---
+
+== Appendix B: Quorum Voting Examples
+
+=== B.1 Successful Quorum (3/5 agreement)
+
+```
+Store responses for hexad:550e8400, field "title":
+
+Store A: "Machine Learning Paper" (200ms latency)
+Store B: "Machine Learning Paper" (150ms latency)
+Store C: "ML Paper"               (180ms latency)
+Store D: "Machine Learning Paper" (220ms latency)
+Store E: [timeout]                (1000ms timeout)
+
+Quorum calculation:
+  "Machine Learning Paper": 3 votes (A, B, D)
+  "ML Paper": 1 vote (C)
+  No response: 1 (E)
+
+Quorum size: 5 stores × 0.5 + 1 = 3 votes required
+Result: QUORUM REACHED → "Machine Learning Paper"
+Action: Repair local store to quorum value
+```
+
+=== B.2 Failed Quorum (no majority)
+
+```
+Store responses for hexad:6ba7b810, field "status":
+
+Store A: "published" (200ms latency)
+Store B: "retracted" (150ms latency)
+Store C: "published" (180ms latency)
+Store D: "retracted" (220ms latency)
+Store E: [network partition]
+
+Quorum calculation:
+  "published": 2 votes (A, C)
+  "retracted": 2 votes (B, D)
+  No response: 1 (E)
+
+Quorum size: 5 stores × 0.5 + 1 = 3 votes required
+Result: NO QUORUM (tie)
+Action: MANUAL INTERVENTION REQUIRED
+```
+
+**Resolution strategies for failed quorum**:
+
+1. **Retry with more stores**: Query 10 stores instead of 5
+2. **Increase timeout**: Maybe Store E would respond with 2000ms timeout
+3. **Manual override**: Operator investigates and sets correct value
+4. **Pessimistic default**: Assume most restrictive value ("retracted" safer than "published")

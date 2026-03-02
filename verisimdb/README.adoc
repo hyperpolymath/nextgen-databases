@@ -1,0 +1,479 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= VeriSimDB
+:toc:
+:toc-placement!:
+
+**Cross-system data consistency that catches drift before it causes damage.**
+
+toc::[]
+
+== The Problem: Silent Data Drift
+
+Your data lives in multiple systems — graphs, vector stores, document indexes, time-series databases. When one system's view of an entity silently diverges from the others, you get **data drift**: stale embeddings, broken provenance chains, graph edges referencing deleted documents, spatial coordinates that no longer match textual descriptions.
+
+Traditional tools detect drift _after_ it causes downstream failures. VeriSimDB detects and repairs it _continuously_, before anyone notices.
+
+== What VeriSimDB Does
+
+VeriSimDB is a **cross-modal consistency engine**. Each entity exists simultaneously across up to 8 representations (the **octad**) with automatic drift detection and self-normalisation:
+
+----
+┌─────────────────────────────────────────────────────────────┐
+│                    ONE ENTITY, EIGHT VIEWS                  │
+│                                                             │
+│   Graph ─── Vector ─── Tensor ─── Semantic                 │
+│     │                                 │                     │
+│  Document ─ Temporal ─ Provenance ─ Spatial                 │
+│                                                             │
+│         ↕ Continuous drift detection ↕                      │
+│         ↕ Automatic self-normalisation ↕                    │
+└─────────────────────────────────────────────────────────────┘
+----
+
+When VeriSimDB detects that an entity's vector embedding has diverged from its document content, or that a provenance chain's hash integrity is broken, or that spatial coordinates no longer match location references in the text — it identifies the drift type, scores the severity, and triggers repair automatically.
+
+== Repository Scope
+
+This repository is the plain upstream core for cloning and deployment.
+
+Consumer repositories should keep their own lightweight VeriSim runtime profiles (ports, launch policy, integration toggles) rather than vendoring this repository or sharing a single fixed local port.
+
+Canonical bot policy files for this repository live in `/.machine_readable/bot_directives/`. Root-level `/.bot_directives/` is treated as legacy.
+
+=== Drift Detection Demo
+
+[source,bash]
+----
+cd elixir-orchestration && mix run ../demos/drift-detection/run_demo.exs
+----
+
+Sample output:
+
+----
+╔══════════════════════════════════════════════════════════════════╗
+║                        DEMO RESULTS                            ║
+╠══════════════════════════════════════════════════════════════════╣
+║  Entities created:   1000                                      ║
+║  Entities corrupted: 50                                        ║
+║                                                                ║
+║  DETECTION                                                     ║
+║    Detection rate:      100.0%                                 ║
+║                                                                ║
+║  REPAIR                                                        ║
+║    Repair rate:         100.0%                                 ║
+║                                                                ║
+║  VERIFICATION                                                  ║
+║    Consistency rate:    100.0%                                 ║
+║    System health:       healthy                                ║
+║                                                                ║
+║  TIMING                                                        ║
+║    Total:              ~2500ms                                 ║
+╚══════════════════════════════════════════════════════════════════╝
+----
+
+=== How It Compares
+
+[cols="1,1,1,1"]
+|===
+|Capability |Great Expectations |Monte Carlo |VeriSimDB
+
+|Schema validation
+|Yes
+|Yes
+|Yes
+
+|Drift detection
+|Manual rules
+|ML-based
+|**Cross-modal, continuous**
+
+|Self-repair
+|No
+|No
+|**Yes (automatic normalisation)**
+
+|Multi-representation
+|No
+|No
+|**8 modalities per entity**
+
+|Provenance tracking
+|No
+|Partial
+|**Hash-chain verified**
+
+|Query language
+|No (Python API)
+|No (UI)
+|**VQL (with dependent types)**
+
+|Formal verification
+|No
+|No
+|**VQL-DT (proof certificates)**
+|===
+
+== The Octad: Eight Modalities
+
+Each entity in VeriSimDB can have representations across eight modalities. Drift detection operates across _all_ of them:
+
+[cols="1,2,1"]
+|===
+|Modality |Purpose |Storage
+
+|**Graph**
+|RDF triples and property graph edges
+|Pure Rust (SimpleGraphStore)
+
+|**Vector**
+|Embeddings for similarity search
+|HNSW (in-memory)
+
+|**Tensor**
+|Multi-dimensional numeric data
+|ndarray / Burn
+
+|**Semantic**
+|Type annotations and CBOR proof blobs
+|CBOR (ciborium)
+
+|**Document**
+|Full-text searchable content
+|Tantivy (LZ4 compression)
+
+|**Temporal**
+|Version history and time-series
+|In-memory (chrono)
+
+|**Provenance**
+|Origin tracking and transformation chain
+|Hash-chain verified (SHA-256)
+
+|**Spatial**
+|Geospatial coordinates and geometries
+|R-tree index
+|===
+
+== Drift Types
+
+VeriSimDB detects eight categories of cross-modal drift:
+
+[cols="1,2,1"]
+|===
+|Drift Type |What It Detects |Default Threshold
+
+|**Semantic-Vector**
+|Embedding diverged from semantic content
+|0.3
+
+|**Graph-Document**
+|Graph structure doesn't match document
+|0.4
+
+|**Temporal Consistency**
+|Version history gaps or conflicts
+|0.2
+
+|**Tensor**
+|Tensor representation diverged
+|0.35
+
+|**Schema**
+|Type constraint violations
+|0.1
+
+|**Provenance**
+|Broken hash-chain integrity
+|0.1
+
+|**Spatial**
+|Coordinates inconsistent with other modalities
+|0.3
+
+|**Quality**
+|Overall weighted degradation
+|0.25
+|===
+
+== Architecture
+
+VeriSimDB runs as a two-layer system: Elixir/OTP for distributed coordination, Rust for performance-critical storage.
+
+=== Standalone Deployment
+
+----
+┌─────────────────────────────────────────────────────────────┐
+│  Elixir Orchestration Layer                                 │
+│    ├── VeriSim.EntityServer (GenServer per entity)          │
+│    ├── VeriSim.DriftMonitor (drift detection coordinator)   │
+│    ├── VeriSim.QueryRouter (distributes queries)            │
+│    └── VeriSim.SchemaRegistry (type system coordinator)     │
+│              ↓ HTTP                                         │
+├─────────────────────────────────────────────────────────────┤
+│  Rust Modality Stores (All Local, Pure Rust)                │
+│    ├── verisim-graph      ├── verisim-semantic              │
+│    ├── verisim-vector     ├── verisim-document              │
+│    ├── verisim-tensor     ├── verisim-temporal              │
+│    ├── verisim-provenance ├── verisim-spatial               │
+│    ├── verisim-hexad      ├── verisim-drift                 │
+│    └── verisim-normalizer └── verisim-api                   │
+└─────────────────────────────────────────────────────────────┘
+----
+
+=== Federated Deployment
+
+VeriSimDB can also operate as a **federation coordinator** over existing databases (ArangoDB, PostgreSQL, Elasticsearch, etc.):
+
+----
+┌────────────────────────────────────────────────────────────────┐
+│  ReScript Registry (Tiny Core)                                 │
+│    ├── UUID → Store Mapping                                    │
+│    ├── KRaft Metadata Log (Raft consensus)                     │
+│    └── Trust Window Management                                 │
+│              ↓ Federation Protocol                             │
+├────────────────────────────────────────────────────────────────┤
+│  Federated Stores (Independent Operators)                      │
+│    ├── University Archive (Graph + Document)                   │
+│    ├── Research Lab (Vector + Tensor)                          │
+│    ├── Corporate DB (Semantic + Temporal)                      │
+│    └── Community Node (All modalities)                         │
+└────────────────────────────────────────────────────────────────┘
+----
+
+== VQL: VeriSim Query Language
+
+VQL provides unified querying across all eight modalities with two execution paths:
+
+=== Slipstream (Fast, No Proofs)
+
+[source,sql]
+----
+-- Query across modalities
+SELECT GRAPH.*, DOCUMENT.*, VECTOR.* FROM HEXAD 'entity-001'
+
+-- Cross-modal drift detection in WHERE clause
+SELECT * FROM HEXAD 'entity-001'
+  WHERE DRIFT(VECTOR, DOCUMENT) > 0.3
+
+-- Modality existence checks
+SELECT * FROM HEXAD 'entity-001'
+  WHERE PROVENANCE EXISTS AND TENSOR NOT EXISTS
+
+-- Federation queries
+SELECT * FROM FEDERATION /* WITH DRIFT STRICT
+----
+
+=== VQL-DT (Dependent Types with Proof Certificates)
+
+[source,sql]
+----
+-- Query with existence proof
+SELECT GRAPH.* FROM HEXAD 'entity-001'
+  PROOF EXISTENCE(entity-001)
+
+-- Multi-proof composition
+SELECT * FROM HEXAD 'entity-001'
+  PROOF EXISTENCE(entity-001) AND PROVENANCE(entity-001)
+
+-- Integrity verification with contract
+SELECT GRAPH.* FROM HEXAD 'entity-001'
+  PROOF INTEGRITY(my_contract)
+----
+
+VQL-DT queries return a `ProvedResult` with data AND a proof certificate:
+
+[source,elixir]
+----
+%{
+  data: [...],
+  proof_certificate: %{
+    proofs: [%{type: :existence, verified: true, ...}],
+    obligations: [%{type: :existence, contract: "entity-001"}],
+    composition: :conjunction,
+    verified_at: ~U[2026-02-28 12:00:00Z],
+    query_hash: "sha256:..."
+  }
+}
+----
+
+== Quick Start
+
+=== Prerequisites
+
+* Rust (edition 2021) — **no C++ linker required** (pure Rust build)
+* Elixir 1.17+
+
+=== Build
+
+[source,bash]
+----
+# Rust core (pure Rust — no C/C++ dependencies)
+cargo build
+
+# Elixir orchestration
+cd elixir-orchestration
+mix deps.get
+mix compile
+----
+
+=== Run
+
+[source,bash]
+----
+# Start Rust API server
+cargo run -p verisim-api
+
+# Start Elixir orchestration (in another terminal)
+cd elixir-orchestration
+iex -S mix
+----
+
+=== Test
+
+[source,bash]
+----
+cargo test                    # Rust: 510+ tests
+cd elixir-orchestration
+mix test                      # Elixir: 160+ tests (VQL, consensus, telemetry, federation, hypatia)
+----
+
+=== Container
+
+[source,bash]
+----
+podman build -t verisimdb:latest -f container/Containerfile .
+podman run -p 8080:8080 verisimdb:latest
+----
+
+== API Examples
+
+=== Create a Hexad
+
+[source,bash]
+----
+curl -X POST http://localhost:8080/api/v1/hexads \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Machine Learning Paper",
+    "body": "An introduction to neural networks...",
+    "embedding": [0.1, 0.2, 0.3],
+    "types": ["http://example.org/Paper"],
+    "relationships": [["cites", "paper-123"]],
+    "provenance": {
+      "event_type": "created",
+      "actor": "researcher@university.edu",
+      "source": "https://arxiv.org/abs/2024.12345"
+    },
+    "spatial": {
+      "latitude": 51.5074,
+      "longitude": -0.1278,
+      "geometry_type": "Point"
+    }
+  }'
+----
+
+=== Check Drift Status
+
+[source,bash]
+----
+curl http://localhost:8080/api/v1/drift/status
+----
+
+=== Trigger Normalisation
+
+[source,bash]
+----
+curl -X POST http://localhost:8080/api/v1/normalizer/trigger/entity-001
+----
+
+=== gRPC (port 50051)
+
+VeriSimDB's gRPC server runs directly on the Rust core (via tonic) on port 50051. The V API gateway does not proxy gRPC traffic — connect directly to the Rust core.
+
+[source,bash]
+----
+# List available gRPC services
+grpcurl -plaintext localhost:50051 list
+
+# Health check
+grpcurl -plaintext localhost:50051 verisimdb.VeriSimService/Health
+
+# Execute a VQL query
+grpcurl -plaintext -d '{"query": "SELECT * FROM hexads LIMIT 10"}' \
+  localhost:50051 verisimdb.VeriSimService/Query
+
+# Get a specific hexad
+grpcurl -plaintext -d '{"id": "entity-001"}' \
+  localhost:50051 verisimdb.VeriSimService/GetHexad
+----
+
+== Project Structure
+
+----
+verisimdb/
+├── rust-core/                 # Rust modality stores (pure Rust, no C++)
+│   ├── verisim-graph/         # Graph (SimpleGraphStore default, Oxigraph optional)
+│   ├── verisim-vector/        # Vector (HNSW similarity search)
+│   ├── verisim-tensor/        # Tensor (ndarray/Burn)
+│   ├── verisim-semantic/      # Semantic (CBOR proof blobs)
+│   ├── verisim-document/      # Document (Tantivy full-text search)
+│   ├── verisim-temporal/      # Temporal (version history)
+│   ├── verisim-provenance/    # Provenance (hash-chain lineage)
+│   ├── verisim-spatial/       # Spatial (R-tree geospatial)
+│   ├── verisim-hexad/         # Unified octad entity
+│   ├── verisim-drift/         # Drift detection
+│   ├── verisim-normalizer/    # Self-normalisation
+│   ├── verisim-wal/           # Write-ahead log
+│   └── verisim-api/           # HTTP/gRPC/GraphQL API
+├── elixir-orchestration/      # Elixir/OTP coordination layer
+│   ├── lib/verisim/
+│   │   ├── drift/             # DriftMonitor GenServer
+│   │   ├── entity/            # EntityServer (per-entity GenServer)
+│   │   ├── query/             # VQL parser, executor, bridge
+│   │   └── rust_client.ex     # HTTP client for Rust core
+│   └── test/
+├── demos/
+│   └── drift-detection/       # Drift detection demo script
+├── docs/                      # Specifications and design documents
+│   ├── vql-grammar.ebnf       # VQL formal grammar
+│   ├── vql-formal-semantics.adoc
+│   └── vql-type-system.adoc
+├── registry/                  # ReScript federation registry
+└── .machine_readable/         # STATE.scm, META.scm, ECOSYSTEM.scm
+----
+
+== Use Cases
+
+=== Data Quality at Scale
+Monitor cross-modal consistency across thousands of entities. When a vector embedding drifts from its source document, or a provenance chain breaks, VeriSimDB detects and repairs it automatically — before downstream ML models or analytics pipelines consume stale data.
+
+=== Open Science Federation
+Universities and research institutions federate their archives while maintaining local control. Drift detection ensures retractions propagate correctly across institutional boundaries.
+
+=== Neurosymbolic AI Pipelines
+Vector embeddings and symbolic graphs coexist in the same namespace. AI systems query both modalities without ETL, with formal proof certificates guaranteeing query correctness.
+
+=== Verifiable Data Exchange
+ZKP proofs and dependent types enable tamper-evident knowledge exchange. VQL-DT queries return data with cryptographic proof certificates — you can verify the result without trusting the source.
+
+== Documentation
+
+* link:docs/vql-grammar.ebnf[VQL Grammar] — Formal EBNF specification
+* link:docs/vql-formal-semantics.adoc[VQL Formal Semantics] — Operational semantics
+* link:docs/vql-type-system.adoc[VQL Type System] — Dependent types and bidirectional type checking
+* link:docs/drift-handling.adoc[Drift Handling] — Detection, repair, federation drift
+* link:docs/safety-and-fault-tolerance.adoc[Safety & Fault Tolerance] — Memory, kernel, platform, supply chain safety
+* link:docs/deployment-modes.adoc[Deployment Modes] — Standalone, federated, hybrid
+* link:docs/getting-started.adoc[Getting Started] — Step-by-step setup guide
+* link:docs/adoption-strategy.adoc[Adoption Strategy] — Target domains and rollout plan
+* link:docs/VQL-SPEC.adoc[VQL Specification] — 2785-line normative language spec
+* link:docs/papers/[White Papers] — Academic and industry papers
+
+== License
+
+PMPL-1.0-or-later
+
+== Contributing
+
+See CONTRIBUTING.adoc for guidelines.

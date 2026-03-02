@@ -1,0 +1,511 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/hashing.rs",
+      "severity": "Medium",
+      "description": "15 unwrap/expect calls in src/analyzers/hashing.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/symmetric.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in src/analyzers/symmetric.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/key_exchange.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in src/analyzers/key_exchange.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/signatures.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in src/analyzers/signatures.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/password.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in src/analyzers/password.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/protocol.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in src/analyzers/protocol.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/rng.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in src/analyzers/rng.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/deps.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in src/analyzers/deps.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/config.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in src/analyzers/config.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "src/analyzers/config.rs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in src/analyzers/config.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/dns.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in src/analyzers/dns.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/infra.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in src/analyzers/infra.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/analyzers/infra.rs",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in src/analyzers/infra.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "src/analyzers/infra.rs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in src/analyzers/infra.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 4640,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 93,
+    "allocation_sites": 56,
+    "io_operations": 9,
+    "threading_constructs": 11
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/analyzers/mod.rs",
+      "lines": 236,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 13,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzers/hashing.rs",
+      "lines": 283,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 15,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/analyzers/symmetric.rs",
+      "lines": 206,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/analyzers/key_exchange.rs",
+      "lines": 192,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/analyzers/signatures.rs",
+      "lines": 185,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/analyzers/password.rs",
+      "lines": 177,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/analyzers/protocol.rs",
+      "lines": 217,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/analyzers/rng.rs",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/analyzers/deps.rs",
+      "lines": 198,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/analyzers/config.rs",
+      "lines": 190,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/analyzers/dns.rs",
+      "lines": 207,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/analyzers/infra.rs",
+      "lines": 210,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/pq_readiness.rs",
+      "lines": 349,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/fleet.rs",
+      "lines": 166,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/policy.rs",
+      "lines": 230,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/report.rs",
+      "lines": 280,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/main.rs",
+      "lines": 312,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 20,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/integration_test.rs",
+      "lines": 228,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "policies/crypto-pq-policy.ecl",
+      "lines": 40,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "disk",
+    "concurrency",
+    "cpu",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/pq_readiness.rs",
+        "to": "src/fleet.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/fleet.rs",
+        "to": "src/policy.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/policy.rs",
+        "to": "src/report.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/report.rs",
+        "to": "src/main.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/mod.rs",
+        "to": "src/analyzers/hashing.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/hashing.rs",
+        "to": "src/analyzers/symmetric.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/symmetric.rs",
+        "to": "src/analyzers/key_exchange.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/key_exchange.rs",
+        "to": "src/analyzers/signatures.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/signatures.rs",
+        "to": "src/analyzers/password.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/password.rs",
+        "to": "src/analyzers/protocol.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/protocol.rs",
+        "to": "src/analyzers/rng.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/rng.rs",
+        "to": "src/analyzers/deps.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/deps.rs",
+        "to": "src/analyzers/config.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/config.rs",
+        "to": "src/analyzers/dns.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/dns.rs",
+        "to": "src/analyzers/infra.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/analyzers/hashing.rs",
+          "src/analyzers/symmetric.rs",
+          "src/analyzers/key_exchange.rs",
+          "src/analyzers/signatures.rs",
+          "src/analyzers/password.rs",
+          "src/analyzers/protocol.rs",
+          "src/analyzers/rng.rs",
+          "src/analyzers/deps.rs",
+          "src/analyzers/config.rs",
+          "src/analyzers/dns.rs",
+          "src/analyzers/infra.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "src/analyzers/infra.rs"
+        ],
+        "frameworks": [],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "src/analyzers/hashing.rs",
+          "src/analyzers/symmetric.rs",
+          "src/analyzers/key_exchange.rs",
+          "src/analyzers/signatures.rs",
+          "src/analyzers/password.rs",
+          "src/analyzers/protocol.rs",
+          "src/analyzers/rng.rs",
+          "src/analyzers/deps.rs",
+          "src/analyzers/config.rs",
+          "src/analyzers/dns.rs",
+          "src/analyzers/infra.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "src/analyzers/config.rs",
+          "src/analyzers/infra.rs"
+        ],
+        "frameworks": [],
+        "relation": "HardcodedSecret->Network"
+      }
+    ]
+  }
+}

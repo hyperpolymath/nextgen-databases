@@ -1,0 +1,471 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Networking",
+    "WebServer"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "scripts/interactive_tidy.sh",
+      "severity": "Medium",
+      "description": "36 potentially unquoted variable expansions in scripts/interactive_tidy.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "graphql-dns-api/tests/integration_test.rs",
+      "severity": "Medium",
+      "description": "12 unwrap/expect calls in graphql-dns-api/tests/integration_test.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 6889,
+    "unsafe_blocks": 0,
+    "panic_sites": 4,
+    "unwrap_calls": 19,
+    "allocation_sites": 9,
+    "io_operations": 3,
+    "threading_constructs": 17
+  },
+  "file_statistics": [
+    {
+      "file_path": "policy/curps/policy.ncl",
+      "lines": 104,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "policy/curps/webmention.ncl",
+      "lines": 40,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "services/webmention-rate-limiter/src/handlers.rs",
+      "lines": 238,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "services/webmention-rate-limiter/src/limiter.rs",
+      "lines": 386,
+      "unsafe_blocks": 0,
+      "panic_sites": 4,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "services/webmention-rate-limiter/src/main.rs",
+      "lines": 135,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "services/webmention-rate-limiter/tests/integration_test.rs",
+      "lines": 106,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "services/webmention-rate-limiter/tests/security_test.rs",
+      "lines": 376,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "graphql-dns-api/src/main.rs",
+      "lines": 159,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "graphql-dns-api/src/db.rs",
+      "lines": 252,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "graphql-dns-api/src/resolvers.rs",
+      "lines": 408,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 8
+    },
+    {
+      "file_path": "graphql-dns-api/src/blockchain.rs",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "graphql-dns-api/src/dnssec.rs",
+      "lines": 146,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "graphql-dns-api/tests/integration_test.rs",
+      "lines": 130,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 12,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "odns-proxy/main.go",
+      "lines": 310,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "odns-resolver/main.go",
+      "lines": 277,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 3
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "concurrency",
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "services/webmention-rate-limiter/src/handlers.rs",
+        "to": "services/webmention-rate-limiter/src/limiter.rs",
+        "relation": "shared_dir:services/webmention-rate-limiter/src",
+        "weight": 1.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/src/limiter.rs",
+        "to": "services/webmention-rate-limiter/src/main.rs",
+        "relation": "shared_dir:services/webmention-rate-limiter/src",
+        "weight": 1.0
+      },
+      {
+        "from": "graphql-dns-api/src/main.rs",
+        "to": "graphql-dns-api/src/db.rs",
+        "relation": "shared_dir:graphql-dns-api/src",
+        "weight": 1.0
+      },
+      {
+        "from": "graphql-dns-api/src/db.rs",
+        "to": "graphql-dns-api/src/resolvers.rs",
+        "relation": "shared_dir:graphql-dns-api/src",
+        "weight": 1.0
+      },
+      {
+        "from": "graphql-dns-api/src/resolvers.rs",
+        "to": "graphql-dns-api/src/blockchain.rs",
+        "relation": "shared_dir:graphql-dns-api/src",
+        "weight": 1.0
+      },
+      {
+        "from": "graphql-dns-api/src/blockchain.rs",
+        "to": "graphql-dns-api/src/dnssec.rs",
+        "relation": "shared_dir:graphql-dns-api/src",
+        "weight": 1.0
+      },
+      {
+        "from": "policy/curps/policy.ncl",
+        "to": "policy/curps/webmention.ncl",
+        "relation": "shared_dir:policy/curps",
+        "weight": 1.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/tests/integration_test.rs",
+        "to": "services/webmention-rate-limiter/tests/security_test.rs",
+        "relation": "shared_dir:services/webmention-rate-limiter/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "policy/curps/policy.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "policy/curps/policy.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "policy/curps/webmention.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "policy/curps/webmention.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/src/handlers.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/src/handlers.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/src/limiter.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/src/limiter.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/tests/integration_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/tests/integration_test.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/tests/security_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "services/webmention-rate-limiter/tests/security_test.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "graphql-dns-api/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "graphql-dns-api/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "graphql-dns-api/src/db.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "graphql-dns-api/src/db.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "graphql-dns-api/src/resolvers.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "graphql-dns-api/src/resolvers.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "graphql-dns-api/src/blockchain.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "graphql-dns-api/src/blockchain.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "graphql-dns-api/src/dnssec.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "graphql-dns-api/src/dnssec.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "graphql-dns-api/tests/integration_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "graphql-dns-api/tests/integration_test.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "odns-proxy/main.go",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "odns-proxy/main.go",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "odns-resolver/main.go",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "odns-resolver/main.go",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "graphql-dns-api/tests/integration_test.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "graphql-dns-api/tests/integration_test.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/interactive_tidy.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

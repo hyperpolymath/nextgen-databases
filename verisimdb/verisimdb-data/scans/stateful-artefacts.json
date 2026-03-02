@@ -1,0 +1,173 @@
+{
+  "program_path": "/var/mnt/eclipse/repos/reposystem/stateful-artefacts",
+  "language": "haskell",
+  "frameworks": [
+    "WebServer"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "examples/automation-update-stats.sh",
+      "severity": "Medium",
+      "description": "29 potentially unquoted variable expansions in examples/automation-update-stats.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 2407,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 3,
+    "allocation_sites": 0,
+    "io_operations": 12,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "gnosis/src/Main.hs",
+      "lines": 115,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gnosis/src/Paxos.hs",
+      "lines": 112,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gnosis/src/SixSCM.hs",
+      "lines": 113,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gnosis/src/DAX.hs",
+      "lines": 255,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gnosis/src/SixSCMEnhanced.hs",
+      "lines": 172,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dashboard/js/dashboard.js",
+      "lines": 382,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "gnosis/src/Main.hs",
+        "to": "gnosis/src/Paxos.hs",
+        "relation": "shared_dir:gnosis/src",
+        "weight": 1.0
+      },
+      {
+        "from": "gnosis/src/Paxos.hs",
+        "to": "gnosis/src/SixSCM.hs",
+        "relation": "shared_dir:gnosis/src",
+        "weight": 1.0
+      },
+      {
+        "from": "gnosis/src/SixSCM.hs",
+        "to": "gnosis/src/DAX.hs",
+        "relation": "shared_dir:gnosis/src",
+        "weight": 1.0
+      },
+      {
+        "from": "gnosis/src/DAX.hs",
+        "to": "gnosis/src/SixSCMEnhanced.hs",
+        "relation": "shared_dir:gnosis/src",
+        "weight": 1.0
+      },
+      {
+        "from": "gnosis/src/Main.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "gnosis/src/Paxos.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "gnosis/src/SixSCM.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "gnosis/src/DAX.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "gnosis/src/SixSCMEnhanced.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dashboard/js/dashboard.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "examples/automation-update-stats.sh"
+        ],
+        "frameworks": [
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "issue-005",
+  "source": "known-issues",
+  "created_at": "2026-02-13T16:19:58Z",
+  "document": {
+    "title": "VQL-DT Not Connected to VQL PROOF Runtime",
+    "body": "\\n**Location:** `vql-dt/` (Lean type definitions), VQL query router\\n\\n**Current state:** Lean type definitions exist in the `vql-dt/` directory specifying dependent type contracts for all six PROOF types (EXISTENCE, INTEGRITY, CONSISTENCY, PROVENANCE, FRESHNESS, AUTHORIZATION). The VQL parser correctly parses `PROOF` clauses and the query router routes to the dependent-type execution path. However, the Lean type checker is not invoked at runtime. VQL-DT queries execute but do not generate real proof certificates.\\n\\n**Impact:** The `PROOF` clause is syntactically supported but semantically inert. Queries with `PROOF` clauses return data but the accompanying proof certificates are placeholders, not verifiable. This is the gap between the designed architecture and the current implementation.\\n\\n**Resolution:** Wire the Lean type checker into the VQL-DT execution path. This requires: (a) compiling Lean definitions to an executable checker, (b) generating proof obligations from the VQL AST, (c) invoking the checker and collecting proof witnesses from modality stores, (d) assembling and returning verifiable proof certificates. See link:docs/vql-vs-vql-dt.adoc[VQL Slipstream vs VQL-DT] for the phased roadmap.\\n\\n",
+    "fields": {
+      "type": "known_issue",
+      "status": "unknown",
+      "severity": "medium"
+    }
+  },
+  "graph": {
+    "relationships": [{"predicate": "documented_in", "target": "file:KNOWN-ISSUES.adoc"}]
+  },
+  "vector": {
+    "embedding": [0.882812,0.218750,0.179687,-0.609375,0.796875,-0.476562,-0.171875,-0.328125,0.679687,0.929687,0.976562,0.726562,-0.710937,-0.070312,-0.703125,0.375000,0.734375,-0.156250,0.578125,-0.921875,0.312500,0.164062,-0.445312,-0.757812,0.773437,0.484375,-0.437500,0.148437,-0.687500,0.398437,0.156250,0.546875,0.882812,0.218750,0.179687,-0.609375,0.796875,-0.476562,-0.171875,-0.328125,0.679687,0.929687,0.976562,0.726562,-0.710937,-0.070312,-0.703125,0.375000,0.734375,-0.156250,0.578125,-0.921875,0.312500,0.164062,-0.445312,-0.757812,0.773437,0.484375,-0.437500,0.148437,-0.687500,0.398437,0.156250,0.546875],
+    "model": "sha256-hash-64d"
+  },
+  "tensor": {
+    "shape": [1, 2],
+    "data": [0.0, 1.0]
+  },
+  "semantic": {
+    "types": ["https://verisim.db/self/type/KnownIssue", "https://verisim.db/self/type/unknown"],
+    "properties": {
+      "status": "unknown",
+      "severity": "medium"
+    }
+  },
+  "temporal": {
+    "timestamp": "2026-02-13T16:19:58Z",
+    "version": 1,
+    "author": "self-ingest"
+  }
+}

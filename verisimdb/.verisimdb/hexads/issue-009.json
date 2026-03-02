@@ -1,0 +1,37 @@
+{
+  "id": "issue-009",
+  "source": "known-issues",
+  "created_at": "2026-02-13T16:19:59Z",
+  "document": {
+    "title": "HNSW Implementation Is Real",
+    "body": "\\n**Location:** `rust-core/verisim-vector/src/hnsw.rs`\\n\\n**Current state:** The HNSW (Hierarchical Navigable Small World) implementation in `verisim-vector` is a genuine, functional implementation at approximately 670 lines of Rust. A previous audit incorrectly claimed this was brute-force search. This is **not** an issue -- it is a correction of a previous mischaracterization.\\n\\n**Impact:** None (this is a positive clarification). The vector modality store uses a real approximate nearest-neighbor algorithm, not a naive linear scan.\\n\\n**Note:** This entry exists to prevent future audits from repeating the same incorrect claim.\\n\\n",
+    "fields": {
+      "type": "known_issue",
+      "status": "unknown",
+      "severity": "medium"
+    }
+  },
+  "graph": {
+    "relationships": [{"predicate": "documented_in", "target": "file:KNOWN-ISSUES.adoc"}]
+  },
+  "vector": {
+    "embedding": [-0.617187,-0.007812,-0.695312,0.664062,-0.304687,0.484375,-0.617187,0.148437,-0.476562,-0.015625,0.109375,0.421875,0.898437,-0.062500,0.921875,0.570312,0.078125,-0.109375,0.781250,-0.500000,-0.453125,-0.601562,0.328125,-0.937500,-0.601562,0.507812,-0.414062,-0.656250,-0.656250,0.468750,-0.562500,0.578125,-0.617187,-0.007812,-0.695312,0.664062,-0.304687,0.484375,-0.617187,0.148437,-0.476562,-0.015625,0.109375,0.421875,0.898437,-0.062500,0.921875,0.570312,0.078125,-0.109375,0.781250,-0.500000,-0.453125,-0.601562,0.328125,-0.937500,-0.601562,0.507812,-0.414062,-0.656250,-0.656250,0.468750,-0.562500,0.578125],
+    "model": "sha256-hash-64d"
+  },
+  "tensor": {
+    "shape": [1, 2],
+    "data": [0.0, 1.0]
+  },
+  "semantic": {
+    "types": ["https://verisim.db/self/type/KnownIssue", "https://verisim.db/self/type/unknown"],
+    "properties": {
+      "status": "unknown",
+      "severity": "medium"
+    }
+  },
+  "temporal": {
+    "timestamp": "2026-02-13T16:19:59Z",
+    "version": 1,
+    "author": "self-ingest"
+  }
+}

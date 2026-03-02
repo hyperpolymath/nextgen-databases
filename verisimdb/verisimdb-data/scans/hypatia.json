@@ -1,0 +1,4912 @@
+{
+  "program_path": "/var/mnt/eclipse/repos/hypatia",
+  "language": "elixir",
+  "frameworks": [
+    "OTP",
+    "Cache",
+    "WebServer",
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": ".audittraining/scripts/quick-deploy.sh",
+      "severity": "Medium",
+      "description": "26 potentially unquoted variable expansions in .audittraining/scripts/quick-deploy.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "registry/src/Hypatia/API.hs",
+      "severity": "High",
+      "description": "2 error/undefined in registry/src/Hypatia/API.hs",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "registry/src/Hypatia/API.hs",
+      "severity": "Low",
+      "description": "12 TODO/FIXME/HACK markers in registry/src/Hypatia/API.hs",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "registry/src/Hypatia/Registry.hs",
+      "severity": "High",
+      "description": "4 error/undefined in registry/src/Hypatia/Registry.hs",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "engine/rules/forge_adapters.lgt",
+      "severity": "High",
+      "description": "Shell/process_create in engine/rules/forge_adapters.lgt",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "RaceCondition",
+      "location": "engine/rules/learning.lgt",
+      "severity": "Medium",
+      "description": "44 dynamic predicate modifications in engine/rules/learning.lgt",
+      "recommended_attack": [
+        "concurrency"
+      ]
+    },
+    {
+      "category": "RaceCondition",
+      "location": "engine/rules/rule_distiller.lgt",
+      "severity": "Medium",
+      "description": "7 dynamic predicate modifications in engine/rules/rule_distiller.lgt",
+      "recommended_attack": [
+        "concurrency"
+      ]
+    },
+    {
+      "category": "RaceCondition",
+      "location": "engine/schema/bot_integration.lgt",
+      "severity": "Medium",
+      "description": "22 dynamic predicate modifications in engine/schema/bot_integration.lgt",
+      "recommended_attack": [
+        "concurrency"
+      ]
+    },
+    {
+      "category": "RaceCondition",
+      "location": "engine/cache/dragonfly_cache.lgt",
+      "severity": "Medium",
+      "description": "6 dynamic predicate modifications in engine/cache/dragonfly_cache.lgt",
+      "recommended_attack": [
+        "concurrency"
+      ]
+    },
+    {
+      "category": "RaceCondition",
+      "location": "engine/learning_engine.lgt",
+      "severity": "Medium",
+      "description": "12 dynamic predicate modifications in engine/learning_engine.lgt",
+      "recommended_attack": [
+        "concurrency"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hooks/lib/common.sh",
+      "severity": "Critical",
+      "description": "eval usage in hooks/lib/common.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hooks/lib/common.sh",
+      "severity": "Medium",
+      "description": "123 potentially unquoted variable expansions in hooks/lib/common.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hooks/lib/cache.sh",
+      "severity": "Medium",
+      "description": "96 potentially unquoted variable expansions in hooks/lib/cache.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "hooks/lib/cache.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in hooks/lib/cache.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hooks/lib/api.sh",
+      "severity": "Medium",
+      "description": "91 potentially unquoted variable expansions in hooks/lib/api.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hooks/templates/pre-commit.sh",
+      "severity": "Medium",
+      "description": "90 potentially unquoted variable expansions in hooks/templates/pre-commit.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hooks/templates/pre-push.sh",
+      "severity": "Medium",
+      "description": "97 potentially unquoted variable expansions in hooks/templates/pre-push.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hooks/templates/post-receive.sh",
+      "severity": "Medium",
+      "description": "78 potentially unquoted variable expansions in hooks/templates/post-receive.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hooks/templates/commit-msg.sh",
+      "severity": "Medium",
+      "description": "43 potentially unquoted variable expansions in hooks/templates/commit-msg.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hooks/templates/prepare-commit-msg.sh",
+      "severity": "Medium",
+      "description": "66 potentially unquoted variable expansions in hooks/templates/prepare-commit-msg.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hooks/installer.sh",
+      "severity": "Medium",
+      "description": "116 potentially unquoted variable expansions in hooks/installer.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "adapters/src/codeberg.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in adapters/src/codeberg.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "adapters/tests/adapter_tests.rs",
+      "severity": "Medium",
+      "description": "38 unwrap/expect calls in adapters/tests/adapter_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "integration/tests/forge_test.rs",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in integration/tests/forge_test.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "integration/tests/ci_simulation_test.rs",
+      "severity": "Medium",
+      "description": "86 unwrap/expect calls in integration/tests/ci_simulation_test.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "integration/run-tests.sh",
+      "severity": "Medium",
+      "description": "50 potentially unquoted variable expansions in integration/run-tests.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "integration/run-tests.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in integration/run-tests.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "integration/src/ci_simulation/mod.rs",
+      "severity": "Medium",
+      "description": "23 unwrap/expect calls in integration/src/ci_simulation/mod.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "integration/src/ci_simulation/scenarios.rs",
+      "severity": "Medium",
+      "description": "103 unwrap/expect calls in integration/src/ci_simulation/scenarios.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "deploy/k8s/secrets/create-secrets.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in deploy/k8s/secrets/create-secrets.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "deploy/k8s/secrets/rotate-secrets.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in deploy/k8s/secrets/rotate-secrets.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "deploy/scripts/init-arangodb.sh",
+      "severity": "Medium",
+      "description": "125 potentially unquoted variable expansions in deploy/scripts/init-arangodb.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "deploy/scripts/init-arangodb.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in deploy/scripts/init-arangodb.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "deploy/scripts/init-dragonfly.sh",
+      "severity": "Medium",
+      "description": "68 potentially unquoted variable expansions in deploy/scripts/init-dragonfly.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "deploy/scripts/init-dragonfly.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in deploy/scripts/init-dragonfly.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "deploy/scripts/migrate.sh",
+      "severity": "Medium",
+      "description": "170 potentially unquoted variable expansions in deploy/scripts/migrate.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "deploy/scripts/migrate.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in deploy/scripts/migrate.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "deploy/scripts/backup.sh",
+      "severity": "Medium",
+      "description": "186 potentially unquoted variable expansions in deploy/scripts/backup.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "deploy/scripts/backup.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in deploy/scripts/backup.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "deploy/scripts/restore.sh",
+      "severity": "Medium",
+      "description": "166 potentially unquoted variable expansions in deploy/scripts/restore.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "deploy/scripts/restore.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in deploy/scripts/restore.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "deploy/scripts/health-check.sh",
+      "severity": "Medium",
+      "description": "151 potentially unquoted variable expansions in deploy/scripts/health-check.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "deploy/scripts/health-check.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in deploy/scripts/health-check.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "read-k9-config.sh",
+      "severity": "Medium",
+      "description": "21 potentially unquoted variable expansions in read-k9-config.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "cli/src/output.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in cli/src/output.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "tui/src/hypatia-terminal.adb",
+      "severity": "High",
+      "description": "3 Unchecked_* operations in tui/src/hypatia-terminal.adb",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/security-check.sh",
+      "severity": "Medium",
+      "description": "92 potentially unquoted variable expansions in scripts/security-check.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "test-scanner.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in test-scanner.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hypatia-cli.sh",
+      "severity": "Medium",
+      "description": "254 potentially unquoted variable expansions in hypatia-cli.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "hypatia-cli.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in hypatia-cli.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "hypatia-scanner-v2.sh",
+      "severity": "Medium",
+      "description": "85 potentially unquoted variable expansions in hypatia-scanner-v2.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 75816,
+    "unsafe_blocks": 3,
+    "panic_sites": 28,
+    "unwrap_calls": 325,
+    "allocation_sites": 227,
+    "io_operations": 220,
+    "threading_constructs": 17
+  },
+  "file_statistics": [
+    {
+      "file_path": ".audittraining/scripts/batch-security-scan.jl",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": ".audittraining/scripts/deploy-prevention-workflows.jl",
+      "lines": 146,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "registry/src/Main.hs",
+      "lines": 554,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "registry/src/Hypatia/API.hs",
+      "lines": 826,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "registry/src/Hypatia/Registry.hs",
+      "lines": 635,
+      "unsafe_blocks": 0,
+      "panic_sites": 4,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "registry/test/CLISpec.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/rules/learning.lgt",
+      "lines": 819,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 44,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/rules/rule_distiller.lgt",
+      "lines": 130,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/rules/pattern_matching.lgt",
+      "lines": 591,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/rules/error_instances.lgt",
+      "lines": 46,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/schema/bot_integration.lgt",
+      "lines": 396,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 22,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/http_client.lgt",
+      "lines": 322,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/arangodb_connector.lgt",
+      "lines": 644,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/cache/dragonfly_cache.lgt",
+      "lines": 556,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/scanner.lgt",
+      "lines": 277,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "engine/learning_engine.lgt",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 12,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "hooks/lib/cache.sh",
+      "lines": 269,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "hooks/lib/api.sh",
+      "lines": 324,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 16,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "hooks/templates/post-receive.sh",
+      "lines": 273,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "hooks/templates/prepare-commit-msg.sh",
+      "lines": 275,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "hooks/installer.sh",
+      "lines": 471,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "adapters/src/bitbucket.rs",
+      "lines": 1233,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "adapters/src/github.rs",
+      "lines": 1389,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "adapters/src/gitlab.rs",
+      "lines": 1330,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "adapters/src/lib.rs",
+      "lines": 252,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "adapters/src/service.rs",
+      "lines": 322,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "adapters/src/codeberg.rs",
+      "lines": 1558,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "adapters/src/sourcehut.rs",
+      "lines": 1248,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 14,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "adapters/src/radicle.rs",
+      "lines": 1203,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 12,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "adapters/tests/adapter_tests.rs",
+      "lines": 609,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 38,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "integration/tests/fleet_test.rs",
+      "lines": 496,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 3,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "integration/tests/arangodb_test.rs",
+      "lines": 553,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "integration/tests/registry_test.rs",
+      "lines": 744,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "integration/tests/hooks_test.rs",
+      "lines": 693,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "integration/tests/forge_test.rs",
+      "lines": 872,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "integration/tests/ci_simulation_test.rs",
+      "lines": 1158,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 86,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "integration/run-tests.sh",
+      "lines": 358,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "integration/src/lib.rs",
+      "lines": 138,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "integration/src/ci_simulation/assertions.rs",
+      "lines": 998,
+      "unsafe_blocks": 0,
+      "panic_sites": 22,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "integration/src/ci_simulation/mod.rs",
+      "lines": 2082,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 23,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "integration/src/ci_simulation/scenarios.rs",
+      "lines": 1376,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 103,
+      "allocation_sites": 16,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "data/src/arangodb.rs",
+      "lines": 368,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "data/src/dragonfly.rs",
+      "lines": 371,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "data/src/lib.rs",
+      "lines": 135,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "data/src/cache.rs",
+      "lines": 682,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "data/src/verisimdb.rs",
+      "lines": 136,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "deploy/k8s/secrets/rotate-secrets.sh",
+      "lines": 456,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "deploy/scripts/init-arangodb.sh",
+      "lines": 787,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "deploy/scripts/migrate.sh",
+      "lines": 624,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "deploy/scripts/backup.sh",
+      "lines": 563,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "deploy/scripts/restore.sh",
+      "lines": 564,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "deploy/scripts/health-check.sh",
+      "lines": 508,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "deploy/scripts/migrations/00000000000001_initial_schema_arangodb.sh",
+      "lines": 70,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "batch-ops/audit-repos.jl",
+      "lines": 658,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "batch-ops/repo-batch-ops.jl",
+      "lines": 725,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "fixer/src/lib.rs",
+      "lines": 94,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "fixer/src/scanner.rs",
+      "lines": 246,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "fixer/src/main.rs",
+      "lines": 271,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/commands/deposit.rs",
+      "lines": 568,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/commands/withdraw.rs",
+      "lines": 445,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/commands/hooks.rs",
+      "lines": 913,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 10,
+      "io_operations": 10,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/commands/batch.rs",
+      "lines": 598,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 6,
+      "io_operations": 4,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "cli/src/commands/fleet.rs",
+      "lines": 751,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/commands/scan.rs",
+      "lines": 882,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 6,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/config.rs",
+      "lines": 639,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/completions.rs",
+      "lines": 134,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/src/output.rs",
+      "lines": 445,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/build.rs",
+      "lines": 84,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/widgets/hypatia-widgets-list.ads",
+      "lines": 97,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/widgets/hypatia-widgets-status_bar.ads",
+      "lines": 66,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/views/hypatia-views-fleet.ads",
+      "lines": 63,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/views/hypatia-views-help.ads",
+      "lines": 41,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/views/hypatia-views-main_menu.ads",
+      "lines": 46,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/views/hypatia-views-registry.ads",
+      "lines": 59,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/views/hypatia-views-scan.ads",
+      "lines": 69,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/views/hypatia-views-settings.ads",
+      "lines": 41,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/hypatia-application.adb",
+      "lines": 276,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/hypatia_main.adb",
+      "lines": 67,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/hypatia-posix.ads",
+      "lines": 153,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/hypatia-terminal.adb",
+      "lines": 585,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/hypatia-terminal.ads",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/spark/hypatia-state_machine.ads",
+      "lines": 58,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/security-check.sh",
+      "lines": 690,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cryptographic-security-lessons.lgt",
+      "lines": 359,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test-scanner.sh",
+      "lines": 113,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "hypatia-cli.sh",
+      "lines": 537,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "schema/generate-findings.ncl",
+      "lines": 21,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "hypatia-scanner-v2.sh",
+      "lines": 298,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "elixir-scanner/lib/hypatia/scanner.ex",
+      "lines": 108,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "elixir-scanner/lib/hypatia/learning.ex",
+      "lines": 195,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/verisimdb_connector.ex",
+      "lines": 322,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/fleet_dispatcher.ex",
+      "lines": 456,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/pattern_registry.ex",
+      "lines": 213,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/outcome_tracker.ex",
+      "lines": 257,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/dispatch_manifest.ex",
+      "lines": 156,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/recipe_matcher.ex",
+      "lines": 189,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/learning_scheduler.ex",
+      "lines": 266,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/self_diagnostics.ex",
+      "lines": 339,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/neural/graph_of_trust.ex",
+      "lines": 229,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/neural/coordinator.ex",
+      "lines": 252,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/neural/persistence.ex",
+      "lines": 193,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/neural/training_pipeline.ex",
+      "lines": 323,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/data/arangodb.ex",
+      "lines": 527,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/safety/rate_limiter.ex",
+      "lines": 184,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/safety/quarantine.ex",
+      "lines": 247,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/safety/batch_rollback.ex",
+      "lines": 191,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/vql/client.ex",
+      "lines": 368,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/vql/file_executor.ex",
+      "lines": 398,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/vql/query.ex",
+      "lines": 468,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/file_ops.zig",
+      "lines": 78,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 124,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk",
+    "network",
+    "memory",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "lib/vql/client.ex",
+        "to": "lib/vql/file_executor.ex",
+        "relation": "shared_dir:lib/vql",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/vql/file_executor.ex",
+        "to": "lib/vql/query.ex",
+        "relation": "shared_dir:lib/vql",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/graph_of_trust.ex",
+        "to": "lib/neural/coordinator.ex",
+        "relation": "shared_dir:lib/neural",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/coordinator.ex",
+        "to": "lib/neural/persistence.ex",
+        "relation": "shared_dir:lib/neural",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/persistence.ex",
+        "to": "lib/neural/training_pipeline.ex",
+        "relation": "shared_dir:lib/neural",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "cli/src/completions.rs",
+        "relation": "shared_dir:cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/completions.rs",
+        "to": "cli/src/output.rs",
+        "relation": "shared_dir:cli/src",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/src/Hypatia/API.hs",
+        "to": "registry/src/Hypatia/Registry.hs",
+        "relation": "shared_dir:registry/src/Hypatia",
+        "weight": 1.0
+      },
+      {
+        "from": "integration/tests/fleet_test.rs",
+        "to": "integration/tests/arangodb_test.rs",
+        "relation": "shared_dir:integration/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "integration/tests/arangodb_test.rs",
+        "to": "integration/tests/registry_test.rs",
+        "relation": "shared_dir:integration/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "integration/tests/registry_test.rs",
+        "to": "integration/tests/hooks_test.rs",
+        "relation": "shared_dir:integration/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "integration/tests/hooks_test.rs",
+        "to": "integration/tests/forge_test.rs",
+        "relation": "shared_dir:integration/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "integration/tests/forge_test.rs",
+        "to": "integration/tests/ci_simulation_test.rs",
+        "relation": "shared_dir:integration/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-scanner/lib/hypatia/scanner.ex",
+        "to": "elixir-scanner/lib/hypatia/learning.ex",
+        "relation": "shared_dir:elixir-scanner/lib/hypatia",
+        "weight": 1.0
+      },
+      {
+        "from": "fixer/src/lib.rs",
+        "to": "fixer/src/scanner.rs",
+        "relation": "shared_dir:fixer/src",
+        "weight": 1.0
+      },
+      {
+        "from": "fixer/src/scanner.rs",
+        "to": "fixer/src/main.rs",
+        "relation": "shared_dir:fixer/src",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/http_client.lgt",
+        "to": "engine/arangodb_connector.lgt",
+        "relation": "shared_dir:engine",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/arangodb_connector.lgt",
+        "to": "engine/scanner.lgt",
+        "relation": "shared_dir:engine",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/scanner.lgt",
+        "to": "engine/learning_engine.lgt",
+        "relation": "shared_dir:engine",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/bitbucket.rs",
+        "to": "adapters/src/github.rs",
+        "relation": "shared_dir:adapters/src",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/github.rs",
+        "to": "adapters/src/gitlab.rs",
+        "relation": "shared_dir:adapters/src",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/gitlab.rs",
+        "to": "adapters/src/lib.rs",
+        "relation": "shared_dir:adapters/src",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/lib.rs",
+        "to": "adapters/src/service.rs",
+        "relation": "shared_dir:adapters/src",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/service.rs",
+        "to": "adapters/src/codeberg.rs",
+        "relation": "shared_dir:adapters/src",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/codeberg.rs",
+        "to": "adapters/src/sourcehut.rs",
+        "relation": "shared_dir:adapters/src",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/sourcehut.rs",
+        "to": "adapters/src/radicle.rs",
+        "relation": "shared_dir:adapters/src",
+        "weight": 1.0
+      },
+      {
+        "from": "cryptographic-security-lessons.lgt",
+        "to": "test-scanner.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "test-scanner.sh",
+        "to": "hypatia-cli.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "hypatia-cli.sh",
+        "to": "hypatia-scanner-v2.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-fleet.ads",
+        "to": "tui/src/views/hypatia-views-help.ads",
+        "relation": "shared_dir:tui/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-help.ads",
+        "to": "tui/src/views/hypatia-views-main_menu.ads",
+        "relation": "shared_dir:tui/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-main_menu.ads",
+        "to": "tui/src/views/hypatia-views-registry.ads",
+        "relation": "shared_dir:tui/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-registry.ads",
+        "to": "tui/src/views/hypatia-views-scan.ads",
+        "relation": "shared_dir:tui/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-scan.ads",
+        "to": "tui/src/views/hypatia-views-settings.ads",
+        "relation": "shared_dir:tui/src/views",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/learning.lgt",
+        "to": "engine/rules/rule_distiller.lgt",
+        "relation": "shared_dir:engine/rules",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/rule_distiller.lgt",
+        "to": "engine/rules/pattern_matching.lgt",
+        "relation": "shared_dir:engine/rules",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/pattern_matching.lgt",
+        "to": "engine/rules/error_instances.lgt",
+        "relation": "shared_dir:engine/rules",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/deposit.rs",
+        "to": "cli/src/commands/withdraw.rs",
+        "relation": "shared_dir:cli/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/withdraw.rs",
+        "to": "cli/src/commands/hooks.rs",
+        "relation": "shared_dir:cli/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/hooks.rs",
+        "to": "cli/src/commands/batch.rs",
+        "relation": "shared_dir:cli/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "cli/src/commands/fleet.rs",
+        "relation": "shared_dir:cli/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/fleet.rs",
+        "to": "cli/src/commands/scan.rs",
+        "relation": "shared_dir:cli/src/commands",
+        "weight": 1.0
+      },
+      {
+        "from": ".audittraining/scripts/batch-security-scan.jl",
+        "to": ".audittraining/scripts/deploy-prevention-workflows.jl",
+        "relation": "shared_dir:.audittraining/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "data/src/arangodb.rs",
+        "to": "data/src/dragonfly.rs",
+        "relation": "shared_dir:data/src",
+        "weight": 1.0
+      },
+      {
+        "from": "data/src/dragonfly.rs",
+        "to": "data/src/lib.rs",
+        "relation": "shared_dir:data/src",
+        "weight": 1.0
+      },
+      {
+        "from": "data/src/lib.rs",
+        "to": "data/src/cache.rs",
+        "relation": "shared_dir:data/src",
+        "weight": 1.0
+      },
+      {
+        "from": "data/src/cache.rs",
+        "to": "data/src/verisimdb.rs",
+        "relation": "shared_dir:data/src",
+        "weight": 1.0
+      },
+      {
+        "from": "integration/src/ci_simulation/assertions.rs",
+        "to": "integration/src/ci_simulation/mod.rs",
+        "relation": "shared_dir:integration/src/ci_simulation",
+        "weight": 1.0
+      },
+      {
+        "from": "integration/src/ci_simulation/mod.rs",
+        "to": "integration/src/ci_simulation/scenarios.rs",
+        "relation": "shared_dir:integration/src/ci_simulation",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/lib/cache.sh",
+        "to": "hooks/lib/api.sh",
+        "relation": "shared_dir:hooks/lib",
+        "weight": 1.0
+      },
+      {
+        "from": "batch-ops/audit-repos.jl",
+        "to": "batch-ops/repo-batch-ops.jl",
+        "relation": "shared_dir:batch-ops",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/templates/post-receive.sh",
+        "to": "hooks/templates/prepare-commit-msg.sh",
+        "relation": "shared_dir:hooks/templates",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-application.adb",
+        "to": "tui/src/hypatia_main.adb",
+        "relation": "shared_dir:tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia_main.adb",
+        "to": "tui/src/hypatia-posix.ads",
+        "relation": "shared_dir:tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-posix.ads",
+        "to": "tui/src/hypatia-terminal.adb",
+        "relation": "shared_dir:tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-terminal.adb",
+        "to": "tui/src/hypatia-terminal.ads",
+        "relation": "shared_dir:tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/widgets/hypatia-widgets-list.ads",
+        "to": "tui/src/widgets/hypatia-widgets-status_bar.ads",
+        "relation": "shared_dir:tui/src/widgets",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/verisimdb_connector.ex",
+        "to": "lib/fleet_dispatcher.ex",
+        "relation": "shared_dir:lib",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/fleet_dispatcher.ex",
+        "to": "lib/pattern_registry.ex",
+        "relation": "shared_dir:lib",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/pattern_registry.ex",
+        "to": "lib/outcome_tracker.ex",
+        "relation": "shared_dir:lib",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/outcome_tracker.ex",
+        "to": "lib/dispatch_manifest.ex",
+        "relation": "shared_dir:lib",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/dispatch_manifest.ex",
+        "to": "lib/recipe_matcher.ex",
+        "relation": "shared_dir:lib",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/recipe_matcher.ex",
+        "to": "lib/learning_scheduler.ex",
+        "relation": "shared_dir:lib",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/learning_scheduler.ex",
+        "to": "lib/self_diagnostics.ex",
+        "relation": "shared_dir:lib",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/safety/rate_limiter.ex",
+        "to": "lib/safety/quarantine.ex",
+        "relation": "shared_dir:lib/safety",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/safety/quarantine.ex",
+        "to": "lib/safety/batch_rollback.ex",
+        "relation": "shared_dir:lib/safety",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/init-arangodb.sh",
+        "to": "deploy/scripts/migrate.sh",
+        "relation": "shared_dir:deploy/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/migrate.sh",
+        "to": "deploy/scripts/backup.sh",
+        "relation": "shared_dir:deploy/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/backup.sh",
+        "to": "deploy/scripts/restore.sh",
+        "relation": "shared_dir:deploy/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/restore.sh",
+        "to": "deploy/scripts/health-check.sh",
+        "relation": "shared_dir:deploy/scripts",
+        "weight": 1.0
+      },
+      {
+        "from": ".audittraining/scripts/batch-security-scan.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".audittraining/scripts/batch-security-scan.jl",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".audittraining/scripts/batch-security-scan.jl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".audittraining/scripts/batch-security-scan.jl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".audittraining/scripts/deploy-prevention-workflows.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".audittraining/scripts/deploy-prevention-workflows.jl",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".audittraining/scripts/deploy-prevention-workflows.jl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": ".audittraining/scripts/deploy-prevention-workflows.jl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/src/Main.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/src/Main.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/src/Main.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/src/Main.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/src/Hypatia/API.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "registry/src/Hypatia/API.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "registry/src/Hypatia/API.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "registry/src/Hypatia/API.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "registry/src/Hypatia/Registry.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "registry/src/Hypatia/Registry.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "registry/src/Hypatia/Registry.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "registry/src/Hypatia/Registry.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "registry/test/CLISpec.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/test/CLISpec.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/test/CLISpec.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/test/CLISpec.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/learning.lgt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/learning.lgt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/learning.lgt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/learning.lgt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/rule_distiller.lgt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/rule_distiller.lgt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/rule_distiller.lgt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/rule_distiller.lgt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/pattern_matching.lgt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/pattern_matching.lgt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/pattern_matching.lgt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/pattern_matching.lgt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/error_instances.lgt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/error_instances.lgt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/error_instances.lgt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/rules/error_instances.lgt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/schema/bot_integration.lgt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/schema/bot_integration.lgt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/schema/bot_integration.lgt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/schema/bot_integration.lgt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/http_client.lgt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/http_client.lgt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/http_client.lgt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/http_client.lgt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/arangodb_connector.lgt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/arangodb_connector.lgt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/arangodb_connector.lgt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/arangodb_connector.lgt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/cache/dragonfly_cache.lgt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/cache/dragonfly_cache.lgt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/cache/dragonfly_cache.lgt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/cache/dragonfly_cache.lgt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/scanner.lgt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/scanner.lgt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/scanner.lgt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/scanner.lgt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/learning_engine.lgt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/learning_engine.lgt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/learning_engine.lgt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "engine/learning_engine.lgt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/lib/cache.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/lib/cache.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/lib/cache.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/lib/cache.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/lib/api.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/lib/api.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/lib/api.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/lib/api.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/templates/post-receive.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/templates/post-receive.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/templates/post-receive.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/templates/post-receive.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/templates/prepare-commit-msg.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/templates/prepare-commit-msg.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/templates/prepare-commit-msg.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/templates/prepare-commit-msg.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/installer.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/installer.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/installer.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hooks/installer.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/bitbucket.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/bitbucket.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/bitbucket.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/bitbucket.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/github.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "adapters/src/github.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "adapters/src/github.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "adapters/src/github.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "adapters/src/gitlab.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/gitlab.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/gitlab.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/gitlab.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/lib.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "adapters/src/service.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/service.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/service.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/service.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "adapters/src/codeberg.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "adapters/src/codeberg.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "adapters/src/codeberg.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "adapters/src/codeberg.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "adapters/src/sourcehut.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "adapters/src/sourcehut.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "adapters/src/sourcehut.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "adapters/src/sourcehut.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "adapters/src/radicle.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "adapters/src/radicle.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "adapters/src/radicle.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "adapters/src/radicle.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "adapters/tests/adapter_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 38.0
+      },
+      {
+        "from": "adapters/tests/adapter_tests.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 38.0
+      },
+      {
+        "from": "adapters/tests/adapter_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 38.0
+      },
+      {
+        "from": "adapters/tests/adapter_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 38.0
+      },
+      {
+        "from": "integration/tests/fleet_test.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "integration/tests/fleet_test.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "integration/tests/fleet_test.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "integration/tests/fleet_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "integration/tests/arangodb_test.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "integration/tests/arangodb_test.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "integration/tests/arangodb_test.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "integration/tests/arangodb_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "integration/tests/registry_test.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "integration/tests/registry_test.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "integration/tests/registry_test.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "integration/tests/registry_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "integration/tests/hooks_test.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "integration/tests/hooks_test.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "integration/tests/hooks_test.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "integration/tests/hooks_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "integration/tests/forge_test.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "integration/tests/forge_test.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "integration/tests/forge_test.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "integration/tests/forge_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "integration/tests/ci_simulation_test.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 86.0
+      },
+      {
+        "from": "integration/tests/ci_simulation_test.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 86.0
+      },
+      {
+        "from": "integration/tests/ci_simulation_test.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 86.0
+      },
+      {
+        "from": "integration/tests/ci_simulation_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 86.0
+      },
+      {
+        "from": "integration/run-tests.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "integration/run-tests.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "integration/run-tests.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "integration/run-tests.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "integration/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "integration/src/lib.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "integration/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "integration/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "integration/src/ci_simulation/assertions.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 45.0
+      },
+      {
+        "from": "integration/src/ci_simulation/assertions.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 45.0
+      },
+      {
+        "from": "integration/src/ci_simulation/assertions.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 45.0
+      },
+      {
+        "from": "integration/src/ci_simulation/assertions.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 45.0
+      },
+      {
+        "from": "integration/src/ci_simulation/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 25.0
+      },
+      {
+        "from": "integration/src/ci_simulation/mod.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 25.0
+      },
+      {
+        "from": "integration/src/ci_simulation/mod.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 25.0
+      },
+      {
+        "from": "integration/src/ci_simulation/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 25.0
+      },
+      {
+        "from": "integration/src/ci_simulation/scenarios.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 103.0
+      },
+      {
+        "from": "integration/src/ci_simulation/scenarios.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 103.0
+      },
+      {
+        "from": "integration/src/ci_simulation/scenarios.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 103.0
+      },
+      {
+        "from": "integration/src/ci_simulation/scenarios.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 103.0
+      },
+      {
+        "from": "data/src/arangodb.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/arangodb.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/arangodb.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/arangodb.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/dragonfly.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/dragonfly.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/dragonfly.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/dragonfly.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "data/src/lib.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "data/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "data/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "data/src/cache.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/cache.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/cache.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/cache.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/verisimdb.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/verisimdb.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/verisimdb.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "data/src/verisimdb.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "deploy/k8s/secrets/rotate-secrets.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/k8s/secrets/rotate-secrets.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/k8s/secrets/rotate-secrets.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/k8s/secrets/rotate-secrets.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/init-arangodb.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/init-arangodb.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/init-arangodb.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/init-arangodb.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/migrate.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/migrate.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/migrate.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/migrate.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/backup.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/backup.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/backup.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/backup.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/restore.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/restore.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/restore.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/restore.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/health-check.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/health-check.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/health-check.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/health-check.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/migrations/00000000000001_initial_schema_arangodb.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/migrations/00000000000001_initial_schema_arangodb.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/migrations/00000000000001_initial_schema_arangodb.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/scripts/migrations/00000000000001_initial_schema_arangodb.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "batch-ops/audit-repos.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "batch-ops/audit-repos.jl",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "batch-ops/audit-repos.jl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "batch-ops/audit-repos.jl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "batch-ops/repo-batch-ops.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "batch-ops/repo-batch-ops.jl",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "batch-ops/repo-batch-ops.jl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "batch-ops/repo-batch-ops.jl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "fixer/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "fixer/src/lib.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "fixer/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "fixer/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "fixer/src/scanner.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "fixer/src/scanner.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "fixer/src/scanner.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "fixer/src/scanner.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "fixer/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "fixer/src/main.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "fixer/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "fixer/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cli/src/commands/deposit.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/deposit.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/deposit.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/deposit.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/withdraw.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/withdraw.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/withdraw.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/withdraw.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/hooks.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/hooks.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/hooks.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/hooks.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "cli/src/commands/batch.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "cli/src/commands/fleet.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/commands/fleet.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/commands/fleet.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/commands/fleet.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/src/commands/scan.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/scan.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/scan.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/commands/scan.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cli/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "cli/src/completions.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/completions.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/completions.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/completions.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/src/output.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "cli/src/output.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "cli/src/output.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "cli/src/output.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "cli/build.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/build.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/build.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "cli/build.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "tui/src/widgets/hypatia-widgets-list.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/widgets/hypatia-widgets-list.ads",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/widgets/hypatia-widgets-list.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/widgets/hypatia-widgets-list.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/widgets/hypatia-widgets-status_bar.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/widgets/hypatia-widgets-status_bar.ads",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/widgets/hypatia-widgets-status_bar.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/widgets/hypatia-widgets-status_bar.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-fleet.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-fleet.ads",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-fleet.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-fleet.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-help.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-help.ads",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-help.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-help.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-main_menu.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-main_menu.ads",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-main_menu.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-main_menu.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-registry.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-registry.ads",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-registry.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-registry.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-scan.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-scan.ads",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-scan.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-scan.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-settings.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-settings.ads",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-settings.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/views/hypatia-views-settings.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-application.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-application.adb",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-application.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-application.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia_main.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia_main.adb",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia_main.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia_main.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-posix.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-posix.ads",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-posix.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-posix.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-terminal.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "tui/src/hypatia-terminal.adb",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "tui/src/hypatia-terminal.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "tui/src/hypatia-terminal.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "tui/src/hypatia-terminal.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-terminal.ads",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-terminal.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/hypatia-terminal.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/spark/hypatia-state_machine.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/spark/hypatia-state_machine.ads",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/spark/hypatia-state_machine.ads",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/spark/hypatia-state_machine.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/security-check.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/security-check.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/security-check.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/security-check.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cryptographic-security-lessons.lgt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cryptographic-security-lessons.lgt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cryptographic-security-lessons.lgt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cryptographic-security-lessons.lgt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test-scanner.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test-scanner.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test-scanner.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test-scanner.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hypatia-cli.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hypatia-cli.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hypatia-cli.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hypatia-cli.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "schema/generate-findings.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "schema/generate-findings.ncl",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "schema/generate-findings.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "schema/generate-findings.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hypatia-scanner-v2.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hypatia-scanner-v2.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hypatia-scanner-v2.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "hypatia-scanner-v2.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-scanner/lib/hypatia/scanner.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-scanner/lib/hypatia/scanner.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-scanner/lib/hypatia/scanner.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-scanner/lib/hypatia/scanner.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir-scanner/lib/hypatia/learning.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir-scanner/lib/hypatia/learning.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir-scanner/lib/hypatia/learning.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir-scanner/lib/hypatia/learning.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/verisimdb_connector.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/verisimdb_connector.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/verisimdb_connector.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/verisimdb_connector.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/fleet_dispatcher.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/fleet_dispatcher.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/fleet_dispatcher.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/fleet_dispatcher.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/pattern_registry.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/pattern_registry.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/pattern_registry.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/pattern_registry.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/outcome_tracker.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/outcome_tracker.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/outcome_tracker.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/outcome_tracker.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/dispatch_manifest.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/dispatch_manifest.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/dispatch_manifest.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/dispatch_manifest.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/recipe_matcher.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/recipe_matcher.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/recipe_matcher.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/recipe_matcher.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/learning_scheduler.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/learning_scheduler.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/learning_scheduler.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/learning_scheduler.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/self_diagnostics.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/self_diagnostics.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/self_diagnostics.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/self_diagnostics.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/neural/graph_of_trust.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/graph_of_trust.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/graph_of_trust.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/graph_of_trust.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/coordinator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/neural/coordinator.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/neural/coordinator.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/neural/coordinator.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/neural/persistence.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/persistence.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/persistence.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/persistence.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/training_pipeline.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/training_pipeline.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/training_pipeline.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/neural/training_pipeline.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/data/arangodb.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/data/arangodb.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/data/arangodb.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/data/arangodb.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/safety/rate_limiter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/safety/rate_limiter.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/safety/rate_limiter.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/safety/rate_limiter.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/safety/quarantine.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/safety/quarantine.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/safety/quarantine.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/safety/quarantine.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/safety/batch_rollback.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/safety/batch_rollback.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/safety/batch_rollback.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/safety/batch_rollback.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/vql/client.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/vql/client.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/vql/client.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/vql/client.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/vql/file_executor.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/vql/file_executor.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/vql/file_executor.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/vql/file_executor.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/vql/query.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/vql/query.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/vql/query.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/vql/query.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/file_ops.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/file_ops.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/file_ops.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/file_ops.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          ".audittraining/scripts/quick-deploy.sh",
+          "engine/rules/forge_adapters.lgt",
+          "hooks/lib/common.sh",
+          "hooks/lib/common.sh",
+          "hooks/lib/cache.sh",
+          "hooks/lib/api.sh",
+          "hooks/templates/pre-commit.sh",
+          "hooks/templates/pre-push.sh",
+          "hooks/templates/post-receive.sh",
+          "hooks/templates/commit-msg.sh",
+          "hooks/templates/prepare-commit-msg.sh",
+          "hooks/installer.sh",
+          "integration/run-tests.sh",
+          "deploy/scripts/init-arangodb.sh",
+          "deploy/scripts/init-dragonfly.sh",
+          "deploy/scripts/migrate.sh",
+          "deploy/scripts/backup.sh",
+          "deploy/scripts/restore.sh",
+          "deploy/scripts/health-check.sh",
+          "read-k9-config.sh",
+          "scripts/security-check.sh",
+          "hypatia-cli.sh",
+          "hypatia-scanner-v2.sh"
+        ],
+        "frameworks": [
+          "OTP",
+          "Cache",
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "engine/rules/forge_adapters.lgt",
+          "hooks/lib/common.sh"
+        ],
+        "frameworks": [
+          "OTP",
+          "Cache",
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "integration/tests/forge_test.rs"
+        ],
+        "frameworks": [
+          "OTP",
+          "Cache",
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "hooks/lib/cache.sh",
+          "integration/run-tests.sh",
+          "deploy/k8s/secrets/create-secrets.sh",
+          "deploy/scripts/init-arangodb.sh",
+          "deploy/scripts/init-dragonfly.sh",
+          "deploy/scripts/migrate.sh",
+          "deploy/scripts/backup.sh",
+          "deploy/scripts/restore.sh",
+          "deploy/scripts/health-check.sh"
+        ],
+        "frameworks": [
+          "OTP",
+          "Cache",
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "HardcodedSecret->Network"
+      },
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          "registry/src/Hypatia/API.hs"
+        ],
+        "frameworks": [
+          "OTP",
+          "Cache",
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "deploy/k8s/secrets/rotate-secrets.sh",
+          "test-scanner.sh",
+          "hypatia-cli.sh"
+        ],
+        "frameworks": [
+          "OTP",
+          "Cache",
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "tui/src/hypatia-terminal.adb"
+        ],
+        "frameworks": [
+          "OTP",
+          "Cache",
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "adapters/src/codeberg.rs",
+          "adapters/tests/adapter_tests.rs",
+          "integration/tests/ci_simulation_test.rs",
+          "integration/src/ci_simulation/mod.rs",
+          "integration/src/ci_simulation/scenarios.rs",
+          "cli/src/output.rs"
+        ],
+        "frameworks": [
+          "OTP",
+          "Cache",
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "adapters/src/codeberg.rs",
+          "adapters/tests/adapter_tests.rs",
+          "integration/tests/ci_simulation_test.rs",
+          "integration/src/ci_simulation/mod.rs",
+          "integration/src/ci_simulation/scenarios.rs",
+          "cli/src/output.rs"
+        ],
+        "frameworks": [
+          "OTP",
+          "Cache",
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "RaceCondition",
+        "sink_axis": "concurrency",
+        "severity_value": 2.5,
+        "files": [
+          "engine/rules/learning.lgt",
+          "engine/rules/rule_distiller.lgt",
+          "engine/schema/bot_integration.lgt",
+          "engine/cache/dragonfly_cache.lgt",
+          "engine/learning_engine.lgt"
+        ],
+        "frameworks": [
+          "OTP",
+          "Cache",
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "RaceCondition->Concurrency"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "registry/src/Hypatia/API.hs",
+          "registry/src/Hypatia/Registry.hs"
+        ],
+        "frameworks": [
+          "OTP",
+          "Cache",
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "PanicPath->Cpu"
+      }
+    ]
+  }
+}

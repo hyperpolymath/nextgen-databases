@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://verisim.db/schema/modality.json",
+  "$comment": "SPDX-License-Identifier: PMPL-1.0-or-later",
+  "title": "Modality",
+  "description": "VeriSimDB octad modality identifier. Each modality represents a distinct representational dimension of a hexad entity. Together the 8 modalities form the octad -- the fundamental multi-modal unit of VeriSimDB.",
+  "type": "string",
+  "enum": [
+    "graph",
+    "vector",
+    "tensor",
+    "semantic",
+    "document",
+    "temporal",
+    "provenance",
+    "spatial"
+  ],
+  "x-enum-descriptions": {
+    "graph": "RDF triples and property-graph edges. Captures relationships between entities.",
+    "vector": "Dense embedding for similarity search (cosine, dot-product, L2).",
+    "tensor": "Multi-dimensional numeric array. Shape + flattened data.",
+    "semantic": "Ontological type annotations, properties, and proof blobs.",
+    "document": "Full-text searchable content (title, body, fields).",
+    "temporal": "Version history and time-travel queries.",
+    "provenance": "Origin tracking, transformation chain, and actor trail (SHA-256 hash chain).",
+    "spatial": "Geospatial coordinates, geometry types, and proximity queries."
+  }
+}

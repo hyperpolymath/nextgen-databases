@@ -1,0 +1,83 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Concurrent"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/lib.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 664,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 6,
+    "allocation_sites": 1,
+    "io_operations": 0,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/lib.rs",
+      "lines": 519,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "memory",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/lib.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 6.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "src/lib.rs"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/lib.rs"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

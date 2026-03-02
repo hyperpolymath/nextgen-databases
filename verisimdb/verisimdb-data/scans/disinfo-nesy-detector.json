@@ -1,0 +1,482 @@
+{
+  "program_path": "/var/mnt/eclipse/repos/disinfo-nesy-detector",
+  "language": "rust",
+  "frameworks": [
+    "MessageQueue",
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "eval/src/pipeline.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in eval/src/pipeline.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 7225,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 19,
+    "allocation_sites": 34,
+    "io_operations": 19,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "eval/src/baselines.rs",
+      "lines": 832,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "eval/src/datasets.rs",
+      "lines": 393,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "eval/src/download.rs",
+      "lines": 287,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "eval/src/explainability.rs",
+      "lines": 575,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "eval/src/main.rs",
+      "lines": 162,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "eval/src/model_card.rs",
+      "lines": 800,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 9,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "eval/src/pipeline.rs",
+      "lines": 592,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 5,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/main.rs",
+      "lines": 270,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/model_pb.rs",
+      "lines": 78,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/onnx_wrapper.rs",
+      "lines": 60,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/souffle_wrapper.rs",
+      "lines": 101,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "src/model_pb.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/model_pb.rs",
+        "to": "src/onnx_wrapper.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/onnx_wrapper.rs",
+        "to": "src/souffle_wrapper.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/baselines.rs",
+        "to": "eval/src/datasets.rs",
+        "relation": "shared_dir:eval/src",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/datasets.rs",
+        "to": "eval/src/download.rs",
+        "relation": "shared_dir:eval/src",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/download.rs",
+        "to": "eval/src/explainability.rs",
+        "relation": "shared_dir:eval/src",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/explainability.rs",
+        "to": "eval/src/main.rs",
+        "relation": "shared_dir:eval/src",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/main.rs",
+        "to": "eval/src/model_card.rs",
+        "relation": "shared_dir:eval/src",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/model_card.rs",
+        "to": "eval/src/pipeline.rs",
+        "relation": "shared_dir:eval/src",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/baselines.rs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/baselines.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/datasets.rs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/datasets.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/download.rs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "eval/src/download.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "eval/src/explainability.rs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/explainability.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/main.rs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/model_card.rs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/model_card.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "eval/src/pipeline.rs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "eval/src/pipeline.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/model_pb.rs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/model_pb.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/onnx_wrapper.rs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/onnx_wrapper.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/souffle_wrapper.rs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/souffle_wrapper.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "MessageQueue",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "eval/src/pipeline.rs"
+        ],
+        "frameworks": [
+          "MessageQueue",
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "eval/src/pipeline.rs"
+        ],
+        "frameworks": [
+          "MessageQueue",
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

@@ -1,0 +1,769 @@
+{
+  "program_path": ".",
+  "language": "javascript",
+  "frameworks": [
+    "Concurrent"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/Utils.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in src/Utils.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/dist/GrimCIValidator.user.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/dist/GrimCIValidator.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/dist/GrimLicenseChecker.user.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/dist/GrimLicenseChecker.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/dist/GrimSecurityScanner.user.js",
+      "severity": "Critical",
+      "description": "eval() usage in scripts/dist/GrimSecurityScanner.user.js",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/dist/GrimSecurityScanner.user.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/dist/GrimSecurityScanner.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/dist/GrimSecurityScanner.user.js",
+      "severity": "High",
+      "description": "document.write usage (XSS risk) in scripts/dist/GrimSecurityScanner.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/dist/GrimSecurityScanner.user.js",
+      "severity": "High",
+      "description": "dangerouslySetInnerHTML usage (React XSS risk) in scripts/dist/GrimSecurityScanner.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/dist/GrimTemplateEngine.user.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/dist/GrimTemplateEngine.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/dist/GrimTemplateEngine.user.js",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in scripts/dist/GrimTemplateEngine.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/core/GrimCore.mjs",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/src/core/GrimCore.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/scripts/a11y/A11yOverlay.mjs",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/src/scripts/a11y/A11yOverlay.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/scripts/aibdp/AibdpChecker.mjs",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/src/scripts/aibdp/AibdpChecker.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/scripts/ci/GrimCIValidator.mjs",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/src/scripts/ci/GrimCIValidator.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/scripts/code/GitlabEnhanced.mjs",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/src/scripts/code/GitlabEnhanced.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/scripts/content/DarkMode.mjs",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/src/scripts/content/DarkMode.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/src/scripts/content/DarkMode.mjs",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in scripts/src/scripts/content/DarkMode.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "scripts/src/scripts/greaser/GrimGreaser.res",
+      "severity": "Medium",
+      "description": "10 unsafe get calls in scripts/src/scripts/greaser/GrimGreaser.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/scripts/license/GrimLicenseChecker.mjs",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/src/scripts/license/GrimLicenseChecker.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/scripts/security/GrimSecurityScanner.mjs",
+      "severity": "Critical",
+      "description": "eval() usage in scripts/src/scripts/security/GrimSecurityScanner.mjs",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/scripts/security/GrimSecurityScanner.mjs",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/src/scripts/security/GrimSecurityScanner.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/scripts/security/GrimSecurityScanner.mjs",
+      "severity": "High",
+      "description": "document.write usage (XSS risk) in scripts/src/scripts/security/GrimSecurityScanner.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/scripts/security/GrimSecurityScanner.mjs",
+      "severity": "High",
+      "description": "dangerouslySetInnerHTML usage (React XSS risk) in scripts/src/scripts/security/GrimSecurityScanner.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/src/scripts/template/GrimTemplateEngine.mjs",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/src/scripts/template/GrimTemplateEngine.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/src/scripts/template/GrimTemplateEngine.mjs",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in scripts/src/scripts/template/GrimTemplateEngine.mjs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "scripts/src/scripts/template/GrimTemplateEngine.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in scripts/src/scripts/template/GrimTemplateEngine.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/userscripts/GrimCIValidator.user.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/userscripts/GrimCIValidator.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/userscripts/GrimLicenseChecker.user.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/userscripts/GrimLicenseChecker.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/userscripts/GrimSecurityScanner.user.js",
+      "severity": "Critical",
+      "description": "eval() usage in scripts/userscripts/GrimSecurityScanner.user.js",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/userscripts/GrimSecurityScanner.user.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/userscripts/GrimSecurityScanner.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/userscripts/GrimSecurityScanner.user.js",
+      "severity": "High",
+      "description": "document.write usage (XSS risk) in scripts/userscripts/GrimSecurityScanner.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/userscripts/GrimSecurityScanner.user.js",
+      "severity": "High",
+      "description": "dangerouslySetInnerHTML usage (React XSS risk) in scripts/userscripts/GrimSecurityScanner.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "scripts/userscripts/GrimTemplateEngine.user.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in scripts/userscripts/GrimTemplateEngine.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/userscripts/GrimTemplateEngine.user.js",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in scripts/userscripts/GrimTemplateEngine.user.js",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 13049,
+    "unsafe_blocks": 45,
+    "panic_sites": 0,
+    "unwrap_calls": 14,
+    "allocation_sites": 13,
+    "io_operations": 15,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/Utils.res",
+      "lines": 214,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/dist/GrimLicenseChecker.user.js",
+      "lines": 261,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/docs/examples/regreaseproject/src/Main.res",
+      "lines": 40,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/core/GrimCore.mjs",
+      "lines": 384,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/core/GrimCore.res",
+      "lines": 521,
+      "unsafe_blocks": 36,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/a11y/A11yOverlay.res",
+      "lines": 612,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/aibdp/AibdpChecker.mjs",
+      "lines": 367,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/aibdp/AibdpChecker.res",
+      "lines": 440,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/ci/GrimCIValidator.res",
+      "lines": 335,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/code/GitlabEnhanced.mjs",
+      "lines": 410,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/code/GitlabEnhanced.res",
+      "lines": 430,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/content/DarkMode.res",
+      "lines": 622,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/greaser/GrimGreaser.res",
+      "lines": 206,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/license/GrimLicenseChecker.mjs",
+      "lines": 242,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/license/GrimLicenseChecker.res",
+      "lines": 382,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/pager/GrimPager.res",
+      "lines": 272,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/security/GrimSecurityScanner.res",
+      "lines": 413,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/src/scripts/template/GrimTemplateEngine.res",
+      "lines": 685,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/userscripts/GrimLicenseChecker.user.js",
+      "lines": 261,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/publish-greasyfork.ts",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "network",
+    "memory",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "scripts/src/scripts/aibdp/AibdpChecker.mjs",
+        "to": "scripts/src/scripts/aibdp/AibdpChecker.res",
+        "relation": "shared_dir:scripts/src/scripts/aibdp",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/scripts/license/GrimLicenseChecker.mjs",
+        "to": "scripts/src/scripts/license/GrimLicenseChecker.res",
+        "relation": "shared_dir:scripts/src/scripts/license",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/scripts/code/GitlabEnhanced.mjs",
+        "to": "scripts/src/scripts/code/GitlabEnhanced.res",
+        "relation": "shared_dir:scripts/src/scripts/code",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/core/GrimCore.mjs",
+        "to": "scripts/src/core/GrimCore.res",
+        "relation": "shared_dir:scripts/src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Utils.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "scripts/dist/GrimLicenseChecker.user.js",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/docs/examples/regreaseproject/src/Main.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "scripts/src/core/GrimCore.mjs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/core/GrimCore.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 108.0
+      },
+      {
+        "from": "scripts/src/scripts/a11y/A11yOverlay.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "scripts/src/scripts/aibdp/AibdpChecker.mjs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/scripts/aibdp/AibdpChecker.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/scripts/ci/GrimCIValidator.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/scripts/code/GitlabEnhanced.mjs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/scripts/code/GitlabEnhanced.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/scripts/content/DarkMode.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/scripts/greaser/GrimGreaser.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 22.0
+      },
+      {
+        "from": "scripts/src/scripts/license/GrimLicenseChecker.mjs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/scripts/license/GrimLicenseChecker.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/scripts/pager/GrimPager.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "scripts/src/scripts/security/GrimSecurityScanner.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/src/scripts/template/GrimTemplateEngine.res",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "scripts/userscripts/GrimLicenseChecker.user.js",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/publish-greasyfork.ts",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/Utils.res",
+          "scripts/src/scripts/greaser/GrimGreaser.res",
+          "scripts/src/scripts/template/GrimTemplateEngine.res"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "scripts/dist/GrimSecurityScanner.user.js",
+          "scripts/src/scripts/security/GrimSecurityScanner.mjs",
+          "scripts/userscripts/GrimSecurityScanner.user.js"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "scripts/dist/GrimSecurityScanner.user.js",
+          "scripts/src/scripts/security/GrimSecurityScanner.mjs",
+          "scripts/userscripts/GrimSecurityScanner.user.js"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "DynamicCodeExecution->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "scripts/dist/GrimCIValidator.user.js",
+          "scripts/dist/GrimLicenseChecker.user.js",
+          "scripts/dist/GrimSecurityScanner.user.js",
+          "scripts/dist/GrimSecurityScanner.user.js",
+          "scripts/dist/GrimSecurityScanner.user.js",
+          "scripts/dist/GrimTemplateEngine.user.js",
+          "scripts/src/core/GrimCore.mjs",
+          "scripts/src/scripts/a11y/A11yOverlay.mjs",
+          "scripts/src/scripts/aibdp/AibdpChecker.mjs",
+          "scripts/src/scripts/ci/GrimCIValidator.mjs",
+          "scripts/src/scripts/code/GitlabEnhanced.mjs",
+          "scripts/src/scripts/content/DarkMode.mjs",
+          "scripts/src/scripts/license/GrimLicenseChecker.mjs",
+          "scripts/src/scripts/security/GrimSecurityScanner.mjs",
+          "scripts/src/scripts/security/GrimSecurityScanner.mjs",
+          "scripts/src/scripts/security/GrimSecurityScanner.mjs",
+          "scripts/src/scripts/template/GrimTemplateEngine.mjs",
+          "scripts/userscripts/GrimCIValidator.user.js",
+          "scripts/userscripts/GrimLicenseChecker.user.js",
+          "scripts/userscripts/GrimSecurityScanner.user.js",
+          "scripts/userscripts/GrimSecurityScanner.user.js",
+          "scripts/userscripts/GrimSecurityScanner.user.js",
+          "scripts/userscripts/GrimTemplateEngine.user.js"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "DynamicCodeExecution->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "scripts/dist/GrimTemplateEngine.user.js",
+          "scripts/src/scripts/content/DarkMode.mjs",
+          "scripts/src/scripts/template/GrimTemplateEngine.mjs",
+          "scripts/userscripts/GrimTemplateEngine.user.js"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "CommandInjection->Network"
+      }
+    ]
+  }
+}

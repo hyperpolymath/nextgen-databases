@@ -1,0 +1,257 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "WebServer",
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "runtime/src/alloc.rs",
+      "severity": "High",
+      "description": "1 unsafe blocks in runtime/src/alloc.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "runtime/src/ffi.rs",
+      "severity": "High",
+      "description": "5 unsafe blocks in runtime/src/ffi.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "runtime/src/gc.rs",
+      "severity": "High",
+      "description": "11 unsafe blocks in runtime/src/gc.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "runtime/src/panic.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in runtime/src/panic.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 203797,
+    "unsafe_blocks": 19,
+    "panic_sites": 0,
+    "unwrap_calls": 8,
+    "allocation_sites": 18,
+    "io_operations": 37,
+    "threading_constructs": 1
+  },
+  "file_statistics": [
+    {
+      "file_path": "runtime/src/alloc.rs",
+      "lines": 162,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/src/ffi.rs",
+      "lines": 277,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/src/gc.rs",
+      "lines": 282,
+      "unsafe_blocks": 11,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/src/panic.rs",
+      "lines": 242,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affine-doc/src/extract.rs",
+      "lines": 294,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affine-doc/src/html.rs",
+      "lines": 270,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affine-doc/src/index.rs",
+      "lines": 220,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affine-doc/src/render.rs",
+      "lines": 122,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affine-pkg/src/build.rs",
+      "lines": 235,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affine-pkg/src/config.rs",
+      "lines": 235,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affine-pkg/src/lockfile.rs",
+      "lines": 148,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affine-pkg/src/manifest.rs",
+      "lines": 224,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affine-pkg/src/resolve.rs",
+      "lines": 192,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affine-pkg/src/storage.rs",
+      "lines": 197,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 16,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affine-pkg/src/workspace.rs",
+      "lines": 165,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affinescript-lsp/src/diagnostics.rs",
+      "lines": 185,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affinescript-lsp/src/document.rs",
+      "lines": 183,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "tools/affinescript-lsp/src/handlers.rs",
+      "lines": 364,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/affinescript-lsp/src/main.rs",
+      "lines": 322,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "concurrency",
+    "memory",
+    "cpu"
+  ]
+}

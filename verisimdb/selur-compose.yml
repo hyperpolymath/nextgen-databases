@@ -1,0 +1,262 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath)
+#
+# selur-compose.yml — VeriSimDB deployment stack
+# Run with: selur seal && podman-compose -f selur-compose.yml up -d
+#
+# Stack: verisimdb (Rust API + Elixir OTP) with full security tooling
+# Vordr: runtime verification, Cerro-Torre: image signing, Rokur: secret rotation
+
+version: "1.0"
+
+x-security-defaults: &security-defaults
+  restart: unless-stopped
+  security_opt:
+    - no-new-privileges:true
+  read_only: true
+  tmpfs:
+    - /tmp:noexec,nosuid,size=64M
+  cap_drop:
+    - ALL
+
+x-svalinn:
+  policy: strict
+  verification:
+    require_manifest: true
+    require_attestation: true
+    require_signature: true
+  attestations:
+    require-sbom: true
+    require-signature: true
+    require-provenance: true
+  slsa-level: 3
+  crypto:
+    signature-algorithm: ML-DSA-87
+    hash-algorithm: SHA-3-256
+    key-exchange: ML-KEM-1024
+
+x-vordr-config:
+  enable-formal-proofs: true
+  proof-systems: [idris2, lean4]
+  memory-model: linear-types
+  concurrency-model: capability-safe
+  syscall-policy: deny-by-default
+  network-policy: deny-by-default
+  formal-verification: true
+  runtime-checks: true
+  memory-safety: proven
+
+x-cerro-torre:
+  signing:
+    algorithm: ML-DSA-87
+    key-source: rokur
+    key-path: verisimdb/signing/key
+  attestations:
+    sbom-format: spdx-json
+    sbom-path: /app/sbom.spdx.json
+    provenance-log: verisimdb-data/provenance/
+  verification:
+    enforce: true
+    trust-root: cerro-torre-root-2026
+
+x-rokur:
+  secrets-backend: rokur
+  rotation-policy:
+    interval: 30d
+    algorithm: argon2id
+  lifecycle:
+    retention: 90d
+    auto-rotate: true
+
+services:
+  # ── VeriSimDB Rust Core ──────────────────────────────────────
+  verisimdb-api:
+    image: ghcr.io/hyperpolymath/verisimdb:latest
+    build:
+      context: .
+      dockerfile: container/Containerfile
+      target: ""
+    container_name: verisimdb-api
+    hostname: verisimdb-api
+    <<: *security-defaults
+    read_only: false
+    ports:
+      - "[::1]:8080:8080"
+    environment:
+      RUST_LOG: info
+      VERISIM_HOST: "[::]"
+      VERISIM_PORT: "8080"
+      VERISIM_LOG_FORMAT: json
+      VERISIM_DATA_DIR: /app/data
+    volumes:
+      - verisimdb_data:/app/data:rw
+    networks:
+      - verisimdb-internal
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    user: "verisim"
+    x-svalinn:
+      policy: strict
+      verify: true
+    labels:
+      io.hyperpolymath.service: "verisimdb-api"
+      io.hyperpolymath.modalities: "graph,vector,tensor,semantic,document,temporal"
+
+  # ── Elixir OTP Orchestration ─────────────────────────────────
+  verisimdb-otp:
+    image: ghcr.io/hyperpolymath/verisimdb:latest
+    container_name: verisimdb-otp
+    hostname: verisimdb-otp
+    <<: *security-defaults
+    read_only: false
+    command: ["/app/elixir/bin/verisim", "start"]
+    environment:
+      VERISIM_RUST_CORE_URL: "http://verisimdb-api:8080/api/v1"
+      MIX_ENV: prod
+      RELEASE_NODE: "verisim@verisimdb-otp"
+      ERL_AFLAGS: "+JPperf true"
+    depends_on:
+      verisimdb-api:
+        condition: service_healthy
+    networks:
+      - verisimdb-internal
+    healthcheck:
+      test: ["CMD", "/app/elixir/bin/verisim", "pid"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    user: "verisim"
+    x-svalinn:
+      policy: strict
+      verify: true
+    labels:
+      io.hyperpolymath.service: "verisimdb-otp"
+      io.hyperpolymath.role: "orchestration"
+
+  # ── Svalinn Gateway ──────────────────────────────────────────
+  svalinn:
+    image: ghcr.io/hyperpolymath/svalinn:latest
+    container_name: verisimdb-svalinn
+    hostname: svalinn
+    <<: *security-defaults
+    ports:
+      - "[::]:8443:8443"
+    environment:
+      SVALINN_UPSTREAM: "http://verisimdb-api:8080"
+      SVALINN_TLS_CERT: /etc/svalinn/tls/cert.pem
+      SVALINN_TLS_KEY: /etc/svalinn/tls/key.pem
+      SVALINN_POLICY: strict
+    volumes:
+      - svalinn_tls:/etc/svalinn/tls:ro
+    depends_on:
+      verisimdb-api:
+        condition: service_healthy
+    networks:
+      - verisimdb-internal
+      - verisimdb-external
+    x-svalinn:
+      policy: strict
+      verify: true
+    labels:
+      io.hyperpolymath.service: "svalinn"
+      io.hyperpolymath.role: "gateway"
+
+  # ── Vordr Runtime Verifier ───────────────────────────────────
+  vordr:
+    image: ghcr.io/hyperpolymath/vordr:latest
+    container_name: verisimdb-vordr
+    hostname: vordr
+    <<: *security-defaults
+    environment:
+      VORDR_TARGET: "verisimdb-api:8080"
+      VORDR_POLICY: strict
+      VORDR_FORMAL_PROOFS: "true"
+      VORDR_REPORT_FORMAT: json
+    depends_on:
+      verisimdb-api:
+        condition: service_healthy
+    networks:
+      - verisimdb-internal
+    x-svalinn:
+      policy: strict
+      verify: true
+    labels:
+      io.hyperpolymath.service: "vordr"
+      io.hyperpolymath.role: "verification"
+
+  # ── Cerro-Torre Image Signer ─────────────────────────────────
+  cerro-torre:
+    image: ghcr.io/hyperpolymath/cerro-torre:latest
+    container_name: verisimdb-cerro-torre
+    hostname: cerro-torre
+    <<: *security-defaults
+    environment:
+      CERRO_TORRE_REGISTRY: "ghcr.io/hyperpolymath"
+      CERRO_TORRE_ALGORITHM: ML-DSA-87
+      CERRO_TORRE_SBOM_FORMAT: spdx-json
+    volumes:
+      - cerro_torre_keys:/etc/cerro-torre/keys:ro
+    networks:
+      - verisimdb-internal
+    x-svalinn:
+      policy: strict
+      verify: true
+    labels:
+      io.hyperpolymath.service: "cerro-torre"
+      io.hyperpolymath.role: "signing"
+
+  # ── Rokur Secret Manager ─────────────────────────────────────
+  rokur:
+    image: ghcr.io/hyperpolymath/rokur:latest
+    container_name: verisimdb-rokur
+    hostname: rokur
+    <<: *security-defaults
+    environment:
+      ROKUR_STORE: /var/rokur/secrets
+      ROKUR_ROTATION_INTERVAL: 30d
+      ROKUR_ALGORITHM: argon2id
+    volumes:
+      - rokur_secrets:/var/rokur/secrets:rw
+    networks:
+      - verisimdb-internal
+    x-svalinn:
+      policy: strict
+      verify: true
+    labels:
+      io.hyperpolymath.service: "rokur"
+      io.hyperpolymath.role: "secrets"
+
+networks:
+  verisimdb-internal:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: "fd00:verisim:1::/48"
+  verisimdb-external:
+    driver: bridge
+
+volumes:
+  verisimdb_data:
+    driver: local
+  svalinn_tls:
+    driver: local
+  cerro_torre_keys:
+    driver: local
+  rokur_secrets:
+    driver: local
+
+secrets:
+  db-signing-key:
+    provider: rokur
+    key: verisimdb/signing/key
+  tls-cert:
+    provider: rokur
+    key: verisimdb/tls/cert
+  tls-key:
+    provider: rokur
+    key: verisimdb/tls/key

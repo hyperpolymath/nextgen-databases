@@ -1,0 +1,654 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= VQL Formal Semantics
+:toc: left
+:toclevels: 4
+:sectnums:
+:stem: latexmath
+
+== Overview
+
+This document specifies the **formal operational semantics** and **static type system** for VeriSim Query Language (VQL). VQL has two execution paths with different semantic guarantees:
+
+1. **Dependent-Type Path** - Queries with `PROOF` clause, formally verified via ZKP
+2. **Slipstream Path** - Queries without `PROOF` clause, fast but unverified
+
+== Notation
+
+We use standard mathematical notation for formal semantics:
+
+[cols="1,3"]
+|===
+|Notation |Meaning
+
+|stem:[\Gamma]
+|Type environment (context)
+
+|stem:[\Gamma \vdash e : \tau]
+|Expression `e` has type stem:[\tau] in context stem:[\Gamma]
+
+|stem:[e \Rightarrow v]
+|Expression `e` evaluates to value `v` (big-step semantics)
+
+|stem:[e \rightarrow e']
+|Expression `e` reduces to `e'` (small-step semantics)
+
+|stem:[\llbracket e \rrbracket_{\rho}]
+|Denotational semantics of `e` in environment stem:[\rho]
+
+|stem:[\pi : \phi]
+|Proof term stem:[\pi] for proposition stem:[\phi]
+
+|stem:[\{x : \tau \mid \phi(x)\}]
+|Refinement type: values of type stem:[\tau] satisfying predicate stem:[\phi]
+|===
+
+== Syntax (Abstract)
+
+We define the abstract syntax of VQL (concrete syntax in link:vql-grammar.ebnf[vql-grammar.ebnf]):
+
+----
+Query       ::= SELECT Modalities FROM Source [WHERE Condition]
+                [PROOF ProofSpec] [LIMIT Int] [OFFSET Int]
+
+Modalities  ::= * | Modality, ...
+Modality    ::= GRAPH | VECTOR | TENSOR | SEMANTIC | DOCUMENT | TEMPORAL
+
+Source      ::= HEXAD UUID
+              | FEDERATION Pattern [WITH DRIFT DriftMode]
+              | STORE ID
+
+Condition   ::= SimpleCond | CompoundCond | (Condition)
+SimpleCond  ::= GraphCond | VectorCond | TensorCond | ...
+CompoundCond::= Condition AND Condition
+              | Condition OR Condition
+              | NOT Condition
+
+ProofSpec   ::= ProofType(Contract) [WITH Params]
+ProofType   ::= EXISTENCE | CITATION | ACCESS | INTEGRITY | PROVENANCE | CUSTOM
+----
+
+== Type System (Static Semantics)
+
+=== Base Types
+
+VQL has the following base types:
+
+----
+τ ::= UUID                          -- 128-bit identifier
+    | String                        -- UTF-8 string
+    | Int                           -- Integer
+    | Float                         -- IEEE 754 double
+    | Bool                          -- Boolean
+    | Vector[n]                     -- n-dimensional vector
+    | Tensor[d₁, ..., dₙ]          -- n-dimensional tensor
+    | Timestamp                     -- ISO 8601 datetime
+    | RDFTriple                     -- (subject, predicate, object)
+    | HexadRef                      -- Reference to a Hexad
+    | Modality                      -- GRAPH | VECTOR | TENSOR | ...
+    | Proof[φ]                      -- Proof of proposition φ
+----
+
+=== Modal Type System
+
+Each modality has an associated type projection:
+
+[stem]
+++++
+\begin{aligned}
+\text{Graph}(h) &: \text{Set}(\text{RDFTriple}) \\
+\text{Vector}(h) &: \text{Vector}[n] \\
+\text{Tensor}(h) &: \text{Tensor}[d_1, \ldots, d_n] \\
+\text{Semantic}(h) &: \text{Set}(\text{TypeAnnotation}) \\
+\text{Document}(h) &: \text{String} \\
+\text{Temporal}(h) &: \text{List}(\text{Version})
+\end{aligned}
+++++
+
+=== Hexad Type
+
+A **Hexad** is a dependent product over modalities:
+
+[stem]
+++++
+\text{Hexad} = \{h : \text{UUID} \mid \exists m_1, \ldots, m_k \in \text{Modalities}. \text{Valid}(h, m_1) \land \cdots \land \text{Valid}(h, m_k)\}
+++++
+
+Where stem:[\text{Valid}(h, m)] asserts that hexad `h` has a valid representation in modality `m`.
+
+=== Refinement Types for Queries
+
+==== Query Result Type
+
+A query result has a refinement type that depends on the modalities selected:
+
+[stem]
+++++
+\text{QueryResult}[\mathcal{M}] = \text{List}(\text{Hexad}_\mathcal{M})
+++++
+
+Where stem:[\mathcal{M} \subseteq \{\text{GRAPH}, \text{VECTOR}, \ldots\}] and:
+
+[stem]
+++++
+\text{Hexad}_\mathcal{M} = \{h : \text{Hexad} \mid \forall m \in \mathcal{M}. \text{Valid}(h, m)\}
+++++
+
+==== Dependent-Type Query Result
+
+For queries with `PROOF` clause, the result type includes a proof term:
+
+[stem]
+++++
+\text{ProvedResult}[\mathcal{M}, \phi] = \{(r, \pi) : \text{QueryResult}[\mathcal{M}] \times \text{Proof}[\phi] \mid \pi : \phi(r)\}
+++++
+
+Where stem:[\phi] is the proposition specified by the `PROOF` clause.
+
+=== Typing Rules
+
+==== T-Query (Slipstream Path)
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash \text{modalities} : \mathcal{M} \quad
+  \Gamma \vdash \text{source} : \text{Source} \quad
+  \Gamma \vdash \text{condition} : \text{Hexad} \to \text{Bool}
+}{
+  \Gamma \vdash \texttt{SELECT } \mathcal{M} \texttt{ FROM } \text{source} \texttt{ WHERE } \text{condition} : \text{QueryResult}[\mathcal{M}]
+}
+++++
+
+**Interpretation:** A slipstream query returns a list of hexads with selected modalities, **without proof guarantees**.
+
+==== T-ProvedQuery (Dependent-Type Path)
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash \text{modalities} : \mathcal{M} \quad
+  \Gamma \vdash \text{source} : \text{Source} \quad
+  \Gamma \vdash \text{condition} : \text{Hexad} \to \text{Bool} \quad
+  \Gamma \vdash \text{proof-spec} : \text{ProofType} \times \text{Contract}
+}{
+  \Gamma \vdash \texttt{SELECT } \mathcal{M} \texttt{ ... PROOF } \text{proof-spec} : \text{ProvedResult}[\mathcal{M}, \phi_{\text{proof-spec}}]
+}
+++++
+
+**Interpretation:** A dependent-type query returns results **with proof** that the contract stem:[\phi_{\text{proof-spec}}] holds.
+
+==== T-Condition (Graph Condition Example)
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash \text{pattern} : \text{SPARQLPattern}
+}{
+  \Gamma \vdash \texttt{WHERE } \text{pattern} : \text{Hexad} \to \text{Bool}
+}
+++++
+
+==== T-VectorSimilarity
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash v : \text{Vector}[n] \quad
+  \Gamma \vdash \text{threshold} : \text{Float}
+}{
+  \Gamma \vdash \texttt{WHERE h.embedding SIMILAR TO } v \texttt{ WITHIN } \text{threshold} : \text{Hexad} \to \text{Bool}
+}
+++++
+
+==== T-ProofSpec (EXISTENCE)
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash \text{contract} : \text{ExistenceContract}
+}{
+  \Gamma \vdash \texttt{PROOF EXISTENCE(contract)} : \text{ProofSpec}[\exists h. \text{Valid}(h)]
+}
+++++
+
+==== T-ProofSpec (CITATION)
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash \text{contract} : \text{CitationContract}
+}{
+  \Gamma \vdash \texttt{PROOF CITATION(contract)} : \text{ProofSpec}[\forall h. \text{CitationValid}(h)]
+}
+++++
+
+== Operational Semantics (Dynamic Semantics)
+
+=== Evaluation Environments
+
+We define two evaluation environments:
+
+1. **Store Environment** stem:[\Sigma]: Maps UUIDs to Hexad data
+2. **Proof Environment** stem:[\Pi]: Maps contracts to proof functions
+
+[stem]
+++++
+\begin{aligned}
+\Sigma &: \text{UUID} \rightharpoonup \text{HexadData} \\
+\Pi &: \text{Contract} \rightharpoonup (\text{HexadData} \to \text{Proof})
+\end{aligned}
+++++
+
+=== Big-Step Semantics (Slipstream Path)
+
+==== E-SlipstreamQuery
+
+[stem]
+++++
+\frac{
+  \llbracket \text{source} \rrbracket_\Sigma = \{h_1, \ldots, h_n\} \quad
+  \forall i. \llbracket \text{condition}(h_i) \rrbracket_\Sigma = \text{true} \Rightarrow h_i \in R \quad
+  \forall i. R_i = \text{project}_\mathcal{M}(h_i)
+}{
+  \llbracket \texttt{SELECT } \mathcal{M} \texttt{ FROM } \text{source} \texttt{ WHERE } \text{condition} \rrbracket_\Sigma = [R_1, \ldots, R_k]
+}
+++++
+
+**Interpretation:**
+1. Retrieve candidate hexads from source
+2. Filter by condition
+3. Project to selected modalities
+4. **No proof generation**
+
+==== E-ProjectModality
+
+[stem]
+++++
+\frac{
+  \Sigma(h) = \text{hexad-data} \quad
+  \text{modality} \in \mathcal{M}
+}{
+  \text{project}_\mathcal{M}(h)[\text{modality}] = \text{extract}(\text{hexad-data}, \text{modality})
+}
+++++
+
+=== Big-Step Semantics (Dependent-Type Path)
+
+==== E-ProvedQuery
+
+[stem]
+++++
+\frac{
+  \llbracket \text{source} \rrbracket_\Sigma = \{h_1, \ldots, h_n\} \quad
+  \forall i. \llbracket \text{condition}(h_i) \rrbracket_\Sigma = \text{true} \Rightarrow h_i \in R \quad
+  \forall i. R_i = \text{project}_\mathcal{M}(h_i) \quad
+  \pi = \text{prove}_\Pi(\text{proof-spec}, [R_1, \ldots, R_k]) \quad
+  \pi : \phi_{\text{proof-spec}}([R_1, \ldots, R_k])
+}{
+  \llbracket \texttt{SELECT } \mathcal{M} \texttt{ ... PROOF } \text{proof-spec} \rrbracket_{\Sigma,\Pi} = ([R_1, \ldots, R_k], \pi)
+}
+++++
+
+**Interpretation:**
+1. Same filtering as slipstream path
+2. **Generate proof** stem:[\pi] that contract holds
+3. Return results **with proof term**
+
+==== E-Prove (EXISTENCE)
+
+[stem]
+++++
+\frac{
+  \text{contract} = \text{ExistenceContract} \quad
+  \forall h \in R. \Sigma(h) \neq \bot
+}{
+  \text{prove}_\Pi(\texttt{EXISTENCE(contract)}, R) = \pi_{\exists}
+}
+++++
+
+Where stem:[\pi_{\exists}] is a ZKP proving existence without revealing data.
+
+==== E-Prove (CITATION)
+
+[stem]
+++++
+\frac{
+  \text{contract} = \text{CitationContract} \quad
+  \forall h \in R. \text{validateCitationChain}_\Sigma(h) = \text{true}
+}{
+  \text{prove}_\Pi(\texttt{CITATION(contract)}, R) = \pi_{\text{cite}}
+}
+++++
+
+Where stem:[\pi_{\text{cite}}] is a ZKP proving citation chain validity.
+
+=== Small-Step Semantics (Drift Handling)
+
+For federated queries with drift, we model evaluation as a state machine:
+
+[stem]
+++++
+\langle Q, \Sigma_1 \parallel \cdots \parallel \Sigma_n, \text{DRIFT-MODE} \rangle \rightarrow^* \langle R, \Pi \rangle
+++++
+
+==== S-DriftDetect
+
+[stem]
+++++
+\frac{
+  \Sigma_i(h)[\text{modality}_1] \neq \Sigma_j(h)[\text{modality}_1] \quad
+  i \neq j
+}{
+  \langle h, \Sigma_1 \parallel \cdots \parallel \Sigma_n \rangle \xrightarrow{\text{drift}} \langle h, \text{INCONSISTENT} \rangle
+}
+++++
+
+==== S-DriftRepair-LatestWins
+
+[stem]
+++++
+\frac{
+  \text{DRIFT-MODE} = \texttt{LATEST} \quad
+  \Sigma_k(h)[\text{timestamp}] = \max_i \Sigma_i(h)[\text{timestamp}]
+}{
+  \langle h, \text{INCONSISTENT} \rangle \xrightarrow{\text{repair}} \langle h, \Sigma_k(h) \rangle
+}
+++++
+
+==== S-DriftRepair-Quorum
+
+[stem]
+++++
+\frac{
+  \text{DRIFT-MODE} = \texttt{REPAIR} \quad
+  \exists v. |\{i \mid \Sigma_i(h)[\text{field}] = v\}| > n/2
+}{
+  \langle h, \text{INCONSISTENT} \rangle \xrightarrow{\text{quorum}} \langle h, v \rangle
+}
+++++
+
+== Proof Obligations (Dependent-Type Path)
+
+=== ZKP Contract Specifications
+
+For each proof type, we specify the **proposition** stem:[\phi] that must be proven:
+
+==== EXISTENCE Contract
+
+[stem]
+++++
+\phi_{\text{EXISTENCE}}(h) \equiv \exists \text{data} \in \Sigma. \Sigma(h) = \text{data} \land \text{accessible}(h)
+++++
+
+**Informal:** The hexad exists in at least one store and is accessible to the querier.
+
+==== CITATION Contract
+
+[stem]
+++++
+\phi_{\text{CITATION}}(h) \equiv \forall h' \in \text{citations}(h). \text{ValidCitation}(h, h') \land \phi_{\text{EXISTENCE}}(h')
+++++
+
+**Informal:** All citations are valid and cited hexads exist.
+
+==== ACCESS Contract
+
+[stem]
+++++
+\phi_{\text{ACCESS}}(h, u) \equiv \text{hasPermission}(u, h, \text{READ})
+++++
+
+**Informal:** User `u` has read permission for hexad `h`.
+
+==== INTEGRITY Contract
+
+[stem]
+++++
+\phi_{\text{INTEGRITY}}(h) \equiv \forall t \in \text{versions}(h). \text{Hash}(\text{data}(h, t)) = \text{CommittedHash}(h, t)
+++++
+
+**Informal:** Data has not been tampered with since commitment.
+
+==== PROVENANCE Contract
+
+[stem]
+++++
+\phi_{\text{PROVENANCE}}(h) \equiv \exists \text{lineage}. \text{ValidLineage}(h, \text{lineage}) \land \forall h' \in \text{lineage}. \phi_{\text{INTEGRITY}}(h')
+++++
+
+**Informal:** Full lineage is traceable and all ancestors maintain integrity.
+
+=== Proof Generation
+
+For dependent-type queries, VQL delegates to **proven-library** (external ZKP framework):
+
+[stem]
+++++
+\text{prove}_\Pi(\text{proof-spec}, R) = \text{proven.generate}(\phi_{\text{proof-spec}}, R, \text{witness})
+++++
+
+Where:
+- stem:[\phi_{\text{proof-spec}}] is the proposition from the contract
+- `R` is the query result (public input)
+- `witness` is private data used for proof construction
+
+== Soundness Theorem
+
+=== Slipstream Path
+
+**Theorem (Slipstream Correctness):**
+
+If stem:[\Gamma \vdash Q : \text{QueryResult}[\mathcal{M}]] and stem:[\llbracket Q \rrbracket_\Sigma = R], then:
+
+[stem]
+++++
+\forall h \in R. \exists \text{data} \in \Sigma. h = \text{project}_\mathcal{M}(\text{data})
+++++
+
+**Informal:** All results are valid projections from the store (but no additional guarantees).
+
+=== Dependent-Type Path
+
+**Theorem (Dependent-Type Soundness):**
+
+If stem:[\Gamma \vdash Q : \text{ProvedResult}[\mathcal{M}, \phi]] and stem:[\llbracket Q \rrbracket_{\Sigma,\Pi} = (R, \pi)], then:
+
+[stem]
+++++
+\pi : \phi(R) \land \text{verify}(\pi, \phi(R), \text{public-params}) = \text{true}
+++++
+
+**Informal:** The proof term stem:[\pi] is a valid proof of proposition stem:[\phi] applied to results `R`, and it verifies correctly.
+
+**Proof sketch:** By induction on the derivation of stem:[\Gamma \vdash Q : \text{ProvedResult}[\mathcal{M}, \phi]]. The critical step uses the soundness of the underlying ZKP system (proven-library).
+
+== Semantic Equivalence
+
+=== Query Equivalence
+
+Two queries stem:[Q_1] and stem:[Q_2] are **semantically equivalent** (stem:[Q_1 \equiv Q_2]) if:
+
+[stem]
+++++
+\forall \Sigma. \llbracket Q_1 \rrbracket_\Sigma = \llbracket Q_2 \rrbracket_\Sigma
+++++
+
+**Example equivalences:**
+
+1. **Commutativity of AND:**
++
+[stem]
+++++
+\texttt{WHERE } C_1 \texttt{ AND } C_2 \equiv \texttt{WHERE } C_2 \texttt{ AND } C_1
+++++
+
+2. **Idempotence of modality selection:**
++
+[stem]
+++++
+\texttt{SELECT GRAPH, GRAPH} \equiv \texttt{SELECT GRAPH}
+++++
+
+3. **Filter distribution:**
++
+[stem]
+++++
+\texttt{WHERE } C_1 \texttt{ AND } (C_2 \texttt{ OR } C_3) \equiv (\texttt{WHERE } C_1 \texttt{ AND } C_2) \texttt{ OR } (\texttt{WHERE } C_1 \texttt{ AND } C_3)
+++++
+
+=== Proof Equivalence
+
+Two proofs stem:[\pi_1] and stem:[\pi_2] are **equivalent** if they prove the same proposition:
+
+[stem]
+++++
+\pi_1 \sim \pi_2 \iff \pi_1 : \phi \land \pi_2 : \phi
+++++
+
+**Note:** ZKPs may have different witnesses but prove the same statement.
+
+== Drift Semantics
+
+=== Consistency Levels
+
+We define a **consistency lattice** for federated queries:
+
+[stem]
+++++
+\begin{aligned}
+\text{STRICT} &\sqsubset \text{LATEST} \\
+\text{STRICT} &\sqsubset \text{REPAIR} \\
+\text{LATEST} &\sqsubset \text{TOLERATE} \\
+\text{REPAIR} &\sqsubset \text{TOLERATE}
+\end{aligned}
+++++
+
+Where stem:[A \sqsubset B] means "A provides stronger guarantees than B".
+
+=== Drift-Aware Semantics
+
+For federated queries with drift mode stem:[D]:
+
+[stem]
+++++
+\llbracket Q \rrbracket_{\Sigma_1 \parallel \cdots \parallel \Sigma_n, D} = \text{merge}_D(\llbracket Q \rrbracket_{\Sigma_1}, \ldots, \llbracket Q \rrbracket_{\Sigma_n})
+++++
+
+Where stem:[\text{merge}_D] implements the drift policy:
+
+==== STRICT
+
+[stem]
+++++
+\text{merge}_{\text{STRICT}}(R_1, \ldots, R_n) =
+\begin{cases}
+R_1 & \text{if } R_1 = \cdots = R_n \\
+\bot & \text{otherwise}
+\end{cases}
+++++
+
+==== LATEST
+
+[stem]
+++++
+\text{merge}_{\text{LATEST}}(R_1, \ldots, R_n) = R_i \text{ where } \text{timestamp}(R_i) = \max_j \text{timestamp}(R_j)
+++++
+
+==== REPAIR
+
+[stem]
+++++
+\text{merge}_{\text{REPAIR}}(R_1, \ldots, R_n) = \text{quorum}(R_1, \ldots, R_n)
+++++
+
+==== TOLERATE
+
+[stem]
+++++
+\text{merge}_{\text{TOLERATE}}(R_1, \ldots, R_n) = R_1 \cup \cdots \cup R_n \text{ (with drift annotations)}
+++++
+
+== Denotational Semantics (Alternative View)
+
+We can also give a **denotational semantics** by interpreting queries as functions on stores:
+
+[stem]
+++++
+\llbracket \cdot \rrbracket : \text{Query} \to (\text{Store} \to \mathcal{P}(\text{Hexad}))
+++++
+
+Where stem:[\mathcal{P}(\text{Hexad})] is the powerset of hexads.
+
+=== Basic Queries
+
+[stem]
+++++
+\llbracket \texttt{SELECT } \mathcal{M} \texttt{ FROM HEXAD } u \rrbracket(\Sigma) =
+\begin{cases}
+\{\text{project}_\mathcal{M}(\Sigma(u))\} & \text{if } u \in \text{dom}(\Sigma) \\
+\emptyset & \text{otherwise}
+\end{cases}
+++++
+
+=== Filtered Queries
+
+[stem]
+++++
+\llbracket \texttt{SELECT } \mathcal{M} \texttt{ ... WHERE } C \rrbracket(\Sigma) = \{h \in \llbracket \texttt{SELECT } \mathcal{M} \texttt{ ...} \rrbracket(\Sigma) \mid \llbracket C \rrbracket(h) = \text{true}\}
+++++
+
+=== Compositional Semantics
+
+Conditions compose via logical operators:
+
+[stem]
+++++
+\begin{aligned}
+\llbracket C_1 \texttt{ AND } C_2 \rrbracket(h) &= \llbracket C_1 \rrbracket(h) \land \llbracket C_2 \rrbracket(h) \\
+\llbracket C_1 \texttt{ OR } C_2 \rrbracket(h) &= \llbracket C_1 \rrbracket(h) \lor \llbracket C_2 \rrbracket(h) \\
+\llbracket \texttt{NOT } C \rrbracket(h) &= \neg \llbracket C \rrbracket(h)
+\end{aligned}
+++++
+
+== Future Extensions
+
+=== Dependent Types with Refinements
+
+Future versions may support **refinement predicates** in query syntax:
+
+[source,vql]
+----
+SELECT GRAPH, VECTOR
+FROM verisim:semantic
+WHERE hexad : {h : Hexad | citationCount(h) > 10}
+LIMIT 100;
+----
+
+Formal type:
+
+[stem]
+++++
+\{h : \text{Hexad} \mid \text{citationCount}(h) > 10\}
+++++
+
+=== Liquid Types
+
+Integration with **liquid types** for automatic predicate inference:
+
+[stem]
+++++
+\Gamma \vdash Q : \text{QueryResult}[\mathcal{M}]\{\nu : \text{List}(\text{Hexad}) \mid \phi(\nu)\}
+++++
+
+Where stem:[\phi] is automatically inferred from the query structure.
+
+== References
+
+- link:vql-grammar.ebnf[VQL Grammar (ISO EBNF)]
+- link:vql-type-system.adoc[VQL Type System Specification]
+- link:backwards-compatibility.adoc[Backwards Compatibility (VERSION semantics)]
+- link:drift-handling.adoc[Drift Handling (DRIFT semantics)]
+- Pierce, B. C. (2002). *Types and Programming Languages*. MIT Press.
+- Chlipala, A. (2013). *Certified Programming with Dependent Types*. MIT Press.
+- https://crypto.stanford.edu/~dabo/cryptobook/[Boneh & Shoup. *A Graduate Course in Applied Cryptography*] (ZKP foundations)

@@ -1,0 +1,37 @@
+{
+  "id": "issue-012",
+  "source": "known-issues",
+  "created_at": "2026-02-13T16:19:59Z",
+  "document": {
+    "title": "Cross-Modal Drift/Consistency Were Stubs",
+    "body": "\\n**Location:** `elixir-orchestration/lib/verisim/query/vql_executor.ex`\\n\\n**Resolved:** 2026-02-13. `compute_modality_drift/3` now fetches drift from the Rust drift API when available, falling back to cosine distance between extracted modality embeddings (with content fingerprinting for non-vector modalities). `compute_consistency/4` now computes real scores using the specified metric (COSINE, EUCLIDEAN, DOT_PRODUCT, JACCARD). Both functions previously returned hardcoded constants (0.0 and 0.5).\\n\\n**Original issue:** Cross-modal correlation queries parsed correctly but evaluation returned fake scores, making WHERE DRIFT(...) and CONSISTENT(...) conditions meaningless.\\n\\n",
+    "fields": {
+      "type": "known_issue",
+      "status": "resolved",
+      "severity": "resolved"
+    }
+  },
+  "graph": {
+    "relationships": [{"predicate": "documented_in", "target": "file:KNOWN-ISSUES.adoc"}]
+  },
+  "vector": {
+    "embedding": [0.015625,0.414062,-0.195312,0.218750,-0.515625,-0.984375,0.664062,0.203125,0.304687,-0.007812,0.773437,-0.601562,-0.046875,0.968750,0.195312,0.570312,0.742187,-0.671875,0.445312,0.757812,0.343750,-0.171875,-0.070312,-0.554687,-0.054687,-0.734375,-0.046875,-0.750000,-0.843750,-0.242187,-0.078125,-0.617187,0.015625,0.414062,-0.195312,0.218750,-0.515625,-0.984375,0.664062,0.203125,0.304687,-0.007812,0.773437,-0.601562,-0.046875,0.968750,0.195312,0.570312,0.742187,-0.671875,0.445312,0.757812,0.343750,-0.171875,-0.070312,-0.554687,-0.054687,-0.734375,-0.046875,-0.750000,-0.843750,-0.242187,-0.078125,-0.617187],
+    "model": "sha256-hash-64d"
+  },
+  "tensor": {
+    "shape": [1, 2],
+    "data": [1.0, 0.0]
+  },
+  "semantic": {
+    "types": ["https://verisim.db/self/type/KnownIssue", "https://verisim.db/self/type/resolved"],
+    "properties": {
+      "status": "resolved",
+      "severity": "resolved"
+    }
+  },
+  "temporal": {
+    "timestamp": "2026-02-13T16:20:00Z",
+    "version": 1,
+    "author": "self-ingest"
+  }
+}

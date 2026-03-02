@@ -1,0 +1,353 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/gateway/Gateway.res",
+      "severity": "Medium",
+      "description": "10 unsafe get calls in src/gateway/Gateway.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/validation/Validation.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/validation/Validation.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/mcp/McpClient.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in src/mcp/McpClient.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/policy/PolicyEngine.res",
+      "severity": "Medium",
+      "description": "8 unsafe get calls in src/policy/PolicyEngine.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/auth/JWT.res",
+      "severity": "Medium",
+      "description": "11 unsafe get calls in src/auth/JWT.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "test-server.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in test-server.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 10858,
+    "unsafe_blocks": 57,
+    "panic_sites": 0,
+    "unwrap_calls": 32,
+    "allocation_sites": 6,
+    "io_operations": 33,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "tools/mvp/svalinn_gate.py",
+      "lines": 226,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/gateway/Gateway.res",
+      "lines": 882,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/gateway/Gateway.res.js",
+      "lines": 878,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/validation/Validation.res",
+      "lines": 237,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/vordr/Client.res",
+      "lines": 253,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/vordr/Client.res.js",
+      "lines": 237,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/mcp/McpClient.res",
+      "lines": 306,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/mcp/McpClient.res.js",
+      "lines": 290,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/bindings/Deno.res",
+      "lines": 94,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/bindings/Fetch.res",
+      "lines": 78,
+      "unsafe_blocks": 16,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/bindings/Hono.res",
+      "lines": 92,
+      "unsafe_blocks": 31,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/policy/PolicyEngine.res",
+      "lines": 328,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/auth/JWT.res",
+      "lines": 407,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 3,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/auth/OAuth2.res",
+      "lines": 363,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/auth/Middleware.res",
+      "lines": 539,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/auth/OAuth2.res.js",
+      "lines": 409,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/auth/JWT.res.js",
+      "lines": 393,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/integration_test.res",
+      "lines": 256,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test-server.sh",
+      "lines": 68,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/mcp/McpClient.res",
+        "to": "src/mcp/McpClient.res.js",
+        "relation": "shared_dir:src/mcp",
+        "weight": 1.0
+      },
+      {
+        "from": "src/auth/JWT.res",
+        "to": "src/auth/OAuth2.res",
+        "relation": "shared_dir:src/auth",
+        "weight": 1.0
+      },
+      {
+        "from": "src/auth/OAuth2.res",
+        "to": "src/auth/Middleware.res",
+        "relation": "shared_dir:src/auth",
+        "weight": 1.0
+      },
+      {
+        "from": "src/auth/Middleware.res",
+        "to": "src/auth/OAuth2.res.js",
+        "relation": "shared_dir:src/auth",
+        "weight": 1.0
+      },
+      {
+        "from": "src/auth/OAuth2.res.js",
+        "to": "src/auth/JWT.res.js",
+        "relation": "shared_dir:src/auth",
+        "weight": 1.0
+      },
+      {
+        "from": "src/vordr/Client.res",
+        "to": "src/vordr/Client.res.js",
+        "relation": "shared_dir:src/vordr",
+        "weight": 1.0
+      },
+      {
+        "from": "src/bindings/Deno.res",
+        "to": "src/bindings/Fetch.res",
+        "relation": "shared_dir:src/bindings",
+        "weight": 1.0
+      },
+      {
+        "from": "src/bindings/Fetch.res",
+        "to": "src/bindings/Hono.res",
+        "relation": "shared_dir:src/bindings",
+        "weight": 1.0
+      },
+      {
+        "from": "src/gateway/Gateway.res",
+        "to": "src/gateway/Gateway.res.js",
+        "relation": "shared_dir:src/gateway",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "test-server.sh"
+        ],
+        "frameworks": [],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/gateway/Gateway.res",
+          "src/validation/Validation.res",
+          "src/mcp/McpClient.res",
+          "src/policy/PolicyEngine.res",
+          "src/auth/JWT.res"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

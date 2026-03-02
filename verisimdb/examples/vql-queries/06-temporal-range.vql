@@ -1,0 +1,21 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- 06-temporal-range.vql
+-- Temporal range: find entities modified in the last 30 days
+--
+-- The temporal modality tracks creation time, last modification time,
+-- and version number for each hexad entity. This enables time-bounded
+-- queries that find recently changed data — useful for incremental
+-- synchronisation, change feeds, and audit trails.
+--
+-- The temporal.modified field is an ISO 8601 timestamp. VeriSimDB
+-- indexes it in a B-tree for efficient range queries.
+--
+-- Expected results: many entities in the sample data were modified in
+-- February 2026, so this query (relative to 2026-02-28) should return
+-- entity-001, entity-008, entity-011, and others recently updated.
+
+SELECT temporal, document.title FROM hexads
+WHERE temporal.modified > '2026-01-28T00:00:00Z'
+ORDER BY temporal.modified DESC
+LIMIT 20

@@ -1,0 +1,155 @@
+{
+  "program_path": ".",
+  "language": "idris",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "ffi/zig/src/main.zig",
+      "severity": "High",
+      "description": "2 unsafe pointer casts in ffi/zig/src/main.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ochrance-core/Ochrance/FFI/Crypto.idr",
+      "severity": "Critical",
+      "description": "3 believe_me (type checker bypass) in ochrance-core/Ochrance/FFI/Crypto.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ochrance-core/Ochrance/FFI/Crypto.idr",
+      "severity": "High",
+      "description": "unsafePerformIO in ochrance-core/Ochrance/FFI/Crypto.idr",
+      "recommended_attack": [
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "ochrance-core/Ochrance/Filesystem/Repair.idr",
+      "severity": "High",
+      "description": "unsafePerformIO in ochrance-core/Ochrance/Filesystem/Repair.idr",
+      "recommended_attack": [
+        "concurrency"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 5937,
+    "unsafe_blocks": 14,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 1,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/abi/Ochrance/ABI/Foreign.idr",
+      "lines": 89,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 188,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "ochrance-core/Ochrance/FFI/Echidna.idr",
+      "lines": 41,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ochrance-core/Ochrance/FFI/Crypto.idr",
+      "lines": 143,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "concurrency",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "ochrance-core/Ochrance/FFI/Echidna.idr",
+        "to": "ochrance-core/Ochrance/FFI/Crypto.idr",
+        "relation": "shared_dir:ochrance-core/Ochrance/FFI",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "ffi/zig/src/main.zig",
+          "ochrance-core/Ochrance/FFI/Crypto.idr"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "ochrance-core/Ochrance/FFI/Crypto.idr",
+          "ochrance-core/Ochrance/Filesystem/Repair.idr"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Concurrency"
+      }
+    ]
+  }
+}

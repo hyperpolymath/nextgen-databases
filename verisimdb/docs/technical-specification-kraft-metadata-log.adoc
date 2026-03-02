@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= Technical Specification: The KRaft Metadata Log
+
+In VeriSimDB, the Registry is not a passive database but an active Replicated State Machine (RSM). Following the KRaft pattern, all metadata changes are treated as a sequence of events.
+
+== 1. The Append-Only Ledger
+
+Every change to the global namespace—whether a new Hexad registration or a policy update—is appended to a log.
+
+*Consensus*:: A change is only considered "Committed" once it has been replicated to a majority of the Registry Quorum.
+
+*Order*:: The log index ensures a total ordering of events, preventing "Split-Brain" scenarios in the federation.
+
+== 2. Log Truncation & Snapshots
+
+To maintain a "Tiny Core" footprint, the log is not infinite.
+
+When the log exceeds the `THRESHOLD_LIMIT`, the current `registryState` (as defined in the ReScript types) is serialized into a Snapshot.
+
+The log is then truncated, keeping only the snapshot and any entries created after it.
+
+== 3. Pull-Based Follower Sync
+
+Stores or passive registry nodes that have been offline do not wait for a push. They perform a Catch-up Pull:
+
+. Request the current Snapshot from the Leader.
+. Apply the snapshot to their local state.
+. Replay the remaining log entries from the `lastIncludedIndex`.
+
+== 4. The "Trust Window" Integration
+
+The KRaft log also stores the short-lived symmetric keys used for Trust Windows. By replicating these keys across the quorum, we ensure that a client can fail-over from one registry node to another without needing a "Heavy Handshake" re-authentication.

@@ -1,0 +1,2789 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= VeriSim Query Language (VQL) Specification
+:author: Jonathan D.A. Jewell
+:email: j.d.a.jewell@open.ac.uk
+:revnumber: 2.0
+:revdate: 2026-02-27
+:toc: left
+:toclevels: 4
+:sectnums:
+:stem: latexmath
+:icons: font
+:source-highlighter: rouge
+
+// ============================================================================
+// 1. INTRODUCTION
+// ============================================================================
+
+== Introduction
+
+=== Purpose and Scope
+
+The VeriSim Query Language (VQL) is the native query interface for VeriSimDB, a cross-system entity consistency engine with drift detection, self-normalisation, and formally verified queries. This document is the **normative language specification** for VQL version 2.0.
+
+VQL is not SQL. It is a domain-specific language for querying and mutating **octad entities** — data objects that exist simultaneously across up to eight modalities (Graph, Vector, Tensor, Semantic, Document, Temporal, Provenance, Spatial). VQL provides:
+
+* **Multi-modal querying** — SELECT across any combination of eight modalities in a single statement.
+* **Dual-path execution** — Slipstream (fast, unverified) and VQL-DT (formally verified with ZKP proofs).
+* **Federation** — Query across distributed VeriSimDB instances with configurable drift policies.
+* **Cross-modal conditions** — Filter on relationships _between_ modalities (drift, consistency, existence).
+* **Write path** — INSERT, UPDATE, DELETE with optional proof verification.
+
+This specification unifies and supersedes the information in:
+
+* `vql-grammar.ebnf` — Normative EBNF grammar (included in full as <<appendix-a>>)
+* `vql-type-system.adoc` — Formal type system
+* `vql-formal-semantics.adoc` — Operational and denotational semantics
+* `vql-examples.adoc` — 63 comprehensive examples
+* `vql-architecture.adoc` — Dual-path routing architecture
+* `vql-vs-vql-dt.adoc` — Slipstream vs dependent-type comparison
+* `vql-vs-sql.adoc` — SQL differences
+
+Those documents remain valid for deep dives; this specification is the authoritative reference for language behaviour.
+
+=== Notational Conventions
+
+[cols="1,3"]
+|===
+| Convention | Meaning
+
+| `KEYWORD`
+| VQL keyword (case-insensitive in source, uppercase in this document)
+
+| `identifier`
+| User-defined name
+
+| `<rule>`
+| Grammar production rule (see <<appendix-a>> for full EBNF)
+
+| stem:[\tau]
+| Type expression
+
+| stem:[\Gamma \vdash e : \tau]
+| Typing judgment: expression _e_ has type stem:[\tau] in context stem:[\Gamma]
+
+| `[.implemented]`
+| Feature is fully implemented and tested
+
+| `[.partial]`
+| Feature is partially implemented (gaps noted)
+
+| `[.planned]`
+| Feature is specified but not yet implemented
+|===
+
+Keywords are **case-insensitive** throughout VQL. `SELECT`, `select`, and `Select` are equivalent.
+
+=== Dual-Path Architecture
+
+VQL operates in two execution modes, determined by the presence or absence of a `PROOF` clause:
+
+[cols="1,1,1"]
+|===
+| Property | Slipstream (no PROOF) | VQL-DT (with PROOF)
+
+| Parse
+| Same parser, same AST
+| Same parser, same AST
+
+| Type checking
+| Basic validation only
+| Full dependent type checking
+
+| Proof generation
+| Skipped
+| ZKP witness generation per proof obligation
+
+| Result type
+| `List(Hexad_M)` — bare results
+| `Sigma(QueryResult, Proof)` — results bundled with proof certificate
+
+| Latency
+| ~50-500ms
+| ~240-1350ms
+
+| Use case
+| Analytics, exploration, performance-sensitive
+| Compliance, audit, provenance, federation trust
+|===
+
+Both modes use the same parser and produce the same AST. They diverge at the **query router**, which inspects the AST for a `PROOF` node and selects the execution pipeline.
+
+.Dual-path architecture
+----
+                     ┌──────────────────────────────────────────────────┐
+                     │              VQL Statement                       │
+                     └───────────────────┬──────────────────────────────┘
+                                         │
+                                   ┌─────▼──────┐
+                                   │   Parser    │ (ReScript / Elixir fallback)
+                                   └─────┬──────┘
+                                         │ AST
+                                   ┌─────▼──────┐
+                                   │ Type Check  │ (VQLBidir.res)
+                                   └─────┬──────┘
+                                         │
+                              ┌──────────┴──────────┐
+                              │ PROOF clause?        │
+                         ┌────▼────┐          ┌─────▼─────┐
+                         │   NO    │          │    YES    │
+                    ┌────▼────┐         ┌─────▼─────┐
+                    │Slipstream│         │  VQL-DT    │
+                    │  Path    │         │  Path      │
+                    └────┬────┘         └─────┬─────┘
+                         │                     │
+                         │                     ├─ Dependent type check
+                         │                     ├─ Proof obligation gen
+                         │                     ├─ ZKP witness gen
+                         │                     │
+                    ┌────▼─────────────────────▼────┐
+                    │   Elixir Orchestrator          │
+                    │   (QueryRouter GenServer)      │
+                    └────┬──────────────────────┬───┘
+                         │                      │
+            ┌────────────▼──────────┐  ┌───────▼───────────┐
+            │  Modality Stores      │  │  Federation Fan-out │
+            │  (Rust: Oxigraph,     │  │  (multi-node)       │
+            │   Milvus, Tantivy,    │  └───────────────────┘
+            │   Burn, etc.)         │
+            └───────────────────────┘
+----
+
+`[.implemented]` Parser, basic type checking, query routing, store dispatch. +
+`[.partial]` Bidirectional type inference (implemented in ReScript, not wired to runtime Lean checker). +
+`[.planned]` ZKP proof generation via `proven-library` / `sanctify`.
+
+=== Conformance Levels
+
+A VQL implementation MAY support one or both execution paths:
+
+* **Level 1 — Slipstream**: Parse, validate, execute queries without proof obligations. All SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT, OFFSET, and mutation statements MUST be supported.
+* **Level 2 — Full (Slipstream + VQL-DT)**: All Level 1 features plus PROOF clause parsing, dependent type checking, proof generation, and proof certificate bundling.
+
+VeriSimDB's current implementation is Level 1 complete with Level 2 partially implemented (parser and type checker complete; runtime proof generation planned).
+
+
+// ============================================================================
+// 2. LEXICAL STRUCTURE
+// ============================================================================
+
+== Lexical Structure
+
+=== Character Set
+
+VQL source text is encoded in **UTF-8**. Identifiers are restricted to ASCII letters, digits, and underscores. String literals may contain any valid UTF-8 sequence.
+
+=== Keywords
+
+Keywords are **case-insensitive**. The following 70 tokens are reserved and MUST NOT be used as identifiers:
+
+.Reserved keywords (alphabetical)
+----
+ACCESS    AND       AS        ASC       AVG       BETWEEN   BY
+CITATION  CONSISTENT CONTAINS  COSINE    COUNT     CUSTOM    DELETE
+DESC      DOCUMENT  DOT_PRODUCT DRIFT   EUCLIDEAN EXISTENCE EXISTS
+FEDERATION FIELD    FROM      FULLTEXT  GRAPH     GROUP     HAS
+HAVING    HEXAD     INSERT    INTEGRITY JACCARD   LATEST    LIKE
+LIMIT     MATCHES   MAX       MIN       MODIFIED  NEAREST   NOT
+OF        OFFSET    OR        ORDER     PROOF     PROVENANCE RANK
+REPAIR    SELECT    SEMANTIC  SET       SHAPE     SIMILAR   STORE
+STRICT    SUM       TEMPORAL  TENSOR    TO        TOLERATE  UPDATE
+USING     VECTOR    VERIFIED  VERSION   WHERE     WITH      WITHIN
+false     true
+----
+
+`[.implemented]` All keywords are recognised by the parser.
+
+=== Identifiers
+
+----
+identifier = letter_or_underscore , { letter_or_digit_or_underscore } ;
+----
+
+Identifiers are **case-sensitive** (unlike keywords). They name stores, contracts, verifiers, actors, fields, and variables.
+
+.Examples
+----
+my_store          -- valid
+research_papers   -- valid
+node1             -- valid
+123invalid        -- INVALID: starts with digit
+SELECT            -- INVALID: reserved keyword
+----
+
+=== Literals
+
+==== Integer Literals
+
+----
+integer = digit , { digit } ;
+----
+
+Non-negative integers. Examples: `0`, `42`, `1000`.
+
+==== Float Literals
+
+----
+float = digit , { digit } , '.' , digit , { digit } ,
+        [ ('e' | 'E') , ['+' | '-'] , digit , { digit } ] ;
+----
+
+IEEE 754 double-precision. Examples: `3.14`, `0.001`, `1.5e10`, `2.0E-3`.
+
+==== String Literals
+
+----
+string_literal = "'" , { any_char_except_quote_or_backslash
+                       | escaped_quote | escaped_backslash } , "'" ;
+----
+
+Single-quoted. Escape sequences: `\'` (literal quote), `\\` (literal backslash).
+
+==== Boolean Literals
+
+----
+boolean = 'true' | 'false' ;
+----
+
+Case-sensitive (`true` and `false`, not `TRUE` or `FALSE`).
+
+==== Array Literals
+
+----
+array_literal = '[' , literal , { ',' , literal } , ']' ;
+----
+
+Homogeneous arrays. Used for vector data and tensor slices.
+
+==== UUID Literals
+
+----
+uuid = 8*hex_digit , '-' , 4*hex_digit , '-' , 4*hex_digit , '-' ,
+       4*hex_digit , '-' , 12*hex_digit ;
+----
+
+Standard RFC 4122 format. Example: `550e8400-e29b-41d4-a716-446655440000`.
+
+==== Timestamp Literals
+
+----
+timestamp = ISO-8601 datetime ;
+----
+
+Full ISO 8601 format with timezone. Example: `2026-02-13T10:30:00Z`.
+
+==== Regex Literals
+
+----
+regex_literal = '/' , { any_char_except_slash | '\/' | '\\' } , '/' ;
+----
+
+Forward-slash delimited regular expressions. Example: `/\b(AI|ML|DL)\b.*ethics/`.
+
+=== Operators
+
+[cols="1,2,1"]
+|===
+| Operator | Meaning | Valid Types
+
+| `==`
+| Equality
+| All types
+
+| `!=`
+| Inequality
+| All types
+
+| `>`
+| Greater than
+| Int, Float, String, Timestamp
+
+| `<`
+| Less than
+| Int, Float, String, Timestamp
+
+| `>=`
+| Greater than or equal
+| Int, Float, String, Timestamp
+
+| `\<=`
+| Less than or equal
+| Int, Float, String, Timestamp
+
+| `LIKE`
+| Pattern matching (% wildcard)
+| String only
+
+| `CONTAINS`
+| Substring containment (via FULLTEXT)
+| String only
+
+| `MATCHES`
+| Regex matching (via FULLTEXT)
+| String only
+|===
+
+=== Comments
+
+VQL supports two comment styles:
+
+----
+-- This is a line comment (extends to end of line)
+
+/* This is a
+   block comment
+   spanning multiple lines */
+----
+
+Comments are stripped during lexing and have no semantic effect.
+
+
+// ============================================================================
+// 3. DATA MODEL
+// ============================================================================
+
+== Data Model
+
+=== Octad Entities
+
+The fundamental unit of data in VeriSimDB is the **octad** — a single entity that exists simultaneously across up to eight modalities. Each octad is identified by a UUID and contains zero or more modality slots populated with data.
+
+NOTE: The name "hexad" persists in some API surfaces and code for backward compatibility. The data model is octad (8 modalities).
+
+.Octad structure
+----
+Octad := {
+  id:         UUID,
+  graph:      Option<GraphData>,
+  vector:     Option<VectorData>,
+  tensor:     Option<TensorData>,
+  semantic:   Option<SemanticData>,
+  document:   Option<DocumentData>,
+  temporal:   Option<TemporalData>,
+  provenance: Option<ProvenanceData>,
+  spatial:    Option<SpatialData>
+}
+----
+
+Not every octad populates every modality. An octad might have only Document and Vector data, or all eight. The `EXISTS` / `NOT EXISTS` conditions (<<cross-modal-conditions>>) filter on modality presence.
+
+=== Modalities
+
+[cols="1,2,2,1"]
+|===
+| Modality | Storage Engine | Data Model | Status
+
+| `GRAPH`
+| Oxigraph (RDF/Property Graph)
+| Triples, edges, property annotations
+| `[.implemented]`
+
+| `VECTOR`
+| HNSW (verisim-vector)
+| Fixed-dimension float embeddings
+| `[.implemented]`
+
+| `TENSOR`
+| Burn / ndarray (verisim-tensor)
+| Multi-dimensional numeric arrays with shape and dtype
+| `[.implemented]`
+
+| `SEMANTIC`
+| CBOR blobs (verisim-semantic)
+| Type annotations, ZKP proof blobs, contract references
+| `[.implemented]`
+
+| `DOCUMENT`
+| Tantivy (verisim-document)
+| Full-text searchable content with structured fields
+| `[.implemented]`
+
+| `TEMPORAL`
+| verisim-temporal (Merkle trees)
+| Version history, time-series, actor trail
+| `[.implemented]`
+
+| `PROVENANCE`
+| verisim-provenance (hash chains)
+| Origin tracking, transformation chain, actor trail, chain integrity verification
+| `[.implemented]`
+
+| `SPATIAL`
+| verisim-spatial (Haversine/brute-force)
+| WGS84 coordinates, geometries, radius/bounds/nearest queries
+| `[.implemented]`
+|===
+
+=== Primitive Types
+
+VQL's type system operates over these primitive types:
+
+[cols="1,2,2"]
+|===
+| Type | Description | ReScript Representation
+
+| `Int`
+| Arbitrary-precision integer
+| `IntType`
+
+| `Float`
+| IEEE 754 double-precision float
+| `FloatType`
+
+| `String`
+| UTF-8 text
+| `StringType`
+
+| `Bool`
+| Boolean (true/false)
+| `BoolType`
+
+| `Vector<N>`
+| Fixed-size float vector of dimension _N_
+| `VectorType(int)`
+
+| `Tensor<shape>`
+| Multi-dimensional array with shape `[d1, ..., dk]`
+| `TensorType(array<int>)`
+
+| `UUID`
+| RFC 4122 universally unique identifier
+| `UuidType`
+
+| `Timestamp`
+| ISO 8601 datetime
+| `TimestampType`
+|===
+
+=== Cross-Modal Consistency Model
+
+VeriSimDB continuously monitors **drift** — divergence between modality representations of the same octad. When an octad's vector embedding no longer matches its document content, or its graph structure diverges from its semantic annotations, drift is detected.
+
+Drift types monitored (8 total):
+
+* `semantic_vector_drift` — Embedding does not match semantic content
+* `graph_document_drift` — Graph structure does not match document
+* `temporal_consistency_drift` — Version history issues
+* `tensor_drift` — Tensor representation diverged
+* `provenance_drift` — Chain integrity broken, missing events, or stale chain
+* `spatial_drift` — Coordinates inconsistent with graph/document location mentions
+* `schema_drift` — Type constraint violations
+* `quality_drift` — Overall data quality metric
+
+When drift exceeds configurable thresholds, the **self-normalizer** identifies the most authoritative modality, regenerates drifted modalities from it, validates consistency, and updates all modalities atomically.
+
+
+// ============================================================================
+// 4. TYPE SYSTEM
+// ============================================================================
+
+== Type System
+
+VQL has a rich type system that operates in two modes depending on the execution path. The slipstream path uses simple types for basic validation. The VQL-DT path adds dependent types, refinement types, and proof types for formal verification.
+
+=== Type Language
+
+The full VQL type language stem:[\tau] is defined by:
+
+[stem]
+++++
+\begin{aligned}
+\tau ::= &\ \text{UUID} \mid \text{String} \mid \text{Int} \mid \text{Float} \mid \text{Bool} \\
+       | &\ \text{Vector}[n] \mid \text{Tensor}[d_1, \ldots, d_k] \\
+       | &\ \text{Timestamp} \\
+       | &\ \text{Hexad} \mid \text{HexadRef} \\
+       | &\ \text{Modality} \mid \text{ModalitySet} \\
+       | &\ \text{List}(\tau) \mid \text{Option}(\tau) \\
+       | &\ \tau_1 \times \tau_2 \quad \text{(product)} \\
+       | &\ \tau_1 \to \tau_2 \quad \text{(function)} \\
+       | &\ \{x : \tau \mid \phi(x)\} \quad \text{(refinement)} \\
+       | &\ \Pi x : \tau_1. \tau_2(x) \quad \text{(dependent product)} \\
+       | &\ \Sigma x : \tau_1. \tau_2(x) \quad \text{(dependent sum)} \\
+       | &\ \text{Proof}[\phi] \quad \text{(proof type)}
+\end{aligned}
+++++
+
+=== Simple Types (Slipstream Path)
+
+In slipstream mode, the type checker validates:
+
+1. **Modality resolution** — Requested modalities exist and are valid
+2. **Field types** — Field references (`MODALITY.field`) resolve to known primitive types
+3. **Operator compatibility** — Comparison operators match operand types
+4. **Aggregate validity** — Aggregate functions operate on appropriate types (e.g., `SUM` requires numeric)
+
+.ReScript type representation
+[source,rescript]
+----
+type rec vqlType =
+  | Primitive(primitiveType)
+  | ArrayType(vqlType)
+  | ModalityType(modalityType)
+  | HexadType(array<modalityType>)
+  | QueryResultType(queryResultInfo)
+  | ProofType(proofKind, string)
+  | ProvedResultType(queryResultInfo, proofKind, string)
+  | PiType(string, vqlType, vqlType)
+  | SigmaType(string, vqlType, vqlType)
+  | UnitType
+  | NeverType
+----
+
+`[.implemented]` All simple type checking in `VQLBidir.res`.
+
+=== Dependent Types (VQL-DT Path)
+
+When a `PROOF` clause is present, the type checker activates dependent type checking:
+
+==== Pi Types (Dependent Functions)
+
+stem:[\Pi x : \tau_1. \tau_2(x)] — The codomain type depends on the argument value. Used internally to type modality projections:
+
+[stem]
+++++
+\text{VECTOR} : \Pi n : \text{Nat}. \text{Hexad} \to \text{Option}(\text{Vector}[n])
+++++
+
+==== Sigma Types (Dependent Pairs)
+
+stem:[\Sigma x : \tau_1. \tau_2(x)] — A pair where the type of the second component depends on the value of the first. This is the return type of proved queries:
+
+[stem]
+++++
+\text{ProvedQuery} : \Sigma r : \text{QueryResult}[M]. \text{Proof}[\phi(r)]
+++++
+
+The result is bundled with a proof that the result satisfies the stated property stem:[\phi].
+
+==== Proof Types
+
+`Proof[φ]` — A type inhabited by evidence that proposition stem:[\phi] holds. There are six proof kinds:
+
+[cols="1,3,1"]
+|===
+| Proof Kind | Verifies | Cost
+
+| `EXISTENCE`
+| Hexad exists and is accessible in the store
+| Low
+
+| `CITATION`
+| Citation chain is valid (graph traversal verification)
+| Medium
+
+| `ACCESS`
+| User has verified access rights (ZKP access control)
+| Medium
+
+| `INTEGRITY`
+| Data has not been tampered with (Merkle root verification)
+| Medium
+
+| `PROVENANCE`
+| Lineage is verifiable (chain of custody)
+| High
+
+| `CUSTOM`
+| User-defined ZKP contract
+| Variable
+|===
+
+`[.partial]` Parser recognises all six proof types. Type checker validates proof clause structure. Runtime proof generation is planned.
+
+=== Subtyping Rules
+
+The subtyping relation stem:[\tau_1 <: \tau_2] governs when a value of type stem:[\tau_1] can be used where stem:[\tau_2] is expected:
+
+[stem]
+++++
+\begin{aligned}
+& \frac{}{\tau <: \tau} \quad \text{(Reflexivity)} \\[6pt]
+& \frac{\tau_1 <: \tau_2 \quad \tau_2 <: \tau_3}{\tau_1 <: \tau_3} \quad \text{(Transitivity)} \\[6pt]
+& \frac{}{\{x : \tau \mid \phi(x)\} <: \tau} \quad \text{(Refinement Subsumption)} \\[6pt]
+& \frac{\tau_1 <: \tau_2}{\text{List}(\tau_1) <: \text{List}(\tau_2)} \quad \text{(List Covariance)} \\[6pt]
+& \frac{\tau_2 <: \tau_1 \quad \sigma_1 <: \sigma_2}{\tau_1 \to \sigma_1 <: \tau_2 \to \sigma_2} \quad \text{(Function Contra/Covariance)}
+\end{aligned}
+++++
+
+`[.implemented]` Structural subtyping in `VQLBidir.res`.
+
+=== Type Inference (Bidirectional)
+
+VQL uses **bidirectional type checking** with two modes:
+
+* **Synthesis** (stem:[\Gamma \vdash e \Rightarrow \tau]) — Infer the type of an expression from its structure.
+* **Checking** (stem:[\Gamma \vdash e \Leftarrow \tau]) — Verify that an expression has an expected type.
+
+The `synthesizeQuery` function in `VQLBidir.res` walks the query AST through nine phases:
+
+1. Resolve modalities from SELECT clause
+2. Check source (HEXAD/FEDERATION/STORE) typing
+3. Check WHERE clause conditions
+4. Check field projections
+5. Check aggregate expressions
+6. Check GROUP BY fields
+7. Check ORDER BY fields
+8. Build result type
+9. Handle PROOF clause (if present, switch to dependent-type path)
+
+.Core typing rules
+[stem]
+++++
+\frac{\Gamma \vdash q : \text{Query}[M] \quad \text{no PROOF clause}}{\Gamma \vdash q \Rightarrow \text{List}(\text{Hexad}_M)} \quad \text{(T-SlipstreamQuery)}
+++++
+
+[stem]
+++++
+\frac{\Gamma \vdash q : \text{Query}[M] \quad \Gamma \vdash p : \text{ProofSpec}[\phi]}{\Gamma \vdash q\ \text{PROOF}\ p \Rightarrow \Sigma r : \text{QueryResult}[M]. \text{Proof}[\phi(r)]} \quad \text{(T-ProvedQuery)}
+++++
+
+`[.implemented]` Bidirectional type inference in `VQLBidir.res` (841 lines, 9-phase pipeline).
+
+=== Refinement Types
+
+Refinement types stem:[\{x : \tau \mid \phi(x)\}] constrain values beyond their base type. In VQL, refinement types appear implicitly in WHERE conditions:
+
+----
+WHERE FIELD severity > 3
+----
+
+This produces a refined query result type: stem:[\{h : \text{Hexad} \mid h.\text{severity} > 3\}].
+
+`[.partial]` Refinement types are implicit in condition checking. Explicit refinement type syntax is planned.
+
+=== Type Safety Properties
+
+The VQL type system satisfies three key properties (proven in `vql-type-system.adoc`):
+
+* **Progress** — A well-typed query can always take a step (it is never stuck).
+* **Preservation** — If a query steps, the result is still well-typed.
+* **Soundness** — The type checker only accepts queries that produce well-typed results.
+
+
+// ============================================================================
+// 5. QUERY STATEMENTS
+// ============================================================================
+
+== Query Statements
+
+A query statement retrieves hexad data and optionally verifies it:
+
+.Grammar
+----
+query = select_clause , from_clause , [where_clause] ,
+        [group_by_clause] , [having_clause] , [proof_clause] ,
+        [order_by_clause] , [limit_clause] , [offset_clause] ;
+----
+
+Clause order is **fixed**: SELECT, FROM, WHERE, GROUP BY, HAVING, PROOF, ORDER BY, LIMIT, OFFSET. Omitting optional clauses is valid. The only mandatory clauses are SELECT and FROM.
+
+=== SELECT Clause
+
+The SELECT clause specifies which data to retrieve.
+
+.Grammar
+----
+select_clause = 'SELECT' , select_item_list ;
+select_item_list = select_item , { ',' , select_item } ;
+select_item = aggregate_expr | field_ref | modality_spec ;
+----
+
+There are three kinds of select items:
+
+==== Modality Selection
+
+Select entire modalities by name:
+
+[source,vql]
+----
+SELECT GRAPH                          -- single modality
+SELECT GRAPH, VECTOR, DOCUMENT        -- multiple modalities
+SELECT *                              -- all available modalities
+----
+
+Each modality may include a projection to limit the data returned:
+
+----
+SELECT GRAPH(nodes, edges)            -- graph with specific projection
+SELECT DOCUMENT(title, abstract)      -- document fields only
+----
+
+==== Field Projections
+
+Select specific fields from a modality using dot notation (`MODALITY.field`):
+
+[source,vql]
+----
+SELECT DOCUMENT.name, DOCUMENT.severity
+----
+
+Field projections may be mixed with full modality selections:
+
+[source,vql]
+----
+SELECT GRAPH, DOCUMENT.name, DOCUMENT.severity
+----
+
+==== Aggregate Expressions
+
+Five aggregate functions are supported:
+
+[cols="1,2,2"]
+|===
+| Function | Syntax | Return Type
+
+| `COUNT(*)`
+| Count all matching hexads
+| `Int`
+
+| `COUNT(M.field)`
+| Count non-null values of a field
+| `Int`
+
+| `SUM(M.field)`
+| Sum numeric field values
+| `Float` (numeric fields only)
+
+| `AVG(M.field)`
+| Average numeric field values
+| `Float` (numeric fields only)
+
+| `MIN(M.field)`
+| Minimum value
+| Same as field type (comparable types only)
+
+| `MAX(M.field)`
+| Maximum value
+| Same as field type (comparable types only)
+|===
+
+.Type error: aggregate on non-numeric field
+----
+SELECT SUM(DOCUMENT.title)   -- ERROR: AggregateTypeMismatch
+                              --   SUM cannot operate on String
+----
+
+.Example: aggregates
+[source,vql]
+----
+SELECT COUNT(*), AVG(DOCUMENT.severity), MAX(DOCUMENT.severity)
+FROM FEDERATION /scans/*
+----
+
+`[.implemented]` All aggregate functions, field projections, and modality selection.
+
+=== FROM Clause
+
+The FROM clause specifies the data source.
+
+.Grammar
+----
+from_clause = 'FROM' , source_spec ;
+source_spec = hexad_source | federation_source | store_source ;
+----
+
+==== HEXAD Source
+
+Query a specific hexad by UUID:
+
+[source,vql]
+----
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+----
+
+Type: stem:[\text{Hexad}(\text{UUID})]
+
+==== FEDERATION Source
+
+Query across multiple VeriSimDB instances matching a pattern:
+
+[source,vql]
+----
+FROM FEDERATION /universities/*                    -- glob pattern
+FROM FEDERATION /universities/* WITH DRIFT STRICT  -- with drift policy
+----
+
+Drift policies control how inter-node inconsistency is handled:
+
+[cols="1,3,1"]
+|===
+| Policy | Behaviour | Cost
+
+| `STRICT`
+| Fail immediately if any node has drifted. Guarantees perfect consistency.
+| Low (fail-fast)
+
+| `REPAIR`
+| Detect drift, auto-repair via DriftMonitor, then return consistent results.
+| High (repair + retry)
+
+| `TOLERATE`
+| Return data even if nodes are inconsistent. Results may contain stale data.
+| Low
+
+| `LATEST`
+| Use the most recent version from each node, ignoring temporal consistency.
+| Low
+|===
+
+.Example: federation with drift policies
+[source,vql]
+----
+-- Strict: fail on any drift
+SELECT *
+FROM FEDERATION /legal-records/* WITH DRIFT STRICT
+WHERE AS OF 2024-01-01T00:00:00Z
+PROOF INTEGRITY(LegalContract)
+
+-- Repair: auto-fix before returning
+SELECT GRAPH, DOCUMENT
+FROM FEDERATION /collaborative-wiki/* WITH DRIFT REPAIR
+WHERE FULLTEXT CONTAINS "VeriSimDB"
+
+-- Tolerate: return potentially inconsistent data
+SELECT *
+FROM FEDERATION /mirrors/* WITH DRIFT TOLERATE
+WHERE FULLTEXT CONTAINS "archived content"
+LIMIT 1000
+
+-- Latest: most recent version wins
+SELECT DOCUMENT
+FROM FEDERATION /news-feeds/* WITH DRIFT LATEST
+WHERE FULLTEXT CONTAINS "breaking news"
+LIMIT 10
+----
+
+`[.implemented]` All drift modes parsed and routed. Drift detection implemented. Auto-repair partially implemented.
+
+==== STORE Source
+
+Query a specific modality store directly, bypassing federation:
+
+[source,vql]
+----
+FROM STORE milvus-us-east-1      -- direct store access
+FROM STORE oxigraph-node-1       -- specific graph store
+----
+
+Useful for lowest-latency queries when you know which store has your data.
+
+`[.implemented]` Store-direct queries.
+
+=== WHERE Clause
+
+The WHERE clause filters hexads based on conditions.
+
+.Grammar
+----
+where_clause = 'WHERE' , condition ;
+condition = simple_condition | compound_condition | '(' , condition , ')' ;
+compound_condition = condition , 'AND' , condition
+                   | condition , 'OR' , condition
+                   | 'NOT' , condition ;
+----
+
+Conditions are composed with `AND`, `OR`, and `NOT`. Parentheses control precedence. Each simple condition targets a specific modality or operates across modalities.
+
+==== Graph Conditions
+
+Graph conditions use SPARQL-like patterns for traversing the RDF/property graph.
+
+.Grammar
+----
+graph_condition = sparql_pattern | path_pattern ;
+sparql_pattern = '(' , node_var , ')' , edge_pattern , '(' , node_var , ')' ;
+edge_pattern = '-[' , edge_type , ']->'
+             | '-[' , edge_type , ']-'
+             | '<-[' , edge_type , ']-' ;
+path_pattern = node_var , path_quantifier , node_var ;
+path_quantifier = '-[' , edge_type , ('*' | '+' | '{' , int , ',' , int , '}') , ']->' ;
+----
+
+Edge patterns support three directions:
+
+* `-[:TYPE]\->` — Directed edge (outgoing)
+* `-[:TYPE]-` — Undirected edge (either direction)
+* `<-[:TYPE]-` — Reverse edge (incoming)
+
+Path quantifiers control traversal depth:
+
+* `*` — Zero or more hops
+* `+` — One or more hops
+* `{m,n}` — Between _m_ and _n_ hops
+
+.Examples: graph conditions
+[source,vql]
+----
+-- Direct citation
+WHERE (h)-[:CITES]->(target)
+
+-- Citation chain (1-5 hops)
+WHERE (h)-[:CITES*1..5]->(paper)
+
+-- Bidirectional co-authorship
+WHERE (h)-[:CO_AUTHOR]-(colleague)
+
+-- Property conditions on graph nodes
+WHERE (author)-[:WROTE]->(paper)
+  AND paper.citations > 100
+----
+
+.Type rule
+[stem]
+++++
+\frac{\Gamma \vdash v_1 : \text{Node} \quad \Gamma \vdash v_2 : \text{Node} \quad e : \text{EdgeType}}{\Gamma \vdash (v_1)\text{-[}e\text{]->(}v_2) : \text{GraphCondition}}
+++++
+
+`[.implemented]` SPARQL patterns, path quantifiers, property conditions.
+
+==== Vector Conditions
+
+Vector conditions support similarity search and K-nearest-neighbor queries.
+
+.Grammar
+----
+vector_condition = vector_field , 'SIMILAR' , 'TO' , vector_literal , [similarity_threshold]
+                 | vector_field , 'NEAREST' , integer , [metric_type] ;
+similarity_threshold = 'WITHIN' , float ;
+metric_type = 'USING' , ('COSINE' | 'EUCLIDEAN' | 'DOT_PRODUCT') ;
+----
+
+.Examples: vector conditions
+[source,vql]
+----
+-- Approximate nearest neighbor with threshold
+WHERE h.embedding SIMILAR TO [0.12, 0.45, 0.78, ...] WITHIN 0.8
+
+-- K-nearest neighbors with metric
+WHERE h.embedding NEAREST 15 USING DOT_PRODUCT
+
+-- Similarity with explicit metric
+WHERE h.embedding SIMILAR TO [0.12, 0.45, 0.78, ...]
+  WITHIN 0.9
+  USING COSINE
+----
+
+.Type rule
+[stem]
+++++
+\frac{\Gamma \vdash f : \text{Vector}[n] \quad \Gamma \vdash v : \text{Vector}[m] \quad n = m}{\Gamma \vdash f\ \text{SIMILAR TO}\ v : \text{VectorCondition}} \quad \text{(T-VectorSim)}
+++++
+
+Dimension mismatch produces `VectorDimensionMismatch` error.
+
+`[.implemented]` Similarity search, KNN, all three metrics (COSINE, EUCLIDEAN, DOT_PRODUCT).
+
+==== Tensor Conditions
+
+Tensor conditions filter on shape, rank, and element properties.
+
+.Grammar
+----
+tensor_condition = tensor_field , tensor_op , tensor_literal ;
+tensor_op = '==' | '>' | '<' | '>=' | '<=' | 'SHAPE' | 'RANK' ;
+----
+
+.Examples: tensor conditions
+[source,vql]
+----
+-- Shape filtering
+WHERE tensor.data SHAPE == [256, 256, 3]
+
+-- Rank filtering with statistics
+WHERE tensor.data RANK == 3
+  AND tensor.statistics.mean > 0.5
+  AND tensor.statistics.std < 0.2
+----
+
+`[.implemented]` Shape and rank filtering. Element-wise operations partial.
+
+==== Semantic Conditions
+
+Semantic conditions verify ZKP contracts and proof properties.
+
+.Grammar
+----
+semantic_condition = 'SATISFIES' , contract_name , [contract_params]
+                   | 'HAS' , 'PROOF' , proof_type
+                   | 'VERIFIED' , 'BY' , verifier_id ;
+contract_params = '(' , param_list , ')' ;
+param_list = identifier , '=' , literal , { ',' , identifier , '=' , literal } ;
+----
+
+.Examples: semantic conditions
+[source,vql]
+----
+-- Contract satisfaction
+WHERE SATISFIES AccessControlContract(role=researcher, institution=MIT)
+
+-- Existing proof check
+WHERE HAS PROOF ACCESS
+
+-- Verifier check
+WHERE VERIFIED BY fda-validator
+
+-- Multi-contract
+WHERE SATISFIES GDPRContract(anonymized=true)
+  AND SATISFIES FAIRContract(findable=true, accessible=true)
+  AND SATISFIES LicenseContract(license=CC-BY-4.0)
+----
+
+`[.partial]` Parser and type checker handle semantic conditions. Runtime contract verification via ZKP is planned.
+
+==== Document Conditions
+
+Document conditions support full-text search, regex matching, and structured field queries against the Tantivy index.
+
+.Grammar
+----
+document_condition = 'FULLTEXT' , 'CONTAINS' , string_literal
+                   | 'FULLTEXT' , 'MATCHES' , regex_literal
+                   | 'FIELD' , identifier , comparison_op , literal ;
+----
+
+.Examples: document conditions
+[source,vql]
+----
+-- Full-text search
+WHERE FULLTEXT CONTAINS "quantum computing"
+
+-- Regex pattern matching
+WHERE FULLTEXT MATCHES /\b(AI|ML|DL)\b.*ethics/
+
+-- Structured field query
+WHERE FIELD author == "Jane Doe"
+  AND FIELD year >= 2020
+
+-- Combining full-text with structured
+WHERE FULLTEXT CONTAINS "deep learning"
+  AND FIELD doi LIKE "10.1234/%"
+  AND FIELD impact_factor >= 5.0
+----
+
+`[.implemented]` Full-text search, regex matching, structured field queries.
+
+==== Temporal Conditions
+
+Temporal conditions query version history and time-series data backed by Merkle trees.
+
+.Grammar
+----
+temporal_condition = 'AS' , 'OF' , timestamp
+                   | 'BETWEEN' , timestamp , 'AND' , timestamp
+                   | 'VERSION' , version_id
+                   | 'MODIFIED' , 'BY' , actor_id ;
+----
+
+.Examples: temporal conditions
+[source,vql]
+----
+-- Point-in-time query
+WHERE AS OF 2024-06-15T10:30:00Z
+
+-- Version range
+WHERE BETWEEN 2024-01-01T00:00:00Z AND 2024-12-31T23:59:59Z
+
+-- Specific version
+WHERE VERSION v3-final
+
+-- Actor filter
+WHERE MODIFIED BY legal-team
+----
+
+`[.implemented]` All temporal conditions parsed and routed to verisim-temporal.
+
+[[cross-modal-conditions]]
+==== Cross-Modal Conditions
+
+Cross-modal conditions operate on relationships _between_ modalities rather than within a single modality. These conditions are evaluated **post-fetch** (after modality data has been retrieved from stores), unlike single-modality conditions which are pushed down to stores.
+
+.Grammar
+----
+cross_modal_condition = cross_modal_field_compare
+                      | drift_condition
+                      | consistency_condition
+                      | exists_condition
+                      | not_exists_condition ;
+----
+
+===== Field Comparison Across Modalities
+
+Compare field values from different modalities on the same hexad:
+
+----
+cross_modal_field_compare = field_ref , comparison_op , field_ref ;
+----
+
+[source,vql]
+----
+WHERE DOCUMENT.severity > GRAPH.centrality
+----
+
+.Type rule
+[stem]
+++++
+\frac{\Gamma \vdash f_1 : \tau_1 \quad \Gamma \vdash f_2 : \tau_2 \quad \tau_1 \sim \tau_2 \quad \text{op valid for } \tau_1}{\Gamma \vdash f_1\ \text{op}\ f_2 : \text{CrossModalCondition}}
+++++
+
+Both fields must be comparable types. `CrossModalTypeMismatch` error if they are not.
+
+===== Drift Detection Between Modalities
+
+Measure representation drift between two modalities:
+
+----
+drift_condition = 'DRIFT' , '(' , modality , ',' , modality , ')' , comparison_op , float ;
+----
+
+[source,vql]
+----
+WHERE DRIFT(VECTOR, DOCUMENT) > 0.3
+----
+
+Returns hexads where the drift score between the two modalities exceeds the threshold. The drift score is computed as a normalised distance metric (0.0 = perfectly consistent, 1.0 = maximally divergent).
+
+`DriftRequiresNumeric` error if either modality lacks a numeric/vector representation.
+
+===== Consistency Check
+
+Verify that two modalities are consistent using a specific metric:
+
+----
+consistency_condition = 'CONSISTENT' , '(' , modality , ',' , modality , ')' ,
+                        'USING' , metric_name ;
+metric_name = 'COSINE' | 'EUCLIDEAN' | 'DOT_PRODUCT' | 'JACCARD' ;
+----
+
+[source,vql]
+----
+WHERE CONSISTENT(VECTOR, SEMANTIC) USING COSINE
+----
+
+`ConsistencyMetricInvalid` error if the metric is not applicable to the modality pair.
+
+===== Modality Existence
+
+Filter hexads based on which modalities are populated:
+
+----
+exists_condition = modality_name , 'EXISTS' ;
+not_exists_condition = modality_name , 'NOT' , 'EXISTS' ;
+----
+
+[source,vql]
+----
+-- Hexads with vectors but without tensors
+WHERE VECTOR EXISTS
+  AND TENSOR NOT EXISTS
+----
+
+.Combined example: cross-modal with standard conditions
+[source,vql]
+----
+SELECT GRAPH, VECTOR, DOCUMENT
+FROM FEDERATION /research-db/* WITH DRIFT REPAIR
+WHERE FULLTEXT CONTAINS "neural networks"     -- pushdown to document store
+  AND DRIFT(VECTOR, DOCUMENT) < 0.2           -- cross-modal (post-fetch)
+  AND VECTOR EXISTS                            -- cross-modal (post-fetch)
+  AND GRAPH EXISTS                             -- cross-modal (post-fetch)
+PROOF CITATION(NeuralNetworkContract)
+  AND INTEGRITY(DataIntegrityContract)
+LIMIT 50
+----
+
+`[.implemented]` All cross-modal conditions: field compare, drift, consistency, exists/not-exists.
+
+=== PROOF Clause
+
+The PROOF clause activates the VQL-DT execution path and specifies proof obligations.
+
+.Grammar
+----
+proof_clause = 'PROOF' , proof_spec_list ;
+proof_spec_list = proof_spec , { 'AND' , proof_spec } ;
+proof_spec = proof_type , '(' , contract_name , ')' , [proof_params] ;
+proof_params = 'WITH' , param_list ;
+----
+
+Multiple proofs are composed with `AND` — all must pass before results are returned.
+
+.Examples: proof clause
+[source,vql]
+----
+-- Single proof
+PROOF EXISTENCE(ExistenceContract)
+
+-- Dual proof
+PROOF EXISTENCE(ExistenceContract) AND INTEGRITY(DataIntegrityContract)
+
+-- Triple proof with parameters
+PROOF ACCESS(InstitutionalAccessContract)
+  AND PROVENANCE(ClinicalTrialContract)
+  AND INTEGRITY(DataIntegrityContract)
+
+-- Custom proof with verifier
+PROOF CUSTOM(ComplianceContract) WITH auditor=legal-team
+----
+
+.Type rule
+[stem]
+++++
+\frac{\Gamma \vdash p_1 : \text{Proof}[\phi_1] \quad \Gamma \vdash p_2 : \text{Proof}[\phi_2]}{\Gamma \vdash p_1\ \text{AND}\ p_2 : \text{Proof}[\phi_1 \land \phi_2]} \quad \text{(T-ProofCompose)}
+++++
+
+The type checker validates proof composability via the context's contract registry. `MultiProofConflict` error if proofs have conflicting requirements.
+
+`[.partial]` Parser and type checker handle proof clauses. Runtime ZKP generation planned.
+
+=== GROUP BY / HAVING
+
+Group results and filter groups.
+
+.Grammar
+----
+group_by_clause = 'GROUP' , 'BY' , field_ref_list ;
+having_clause = 'HAVING' , condition ;
+----
+
+`HAVING` requires `GROUP BY` — using HAVING without GROUP BY produces `HavingWithoutGroupBy` error.
+
+.Example: grouping with aggregate filter
+[source,vql]
+----
+SELECT DOCUMENT.name, COUNT(*), AVG(DOCUMENT.severity)
+FROM FEDERATION /universities/*
+GROUP BY DOCUMENT.name
+HAVING FIELD count > 3
+ORDER BY DOCUMENT.name ASC
+LIMIT 50
+----
+
+`[.implemented]` GROUP BY, HAVING, aggregate validation.
+
+=== ORDER BY
+
+Sort results by one or more fields.
+
+.Grammar
+----
+order_by_clause = 'ORDER' , 'BY' , order_by_list ;
+order_by_item = field_ref , [sort_direction] ;
+sort_direction = 'ASC' | 'DESC' ;
+----
+
+Default sort direction is `ASC` when omitted.
+
+.Example: multi-field sort
+[source,vql]
+----
+SELECT DOCUMENT.name, DOCUMENT.severity
+FROM FEDERATION /archives/*
+ORDER BY DOCUMENT.severity DESC, DOCUMENT.name ASC
+LIMIT 100
+----
+
+Fields must be comparable types (Int, Float, String, Timestamp). `InvalidOrderByField` error otherwise.
+
+`[.implemented]` Multi-field ORDER BY with ASC/DESC.
+
+=== LIMIT / OFFSET
+
+Paginate results.
+
+.Grammar
+----
+limit_clause = 'LIMIT' , integer ;
+offset_clause = 'OFFSET' , integer ;
+----
+
+.Example: pagination
+[source,vql]
+----
+SELECT DOCUMENT
+FROM FEDERATION /archives/*
+WHERE FULLTEXT CONTAINS "machine learning"
+LIMIT 100
+OFFSET 500
+----
+
+`[.implemented]` LIMIT and OFFSET.
+
+
+// ============================================================================
+// 6. MUTATION STATEMENTS
+// ============================================================================
+
+== Mutation Statements
+
+VQL 2.0 adds a write path with INSERT, UPDATE, and DELETE operations. All mutations optionally accept a PROOF clause for verified writes.
+
+.Grammar
+----
+mutation = insert_mutation | update_mutation | delete_mutation ;
+----
+
+=== INSERT HEXAD
+
+Create a new hexad with modality data.
+
+.Grammar
+----
+insert_mutation = 'INSERT' , 'HEXAD' , 'WITH' , modality_data_list , [proof_clause] ;
+modality_data_list = modality_data , { ',' , modality_data } ;
+modality_data = document_data | vector_data | graph_data
+              | tensor_data | semantic_data | temporal_data ;
+----
+
+Each modality data type has its own syntax:
+
+[cols="1,3"]
+|===
+| Modality | Syntax
+
+| `DOCUMENT`
+| `DOCUMENT(field = value, ...)`
+
+| `VECTOR`
+| `VECTOR([float, ...])`
+
+| `GRAPH`
+| `GRAPH(edge_type, target_hexad_id)`
+
+| `TENSOR`
+| `TENSOR([array_literal])`
+
+| `SEMANTIC`
+| `SEMANTIC(contract_name)`
+
+| `TEMPORAL`
+| `TEMPORAL(timestamp)`
+|===
+
+.Examples: INSERT
+[source,vql]
+----
+-- Basic insert with document and vector
+INSERT HEXAD WITH
+  DOCUMENT(title = "New Research Paper", author = "Jane Doe", severity = 3),
+  VECTOR([0.12, 0.45, 0.78, 0.23, 0.91])
+
+-- Insert with graph relationship
+INSERT HEXAD WITH
+  DOCUMENT(title = "Follow-Up Study", year = 2026),
+  VECTOR([0.5, 0.3, 0.2, 0.8]),
+  GRAPH(CITES, 550e8400-e29b-41d4-a716-446655440000)
+
+-- Verified insert with proof
+INSERT HEXAD WITH
+  DOCUMENT(title = "Clinical Trial Result", status = "verified"),
+  SEMANTIC(ClinicalTrialContract),
+  TEMPORAL(2026-02-13T10:30:00Z)
+PROOF INTEGRITY(WriteContract) AND PROVENANCE(AuditTrailContract)
+----
+
+The hexad ID is **auto-generated** and returned in the result. Drift detection fires after insert to validate cross-modal consistency.
+
+`[.implemented]` INSERT parsing and execution via Elixir executor.
+
+=== UPDATE HEXAD
+
+Modify fields of an existing hexad.
+
+.Grammar
+----
+update_mutation = 'UPDATE' , 'HEXAD' , uuid , 'SET' , set_list , [proof_clause] ;
+set_list = set_assignment , { ',' , set_assignment } ;
+set_assignment = field_ref , '=' , literal ;
+----
+
+.Examples: UPDATE
+[source,vql]
+----
+-- Simple field update
+UPDATE HEXAD 550e8400-e29b-41d4-a716-446655440000
+SET DOCUMENT.title = "Corrected Title", DOCUMENT.severity = 5
+
+-- Verified update with proof
+UPDATE HEXAD 550e8400-e29b-41d4-a716-446655440000
+SET DOCUMENT.status = "retracted",
+    DOCUMENT.retraction_reason = "Data fabrication"
+PROOF ACCESS(EditAccessContract)
+  AND PROVENANCE(RetractionContract)
+----
+
+`UpdateNotFound` error if the hexad UUID does not exist. Drift detection fires after update.
+
+`[.implemented]` UPDATE parsing and execution.
+
+=== DELETE HEXAD
+
+Remove a hexad and all its modality data.
+
+.Grammar
+----
+delete_mutation = 'DELETE' , 'HEXAD' , uuid , [proof_clause] ;
+----
+
+.Examples: DELETE
+[source,vql]
+----
+-- Simple deletion
+DELETE HEXAD 550e8400-e29b-41d4-a716-446655440000
+
+-- Verified deletion with proof
+DELETE HEXAD 550e8400-e29b-41d4-a716-446655440000
+PROOF ACCESS(AdminAccessContract)
+  AND PROVENANCE(DeletionAuditContract)
+----
+
+All deletions are logged in verisim-temporal for auditability, even without explicit proof.
+
+`[.implemented]` DELETE parsing and execution.
+
+
+// ============================================================================
+// 7. FEDERATION QUERIES
+// ============================================================================
+
+== Federation Queries
+
+Federation queries distribute execution across multiple VeriSimDB instances. The Elixir orchestration layer handles fan-out, result aggregation, and drift resolution.
+
+=== Node Patterns
+
+Two node pattern syntaxes select federation targets:
+
+.Glob patterns
+----
+FROM FEDERATION /universities/*        -- all nodes under /universities/
+FROM FEDERATION /research-db/**        -- recursive
+----
+
+.Node lists
+----
+FROM FEDERATION [node1, node2, node3]  -- explicit list
+----
+
+=== Drift Policies
+
+Federation queries MUST decide how to handle inter-node inconsistency. Without an explicit drift policy, the default is `TOLERATE`.
+
+.Drift policy semantics
+[cols="1,3,1"]
+|===
+| Policy | Formal Semantics | Consistency Guarantee
+
+| `STRICT`
+| stem:[\forall n \in N : \text{hash}(n) = \text{hash}(n_0)] — all nodes agree
+| Full
+
+| `REPAIR`
+| Detect → repair → retry → return consistent results
+| Full (eventual)
+
+| `TOLERATE`
+| Return union of results regardless of consistency
+| None
+
+| `LATEST`
+| stem:[\forall n \in N : \text{select}(\max(\text{timestamp}(n)))] — most recent wins
+| Temporal only
+|===
+
+.Consistency lattice
+----
+STRICT < LATEST < REPAIR < TOLERATE
+                           (increasing tolerance)
+----
+
+.Small-step drift semantics
+[stem]
+++++
+\frac{\exists n_i, n_j \in N : \text{hash}(n_i) \neq \text{hash}(n_j) \quad \text{policy} = \text{STRICT}}{\langle N, q \rangle \to \text{Error}(\text{DriftDetected})} \quad \text{(S-DriftStrict)}
+++++
+
+[stem]
+++++
+\frac{\text{divergent}(N) \neq \emptyset \quad \text{policy} = \text{REPAIR} \quad N' = \text{repair}(N)}{\langle N, q \rangle \to \langle N', q \rangle} \quad \text{(S-DriftRepair)}
+++++
+
+`[.implemented]` Federation fan-out, glob patterns, node lists. Drift detection via DriftMonitor GenServer. +
+`[.partial]` Auto-repair strategies (latest_wins implemented, quorum partial). +
+`[.planned]` Byzantine fault detection.
+
+
+// ============================================================================
+// 8. PROOF SYSTEM
+// ============================================================================
+
+== Proof System
+
+The proof system is the core differentiator between VQL and traditional query languages. It enables cryptographic verification of query results.
+
+=== Six Proof Types
+
+[cols="1,3,2"]
+|===
+| Type | Contract | Formal Proposition
+
+| `EXISTENCE`
+| Hexad exists and is accessible
+| stem:[\exists h \in S : h.\text{id} = \text{uuid} \land \text{accessible}(h)]
+
+| `CITATION`
+| Citation chain is valid
+| stem:[\forall e \in \text{path} : \text{valid\_edge}(e) \land \text{exists}(\text{target}(e))]
+
+| `ACCESS`
+| User has verified access rights
+| stem:[\text{role}(\text{user}) \in \text{allowed\_roles}(\text{resource})]
+
+| `INTEGRITY`
+| Data has not been tampered with
+| stem:[\text{hash}(\text{data}) = \text{merkle\_root}(\text{store})]
+
+| `PROVENANCE`
+| Lineage is verifiable
+| stem:[\forall t \in \text{chain} : \text{valid\_transform}(t) \land \text{signed}(t.\text{actor})]
+
+| `CUSTOM`
+| User-defined ZKP contract
+| stem:[\phi(\text{data}, \text{witness}) = \text{true}]
+|===
+
+=== Proof Composition
+
+Multiple proofs are composed with `AND`. Composition is **conjunctive** — all proofs must hold simultaneously:
+
+[source,vql]
+----
+PROOF ACCESS(InstitutionalAccessContract)
+  AND PROVENANCE(ClinicalTrialContract)
+  AND INTEGRITY(DataIntegrityContract)
+----
+
+This produces a composite proof type:
+
+[stem]
+++++
+\text{Proof}[\text{access} \land \text{provenance} \land \text{integrity}]
+++++
+
+ZKP witnesses for each proof are generated independently and composed into a single **proof bundle**. The type checker validates that proofs do not conflict (e.g., a contract requiring data deletion with one requiring data preservation would produce `MultiProofConflict`).
+
+=== ZKP Circuit Definitions
+
+Each proof type maps to a ZKP circuit via the `proven-library`:
+
+----
+EXISTENCE  → existence_circuit    (hash lookup + membership)
+CITATION   → citation_circuit     (graph traversal + edge validity)
+ACCESS     → access_circuit       (role check + credential verification)
+INTEGRITY  → integrity_circuit    (Merkle tree verification, Blake3)
+PROVENANCE → provenance_circuit   (chain validation + signature check)
+CUSTOM     → user_circuit         (custom circuit from contract definition)
+----
+
+`[.planned]` ZKP circuit compilation and execution via proven-library / sanctify.
+
+=== Proof Certificates
+
+When a VQL-DT query succeeds, the result includes a **proof certificate**:
+
+[source,json]
+----
+{
+  "data": [ ... ],           // Query results
+  "proof": {
+    "type": "INTEGRITY",
+    "contract": "DataIntegrityContract",
+    "certificate": "base64-encoded-zkp-certificate",
+    "verifiable": true,
+    "generated_at": "2026-02-13T10:30:00Z",
+    "circuit_id": "integrity_v2"
+  }
+}
+----
+
+Certificates are independently verifiable — any party with the verification key can confirm the proof without access to the underlying data.
+
+`[.planned]` Certificate generation and verification.
+
+
+// ============================================================================
+// 9. QUERY EXECUTION MODEL
+// ============================================================================
+
+== Query Execution Model
+
+=== Query Routing
+
+The execution pipeline flows through three layers:
+
+1. **ReScript Core** — Parsing, type checking, query plan generation
+2. **Elixir Orchestrator** — Query routing, federation fan-out, drift handling
+3. **Rust Modality Stores** — Per-modality query execution
+
+.Execution pipeline
+----
+VQL String
+  → Parser (ReScript VQLParser.res / Elixir vql_bridge.ex fallback)
+  → AST
+  → Type Checker (VQLBidir.res)
+  → Query Plan Generator (VQLExplain.res)
+  → Condition Classifier (pushdown vs cross-modal)
+  → Elixir QueryRouter GenServer
+    → Route to stores by modality:
+        :text     → RustClient.search_text (Tantivy)
+        :vector   → RustClient.search_vector (HNSW)
+        :graph    → RustClient.get_related (Oxigraph)
+        :semantic → Text search with type: prefix
+        :temporal → Version lookup via REST API
+        :multi    → Combine text + vector, deduplicate
+    → Cross-modal evaluation (post-fetch)
+    → Aggregation / sorting / pagination
+  → Response
+----
+
+.Condition classification
+The executor separates conditions into two categories:
+
+* **Pushdown conditions** — Sent directly to modality stores for server-side evaluation (FULLTEXT CONTAINS, FIELD comparisons, graph patterns, vector similarity, tensor operations, temporal conditions, semantic conditions).
+* **Cross-modal conditions** — Evaluated in the Elixir layer after all store results are fetched (DRIFT, CONSISTENT, EXISTS/NOT EXISTS, cross-modal field comparisons).
+
+=== Cross-Modal Joins
+
+VQL does not have explicit JOIN syntax. Instead, cross-modal querying is implicit — every hexad is already the join of all its modalities. When you write:
+
+[source,vql]
+----
+SELECT GRAPH, VECTOR, DOCUMENT
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE (h)-[:CITES]->(target)
+  AND h.embedding SIMILAR TO [0.1, 0.2, 0.3] WITHIN 0.8
+  AND FULLTEXT CONTAINS "neural networks"
+----
+
+The executor:
+
+1. Routes graph condition to Oxigraph
+2. Routes vector condition to HNSW
+3. Routes document condition to Tantivy
+4. Intersects results by hexad ID
+5. Returns the unified hexad with all three modalities populated
+
+=== EXPLAIN Plans
+
+Prefix a query with `EXPLAIN` to see the execution plan without executing:
+
+[source,vql]
+----
+EXPLAIN SELECT GRAPH, VECTOR, DOCUMENT
+FROM FEDERATION /research-db/*
+WHERE FULLTEXT CONTAINS "AI"
+  AND h.embedding SIMILAR TO [0.1, 0.2, 0.3]
+LIMIT 50
+----
+
+.Example EXPLAIN output
+----
+VQL Execution Plan
+==================
+Strategy: Parallel
+Steps:
+  1. [DOCUMENT] Full-text search: "AI"
+     Estimated cost: 80ms | Selectivity: 0.3
+     Pushed predicates: FULLTEXT CONTAINS "AI"
+  2. [VECTOR] Similarity search
+     Estimated cost: 50ms | Selectivity: 0.1
+     Pushed predicates: SIMILAR TO [0.1, 0.2, 0.3]
+  3. [GRAPH] Graph retrieval
+     Estimated cost: 150ms | Selectivity: 1.0
+  4. [INTERSECT] Cross-modal join by hexad ID
+     Estimated cost: 10ms
+  5. [LIMIT] Cap results at 50
+     Estimated cost: 1ms
+
+Total estimated cost: 291ms
+Optimization hints:
+  - Consider adding LIMIT to reduce result set
+  - VECTOR + DOCUMENT queries can execute in parallel
+----
+
+.Per-modality base costs (from VQLExplain.res)
+[cols="1,1"]
+|===
+| Modality | Base Cost
+
+| GRAPH
+| 150ms
+
+| VECTOR
+| 50ms
+
+| TENSOR
+| 200ms
+
+| SEMANTIC
+| 300ms
+
+| DOCUMENT
+| 80ms
+
+| TEMPORAL
+| 30ms
+|===
+
+`[.implemented]` EXPLAIN plan generation with cost estimation and performance hints.
+
+=== Error Handling and Diagnostics
+
+VQL provides structured error responses with error codes, messages, and recovery hints.
+
+==== Error Categories
+
+[cols="1,2,1"]
+|===
+| Category | Error Code Pattern | Recoverable?
+
+| Parse errors
+| `VQL_PARSE_ERROR`
+| No
+
+| Type errors
+| `VQL_TYPE_ERROR`
+| No
+
+| Runtime errors
+| `VQL_STORE_UNAVAILABLE`, `VQL_QUERY_TIMEOUT`, `VQL_DRIFT_DETECTED`, `VQL_PERMISSION_DENIED`, `VQL_RESOURCE_EXHAUSTED`, `VQL_RUNTIME_ERROR`
+| Varies
+
+| Modality errors
+| `VQL_GRAPH_ERROR`, `VQL_VECTOR_ERROR`, `VQL_TENSOR_ERROR`, `VQL_SEMANTIC_ERROR`, `VQL_DOCUMENT_ERROR`, `VQL_TEMPORAL_ERROR`
+| No
+
+| Federation errors
+| `VQL_FEDERATION_ERROR`
+| `PartialResults` and `RemoteStoreUnreachable` are recoverable
+|===
+
+==== Error Response Format
+
+[source,json]
+----
+{
+  "error_code": "VQL_PARSE_ERROR",
+  "message": "Parse Error at 3:27-3:27: Expected ']->',  found end of input",
+  "recoverable": false
+}
+----
+
+==== Common Error Conditions
+
+.Parse-time errors
+[cols="1,3"]
+|===
+| Error | Cause
+
+| `UnexpectedToken`
+| Parser encountered a token it did not expect
+
+| `MissingFromClause`
+| Query has SELECT but no FROM
+
+| `HavingWithoutGroupBy`
+| HAVING clause used without GROUP BY
+
+| `AggregateWithoutGroupBy`
+| Aggregate function used without GROUP BY
+|===
+
+.Type-time errors
+[cols="1,3"]
+|===
+| Error | Cause
+
+| `VectorDimensionMismatch`
+| SIMILAR TO vector has different dimension than stored embeddings
+
+| `OperatorTypeMismatch`
+| Comparison operator used with incompatible types
+
+| `AggregateTypeMismatch`
+| SUM/AVG applied to non-numeric field
+
+| `CrossModalTypeMismatch`
+| Cross-modal field comparison with incompatible types
+
+| `MultiProofConflict`
+| Two proof specifications have conflicting requirements
+
+| `UnknownField`
+| Field reference does not exist for the specified modality
+|===
+
+.Runtime errors
+[cols="1,3"]
+|===
+| Error | Cause
+
+| `StoreUnavailable`
+| A modality store is down or unreachable
+
+| `QueryTimeout`
+| Query exceeded the configured timeout
+
+| `DriftDetected`
+| Federation drift detected with STRICT policy
+
+| `ByzantineFaultDetected`
+| Suspicious inconsistencies suggesting Byzantine behaviour
+|===
+
+`[.implemented]` All error types defined in `VQLError.res` (447 lines). Structured JSON error responses.
+
+
+// ============================================================================
+// 10. IMPLEMENTATION STATUS
+// ============================================================================
+
+== Implementation Status
+
+This section provides an honest assessment of what is implemented, partially implemented, and planned as of 2026-02-27.
+
+=== Implemented
+
+[cols="2,1,3"]
+|===
+| Feature | Version | Notes
+
+| VQL Parser (ReScript)
+| 2.0
+| 1154 lines, monadic parser combinators. Handles all grammar productions.
+
+| VQL Parser (Elixir fallback)
+| 2.0
+| Built into `vql_bridge.ex` (672 lines). No external Deno/Node dependency needed.
+
+| Bidirectional Type Checker
+| 2.0
+| `VQLBidir.res` (841 lines). 9-phase pipeline. Cross-modal checking, mutation checking.
+
+| Type System
+| 2.0
+| `VQLTypes.res` (296 lines). Pi types, Sigma types, proof types, structural equality.
+
+| Error System
+| 2.0
+| `VQLError.res` (447 lines). 5 error categories, 40+ error kinds, JSON serialization.
+
+| EXPLAIN Plans
+| 2.0
+| `VQLExplain.res` (427 lines). Per-modality cost estimation, performance hints.
+
+| Query Executor
+| 2.0
+| `vql_executor.ex` (1162 lines). Full pipeline: parse, type check, plan, route, aggregate.
+
+| Query Router
+| 2.0
+| `query_router.ex` (187 lines). GenServer routing by modality type with statistics.
+
+| SELECT (modalities, projections, aggregates)
+| 2.0
+| All three selection modes.
+
+| FROM (HEXAD, FEDERATION, STORE)
+| 2.0
+| All three source types.
+
+| WHERE (all condition types)
+| 2.0
+| Graph, vector, tensor, semantic, document, temporal, cross-modal.
+
+| GROUP BY / HAVING
+| 2.0
+| With aggregate validation.
+
+| ORDER BY
+| 2.0
+| Multi-field, ASC/DESC.
+
+| LIMIT / OFFSET
+| 2.0
+| Pagination.
+
+| INSERT / UPDATE / DELETE
+| 2.0
+| All three mutation types with optional PROOF clause.
+
+| Drift Detection
+| 1.0
+| DriftMonitor GenServer. Merkle tree divergence detection.
+
+| Modality Stores (Rust)
+| 1.0
+| Oxigraph, HNSW, Burn/ndarray, CBOR, Tantivy, verisim-temporal. 510 tests pass.
+|===
+
+=== Partial
+
+[cols="2,3"]
+|===
+| Feature | Gaps
+
+| Federation drift auto-repair
+| `latest_wins` strategy implemented. `quorum` strategy partial. Byzantine detection planned.
+
+| Semantic condition runtime
+| Parser and type checker handle SATISFIES, HAS PROOF, VERIFIED BY. Runtime contract verification via ZKP is stubbed.
+
+| Cross-modal write atomicity
+| INSERT/UPDATE/DELETE execute but atomic cross-modal writes (all modalities or none) are not guaranteed.
+
+| VQL Bridge (Elixir ↔ ReScript)
+| Port-based communication works. Falls back to built-in Elixir parser when Deno/Node unavailable.
+|===
+
+=== Planned
+
+[cols="2,2"]
+|===
+| Feature | Timeline
+
+| VQL-DT runtime (Lean type checker wired to execution)
+| Next milestone
+
+| ZKP proof generation (proven-library / sanctify)
+| Next milestone
+
+| Proof certificates
+| After ZKP integration
+
+| Provenance modality (verisim-provenance)
+| Active development
+
+| Spatial modality (verisim-spatial)
+| Backlog
+
+| Heterogeneous federation (non-VeriSimDB backends)
+| Backlog
+
+| Refinement type syntax (explicit)
+| Future
+
+| Row polymorphism, effect types, linear types for ZKP witnesses
+| Research
+|===
+
+
+// ============================================================================
+// APPENDIX A: COMPLETE EBNF GRAMMAR
+// ============================================================================
+
+[[appendix-a]]
+[appendix]
+== Complete EBNF Grammar
+
+This is the normative grammar for VQL 2.0, reproduced from `vql-grammar.ebnf` (ISO/IEC 14977 EBNF notation).
+
+[source,ebnf]
+----
+(* VeriSim Query Language (VQL) Grammar *)
+(* Version: 2.0 — Dependent types, cross-modal correlation, write path *)
+
+(* 1. TOP-LEVEL STRUCTURE *)
+statement = query | mutation ;
+
+query = select_clause,
+        from_clause,
+        [where_clause],
+        [group_by_clause],
+        [having_clause],
+        [proof_clause],
+        [order_by_clause],
+        [limit_clause],
+        [offset_clause] ;
+
+(* 2. SELECT CLAUSE *)
+select_clause = 'SELECT', select_item_list ;
+select_item_list = select_item, { ',', select_item } ;
+select_item = aggregate_expr | field_ref | modality_spec ;
+
+field_ref = modality_name, '.', identifier ;
+
+aggregate_expr = count_all | aggregate_field ;
+count_all = 'COUNT', '(', '*', ')' ;
+aggregate_field = aggregate_func, '(', field_ref, ')' ;
+aggregate_func = 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX' ;
+
+modality_spec = 'GRAPH', [graph_projection]
+              | 'VECTOR', [vector_projection]
+              | 'TENSOR', [tensor_projection]
+              | 'SEMANTIC', [semantic_projection]
+              | 'DOCUMENT', [document_projection]
+              | 'TEMPORAL', [temporal_projection]
+              | '*' ;
+
+modality_name = 'GRAPH' | 'VECTOR' | 'TENSOR'
+              | 'SEMANTIC' | 'DOCUMENT' | 'TEMPORAL' ;
+
+graph_projection = '(', sparql_pattern, ')' ;
+vector_projection = '(', vector_fields, ')' ;
+tensor_projection = '(', tensor_slice, ')' ;
+semantic_projection = '(', contract_names, ')' ;
+document_projection = '(', document_fields, ')' ;
+temporal_projection = '(', version_spec, ')' ;
+
+(* 3. FROM CLAUSE *)
+from_clause = 'FROM', source_spec ;
+source_spec = hexad_source | federation_source | store_source ;
+
+hexad_source = 'HEXAD', uuid ;
+
+federation_source = 'FEDERATION', node_pattern, [drift_policy] ;
+node_pattern = glob_pattern | node_list ;
+
+drift_policy = 'WITH', 'DRIFT', drift_mode ;
+drift_mode = 'STRICT' | 'REPAIR' | 'TOLERATE' | 'LATEST' ;
+
+store_source = 'STORE', store_id ;
+
+(* 4. WHERE CLAUSE *)
+where_clause = 'WHERE', condition ;
+
+condition = simple_condition | compound_condition | '(', condition, ')' ;
+
+simple_condition = graph_condition | vector_condition | tensor_condition
+                 | semantic_condition | document_condition
+                 | temporal_condition | cross_modal_condition ;
+
+cross_modal_condition = cross_modal_field_compare | drift_condition
+                      | consistency_condition | exists_condition
+                      | not_exists_condition ;
+
+cross_modal_field_compare = field_ref, comparison_op, field_ref ;
+
+drift_condition = 'DRIFT', '(', modality_name, ',', modality_name, ')',
+                  comparison_op, float ;
+
+consistency_condition = 'CONSISTENT', '(', modality_name, ',', modality_name, ')',
+                        'USING', metric_name ;
+metric_name = 'COSINE' | 'EUCLIDEAN' | 'DOT_PRODUCT' | 'JACCARD' ;
+
+exists_condition = modality_name, 'EXISTS' ;
+not_exists_condition = modality_name, 'NOT', 'EXISTS' ;
+
+compound_condition = condition, 'AND', condition
+                   | condition, 'OR', condition
+                   | 'NOT', condition ;
+
+(* 4.1. Graph Conditions *)
+graph_condition = sparql_pattern | path_pattern ;
+sparql_pattern = '(', node_var, ')', edge_pattern, '(', node_var, ')' ;
+edge_pattern = '-[', edge_type, ']->'
+             | '-[', edge_type, ']-'
+             | '<-[', edge_type, ']-' ;
+node_var = identifier | ('?', identifier) ;
+edge_type = ':', identifier ;
+
+path_pattern = node_var, path_quantifier, node_var ;
+path_quantifier = '-[', edge_type,
+                  ('*' | '+' | '{', integer, ',', integer, '}'),
+                  ']->' ;
+
+(* 4.2. Vector Conditions *)
+vector_condition = vector_field, 'SIMILAR', 'TO', vector_literal,
+                   [similarity_threshold]
+                 | vector_field, 'NEAREST', integer, [metric_type] ;
+
+vector_field = identifier, '.', 'embedding' ;
+vector_literal = '[', float, { ',', float }, ']' ;
+similarity_threshold = 'WITHIN', float ;
+metric_type = 'USING', ('COSINE' | 'EUCLIDEAN' | 'DOT_PRODUCT') ;
+
+(* 4.3. Tensor Conditions *)
+tensor_condition = tensor_field, tensor_op, tensor_literal ;
+tensor_op = '==' | '>' | '<' | '>=' | '<=' | 'SHAPE' | 'RANK' ;
+tensor_literal = array_literal | scalar_literal ;
+
+(* 4.4. Semantic Conditions *)
+semantic_condition = 'SATISFIES', contract_name, [contract_params]
+                   | 'HAS', 'PROOF', proof_type
+                   | 'VERIFIED', 'BY', verifier_id ;
+
+contract_name = identifier ;
+contract_params = '(', param_list, ')' ;
+param_list = identifier, '=', literal,
+             { ',', identifier, '=', literal } ;
+
+(* 4.5. Document Conditions *)
+document_condition = 'FULLTEXT', 'CONTAINS', string_literal
+                   | 'FULLTEXT', 'MATCHES', regex_literal
+                   | 'FIELD', identifier, comparison_op, literal ;
+
+comparison_op = '==' | '!=' | '>' | '<' | '>=' | '<=' | 'LIKE' ;
+
+(* 4.6. Temporal Conditions *)
+temporal_condition = 'AS', 'OF', timestamp
+                   | 'BETWEEN', timestamp, 'AND', timestamp
+                   | 'VERSION', version_id
+                   | 'MODIFIED', 'BY', actor_id ;
+
+(* 5. PROOF CLAUSE *)
+proof_clause = 'PROOF', proof_spec_list ;
+proof_spec_list = proof_spec, { 'AND', proof_spec } ;
+proof_spec = proof_type, '(', contract_name, ')', [proof_params] ;
+proof_type = 'EXISTENCE' | 'CITATION' | 'ACCESS'
+           | 'INTEGRITY' | 'PROVENANCE' | 'CUSTOM' ;
+proof_params = 'WITH', param_list ;
+
+(* 6. GROUP BY / HAVING *)
+group_by_clause = 'GROUP', 'BY', field_ref_list ;
+field_ref_list = field_ref, { ',', field_ref } ;
+having_clause = 'HAVING', condition ;
+
+(* 7. ORDER BY *)
+order_by_clause = 'ORDER', 'BY', order_by_list ;
+order_by_list = order_by_item, { ',', order_by_item } ;
+order_by_item = field_ref, [sort_direction] ;
+sort_direction = 'ASC' | 'DESC' ;
+
+(* 8. PAGINATION *)
+limit_clause = 'LIMIT', integer ;
+offset_clause = 'OFFSET', integer ;
+
+(* 9. MUTATIONS *)
+mutation = insert_mutation | update_mutation | delete_mutation ;
+
+insert_mutation = 'INSERT', 'HEXAD', 'WITH',
+                  modality_data_list, [proof_clause] ;
+modality_data_list = modality_data, { ',', modality_data } ;
+modality_data = document_data | vector_data | graph_data
+              | tensor_data | semantic_data | temporal_data ;
+
+document_data = 'DOCUMENT', '(', field_assignment_list, ')' ;
+vector_data = 'VECTOR', '(', vector_literal, ')' ;
+graph_data = 'GRAPH', '(', identifier, ',', identifier, ')' ;
+tensor_data = 'TENSOR', '(', array_literal, ')' ;
+semantic_data = 'SEMANTIC', '(', identifier, ')' ;
+temporal_data = 'TEMPORAL', '(', timestamp, ')' ;
+
+field_assignment_list = field_assignment, { ',', field_assignment } ;
+field_assignment = identifier, '=', literal ;
+
+update_mutation = 'UPDATE', 'HEXAD', uuid, 'SET',
+                  set_list, [proof_clause] ;
+set_list = set_assignment, { ',', set_assignment } ;
+set_assignment = field_ref, '=', literal ;
+
+delete_mutation = 'DELETE', 'HEXAD', uuid, [proof_clause] ;
+
+(* 10. LEXICAL ELEMENTS *)
+uuid = 8*hex_digit, '-', 4*hex_digit, '-', 4*hex_digit, '-',
+       4*hex_digit, '-', 12*hex_digit ;
+hex_digit = '0'..'9' | 'a'..'f' | 'A'..'F' ;
+
+identifier = (letter | '_'), { letter | digit | '_' } ;
+store_id = identifier ;
+verifier_id = identifier ;
+actor_id = identifier ;
+version_id = identifier ;
+
+integer = digit, { digit } ;
+float = digit, { digit }, '.', digit, { digit },
+        [('e' | 'E'), ['+' | '-'], digit, { digit }] ;
+
+string_literal = "'", { char - ("'" | '\') | "\'" | "\\" }, "'" ;
+regex_literal = '/', { char - ('/' | '\') | '\/' | '\\' }, '/' ;
+
+timestamp = iso8601_datetime ;
+
+glob_pattern = '/', path_segment, { '/', path_segment },
+               ('/*' | '/**') ;
+path_segment = (alphanum | '_' | '-'),
+               { alphanum | '_' | '-' } ;
+
+array_literal = '[', literal, { ',', literal }, ']' ;
+scalar_literal = integer | float | string_literal | boolean ;
+boolean = 'true' | 'false' ;
+literal = scalar_literal | array_literal ;
+
+(* 11. COMMENTS *)
+comment = '--', { char - newline }, newline
+        | '/*', { any }, '*/' ;
+
+(* 12. RESERVED KEYWORDS *)
+keywords = 'SELECT' | 'FROM' | 'WHERE' | 'PROOF' | 'LIMIT' | 'OFFSET'
+         | 'GRAPH' | 'VECTOR' | 'TENSOR' | 'SEMANTIC' | 'DOCUMENT'
+         | 'TEMPORAL' | 'HEXAD' | 'FEDERATION' | 'STORE'
+         | 'WITH' | 'DRIFT' | 'STRICT' | 'REPAIR' | 'TOLERATE'
+         | 'LATEST' | 'AND' | 'OR' | 'NOT'
+         | 'SIMILAR' | 'TO' | 'WITHIN' | 'NEAREST' | 'USING'
+         | 'SATISFIES' | 'HAS' | 'VERIFIED' | 'BY'
+         | 'FULLTEXT' | 'CONTAINS' | 'MATCHES' | 'FIELD' | 'LIKE'
+         | 'AS' | 'OF' | 'BETWEEN' | 'VERSION' | 'MODIFIED'
+         | 'EXISTENCE' | 'CITATION' | 'ACCESS' | 'INTEGRITY'
+         | 'PROVENANCE' | 'CUSTOM'
+         | 'COSINE' | 'EUCLIDEAN' | 'DOT_PRODUCT' | 'JACCARD'
+         | 'SHAPE' | 'RANK'
+         | 'ORDER' | 'GROUP' | 'HAVING' | 'ASC' | 'DESC'
+         | 'COUNT' | 'SUM' | 'AVG' | 'MIN' | 'MAX'
+         | 'INSERT' | 'UPDATE' | 'DELETE' | 'SET'
+         | 'EXISTS' | 'CONSISTENT'
+         | 'true' | 'false' ;
+----
+
+
+// ============================================================================
+// APPENDIX B: RESERVED KEYWORDS
+// ============================================================================
+
+[appendix]
+== Reserved Keywords
+
+Complete alphabetical list of all 70 reserved keywords. Keywords are case-insensitive in VQL source.
+
+[cols="4*"]
+|===
+
+| `ACCESS`
+| `AND`
+| `AS`
+| `ASC`
+
+| `AVG`
+| `BETWEEN`
+| `BY`
+| `CITATION`
+
+| `CONSISTENT`
+| `CONTAINS`
+| `COSINE`
+| `COUNT`
+
+| `CUSTOM`
+| `DELETE`
+| `DESC`
+| `DOCUMENT`
+
+| `DOT_PRODUCT`
+| `DRIFT`
+| `EUCLIDEAN`
+| `EXISTENCE`
+
+| `EXISTS`
+| `FEDERATION`
+| `FIELD`
+| `FROM`
+
+| `FULLTEXT`
+| `GRAPH`
+| `GROUP`
+| `HAS`
+
+| `HAVING`
+| `HEXAD`
+| `INSERT`
+| `INTEGRITY`
+
+| `JACCARD`
+| `LATEST`
+| `LIKE`
+| `LIMIT`
+
+| `MATCHES`
+| `MAX`
+| `MIN`
+| `MODIFIED`
+
+| `NEAREST`
+| `NOT`
+| `OF`
+| `OFFSET`
+
+| `OR`
+| `ORDER`
+| `PROOF`
+| `PROVENANCE`
+
+| `RANK`
+| `REPAIR`
+| `SELECT`
+| `SEMANTIC`
+
+| `SET`
+| `SHAPE`
+| `SIMILAR`
+| `STORE`
+
+| `STRICT`
+| `SUM`
+| `TEMPORAL`
+| `TENSOR`
+
+| `TO`
+| `TOLERATE`
+| `UPDATE`
+| `USING`
+
+| `VECTOR`
+| `VERIFIED`
+| `VERSION`
+| `WHERE`
+
+| `WITH`
+| `WITHIN`
+| `false`
+| `true`
+|===
+
+
+// ============================================================================
+// APPENDIX C: ERROR CODES
+// ============================================================================
+
+[appendix]
+== Error Codes
+
+=== Top-Level Error Codes
+
+[cols="2,3"]
+|===
+| Code | Description
+
+| `VQL_PARSE_ERROR`
+| Syntax error during parsing
+
+| `VQL_TYPE_ERROR`
+| Type system violation
+
+| `VQL_STORE_UNAVAILABLE`
+| A modality store is unreachable
+
+| `VQL_QUERY_TIMEOUT`
+| Query exceeded time limit
+
+| `VQL_DRIFT_DETECTED`
+| Cross-node inconsistency with STRICT policy
+
+| `VQL_PERMISSION_DENIED`
+| Insufficient access rights
+
+| `VQL_RESOURCE_EXHAUSTED`
+| System resource limit reached
+
+| `VQL_RUNTIME_ERROR`
+| General runtime error
+
+| `VQL_GRAPH_ERROR`
+| Graph-specific error (Oxigraph)
+
+| `VQL_VECTOR_ERROR`
+| Vector-specific error (HNSW)
+
+| `VQL_TENSOR_ERROR`
+| Tensor-specific error (Burn/ndarray)
+
+| `VQL_SEMANTIC_ERROR`
+| Semantic-specific error (ZKP/CBOR)
+
+| `VQL_DOCUMENT_ERROR`
+| Document-specific error (Tantivy)
+
+| `VQL_TEMPORAL_ERROR`
+| Temporal-specific error (Merkle trees)
+
+| `VQL_FEDERATION_ERROR`
+| Federation-specific error
+
+| `VQL_MULTIPLE_ERRORS`
+| Multiple errors occurred
+|===
+
+=== Parse Error Kinds
+
+[cols="2,3"]
+|===
+| Kind | Description
+
+| `UnexpectedToken`
+| Parser expected specific tokens but found something else
+
+| `UnterminatedString`
+| String literal missing closing quote
+
+| `InvalidNumber`
+| Malformed numeric literal
+
+| `InvalidModality`
+| Unknown modality name (valid: GRAPH, VECTOR, TENSOR, SEMANTIC, DOCUMENT, TEMPORAL)
+
+| `InvalidDriftPolicy`
+| Unknown drift policy (valid: STRICT, REPAIR, TOLERATE, LATEST)
+
+| `InvalidProofType`
+| Unknown proof type (valid: EXISTENCE, CITATION, ACCESS, INTEGRITY, PROVENANCE, CUSTOM)
+
+| `MissingFromClause`
+| Query has SELECT but no FROM
+
+| `MissingSelectClause`
+| Query has FROM but no SELECT
+
+| `InvalidGraphPattern`
+| Malformed SPARQL-like graph pattern
+
+| `InvalidVectorExpression`
+| Malformed vector similarity or KNN expression
+
+| `InvalidSemanticContract`
+| Malformed SATISFIES contract expression
+
+| `InvalidAggregateExpression`
+| Malformed aggregate function call
+
+| `InvalidOrderByField`
+| ORDER BY field not in MODALITY.field format
+
+| `InvalidGroupByField`
+| GROUP BY field not in MODALITY.field format
+
+| `HavingWithoutGroupBy`
+| HAVING clause used without GROUP BY
+
+| `AggregateWithoutGroupBy`
+| Aggregate function used without GROUP BY
+|===
+
+=== Type Error Kinds
+
+[cols="2,3"]
+|===
+| Kind | Description
+
+| `ContractNotFound`
+| Referenced contract does not exist in registry
+
+| `ContractViolation`
+| Data violates contract constraints
+
+| `ProofGenerationFailed`
+| ZKP proof could not be generated
+
+| `ProofVerificationFailed`
+| ZKP proof did not verify
+
+| `TypeMismatch`
+| Expression type does not match expected type
+
+| `MissingTypeAnnotation`
+| Field or expression requires a type annotation that was not provided
+
+| `CircularDependency`
+| Circular dependency detected in contract or type definitions
+
+| `SubtypingFailed`
+| Value type is not a subtype of expected type
+
+| `FieldTypeMismatch`
+| Field has wrong type for operation
+
+| `OperatorTypeMismatch`
+| Comparison operator used with incompatible types
+
+| `VectorDimensionMismatch`
+| Vector dimension does not match (e.g., SIMILAR TO with wrong dimension)
+
+| `ProofObligationFailed`
+| Proof obligation could not be discharged
+
+| `AggregateTypeMismatch`
+| Aggregate function applied to incompatible type
+
+| `MultiProofConflict`
+| Multiple proof specifications conflict
+
+| `UnknownField`
+| Field does not exist for specified modality
+
+| `CrossModalTypeMismatch`
+| Cross-modal field comparison with incompatible types
+
+| `DriftRequiresNumeric`
+| DRIFT() condition on non-numeric modalities
+
+| `ConsistencyMetricInvalid`
+| CONSISTENT() metric not applicable to modality pair
+
+| `InsertConflict`
+| INSERT hexad already exists
+
+| `UpdateNotFound`
+| UPDATE hexad does not exist
+
+| `DeleteNotFound`
+| DELETE hexad does not exist
+
+| `ConstraintViolation`
+| Write violates field constraints
+
+| `WriteProofFailed`
+| Write proof obligation failed
+
+| `ReadOnlyStore`
+| Attempted write to read-only store
+|===
+
+=== Runtime Error Kinds
+
+[cols="2,3"]
+|===
+| Kind | Description
+
+| `StoreUnavailable`
+| A modality store is down or unreachable
+
+| `QueryTimeout`
+| Query exceeded the configured time limit
+
+| `DriftDetected`
+| Cross-node inconsistency detected (with STRICT drift policy)
+
+| `PermissionDenied`
+| Insufficient access rights for the requested resource
+
+| `ResourceExhausted`
+| System resource limit reached (memory, connections, etc.)
+
+| `InvalidHexadId`
+| Hexad UUID is malformed or syntactically invalid
+
+| `NetworkError`
+| Network error connecting to a store or federation endpoint
+
+| `InternalError`
+| Unexpected internal error
+|===
+
+=== Modality-Specific Error Kinds
+
+==== Graph Errors
+
+[cols="2,3"]
+|===
+| Kind | Description
+
+| `MalformedRDF`
+| Invalid RDF syntax
+
+| `InvalidTriplePattern`
+| Invalid triple pattern in WHERE clause
+
+| `CycleDetected`
+| Graph cycle detected during traversal
+
+| `PredicateNotFound`
+| Edge type does not exist
+
+| `TraversalDepthExceeded`
+| Path quantifier exceeded maximum depth
+|===
+
+==== Vector Errors
+
+[cols="2,3"]
+|===
+| Kind | Description
+
+| `DimensionMismatch`
+| Query vector dimension differs from stored embeddings
+
+| `InvalidDistanceMetric`
+| Unknown or unsupported distance metric
+
+| `EmbeddingNotFound`
+| Requested embedding does not exist
+
+| `ANNIndexUnavailable`
+| Approximate nearest neighbor index not ready
+|===
+
+==== Tensor Errors
+
+[cols="2,3"]
+|===
+| Kind | Description
+
+| `ShapeMismatch`
+| Tensor shape does not match expected shape
+
+| `NumericOverflow`
+| Numeric computation overflow
+
+| `InvalidOperation`
+| Unsupported tensor operation
+
+| `UnsupportedDtype`
+| Unknown data type for tensor elements
+|===
+
+==== Semantic Errors
+
+[cols="2,3"]
+|===
+| Kind | Description
+
+| `InvalidContract`
+| Contract definition is malformed
+
+| `ZKPVerificationFailed`
+| Zero-knowledge proof did not verify
+
+| `WitnessGenerationFailed`
+| Could not generate ZKP witness
+
+| `ContractExpired`
+| Contract has expired and is no longer valid
+|===
+
+==== Document Errors
+
+[cols="2,3"]
+|===
+| Kind | Description
+
+| `InvalidFullTextQuery`
+| Full-text query syntax is malformed
+
+| `UnsupportedLanguage`
+| Text language not supported by analyser
+
+| `IndexCorrupted`
+| Tantivy index is corrupted
+|===
+
+==== Temporal Errors
+
+[cols="2,3"]
+|===
+| Kind | Description
+
+| `InvalidTimestamp`
+| Timestamp is not valid ISO 8601
+
+| `VersionNotFound`
+| Requested version does not exist
+
+| `MerkleVerificationFailed`
+| Merkle tree integrity check failed
+
+| `TemporalConflict`
+| Concurrent modification conflict
+|===
+
+=== Federation Error Kinds
+
+[cols="2,3"]
+|===
+| Kind | Description
+
+| `RemoteStoreUnreachable`
+| Cannot connect to remote federation node (recoverable)
+
+| `PartialResults`
+| Some federation nodes responded, others failed (recoverable)
+
+| `CrossOrgAccessDenied`
+| Cross-organisation access policy violation
+
+| `ByzantineFaultDetected`
+| Suspicious inconsistencies suggesting Byzantine behaviour
+
+| `ConsensusTimeout`
+| Federation consensus protocol timed out
+
+| `FederationPolicyViolation`
+| Query violates federation-level policy
+|===
+
+
+// ============================================================================
+// APPENDIX D: RELATED SPECIFICATIONS
+// ============================================================================
+
+[appendix]
+== Related Specifications
+
+This specification is the authoritative reference for VQL language behaviour. The following documents provide deeper coverage of specific topics:
+
+[cols="2,3"]
+|===
+| Document | Scope
+
+| link:vql-grammar.ebnf[`vql-grammar.ebnf`]
+| Standalone EBNF grammar file (ISO/IEC 14977). Normative source reproduced in <<appendix-a>>.
+
+| link:vql-type-system.adoc[`vql-type-system.adoc`]
+| Formal type system with LaTeX notation: type syntax, typing rules, type checking algorithm, subtyping, type equivalence, type safety proofs. 923 lines.
+
+| link:vql-formal-semantics.adoc[`vql-formal-semantics.adoc`]
+| Operational semantics (big-step and small-step), denotational semantics, proof obligations, soundness theorems, drift semantics. 655 lines.
+
+| link:vql-examples.adoc[`vql-examples.adoc`]
+| 63 comprehensive examples covering all VQL constructs, both execution paths, error cases, and advanced use cases. 1078 lines.
+
+| link:vql-architecture.adoc[`vql-architecture.adoc`]
+| Dual-path routing architecture, ReScript/Elixir/Rust stack, metadata storage, audit trail, drift detection, API endpoint, performance comparison. 708 lines.
+
+| link:vql-vs-vql-dt.adoc[`vql-vs-vql-dt.adoc`]
+| Detailed comparison of Slipstream vs VQL-DT execution paths, six proof types, performance implications, honest implementation status. 282 lines.
+
+| link:vql-vs-sql.adoc[`vql-vs-sql.adoc`]
+| Comparative guide between VQL and SQL for developers familiar with relational databases. 241 lines. Note: pre-dates v2.0 GROUP BY/ORDER BY/mutation additions.
+|===
+
+=== Implementation Files
+
+[cols="2,3"]
+|===
+| File | Role
+
+| `src/vql/VQLParser.res`
+| ReScript parser (1154 lines). Monadic combinator library + grammar.
+
+| `src/vql/VQLTypes.res`
+| Core type definitions (296 lines). Modality, primitive, VQL, and proof types.
+
+| `src/vql/VQLBidir.res`
+| Bidirectional type inference engine (841 lines). 9-phase synthesis pipeline.
+
+| `src/vql/VQLError.res`
+| Structured error types (447 lines). 5 categories, 40+ error kinds.
+
+| `src/vql/VQLExplain.res`
+| EXPLAIN plan generation (427 lines). Cost estimation and hints.
+
+| `elixir-orchestration/lib/verisim/query/query_router.ex`
+| Elixir query router GenServer (187 lines). Routes by modality.
+
+| `elixir-orchestration/lib/verisim/query/vql_bridge.ex`
+| Elixir ↔ ReScript bridge (672 lines). Built-in fallback parser.
+
+| `elixir-orchestration/lib/verisim/query/vql_executor.ex`
+| Full VQL executor (1162 lines). Parse → type check → plan → route → aggregate.
+|===
+
+=== Known Inconsistencies in Existing Documents
+
+For transparency, these inconsistencies exist between the pre-v2.0 documents:
+
+1. **`vql-vs-sql.adoc`** states VQL lacks GROUP BY, ORDER BY, aggregates, and mutations. This was true for v1.0 but is incorrect for v2.0. The grammar, parser, and executor all support these features.
+
+2. **`vql-vs-vql-dt.adoc`** lists six proof types (EXISTENCE, INTEGRITY, CONSISTENCY, PROVENANCE, FRESHNESS, AUTHORIZATION) which differ from the grammar's six (EXISTENCE, CITATION, ACCESS, INTEGRITY, PROVENANCE, CUSTOM). This specification follows the grammar and implementation.
+
+3. **`vql-vs-sql.adoc`** describes VQL as "read-only" which is no longer accurate after v2.0 mutations.
+
+This specification resolves all three inconsistencies in favour of the implemented grammar and source code.

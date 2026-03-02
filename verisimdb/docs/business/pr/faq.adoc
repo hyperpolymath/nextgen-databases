@@ -1,0 +1,316 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB — Frequently Asked Questions
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-02-28
+:revremark: Comprehensive FAQ for press, analysts, developers, and evaluators
+:toc: macro
+:toclevels: 2
+:sectnums:
+:icons: font
+
+[abstract]
+Answers to the most frequently asked questions about VeriSimDB, covering
+product fundamentals, technical architecture, competitive positioning, licensing,
+and roadmap. Intended for press, analysts, developers, enterprise evaluators, and
+potential contributors.
+
+toc::[]
+
+== Product Fundamentals
+
+=== What is VeriSimDB?
+
+VeriSimDB is the world's first multimodal database with cross-modal drift
+detection and self-normalisation. It stores every entity across up to 8
+simultaneous data representations -- graph, vector, tensor, semantic, document,
+temporal, provenance, and spatial (the "octad") -- and continuously monitors
+whether those representations are consistent with each other.
+
+When representations diverge (a condition called "drift"), VeriSimDB detects the
+divergence, quantifies it with a coherence score, and can automatically
+reconcile the data through configurable self-normalisation strategies.
+
+=== What problem does VeriSimDB solve?
+
+The same real-world entity (a customer, a product, a transaction, a research
+dataset) is typically represented across 5-10 different systems: a graph database,
+a vector index, a document store, a relational database, a temporal audit trail,
+and so on. When one representation changes, the others go stale. No existing
+database or tool detects this cross-system inconsistency.
+
+According to Gartner, poor data quality -- primarily caused by cross-system
+inconsistency -- costs enterprises an average of $12.9 million per year. VeriSimDB
+addresses this by making cross-modal consistency a first-class database feature.
+
+=== What is the octad model?
+
+The octad model is VeriSimDB's approach to multimodal data representation. Every
+entity can be simultaneously represented across 8 modalities:
+
+1. *Graph* -- Relationships, connections, topology
+2. *Vector* -- Semantic similarity, embeddings, nearest-neighbour search
+3. *Tensor* -- Multi-dimensional numerical data, ML feature stores
+4. *Semantic* -- Ontological meaning, RDF triples, knowledge representation
+5. *Document* -- Schemaless structured data (JSON/BSON)
+6. *Temporal* -- Time-versioned state, bitemporal queries, audit trails
+7. *Provenance* -- Origin tracking, transformation lineage, trust chains
+8. *Spatial* -- Geographic and geometric data, GIS operations
+
+Not every entity needs all 8 modalities. The octad defines the maximum set; each
+entity uses the modalities relevant to its domain.
+
+=== What is drift detection?
+
+Drift detection is VeriSimDB's core innovation. It continuously monitors the
+consistency of an entity's representations across all active modalities. For
+each entity, VeriSimDB computes a *coherence score* -- a quantified measure of
+how well its representations agree with each other.
+
+For example, if a customer's graph representation shows 47 account connections but
+their vector embedding was computed when they had 12 connections, the graph and
+vector modalities have "drifted." VeriSimDB detects this divergence, reports a
+reduced coherence score, and can take corrective action.
+
+The coherence score is not a binary pass/fail -- it is a continuous value that
+reflects the degree of consistency across all active modalities. Configurable
+thresholds determine when drift triggers alerts, quarantine, or self-normalisation.
+
+=== What is self-normalisation?
+
+Self-normalisation is VeriSimDB's ability to automatically repair drifted data.
+When drift is detected and exceeds a configured threshold, VeriSimDB can:
+
+* *Alert:* Notify downstream systems that data may be inconsistent, without
+  modifying the data
+* *Quarantine:* Mark the entity as potentially drifted, excluding it from query
+  results until a human or automated process resolves the inconsistency
+* *Self-normalise:* Automatically reconcile the representations using
+  configurable resolution strategies (e.g., "prefer the most recently updated
+  modality" or "prefer the modality with the highest confidence provenance")
+
+Self-normalisation strategies are fully configurable per entity type and per
+modality pair. Organisations can start with alert-only and gradually adopt
+automated repair as they build confidence.
+
+== Competitive Positioning
+
+=== How is VeriSimDB different from Neo4j?
+
+Neo4j is a graph database -- it excels at graph traversals, path finding, and
+relationship queries. However, Neo4j stores data in a single modality (graph).
+It has recently added limited vector search capabilities, but there is no
+cross-modal consistency checking between the graph and vector representations.
+
+VeriSimDB stores entities across 8 modalities and continuously monitors their
+consistency. If a graph node's relationships change but its vector embedding is
+not re-computed, VeriSimDB detects the drift. Neo4j does not.
+
+=== How is VeriSimDB different from Pinecone?
+
+Pinecone is a managed vector database optimised for similarity search. It stores
+vector embeddings only -- no graphs, documents, temporal data, or provenance. It
+is a proprietary, cloud-only service with no self-hosted option.
+
+VeriSimDB includes vector search as one of 8 modalities and detects when vector
+embeddings diverge from other representations. It is open source, self-hostable,
+and designed for organisations that need more than similarity search.
+
+=== How is VeriSimDB different from Weaviate?
+
+Weaviate combines vector search with object/document storage and provides
+GraphQL-based querying. It supports 2 modalities (vector + document/object) but
+has no drift detection, no temporal versioning, no provenance tracking, no formal
+query verification, and no federation.
+
+VeriSimDB supports 8 modalities with cross-modal drift detection and formal query
+proofs (VQL-DT). The fundamental difference is architectural: Weaviate treats
+vectors and objects as complementary storage; VeriSimDB treats all modalities as
+representations of a single entity that must remain consistent.
+
+=== How is VeriSimDB different from ArangoDB?
+
+ArangoDB is a multi-model database supporting graph, document, and key-value
+models in a single database. It has a mature query language (AQL) and a strong
+production track record.
+
+However, ArangoDB has no mechanism to verify that its graph, document, and
+key-value representations of the same entity are consistent. If a graph edge
+and a document describing the same relationship diverge, ArangoDB does not
+detect this. VeriSimDB does.
+
+ArangoDB also lacks vector search, tensor operations, temporal versioning,
+provenance tracking, and spatial queries -- all of which are native VeriSimDB
+modalities.
+
+=== How is VeriSimDB different from SurrealDB?
+
+SurrealDB is a newer multi-model database supporting document, graph, and (recently)
+vector models with a modern query language (SurrealQL). It is built in Rust and
+has strong developer ergonomics.
+
+Like ArangoDB, SurrealDB stores multiple models but does not check consistency
+between them. It has no drift detection, no self-normalisation, no formal query
+verification, and no federation. Its Business Source License (BSL 1.1) restricts
+commercial use, while VeriSimDB's PMPL license is permissive.
+
+== Technical Architecture
+
+=== What languages is VeriSimDB built in?
+
+* *Rust:* Core storage engine, indexing, drift detection algorithms. Provides
+  near-C performance with memory safety guarantees.
+* *Elixir/OTP:* Orchestration layer, concurrency management, fault tolerance.
+  The Erlang VM (BEAM) provides battle-tested supervision trees and hot code
+  reloading.
+* *ReScript:* Type-safe registry for modality metadata. Compiles to JavaScript
+  with an ML-family type system.
+* *Idris2:* ABI (Application Binary Interface) definitions with dependent-type
+  proofs for interface correctness.
+* *Zig:* FFI (Foreign Function Interface) implementation for C-compatible
+  bindings.
+
+=== What is VQL?
+
+VQL (Verisimilitude Query Language) is VeriSimDB's purpose-built query language
+for cross-modal operations. VQL allows queries to span multiple modalities in
+a single expression, include coherence scores in result sets, and filter by
+drift thresholds.
+
+VQL is designed to be familiar to SQL users while supporting modality-specific
+operations (graph traversals, vector similarity, tensor operations, temporal
+time-travel, spatial containment, etc.) in a unified syntax.
+
+=== What are dependent-type proofs (VQL-DT)?
+
+VQL-DT is an optional extension to VQL that adds dependent-type verification.
+When enabled, VQL-DT uses the Idris2 type system to prove properties of queries
+at compile time:
+
+* *Type correctness:* Ensure that query expressions are well-typed across
+  modalities (e.g., a vector similarity comparison is applied to actual vector
+  fields, not document fields)
+* *Semantic compatibility:* Verify that cross-modal joins are semantically
+  meaningful
+* *Threshold validity:* Prove that coherence thresholds are within valid ranges
+
+VQL-DT is entirely optional. Teams can use plain VQL for standard operations and
+adopt VQL-DT incrementally when they want formal guarantees.
+
+=== How does federation work?
+
+VeriSimDB can federate across heterogeneous database backends, bringing drift
+detection to existing infrastructure without requiring data migration. Federation
+connectors translate between VQL and native query languages:
+
+* *PostgreSQL:* SQL translation, table-to-document mapping
+* *ArangoDB:* AQL translation, graph-to-graph mapping
+* *Elasticsearch:* Query DSL translation, search-to-vector mapping
+* *Neo4j:* Cypher translation, graph-to-graph mapping
+
+Each connector is independently tested and includes fallback to local-only mode
+if the external database is unavailable. Federation is optional -- VeriSimDB can
+operate as a standalone database without any external connections.
+
+== Licensing and Business
+
+=== Is VeriSimDB open source?
+
+Yes. VeriSimDB is released under the *Palimpsest License (PMPL-1.0-or-later)*,
+a permissive open-source license. The community edition is full-featured with
+no artificial restrictions -- all 8 modalities, drift detection,
+self-normalisation, VQL, and federation are included.
+
+=== What is the PMPL license?
+
+The Palimpsest License (PMPL-1.0-or-later) is a permissive open-source license
+developed by hyperpolymath. It allows free use, modification, and distribution
+of the software with minimal restrictions. For projects that require an
+OSI-approved license, an MPL-2.0 fallback is available.
+
+=== Is there a commercial version?
+
+VeriSimDB follows an open-core model. The community edition is free and
+full-featured. A *commercial support license* is available for organisations that
+require:
+
+* Enterprise SLA (99.9% uptime guarantee)
+* Priority security patches (24-hour response time)
+* Dedicated support channel
+* Deployment consulting and architecture review
+* Training and certification for development teams
+
+The commercial license does not add features beyond what the community edition
+provides. It provides operational guarantees and expert support.
+
+=== How much does the commercial license cost?
+
+The target annual contract value (ACV) for enterprise support is $40,000.
+Pricing is tiered by organisation size and SLA level. Contact
+j.d.a.jewell@open.ac.uk for a quote.
+
+== Getting Started
+
+=== How do I try VeriSimDB?
+
+1. Clone the repository: `git clone https://github.com/hyperpolymath/verisimdb`
+2. Follow the getting-started guide: `docs/getting-started.adoc`
+3. Run the test suite: `cargo test` (Rust) and `mix test` (Elixir)
+4. Explore the VQL examples: `docs/vql-examples.adoc`
+
+=== Is VeriSimDB production-ready?
+
+VeriSimDB is in *alpha stage*. The core architecture, modality model, drift
+detection engine, and VQL language are implemented and tested (662 tests, 0
+failures). However, production deployment requires:
+
+* Performance benchmarking at enterprise scale
+* Security hardening review
+* Deployment automation (container images, Helm charts)
+* Operational tooling (monitoring, alerting, backup)
+
+VeriSimDB is suitable for development, evaluation, and pilot deployments. We
+recommend contacting j.d.a.jewell@open.ac.uk before production deployment to
+discuss architecture review and support options.
+
+== Project and Community
+
+=== Who built VeriSimDB?
+
+VeriSimDB was created by *Jonathan D.A. Jewell*, a researcher at The Open
+University (UK) and the lead of the hyperpolymath open-source organisation.
+Jonathan's background spans multimodal data systems, formal methods, programming
+language theory, and database internals.
+
+=== What is the roadmap?
+
+The roadmap includes:
+
+* *Short-term (0-6 months):* Community building, documentation improvements,
+  federation connector hardening, performance benchmarking
+* *Medium-term (6-18 months):* Container images, managed service pilot, VQL-DT
+  tooling, additional federation connectors
+* *Long-term (18-36 months):* Enterprise features (RBAC, audit logging),
+  OEM licensing framework, academic paper publications
+
+See `ROADMAP.adoc` in the repository for the detailed roadmap.
+
+=== Can I contribute?
+
+Yes. VeriSimDB welcomes contributions in:
+
+* *Rust:* Core storage, indexing, drift detection algorithms
+* *Elixir:* Orchestration, fault tolerance, federation connectors
+* *ReScript:* Registry, type-safe metadata
+* *Documentation:* Tutorials, use case guides, API references
+* *Testing:* Additional test cases, integration tests, benchmarks
+
+See `CONTRIBUTING.md` in the repository for contribution guidelines.
+
+=== Where can I learn more?
+
+* *Repository:* https://github.com/hyperpolymath/verisimdb
+* *Documentation:* `docs/` directory in the repository
+* *VQL specification:* `docs/VQL-SPEC.adoc`
+* *Architecture:* `docs/vql-architecture.adoc`
+* *Contact:* j.d.a.jewell@open.ac.uk

@@ -1,0 +1,416 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= Reversibility in VeriSimDB: Design Analysis
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+This document analyzes the feasibility, costs, and benefits of making VeriSimDB operations **reversible** - i.e., the ability to undo/redo any operation at any point in time.
+
+== What is Reversibility?
+
+**Reversibility** means every operation has an **inverse operation** that can restore the previous state:
+
+[source,text]
+----
+State A → [Operation O] → State B → [Inverse O⁻¹] → State A
+----
+
+**Examples:**
+- `INSERT hexad X` → `DELETE hexad X`
+- `UPDATE hexad X field=Y` → `UPDATE hexad X field=<old_value>`
+- `QUERY returns 100 results` → `RESTORE query state (cached)`
+
+== Why Reversibility Matters
+
+=== Use Cases
+
+1. **Undo Accidental Changes**
+   - User deletes important hexad → Undo
+   - Drift repair applies wrong fix → Undo
+
+2. **Time-Travel Queries**
+   - "What did the database look like 3 hours ago?"
+   - "Show me the state before the retraction was applied"
+
+3. **A/B Testing**
+   - Branch 1: Apply update
+   - Branch 2: Don't apply update
+   - Compare results, revert losing branch
+
+4. **Debugging**
+   - Replay sequence of operations
+   - Step backward through query execution
+
+5. **Audit Compliance**
+   - Prove database state at specific time
+   - Reconstruct history for legal requirements
+
+6. **Drift Repair Validation**
+   - Apply repair → Test → If bad, revert
+
+== Good News: VeriSimDB is Already 80% There!
+
+VeriSimDB's architecture **naturally supports reversibility** because:
+
+=== 1. verisim-temporal Uses Merkle Trees
+
+**Already immutable and append-only:**
+
+[source,text]
+----
+Time 0: [State A] → Hash: 0xABC123
+Time 1: [State B] → Hash: 0xDEF456, Parent: 0xABC123
+Time 2: [State C] → Hash: 0x789GHI, Parent: 0xDEF456
+
+To revert to Time 1:
+  1. Look up hash 0xDEF456
+  2. Reconstruct state from Merkle chain
+  3. Apply as current state
+----
+
+**Cost:** Already implemented! Zero additional cost for temporal history.
+
+=== 2. KRaft Metadata Log is Append-Only
+
+The registry doesn't delete entries - it appends new versions:
+
+[source,text]
+----
+Log Entry 1: REGISTER hexad abc-123 → store-1
+Log Entry 2: UPDATE hexad abc-123 → store-2 (moved)
+Log Entry 3: DELETE hexad abc-123 (tombstone)
+
+To revert to Entry 2:
+  - Replay log up to Entry 2
+  - Ignore Entry 3
+----
+
+**Cost:** Already implemented! Log truncation is optional.
+
+=== 3. Modality Stores Support Versioning
+
+Each modality can be made reversible:
+
+|===
+| Modality | Reversibility Support | Implementation Cost
+
+| **Temporal**
+| ✅ Native (Merkle trees)
+| **FREE** - Already designed for versioning
+
+| **Graph** (Oxigraph)
+| ⚠️ Partial (RDF versioning)
+| **LOW** - Use named graphs per version
+
+| **Vector** (Milvus)
+| ❌ Not native
+| **MEDIUM** - Wrap with versioned layer
+
+| **Document** (Tantivy)
+| ⚠️ Partial (index snapshots)
+| **LOW** - Snapshot-based revert
+
+| **Tensor** (Burn)
+| ⚠️ Depends on backend
+| **LOW** - File-based snapshots
+
+| **Semantic** (verisim-semantic)
+| ✅ Native (ZKP proofs are immutable)
+| **FREE** - Proofs are already versioned
+|===
+
+== Implementation Strategy
+
+=== Level 1: Metadata Reversibility (FREE)
+
+**What:** Revert registry and metadata changes only.
+
+**How:**
+1. Replay KRaft log to target timestamp
+2. Reconstruct registry state
+3. Ignore later entries
+
+**Limitations:** Modality data not reverted (just pointers).
+
+**Use Case:** Undo registry mistakes (wrong store mapping).
+
+=== Level 2: Temporal + Semantic Reversibility (CHEAP)
+
+**What:** Full reversibility for Temporal and Semantic modalities.
+
+**How:**
+1. Use verisim-temporal Merkle chain to retrieve old state
+2. ZKP proofs are immutable, just replay
+
+**Cost:** ~5% storage overhead (Merkle chain hashes).
+
+**Use Case:** Compliance audits, provenance verification.
+
+=== Level 3: Full Multi-Modal Reversibility (MODERATE COST)
+
+**What:** All six modalities support revert.
+
+**Implementation:**
+
+==== Option A: Snapshot-Based (Simple)
+
+[source,rust]
+----
+// Take periodic snapshots
+pub struct ModalitySnapshot {
+    timestamp: i64,
+    modality: Modality,
+    data_hash: [u8; 32],
+    delta_from_previous: Option<Delta>,
+}
+
+impl ModalitySnapshot {
+    pub fn revert_to(&self, target_time: i64) -> Result<State, Error> {
+        // Find snapshot before target_time
+        let snapshot = self.find_snapshot_before(target_time)?;
+
+        // Apply deltas forward from snapshot to target_time
+        snapshot.apply_deltas_until(target_time)
+    }
+}
+----
+
+**Storage Cost:** 10-20% overhead (depends on snapshot frequency).
+
+**Revert Speed:** Fast (O(log n) if deltas are small).
+
+==== Option B: Copy-on-Write (Elegant)
+
+[source,rust]
+----
+// Use persistent data structures (like Git)
+pub struct CowHexad {
+    id: Uuid,
+    versions: BTreeMap<Timestamp, Arc<HexadState>>,
+}
+
+impl CowHexad {
+    pub fn update(&mut self, new_state: HexadState) {
+        // Share unchanged data, clone only modified parts
+        let new_version = Arc::new(new_state);
+        self.versions.insert(Utc::now(), new_version);
+    }
+
+    pub fn revert_to(&self, timestamp: Timestamp) -> Option<Arc<HexadState>> {
+        self.versions.range(..=timestamp).next_back().map(|(_, state)| state.clone())
+    }
+}
+----
+
+**Storage Cost:** 15-30% overhead (shared data reduces duplication).
+
+**Revert Speed:** Instant (O(1) lookup).
+
+==== Option C: Event Sourcing (Most Powerful)
+
+[source,rust]
+----
+// Store operations, not states
+pub enum HexadEvent {
+    Created { id: Uuid, data: HexadData },
+    Updated { id: Uuid, field: String, old: Value, new: Value },
+    Deleted { id: Uuid },
+}
+
+pub struct EventLog {
+    events: Vec<HexadEvent>,
+}
+
+impl EventLog {
+    pub fn reconstruct_at(&self, timestamp: i64) -> HexadState {
+        self.events
+            .iter()
+            .take_while(|e| e.timestamp <= timestamp)
+            .fold(HexadState::default(), |state, event| {
+                state.apply(event)
+            })
+    }
+
+    pub fn revert(&self, steps: usize) -> HexadState {
+        // Replay all events except last N
+        self.reconstruct_from_events(&self.events[..self.events.len() - steps])
+    }
+}
+----
+
+**Storage Cost:** 20-40% overhead (every operation stored).
+
+**Revert Speed:** Slow for full reconstruction (O(n)), fast for recent reverts.
+
+**Benefit:** Enables **query replay** (see below).
+
+== Recommended Approach: Hybrid
+
+**Phase 1: Metadata + Temporal + Semantic (Immediate)**
+- Use existing Merkle trees and KRaft log
+- **Cost:** FREE (already implemented)
+- **Benefit:** Compliance, audit trails, metadata undo
+
+**Phase 2: Document + Graph Snapshots (3 months)**
+- Snapshot-based reversibility for Tantivy and Oxigraph
+- Snapshots every 1 hour (configurable)
+- **Cost:** 10% storage overhead
+- **Benefit:** Undo accidental deletes, time-travel queries
+
+**Phase 3: Vector + Tensor Copy-on-Write (6 months)**
+- CoW for Milvus embeddings and Burn tensors
+- Share unchanged data between versions
+- **Cost:** 20% storage overhead
+- **Benefit:** A/B testing, drift repair validation
+
+**Phase 4: Full Event Sourcing (Optional, 12 months)**
+- Event log for all operations
+- Enable query replay and advanced debugging
+- **Cost:** 30% storage overhead
+- **Benefit:** Full reversibility, query optimization via replay
+
+== Cost-Benefit Analysis
+
+|===
+| Capability | Storage Cost | CPU Cost | Revert Speed | Benefit
+
+| **Metadata Only**
+| 0%
+| 0%
+| Instant
+| Registry undo
+
+| **+ Temporal/Semantic**
+| 5%
+| 2%
+| Instant
+| Compliance, provenance
+
+| **+ Snapshots (Doc/Graph)**
+| 15%
+| 5%
+| Fast (seconds)
+| Time-travel queries
+
+| **+ CoW (Vector/Tensor)**
+| 25%
+| 10%
+| Instant
+| A/B testing, validation
+
+| **+ Event Sourcing**
+| 40%
+| 20%
+| Varies
+| Full replay, debugging
+|===
+
+== Query Reversibility (Bonus Feature)
+
+**Event sourcing enables query replay:**
+
+[source,vql]
+----
+-- Original query (3 hours ago)
+SELECT GRAPH, VECTOR
+FROM FEDERATION /universities/*
+WHERE FULLTEXT CONTAINS "machine learning"
+LIMIT 100
+
+-- Replay query at historical timestamp
+SELECT GRAPH, VECTOR
+FROM FEDERATION /universities/*
+WHERE FULLTEXT CONTAINS "machine learning"
+  AND AS OF '2026-01-22T12:00:00Z'
+LIMIT 100
+----
+
+**Use Case:** "Show me what this query returned yesterday" (for debugging drift).
+
+== Drift Repair with Reversibility
+
+**Current Drift Repair:**
+1. Detect drift
+2. Apply repair
+3. Hope it works
+
+**With Reversibility:**
+1. Detect drift
+2. Snapshot current state
+3. Apply repair
+4. Validate repair
+5. **If bad: Revert to snapshot**
+6. If good: Commit repair
+
+**Code Example:**
+
+[source,elixir]
+----
+defmodule VeriSim.DriftMonitor do
+  def repair_with_validation(hexad_id, repair_policy) do
+    # Create reversible checkpoint
+    checkpoint = Reversibility.create_checkpoint(hexad_id)
+
+    # Apply repair
+    case apply_repair(hexad_id, repair_policy) do
+      {:ok, new_state} ->
+        # Validate repair
+        if validate_consistency(new_state) do
+          # Good repair, commit
+          Reversibility.commit_checkpoint(checkpoint)
+          {:ok, new_state}
+        else
+          # Bad repair, revert
+          Reversibility.revert_to_checkpoint(checkpoint)
+          {:error, :repair_failed_validation}
+        end
+
+      {:error, reason} ->
+        # Repair failed, revert
+        Reversibility.revert_to_checkpoint(checkpoint)
+        {:error, reason}
+    end
+  end
+end
+----
+
+== Conclusion
+
+**Is Reversibility Hard?** No - VeriSimDB already has 80% of the infrastructure.
+
+**Is It Expensive?** Moderate - 15-25% storage overhead for full reversibility.
+
+**Is It Useful?** **EXTREMELY** - Enables:
+- Compliance audits
+- Time-travel queries
+- Drift repair validation
+- A/B testing
+- Debugging
+- Undo operations
+
+**Recommendation:** Implement in phases:
+1. **Now:** Use existing Merkle trees (FREE)
+2. **3 months:** Add snapshots (10% cost, high value)
+3. **6 months:** Add CoW (20% cost, very high value)
+4. **Optional:** Event sourcing (40% cost, specialized use cases)
+
+== Next Steps
+
+1. Enable reversibility for Temporal + Semantic (already done!)
+2. Add snapshot infrastructure for Document/Graph
+3. Design CoW layer for Vector/Tensor
+4. Create VQL syntax for time-travel queries:
+   ```vql
+   SELECT * FROM HEXAD abc-123 AS OF '2026-01-22T12:00:00Z'
+   REVERT TO '2026-01-22T12:00:00Z'
+   ```
+
+== References
+
+- link:../WHITEPAPER.md[VeriSimDB White Paper] - Temporal modality design
+- link:technical-specification-kraft-metadata-log.adoc[KRaft Log] - Append-only log
+- link:vql-architecture.adoc[VQL Architecture] - Query execution
+- https://martin.kleppmann.com/2015/05/27/logs-for-data-infrastructure.html[Designing Data-Intensive Applications]

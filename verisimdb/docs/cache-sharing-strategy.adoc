@@ -1,0 +1,745 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= Cache Sharing Strategy: Local vs Federated
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+VeriSimDB's cache is **tiered** (L1, L2, L3) and **selectively shared** depending on deployment mode and security requirements.
+
+**Key Principle:** Share what's safe and beneficial, keep private what's sensitive or node-specific.
+
+== Three-Tier Architecture
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────────┐
+│ L1: Per-Node In-Memory Cache (ETS)                         │
+│ - NOT shared across nodes                                   │
+│ - Each node has its own L1                                  │
+│ - Fastest: <1ms access                                      │
+│ - Use: Hot data for THIS node                               │
+└─────────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│ L2: Distributed Cache (Shared Across Cluster)              │
+│ - SHARED within same organization/trust boundary            │
+│ - NOT shared across federation (different orgs)             │
+│ - Medium speed: <10ms access                                │
+│ - Use: Warm data shared within trusted cluster              │
+│ - Implementation: Raft-based or Redis cluster               │
+└─────────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│ L3: Persistent Cache (verisim-temporal)                    │
+│ - CAN be shared (depends on policy)                        │
+│ - Public data: Shared across federation                     │
+│ - Private data: Local only                                  │
+│ - Slow: <100ms access                                       │
+│ - Use: Cold data, historical queries                        │
+└─────────────────────────────────────────────────────────────┘
+----
+
+== Multi-Organization Architecture
+
+This diagram shows how cache layers are organized across multiple organizations in a federated deployment:
+
+[source,text]
+----
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         ORGANIZATION A (University)                          │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐                            │
+│  │  Node A1   │  │  Node A2   │  │  Node A3   │                            │
+│  ├────────────┤  ├────────────┤  ├────────────┤                            │
+│  │ L1: ETS    │  │ L1: ETS    │  │ L1: ETS    │  ← Per-node, NOT shared   │
+│  │ 1GB cache  │  │ 1GB cache  │  │ 1GB cache  │                            │
+│  │ <1ms       │  │ <1ms       │  │ <1ms       │                            │
+│  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘                            │
+│        │                │                │                                   │
+│        └────────────────┼────────────────┘                                   │
+│                         ▼                                                    │
+│           ┌──────────────────────────────┐                                  │
+│           │   L2: Distributed Cache      │  ← Shared within Org A only      │
+│           │   (Raft or Redis Cluster)    │                                  │
+│           │   <10ms access               │                                  │
+│           │   org:A:* keys only          │                                  │
+│           └──────────────┬───────────────┘                                  │
+│                          │                                                   │
+└──────────────────────────┼───────────────────────────────────────────────────┘
+                           │
+                           ▼
+         ┌─────────────────────────────────────────┐
+         │         L3: verisim-temporal            │
+         │      (Selective Federation)             │
+         │                                         │
+         │  ┌────────────┐  ┌──────────────┐     │
+         │  │  Private   │  │   Public      │     │
+         │  │  (Org A    │  │  (Federated   │     │
+         │  │   only)    │  │   shared)     │     │
+         │  └────────────┘  └──────────────┘     │
+         │   <100ms access                        │
+         └─────────────────────────────────────────┘
+                           ▲
+                           │
+┌──────────────────────────┼───────────────────────────────────────────────────┐
+│                          │                                                   │
+│           ┌──────────────┴───────────────┐                                  │
+│           │   L2: Distributed Cache      │  ← Shared within Org B only      │
+│           │   (Raft or Redis Cluster)    │                                  │
+│           │   <10ms access               │                                  │
+│           │   org:B:* keys only          │                                  │
+│           └──────────────┬───────────────┘                                  │
+│                          ▲                                                   │
+│        ┌────────────────┼────────────────┐                                   │
+│        │                │                │                                   │
+│  ┌─────┴──────┐  ┌─────┴──────┐  ┌─────┴──────┐                            │
+│  │  Node B1   │  │  Node B2   │  │  Node B3   │                            │
+│  ├────────────┤  ├────────────┤  ├────────────┤                            │
+│  │ L1: ETS    │  │ L1: ETS    │  │ L1: ETS    │  ← Per-node, NOT shared   │
+│  │ 1GB cache  │  │ 1GB cache  │  │ 1GB cache  │                            │
+│  │ <1ms       │  │ <1ms       │  │ <1ms       │                            │
+│  └────────────┘  └────────────┘  └────────────┘                            │
+│                         ORGANIZATION B (Research Lab)                        │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+KEY POINTS:
+• L1 caches are isolated per-node (each node has its own ETS table)
+• L2 caches are isolated per-organization (org:A:* vs org:B:* key prefixes)
+• L3 is split: private data stays local, public data is federated
+• Organizations CANNOT access each other's L2 caches
+• Public data in L3 is shared across federation to avoid duplication
+----
+
+== Cache Lookup Sequence
+
+This diagram shows the sequence when a query is executed:
+
+[source,text]
+----
+Client                Node A             L1 Cache      L2 Cache      L3 Cache      Store
+  │                     │                   │             │             │            │
+  │  Query              │                   │             │             │            │
+  ├────────────────────►│                   │             │             │            │
+  │                     │                   │             │             │            │
+  │                     │  1. Check L1      │             │             │            │
+  │                     ├──────────────────►│             │             │            │
+  │                     │◄──────────────────┤             │             │            │
+  │                     │  MISS (<1ms)      │             │             │            │
+  │                     │                   │             │             │            │
+  │                     │  2. Check L2                    │             │            │
+  │                     ├────────────────────────────────►│             │            │
+  │                     │◄────────────────────────────────┤             │            │
+  │                     │  MISS (<10ms)                   │             │            │
+  │                     │                   │             │             │            │
+  │                     │  3. Check L3                                  │            │
+  │                     ├──────────────────────────────────────────────►│            │
+  │                     │◄──────────────────────────────────────────────┤            │
+  │                     │  MISS (<100ms)                                │            │
+  │                     │                   │             │             │            │
+  │                     │  4. Fetch from store                                       │
+  │                     ├────────────────────────────────────────────────────────────►│
+  │                     │◄────────────────────────────────────────────────────────────┤
+  │                     │  Result (200-800ms)                                        │
+  │                     │                   │             │             │            │
+  │                     │  5. Cache in L3                               │            │
+  │                     ├──────────────────────────────────────────────►│            │
+  │                     │                   │             │             │            │
+  │                     │  6. Cache in L2                 │             │            │
+  │                     ├────────────────────────────────►│             │            │
+  │                     │                   │             │             │            │
+  │                     │  7. Cache in L1   │             │             │            │
+  │                     ├──────────────────►│             │             │            │
+  │                     │                   │             │             │            │
+  │  Result             │                   │             │             │            │
+  │◄────────────────────┤                   │             │             │            │
+  │  (Total: ~1000ms)   │                   │             │             │            │
+  │                     │                   │             │             │            │
+  │                     │                   │             │             │            │
+  │  SECOND QUERY       │                   │             │             │            │
+  ├────────────────────►│                   │             │             │            │
+  │                     │  1. Check L1      │             │             │            │
+  │                     ├──────────────────►│             │             │            │
+  │                     │◄──────────────────┤             │             │            │
+  │                     │  HIT! (<1ms)      │             │             │            │
+  │  Result             │                   │             │             │            │
+  │◄────────────────────┤                   │             │             │            │
+  │  (Total: ~2ms)      │                   │             │             │            │
+  │  250x faster! ⚡     │                   │             │             │            │
+
+NOTES:
+• First query: Full miss cascade (L1→L2→L3→Store), total ~1000ms
+• Second query: L1 hit, total ~2ms (250x speedup)
+• Cache promotion: Data fetched from L3 is promoted to L2 and L1
+• TTL-based expiration: Entries expire based on modality policy
+----
+
+== Invalidation Cascade Sequence
+
+This diagram shows how invalidation propagates when drift is detected:
+
+[source,text]
+----
+DriftMonitor         Node A           Node A-L1     L2 Cluster    Node B-L1    Node C-L1
+     │                 │                  │              │            │            │
+     │  Drift detected │                  │              │            │            │
+     │  (hexad:abc-123)│                  │              │            │            │
+     ├────────────────►│                  │              │            │            │
+     │                 │                  │              │            │            │
+     │                 │  1. Invalidate   │              │            │            │
+     │                 │     local L1     │              │            │            │
+     │                 ├─────────────────►│              │            │            │
+     │                 │                  │ Delete       │            │            │
+     │                 │                  │ hexad:abc*   │            │            │
+     │                 │◄─────────────────┤              │            │            │
+     │                 │  Invalidated     │              │            │            │
+     │                 │                  │              │            │            │
+     │                 │  2. Broadcast to L2             │            │            │
+     │                 ├────────────────────────────────►│            │            │
+     │                 │                  │              │ Raft/Redis │            │
+     │                 │                  │              │ invalidate │            │
+     │                 │                  │              │ org:A:*abc*│            │
+     │                 │◄────────────────────────────────┤            │            │
+     │                 │  Broadcast sent  │              │            │            │
+     │                 │                  │              │            │            │
+     │                 │                  │              │  3. Notify all nodes    │
+     │                 │                  │              ├───────────►│            │
+     │                 │                  │              │            │ Invalidate │
+     │                 │                  │              │            │ local L1   │
+     │                 │                  │              │            │            │
+     │                 │                  │              ├────────────────────────►│
+     │                 │                  │              │            │            │
+     │                 │                  │              │            │       Invalidate
+     │                 │                  │              │            │       local L1
+     │                 │                  │              │            │            │
+     │                 │  4. Log invalidation            │            │            │
+     │                 │     (temporal)   │              │            │            │
+     │                 ├─────────────────►│              │            │            │
+     │                 │                  │              │            │            │
+     │  Confirmation   │                  │              │            │            │
+     │◄────────────────┤                  │              │            │            │
+     │                 │                  │              │            │            │
+
+PROPAGATION TIMES:
+• Step 1 (local L1): <1ms
+• Step 2 (L2 broadcast): <10ms
+• Step 3 (cluster-wide): <50ms total
+• Step 4 (audit log): <100ms
+
+GUARANTEES:
+✓ All nodes in organization receive invalidation within 50ms
+✓ Audit trail in verisim-temporal for compliance
+✓ Tag-based invalidation (can invalidate by hexad, modality, federation)
+✓ No stale data served after drift detection
+----
+
+== Tag-Based Invalidation Patterns
+
+[source,text]
+----
+SCENARIO 1: Hexad-Specific Drift
+  invalidate_by_tag("hexad:abc-123")
+  ↓
+  Invalidates:
+  • All query results for hexad abc-123
+  • All modalities (GRAPH, VECTOR, DOCUMENT, etc.)
+  • Across all cache layers (L1, L2, L3)
+
+SCENARIO 2: Modality Store Update
+  invalidate_by_tag("modality:GRAPH")
+  ↓
+  Invalidates:
+  • All GRAPH query results
+  • All hexads that have GRAPH data
+  • Statistics and execution plans for GRAPH
+
+SCENARIO 3: Federation-Wide Invalidation
+  invalidate_by_tag("federation:/universities/*")
+  ↓
+  Invalidates:
+  • All queries targeting /universities/* federation pattern
+  • Across all organizations in the federation
+  • Both L2 (per-org) and L3 (federated) layers
+
+SCENARIO 4: Organization-Scoped Invalidation
+  invalidate_by_tag("org:university-a")
+  ↓
+  Invalidates:
+  • All cache entries for organization "university-a"
+  • L1 on all nodes in that org
+  • L2 shared cache for that org
+  • L3 org-scoped data (NOT public federated data)
+
+TAG COMPOSITION:
+  Cache entries can have multiple tags:
+  tags: [
+    "hexad:abc-123",
+    "modality:GRAPH",
+    "federation:/universities/*",
+    "org:university-a"
+  ]
+
+  Invalidation of ANY tag clears the entry.
+----
+
+== Sharing Matrix
+
+[cols="1,2,2,2"]
+|===
+|Cache Layer |Standalone Mode |Hybrid Mode |Federated Mode
+
+|**L1 (ETS)**
+|Per-process (not shared)
+|Per-node (not shared across nodes)
+|Per-node (not shared across orgs)
+
+|**L2 (Distributed)**
+|N/A (single node)
+|Shared across local nodes
+|Shared within org, NOT across orgs
+
+|**L3 (Persistent)**
+|Local disk
+|Local disk + selective federation
+|Selective: public data shared, private local
+|===
+
+== L1: Always Local, Never Shared
+
+**Why NOT shared:**
+1. **Performance:** ETS is in-process memory, sharing would require serialization/network
+2. **Isolation:** Each node has different query patterns
+3. **Security:** Prevents cross-node cache poisoning
+
+**What's cached in L1:**
+- Query results for THIS node's queries
+- Parsed ASTs for THIS node
+- Execution plans for THIS node
+- Hot data recently accessed by THIS node
+
+**Cache invalidation:**
+- Local only (doesn't propagate to other nodes)
+- Must be explicitly invalidated on each node
+
+[source,elixir]
+----
+# L1 cache is node-local
+Node A: Caches query result for "SELECT GRAPH FROM hexad abc-123"
+Node B: Doesn't have this cached, must fetch separately
+
+# Invalidation is per-node
+Node A: invalidate("query:result:abc123") ← Only affects Node A
+Node B: Still has stale cache ← Must invalidate separately
+----
+
+== L2: Shared Within Trust Boundary
+
+**Should L2 be shared?** **YES, within same organization/cluster.**
+
+**Why shared:**
+1. **Efficiency:** Multiple nodes benefit from same cache entry
+2. **Consistency:** All nodes in cluster see same data
+3. **Cost savings:** Avoid duplicate work across nodes
+
+**Why NOT shared across organizations:**
+1. **Privacy:** University A shouldn't see University B's cached queries
+2. **Security:** Cross-org cache poisoning risk
+3. **Access control:** Different orgs have different permissions
+
+=== Implementation Options
+
+==== Option A: Raft-Based Shared Cache (Recommended for <20 nodes)
+
+[source,text]
+----
+┌──────────────────────────────────────────────────┐
+│          Raft Cache Cluster (Same Org)           │
+│                                                  │
+│  Node 1 ◄─────┐                                 │
+│               │                                  │
+│  Node 2 ◄─────┼─── Raft Consensus ───► Cache   │
+│               │                                  │
+│  Node 3 ◄─────┘                                 │
+└──────────────────────────────────────────────────┘
+
+# Benefits:
+- Strongly consistent
+- No external dependencies
+- Integrates with existing Raft (KRaft metadata log)
+
+# Drawbacks:
+- More complex than Redis
+- Limited to <20 nodes (Raft quorum overhead)
+----
+
+[source,elixir]
+----
+defmodule VeriSim.QueryCache.L2Raft do
+  @moduledoc """
+  L2 cache using Raft consensus for distributed caching.
+  Only shares within same organization cluster.
+  """
+
+  def put(key, value, opts) do
+    # Write to Raft log (replicated across cluster)
+    RaftCache.append_entry(%{
+      command: :put,
+      key: key,
+      value: value,
+      org_id: get_org_id(),  # Scoped to organization
+      ttl: opts[:ttl]
+    })
+  end
+
+  def get(key) do
+    # Read from local Raft replica (no consensus needed)
+    org_id = get_org_id()
+
+    case RaftCache.read_local(key) do
+      {:ok, entry} when entry.org_id == org_id -> {:ok, entry.value}
+      _ -> {:error, :not_found}
+    end
+  end
+end
+----
+
+==== Option B: Redis Cluster (Recommended for >20 nodes)
+
+[source,text]
+----
+┌──────────────────────────────────────────────────┐
+│       Redis Cluster (Same Org)                   │
+│                                                  │
+│  Node 1 ◄────┐                                  │
+│              │                                   │
+│  Node 2 ◄────┼─── Redis Pub/Sub ───► Cache     │
+│              │                                   │
+│  Node 3 ◄────┘                                  │
+└──────────────────────────────────────────────────┘
+
+# Benefits:
+- Mature, battle-tested
+- Scales to 100+ nodes
+- Built-in pub/sub for invalidation
+
+# Drawbacks:
+- External dependency (Redis server)
+- Eventually consistent (not strongly consistent)
+----
+
+[source,elixir]
+----
+defmodule VeriSim.QueryCache.L2Redis do
+  @moduledoc """
+  L2 cache using Redis for distributed caching.
+  Scoped to organization via key prefixes.
+  """
+
+  def put(key, value, opts) do
+    org_id = get_org_id()
+    redis_key = "org:#{org_id}:#{key}"
+
+    # Store in Redis with TTL
+    Redix.command(:redix, ["SETEX", redis_key, opts[:ttl], :erlang.term_to_binary(value)])
+
+    # Publish invalidation event (other nodes update their L1)
+    Redix.command(:redix, ["PUBLISH", "cache:invalidate:#{org_id}", key])
+  end
+
+  def get(key) do
+    org_id = get_org_id()
+    redis_key = "org:#{org_id}:#{key}"
+
+    case Redix.command(:redix, ["GET", redis_key]) do
+      {:ok, nil} -> {:error, :not_found}
+      {:ok, binary} -> {:ok, :erlang.binary_to_term(binary)}
+      error -> error
+    end
+  end
+end
+----
+
+=== Invalidation Propagation
+
+When L2 is shared, invalidations must propagate:
+
+[source,elixir]
+----
+# Node A invalidates cache
+Node A: QueryCache.invalidate("query:result:abc123")
+  ↓
+L2 (Raft/Redis): Broadcasts invalidation
+  ↓
+Node B, C, D: Receive invalidation → Clear L1
+
+# Result: All nodes in cluster stay consistent
+----
+
+== L3: Selectively Shared Based on Data Sensitivity
+
+**Should L3 be shared?** **It depends on the data.**
+
+=== Public Data: Share Across Federation
+
+**What to share:**
+- Published research papers (Document modality)
+- Public embeddings (Vector modality)
+- Open citation graphs (Graph modality)
+- Historical public records (Temporal modality)
+
+**Benefits:**
+1. **Efficiency:** Avoid duplicate storage across federation
+2. **Consistency:** Everyone sees same historical data
+3. **Cost savings:** Reduce federation-wide storage
+
+[source,elixir]
+----
+# Public data cached in federated L3
+University A: Caches public paper "Climate Change 2025"
+  ↓
+Stored in federated verisim-temporal with tag: "visibility:public"
+  ↓
+University B: Queries same paper → L3 hit (no need to re-fetch)
+
+# Result: 200x faster for University B (no network fetch)
+----
+
+=== Private Data: Keep Local Only
+
+**What NOT to share:**
+- Unpublished drafts
+- Internal datasets
+- Personally identifiable information (PII)
+- Data under NDA/embargo
+
+**Implementation:**
+
+[source,elixir]
+----
+defmodule VeriSim.QueryCache.L3 do
+  def put(key, value, opts) do
+    visibility = Keyword.get(opts, :visibility, :private)
+
+    case visibility do
+      :public ->
+        # Store in federated verisim-temporal (shared)
+        VeriSimTemporal.store_federated(key, value, opts)
+
+      :private ->
+        # Store in local verisim-temporal only (NOT shared)
+        VeriSimTemporal.store_local(key, value, opts)
+
+      :org ->
+        # Store in organization-scoped temporal (shared within org)
+        org_id = get_org_id()
+        VeriSimTemporal.store_scoped(org_id, key, value, opts)
+    end
+  end
+
+  def get(key) do
+    # Try local first (private data)
+    case VeriSimTemporal.get_local(key) do
+      {:ok, value} -> {:ok, value}
+      {:error, :not_found} ->
+        # Try org-scoped
+        case VeriSimTemporal.get_org_scoped(get_org_id(), key) do
+          {:ok, value} -> {:ok, value}
+          {:error, :not_found} ->
+            # Try federated (public data)
+            VeriSimTemporal.get_federated(key)
+        end
+    end
+  end
+end
+----
+
+== Cache Consistency Across Layers
+
+=== Write-Through Strategy
+
+**When data is cached, write to all appropriate layers:**
+
+[source,elixir]
+----
+def cache_query_result(key, result, opts) do
+  visibility = get_visibility(result)
+
+  # Always write to L1 (local)
+  put_l1(key, result, opts)
+
+  # Write to L2 if in cluster mode
+  if in_cluster_mode?() do
+    put_l2(key, result, opts)
+  end
+
+  # Write to L3 based on visibility
+  case visibility do
+    :public -> put_l3_federated(key, result, opts)
+    :org -> put_l3_org_scoped(key, result, opts)
+    :private -> put_l3_local(key, result, opts)
+  end
+end
+----
+
+=== Invalidation Cascade
+
+**When data is invalidated, cascade through all layers:**
+
+[source,elixir]
+----
+def invalidate_cascade(key) do
+  # 1. Invalidate L1 (local)
+  invalidate_l1(key)
+
+  # 2. Invalidate L2 (broadcast to cluster)
+  if in_cluster_mode?() do
+    broadcast_invalidation_to_cluster(key)
+  end
+
+  # 3. Invalidate L3 (based on scope)
+  invalidate_l3(key)
+end
+
+def broadcast_invalidation_to_cluster(key) do
+  # Raft-based
+  RaftCache.append_entry(%{command: :invalidate, key: key})
+
+  # Or Redis-based
+  Redix.command(:redix, ["PUBLISH", "cache:invalidate", key])
+end
+----
+
+== Security Considerations
+
+=== Cache Isolation by Organization
+
+[source,elixir]
+----
+# Every cache key is prefixed by org_id
+def cache_key(query, org_id) do
+  "org:#{org_id}:query:#{hash(query)}"
+end
+
+# Organization A cannot access Organization B's cache
+Org A: get("org:A:query:abc123") → ✓ Allowed
+Org A: get("org:B:query:abc123") → ✗ Denied (different org)
+----
+
+=== Cache Poisoning Prevention
+
+[source,elixir]
+----
+# Validate cache entries before serving
+def get_from_cache(key) do
+  case fetch_from_l2(key) do
+    {:ok, entry} ->
+      # Verify integrity (ZKP signature)
+      if verify_signature(entry) do
+        {:ok, entry.value}
+      else
+        Logger.error("Cache poisoning detected: #{key}")
+        invalidate(key)
+        {:error, :invalid_signature}
+      end
+
+    error -> error
+  end
+end
+----
+
+=== Access Control
+
+[source,elixir]
+----
+# Check permissions before serving cached data
+def get_with_access_check(key, user_id) do
+  case get_from_cache(key) do
+    {:ok, cached_result} ->
+      # Verify user still has access
+      if AccessControl.can_read?(user_id, cached_result.hexad_id) do
+        {:ok, cached_result}
+      else
+        Logger.warn("Access denied to cached data: #{key}")
+        {:error, :access_denied}
+      end
+
+    error -> error
+  end
+end
+----
+
+== Deployment Recommendations
+
+[cols="1,2,2,2"]
+|===
+|Deployment Mode |L1 (Local) |L2 (Distributed) |L3 (Persistent)
+
+|**Standalone**
+|✓ ETS (1GB)
+|✗ Not needed
+|✓ Local disk
+
+|**Hybrid (Single Org)**
+|✓ ETS per node
+|✓ Raft/Redis shared
+|✓ Local + selective federation
+
+|**Federated (Multi-Org)**
+|✓ ETS per node
+|✓ Raft/Redis (per org)
+|✓ Public: federated, Private: local
+|===
+
+=== Cost-Benefit Analysis
+
+[cols="1,1,1,2"]
+|===
+|Sharing Level |Storage Cost |Network Cost |Benefit
+
+|**L1: Not shared**
+|High (duplicate on each node)
+|None
+|Fastest access (<1ms)
+
+|**L2: Shared within org**
+|Medium (one copy per org)
+|Low (<10ms intra-cluster)
+|Avoid duplicate work
+
+|**L3: Selectively shared**
+|Low (one copy federation-wide)
+|Medium (<100ms cross-org)
+|Avoid duplicate storage
+|===
+
+== Summary
+
+**Cache Tiering:**
+- ✅ **Yes**, VeriSimDB uses 3-tier caching (L1, L2, L3)
+
+**Cache Sharing:**
+- **L1:** ❌ Never shared (per-node, in-memory)
+- **L2:** ✅ Shared within organization/cluster, ❌ NOT across organizations
+- **L3:** ✅ Public data shared across federation, ❌ Private data kept local
+
+**Why this design:**
+1. **Performance:** L1 local = fastest
+2. **Efficiency:** L2 shared within org = avoid duplicate work
+3. **Privacy:** L3 selective = respect data sensitivity
+4. **Security:** Org isolation = prevent cross-org cache poisoning
+
+**Recommendation:**
+- Start with **L1 only** (simplest)
+- Add **L2 (Raft)** when you have 3-5 nodes in same org
+- Add **L2 (Redis)** when you exceed 20 nodes
+- Use **L3 federation** only for public data
+
+== References
+
+- link:caching-strategy.adoc[Caching Strategy Overview]
+- link:vql-architecture.adoc[VQL Architecture]
+- link:challenges-federated.adoc[Federated Deployment Challenges]
+- link:../lib/verisim/query_cache.ex[Query Cache Implementation]

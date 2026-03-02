@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://verisim.db/schema/hexad-input.json",
+  "$comment": "SPDX-License-Identifier: PMPL-1.0-or-later",
+  "title": "HexadInput",
+  "description": "Input payload for creating or updating a VeriSimDB hexad entity. All modality fields are optional -- only the modalities provided will be populated or updated. Omitted modalities are left unchanged on update, or unpopulated on create.",
+  "type": "object",
+  "properties": {
+    "graph": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Graph modality input. Defines outgoing relationships from this entity to other entities.",
+          "required": ["relationships"],
+          "properties": {
+            "relationships": {
+              "type": "array",
+              "description": "List of outgoing edges. Each relationship is a (predicate, target_id) pair.",
+              "items": {
+                "type": "object",
+                "required": ["predicate", "target_id"],
+                "properties": {
+                  "predicate": {
+                    "type": "string",
+                    "description": "Edge label or relationship type (IRI or plain string, e.g. 'relates_to', 'http://schema.org/knows')."
+                  },
+                  "target_id": {
+                    "type": "string",
+                    "description": "Target entity hexad ID or IRI."
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "description": "Graph relationships to create. Null or omitted to skip."
+    },
+    "vector": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Vector modality input. Provides a dense embedding for similarity search.",
+          "required": ["embedding"],
+          "properties": {
+            "embedding": {
+              "type": "array",
+              "items": { "type": "number" },
+              "description": "Dense embedding vector (float32 values). Length must match the store's configured vector_dimension."
+            },
+            "model": {
+              "type": "string",
+              "description": "Name or identifier of the embedding model used (e.g. 'all-MiniLM-L6-v2'). Optional, for provenance tracking."
+            }
+          }
+        }
+      ],
+      "description": "Vector embedding to set. Null or omitted to skip."
+    },
+    "tensor": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Tensor modality input. Multi-dimensional numeric data with shape metadata.",
+          "required": ["shape", "data"],
+          "properties": {
+            "shape": {
+              "type": "array",
+              "items": { "type": "integer", "minimum": 0 },
+              "description": "Tensor dimensions (e.g. [3, 4] for a 3x4 matrix). The product of all values must equal the length of the data array.",
+              "minItems": 1
+            },
+            "data": {
+              "type": "array",
+              "items": { "type": "number" },
+              "description": "Flattened tensor values in row-major order (float64)."
+            }
+          }
+        }
+      ],
+      "description": "Tensor data to set. Null or omitted to skip."
+    },
+    "semantic": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Semantic modality input. Ontological type annotations and property maps.",
+          "properties": {
+            "types": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Type IRIs from ontologies (e.g. ['http://schema.org/Person', 'http://xmlns.com/foaf/0.1/Agent'])."
+            },
+            "properties": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "description": "Semantic key-value properties. Keys are property IRIs or plain strings; values are string literals."
+            }
+          }
+        }
+      ],
+      "description": "Semantic annotations to set. Null or omitted to skip."
+    },
+    "document": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Document modality input. Full-text content for indexing and search.",
+          "required": ["title", "body"],
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Document title. Used for display and search ranking."
+            },
+            "body": {
+              "type": "string",
+              "description": "Document body. Full-text indexed for search."
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "description": "Additional searchable fields beyond title and body (e.g. 'author', 'category')."
+            }
+          }
+        }
+      ],
+      "description": "Document content to set. Null or omitted to skip."
+    },
+    "provenance": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Provenance modality input. Records a lineage event in the entity's hash chain.",
+          "required": ["event_type", "actor", "description"],
+          "properties": {
+            "event_type": {
+              "type": "string",
+              "description": "Classification of the provenance event.",
+              "enum": ["created", "modified", "imported", "normalized", "drift_repaired", "deleted", "merged"]
+            },
+            "actor": {
+              "type": "string",
+              "description": "Who or what caused this event (user ID, system component, bot name)."
+            },
+            "source": {
+              "type": "string",
+              "description": "Optional source identifier (URL, file path, upstream entity ID)."
+            },
+            "description": {
+              "type": "string",
+              "description": "Human-readable description of what happened."
+            }
+          }
+        }
+      ],
+      "description": "Provenance event to record. Null or omitted to skip."
+    },
+    "spatial": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "description": "Spatial modality input. Geospatial coordinates and geometry.",
+          "required": ["latitude", "longitude"],
+          "properties": {
+            "latitude": {
+              "type": "number",
+              "minimum": -90.0,
+              "maximum": 90.0,
+              "description": "Latitude in decimal degrees (WGS84). North is positive."
+            },
+            "longitude": {
+              "type": "number",
+              "minimum": -180.0,
+              "maximum": 180.0,
+              "description": "Longitude in decimal degrees (WGS84). East is positive."
+            },
+            "altitude": {
+              "type": "number",
+              "description": "Altitude in metres above the WGS84 ellipsoid. Optional."
+            },
+            "geometry_type": {
+              "type": "string",
+              "enum": ["Point", "LineString", "Polygon", "MultiPoint", "MultiPolygon"],
+              "description": "OGC Simple Features geometry type. Defaults to 'Point' if omitted."
+            },
+            "srid": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Spatial Reference System Identifier. Defaults to 4326 (WGS84) if omitted."
+            },
+            "properties": {
+              "type": "object",
+              "additionalProperties": { "type": "string" },
+              "description": "Arbitrary spatial metadata (address, region, accuracy, etc.)."
+            }
+          }
+        }
+      ],
+      "description": "Spatial data to set. Null or omitted to skip."
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Arbitrary key-value metadata. Not indexed by any specific modality but stored alongside the entity."
+    }
+  },
+  "additionalProperties": false
+}

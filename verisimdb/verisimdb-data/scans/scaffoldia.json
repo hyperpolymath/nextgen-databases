@@ -1,0 +1,474 @@
+{
+  "program_path": ".",
+  "language": "nickel",
+  "frameworks": [
+    "Phoenix",
+    "WebServer",
+    "OTP",
+    "Ecto",
+    "Database"
+  ],
+  "weak_points": [
+    {
+      "category": "HardcodedSecret",
+      "location": "registry/elixir/phoenix-service.ncl",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in registry/elixir/phoenix-service.ncl",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 6344,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 24,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "builder/main.ncl",
+      "lines": 306,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "cli/scaffoldia.hs",
+      "lines": 426,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Scaffoldia/Builder.hs",
+      "lines": 126,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Scaffoldia/Registry.hs",
+      "lines": 171,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Scaffoldia/Template.hs",
+      "lines": 163,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "registry/haskell/stack-library.ncl",
+      "lines": 397,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "registry/rust/library.ncl",
+      "lines": 224,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "registry/elixir/phoenix-service.ncl",
+      "lines": 522,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "registry/gitbot/fleet-bot.ncl",
+      "lines": 507,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "network",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/Scaffoldia/Builder.hs",
+        "to": "src/Scaffoldia/Registry.hs",
+        "relation": "shared_dir:src/Scaffoldia",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Registry.hs",
+        "to": "src/Scaffoldia/Template.hs",
+        "relation": "shared_dir:src/Scaffoldia",
+        "weight": 1.0
+      },
+      {
+        "from": "builder/main.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "builder/main.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "builder/main.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "builder/main.ncl",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "builder/main.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/scaffoldia.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/scaffoldia.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/scaffoldia.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/scaffoldia.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "cli/scaffoldia.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Builder.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Builder.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Builder.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Builder.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Builder.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Registry.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Registry.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Registry.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Registry.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Registry.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Template.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Template.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Template.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Template.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Scaffoldia/Template.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/haskell/stack-library.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/haskell/stack-library.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/haskell/stack-library.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/haskell/stack-library.ncl",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/haskell/stack-library.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/rust/library.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/rust/library.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/rust/library.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/rust/library.ncl",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/rust/library.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/elixir/phoenix-service.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/elixir/phoenix-service.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/elixir/phoenix-service.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/elixir/phoenix-service.ncl",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/elixir/phoenix-service.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/gitbot/fleet-bot.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/gitbot/fleet-bot.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/gitbot/fleet-bot.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/gitbot/fleet-bot.ncl",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "registry/gitbot/fleet-bot.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "registry/elixir/phoenix-service.ncl"
+        ],
+        "frameworks": [
+          "Phoenix",
+          "WebServer",
+          "OTP",
+          "Ecto",
+          "Database"
+        ],
+        "relation": "HardcodedSecret->Network"
+      }
+    ]
+  }
+}

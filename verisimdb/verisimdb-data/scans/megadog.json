@@ -1,0 +1,298 @@
+{
+  "program_path": ".",
+  "language": "pony",
+  "frameworks": [
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "proofs/LogarithmicStorage.lean",
+      "severity": "High",
+      "description": "3 sorry (unproven proposition) in proofs/LogarithmicStorage.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/deploy.sh",
+      "severity": "Medium",
+      "description": "42 potentially unquoted variable expansions in scripts/deploy.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 3168,
+    "unsafe_blocks": 10,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 1,
+    "threading_constructs": 13
+  },
+  "file_statistics": [
+    {
+      "file_path": "proofs/LogarithmicStorage.lean",
+      "lines": 156,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/deploy.sh",
+      "lines": 190,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/src/anti_cheat.pony",
+      "lines": 247,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "server/src/batch_aggregator.pony",
+      "lines": 212,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "server/src/connection_manager.pony",
+      "lines": 264,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "server/src/dog.pony",
+      "lines": 198,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "server/src/dog_manager.pony",
+      "lines": 236,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "server/src/main.pony",
+      "lines": 63,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "server/src/metrics.pony",
+      "lines": 264,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "server/src/websocket_server.pony",
+      "lines": 301,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "server/src/blockchain_client.pony",
+      "lines": 235,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "server/src/anti_cheat.pony",
+        "to": "server/src/batch_aggregator.pony",
+        "relation": "shared_dir:server/src",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/batch_aggregator.pony",
+        "to": "server/src/connection_manager.pony",
+        "relation": "shared_dir:server/src",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/connection_manager.pony",
+        "to": "server/src/dog.pony",
+        "relation": "shared_dir:server/src",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/dog.pony",
+        "to": "server/src/dog_manager.pony",
+        "relation": "shared_dir:server/src",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/dog_manager.pony",
+        "to": "server/src/main.pony",
+        "relation": "shared_dir:server/src",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/main.pony",
+        "to": "server/src/metrics.pony",
+        "relation": "shared_dir:server/src",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/metrics.pony",
+        "to": "server/src/websocket_server.pony",
+        "relation": "shared_dir:server/src",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/websocket_server.pony",
+        "to": "server/src/blockchain_client.pony",
+        "relation": "shared_dir:server/src",
+        "weight": 1.0
+      },
+      {
+        "from": "proofs/LogarithmicStorage.lean",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "scripts/deploy.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "server/src/anti_cheat.pony",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/src/batch_aggregator.pony",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 14.0
+      },
+      {
+        "from": "server/src/connection_manager.pony",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "server/src/dog.pony",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "server/src/dog_manager.pony",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "server/src/main.pony",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/src/metrics.pony",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/src/websocket_server.pony",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "server/src/blockchain_client.pony",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "proofs/LogarithmicStorage.lean"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/deploy.sh"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

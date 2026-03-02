@@ -1,0 +1,964 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "firefox-lsp/lib/adapters/firefox.ex",
+      "severity": "Medium",
+      "description": "System command execution in firefox-lsp/lib/adapters/firefox.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "firefox-lsp/lib/lsp/server.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in firefox-lsp/lib/lsp/server.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "firefox-mcp/extension-mv3/background.js",
+      "severity": "Critical",
+      "description": "eval() usage in firefox-mcp/extension-mv3/background.js",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "firefox-mcp/extension/content/bridge.js",
+      "severity": "Critical",
+      "description": "eval() usage in firefox-mcp/extension/content/bridge.js",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "firefox-mcp/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in firefox-mcp/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "gecko-browser-extension/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in gecko-browser-extension/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "gecko-browser-extension/src/content/content.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in gecko-browser-extension/src/content/content.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "gecko-browser-extension/src/popup/popup.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in gecko-browser-extension/src/popup/popup.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "gitlab-bridge/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in gitlab-bridge/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "gitlab-bridge/src/config/MultiRepo.res",
+      "severity": "Medium",
+      "description": "6 unsafe get calls in gitlab-bridge/src/config/MultiRepo.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "gitlab-bridge/src/services/MRReviewer.res",
+      "severity": "High",
+      "description": "1 JSON.parseExn calls in gitlab-bridge/src/services/MRReviewer.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "mozilla-extension/scripts/build.sh",
+      "severity": "Medium",
+      "description": "27 potentially unquoted variable expansions in mozilla-extension/scripts/build.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "mozilla-extension/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in mozilla-extension/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "mozilla-extension/src/core/storage.js",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in mozilla-extension/src/core/storage.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "mozilla-extension/src/ui/sidebar.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in mozilla-extension/src/ui/sidebar.js",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 21230,
+    "unsafe_blocks": 157,
+    "panic_sites": 1,
+    "unwrap_calls": 6,
+    "allocation_sites": 26,
+    "io_operations": 11,
+    "threading_constructs": 11
+  },
+  "file_statistics": [
+    {
+      "file_path": "firefox-lsp/lib/adapters/firefox.ex",
+      "lines": 365,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "firefox-lsp/lib/lsp/server.ex",
+      "lines": 245,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "firefox-lsp/vscode-extension/src/bindings/Vscode.res",
+      "lines": 132,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "firefox-lsp/vscode-extension/src/Extension.res",
+      "lines": 291,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "firefox-mcp/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "firefox-mcp/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "firefox-mcp/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "firefox-mcp/host/bindings/Deno_Ws.res",
+      "lines": 145,
+      "unsafe_blocks": 26,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "firefox-mcp/host/Server.res",
+      "lines": 859,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "firefox-mcp/host/NativeHost.res",
+      "lines": 724,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 13,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "firefox-mcp/scripts/install.sh",
+      "lines": 85,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "firefox-mcp/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "firefox-mcp/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gecko-browser-extension/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gecko-browser-extension/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gecko-browser-extension/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "gecko-browser-extension/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gecko-browser-extension/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gecko-browser-extension/src/background/background.js",
+      "lines": 165,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "gitlab-bridge/lib/bs/src/bindings/Express.res",
+      "lines": 60,
+      "unsafe_blocks": 19,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/src/auth/RateLimiter.res",
+      "lines": 235,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/src/bindings/Express.res",
+      "lines": 59,
+      "unsafe_blocks": 19,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/src/bindings/Crypto.res",
+      "lines": 108,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/src/bindings/Vitest.res",
+      "lines": 93,
+      "unsafe_blocks": 24,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/src/config/MultiRepo.res",
+      "lines": 220,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/src/services/MRReviewer.res",
+      "lines": 239,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "gitlab-bridge/tests/unit/auth/RateLimiterTest.res",
+      "lines": 213,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "mozilla-extension/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "mozilla-extension/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "mozilla-extension/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "mozilla-extension/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "mozilla-extension/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "mozilla-extension/src/core/api.js",
+      "lines": 141,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "network",
+    "memory",
+    "concurrency",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "gitlab-bridge/src/bindings/Express.res",
+        "to": "gitlab-bridge/src/bindings/Crypto.res",
+        "relation": "shared_dir:gitlab-bridge/src/bindings",
+        "weight": 1.0
+      },
+      {
+        "from": "gitlab-bridge/src/bindings/Crypto.res",
+        "to": "gitlab-bridge/src/bindings/Vitest.res",
+        "relation": "shared_dir:gitlab-bridge/src/bindings",
+        "weight": 1.0
+      },
+      {
+        "from": "gitlab-bridge/src/abi/Foreign.idr",
+        "to": "gitlab-bridge/src/abi/Types.idr",
+        "relation": "shared_dir:gitlab-bridge/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "firefox-mcp/src/abi/Foreign.idr",
+        "to": "firefox-mcp/src/abi/Types.idr",
+        "relation": "shared_dir:firefox-mcp/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "mozilla-extension/src/abi/Foreign.idr",
+        "to": "mozilla-extension/src/abi/Types.idr",
+        "relation": "shared_dir:mozilla-extension/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "gecko-browser-extension/src/abi/Foreign.idr",
+        "to": "gecko-browser-extension/src/abi/Types.idr",
+        "relation": "shared_dir:gecko-browser-extension/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "firefox-mcp/host/Server.res",
+        "to": "firefox-mcp/host/NativeHost.res",
+        "relation": "shared_dir:firefox-mcp/host",
+        "weight": 1.0
+      },
+      {
+        "from": "firefox-lsp/lib/adapters/firefox.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "firefox-lsp/lib/lsp/server.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "firefox-lsp/vscode-extension/src/bindings/Vscode.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 15.0
+      },
+      {
+        "from": "firefox-lsp/vscode-extension/src/Extension.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "firefox-mcp/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "firefox-mcp/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "firefox-mcp/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "firefox-mcp/host/bindings/Deno_Ws.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 78.0
+      },
+      {
+        "from": "firefox-mcp/host/Server.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "firefox-mcp/host/NativeHost.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "firefox-mcp/scripts/install.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "firefox-mcp/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "firefox-mcp/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "gecko-browser-extension/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "gecko-browser-extension/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "gecko-browser-extension/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "gecko-browser-extension/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "gecko-browser-extension/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "gecko-browser-extension/src/background/background.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "gitlab-bridge/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "gitlab-bridge/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "gitlab-bridge/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "gitlab-bridge/lib/bs/src/bindings/Express.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "gitlab-bridge/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "gitlab-bridge/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "gitlab-bridge/src/auth/RateLimiter.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "gitlab-bridge/src/bindings/Express.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "gitlab-bridge/src/bindings/Crypto.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 15.0
+      },
+      {
+        "from": "gitlab-bridge/src/bindings/Vitest.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 72.0
+      },
+      {
+        "from": "gitlab-bridge/src/config/MultiRepo.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "gitlab-bridge/src/services/MRReviewer.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "gitlab-bridge/tests/unit/auth/RateLimiterTest.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "mozilla-extension/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "mozilla-extension/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "mozilla-extension/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "mozilla-extension/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "mozilla-extension/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "mozilla-extension/src/core/api.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "firefox-mcp/src/abi/Foreign.idr",
+          "gecko-browser-extension/src/abi/Foreign.idr",
+          "gitlab-bridge/src/abi/Foreign.idr",
+          "mozilla-extension/src/abi/Foreign.idr"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "AtomExhaustion",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "firefox-lsp/lib/lsp/server.ex"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "AtomExhaustion->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "firefox-mcp/extension-mv3/background.js",
+          "firefox-mcp/extension/content/bridge.js"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "firefox-mcp/extension-mv3/background.js",
+          "firefox-mcp/extension/content/bridge.js"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "DynamicCodeExecution->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "firefox-lsp/lib/adapters/firefox.ex",
+          "mozilla-extension/scripts/build.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "gecko-browser-extension/src/content/content.js",
+          "gecko-browser-extension/src/popup/popup.js",
+          "mozilla-extension/src/ui/sidebar.js"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "DynamicCodeExecution->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "firefox-lsp/lib/adapters/firefox.ex"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "gitlab-bridge/src/config/MultiRepo.res"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "gitlab-bridge/src/services/MRReviewer.res"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeDeserialization->Memory"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "gitlab-bridge/src/services/MRReviewer.res"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeDeserialization->Cpu"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "mozilla-extension/src/core/storage.js"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "HardcodedSecret->Network"
+      }
+    ]
+  }
+}

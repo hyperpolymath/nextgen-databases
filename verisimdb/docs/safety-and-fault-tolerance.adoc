@@ -1,0 +1,1161 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= Safety and Fault Tolerance
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+VeriSimDB implements **defense in depth** across all safety dimensions: from kernel-level protections to socio-technical governance. This document catalogs safety guarantees, fault tolerance mechanisms, and failure recovery strategies.
+
+**Threat Model:**
+
+- Byzantine failures (malicious nodes)
+- Crash failures (nodes die unexpectedly)
+- Network partitions (split brain scenarios)
+- Data corruption (bit flips, disk failures)
+- Resource exhaustion (memory, disk, CPU)
+- Supply chain attacks (compromised dependencies)
+- Human errors (operational mistakes)
+
+== Fault Tolerance
+
+=== BEAM/OTP Supervisor Trees
+
+**Guarantee:** Process crashes don't cascade to entire system.
+
+[source,elixir]
+----
+defmodule VeriSim.Application do
+  use Application
+
+  def start(_type, _args) do
+    children = [
+      # Registry for hexad servers
+      {Registry, keys: :unique, name: VeriSim.EntityRegistry},
+
+      # DynamicSupervisor for hexad entities
+      {DynamicSupervisor, name: VeriSim.EntitySupervisor, strategy: :one_for_one},
+
+      # Query router (restart if crashes)
+      {VeriSim.QueryRouter, []},
+
+      # Cache (restart if crashes, lose cache but not data)
+      {VeriSim.QueryCache, []},
+
+      # Drift monitor (restart if crashes, resume monitoring)
+      {VeriSim.DriftMonitor, []},
+    ]
+
+    opts = [strategy: :one_for_one, name: VeriSim.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+end
+----
+
+**Strategy:**
+
+- `:one_for_one` - If one child crashes, restart only that child
+- `:one_for_all` - If one child crashes, restart all children (for tightly coupled processes)
+- `:rest_for_one` - If one child crashes, restart it and all children started after it
+
+**Crash Isolation:**
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────┐
+│  VeriSim.Supervisor (one_for_one)                       │
+│                                                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │
+│  │ QueryRouter  │  │  QueryCache  │  │ DriftMonitor │ │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘ │
+│         │ crashes          │                 │         │
+│         ✗                  │                 │         │
+│         │ restarted        │                 │         │
+│         ✓                  │ unaffected      │         │
+│                            ✓                 ✓         │
+└─────────────────────────────────────────────────────────┘
+----
+
+=== Self-Healing
+
+**Guarantee:** System automatically recovers from transient failures.
+
+==== 1. Automatic Process Restart
+
+[source,elixir]
+----
+defmodule VeriSim.EntityServer do
+  use GenServer, restart: :transient  # Restart only if abnormal exit
+
+  def init(hexad_id) do
+    # Restore state from verisim-temporal
+    case VeriSim.Temporal.load_hexad_state(hexad_id) do
+      {:ok, state} ->
+        Logger.info("Restored hexad #{hexad_id} from temporal log")
+        {:ok, state}
+
+      {:error, :not_found} ->
+        # First time initialization
+        {:ok, %{hexad_id: hexad_id, data: %{}}}
+    end
+  end
+end
+----
+
+==== 2. Circuit Breaker Recovery
+
+[source,elixir]
+----
+# Circuit breaker automatically transitions from :open → :half_open → :closed
+defmodule VeriSim.CircuitBreaker do
+  def handle_info(:check_circuit, state) when state.state == :open do
+    if time_since_last_failure(state) > state.timeout_ms do
+      Logger.info("Circuit breaker transitioning to half_open for #{state.store_id}")
+      {:noreply, %{state | state: :half_open}}
+    else
+      schedule_check()
+      {:noreply, state}
+    end
+  end
+end
+----
+
+==== 3. Cache Warming After Restart
+
+[source,elixir]
+----
+defmodule VeriSim.QueryCache do
+  def init(_opts) do
+    # Schedule cache warming after startup
+    Process.send_after(self(), :warm_cache, 5_000)
+
+    state = %{...}
+    {:ok, state}
+  end
+
+  def handle_info(:warm_cache, state) do
+    Logger.info("Warming cache with common queries")
+
+    common_queries = get_common_queries()
+    VeriSim.QueryRouter.Cached.warm_cache(common_queries)
+
+    {:noreply, state}
+  end
+end
+----
+
+==== 4. Drift Repair
+
+[source,elixir]
+----
+# Automatic drift repair when detected
+defmodule VeriSim.DriftMonitor do
+  def handle_drift_detected(hexad_id, drift_details) do
+    Logger.warn("Drift detected for hexad #{hexad_id}: #{inspect(drift_details)}")
+
+    case get_repair_policy(hexad_id) do
+      :auto_repair ->
+        Logger.info("Auto-repairing hexad #{hexad_id}")
+        VeriSim.DriftRepair.repair(hexad_id, drift_details)
+
+      :manual ->
+        Logger.warn("Manual repair required for hexad #{hexad_id}")
+        notify_admin(hexad_id, drift_details)
+
+      :tolerate ->
+        Logger.info("Tolerating drift for hexad #{hexad_id}")
+        :ok
+    end
+  end
+end
+----
+
+== Memory Safety
+
+**Guarantee:** Rust provides memory safety without garbage collection.
+
+=== Rust Ownership System
+
+[source,rust]
+----
+// SAFE: Ownership prevents use-after-free
+fn process_hexad(hexad: Hexad) {
+    let graph = hexad.graph;  // Ownership transferred
+    analyze_graph(graph);
+    // hexad.graph cannot be accessed here (ownership moved)
+}
+
+// SAFE: Borrowing allows temporary access
+fn analyze_hexad(hexad: &Hexad) {
+    println!("Hexad ID: {}", hexad.id);
+    // hexad remains valid after function returns
+}
+
+// SAFE: Lifetimes ensure references don't outlive data
+fn get_hexad_id<'a>(hexad: &'a Hexad) -> &'a str {
+    &hexad.id  // Lifetime 'a ensures this reference is valid
+}
+----
+
+=== No Buffer Overflows
+
+[source,rust]
+----
+// SAFE: Bounds checking on array access
+let embeddings: Vec<f32> = vec![0.1, 0.2, 0.3];
+let value = embeddings.get(10);  // Returns None (safe)
+
+// UNSAFE code is explicitly marked and isolated
+unsafe fn read_raw_memory(ptr: *const u8, len: usize) -> &'static [u8] {
+    std::slice::from_raw_parts(ptr, len)
+}
+----
+
+=== Elixir Immutability
+
+[source,elixir]
+----
+# Immutable data structures prevent accidental mutation
+hexad = %{id: "abc-123", data: %{title: "Original"}}
+
+# This creates a NEW map, doesn't mutate original
+updated = Map.put(hexad, :data, %{title: "Updated"})
+
+# Original remains unchanged
+IO.inspect(hexad.data.title)  # => "Original"
+IO.inspect(updated.data.title)  # => "Updated"
+----
+
+== Kernel Safety
+
+**Guarantee:** OS-level isolation between processes.
+
+=== Process Isolation
+
+[source,text]
+----
+┌──────────────────────────────────────────────────────┐
+│  Linux Kernel                                        │
+│                                                      │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │
+│  │  Process A  │  │  Process B  │  │  Process C  │ │
+│  │  (Elixir)   │  │  (Rust API) │  │ (Postgres)  │ │
+│  │             │  │             │  │             │ │
+│  │ Memory:     │  │ Memory:     │  │ Memory:     │ │
+│  │ 0x1000-2000 │  │ 0x3000-4000 │  │ 0x5000-6000 │ │
+│  │             │  │             │  │             │ │
+│  │ Cannot      │  │ Cannot      │  │ Cannot      │ │
+│  │ access B/C  │  │ access A/C  │  │ access A/B  │ │
+│  └─────────────┘  └─────────────┘  └─────────────┘ │
+└──────────────────────────────────────────────────────┘
+
+Isolation via:
+- Virtual memory (MMU)
+- System calls (controlled kernel entry)
+- File descriptors (capability-based access)
+----
+
+=== Resource Limits (cgroups)
+
+[source,bash]
+----
+# Limit memory per process
+systemctl set-property verisim-api.service MemoryMax=2G
+
+# Limit CPU shares
+systemctl set-property verisim-api.service CPUQuota=200%
+
+# Limit open file descriptors
+ulimit -n 4096
+----
+
+=== Seccomp (System Call Filtering)
+
+[source,rust]
+----
+// Restrict which syscalls Rust processes can make
+use seccomp::*;
+
+fn setup_seccomp() -> Result<(), seccomp::Error> {
+    let mut filter = SeccompFilter::new()?;
+
+    // Allow only essential syscalls
+    filter.allow(libc::SYS_read)?;
+    filter.allow(libc::SYS_write)?;
+    filter.allow(libc::SYS_open)?;
+    filter.allow(libc::SYS_close)?;
+
+    // Block dangerous syscalls
+    filter.deny(libc::SYS_fork)?;
+    filter.deny(libc::SYS_execve)?;
+
+    filter.load()?;
+    Ok(())
+}
+----
+
+== Platform Safety
+
+**Guarantee:** Cross-platform compatibility without platform-specific vulnerabilities.
+
+=== Supported Platforms
+
+[cols="1,1,2"]
+|===
+|Platform |Status |Notes
+
+|**Linux x86_64**
+|✅ Primary
+|Reference platform, full testing
+
+|**macOS x86_64**
+|✅ Supported
+|Developer platform
+
+|**macOS ARM64**
+|✅ Supported
+|Apple Silicon
+
+|**Windows x86_64**
+|⚠️ Experimental
+|WSL2 recommended
+
+|**FreeBSD**
+|🔬 Research
+|Rust support good, BEAM needs testing
+|===
+
+=== Platform-Specific Issues
+
+[source,elixir]
+----
+defmodule VeriSim.Platform do
+  def get_temp_dir do
+    case :os.type() do
+      {:unix, :darwin} -> "/tmp"
+      {:unix, :linux} -> "/tmp"
+      {:unix, :freebsd} -> "/tmp"
+      {:win32, _} -> System.get_env("TEMP") || "C:\\Temp"
+    end
+  end
+
+  def get_data_dir do
+    case :os.type() do
+      {:unix, _} -> "~/.local/share/verisim"
+      {:win32, _} -> Path.join(System.get_env("APPDATA"), "verisim")
+    end
+  end
+end
+----
+
+=== Endianness Handling
+
+[source,rust]
+----
+use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
+
+// Always use explicit endianness for network/disk I/O
+fn serialize_vector(embedding: &[f32]) -> Vec<u8> {
+    let mut buf = Vec::new();
+
+    for &value in embedding {
+        buf.write_f32::<LittleEndian>(value).unwrap();
+    }
+
+    buf
+}
+----
+
+== Supply Chain Safety
+
+**Guarantee:** Dependencies are audited, pinned, and reproducible.
+
+=== Dependency Auditing
+
+[source,bash]
+----
+# Rust: cargo-audit checks for known vulnerabilities
+cargo audit
+
+# Elixir: mix audit checks hex.pm packages
+mix audit
+
+# Continuous monitoring in CI
+----
+
+=== Dependency Pinning
+
+**Cargo.lock (Rust):**
+[source,toml]
+----
+# Exact versions locked
+[[package]]
+name = "serde"
+version = "1.0.195"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "63261df402c67811e9ac6def069e4786148c4563f4b50fd4bf30aa370d626b02"
+----
+
+**mix.lock (Elixir):**
+[source,elixir]
+----
+%{
+  "phoenix": {:hex, :phoenix, "1.7.10", "02189140a61b2ce85bb633a9b6fd02dff705a5f1596869547aeb2e2b8a61511", [:mix], [...], "hexpm", "..."},
+}
+----
+
+=== Vendor Dependencies
+
+[source,bash]
+----
+# Rust: Vendor all dependencies locally
+cargo vendor
+
+# Commit vendor/ directory to repo for air-gapped builds
+git add vendor/
+git commit -m "Vendor Rust dependencies"
+----
+
+=== Reproducible Builds
+
+[source,dockerfile]
+----
+# Containerfile with pinned base images
+FROM rust:1.75.0-bookworm AS rust-builder
+
+# Pin Elixir/Erlang versions
+FROM hexpm/elixir:1.17.3-erlang-27.1.2-debian-bookworm-20241016-slim
+
+# Verify checksums
+RUN echo "sha256:abc123..." | sha256sum -c -
+----
+
+=== SBOM Generation
+
+[source,bash]
+----
+# Generate Software Bill of Materials
+cargo sbom > sbom-rust.json
+mix sbom > sbom-elixir.json
+
+# Publish SBOM for transparency
+----
+
+== System Safety
+
+**Guarantee:** Resilience to hardware failures, disk corruption, power loss.
+
+=== Disk Corruption Detection
+
+[source,rust]
+----
+// CRC32 checksums for all writes
+use crc32fast::Hasher;
+
+fn write_with_checksum(data: &[u8], file: &mut File) -> io::Result<()> {
+    let mut hasher = Hasher::new();
+    hasher.update(data);
+    let checksum = hasher.finalize();
+
+    // Write: [length: u32][data: bytes][checksum: u32]
+    file.write_u32::<LittleEndian>(data.len() as u32)?;
+    file.write_all(data)?;
+    file.write_u32::<LittleEndian>(checksum)?;
+    file.sync_all()?;  // fsync
+
+    Ok(())
+}
+
+fn read_with_checksum(file: &mut File) -> io::Result<Vec<u8>> {
+    let len = file.read_u32::<LittleEndian>()? as usize;
+    let mut data = vec![0u8; len];
+    file.read_exact(&mut data)?;
+    let stored_checksum = file.read_u32::<LittleEndian>()?;
+
+    let mut hasher = Hasher::new();
+    hasher.update(&data);
+    let computed_checksum = hasher.finalize();
+
+    if computed_checksum != stored_checksum {
+        return Err(io::Error::new(io::ErrorKind::InvalidData, "Checksum mismatch"));
+    }
+
+    Ok(data)
+}
+----
+
+=== Crash-Safe Writes (fsync)
+
+[source,rust]
+----
+// Write-ahead logging with fsync
+fn append_to_wal(entry: &LogEntry) -> io::Result<()> {
+    let mut file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open("wal.log")?;
+
+    let serialized = bincode::serialize(entry)?;
+
+    file.write_all(&serialized)?;
+    file.sync_all()?;  // Guarantee durability before returning
+
+    Ok(())
+}
+----
+
+=== Redundant Storage (RAID-like)
+
+[source,elixir]
+----
+# Write to multiple stores for redundancy
+defmodule VeriSim.ReplicatedStore do
+  def write_with_replication(key, value, replicas: 3) do
+    stores = select_replica_stores(3)
+
+    results = stores
+    |> Task.async_stream(fn store ->
+      write_to_store(store, key, value)
+    end, timeout: 5_000)
+    |> Enum.to_list()
+
+    succeeded = Enum.count(results, fn {:ok, {:ok, _}} -> true; _ -> false end)
+
+    if succeeded >= 2 do  # Quorum: 2/3
+      {:ok, :replicated}
+    else
+      {:error, :replication_failed}
+    end
+  end
+end
+----
+
+=== Power Loss Recovery
+
+[source,rust]
+----
+// Atomic rename for crash-safe file updates
+use std::fs;
+
+fn atomic_write(path: &Path, data: &[u8]) -> io::Result<()> {
+    let temp_path = path.with_extension("tmp");
+
+    // 1. Write to temp file
+    fs::write(&temp_path, data)?;
+
+    // 2. Sync temp file to disk
+    let file = File::open(&temp_path)?;
+    file.sync_all()?;
+
+    // 3. Atomic rename (POSIX guarantees)
+    fs::rename(&temp_path, path)?;
+
+    // 4. Sync directory entry
+    let dir = path.parent().unwrap();
+    let dir_file = File::open(dir)?;
+    dir_file.sync_all()?;
+
+    Ok(())
+}
+----
+
+== Runtime Safety
+
+**Guarantee:** Controlled resource usage, graceful degradation under load.
+
+=== BEAM Scheduler
+
+[source,text]
+----
+┌──────────────────────────────────────────────────────┐
+│  BEAM VM (Erlang Runtime)                           │
+│                                                      │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐         │
+│  │ Scheduler│  │ Scheduler│  │ Scheduler│         │
+│  │    1     │  │    2     │  │    3     │         │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘         │
+│       │             │             │                 │
+│   ┌───┴─────────────┴─────────────┴───┐           │
+│   │      Process Queue                 │           │
+│   │  [P1] [P2] [P3] ... [Pn]           │           │
+│   └────────────────────────────────────┘           │
+│                                                      │
+│  Each process gets fair CPU time (reduction count)  │
+│  Preemptive multitasking (no process starves)      │
+└──────────────────────────────────────────────────────┘
+----
+
+**Reduction-based scheduling:**
+- Each process gets 2000 reductions
+- Function calls, message sends count as reductions
+- Scheduler preempts after 2000 reductions
+
+=== Rust Panic Handling
+
+[source,rust]
+----
+use std::panic;
+
+fn safe_execute_query(query: &str) -> Result<QueryResult, QueryError> {
+    // Catch panics to prevent process crash
+    let result = panic::catch_unwind(|| {
+        execute_query_internal(query)
+    });
+
+    match result {
+        Ok(Ok(res)) => Ok(res),
+        Ok(Err(e)) => Err(e),
+        Err(panic_payload) => {
+            eprintln!("Query panicked: {:?}", panic_payload);
+            Err(QueryError::InternalError("Query execution panicked".into()))
+        }
+    }
+}
+----
+
+=== Resource Limits
+
+[source,elixir]
+----
+defmodule VeriSim.QueryRouter do
+  @max_query_time_ms 60_000  # 60 seconds
+  @max_memory_mb 512
+
+  def execute_with_limits(query) do
+    task = Task.async(fn ->
+      # Monitor memory usage
+      Process.flag(:max_heap_size, %{
+        size: @max_memory_mb * 1024 * 1024 div :erlang.system_info(:wordsize),
+        kill: true,
+        error_logger: true
+      })
+
+      execute_query(query)
+    end)
+
+    case Task.yield(task, @max_query_time_ms) || Task.shutdown(task) do
+      {:ok, result} -> result
+      nil -> {:error, {:timeout, @max_query_time_ms}}
+    end
+  end
+end
+----
+
+=== Back Pressure
+
+[source,elixir]
+----
+defmodule VeriSim.RateLimiter do
+  use GenServer
+
+  # Token bucket algorithm
+  def init(opts) do
+    state = %{
+      tokens: opts[:max_tokens],
+      max_tokens: opts[:max_tokens],
+      refill_rate: opts[:refill_rate],  # tokens per second
+    }
+
+    schedule_refill()
+    {:ok, state}
+  end
+
+  def handle_call(:acquire, _from, state) do
+    if state.tokens > 0 do
+      {:reply, :ok, %{state | tokens: state.tokens - 1}}
+    else
+      {:reply, {:error, :rate_limit_exceeded}, state}
+    end
+  end
+
+  defp handle_info(:refill, state) do
+    new_tokens = min(state.tokens + state.refill_rate, state.max_tokens)
+    schedule_refill()
+    {:noreply, %{state | tokens: new_tokens}}
+  end
+end
+----
+
+== Execution Safety
+
+**Guarantee:** Least privilege, sandboxing, capability-based security.
+
+=== Capability-Based Security
+
+[source,elixir]
+----
+defmodule VeriSim.Capability do
+  @type capability :: :read | :write | :execute | :admin
+
+  def check_capability(user, hexad_id, required_cap) do
+    user_caps = get_capabilities(user, hexad_id)
+
+    if required_cap in user_caps do
+      :ok
+    else
+      {:error, {:insufficient_capability, required_cap}}
+    end
+  end
+end
+
+# Usage
+case Capability.check_capability(user, hexad_id, :write) do
+  :ok -> update_hexad(hexad_id, new_data)
+  {:error, reason} -> {:error, reason}
+end
+----
+
+=== Sandboxed Query Execution
+
+[source,rust]
+----
+// Execute queries in isolated environment
+use nix::unistd;
+use nix::sched::{clone, CloneFlags};
+
+fn execute_sandboxed(query: &str) -> Result<QueryResult, QueryError> {
+    // Create new PID namespace (isolated process tree)
+    // Create new NET namespace (no network access unless explicitly granted)
+    // Create new MOUNT namespace (isolated filesystem view)
+
+    let flags = CloneFlags::CLONE_NEWPID
+        | CloneFlags::CLONE_NEWNET
+        | CloneFlags::CLONE_NEWNS;
+
+    // Child process executes query in sandbox
+    match unsafe { clone(Box::new(|| {
+        drop_privileges()?;
+        execute_query_internal(query)
+    }), flags) } {
+        Ok(pid) => wait_for_child(pid),
+        Err(e) => Err(QueryError::SandboxError(e.to_string()))
+    }
+}
+
+fn drop_privileges() -> Result<(), nix::Error> {
+    // Drop to non-root user
+    unistd::setuid(unistd::Uid::from_raw(1000))?;
+    unistd::setgid(unistd::Gid::from_raw(1000))?;
+    Ok(())
+}
+----
+
+=== SELinux/AppArmor Policies
+
+[source,text]
+----
+# AppArmor profile for verisim-api
+/usr/local/bin/verisim-api {
+  # Read-only access to config
+  /etc/verisim/** r,
+
+  # Read-write access to data directory
+  /var/lib/verisim/** rw,
+
+  # Network access
+  network inet stream,
+  network inet6 stream,
+
+  # Deny everything else
+  deny /** wx,
+}
+----
+
+== Driver Safety
+
+**Guarantee:** Safe interaction with external systems (databases, networks, devices).
+
+=== Database Connection Pooling
+
+[source,elixir]
+----
+# Connection pools prevent resource exhaustion
+config :verisim, VeriSim.Repo,
+  pool_size: 10,              # Max 10 concurrent connections
+  queue_target: 50,            # Target queue time (ms)
+  queue_interval: 1000,        # Check queue every second
+  timeout: 15_000,             # Query timeout
+  connect_timeout: 5_000       # Connection timeout
+----
+
+=== Network Timeouts
+
+[source,rust]
+----
+use reqwest::Client;
+use std::time::Duration;
+
+fn create_http_client() -> Client {
+    Client::builder()
+        .timeout(Duration::from_secs(10))
+        .connect_timeout(Duration::from_secs(5))
+        .pool_max_idle_per_host(10)
+        .build()
+        .unwrap()
+}
+----
+
+=== Device Access Control
+
+[source,elixir]
+----
+defmodule VeriSim.DiskAccess do
+  @allowed_paths [
+    "/var/lib/verisim",
+    "/tmp/verisim"
+  ]
+
+  def read_file(path) do
+    if is_safe_path?(path) do
+      File.read(path)
+    else
+      {:error, {:access_denied, path}}
+    end
+  end
+
+  defp is_safe_path?(path) do
+    canonical = Path.expand(path)
+
+    Enum.any?(@allowed_paths, fn allowed ->
+      String.starts_with?(canonical, allowed)
+    end)
+  end
+end
+----
+
+== Process Safety
+
+**Guarantee:** Process isolation, crash containment, message passing without shared memory.
+
+=== BEAM Process Model
+
+[source,text]
+----
+┌──────────────────────────────────────────────────────┐
+│  Process A          Process B          Process C     │
+│  ┌──────────┐      ┌──────────┐      ┌──────────┐  │
+│  │ Mailbox  │      │ Mailbox  │      │ Mailbox  │  │
+│  │ [msg1]   │      │ [msg3]   │      │          │  │
+│  │ [msg2]   │      │          │      │          │  │
+│  └────┬─────┘      └────┬─────┘      └────┬─────┘  │
+│       │                 │                 │         │
+│  ┌────▼─────┐      ┌────▼─────┐      ┌────▼─────┐  │
+│  │  Heap    │      │  Heap    │      │  Heap    │  │
+│  │  (private)│      │ (private)│      │ (private)│  │
+│  └──────────┘      └──────────┘      └──────────┘  │
+│                                                      │
+│  NO SHARED MEMORY - messages copied between heaps   │
+└──────────────────────────────────────────────────────┘
+----
+
+**Guarantees:**
+
+- Process crashes don't affect other processes
+- No data races (no shared memory)
+- Message passing is safe (deep copy)
+- Each process has independent garbage collection
+
+=== Link and Monitor
+
+[source,elixir]
+----
+# Link: Bidirectional crash propagation (for tightly coupled processes)
+defmodule Parent do
+  def start_child do
+    pid = spawn_link(Child, :run, [])  # If child crashes, parent crashes too
+    pid
+  end
+end
+
+# Monitor: Unidirectional notification (supervisor pattern)
+defmodule Supervisor do
+  def start_child do
+    {pid, ref} = spawn_monitor(Child, :run, [])
+
+    receive do
+      {:DOWN, ^ref, :process, ^pid, reason} ->
+        Logger.warn("Child process #{inspect(pid)} died: #{inspect(reason)}")
+        restart_child()
+    end
+  end
+end
+----
+
+=== Crash Reports
+
+[source,elixir]
+----
+defmodule VeriSim.CrashLogger do
+  require Logger
+
+  def log_crash(pid, reason, stacktrace) do
+    crash_report = %{
+      timestamp: DateTime.utc_now(),
+      pid: inspect(pid),
+      reason: inspect(reason),
+      stacktrace: Exception.format_stacktrace(stacktrace),
+      memory: :erlang.process_info(pid, :memory),
+      message_queue_len: :erlang.process_info(pid, :message_queue_len)
+    }
+
+    Logger.error("Process crash: #{inspect(crash_report)}")
+
+    # Write to verisim-temporal for audit trail
+    VeriSim.Temporal.append_audit_log("crashes", crash_report)
+  end
+end
+----
+
+== Program Safety
+
+**Guarantee:** Type safety, formal verification (ZKP), contract-based programming.
+
+=== ReScript Type Safety
+
+[source,rescript]
+----
+// Exhaustive pattern matching (compiler enforces)
+let handleResult = (result: result<data, error>) => {
+  switch result {
+  | Ok(data) => processData(data)
+  | Error(ParseError(e)) => logParseError(e)
+  | Error(TypeError(e)) => logTypeError(e)
+  | Error(RuntimeError(e)) => logRuntimeError(e)
+  // Compiler error if any case is missing!
+  }
+}
+
+// Phantom types for compile-time guarantees
+type verified<'a>
+type unverified<'a>
+
+let verify: query<unverified> => result<query<verified>, error>
+let execute: query<verified> => result<data, error>
+
+// Cannot execute unverified queries (type error!)
+let unsafeQuery: query<unverified> = parseQuery("...")
+// execute(unsafeQuery)  // TYPE ERROR: expected query<verified>
+
+let safeQuery: query<verified> = verify(unsafeQuery)->Belt.Result.getExn
+execute(safeQuery)  // OK
+----
+
+=== Contract Programming (Elixir Dialyzer)
+
+[source,elixir]
+----
+defmodule VeriSim.Hexad do
+  @type hexad_id :: String.t()
+  @type modality :: :graph | :vector | :tensor | :semantic | :document | :temporal
+
+  @spec get_hexad(hexad_id()) :: {:ok, map()} | {:error, atom()}
+  def get_hexad(hexad_id) when is_binary(hexad_id) do
+    # Implementation
+  end
+
+  # Dialyzer catches type mismatches at compile time
+  # get_hexad(123)  # WARNING: function expects binary, got integer
+end
+----
+
+=== ZKP Formal Verification
+
+[source,text]
+----
+Contract: CitationContract
+
+Precondition:
+  ∀ citation ∈ hexad.citations,
+    ∃ cited_hexad ∈ registry,
+      hexad.timestamp > cited_hexad.timestamp
+
+Postcondition:
+  proof ← generate_zkp(hexad, CitationContract)
+  verify_zkp(proof, public_inputs) = true
+
+Invariant:
+  Citations cannot reference future hexads
+----
+
+== Socio-Technical Safety
+
+**Guarantee:** Human factors considered, operational safety, governance.
+
+=== Human Error Prevention
+
+[cols="1,2,2"]
+|===
+|Hazard |Mitigation |Enforcement
+
+|**Accidental Data Deletion**
+|Soft delete + retention policy
+|Reversibility with time-travel queries
+
+|**Incorrect Access Control**
+|Principle of least privilege
+|Capability-based security, audit logs
+
+|**Deployment Errors**
+|Blue-green deployments
+|Rollback scripts, canary releases
+
+|**Configuration Mistakes**
+|Config validation + defaults
+|Nickel type system, schema validation
+
+|**Operational Burnout**
+|On-call rotation limits
+|Governance policy (max 1 week on-call)
+|===
+
+=== Operational Safety
+
+[source,text]
+----
+┌────────────────────────────────────────────────────┐
+│  OPERATIONAL SAFETY LAYERS                         │
+│                                                    │
+│  1. Monitoring & Alerting                         │
+│     ├─ Prometheus metrics                         │
+│     ├─ Grafana dashboards                         │
+│     └─ PagerDuty integration                      │
+│                                                    │
+│  2. Incident Response                             │
+│     ├─ Runbooks (step-by-step guides)            │
+│     ├─ Post-mortem process                        │
+│     └─ Blameless culture                          │
+│                                                    │
+│  3. Change Management                             │
+│     ├─ Change advisory board                      │
+│     ├─ Approval workflow                          │
+│     └─ Rollback procedures                        │
+│                                                    │
+│  4. Documentation                                 │
+│     ├─ Architecture decision records (ADRs)       │
+│     ├─ Deployment guides                          │
+│     └─ Troubleshooting guides                     │
+└────────────────────────────────────────────────────┘
+----
+
+=== Governance
+
+[source,adoc]
+----
+= VeriSimDB Governance
+
+== Decision-Making Process
+
+1. **Proposal** - Anyone can propose changes (RFC process)
+2. **Discussion** - Community feedback (minimum 1 week)
+3. **Vote** - Steering committee votes (simple majority)
+4. **Implementation** - Approved proposals merged
+5. **Review** - Post-deployment review (1 month)
+
+== Steering Committee
+
+- 5 members (elected annually)
+- Responsibilities:
+  * Approve major architectural changes
+  * Resolve conflicts
+  * Oversee security advisories
+
+== Security Advisory Process
+
+1. **Report** - security@verisimdb.org (private)
+2. **Triage** - Assess severity (CVSS score)
+3. **Patch** - Develop fix (private repo)
+4. **Coordinated Disclosure** - 90 days or when patched
+5. **Post-Mortem** - Public analysis after disclosure
+----
+
+=== Ethics & Privacy
+
+[cols="1,2"]
+|===
+|Principle |Implementation
+
+|**Data Minimization**
+|Only collect necessary data, ZKP for verification without disclosure
+
+|**Purpose Limitation**
+|Data used only for stated purpose, no secondary use without consent
+
+|**Transparency**
+|Audit logs public (privacy-preserving), open-source codebase
+
+|**User Control**
+|Users can export, delete, or restrict their data
+
+|**Security by Design**
+|End-to-end encryption, defense in depth
+|===
+
+== Safety Guarantees Summary
+
+[cols="1,1,2"]
+|===
+|Safety Dimension |Status |Key Mechanism
+
+|**Fault Tolerance**
+|✅ High
+|BEAM supervisors, automatic restart
+
+|**Self-Healing**
+|✅ High
+|Circuit breakers, drift repair, cache warming
+
+|**Memory Safety**
+|✅ Guaranteed
+|Rust ownership, Elixir immutability
+
+|**Kernel Safety**
+|✅ Strong
+|Process isolation, cgroups, seccomp
+
+|**Platform Safety**
+|✅ Good
+|Cross-platform testing, explicit endianness
+
+|**Supply Chain**
+|✅ Strong
+|Dependency auditing, pinning, SBOM
+
+|**System Safety**
+|✅ High
+|CRC checksums, fsync, redundant storage
+
+|**Runtime Safety**
+|✅ High
+|Resource limits, back pressure, preemptive scheduling
+
+|**Execution Safety**
+|✅ Strong
+|Capabilities, sandboxing, least privilege
+
+|**Driver Safety**
+|✅ Good
+|Connection pools, timeouts, access control
+
+|**Process Safety**
+|✅ Guaranteed
+|No shared memory, message passing, crash isolation
+
+|**Program Safety**
+|✅ Strong
+|Type safety, contracts, ZKP formal verification
+
+|**Socio-Technical**
+|✅ Evolving
+|Governance, ethics, operational safety culture
+|===
+
+== References
+
+- link:error-handling-strategy.adoc[Error Handling Strategy]
+- link:reversibility-design.adoc[Reversibility Design]
+- link:vql-architecture.adoc[VQL Architecture]
+- link:../lib/verisim/supervisor.ex[Supervisor Tree Implementation]
+- https://www.erlang.org/doc/design_principles/des_princ.html[OTP Design Principles]
+- https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html[Rust Ownership System]

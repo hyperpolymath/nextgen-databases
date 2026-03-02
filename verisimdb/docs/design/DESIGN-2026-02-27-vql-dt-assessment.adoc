@@ -1,0 +1,572 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VQL-DT (Dependent Type Path) Wiring Assessment
+:author: Jonathan D.A. Jewell (hyperpolymath)
+:date: 2026-02-27
+:repo: verisimdb
+:toc:
+:toclevels: 3
+
+== Executive Summary
+
+VQL-DT has *substantially more real implementation than initially expected*.
+The ReScript type checker and Rust proof/semantic layer are genuinely functional
+with real algorithms, tests, and meaningful code. However, the three layers
+(ReScript, Rust, Elixir) are **not wired together end-to-end**. Each layer
+works in isolation but the integration seams are broken or stubbed.
+
+[cols="1,1,1,1"]
+|===
+| Layer | Implementation | Integration | Assessment
+
+| ReScript VQL
+| ~85% real code
+| 0% connected to Elixir executor
+| *Impressive standalone work, needs integration*
+
+| Rust Proof/Semantic
+| ~90% real code
+| ~20% reachable from Elixir
+| *Strong foundation, partially exposed via API*
+
+| Elixir Orchestration
+| ~60% real code
+| ~15% calls Rust proof APIs
+| *Proof verification mostly stubbed*
+
+| Lean/Idris2 Type Checker
+| 0% — does not exist
+| N/A
+| *No formal type checker present*
+|===
+
+**Honest overall VQL-DT completion: ~35%** (individual components exist;
+end-to-end pipeline does not).
+
+== Layer-by-Layer Assessment
+
+=== 1. ReScript VQL Layer (`src/vql/`)
+
+==== What Is Actually Implemented (Real Working Code)
+
+[cols="1,3"]
+|===
+| File | Status
+
+| `VQLTypes.res` (296 lines)
+| *FULLY IMPLEMENTED.* Pi types, Sigma types, ProofType, ProvedResultType,
+  QueryResultType. Conversion functions between AST types and type-level types.
+  No stubs.
+
+| `VQLBidir.res` (841 lines)
+| *SUBSTANTIALLY IMPLEMENTED.* Real bidirectional type inference with
+  `synthesizeQuery` (9-step pipeline) and `checkQuery`. Handles proof clause
+  branching: Slipstream path returns `QueryResultType`, dependent-type path
+  calls `checkMultiProof` and returns `ProvedResultType`. Multi-proof
+  composition checks contract registry compatibility and mutual composability.
+  Mutation type checking (`synthesizeMutation`) covers INSERT/UPDATE/DELETE
+  with optional proofs.
+
+| `VQLParser.res` (1154 lines)
+| *FULLY IMPLEMENTED.* Complete parser combinator library. Handles PROOF
+  clause parsing (`proofClause`), dependent type mode detection
+  (`parseDependentType`), Slipstream rejection of PROOF (`parseSlipstream`).
+  Full mutation parsing. 48 tests in `VQLParser_test.res`.
+
+| `VQLContext.res` (228 lines)
+| *FULLY IMPLEMENTED.* Typing environment with bindings, contract registry,
+  modality field registries. Default context provides known fields per
+  modality. Contract composition checking.
+
+| `VQLSubtyping.res` (248 lines)
+| *5 of 6 rules implemented.* Rule 6 (Refinement subsumption) explicitly
+  DEFERRED with comment "needs SMT solver". ProvedResultType correctly
+  subtypes plain QueryResultType (can forget proof).
+
+| `VQLProofObligation.res` (252 lines)
+| *IMPLEMENTED with hardcoded circuit names.* Generates structured
+  `composedProofPlan` with composition strategies (Independent, Sequential,
+  Nested). Circuit names are hardcoded strings like "existence-proof-v1" —
+  these do NOT correspond to registered circuits in the Rust circuit registry.
+
+| `VQLCircuit.res` (72 lines)
+| *TYPE DEFINITIONS ONLY.* Circuit DSL types (gates, wires, constraints).
+  `parseCustomProof` is trivial — just converts params to a Dict.
+  `serializeCircuitDef` delegates to `Js.Json.stringifyAny`. No actual
+  circuit compilation or verification logic on the ReScript side.
+
+| `VQLError.res` (447 lines)
+| *FULLY IMPLEMENTED.* Comprehensive error hierarchy covering Phase 1
+  (dependent type errors), Phase 2 (cross-modal), Phase 3 (write path).
+
+| `VQLExplain.res` (427 lines)
+| *FULLY IMPLEMENTED.* Query plan visualization including proof obligation
+  nodes. Hardcoded cost estimates per modality (reasonable heuristics).
+
+| `VQLTypeChecker.res` (355 lines)
+| *FULLY IMPLEMENTED.* Thin facade over VQLBidir. Backward-compatible API.
+|===
+
+==== What Is Stubbed/Incomplete
+
+1. **VQLSubtyping Rule 6** — Refinement subsumption needs an SMT solver
+   (e.g., Z3 or CVC5). This is required for proving that a refined type
+   (with proof) is a subtype of another refined type.
+
+2. **VQLCircuit.res** — The circuit DSL is type definitions only. No
+   serialization to R1CS or compilation logic on the ReScript side. The Rust
+   `circuit_compiler.rs` has this functionality but it is not reachable from
+   ReScript.
+
+3. **Hardcoded circuit names** in VQLProofObligation.res — The function
+   `proofKindToCircuit` returns static strings that are not validated against
+   the Rust circuit registry.
+
+==== What Is Missing
+
+1. **No integration with Elixir executor.** The ReScript type checker runs
+   entirely client-side (in the browser or via Deno/Node). The Elixir VQL
+   executor comment says "Type-check if PROOF clause present (VQLTypeChecker
+   -> VQLBidir)" but this invocation never happens. The Elixir executor
+   parses VQL independently using its own built-in parser.
+
+2. **No proof generation triggered from type checker.** The type checker
+   produces a `ProvedResultType` and `composedProofPlan`, but these are not
+   sent anywhere for actual proof generation.
+
+=== 2. Rust Proof/Semantic Layer (`rust-core/verisim-semantic/`)
+
+==== What Is Actually Implemented (Real Working Code)
+
+[cols="1,3"]
+|===
+| File | Status
+
+| `lib.rs` (395 lines)
+| *FULLY IMPLEMENTED.* SemanticStore trait, ProofBlob with CBOR
+  serialization/deserialization, InMemorySemanticStore with type registration,
+  annotation validation, proof storage. `ProofBlob::verify()` attempts ZKP
+  `VerifiableProofData` decoding with graceful legacy fallback.
+
+| `zkp.rs` (368 lines)
+| *FULLY IMPLEMENTED.* Real SHA-256 hash commitments, Merkle tree
+  construction (`build_merkle_tree`), Merkle proof generation
+  (`generate_merkle_proof`) and verification (`verify_merkle_proof`).
+  `VerifiableProofData` enum with Commitment, Reveal, MerkleInclusion,
+  ContentIntegrity variants. Constant-time byte comparison. 12 tests.
+
+| `zkp_bridge.rs` (629 lines)
+| *SUBSTANTIALLY IMPLEMENTED but NOT true ZK-SNARKs.* Privacy-level routing
+  (Public/Private/ZeroKnowledge). ZeroKnowledge path uses blinded Merkle
+  proofs with committed witnesses — this is a real cryptographic commitment
+  scheme but NOT actual zero-knowledge proofs. Comments acknowledge this:
+  "Full ZK-SNARK via sanctify is designed but not yet compiled in" (line 49)
+  and "Full ZK verification would invoke a ZK-SNARK verifier here" (line
+  337). Nonce generation is deterministic (NOT cryptographically secure).
+  11 tests.
+
+| `circuit_registry.rs` (314 lines)
+| *FULLY IMPLEMENTED.* In-memory circuit registry with RwLock. R1CS
+  constraint system (`R1CSConstraint { a, b, c }` where A * B = C).
+  `CompiledCircuit::verify` evaluates constraints against witness/public
+  inputs. Full CRUD API. Tests pass.
+
+| `circuit_compiler.rs` (297 lines)
+| *FULLY IMPLEMENTED.* Compiles circuit definitions into R1CS constraints.
+  Handles AND, OR, XOR, NOT, LinearCombination gate types. Generates
+  verification keys from SHA-256 Merkle commitment over constraints.
+
+| `verification_keys.rs` (247 lines)
+| *FULLY IMPLEMENTED.* Key management with rotation support (active +
+  previous key). Federation key export/import with instance-prefixed naming.
+  Expiry checking. Tests pass.
+
+| `proven_bridge.rs` (278 lines)
+| *FULLY IMPLEMENTED for certificate parsing.* Parses JSON/CBOR certificates
+  from the `proven` library. ProverKind enum (Z3, Lean, Coq, Agda, Idris2,
+  Custom). Certificate verification: checks version, signature (SHA-256 of
+  prover+statement+proof_term), timestamp. Converts certificates to
+  ProofBlob. BUT: the `proven` library itself is NOT integrated — this
+  bridge only consumes pre-existing certificates.
+
+| `sanctify_bridge.rs` (414 lines)
+| *FULLY IMPLEMENTED.* Parses sanctify-php security reports, security issue
+  types, severity levels, contract validation, proof blob conversion.
+  Tangential to VQL-DT but functional.
+|===
+
+==== What Is Stubbed/Incomplete
+
+1. **No actual ZK-SNARK backend.** The `zkp_bridge.rs` uses hash
+   commitments and Merkle proofs as an approximation. True zero-knowledge
+   proofs (Groth16, PLONK, etc.) are not implemented.
+
+2. **Deterministic nonce generation** in `zkp_bridge.rs` (line 349-350):
+   `"In production, replace with a CSPRNG."` This means ZKP proofs are
+   currently NOT cryptographically secure.
+
+3. **No connection to external proof assistants.** The `proven_bridge.rs`
+   parses certificates that would be generated by the `proven` library (an
+   Idris2-based ZKP system), but `proven` is not integrated or invoked. The
+   bridge is a one-way importer for externally-generated certificates.
+
+==== What Is Exposed via API
+
+The Rust API (`verisim-api/src/lib.rs`) exposes three proof endpoints:
+
+- `POST /proofs/generate` — calls `zkp_api::generate_zkp()` (hash
+  commitments/Merkle proofs, not ZK-SNARKs)
+- `POST /proofs/verify` — calls `zkp_api::verify_zkp()`
+- `POST /proofs/generate-with-circuit` — calls
+  `zkp_api::generate_zkp_with_circuit()` (circuit registry integration)
+
+These endpoints are REAL and functional. The Elixir executor calls the first
+two for `:zkp` and `:proven` proof types.
+
+==== What Is NOT Exposed
+
+The Rust VQL endpoint (`vql.rs`) is a **Slipstream-only parser**. It handles
+SELECT, SEARCH, INSERT, DELETE, SHOW, COUNT, EXPLAIN but has *zero PROOF
+clause handling*. Any VQL query with a PROOF clause sent to the Rust VQL
+endpoint would fail or be silently ignored.
+
+=== 3. Elixir Orchestration Layer (`elixir-orchestration/lib/verisim/query/`)
+
+==== What Is Actually Implemented
+
+[cols="1,3"]
+|===
+| File | Status
+
+| `vql_bridge.ex` (672 lines)
+| *IMPLEMENTED with degraded fallback.* GenServer managing a Deno/Node
+  subprocess that runs compiled ReScript VQL parser. Falls back to built-in
+  Elixir parser when subprocess unavailable. `parse_dependent/2` exists but
+  the fallback parser only collects PROOF tokens as raw strings, not
+  structured proof specs.
+
+| `vql_executor.ex` (~1000 lines)
+| *PARTIALLY IMPLEMENTED.* Full SELECT/INSERT/UPDATE/DELETE execution,
+  cross-modal condition evaluation (DRIFT, CONSISTENT, EXISTS/NOT EXISTS
+  between modalities), pagination, ORDER BY, GROUP BY, aggregates. BUT: proof
+  verification is **largely stubbed** (see below).
+
+| `query_router.ex` (187 lines)
+| *IMPLEMENTED.* Routes queries by type (:text, :vector, :graph, :semantic,
+  :temporal, :multi) to RustClient. No VQL-DT-specific logic.
+|===
+
+==== The Critical Proof Verification Gap
+
+The `verify_single_proof/1` function in `vql_executor.ex` (lines 514-592)
+reveals the core disconnect:
+
+[source,elixir]
+----
+# What each proof type ACTUALLY does:
+
+:existence   -> :ok                          # Stub — always passes
+:citation    -> validate_contract_exists()   # Text search for contract name
+:access      -> :ok                          # Stub — always passes
+:integrity   -> text search for contract     # Superficial check
+:provenance  -> :ok                          # Stub — always passes
+:custom      -> validate_contract_exists()   # Text search for contract name
+:zkp         -> RustClient.post("/proofs/generate", ...) # REAL call to Rust
+:proven      -> RustClient.post("/proofs/generate", ...) # REAL call to Rust
+:sanctify    -> validate_contract_exists()   # Text search for contract name
+----
+
+Out of 9 proof types, **only 2 actually call the Rust ZKP API**.
+
+Furthermore, `validate_contract_exists/1` (line 626-638) has a critical
+safety bypass:
+
+[source,elixir]
+----
+{:error, _} ->
+  # If search fails (e.g., Rust core unavailable), allow proof to pass
+  # with a warning — this prevents query failures during development
+  Logger.warning("Cannot verify contract '#{contract_name}': semantic store unreachable")
+  :ok  # <-- SILENTLY PASSES when Rust is down
+----
+
+This means even the contract existence checks are unreliable — if the Rust
+core is down, ALL proof verification silently passes.
+
+==== What The Elixir Executor Does NOT Do
+
+1. Does **not invoke the ReScript bidirectional type checker**
+2. Does **not type-check VQL-DT queries** (only the ReScript layer does this,
+   client-side)
+3. Does **not generate actual proof obligations** from PROOF clauses (only the
+   ReScript `VQLProofObligation.res` does this, client-side)
+4. Does **not verify circuit constraints** via the Rust circuit registry
+5. Does **not call the circuit compilation endpoint** (`/proofs/generate-with-circuit`)
+6. Does **not verify proven certificates** (calls `/proofs/generate` instead,
+   which generates new hash commitments rather than verifying existing
+   certificates)
+
+=== 4. Lean/Idris2 Type Checker
+
+**Does not exist.** The Idris2 files found in `src/abi/` (Types.idr,
+Layout.idr, Foreign.idr) are standard ABI definitions for VeriSimDB's FFI
+layer, not VQL type checkers. No `.lean` files exist anywhere in the
+repository.
+
+The CLAUDE.md Known Issues section acknowledges: "VQL-DT not connected to VQL
+PROOF runtime (Lean type checker not invoked)." This is accurate — no Lean
+type checker has been written.
+
+== Integration Gap Analysis
+
+=== Disconnected Seams
+
+[cols="1,1,1"]
+|===
+| From | To | Status
+
+| ReScript type checker
+| Elixir executor
+| *BROKEN.* Executor never invokes type checker.
+
+| ReScript proof obligations
+| Rust ZKP bridge
+| *BROKEN.* Obligations are generated client-side but never sent to Rust.
+
+| ReScript circuit DSL
+| Rust circuit compiler
+| *BROKEN.* Circuit definitions cannot reach the compiler.
+
+| Elixir executor proof verify
+| Rust circuit registry
+| *BROKEN.* Executor never calls `/proofs/generate-with-circuit`.
+
+| Elixir executor
+| Rust VQL endpoint
+| *PARTIAL.* The Rust VQL endpoint has no PROOF handling.
+
+| proven library (external)
+| Rust proven_bridge
+| *BROKEN.* proven is not integrated; bridge only imports certificates.
+
+| Rust ZKP bridge
+| Real ZK-SNARK backend
+| *MISSING.* Only hash commitments, no real ZK-SNARKs.
+|===
+
+=== Data Flow: What Should Happen vs What Actually Happens
+
+**Intended VQL-DT data flow:**
+[source]
+----
+Client sends VQL with PROOF clause
+  -> Elixir executor receives query
+  -> ReScript type checker validates types + generates proof obligations
+  -> Proof obligations sent to Rust ZKP bridge
+  -> Rust generates real ZK proofs (SNARKs)
+  -> Proofs stored in semantic store
+  -> Results returned with proof certificate (ProvedResultType)
+----
+
+**What actually happens today:**
+[source]
+----
+Client sends VQL with PROOF clause
+  -> Elixir executor receives query (via fallback parser)
+  -> PROOF tokens collected as raw strings
+  -> verify_single_proof() called per spec
+  -> Most proof types return :ok (stub) or do text search
+  -> :zkp/:proven types call Rust /proofs/generate
+  -> Rust generates hash commitments (NOT ZK-SNARKs)
+  -> Query results returned WITHOUT proof certificate
+  -> ReScript type checker never invoked
+  -> ProvedResultType never constructed server-side
+----
+
+== Scope of Remaining Work
+
+=== Priority 1: Wire ReScript Type Checker to Elixir Executor (HIGH)
+
+**Effort: 3-5 days**
+
+The ReScript type checker is the most complete component but is entirely
+disconnected. Wire it:
+
+1. Ensure `vql_bridge.ex` reliably spawns the ReScript parser process (or
+   compile ReScript to a standalone binary via Deno).
+2. Add a `typecheck/2` function to `vql_bridge.ex` that sends the parsed AST
+   to the ReScript type checker and receives back:
+   - Inferred types
+   - Proof obligations (from `VQLProofObligation.res`)
+   - Composition strategy
+3. In `vql_executor.ex`, after parsing a query with PROOF clause, call the
+   type checker before executing.
+4. Use the returned proof obligations to drive actual proof generation
+   (Priority 2).
+
+=== Priority 2: Connect Proof Obligations to Rust ZKP Bridge (HIGH)
+
+**Effort: 2-3 days**
+
+Replace the stubbed `verify_single_proof/1` with real proof generation:
+
+1. For each proof obligation from the type checker, construct a proper
+   `ZkpBridgeRequest` and call the Rust API.
+2. Use `/proofs/generate-with-circuit` for Custom proof types (requires
+   circuit name resolution).
+3. Store generated proofs in the semantic store via `POST /proofs/store`
+   (this endpoint may need to be added to the Rust API).
+4. Return proofs alongside query results.
+
+=== Priority 3: Implement Real Proof Verification in Executor (MEDIUM)
+
+**Effort: 2-3 days**
+
+1. Replace `:existence`, `:access`, `:provenance` stubs with actual checks
+   (query the hexad store, check access policies, verify provenance chain).
+2. Remove the silent-pass-on-error in `validate_contract_exists/1`.
+3. For `:proven` type, call the proven bridge's certificate verification
+   rather than generating new hash commitments.
+4. For `:sanctify` type, call the sanctify bridge's contract validation.
+
+=== Priority 4: VQLSubtyping Rule 6 — Refinement Subsumption (MEDIUM)
+
+**Effort: 3-5 days (significant)**
+
+Requires integrating an SMT solver (Z3 or CVC5) to prove refinement subtyping
+relationships. Options:
+
+1. **Z3 via WASM** — Run Z3 in the browser/Deno alongside the ReScript type
+   checker. Heaviest but most powerful.
+2. **Z3 via Rust binding** — Add `z3-sys` crate to `verisim-semantic` and
+   expose an endpoint. Requires linking to Z3's C library.
+3. **Simplified refinement checking** — Implement a subset of refinement
+   subsumption without a full SMT solver (handles common cases).
+
+=== Priority 5: Real ZK-SNARK Backend (LOW — significant scope)
+
+**Effort: 2-4 weeks**
+
+The current hash commitment + Merkle proof approach is NOT zero-knowledge.
+To get real ZK-SNARKs:
+
+1. Integrate a Rust ZK library (`bellman`, `arkworks`, or `halo2`).
+2. Implement Groth16 or PLONK proving/verification.
+3. Replace the blinded Merkle proof approximation in `zkp_bridge.rs`.
+4. Fix the deterministic nonce generation with a CSPRNG.
+5. Update circuit compiler to emit actual ZK circuits.
+
+=== Priority 6: Lean/Idris2 Formal Type Checker (LOW — aspirational)
+
+**Effort: 4-8 weeks**
+
+The CLAUDE.md mentions a Lean type checker but none exists. Building one would
+mean:
+
+1. Define VQL-DT's type system in Lean 4 or Idris2.
+2. Implement bidirectional type checking with dependent types.
+3. Generate proof obligations as Lean/Idris2 terms.
+4. Verify proof obligations against the type system.
+5. Bridge to Rust/Elixir for runtime integration.
+
+This is the most ambitious item and may not be necessary if the ReScript type
+checker is sufficient for practical use.
+
+== Honest Completion Percentages
+
+[cols="1,1,1,1"]
+|===
+| Component | Code Written | Code Working | End-to-End Wired
+
+| ReScript VQL Parser
+| 95%
+| 95%
+| 0%
+
+| ReScript Type Checker (VQLBidir)
+| 85%
+| 85%
+| 0%
+
+| ReScript Proof Obligations
+| 80%
+| 80%
+| 0%
+
+| Rust ZKP Core (zkp.rs)
+| 90%
+| 90%
+| 20%
+
+| Rust ZKP Bridge (privacy levels)
+| 85%
+| 85%
+| 20%
+
+| Rust Circuit Registry + Compiler
+| 90%
+| 90%
+| 0%
+
+| Rust Proven Bridge
+| 90%
+| 90%
+| 0%
+
+| Rust Verification Keys
+| 90%
+| 90%
+| 0%
+
+| Elixir VQL Bridge
+| 70%
+| 70%
+| 40%
+
+| Elixir VQL Executor (proof path)
+| 30%
+| 30%
+| 15%
+
+| Real ZK-SNARK Backend
+| 0%
+| 0%
+| 0%
+
+| Lean/Idris2 Type Checker
+| 0%
+| 0%
+| 0%
+
+| *Overall VQL-DT Pipeline*
+| *~60%*
+| *~55%*
+| *~10%*
+|===
+
+NOTE: "Code Written" and "Code Working" are high because real algorithms are
+implemented and tests pass. "End-to-End Wired" is abysmal because the layers
+do not talk to each other for the VQL-DT path.
+
+== Key Takeaways
+
+1. **The individual components are much better than expected.** The ReScript
+   type checker is a real bidirectional type checker with dependent types. The
+   Rust proof layer has real cryptographic primitives. Neither is stub code.
+
+2. **The integration is much worse than expected.** The three layers operate
+   as isolated islands. The Elixir executor's proof verification is the weakest
+   link — it's largely hardcoded `:ok` returns.
+
+3. **The shortest path to a working VQL-DT pipeline** is wiring the ReScript
+   type checker to the Elixir executor (Priority 1) and connecting proof
+   obligations to the Rust ZKP bridge (Priority 2). This would give ~60%
+   end-to-end functionality in roughly 1-2 weeks of focused work.
+
+4. **Real ZK-SNARKs are a separate, larger project.** The current hash
+   commitment approach is functional for demonstration and development but
+   provides no actual zero-knowledge properties. This is the honest truth.
+
+5. **The Lean type checker is aspirational.** The ReScript type checker is
+   capable enough for practical VQL-DT use. A Lean version would provide
+   formal verification guarantees but is not blocking functionality.

@@ -1,0 +1,604 @@
+{
+  "program_path": ".",
+  "language": "elixir",
+  "frameworks": [
+    "WebServer",
+    "Phoenix",
+    "OTP",
+    "Database"
+  ],
+  "weak_points": [
+    {
+      "category": "AtomExhaustion",
+      "location": "config/runtime.exs",
+      "severity": "High",
+      "description": "2 String.to_atom calls in config/runtime.exs (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/har/control_plane/routing_table.ex",
+      "severity": "High",
+      "description": "3 String.to_atom calls in lib/har/control_plane/routing_table.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/har/data_plane/parsers/ansible.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/har/data_plane/parsers/ansible.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/har/data_plane/parsers/chef.ex",
+      "severity": "High",
+      "description": "7 String.to_atom calls in lib/har/data_plane/parsers/chef.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/har/data_plane/parsers/kubernetes.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/har/data_plane/parsers/kubernetes.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/har/data_plane/parsers/pulumi.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/har/data_plane/parsers/pulumi.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/har/data_plane/parsers/puppet.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/har/data_plane/parsers/puppet.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/har/data_plane/parsers/salt.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/har/data_plane/parsers/salt.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/har/data_plane/parsers/terraform.ex",
+      "severity": "High",
+      "description": "2 String.to_atom calls in lib/har/data_plane/parsers/terraform.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/har/application.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/har/application.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "lib/har_web/components/core_components.ex",
+      "severity": "Medium",
+      "description": "5 HTTP (non-HTTPS) URLs in lib/har_web/components/core_components.ex",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "lib/har_web/live/graph_live.ex",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in lib/har_web/live/graph_live.ex",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/mix/tasks/har.convert.ex",
+      "severity": "High",
+      "description": "3 String.to_atom calls in lib/mix/tasks/har.convert.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/mix/tasks/har.parse.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/mix/tasks/har.parse.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/mix/tasks/har.transform.ex",
+      "severity": "High",
+      "description": "5 String.to_atom calls in lib/mix/tasks/har.transform.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "lib/har_web.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in lib/har_web.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 15984,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 12,
+    "threading_constructs": 6
+  },
+  "file_statistics": [
+    {
+      "file_path": "lib/har/control_plane/health_checker.ex",
+      "lines": 269,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/har/control_plane/policy_engine.ex",
+      "lines": 337,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/har/control_plane/routing_table.ex",
+      "lines": 205,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/har/ipfs/node.ex",
+      "lines": 46,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/har/security/manager.ex",
+      "lines": 60,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/har/web/endpoint.ex",
+      "lines": 38,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/mix/tasks/har.convert.ex",
+      "lines": 165,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/mix/tasks/har.parse.ex",
+      "lines": 156,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/mix/tasks/har.transform.ex",
+      "lines": 138,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "deploy/run.sh",
+      "lines": 221,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "disk",
+    "cpu",
+    "concurrency",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "lib/har/control_plane/health_checker.ex",
+        "to": "lib/har/control_plane/policy_engine.ex",
+        "relation": "shared_dir:lib/har/control_plane",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/har/control_plane/policy_engine.ex",
+        "to": "lib/har/control_plane/routing_table.ex",
+        "relation": "shared_dir:lib/har/control_plane",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.convert.ex",
+        "to": "lib/mix/tasks/har.parse.ex",
+        "relation": "shared_dir:lib/mix/tasks",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.parse.ex",
+        "to": "lib/mix/tasks/har.transform.ex",
+        "relation": "shared_dir:lib/mix/tasks",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/har/control_plane/health_checker.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/control_plane/health_checker.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/control_plane/health_checker.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/control_plane/health_checker.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/control_plane/policy_engine.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/control_plane/policy_engine.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/control_plane/policy_engine.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/control_plane/policy_engine.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/control_plane/routing_table.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/control_plane/routing_table.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/control_plane/routing_table.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/control_plane/routing_table.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/ipfs/node.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/ipfs/node.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/ipfs/node.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/ipfs/node.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/security/manager.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/security/manager.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/security/manager.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/security/manager.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/web/endpoint.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/web/endpoint.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/web/endpoint.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/har/web/endpoint.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/mix/tasks/har.convert.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.convert.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.convert.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.convert.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.parse.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.parse.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.parse.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.parse.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.transform.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.transform.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.transform.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mix/tasks/har.transform.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/run.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/run.sh",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/run.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "deploy/run.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "AtomExhaustion",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "config/runtime.exs",
+          "lib/har/control_plane/routing_table.ex",
+          "lib/har/data_plane/parsers/ansible.ex",
+          "lib/har/data_plane/parsers/chef.ex",
+          "lib/har/data_plane/parsers/kubernetes.ex",
+          "lib/har/data_plane/parsers/pulumi.ex",
+          "lib/har/data_plane/parsers/puppet.ex",
+          "lib/har/data_plane/parsers/salt.ex",
+          "lib/har/data_plane/parsers/terraform.ex",
+          "lib/har/application.ex",
+          "lib/mix/tasks/har.convert.ex",
+          "lib/mix/tasks/har.parse.ex",
+          "lib/mix/tasks/har.transform.ex"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Phoenix",
+          "OTP",
+          "Database"
+        ],
+        "relation": "AtomExhaustion->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "lib/har_web.ex"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Phoenix",
+          "OTP",
+          "Database"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "lib/har_web/components/core_components.ex",
+          "lib/har_web/live/graph_live.ex"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Phoenix",
+          "OTP",
+          "Database"
+        ],
+        "relation": "InsecureProtocol->Network"
+      }
+    ]
+  }
+}

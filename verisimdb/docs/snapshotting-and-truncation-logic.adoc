@@ -1,0 +1,77 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= VeriSimDB: Snapshotting & Truncation Logic
+
+To maintain the "Tiny Core" mandate, VeriSimDB uses a KRaft-inspired snapshotting mechanism. This prevents the append-only metadata log from growing indefinitely.
+
+== 1. The Trigger Mechanism
+
+The Elixir Orchestrator monitors the log size. Once the log reaches a configurable threshold (e.g., 10,000 entries or 10MB), a snapshot is initiated.
+
+[source,elixir]
+----
+defmodule VeriSim.Registry.Snapshotter do
+  @doc """
+  Initiates a snapshot of the current FSM state.
+  """
+  def take_snapshot(state_machine_pid) do
+    # 1. Capture the current state from the Raft FSM
+    state = Raft.get_state(state_machine_pid)
+
+    # 2. Serialize to CBOR (compact binary format)
+    snapshot_data = CBOR.encode(state)
+
+    # 3. Calculate the metadata for the snapshot
+    meta = %{
+      last_included_index: Raft.get_last_index(state_machine_pid),
+      last_included_term: Raft.get_last_term(state_machine_pid)
+    }
+
+    # 4. Save to disk/store and truncate the log
+    Raft.commit_snapshot(state_machine_pid, meta, snapshot_data)
+  end
+end
+----
+
+== 2. Log Truncation
+
+Once the snapshot is successfully written and acknowledged by the Quorum:
+
+* All log entries preceding `last_included_index` are deleted.
+* Memory is freed.
+* Any new node joining the cluster downloads the snapshot first, then catches up on the few remaining log entries.
+
+== 3. Structural ASCII Overview
+
+=== System Architecture
+
+----
+[ Client (WASM SDK) ]
+        |
+        | (1) Signed Request (sactify-php)
+        v
+[ WASM Proxy Node ] <---- (2) Trust Window Lookup ----> [ Elixir Orchestrator ]
+        |                                                        |
+        | (3) Multi-Modality Fetch                               | (4) Drift Check
+        |                                                        |
+        +------------+-------------+-------------+               |
+        |            |             |             |               v
+[ Store A ]    [ Store B ]   [ Store C ]   [ Store D ] <--- [ Registry Quorum ]
+ (Graph)       (Vector)      (Tensor)      (Semantic)       (KRaft Consistency)
+----
+
+=== Sequence Flow: Registration
+
+----
+Client          WASM Proxy        Controller Quorum       Store (Rust)
+  |                 |                    |                    |
+  |---(Sign/Auth)-->|                    |                    |
+  |                 |---(Propose)------->|                    |
+  |                 |                    |--[ Consensusing ]--|
+  |                 |                    |                    |
+  |                 |<--(Commit/Ack)-----|                    |
+  |                 |                    |                    |
+  |                 |---(Distribute)------------------------->|
+  |                 |                    |                    |
+  |<---(201 Created)|                    |                    |
+----

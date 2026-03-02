@@ -1,0 +1,157 @@
+; SPDX-License-Identifier: PMPL-1.0-or-later
+;
+; 0-AI-MANIFEST.a2ml — AI-readable manifest for VeriSimDB test infrastructure
+;
+; This file is the universal entry point for ALL AI agents working with
+; the VeriSimDB integration test database stack.
+;
+; Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+
+(ai-manifest
+  (version "1.0")
+  (name "verisimdb-test-infra")
+  (purpose "Integration test database stack for VeriSimDB federation adapters")
+
+  ;; =========================================================================
+  ;; Canonical file locations
+  ;; =========================================================================
+
+  (canonical-locations
+    (compose-file "connectors/test-infra/compose.toml")
+    (containerfiles "connectors/test-infra/images/Containerfile.*")
+    (seed-scripts "connectors/test-infra/seed/")
+    (build-script "connectors/test-infra/ct-build.sh")
+    (cerro-torre-manifest "connectors/test-infra/manifest.toml")
+    (gatekeeper-policy "connectors/test-infra/.gatekeeper.yaml")
+    (vordr-config "connectors/test-infra/vordr.toml")
+    (k9-deploy "connectors/test-infra/deploy.k9.ncl"))
+
+  ;; =========================================================================
+  ;; Critical invariants — rules that must NEVER be violated
+  ;; =========================================================================
+
+  (invariants
+    (rule "All custom Containerfiles use cgr.dev/chainguard/wolfi-base:latest as base")
+    (rule "All containers run as non-root users")
+    (rule "Test images are NEVER signed (--no-sign flag in ct-build.sh)")
+    (rule "No production credentials in seed scripts — test-only passwords")
+    (rule "DuckDB and SQLite are NOT in this stack — they are embedded databases tested via unit tests")
+    (rule "MinIO API port is remapped to 9002 to avoid conflict with ClickHouse native port 9000")
+    (rule "Use Containerfile NOT Dockerfile")
+    (rule "Use Podman NOT Docker"))
+
+  ;; =========================================================================
+  ;; Available databases and ports
+  ;; =========================================================================
+
+  (services
+    (service
+      (name "mongodb")
+      (image "cgr.dev/chainguard/mongodb:latest")
+      (ports (port 27017 "MongoDB wire protocol"))
+      (purpose "Document store federation adapter")
+      (notes "Replica set rs0 for change streams. Seeds automatically on first start."))
+
+    (service
+      (name "redis-stack")
+      (image "verisimdb-test-redis-stack:latest (custom build)")
+      (ports (port 6379 "Redis protocol"))
+      (purpose "In-memory store with RediSearch + RedisJSON + RedisTimeSeries")
+      (notes "Modules compiled from source on wolfi-base."))
+
+    (service
+      (name "neo4j")
+      (image "verisimdb-test-neo4j:latest (custom build)")
+      (ports
+        (port 7474 "HTTP API + browser")
+        (port 7687 "Bolt protocol"))
+      (purpose "Graph database for graph modality federation")
+      (notes "Community edition with APOC plugin. Auth disabled for testing."))
+
+    (service
+      (name "clickhouse")
+      (image "verisimdb-test-clickhouse:latest (custom build)")
+      (ports
+        (port 8123 "HTTP interface")
+        (port 9000 "Native TCP protocol"))
+      (purpose "Columnar analytics for aggregate drift queries")
+      (notes "Static binary build. Default user has full access management."))
+
+    (service
+      (name "surrealdb")
+      (image "verisimdb-test-surrealdb:latest (custom build)")
+      (ports (port 8000 "HTTP + WebSocket API"))
+      (purpose "Multi-model database (document + graph)")
+      (notes "Runs in memory mode for tests — no persistence overhead."))
+
+    (service
+      (name "influxdb")
+      (image "verisimdb-test-influxdb:latest (custom build)")
+      (ports (port 8086 "HTTP API"))
+      (purpose "Time-series database for temporal modality federation")
+      (notes "Pre-configured org verisimdb, bucket metrics. Token: verisim-test-token-do-not-use-in-production"))
+
+    (service
+      (name "minio")
+      (image "cgr.dev/chainguard/minio:latest")
+      (ports
+        (port 9002 "S3 API (remapped from 9000)")
+        (port 9001 "Web console"))
+      (purpose "S3-compatible object storage for binary blob modalities")
+      (notes "Credentials: verisim / verisim-test-password. Console at http://localhost:9001")))
+
+  ;; =========================================================================
+  ;; How to start and stop the stack
+  ;; =========================================================================
+
+  (operations
+    (start
+      (step 1 "Build custom images" "cd connectors/test-infra && ./ct-build.sh")
+      (step 2 "Start stack" "cd connectors/test-infra && selur-compose up --detach")
+      (step 3 "Wait for health" "Wait ~30 seconds for all services to pass health checks")
+      (step 4 "Seed data" "Run seed scripts (see below)"))
+
+    (stop
+      (step 1 "Stop stack" "cd connectors/test-infra && selur-compose down")
+      (step 2 "Remove volumes" "cd connectors/test-infra && selur-compose down --volumes"))
+
+    (fallback
+      (note "If selur-compose is not installed, use podman-compose as fallback")))
+
+  ;; =========================================================================
+  ;; How to run seed scripts
+  ;; =========================================================================
+
+  (seeding
+    (note "MongoDB seeds automatically via /docker-entrypoint-initdb.d/init.js")
+    (script "redis-init.sh" "shell" "cd connectors/test-infra/seed && ./redis-init.sh")
+    (script "neo4j-init.cypher" "cypher" "cat connectors/test-infra/seed/neo4j-init.cypher | cypher-shell -a bolt://localhost:7687")
+    (script "clickhouse-init.sql" "sql" "clickhouse-client --multiquery < connectors/test-infra/seed/clickhouse-init.sql")
+    (script "surrealdb-init.surql" "surql" "cat connectors/test-infra/seed/surrealdb-init.surql | surreal sql --endpoint http://localhost:8000 --ns verisimdb --db test")
+    (script "influxdb-init.sh" "shell" "cd connectors/test-infra/seed && ./influxdb-init.sh")
+    (script "minio-init.sh" "shell" "cd connectors/test-infra/seed && ./minio-init.sh"))
+
+  ;; =========================================================================
+  ;; How to run integration tests
+  ;; =========================================================================
+
+  (testing
+    (rust "cd rust-core && cargo test --test integration -- --test-threads=1")
+    (elixir "cd elixir-orchestration && mix test test/integration")
+    (note "Integration tests expect the full stack to be running and seeded")
+    (note "Use --test-threads=1 for Rust to avoid port contention"))
+
+  ;; =========================================================================
+  ;; Dependencies
+  ;; =========================================================================
+
+  (dependencies
+    (required "Podman" "Container runtime — 4.0+ recommended")
+    (required "selur-compose OR podman-compose" "Container orchestration")
+    (optional "ct" "Cerro-torre CLI for .ctp bundle packaging")
+    (optional "redis-cli" "For running redis-init.sh seed script")
+    (optional "cypher-shell" "For running neo4j-init.cypher seed script")
+    (optional "clickhouse-client" "For running clickhouse-init.sql seed script")
+    (optional "surreal" "For running surrealdb-init.surql seed script")
+    (optional "influx" "For running influxdb-init.sh seed script")
+    (optional "mc" "MinIO client for running minio-init.sh seed script")))

@@ -1,0 +1,136 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# Cerro Torre manifest for VeriSimDB test infrastructure bundle
+#
+# Describes the test database stack for verified container packaging.
+# Unlike the production manifest, test images are NOT signed (--no-sign)
+# and use relaxed security policies.
+#
+# Used by `ct pack` to create .ctp bundles of the test infrastructure.
+
+[metadata]
+name = "verisimdb-test-infra"
+version = "0.1.0"
+revision = 1
+summary = "Integration test database stack for VeriSimDB federation adapters"
+description = """
+Containerised stack of 7 databases for integration testing of VeriSimDB's
+10 federation adapters. Includes MongoDB (replica set), Redis Stack
+(RediSearch + RedisJSON + RedisTimeSeries), Neo4j Community (APOC),
+ClickHouse, SurrealDB, InfluxDB 2, and MinIO (S3-compatible).
+
+DuckDB and SQLite are embedded databases tested via unit tests and are
+not included in this stack.
+"""
+license = "PMPL-1.0-or-later"
+homepage = "https://github.com/hyperpolymath/verisimdb"
+maintainer = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"
+
+[provenance]
+upstream = "https://github.com/hyperpolymath/verisimdb"
+import_date = 2026-02-28T00:00:00Z
+
+[dependencies]
+runtime = ["podman", "curl"]
+build = ["podman"]
+
+[build]
+system = "podman"
+
+[build.environment]
+COMPOSE_FILE = "compose.toml"
+
+# ---------------------------------------------------------------------------
+# Services — 7 database containers
+# ---------------------------------------------------------------------------
+
+[services.mongodb]
+image = "cgr.dev/chainguard/mongodb:latest"
+build_context = false
+ports = [27017]
+purpose = "Document store federation adapter (replica set for change streams)"
+
+[services.redis-stack]
+image = "verisimdb-test-redis-stack:latest"
+build_context = "./images"
+containerfile = "Containerfile.redis-stack"
+ports = [6379]
+purpose = "In-memory store with RediSearch, RedisJSON, RedisTimeSeries"
+
+[services.neo4j]
+image = "verisimdb-test-neo4j:latest"
+build_context = "./images"
+containerfile = "Containerfile.neo4j"
+ports = [7474, 7687]
+purpose = "Graph database for graph modality federation (APOC plugin)"
+
+[services.clickhouse]
+image = "verisimdb-test-clickhouse:latest"
+build_context = "./images"
+containerfile = "Containerfile.clickhouse"
+ports = [8123, 9000]
+purpose = "Columnar analytics for aggregate drift queries"
+
+[services.surrealdb]
+image = "verisimdb-test-surrealdb:latest"
+build_context = "./images"
+containerfile = "Containerfile.surrealdb"
+ports = [8000]
+purpose = "Multi-model database (document + graph) federation"
+
+[services.influxdb]
+image = "verisimdb-test-influxdb:latest"
+build_context = "./images"
+containerfile = "Containerfile.influxdb"
+ports = [8086]
+purpose = "Time-series database for temporal modality federation"
+
+[services.minio]
+image = "cgr.dev/chainguard/minio:latest"
+build_context = false
+ports = [9002, 9001]
+purpose = "S3-compatible object storage for binary blob modalities"
+
+# ---------------------------------------------------------------------------
+# Outputs
+# ---------------------------------------------------------------------------
+
+[outputs]
+primary = "verisimdb-test-infra"
+split = [
+    "verisimdb-test-redis-stack",
+    "verisimdb-test-neo4j",
+    "verisimdb-test-clickhouse",
+    "verisimdb-test-surrealdb",
+    "verisimdb-test-influxdb",
+]
+
+# ---------------------------------------------------------------------------
+# Attestations — relaxed for test images
+# ---------------------------------------------------------------------------
+
+[attestations]
+require = []
+recommend = ["sbom-complete"]
+
+# ---------------------------------------------------------------------------
+# Security — relaxed for local testing
+# ---------------------------------------------------------------------------
+
+[security]
+user = "test"
+group = "test"
+read_only_root = false
+no_new_privileges = false
+
+[security.capabilities]
+drop = []
+add = []
+
+[security.network]
+listen_tcp = [6379, 7474, 7687, 8000, 8086, 8123, 9000, 9001, 9002, 27017]
+
+[security.filesystem]
+read = ["/"]
+write = ["/data/", "/tmp/", "/var/lib/"]
+execute = []

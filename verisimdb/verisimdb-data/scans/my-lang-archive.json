@@ -1,0 +1,1669 @@
+{
+  "program_path": "/var/mnt/eclipse/repos/my-lang-archive",
+  "language": "mylang",
+  "frameworks": [
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "lib/common/concurrency.rs",
+      "severity": "Medium",
+      "description": "15 unwrap/expect calls in lib/common/concurrency.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "my-ssg/src/main.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in my-ssg/src/main.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/my-lang/src/scope.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in crates/my-lang/src/scope.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/my-lang/src/parser.rs",
+      "severity": "Medium",
+      "description": "181 unwrap/expect calls in crates/my-lang/src/parser.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "crates/my-llvm/src/lib.rs",
+      "severity": "High",
+      "description": "1 unsafe blocks in crates/my-llvm/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "crates/my-mir/src/lib.rs",
+      "severity": "Low",
+      "description": "12 TODO/FIXME/HACK markers in crates/my-mir/src/lib.rs",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/my-fmt/src/lib.rs",
+      "severity": "Medium",
+      "description": "25 unwrap/expect calls in crates/my-fmt/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/scope.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in src/scope.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/property_tests.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in tests/property_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/integration_test.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in tests/integration_test.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "dialects/me/crates/parser/src/lib.rs",
+      "severity": "Medium",
+      "description": "81 unwrap/expect calls in dialects/me/crates/parser/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 37761,
+    "unsafe_blocks": 3,
+    "panic_sites": 40,
+    "unwrap_calls": 388,
+    "allocation_sites": 366,
+    "io_operations": 78,
+    "threading_constructs": 15
+  },
+  "file_statistics": [
+    {
+      "file_path": "lib/common/io.rs",
+      "lines": 69,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/common/string.rs",
+      "lines": 308,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/common/types.rs",
+      "lines": 333,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/common/utils.rs",
+      "lines": 360,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "lib/common/collections.rs",
+      "lines": 364,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/common/concurrency.rs",
+      "lines": 282,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 15,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "lib/common/fs.rs",
+      "lines": 244,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/common/net.rs",
+      "lines": 321,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/mylang/ai.rs",
+      "lines": 397,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/mylang/prompt.rs",
+      "lines": 370,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/mylang/stream.rs",
+      "lines": 371,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/mylang/tools.rs",
+      "lines": 440,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "my-ssg/src/config.rs",
+      "lines": 179,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "my-ssg/src/generator.rs",
+      "lines": 552,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "my-ssg/src/main.rs",
+      "lines": 495,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "my-ssg/src/markdown.rs",
+      "lines": 478,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "my-ssg/src/template.rs",
+      "lines": 569,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 9,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-hir/src/lib.rs",
+      "lines": 665,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 32,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/lib/common/io.rs",
+      "lines": 69,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/lib/common/string.rs",
+      "lines": 308,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/lib/common/types.rs",
+      "lines": 333,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/lib/common/utils.rs",
+      "lines": 360,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "crates/my-lang/lib/mylang/ai.rs",
+      "lines": 397,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/lib/mylang/prompt.rs",
+      "lines": 370,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/lib/mylang/stream.rs",
+      "lines": 371,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "crates/my-lang/lib/mylang/tools.rs",
+      "lines": 440,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/src/lib.rs",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/src/proptest.rs",
+      "lines": 189,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/src/scope.rs",
+      "lines": 326,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/src/stdlib.rs",
+      "lines": 1378,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 6,
+      "io_operations": 4,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "crates/my-lang/src/types.rs",
+      "lines": 184,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/src/checker.rs",
+      "lines": 1349,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 78,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/src/interpreter.rs",
+      "lines": 963,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/src/lexer.rs",
+      "lines": 540,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/src/main.rs",
+      "lines": 459,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lang/src/parser.rs",
+      "lines": 2627,
+      "unsafe_blocks": 0,
+      "panic_sites": 35,
+      "unwrap_calls": 181,
+      "allocation_sites": 52,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-llvm/src/lib.rs",
+      "lines": 1061,
+      "unsafe_blocks": 1,
+      "panic_sites": 1,
+      "unwrap_calls": 3,
+      "allocation_sites": 3,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lsp/src/main.rs",
+      "lines": 133,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "crates/my-lsp/src/lib.rs",
+      "lines": 514,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "crates/my-test/src/lib.rs",
+      "lines": 179,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-test/src/main.rs",
+      "lines": 164,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-cli/src/main.rs",
+      "lines": 257,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-ai/src/lib.rs",
+      "lines": 696,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "crates/my-mir/src/lib.rs",
+      "lines": 1264,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 21,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-fmt/src/main.rs",
+      "lines": 128,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-fmt/src/lib.rs",
+      "lines": 450,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 25,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lint/src/lib.rs",
+      "lines": 335,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-lint/src/main.rs",
+      "lines": 149,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-pkg/src/lib.rs",
+      "lines": 361,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/my-debug/src/main.rs",
+      "lines": 265,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/lexer.rs",
+      "lines": 506,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/lib.rs",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/main.rs",
+      "lines": 456,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/proptest.rs",
+      "lines": 189,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/scope.rs",
+      "lines": 326,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/types.rs",
+      "lines": 184,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/property_tests.rs",
+      "lines": 768,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/integration_test.rs",
+      "lines": 237,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 10,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test_pipeline.sh",
+      "lines": 26,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/crates/lexer/src/lib.rs",
+      "lines": 397,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/crates/parser/src/lib.rs",
+      "lines": 1387,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 81,
+      "allocation_sites": 64,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/examples/duet/02_verification.duet",
+      "lines": 36,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/examples/ensemble/newroom_variant_b.duet",
+      "lines": 186,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/examples/solo/10_affine_types.solo",
+      "lines": 153,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 11,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/examples/solo/11_async_await.solo",
+      "lines": 164,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/examples/solo/14_error_handling.solo",
+      "lines": 171,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/examples/solo/15_collections.solo",
+      "lines": 130,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/examples/solo/18_smart_pointers.solo",
+      "lines": 198,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/examples/solo/19_threading.solo",
+      "lines": 130,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 10,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/examples/solo/21_file_io.solo",
+      "lines": 47,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 16,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/me/examples/solo/22_networking.solo",
+      "lines": 88,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/solo/compiler/src/lexer.rs",
+      "lines": 346,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dialects/solo/compiler/src/lib.rs",
+      "lines": 54,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "concurrency",
+    "cpu",
+    "disk",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "crates/my-lsp/src/main.rs",
+        "to": "crates/my-lsp/src/lib.rs",
+        "relation": "shared_dir:crates/my-lsp/src",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/property_tests.rs",
+        "to": "tests/integration_test.rs",
+        "relation": "shared_dir:tests",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/lib/common/io.rs",
+        "to": "crates/my-lang/lib/common/string.rs",
+        "relation": "shared_dir:crates/my-lang/lib/common",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/lib/common/string.rs",
+        "to": "crates/my-lang/lib/common/types.rs",
+        "relation": "shared_dir:crates/my-lang/lib/common",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/lib/common/types.rs",
+        "to": "crates/my-lang/lib/common/utils.rs",
+        "relation": "shared_dir:crates/my-lang/lib/common",
+        "weight": 1.0
+      },
+      {
+        "from": "my-ssg/src/config.rs",
+        "to": "my-ssg/src/generator.rs",
+        "relation": "shared_dir:my-ssg/src",
+        "weight": 1.0
+      },
+      {
+        "from": "my-ssg/src/generator.rs",
+        "to": "my-ssg/src/main.rs",
+        "relation": "shared_dir:my-ssg/src",
+        "weight": 1.0
+      },
+      {
+        "from": "my-ssg/src/main.rs",
+        "to": "my-ssg/src/markdown.rs",
+        "relation": "shared_dir:my-ssg/src",
+        "weight": 1.0
+      },
+      {
+        "from": "my-ssg/src/markdown.rs",
+        "to": "my-ssg/src/template.rs",
+        "relation": "shared_dir:my-ssg/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/lib/mylang/ai.rs",
+        "to": "crates/my-lang/lib/mylang/prompt.rs",
+        "relation": "shared_dir:crates/my-lang/lib/mylang",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/lib/mylang/prompt.rs",
+        "to": "crates/my-lang/lib/mylang/stream.rs",
+        "relation": "shared_dir:crates/my-lang/lib/mylang",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/lib/mylang/stream.rs",
+        "to": "crates/my-lang/lib/mylang/tools.rs",
+        "relation": "shared_dir:crates/my-lang/lib/mylang",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lint/src/lib.rs",
+        "to": "crates/my-lint/src/main.rs",
+        "relation": "shared_dir:crates/my-lint/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/lib.rs",
+        "to": "crates/my-lang/src/proptest.rs",
+        "relation": "shared_dir:crates/my-lang/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/proptest.rs",
+        "to": "crates/my-lang/src/scope.rs",
+        "relation": "shared_dir:crates/my-lang/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/scope.rs",
+        "to": "crates/my-lang/src/stdlib.rs",
+        "relation": "shared_dir:crates/my-lang/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/stdlib.rs",
+        "to": "crates/my-lang/src/types.rs",
+        "relation": "shared_dir:crates/my-lang/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/types.rs",
+        "to": "crates/my-lang/src/checker.rs",
+        "relation": "shared_dir:crates/my-lang/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/checker.rs",
+        "to": "crates/my-lang/src/interpreter.rs",
+        "relation": "shared_dir:crates/my-lang/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/interpreter.rs",
+        "to": "crates/my-lang/src/lexer.rs",
+        "relation": "shared_dir:crates/my-lang/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/lexer.rs",
+        "to": "crates/my-lang/src/main.rs",
+        "relation": "shared_dir:crates/my-lang/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/main.rs",
+        "to": "crates/my-lang/src/parser.rs",
+        "relation": "shared_dir:crates/my-lang/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-fmt/src/main.rs",
+        "to": "crates/my-fmt/src/lib.rs",
+        "relation": "shared_dir:crates/my-fmt/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/lexer.rs",
+        "to": "src/lib.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/lib.rs",
+        "to": "src/main.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "src/proptest.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/proptest.rs",
+        "to": "src/scope.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/scope.rs",
+        "to": "src/types.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-test/src/lib.rs",
+        "to": "crates/my-test/src/main.rs",
+        "relation": "shared_dir:crates/my-test/src",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/10_affine_types.solo",
+        "to": "dialects/me/examples/solo/11_async_await.solo",
+        "relation": "shared_dir:dialects/me/examples/solo",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/11_async_await.solo",
+        "to": "dialects/me/examples/solo/14_error_handling.solo",
+        "relation": "shared_dir:dialects/me/examples/solo",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/14_error_handling.solo",
+        "to": "dialects/me/examples/solo/15_collections.solo",
+        "relation": "shared_dir:dialects/me/examples/solo",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/15_collections.solo",
+        "to": "dialects/me/examples/solo/18_smart_pointers.solo",
+        "relation": "shared_dir:dialects/me/examples/solo",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/18_smart_pointers.solo",
+        "to": "dialects/me/examples/solo/19_threading.solo",
+        "relation": "shared_dir:dialects/me/examples/solo",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/19_threading.solo",
+        "to": "dialects/me/examples/solo/21_file_io.solo",
+        "relation": "shared_dir:dialects/me/examples/solo",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/21_file_io.solo",
+        "to": "dialects/me/examples/solo/22_networking.solo",
+        "relation": "shared_dir:dialects/me/examples/solo",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mylang/ai.rs",
+        "to": "lib/mylang/prompt.rs",
+        "relation": "shared_dir:lib/mylang",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mylang/prompt.rs",
+        "to": "lib/mylang/stream.rs",
+        "relation": "shared_dir:lib/mylang",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mylang/stream.rs",
+        "to": "lib/mylang/tools.rs",
+        "relation": "shared_dir:lib/mylang",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/io.rs",
+        "to": "lib/common/string.rs",
+        "relation": "shared_dir:lib/common",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/string.rs",
+        "to": "lib/common/types.rs",
+        "relation": "shared_dir:lib/common",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/types.rs",
+        "to": "lib/common/utils.rs",
+        "relation": "shared_dir:lib/common",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/utils.rs",
+        "to": "lib/common/collections.rs",
+        "relation": "shared_dir:lib/common",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/collections.rs",
+        "to": "lib/common/concurrency.rs",
+        "relation": "shared_dir:lib/common",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/concurrency.rs",
+        "to": "lib/common/fs.rs",
+        "relation": "shared_dir:lib/common",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/fs.rs",
+        "to": "lib/common/net.rs",
+        "relation": "shared_dir:lib/common",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/solo/compiler/src/lexer.rs",
+        "to": "dialects/solo/compiler/src/lib.rs",
+        "relation": "shared_dir:dialects/solo/compiler/src",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/io.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/string.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/types.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/utils.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "lib/common/collections.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/concurrency.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 19.0
+      },
+      {
+        "from": "lib/common/fs.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/common/net.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mylang/ai.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mylang/prompt.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/mylang/stream.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/mylang/tools.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "my-ssg/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "my-ssg/src/generator.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "my-ssg/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "my-ssg/src/markdown.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "my-ssg/src/template.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "crates/my-hir/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "crates/my-lang/lib/common/io.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/lib/common/string.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/lib/common/types.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/lib/common/utils.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "crates/my-lang/lib/mylang/ai.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/lib/mylang/prompt.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/lib/mylang/stream.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "crates/my-lang/lib/mylang/tools.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "crates/my-lang/src/proptest.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "crates/my-lang/src/scope.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "crates/my-lang/src/stdlib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "crates/my-lang/src/types.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/checker.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/interpreter.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/lexer.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-lang/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "crates/my-lang/src/parser.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 251.0
+      },
+      {
+        "from": "crates/my-llvm/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "crates/my-lsp/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "crates/my-lsp/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "crates/my-test/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-test/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "crates/my-cli/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-ai/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "crates/my-mir/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "crates/my-fmt/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-fmt/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 25.0
+      },
+      {
+        "from": "crates/my-lint/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "crates/my-lint/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-pkg/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/my-debug/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/lexer.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/proptest.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/scope.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "src/types.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/property_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "tests/integration_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "test_pipeline.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/crates/lexer/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/crates/parser/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 81.0
+      },
+      {
+        "from": "dialects/me/examples/duet/02_verification.duet",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "dialects/me/examples/ensemble/newroom_variant_b.duet",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/10_affine_types.solo",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/11_async_await.solo",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/14_error_handling.solo",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/15_collections.solo",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/18_smart_pointers.solo",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/19_threading.solo",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/21_file_io.solo",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/me/examples/solo/22_networking.solo",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dialects/solo/compiler/src/lexer.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "dialects/solo/compiler/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "lib/common/concurrency.rs",
+          "my-ssg/src/main.rs",
+          "crates/my-lang/src/scope.rs",
+          "crates/my-lang/src/parser.rs",
+          "crates/my-fmt/src/lib.rs",
+          "src/scope.rs",
+          "tests/property_tests.rs",
+          "tests/integration_test.rs",
+          "dialects/me/crates/parser/src/lib.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "crates/my-llvm/src/lib.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Concurrency"
+      },
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          "crates/my-mir/src/lib.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "crates/my-llvm/src/lib.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "lib/common/concurrency.rs",
+          "my-ssg/src/main.rs",
+          "crates/my-lang/src/scope.rs",
+          "crates/my-lang/src/parser.rs",
+          "crates/my-fmt/src/lib.rs",
+          "src/scope.rs",
+          "tests/property_tests.rs",
+          "tests/integration_test.rs",
+          "dialects/me/crates/parser/src/lib.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

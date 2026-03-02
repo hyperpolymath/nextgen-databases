@@ -1,0 +1,142 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/orchestrator/db/ArangoDb.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/orchestrator/db/ArangoDb.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/orchestrator/Config.res",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in src/orchestrator/Config.res",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 1704,
+    "unsafe_blocks": 8,
+    "panic_sites": 0,
+    "unwrap_calls": 2,
+    "allocation_sites": 0,
+    "io_operations": 19,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "scripts/demo.sh",
+      "lines": 79,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analytics/causal_inference.jl",
+      "lines": 193,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analytics/impact_analysis.jl",
+      "lines": 333,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/core/src/lib.rs",
+      "lines": 227,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/orchestrator/db/ArangoDb.res",
+      "lines": 265,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 10,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/orchestrator/db/Bindings.res",
+      "lines": 62,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "disk",
+    "network"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/orchestrator/db/ArangoDb.res",
+        "to": "src/orchestrator/db/Bindings.res",
+        "relation": "shared_dir:src/orchestrator/db",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analytics/causal_inference.jl",
+        "to": "src/analytics/impact_analysis.jl",
+        "relation": "shared_dir:src/analytics",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "src/orchestrator/Config.res"
+        ],
+        "frameworks": [],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/orchestrator/db/ArangoDb.res"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

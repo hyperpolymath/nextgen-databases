@@ -1,0 +1,21 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- 03-cross-modal-join.vql
+-- Cross-modal join: graph edges + vector similarity combined
+--
+-- This query demonstrates VeriSimDB's ability to combine constraints
+-- from different modalities in a single query. Here we find entities
+-- that are connected to entity-011 (Dr. Amara Okonkwo) via graph edges
+-- AND have embeddings within a cosine similarity threshold of 0.7.
+--
+-- The query planner resolves this by first traversing graph edges to
+-- find connected entities, then filtering by vector similarity. The
+-- execution order is optimised based on estimated cardinality.
+--
+-- Expected results: entity-001, entity-003, entity-006, entity-008
+-- (papers authored by Dr. Okonkwo with similar embeddings).
+
+SELECT graph, vector, document FROM hexads
+WHERE graph.edge_to = 'entity-011'
+AND vector.similarity > 0.7
+LIMIT 20

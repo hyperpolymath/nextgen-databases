@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://verisim.db/schema/query-params.json",
+  "$comment": "SPDX-License-Identifier: PMPL-1.0-or-later",
+  "title": "QueryParams",
+  "description": "Parameters for a VeriSimDB federation query. Specifies which modalities to search, what to search for, and how to filter results. Used by federation adapters to translate queries into the target store's native language.",
+  "type": "object",
+  "required": ["modalities"],
+  "properties": {
+    "modalities": {
+      "type": "array",
+      "items": { "$ref": "modality.json" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Which octad modalities to include in the query. At least one modality must be specified."
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000,
+      "default": 100,
+      "description": "Maximum number of results to return. Defaults to 100, capped at 10000."
+    },
+    "text_query": {
+      "type": "string",
+      "description": "Full-text search query string. Used by the document modality (Tantivy) and any adapter that supports text search."
+    },
+    "vector_query": {
+      "type": "array",
+      "items": { "type": "number" },
+      "description": "Vector for similarity search (cosine / dot-product / L2). Dimensionality must match the target store's configured vector_dimension."
+    },
+    "graph_pattern": {
+      "type": "string",
+      "description": "Graph traversal pattern. Syntax depends on the adapter (SPARQL, Cypher, Gremlin, etc.). Federation protocol uses a simplified triple pattern: 'subject predicate object'."
+    },
+    "spatial_bounds": {
+      "type": "object",
+      "description": "Bounding box for spatial queries. Defined by south-west and north-east corners in WGS84.",
+      "required": ["min_lat", "min_lon", "max_lat", "max_lon"],
+      "properties": {
+        "min_lat": {
+          "type": "number",
+          "minimum": -90.0,
+          "maximum": 90.0,
+          "description": "Southern latitude boundary."
+        },
+        "min_lon": {
+          "type": "number",
+          "minimum": -180.0,
+          "maximum": 180.0,
+          "description": "Western longitude boundary."
+        },
+        "max_lat": {
+          "type": "number",
+          "minimum": -90.0,
+          "maximum": 90.0,
+          "description": "Northern latitude boundary."
+        },
+        "max_lon": {
+          "type": "number",
+          "minimum": -180.0,
+          "maximum": 180.0,
+          "description": "Eastern longitude boundary."
+        }
+      },
+      "additionalProperties": false
+    },
+    "temporal_range": {
+      "type": "object",
+      "description": "Time range filter for temporal queries. Both endpoints are inclusive.",
+      "required": ["start", "end"],
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start of the time range (ISO 8601)."
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time",
+          "description": "End of the time range (ISO 8601)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "filters": {
+      "type": "object",
+      "description": "Additional key-value filters applied after the primary query. Interpretation is adapter-specific. Common keys include 'status', 'actor', 'event_type', and 'geometry_type'.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

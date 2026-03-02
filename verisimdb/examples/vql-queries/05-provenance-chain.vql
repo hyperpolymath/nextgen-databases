@@ -1,0 +1,21 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- 05-provenance-chain.vql
+-- Provenance chain: trace the full origin and transformation history
+--
+-- The provenance modality records the complete lineage of each entity:
+-- where it originated, who created or modified it, and the ordered
+-- sequence of transformations it underwent. This is modelled after the
+-- W3C PROV-O ontology.
+--
+-- This query retrieves the provenance chain for entity-031 (the
+-- PolyBench benchmark dataset), showing how it was generated, had
+-- drift injected, and was released as v1.0.
+--
+-- Expected result:
+--   origin: "Imperial College London — Data Systems Lab"
+--   actor: "entity-020" (Dr. Nia Williams)
+--   chain: ["initial-generation", "drift-injection", "v1.0-release"]
+
+SELECT provenance FROM hexads
+WHERE id = 'entity-031'

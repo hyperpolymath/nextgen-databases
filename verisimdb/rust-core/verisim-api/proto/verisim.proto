@@ -1,0 +1,178 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// VeriSimDB gRPC service definitions.
+
+syntax = "proto3";
+
+package verisim;
+
+// ============================================================================
+// Planner Service
+// ============================================================================
+
+service VeriSimPlanner {
+  // Optimize a logical plan into a physical plan.
+  rpc OptimizePlan(LogicalPlanRequest) returns (PhysicalPlanResponse);
+  // Generate EXPLAIN output for a logical plan.
+  rpc ExplainPlan(LogicalPlanRequest) returns (ExplainResponse);
+  // Get current planner configuration.
+  rpc GetConfig(Empty) returns (PlannerConfigResponse);
+  // Update planner configuration.
+  rpc SetConfig(PlannerConfigRequest) returns (PlannerConfigResponse);
+  // Get per-modality statistics snapshot.
+  rpc GetStats(Empty) returns (StatsResponse);
+}
+
+// ============================================================================
+// Hexad Service
+// ============================================================================
+
+service VeriSimHexad {
+  // Create a new hexad.
+  rpc Create(HexadCreateRequest) returns (HexadResponse);
+  // Get a hexad by ID.
+  rpc Get(HexadIdRequest) returns (HexadResponse);
+  // Update an existing hexad.
+  rpc Update(HexadUpdateRequest) returns (HexadResponse);
+  // Delete a hexad.
+  rpc Delete(HexadIdRequest) returns (Empty);
+  // Full-text search.
+  rpc SearchText(TextSearchRequest) returns (SearchResponse);
+  // Vector similarity search.
+  rpc SearchVector(VectorSearchRequest) returns (SearchResponse);
+}
+
+// ============================================================================
+// Common Messages
+// ============================================================================
+
+message Empty {}
+
+// ============================================================================
+// Planner Messages
+// ============================================================================
+
+// Logical plan passed as JSON string (mirrors the REST API).
+// This avoids duplicating the full plan type hierarchy in protobuf.
+message LogicalPlanRequest {
+  string plan_json = 1;
+}
+
+message PhysicalPlanResponse {
+  repeated PlanStepMsg steps = 1;
+  string strategy = 2;
+  double total_time_ms = 3;
+  uint64 total_estimated_rows = 4;
+  repeated string notes = 5;
+}
+
+message PlanStepMsg {
+  int32 step = 1;
+  string operation = 2;
+  string modality = 3;
+  double time_ms = 4;
+  uint64 estimated_rows = 5;
+  double selectivity = 6;
+  string optimization_hint = 7;
+}
+
+message ExplainResponse {
+  repeated PlanStepMsg steps = 1;
+  repeated ModalityCostMsg cost_breakdown = 2;
+  repeated PerformanceHintMsg performance_hints = 3;
+  double total_cost_ms = 4;
+  string strategy = 5;
+  string text_output = 6;
+}
+
+message ModalityCostMsg {
+  string modality = 1;
+  double time_ms = 2;
+  double percentage = 3;
+}
+
+message PerformanceHintMsg {
+  string severity = 1;
+  string message = 2;
+}
+
+message PlannerConfigRequest {
+  string global_mode = 1;
+  double statistics_weight = 2;
+  bool enable_adaptive = 3;
+  int32 parallel_threshold = 4;
+}
+
+message PlannerConfigResponse {
+  string global_mode = 1;
+  double statistics_weight = 2;
+  bool enable_adaptive = 3;
+  int32 parallel_threshold = 4;
+}
+
+message StoreStatsMsg {
+  string modality = 1;
+  uint64 total_rows = 2;
+  double avg_latency_ms = 3;
+  uint64 avg_rows_returned = 4;
+  uint64 query_count = 5;
+}
+
+message StatsResponse {
+  repeated StoreStatsMsg stores = 1;
+}
+
+// ============================================================================
+// Hexad Messages
+// ============================================================================
+
+message HexadCreateRequest {
+  string title = 1;
+  string body = 2;
+  repeated float embedding = 3;
+  repeated string types = 4;
+}
+
+message HexadIdRequest {
+  string id = 1;
+}
+
+message HexadUpdateRequest {
+  string id = 1;
+  string title = 2;
+  string body = 3;
+  repeated float embedding = 4;
+  repeated string types = 5;
+}
+
+message HexadResponse {
+  string id = 1;
+  string created_at = 2;
+  string modified_at = 3;
+  uint64 version = 4;
+  bool has_graph = 5;
+  bool has_vector = 6;
+  bool has_tensor = 7;
+  bool has_semantic = 8;
+  bool has_document = 9;
+  uint64 version_count = 10;
+}
+
+message TextSearchRequest {
+  string query = 1;
+  int32 limit = 2;
+}
+
+message VectorSearchRequest {
+  repeated float vector = 1;
+  int32 k = 2;
+}
+
+message SearchResultMsg {
+  string id = 1;
+  float score = 2;
+  string title = 3;
+}
+
+message SearchResponse {
+  repeated SearchResultMsg results = 1;
+}

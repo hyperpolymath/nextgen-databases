@@ -1,0 +1,79 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB — Product One-Pager
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-02-28
+:revremark: Product summary for investors, partners, and prospects
+
+== What Is VeriSimDB?
+
+*The world's first multimodal database with cross-modal drift detection and
+self-normalisation.* VeriSimDB stores every entity across 8 simultaneous
+representations and automatically detects when those representations diverge.
+
+== The Problem
+
+Data lives in silos. The same customer, product, or transaction exists as a graph
+node, a vector embedding, a JSON document, a relational row, and a temporal
+snapshot -- all in different systems. When one representation changes, the others
+go stale. *Nobody notices until the damage is done.*
+
+Poor data quality costs enterprises *$12.9 million per year* (Gartner). The root
+cause is not dirty data at entry -- it is *cross-system inconsistency*. No existing
+database tracks whether multiple representations of the same entity agree with
+each other.
+
+== The Solution
+
+VeriSimDB introduces the *octad model* -- 8 modalities per entity, with continuous
+cross-modal consistency monitoring.
+
+=== Key Features
+
+* *8-modality storage* -- Graph, Vector, Tensor, Semantic, Document, Temporal,
+  Provenance, and Spatial representations in a single database
+* *Cross-modal drift detection* -- Continuous coherence scoring detects when
+  representations diverge, before downstream systems consume inconsistent data
+* *Self-normalisation* -- Automatic reconciliation of drifted data using
+  configurable resolution strategies (alert, quarantine, or repair)
+* *VQL query language* -- Purpose-built query language for cross-modal operations
+  with optional dependent-type proofs (VQL-DT) for compile-time query verification
+* *Federation* -- Bring drift detection to existing infrastructure by federating
+  across PostgreSQL, ArangoDB, Elasticsearch, Neo4j, and more
+* *Open source* -- Full-featured community edition under the Palimpsest License
+  (PMPL-1.0-or-later); no feature gating
+
+=== Technical Differentiators
+
+* *Only database with cross-modal drift detection* -- No competitor (Neo4j,
+  Pinecone, Weaviate, ArangoDB, SurrealDB) tracks cross-modal consistency
+* *Formally verified queries* -- VQL-DT provides dependent-type proofs of query
+  correctness, catching type errors and semantic mismatches before execution
+* *Production-grade engineering* -- Rust core + Elixir/OTP orchestration; 662 tests
+  (510 Rust + 152 Elixir), 0 failures; built for performance and fault tolerance
+
+== Pricing
+
+[cols="2,3"]
+|===
+| Tier | Description
+
+| *Community (Free)*
+| Full VeriSimDB with all 8 modalities, drift detection, self-normalisation,
+  VQL, and federation. PMPL-1.0-or-later license.
+
+| *Commercial Support*
+| Enterprise SLA (99.9%), priority security patches, dedicated support channel,
+  deployment consulting, training. Annual subscription.
+|===
+
+== Get Started
+
+* *GitHub:* https://github.com/hyperpolymath/verisimdb[github.com/hyperpolymath/verisimdb]
+* *Documentation:* See `docs/getting-started.adoc` in the repository
+* *Contact:* j.d.a.jewell@open.ac.uk
+
+''''
+
+_VeriSimDB is developed by Jonathan D.A. Jewell at hyperpolymath._
+_Licensed under PMPL-1.0-or-later (Palimpsest License)._

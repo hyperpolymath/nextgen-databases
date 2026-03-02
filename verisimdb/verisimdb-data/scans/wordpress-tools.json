@@ -1,0 +1,3560 @@
+{
+  "program_path": ".",
+  "language": "javascript",
+  "frameworks": [
+    "Networking",
+    "OTP",
+    "Ecto",
+    "WebServer",
+    "Database",
+    "Cache"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "secured/php-aegis/validation/run-validation.sh",
+      "severity": "Medium",
+      "description": "91 potentially unquoted variable expansions in secured/php-aegis/validation/run-validation.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "secured/php-aegis/validation/run-validation.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in secured/php-aegis/validation/run-validation.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "secured/php-aegis/validation/run-validation.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in secured/php-aegis/validation/run-validation.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "secured/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in secured/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "plugin-conflict-mapper/assets/js/admin.js",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in plugin-conflict-mapper/assets/js/admin.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "plugin-conflict-mapper/bin/install-wp-tests.sh",
+      "severity": "Medium",
+      "description": "71 potentially unquoted variable expansions in plugin-conflict-mapper/bin/install-wp-tests.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "plugin-conflict-mapper/bin/install-wp-tests.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in plugin-conflict-mapper/bin/install-wp-tests.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "plugin-conflict-mapper/bin/install-wp-tests.sh",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in plugin-conflict-mapper/bin/install-wp-tests.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "plugin-conflict-mapper/bin/install-wp-tests.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in plugin-conflict-mapper/bin/install-wp-tests.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "plugin-conflict-mapper/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in plugin-conflict-mapper/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "praxis/Core/cli-wrapper/lib/wp_praxis_cli/validator.ex",
+      "severity": "Medium",
+      "description": "System command execution in praxis/Core/cli-wrapper/lib/wp_praxis_cli/validator.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "praxis/Core/db-schema/config/dev.exs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in praxis/Core/db-schema/config/dev.exs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "praxis/Core/db-schema/config/test.exs",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in praxis/Core/db-schema/config/test.exs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "praxis/Core/introspection/src/viz/graph-generator.rkt",
+      "severity": "High",
+      "description": "System/process call in praxis/Core/introspection/src/viz/graph-generator.rkt",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+      "severity": "Critical",
+      "description": "SQL string concatenation (injection risk) in praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "praxis/SymbolicEngine/dashboard/js/dashboard.ts",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in praxis/SymbolicEngine/dashboard/js/dashboard.ts",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "praxis/examples/quickstart/quickstart.sh",
+      "severity": "Medium",
+      "description": "28 potentially unquoted variable expansions in praxis/examples/quickstart/quickstart.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "praxis/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in praxis/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "praxis/wp_injector/tests/unit_tests.rs",
+      "severity": "Medium",
+      "description": "13 unwrap/expect calls in praxis/wp_injector/tests/unit_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "praxis/wp_praxis_core/src/verification.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in praxis/wp_praxis_core/src/verification.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "resurrect/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in resurrect/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "resurrect/state/lib/state-utils.scm",
+      "severity": "High",
+      "description": "eval usage in resurrect/state/lib/state-utils.scm",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "ExcessivePermissions",
+      "location": "sinople-theme/deno/fresh.gen.js",
+      "severity": "High",
+      "description": "Deno -A (all permissions) in sinople-theme/deno/fresh.gen.js",
+      "recommended_attack": [
+        "network",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "sinople-theme/rescript/src/examples/example.res",
+      "severity": "Medium",
+      "description": "8 HTTP (non-HTTPS) URLs in sinople-theme/rescript/src/examples/example.res",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "sinople-theme/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in sinople-theme/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "sinople-theme/wordpress/assets/js/graph-viewer.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in sinople-theme/wordpress/assets/js/graph-viewer.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "sinople-theme/wordpress/assets/js/navigation.js",
+      "severity": "High",
+      "description": "innerHTML/outerHTML usage (XSS risk) in sinople-theme/wordpress/assets/js/navigation.js",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 44014,
+    "unsafe_blocks": 70,
+    "panic_sites": 0,
+    "unwrap_calls": 44,
+    "allocation_sites": 31,
+    "io_operations": 46,
+    "threading_constructs": 24
+  },
+  "file_statistics": [
+    {
+      "file_path": "secured/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "secured/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "secured/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "secured/php-aegis/validation/run-validation.sh",
+      "lines": 367,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "secured/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "secured/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "plugin-conflict-mapper/bin/install-wp-tests.sh",
+      "lines": 157,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "plugin-conflict-mapper/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "plugin-conflict-mapper/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "plugin-conflict-mapper/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "plugin-conflict-mapper/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "plugin-conflict-mapper/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/Core/cli-wrapper/lib/wp_praxis_cli/validator.ex",
+      "lines": 148,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/Core/introspection/src/io/json-reader.rkt",
+      "lines": 115,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/Core/introspection/src/reports/html-reporter.rkt",
+      "lines": 180,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/Core/introspection/src/reports/json-reporter.rkt",
+      "lines": 62,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/Core/introspection/src/viz/graph-generator.rkt",
+      "lines": 119,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+      "lines": 428,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/SymbolicEngine/dashboard/js/dashboard.ts",
+      "lines": 610,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+      "lines": 139,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/SymbolicEngine/dashboard/js/workflow-visualizer.ts",
+      "lines": 247,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/SymbolicEngine/dashboard/src/db/state-aggregator.ts",
+      "lines": 352,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/SymbolicEngine/graphql/client/js/graphql-client.ts",
+      "lines": 241,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/SymbolicEngine/swarm/bin/swarm-cli.ts",
+      "lines": 417,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "praxis/SymbolicEngine/swarm/src/worker.ts",
+      "lines": 450,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "praxis/SymbolicEngine/swarm/tests/coordinator.test.ts",
+      "lines": 226,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 4
+    },
+    {
+      "file_path": "praxis/SymbolicEngine/swarm/tests/worker.test.ts",
+      "lines": 228,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 4
+    },
+    {
+      "file_path": "praxis/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/examples/quickstart/quickstart.sh",
+      "lines": 203,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "praxis/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/wp_injector/src/main.rs",
+      "lines": 1296,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 5,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/wp_injector/tests/unit_tests.rs",
+      "lines": 394,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 13,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/wp_praxis_core/src/parser/toml.rs",
+      "lines": 266,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/wp_praxis_core/src/parser/yaml.rs",
+      "lines": 282,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/wp_praxis_core/src/lib.rs",
+      "lines": 103,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/wp_praxis_core/src/manifest.rs",
+      "lines": 160,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/wp_praxis_core/src/symbol.rs",
+      "lines": 317,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/wp_praxis_core/src/validation.rs",
+      "lines": 300,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/wp_praxis_core/src/verification.rs",
+      "lines": 253,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "praxis/wp_praxis_core/tests/property_tests.rs",
+      "lines": 353,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "resurrect/config/schema/site.ncl",
+      "lines": 86,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "resurrect/config/sites/example.ncl",
+      "lines": 260,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "resurrect/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "resurrect/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "resurrect/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "resurrect/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "resurrect/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "resurrect/src/socp-tui/src/app.rs",
+      "lines": 315,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "resurrect/src/socp-tui/src/config.rs",
+      "lines": 29,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "resurrect/src/socp-tui/src/events.rs",
+      "lines": 57,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "sinople-theme/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "sinople-theme/deno/lib/license-detector/mod.js",
+      "lines": 316,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "sinople-theme/deno/lib/scraper/mod.js",
+      "lines": 409,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "sinople-theme/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "sinople-theme/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "sinople-theme/rescript/src/examples/example.res",
+      "lines": 154,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "sinople-theme/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "sinople-theme/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "sinople-theme/wasm/semantic_processor/src/lib.rs",
+      "lines": 496,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 9,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "sinople-theme/wordpress/assets/js/graph-viewer.js",
+      "lines": 233,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "concurrency",
+    "memory",
+    "cpu",
+    "disk",
+    "network"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "secured/src/abi/Foreign.idr",
+        "to": "secured/src/abi/Types.idr",
+        "relation": "shared_dir:secured/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Foreign.idr",
+        "to": "plugin-conflict-mapper/src/abi/Types.idr",
+        "relation": "shared_dir:plugin-conflict-mapper/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/lib.rs",
+        "to": "praxis/wp_praxis_core/src/manifest.rs",
+        "relation": "shared_dir:praxis/wp_praxis_core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/manifest.rs",
+        "to": "praxis/wp_praxis_core/src/symbol.rs",
+        "relation": "shared_dir:praxis/wp_praxis_core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/symbol.rs",
+        "to": "praxis/wp_praxis_core/src/validation.rs",
+        "relation": "shared_dir:praxis/wp_praxis_core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/validation.rs",
+        "to": "praxis/wp_praxis_core/src/verification.rs",
+        "relation": "shared_dir:praxis/wp_praxis_core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/toml.rs",
+        "to": "praxis/wp_praxis_core/src/parser/yaml.rs",
+        "relation": "shared_dir:praxis/wp_praxis_core/src/parser",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/src/abi/Foreign.idr",
+        "to": "praxis/src/abi/Types.idr",
+        "relation": "shared_dir:praxis/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/dashboard.ts",
+        "to": "praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+        "relation": "shared_dir:praxis/SymbolicEngine/dashboard/js",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+        "to": "praxis/SymbolicEngine/dashboard/js/workflow-visualizer.ts",
+        "relation": "shared_dir:praxis/SymbolicEngine/dashboard/js",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/coordinator.test.ts",
+        "to": "praxis/SymbolicEngine/swarm/tests/worker.test.ts",
+        "relation": "shared_dir:praxis/SymbolicEngine/swarm/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/abi/Foreign.idr",
+        "to": "resurrect/src/abi/Types.idr",
+        "relation": "shared_dir:resurrect/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/html-reporter.rkt",
+        "to": "praxis/Core/introspection/src/reports/json-reporter.rkt",
+        "relation": "shared_dir:praxis/Core/introspection/src/reports",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Foreign.idr",
+        "to": "sinople-theme/src/abi/Types.idr",
+        "relation": "shared_dir:sinople-theme/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/app.rs",
+        "to": "resurrect/src/socp-tui/src/config.rs",
+        "relation": "shared_dir:resurrect/src/socp-tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/config.rs",
+        "to": "resurrect/src/socp-tui/src/events.rs",
+        "relation": "shared_dir:resurrect/src/socp-tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/contractiles/trust/Trustfile.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/contractiles/trust/Trustfile.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/ffi/zig/src/main.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/ffi/zig/src/main.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "secured/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "secured/ffi/zig/test/integration_test.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "secured/ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "secured/ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "secured/ffi/zig/test/integration_test.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "secured/php-aegis/validation/run-validation.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/php-aegis/validation/run-validation.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/php-aegis/validation/run-validation.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/php-aegis/validation/run-validation.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/php-aegis/validation/run-validation.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/php-aegis/validation/run-validation.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "secured/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "secured/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "secured/src/abi/Foreign.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "secured/src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "secured/src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "secured/src/abi/Foreign.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "secured/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "secured/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "secured/src/abi/Types.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "secured/src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "secured/src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "secured/src/abi/Types.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "plugin-conflict-mapper/bin/install-wp-tests.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/bin/install-wp-tests.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/bin/install-wp-tests.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/bin/install-wp-tests.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/bin/install-wp-tests.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/bin/install-wp-tests.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/contractiles/trust/Trustfile.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/contractiles/trust/Trustfile.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/src/main.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/src/main.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/test/integration_test.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "plugin-conflict-mapper/ffi/zig/test/integration_test.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Foreign.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Foreign.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Types.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "plugin-conflict-mapper/src/abi/Types.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/Core/cli-wrapper/lib/wp_praxis_cli/validator.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/cli-wrapper/lib/wp_praxis_cli/validator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/cli-wrapper/lib/wp_praxis_cli/validator.ex",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/cli-wrapper/lib/wp_praxis_cli/validator.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/cli-wrapper/lib/wp_praxis_cli/validator.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/cli-wrapper/lib/wp_praxis_cli/validator.ex",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/io/json-reader.rkt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/io/json-reader.rkt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/io/json-reader.rkt",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/io/json-reader.rkt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/io/json-reader.rkt",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/io/json-reader.rkt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/html-reporter.rkt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/html-reporter.rkt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/html-reporter.rkt",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/html-reporter.rkt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/html-reporter.rkt",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/html-reporter.rkt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/json-reporter.rkt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/json-reporter.rkt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/json-reporter.rkt",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/json-reporter.rkt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/json-reporter.rkt",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/reports/json-reporter.rkt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/viz/graph-generator.rkt",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/viz/graph-generator.rkt",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/viz/graph-generator.rkt",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/viz/graph-generator.rkt",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/viz/graph-generator.rkt",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/Core/introspection/src/viz/graph-generator.rkt",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/dashboard.ts",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/dashboard.ts",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/dashboard.ts",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/dashboard.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/dashboard.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/dashboard.ts",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/workflow-visualizer.ts",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/workflow-visualizer.ts",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/workflow-visualizer.ts",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/workflow-visualizer.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/workflow-visualizer.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/js/workflow-visualizer.ts",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/src/db/state-aggregator.ts",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/src/db/state-aggregator.ts",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/src/db/state-aggregator.ts",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/src/db/state-aggregator.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/src/db/state-aggregator.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/dashboard/src/db/state-aggregator.ts",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/graphql/client/js/graphql-client.ts",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/graphql/client/js/graphql-client.ts",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/graphql/client/js/graphql-client.ts",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/graphql/client/js/graphql-client.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/graphql/client/js/graphql-client.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/graphql/client/js/graphql-client.ts",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/bin/swarm-cli.ts",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/bin/swarm-cli.ts",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/bin/swarm-cli.ts",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/bin/swarm-cli.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/bin/swarm-cli.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/bin/swarm-cli.ts",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/src/worker.ts",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/src/worker.ts",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/src/worker.ts",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/src/worker.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/src/worker.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/src/worker.ts",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/coordinator.test.ts",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/coordinator.test.ts",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/coordinator.test.ts",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/coordinator.test.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/coordinator.test.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/coordinator.test.ts",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/worker.test.ts",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/worker.test.ts",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/worker.test.ts",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/worker.test.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/worker.test.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/SymbolicEngine/swarm/tests/worker.test.ts",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "praxis/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/contractiles/trust/Trustfile.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/contractiles/trust/Trustfile.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/examples/quickstart/quickstart.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/examples/quickstart/quickstart.sh",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/examples/quickstart/quickstart.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/examples/quickstart/quickstart.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/examples/quickstart/quickstart.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/examples/quickstart/quickstart.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/ffi/zig/src/main.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/ffi/zig/src/main.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "praxis/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "praxis/ffi/zig/test/integration_test.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "praxis/ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "praxis/ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "praxis/ffi/zig/test/integration_test.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "praxis/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "praxis/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "praxis/src/abi/Foreign.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "praxis/src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "praxis/src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "praxis/src/abi/Foreign.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "praxis/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/src/abi/Types.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/src/abi/Types.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_injector/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_injector/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_injector/src/main.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_injector/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_injector/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_injector/src/main.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_injector/tests/unit_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "praxis/wp_injector/tests/unit_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "praxis/wp_injector/tests/unit_tests.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "praxis/wp_injector/tests/unit_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "praxis/wp_injector/tests/unit_tests.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "praxis/wp_injector/tests/unit_tests.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/toml.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/toml.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/toml.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/toml.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/toml.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/toml.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/yaml.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/yaml.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/yaml.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/yaml.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/yaml.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/parser/yaml.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/lib.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/lib.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/lib.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/manifest.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/manifest.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/manifest.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/manifest.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/manifest.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/manifest.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/symbol.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/symbol.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/symbol.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/symbol.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/symbol.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/symbol.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/validation.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/validation.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/validation.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/validation.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/validation.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/validation.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/verification.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/verification.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/verification.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/verification.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/verification.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/src/verification.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/tests/property_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/tests/property_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/tests/property_tests.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/tests/property_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/tests/property_tests.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "praxis/wp_praxis_core/tests/property_tests.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/schema/site.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/schema/site.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/schema/site.ncl",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/schema/site.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/schema/site.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/schema/site.ncl",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/sites/example.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/sites/example.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/sites/example.ncl",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/sites/example.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/sites/example.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/config/sites/example.ncl",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/contractiles/trust/Trustfile.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/contractiles/trust/Trustfile.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/ffi/zig/src/main.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/ffi/zig/src/main.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "resurrect/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "resurrect/ffi/zig/test/integration_test.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "resurrect/ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "resurrect/ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "resurrect/ffi/zig/test/integration_test.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "resurrect/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "resurrect/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "resurrect/src/abi/Foreign.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "resurrect/src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "resurrect/src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "resurrect/src/abi/Foreign.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "resurrect/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "resurrect/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "resurrect/src/abi/Types.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "resurrect/src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "resurrect/src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "resurrect/src/abi/Types.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/app.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/app.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/app.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/app.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/app.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/app.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/config.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/config.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/config.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/config.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/config.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/events.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/events.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/events.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/events.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/events.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "resurrect/src/socp-tui/src/events.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/contractiles/trust/Trustfile.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/contractiles/trust/Trustfile.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/license-detector/mod.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/license-detector/mod.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/license-detector/mod.js",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/license-detector/mod.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/license-detector/mod.js",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/license-detector/mod.js",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/scraper/mod.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/scraper/mod.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/scraper/mod.js",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/scraper/mod.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/scraper/mod.js",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/deno/lib/scraper/mod.js",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/src/main.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/src/main.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/test/integration_test.zig",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/ffi/zig/test/integration_test.zig",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/rescript/src/examples/example.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/rescript/src/examples/example.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/rescript/src/examples/example.res",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/rescript/src/examples/example.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/rescript/src/examples/example.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/rescript/src/examples/example.res",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Foreign.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Foreign.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 39.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Types.idr",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "sinople-theme/src/abi/Types.idr",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "sinople-theme/wasm/semantic_processor/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/wasm/semantic_processor/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/wasm/semantic_processor/src/lib.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/wasm/semantic_processor/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/wasm/semantic_processor/src/lib.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/wasm/semantic_processor/src/lib.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "sinople-theme/wordpress/assets/js/graph-viewer.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/wordpress/assets/js/graph-viewer.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/wordpress/assets/js/graph-viewer.js",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/wordpress/assets/js/graph-viewer.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/wordpress/assets/js/graph-viewer.js",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "sinople-theme/wordpress/assets/js/graph-viewer.js",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "plugin-conflict-mapper/assets/js/admin.js",
+          "praxis/SymbolicEngine/dashboard/injector/js/injector.ts"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "CommandInjection->Network"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "praxis/wp_injector/tests/unit_tests.rs",
+          "praxis/wp_praxis_core/src/verification.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          "sinople-theme/deno/fresh.gen.js"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "ExcessivePermissions->Disk"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "secured/php-aegis/validation/run-validation.sh",
+          "plugin-conflict-mapper/bin/install-wp-tests.sh",
+          "praxis/Core/db-schema/config/dev.exs",
+          "praxis/Core/db-schema/config/test.exs"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "HardcodedSecret->Network"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "praxis/wp_injector/tests/unit_tests.rs",
+          "praxis/wp_praxis_core/src/verification.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          "praxis/Core/cli-wrapper/lib/wp_praxis_cli/validator.ex",
+          "praxis/Core/introspection/src/viz/graph-generator.rkt"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "plugin-conflict-mapper/bin/install-wp-tests.sh",
+          "sinople-theme/rescript/src/examples/example.res"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "sinople-theme/deno/fresh.gen.js"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "ExcessivePermissions->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "secured/php-aegis/validation/run-validation.sh",
+          "plugin-conflict-mapper/bin/install-wp-tests.sh",
+          "praxis/Core/cli-wrapper/lib/wp_praxis_cli/validator.ex",
+          "praxis/Core/introspection/src/viz/graph-generator.rkt",
+          "praxis/examples/quickstart/quickstart.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "secured/src/abi/Foreign.idr",
+          "plugin-conflict-mapper/src/abi/Foreign.idr",
+          "praxis/src/abi/Foreign.idr",
+          "resurrect/src/abi/Foreign.idr",
+          "sinople-theme/src/abi/Foreign.idr"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "praxis/SymbolicEngine/dashboard/injector/js/injector.ts",
+          "praxis/SymbolicEngine/dashboard/js/dashboard.ts",
+          "praxis/SymbolicEngine/dashboard/js/symbol-inspector.ts",
+          "sinople-theme/wordpress/assets/js/graph-viewer.js",
+          "sinople-theme/wordpress/assets/js/navigation.js"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "DynamicCodeExecution->Network"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "secured/php-aegis/validation/run-validation.sh",
+          "plugin-conflict-mapper/bin/install-wp-tests.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "resurrect/state/lib/state-utils.scm"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "DynamicCodeExecution->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "resurrect/state/lib/state-utils.scm"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "Ecto",
+          "WebServer",
+          "Database",
+          "Cache"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      }
+    ]
+  }
+}

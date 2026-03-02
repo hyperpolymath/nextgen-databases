@@ -1,0 +1,125 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# VeriSimDB Container Image
+#
+# Build with Podman (in-memory, default):
+#   podman build -t verisimdb:latest -f container/Containerfile .
+#
+# Build with persistent storage (redb + file-backed Tantivy + WAL):
+#   podman build -t verisimdb:latest --build-arg FEATURES=persistent -f container/Containerfile .
+#
+# Run (in-memory):
+#   podman run -p 8080:8080 verisimdb:latest
+#
+# Run (persistent, with volume):
+#   podman run -p 8080:8080 -v verisimdb-data:/data verisimdb:latest
+
+# Stage 1: Build Rust
+FROM cgr.dev/chainguard/wolfi-base:latest AS rust-builder
+
+# openssl-dev removed: TLS now pure Rust (rustls + ring)
+# clang-19 removed: Oxigraph is now optional (oxigraph-backend feature flag, off by default)
+# protoc removed: protobuf code pre-generated at verisim-api/src/proto/verisim.rs
+RUN apk add --no-cache rust pkgconf build-base
+
+# Build arg: set to "persistent" for redb + file-backed Tantivy + WAL
+ARG FEATURES=""
+
+WORKDIR /build
+
+# Copy Rust workspace
+COPY Cargo.toml ./
+COPY rust-core/ ./rust-core/
+COPY benches/ ./benches/
+
+# Build only the API binary (skip benches).
+# When FEATURES=persistent, enables redb graph store + file-backed Tantivy + WAL.
+RUN if [ -n "$FEATURES" ]; then \
+      cargo build --release -p verisim-api --features "$FEATURES"; \
+    else \
+      cargo build --release -p verisim-api; \
+    fi
+
+# Stage 2: Build Elixir
+FROM cgr.dev/chainguard/wolfi-base:latest AS elixir-builder
+
+# Pin to OTP 27: mint 1.7.1 uses pkix_verify_hostname/3 removed in OTP 28
+RUN apk add --no-cache erl27-elixir-1.18 erlang-27 erlang-27-dev git build-base
+
+WORKDIR /build
+
+# Copy Elixir project
+COPY elixir-orchestration/ ./
+
+# Install deps, compile, and build release
+ENV MIX_ENV=prod
+RUN mix local.hex --force && \
+    mix local.rebar --force && \
+    mix deps.get --only prod && \
+    mix compile && \
+    mix release verisim
+
+# Stage 3: Runtime
+FROM cgr.dev/chainguard/wolfi-base:latest
+
+# OCI image labels (compatible with cerro-torre .ctp bundle metadata)
+LABEL org.opencontainers.image.title="VeriSimDB" \
+      org.opencontainers.image.description="Cross-system entity consistency engine with 8-modality drift detection" \
+      org.opencontainers.image.url="https://github.com/hyperpolymath/verisimdb" \
+      org.opencontainers.image.source="https://github.com/hyperpolymath/verisimdb" \
+      org.opencontainers.image.vendor="hyperpolymath" \
+      org.opencontainers.image.licenses="PMPL-1.0-or-later" \
+      org.opencontainers.image.authors="Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>" \
+      dev.cerrotorre.manifest="container/manifest.toml" \
+      dev.cerrotorre.gatekeeper="container/.gatekeeper.yaml" \
+      dev.stapeln.compose="container/compose.toml"
+
+# libssl3 removed: TLS now pure Rust (rustls + ring)
+RUN apk add --no-cache ca-certificates curl libstdc++ ncurses
+
+# Create non-root user
+RUN addgroup -S verisim && adduser -S verisim -G verisim
+
+WORKDIR /app
+
+# Copy Rust binary
+COPY --from=rust-builder /build/target/release/verisim-api /app/verisim-api
+
+# Copy Elixir release
+COPY --from=elixir-builder /build/_build/prod/rel/verisim /app/elixir/
+
+# Copy entrypoint
+COPY container/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Copy stapeln integration files (svalinn gatekeeper policy, cerro-torre manifest)
+COPY container/.gatekeeper.yaml /etc/svalinn/gatekeeper.yaml
+COPY container/manifest.toml /app/manifest.toml
+
+# Create data directory for persistent mode (mountable volume)
+RUN mkdir -p /data && chown verisim:verisim /data
+
+# Set ownership
+RUN chown -R verisim:verisim /app
+
+# Environment — IPv6-only by default
+ENV RUST_LOG=info
+ENV VERISIM_HOST=[::]
+ENV VERISIM_PORT=8080
+ENV VERISIM_RUST_CORE_URL=http://[::1]:8080/api/v1
+ENV VERISIM_LOG_FORMAT=json
+ENV VERISIM_PERSISTENCE_DIR=/data
+
+# Declare /data as a volume for persistent storage
+VOLUME ["/data"]
+
+# Run as non-root
+USER verisim
+
+# Expose API port
+EXPOSE 8080
+
+# Health check (as non-root, curl still works)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -sf http://localhost:8080/health || exit 1
+
+ENTRYPOINT ["/app/entrypoint.sh"]

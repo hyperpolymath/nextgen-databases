@@ -1,0 +1,37 @@
+{
+  "id": "issue-004",
+  "source": "known-issues",
+  "created_at": "2026-02-13T16:19:58Z",
+  "document": {
+    "title": "Drift Auto-Trigger Missing",
+    "body": "\\n**Location:** Elixir orchestration layer, `VeriSim.DriftMonitor`\\n\\n**Resolved:** 2026-02-12. `DriftMonitor.init/1` now schedules a periodic sweep via `Process.send_after` at a configurable interval (default 60s). The `:sweep` handler performs a full drift sweep including pulling aggregate metrics from the Rust core via `RustClient.drift_status/0`, then reschedules itself. The sweep interval is configurable via the `config` option passed to `start_link`.\\n\\n**Original issue:** Drift detection had to be triggered manually. No scheduled or event-driven trigger existed.\\n\\n",
+    "fields": {
+      "type": "known_issue",
+      "status": "resolved",
+      "severity": "resolved"
+    }
+  },
+  "graph": {
+    "relationships": [{"predicate": "documented_in", "target": "file:KNOWN-ISSUES.adoc"}]
+  },
+  "vector": {
+    "embedding": [0.078125,-0.171875,-0.351562,-0.593750,-0.046875,-0.242187,0.359375,0.632812,-0.695312,0.765625,0.570312,0.445312,0.070312,0.328125,0.625000,-0.648437,0.343750,-0.976562,0.218750,-0.242187,-0.445312,-0.914062,0.781250,-0.648437,-0.304687,0.695312,-0.578125,0.710937,0.539062,0.718750,-0.078125,0.531250,0.078125,-0.171875,-0.351562,-0.593750,-0.046875,-0.242187,0.359375,0.632812,-0.695312,0.765625,0.570312,0.445312,0.070312,0.328125,0.625000,-0.648437,0.343750,-0.976562,0.218750,-0.242187,-0.445312,-0.914062,0.781250,-0.648437,-0.304687,0.695312,-0.578125,0.710937,0.539062,0.718750,-0.078125,0.531250],
+    "model": "sha256-hash-64d"
+  },
+  "tensor": {
+    "shape": [1, 2],
+    "data": [1.0, 0.0]
+  },
+  "semantic": {
+    "types": ["https://verisim.db/self/type/KnownIssue", "https://verisim.db/self/type/resolved"],
+    "properties": {
+      "status": "resolved",
+      "severity": "resolved"
+    }
+  },
+  "temporal": {
+    "timestamp": "2026-02-13T16:19:58Z",
+    "version": 1,
+    "author": "self-ingest"
+  }
+}

@@ -1,0 +1,251 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/Session.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/Session.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "lib/bs/src/Session.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in lib/bs/src/Session.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "lib/ocaml/Session.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in lib/ocaml/Session.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 5434,
+    "unsafe_blocks": 25,
+    "panic_sites": 0,
+    "unwrap_calls": 3,
+    "allocation_sites": 1,
+    "io_operations": 1,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Manifest.res",
+      "lines": 127,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Session.res",
+      "lines": 91,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Index.res",
+      "lines": 323,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/Session.res",
+      "lines": 91,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/Manifest.res",
+      "lines": 127,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/Index.res",
+      "lines": 323,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Session.res",
+      "lines": 91,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Manifest.res",
+      "lines": 127,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Index.res",
+      "lines": 323,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "src/abi/Types.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Manifest.res",
+        "to": "src/Session.res",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Session.res",
+        "to": "src/Index.res",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/src/Session.res",
+        "to": "lib/bs/src/Manifest.res",
+        "relation": "shared_dir:lib/bs/src",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/src/Manifest.res",
+        "to": "lib/bs/src/Index.res",
+        "relation": "shared_dir:lib/bs/src",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Session.res",
+        "to": "lib/ocaml/Manifest.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Manifest.res",
+        "to": "lib/ocaml/Index.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/Session.res",
+          "lib/bs/src/Session.res",
+          "lib/ocaml/Session.res"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

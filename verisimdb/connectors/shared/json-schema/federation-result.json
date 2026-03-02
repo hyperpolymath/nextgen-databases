@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://verisim.db/schema/federation-result.json",
+  "$comment": "SPDX-License-Identifier: PMPL-1.0-or-later",
+  "title": "FederationResult",
+  "description": "A normalised result from a federated query. Each result represents a single hexad entity returned by a specific peer store in the federation mesh, along with its relevance score, drift status, and response timing.",
+  "type": "object",
+  "required": ["source_store", "hexad_id", "score", "drifted", "data", "response_time_ms"],
+  "properties": {
+    "source_store": {
+      "type": "string",
+      "description": "Identifier of the peer store that provided this result (e.g. 'store-1', '/universities/oxford')."
+    },
+    "hexad_id": {
+      "type": "string",
+      "description": "Hexad entity identifier within the source store."
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Relevance score for this result, normalised to [0.0, 1.0]. Higher is more relevant. Scoring method depends on the query type (cosine similarity for vector, BM25 for text, etc.)."
+    },
+    "drifted": {
+      "type": "boolean",
+      "description": "Whether the source store has known drift issues for this entity. When true, the entity's modality representations may be inconsistent. The federation coordinator annotates this based on the peer's reported drift scores and the query's drift policy."
+    },
+    "data": {
+      "type": "object",
+      "description": "Result data payload. Structure depends on the queried modalities. May contain document content, graph edges, embedding vectors, or any combination.",
+      "additionalProperties": true
+    },
+    "response_time_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Time in milliseconds that the source store took to respond to this query."
+    }
+  },
+  "additionalProperties": false
+}

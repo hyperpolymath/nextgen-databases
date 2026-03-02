@@ -1,0 +1,301 @@
+{
+  "program_path": ".",
+  "language": "shell",
+  "frameworks": [
+    "Concurrent",
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "crates/lsm/src/lib.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in crates/lsm/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "crates/neurophone-android/src/lib.rs",
+      "severity": "High",
+      "description": "4 unsafe blocks in crates/neurophone-android/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/neurophone-android/src/lib.rs",
+      "severity": "Medium",
+      "description": "17 unwrap/expect calls in crates/neurophone-android/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/build-android.sh",
+      "severity": "Medium",
+      "description": "42 potentially unquoted variable expansions in scripts/build-android.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/setup.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/setup.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 2707,
+    "unsafe_blocks": 4,
+    "panic_sites": 0,
+    "unwrap_calls": 27,
+    "allocation_sites": 2,
+    "io_operations": 2,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "crates/claude-client/src/lib.rs",
+      "lines": 547,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/lsm/src/lib.rs",
+      "lines": 519,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/neurophone-android/src/lib.rs",
+      "lines": 429,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 17,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "crates/neurophone-core/src/lib.rs",
+      "lines": 515,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "scripts/build-android.sh",
+      "lines": 122,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/setup.sh",
+      "lines": 79,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "concurrency",
+    "memory",
+    "disk",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "scripts/build-android.sh",
+        "to": "scripts/setup.sh",
+        "relation": "shared_dir:scripts",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/claude-client/src/lib.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/claude-client/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/lsm/src/lib.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "crates/lsm/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "crates/neurophone-android/src/lib.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 31.0
+      },
+      {
+        "from": "crates/neurophone-android/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 31.0
+      },
+      {
+        "from": "crates/neurophone-core/src/lib.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "crates/neurophone-core/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "scripts/build-android.sh",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/build-android.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/setup.sh",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/setup.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "crates/lsm/src/lib.rs",
+          "crates/neurophone-android/src/lib.rs"
+        ],
+        "frameworks": [
+          "Concurrent",
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/setup.sh"
+        ],
+        "frameworks": [
+          "Concurrent",
+          "Networking"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "crates/lsm/src/lib.rs",
+          "crates/neurophone-android/src/lib.rs"
+        ],
+        "frameworks": [
+          "Concurrent",
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/build-android.sh"
+        ],
+        "frameworks": [
+          "Concurrent",
+          "Networking"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "crates/neurophone-android/src/lib.rs"
+        ],
+        "frameworks": [
+          "Concurrent",
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "crates/neurophone-android/src/lib.rs"
+        ],
+        "frameworks": [
+          "Concurrent",
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Concurrency"
+      }
+    ]
+  }
+}

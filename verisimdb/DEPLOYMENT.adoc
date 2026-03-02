@@ -1,0 +1,791 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= VeriSimDB Production Deployment Guide
+:toc:
+:toc-placement!:
+
+[.lead]
+**Complete guide for deploying VeriSimDB in production environments**
+
+toc::[]
+
+== Overview
+
+VeriSimDB can be deployed in three modes:
+
+1. **Standalone** - Single-node database (like PostgreSQL)
+2. **Federated** - Coordinator for distributed stores across institutions
+3. **Hybrid** - Some modalities local, others federated
+
+This guide covers all deployment modes with focus on production readiness, security, monitoring, and operational procedures.
+
+== Prerequisites
+
+=== Hardware Requirements
+
+==== Minimum (Development/Testing)
+
+[cols="2,3"]
+|===
+|Component |Specification
+
+|CPU |4 cores
+|RAM |8 GB
+|Storage |20 GB SSD
+|Network |100 Mbps
+|===
+
+==== Recommended (Production - Standalone)
+
+[cols="2,3"]
+|===
+|Component |Specification
+
+|CPU |16 cores (AMD EPYC or Intel Xeon)
+|RAM |64 GB ECC
+|Storage |500 GB NVMe SSD (RAID 1)
+|Network |10 Gbps
+|===
+
+==== Recommended (Production - Federated Coordinator)
+
+[cols="2,3"]
+|===
+|Component |Specification
+
+|CPU |8 cores
+|RAM |32 GB ECC
+|Storage |100 GB NVMe SSD (RAID 1)
+|Network |10 Gbps with low latency
+|===
+
+=== Software Requirements
+
+* **OS**: Fedora 39+ or RHEL 9+ (other Linux distributions supported)
+* **Container Runtime**: Podman 4.0+ (preferred) or Docker 24.0+
+* **Rust**: 1.75+ (for building from source)
+* **Elixir**: 1.16+ with Erlang/OTP 26+
+* **Node.js/Deno**: Deno 1.40+ (for ReScript compilation)
+
+== Deployment Modes
+
+=== Mode 1: Standalone Database
+
+Single-node deployment with all 6 modalities local.
+
+==== Use Cases
+
+* Small to medium deployments (<10M hexads)
+* Organizations with single-site requirements
+* Development and testing environments
+* Air-gapped environments
+
+==== Architecture
+
+----
+┌─────────────────────────────────────────┐
+│  Elixir Orchestration (Port 4000)      │
+│    HTTP API + WebSocket                 │
+├─────────────────────────────────────────┤
+│  Rust Core (Port 8080)                  │
+│    verisim-api HTTP Server              │
+├─────────────────────────────────────────┤
+│  Local Modality Stores                  │
+│    ├── Graph (Oxigraph)                 │
+│    ├── Vector (HNSW)                    │
+│    ├── Tensor (ndarray)                 │
+│    ├── Semantic (CBOR)                  │
+│    ├── Document (Tantivy)               │
+│    └── Temporal (Version tree)          │
+└─────────────────────────────────────────┘
+----
+
+==== Deployment Steps
+
+[source,bash]
+----
+# 1. Clone repository
+git clone https://github.com/hyperpolymath/verisimdb
+cd verisimdb
+
+# 2. Build Rust core
+cargo build --release --all-features
+
+# 3. Build Elixir orchestration
+cd elixir-orchestration
+mix deps.get
+MIX_ENV=prod mix release
+
+# 4. Create container image
+cd ..
+podman build -t verisimdb:latest -f container/Containerfile .
+
+# 5. Create persistent volumes
+podman volume create verisimdb-data
+podman volume create verisimdb-logs
+
+# 6. Run container
+podman run -d \
+  --name verisimdb \
+  -p 8080:8080 \
+  -p 4000:4000 \
+  -v verisimdb-data:/var/lib/verisimdb:Z \
+  -v verisimdb-logs:/var/log/verisimdb:Z \
+  -e VERISIM_MODE=standalone \
+  -e VERISIM_DATA_DIR=/var/lib/verisimdb \
+  --restart=unless-stopped \
+  verisimdb:latest
+----
+
+=== Mode 2: Federated Coordinator
+
+Lightweight coordinator that maps hexad IDs to remote store locations.
+
+==== Use Cases
+
+* Multi-institutional collaborations
+* Distributed knowledge networks
+* Organizations with data sovereignty requirements
+* Hybrid cloud deployments
+
+==== Architecture
+
+----
+┌─────────────────────────────────────────────────────┐
+│  ReScript Registry (Port 3000)                      │
+│    UUID → Store Mapping + KRaft Metadata Log        │
+├─────────────────────────────────────────────────────┤
+│  Elixir Orchestration (Port 4000)                   │
+│    Federation Query Router                          │
+├─────────────────────────────────────────────────────┤
+│  Remote Stores (External)                           │
+│    ├── University A (Graph + Document)              │
+│    ├── Research Lab B (Vector + Tensor)             │
+│    └── Company C (Semantic + Temporal)              │
+└─────────────────────────────────────────────────────┘
+----
+
+==== Deployment Steps
+
+[source,bash]
+----
+# 1. Build ReScript registry
+cd src/registry
+deno bundle Registry.res registry.js
+
+# 2. Deploy registry
+podman run -d \
+  --name verisimdb-registry \
+  -p 3000:3000 \
+  -v verisimdb-registry-data:/var/lib/verisimdb-registry:Z \
+  -e VERISIM_MODE=federation \
+  -e VERISIM_REGISTRY_PORT=3000 \
+  --restart=unless-stopped \
+  verisimdb:latest registry
+
+# 3. Deploy orchestration layer
+podman run -d \
+  --name verisimdb-coordinator \
+  -p 4000:4000 \
+  --link verisimdb-registry \
+  -e VERISIM_MODE=federation \
+  -e VERISIM_REGISTRY_URL=http://verisimdb-registry:3000 \
+  --restart=unless-stopped \
+  verisimdb:latest coordinator
+----
+
+=== Mode 3: Hybrid Deployment
+
+Some modalities local (fast), others federated (shared).
+
+==== Use Cases
+
+* Organizations with high-frequency local queries + occasional federated queries
+* Caching frequently accessed remote data
+* Gradual migration from standalone to federated
+
+==== Configuration
+
+[source,toml]
+----
+# config/hybrid.toml
+[verisimdb]
+mode = "hybrid"
+
+[local_modalities]
+document = true
+vector = true
+temporal = true
+
+[federated_modalities]
+graph = ["https://partner-a.example.org:8080"]
+semantic = ["https://partner-b.example.org:8080"]
+tensor = ["https://partner-c.example.org:8080"]
+
+[cache]
+enabled = true
+ttl_seconds = 3600
+max_size_mb = 10240
+----
+
+== Configuration
+
+=== Environment Variables
+
+[cols="2,3,2"]
+|===
+|Variable |Description |Default
+
+|`VERISIM_MODE` |Deployment mode: standalone, federation, hybrid |standalone
+|`VERISIM_DATA_DIR` |Data directory path |/var/lib/verisimdb
+|`VERISIM_LOG_LEVEL` |Log level: debug, info, warn, error |info
+|`VERISIM_HTTP_PORT` |Rust API HTTP port |8080
+|`VERISIM_ELIXIR_PORT` |Elixir orchestration port |4000
+|`VERISIM_REGISTRY_PORT` |ReScript registry port |3000
+|`VERISIM_ENABLE_METRICS` |Enable Prometheus metrics |true
+|`VERISIM_ENABLE_TRACING` |Enable OpenTelemetry tracing |false
+|`VERISIM_MAX_CONNECTIONS` |Max concurrent connections |1000
+|`VERISIM_DRIFT_THRESHOLD` |Drift detection threshold (0.0-1.0) |0.7
+|`VERISIM_AUTO_NORMALIZE` |Enable automatic normalization |true
+|===
+
+=== Configuration File
+
+[source,toml]
+----
+# config/production.toml
+[verisimdb]
+mode = "standalone"
+data_dir = "/var/lib/verisimdb"
+log_level = "info"
+
+[http]
+port = 8080
+max_connections = 1000
+request_timeout_ms = 30000
+keep_alive = true
+
+[orchestration]
+port = 4000
+distributed_erlang = true
+cluster_cookie = "verisimdb-production-secret"
+
+[modalities]
+[modalities.document]
+enabled = true
+index_path = "/var/lib/verisimdb/document"
+commit_interval_ms = 5000
+
+[modalities.vector]
+enabled = true
+dimension = 384
+distance_metric = "cosine"
+hnsw_m = 16
+hnsw_ef_construction = 200
+
+[modalities.graph]
+enabled = true
+storage_path = "/var/lib/verisimdb/graph"
+
+[drift]
+enabled = true
+check_interval_ms = 60000
+thresholds = { semantic_vector = 0.7, graph_document = 0.8 }
+
+[normalization]
+enabled = true
+max_concurrent = 10
+strategy = "hybrid_push_pull"
+
+[metrics]
+enabled = true
+prometheus_port = 9090
+
+[tracing]
+enabled = false
+otlp_endpoint = "http://localhost:4317"
+----
+
+== Security
+
+=== Network Security
+
+==== Firewall Configuration
+
+[source,bash]
+----
+# Allow only necessary ports
+firewall-cmd --permanent --add-port=8080/tcp  # Rust API
+firewall-cmd --permanent --add-port=4000/tcp  # Elixir orchestration
+firewall-cmd --permanent --add-port=9090/tcp  # Prometheus metrics
+firewall-cmd --reload
+
+# Restrict to specific IPs (recommended)
+firewall-cmd --permanent --add-rich-rule='rule family="ipv4" source address="10.0.0.0/8" port port="8080" protocol="tcp" accept'
+----
+
+==== TLS/HTTPS
+
+[source,bash]
+----
+# Generate self-signed certificate (development)
+openssl req -x509 -newkey rsa:4096 -nodes \
+  -keyout /etc/verisimdb/tls/key.pem \
+  -out /etc/verisimdb/tls/cert.pem \
+  -days 365 \
+  -subj "/CN=verisimdb.example.org"
+
+# Production: Use Let's Encrypt
+certbot certonly --standalone \
+  -d verisimdb.example.org \
+  --deploy-hook "systemctl reload verisimdb"
+
+# Configure TLS in config
+[http.tls]
+enabled = true
+cert_path = "/etc/letsencrypt/live/verisimdb.example.org/fullchain.pem"
+key_path = "/etc/letsencrypt/live/verisimdb.example.org/privkey.pem"
+----
+
+=== Authentication & Authorization
+
+==== API Keys
+
+[source,bash]
+----
+# Generate API key
+openssl rand -hex 32 > /etc/verisimdb/api-keys/admin.key
+
+# Configure in environment
+export VERISIM_API_KEY=$(cat /etc/verisimdb/api-keys/admin.key)
+
+# Use in requests
+curl -H "Authorization: Bearer $VERISIM_API_KEY" \
+  https://verisimdb.example.org:8080/api/v1/health
+----
+
+==== Role-Based Access Control (RBAC)
+
+[source,toml]
+----
+# config/rbac.toml
+[roles.reader]
+permissions = ["hexad:read", "search:execute"]
+
+[roles.writer]
+permissions = ["hexad:read", "hexad:write", "search:execute"]
+
+[roles.admin]
+permissions = ["*"]
+
+[users]
+[users."alice@example.org"]
+role = "admin"
+api_key_hash = "sha256:..."
+
+[users."bob@example.org"]
+role = "writer"
+api_key_hash = "sha256:..."
+----
+
+=== Data Encryption
+
+==== Encryption at Rest
+
+[source,bash]
+----
+# Use LUKS for volume encryption
+cryptsetup luksFormat /dev/sdb
+cryptsetup luksOpen /dev/sdb verisimdb-data
+mkfs.ext4 /dev/mapper/verisimdb-data
+mount /dev/mapper/verisimdb-data /var/lib/verisimdb
+
+# Auto-mount on boot
+echo "verisimdb-data UUID=$(blkid -s UUID -o value /dev/sdb) none luks" >> /etc/crypttab
+echo "/dev/mapper/verisimdb-data /var/lib/verisimdb ext4 defaults 0 2" >> /etc/fstab
+----
+
+==== Encryption in Transit
+
+All network communication uses TLS 1.3:
+* API endpoints (HTTPS)
+* Elixir distributed Erlang (TLS)
+* Federated store communication (HTTPS)
+
+== Monitoring
+
+=== Prometheus Metrics
+
+VeriSimDB exposes metrics on port 9090 (configurable):
+
+[source,bash]
+----
+# Scrape configuration
+# prometheus.yml
+scrape_configs:
+  - job_name: 'verisimdb'
+    static_configs:
+      - targets: ['localhost:9090']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+----
+
+==== Key Metrics
+
+[cols="2,3,2"]
+|===
+|Metric |Description |Type
+
+|`verisim_hexads_total` |Total hexads in database |Counter
+|`verisim_queries_total` |Total queries executed |Counter
+|`verisim_query_duration_seconds` |Query latency histogram |Histogram
+|`verisim_drift_score` |Current drift score |Gauge
+|`verisim_normalizations_total` |Total normalizations performed |Counter
+|`verisim_store_health` |Store health status (0-1) |Gauge
+|`verisim_memory_usage_bytes` |Memory usage |Gauge
+|`verisim_disk_usage_bytes` |Disk usage per modality |Gauge
+|===
+
+=== Logging
+
+==== Log Levels
+
+* `DEBUG` - Detailed trace for development
+* `INFO` - Normal operational messages
+* `WARN` - Warning conditions
+* `ERROR` - Error conditions requiring attention
+
+==== Log Format
+
+[source,json]
+----
+{
+  "timestamp": "2026-02-04T20:00:00Z",
+  "level": "INFO",
+  "component": "verisim-api",
+  "message": "Hexad created",
+  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "modalities": ["document", "vector"],
+  "duration_ms": 45
+}
+----
+
+==== Log Rotation
+
+[source,bash]
+----
+# /etc/logrotate.d/verisimdb
+/var/log/verisimdb/*.log {
+    daily
+    rotate 30
+    compress
+    delaycompress
+    notifempty
+    create 0640 verisimdb verisimdb
+    sharedscripts
+    postrotate
+        podman kill -s HUP verisimdb
+    endscript
+}
+----
+
+=== Alerting
+
+==== Prometheus Alerting Rules
+
+[source,yaml]
+----
+# alerts.yml
+groups:
+  - name: verisimdb
+    interval: 30s
+    rules:
+      - alert: HighDriftScore
+        expr: verisim_drift_score > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High drift detected"
+          description: "Drift score {{ $value }} exceeds threshold"
+
+      - alert: SlowQueries
+        expr: histogram_quantile(0.95, verisim_query_duration_seconds) > 1.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow queries detected"
+          description: "95th percentile query latency is {{ $value }}s"
+
+      - alert: StoreUnhealthy
+        expr: verisim_store_health < 0.5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Store unhealthy"
+          description: "Store {{ $labels.store }} health is {{ $value }}"
+----
+
+== Backup & Recovery
+
+=== Backup Strategy
+
+==== Full Backup
+
+[source,bash]
+----
+#!/bin/bash
+# backup-verisimdb.sh
+
+BACKUP_DIR="/backups/verisimdb"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+BACKUP_PATH="$BACKUP_DIR/verisimdb_$TIMESTAMP"
+
+# Stop writes (optional, for consistent backup)
+curl -X POST http://localhost:8080/api/v1/admin/read-only
+
+# Backup data directory
+tar -czf "$BACKUP_PATH.tar.gz" /var/lib/verisimdb
+
+# Backup configuration
+tar -czf "$BACKUP_DIR/config_$TIMESTAMP.tar.gz" /etc/verisimdb
+
+# Resume writes
+curl -X POST http://localhost:8080/api/v1/admin/read-write
+
+# Upload to remote storage
+rclone copy "$BACKUP_PATH.tar.gz" remote:verisimdb-backups/
+
+# Cleanup old backups (keep last 30 days)
+find $BACKUP_DIR -name "verisimdb_*.tar.gz" -mtime +30 -delete
+
+echo "Backup complete: $BACKUP_PATH.tar.gz"
+----
+
+==== Incremental Backup
+
+[source,bash]
+----
+# Use rsync for incremental backups
+rsync -avz --delete \
+  /var/lib/verisimdb/ \
+  backup-server:/backups/verisimdb/current/
+----
+
+=== Recovery
+
+==== Restore from Backup
+
+[source,bash]
+----
+# Stop VeriSimDB
+podman stop verisimdb
+
+# Restore data
+tar -xzf /backups/verisimdb_20260204_120000.tar.gz -C /
+
+# Restore configuration
+tar -xzf /backups/config_20260204_120000.tar.gz -C /
+
+# Start VeriSimDB
+podman start verisimdb
+
+# Verify integrity
+curl http://localhost:8080/api/v1/health
+----
+
+==== Point-in-Time Recovery
+
+VeriSimDB's temporal modality supports point-in-time recovery:
+
+[source,bash]
+----
+# Restore hexad to specific timestamp
+curl -X POST http://localhost:8080/api/v1/admin/restore \
+  -H "Content-Type: application/json" \
+  -d '{
+    "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+    "timestamp": "2026-02-04T12:00:00Z"
+  }'
+----
+
+== Performance Tuning
+
+=== Benchmarking
+
+[source,bash]
+----
+# Run benchmarks
+cargo bench --bench modality_benchmarks
+
+# Results location
+open target/criterion/report/index.html
+----
+
+=== Optimization Tips
+
+==== Vector Store
+
+* Use smaller dimensions (128-384) for faster similarity search
+* Tune HNSW parameters: `M=16`, `ef_construction=200`
+* Consider quantization for large datasets
+
+==== Document Store
+
+* Increase Tantivy commit interval for write-heavy workloads
+* Use smaller index segments for read-heavy workloads
+* Enable compression for large document bodies
+
+==== Graph Store
+
+* Use SPARQL query optimization
+* Index frequently queried predicates
+* Partition large graphs by domain
+
+==== Drift Detection
+
+* Adjust thresholds based on workload
+* Disable for write-heavy applications
+* Use async normalization
+
+== Troubleshooting
+
+=== Common Issues
+
+==== High Memory Usage
+
+[source,bash]
+----
+# Check memory stats
+podman stats verisimdb
+
+# Reduce vector dimension
+# config.toml
+[modalities.vector]
+dimension = 128  # Instead of 384
+
+# Enable disk-based caching
+[cache]
+strategy = "disk"
+max_memory_mb = 1024
+----
+
+==== Slow Queries
+
+[source,bash]
+----
+# Enable query profiling
+export VERISIM_LOG_LEVEL=debug
+export VERISIM_PROFILE_QUERIES=true
+
+# Check slow query log
+grep "slow_query" /var/log/verisimdb/api.log
+
+# Use EXPLAIN for query plans
+curl -X POST http://localhost:8080/api/v1/query/explain \
+  -d '{"query": "SELECT * FROM..."}'
+----
+
+==== Drift Normalization Failures
+
+[source,bash]
+----
+# Check normalization status
+curl http://localhost:8080/api/v1/normalizer/status
+
+# Manual trigger
+curl -X POST http://localhost:8080/api/v1/normalizer/trigger/$HEXAD_ID
+
+# Check drift scores
+curl http://localhost:8080/api/v1/drift/entity/$HEXAD_ID
+----
+
+== Operational Procedures
+
+=== Health Checks
+
+[source,bash]
+----
+# Basic health
+curl http://localhost:8080/api/v1/health
+
+# Detailed status
+curl http://localhost:8080/api/v1/status
+----
+
+=== Upgrades
+
+[source,bash]
+----
+# 1. Backup before upgrade
+./backup-verisimdb.sh
+
+# 2. Pull new image
+podman pull verisimdb:v0.2.0
+
+# 3. Stop current container
+podman stop verisimdb
+
+# 4. Run new version
+podman run -d \
+  --name verisimdb-new \
+  -p 8080:8080 \
+  -v verisimdb-data:/var/lib/verisimdb:Z \
+  verisimdb:v0.2.0
+
+# 5. Verify new version
+curl http://localhost:8080/api/v1/health
+
+# 6. Remove old container
+podman rm verisimdb
+podman rename verisimdb-new verisimdb
+----
+
+=== Scaling
+
+==== Vertical Scaling
+
+* Increase CPU cores for parallel query processing
+* Increase RAM for larger in-memory indexes
+* Use faster NVMe storage for modality stores
+
+==== Horizontal Scaling (Federation)
+
+* Deploy multiple standalone instances
+* Use ReScript registry to coordinate
+* Distribute hexads across instances by hash
+
+== Production Checklist
+
+=== Before Go-Live
+
+- [ ] Hardware meets minimum requirements
+- [ ] TLS certificates configured
+- [ ] API authentication enabled
+- [ ] Firewall rules configured
+- [ ] Monitoring and alerting configured
+- [ ] Backup automation configured
+- [ ] Recovery procedures tested
+- [ ] Load testing completed
+- [ ] Security audit completed
+- [ ] Documentation updated
+
+=== Post-Deployment
+
+- [ ] Monitor metrics for 24 hours
+- [ ] Verify backup completion
+- [ ] Test recovery procedures
+- [ ] Document any issues
+- [ ] Schedule regular maintenance
+- [ ] Plan capacity expansion
+- [ ] Review security logs
+
+== Support
+
+For production support:
+
+* **Documentation**: https://verisimdb.hyperpolymath.org/docs
+* **Issues**: https://github.com/hyperpolymath/verisimdb/issues
+* **Discussions**: https://github.com/hyperpolymath/verisimdb/discussions
+* **Security**: security@hyperpolymath.org

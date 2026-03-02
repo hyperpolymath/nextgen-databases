@@ -1,0 +1,249 @@
+{
+  "program_path": ".",
+  "language": "ada",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "b~main.adb",
+      "severity": "High",
+      "description": "pragma Suppress (runtime checks disabled) in b~main.adb",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 1452,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 27,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/ada/core/kith.adb",
+      "lines": 39,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/core/main.adb",
+      "lines": 10,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/integration/dns.adb",
+      "lines": 30,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/integration/git.adb",
+      "lines": 48,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/integration/webserver.adb",
+      "lines": 42,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/plugins/academic.adb",
+      "lines": 27,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/plugins/creative.adb",
+      "lines": 41,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/plugins/union.adb",
+      "lines": 39,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/ui/cli.adb",
+      "lines": 82,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/ui/tui.adb",
+      "lines": 10,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/validation/aibdp_validation.adb",
+      "lines": 113,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/validation/did.adb",
+      "lines": 85,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ada/validation/security_txt.adb",
+      "lines": 88,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "b~main.adb",
+      "lines": 267,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/ada/plugins/academic.adb",
+        "to": "src/ada/plugins/creative.adb",
+        "relation": "shared_dir:src/ada/plugins",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/plugins/creative.adb",
+        "to": "src/ada/plugins/union.adb",
+        "relation": "shared_dir:src/ada/plugins",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/integration/dns.adb",
+        "to": "src/ada/integration/git.adb",
+        "relation": "shared_dir:src/ada/integration",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/integration/git.adb",
+        "to": "src/ada/integration/webserver.adb",
+        "relation": "shared_dir:src/ada/integration",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/core/kith.adb",
+        "to": "src/ada/core/main.adb",
+        "relation": "shared_dir:src/ada/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/ui/cli.adb",
+        "to": "src/ada/ui/tui.adb",
+        "relation": "shared_dir:src/ada/ui",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/validation/aibdp_validation.adb",
+        "to": "src/ada/validation/did.adb",
+        "relation": "shared_dir:src/ada/validation",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ada/validation/did.adb",
+        "to": "src/ada/validation/security_txt.adb",
+        "relation": "shared_dir:src/ada/validation",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "b~main.adb"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "b~main.adb"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Memory"
+      }
+    ]
+  }
+}

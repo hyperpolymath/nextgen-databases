@@ -1,0 +1,260 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= VeriSimDB Deployment Modes
+
+VeriSimDB is **both** a database and a federation coordinator—the architecture supports multiple deployment modes to suit different use cases.
+
+== Three Deployment Modes
+
+=== Mode 1: Standalone Database (Traditional)
+
+Deploy VeriSimDB as a **complete database system** with all six modalities local.
+
+[cols="1,3"]
+|===
+|Component |Function
+
+|Registry
+|Local in-memory namespace
+
+|Modality Stores
+|All 6 modalities running on the same machine/cluster
+
+|Use Case
+|Single institution, traditional database replacement
+
+|Pros
+|Simple deployment, no federation overhead, full ACID guarantees
+
+|Cons
+|No cross-institutional sharing, scaling limited to vertical/sharding
+|===
+
+[source,bash]
+----
+# Start all-in-one VeriSimDB node
+cargo run -p verisim-api  # Rust stores
+iex -S mix                # Elixir orchestration
+----
+
+**Example:** University research lab wants a multimodal database for their internal projects.
+
+=== Mode 2: Federated Coordinator (Tiny Core)
+
+Deploy only the **ReScript registry + Elixir orchestrator** while modality stores run elsewhere.
+
+[cols="1,3"]
+|===
+|Component |Function
+
+|Registry
+|Central namespace, KRaft quorum for consensus
+
+|Modality Stores
+|External: University A (graph), Lab B (vector), Archive C (document)
+
+|Use Case
+|Cross-institutional federation, data sovereignty
+
+|Pros
+|Minimal footprint (<5k LOC), institutions keep data local, drift detection across boundaries
+
+|Cons
+|Network latency, requires federation protocol adoption
+|===
+
+[source,bash]
+----
+# Deploy only coordination layer
+cd registry && npm run build  # ReScript → WASM
+cd ../elixir-orchestration && iex -S mix
+
+# Remote stores register via API:
+curl -X POST http://registry:8080/api/v1/stores \
+  -d '{"store_id": "...", "endpoint": "https://uni-a.edu/verisim", ...}'
+----
+
+**Example:** Open Science consortium where each university keeps their data but shares namespace.
+
+=== Mode 3: Hybrid (Recommended for Most Users)
+
+Run **some modalities locally** and **federate others**.
+
+[cols="1,3"]
+|===
+|Component |Function
+
+|Registry
+|Local or quorum
+
+|Local Modalities
+|Graph, Vector (performance-critical)
+
+|Federated Modalities
+|Document (archive.org), Temporal (institution B)
+
+|Use Case
+|Performance + federation balance
+
+|Pros
+|Hot data local, cold data federated, flexible scaling
+
+|Cons
+|More complex configuration
+|===
+
+[source,bash]
+----
+# Start local stores for graph + vector
+cargo run -p verisim-api --features graph,vector
+
+# Configure remote federation for document + temporal
+# via orchestrator config
+----
+
+**Example:** AI research lab needs fast vector search locally but shares documentation with broader community.
+
+== Is VeriSimDB a Database?
+
+**Yes**, VeriSimDB is a database in all three modes:
+
+1. **Standalone mode** → Traditional multimodal database
+2. **Federated mode** → Distributed database with controlled consistency
+3. **Hybrid mode** → Partially local, partially federated database
+
+The key architectural innovation is that it **also** enables federation without forcing you into that model.
+
+== Comparison to Traditional Architectures
+
+[cols="1,2,2,2"]
+|===
+|Architecture |Data Location |Consistency Model |Best For
+
+|**PostgreSQL**
+|Single instance or replicas
+|Strong ACID
+|Transactional apps
+
+|**Cassandra**
+|Distributed replicas
+|Eventual consistency
+|High availability
+
+|**IPFS**
+|Content-addressed blocks
+|Immutable
+|Static content
+
+|**VeriSimDB (Standalone)**
+|All local
+|Strong per-modality
+|Multimodal apps
+
+|**VeriSimDB (Federated)**
+|Across institutions
+|Drift-tolerant
+|Cross-institutional collaboration
+
+|**VeriSimDB (Hybrid)**
+|Partially local/remote
+|Configurable
+|Performance + federation
+|===
+
+== Technical: How Mode Selection Works
+
+The deployment mode is determined by:
+
+1. **Registry Configuration** - Single node vs quorum cluster
+2. **Store Registration** - Which modalities are local vs remote
+3. **Orchestrator Config** - Drift detection scope and repair policies
+
+[source,elixir]
+----
+# config/config.exs
+config :verisim,
+  deployment_mode: :hybrid,
+  local_modalities: [:graph, :vector],
+  federated_modalities: [
+    document: "https://archive.org/verisim",
+    temporal: "https://uni-b.edu/verisim"
+  ]
+----
+
+== Migration Paths
+
+=== Start Standalone → Federate Later
+
+1. Deploy Mode 1 (standalone)
+2. As you grow, register external stores
+3. Gradually migrate modalities to federation
+4. Orchestrator handles transition transparently
+
+=== Start Federated → Add Local Stores
+
+1. Deploy Mode 2 (coordinator only)
+2. Add local modality stores for performance
+3. Configure hybrid routing rules
+4. Hot data stays local, cold data federated
+
+== Operational Considerations
+
+[cols="1,2,2"]
+|===
+|Aspect |Standalone |Federated
+
+|**Latency**
+|Sub-millisecond
+|Network-dependent (10-100ms typical)
+
+|**Availability**
+|Single point of failure (unless clustered)
+|Resilient (quorum consensus)
+
+|**Data Sovereignty**
+|Full control
+|Institutions keep ownership
+
+|**Scaling**
+|Vertical + sharding
+|Horizontal federation
+
+|**Complexity**
+|Low (one system)
+|Medium (coordination protocol)
+|===
+
+== Choosing Your Mode
+
+[cols="1,3"]
+|===
+|Use Case |Recommended Mode
+
+|Small team, fast iteration
+|**Standalone**
+
+|Cross-institutional research
+|**Federated**
+
+|Performance-critical AI workloads with external docs
+|**Hybrid**
+
+|Building a product
+|**Standalone** (start), **Hybrid** (scale)
+
+|Open Science consortium
+|**Federated**
+
+|Enterprise with multiple departments
+|**Hybrid** (departments = federated stores)
+|===
+
+== Summary
+
+VeriSimDB's architecture supports three deployment modes:
+
+* **Standalone** - Traditional database, all modalities local
+* **Federated** - Tiny coordinator, stores distributed across institutions
+* **Hybrid** - Best of both worlds, performance + federation
+
+The "tiny core" refers to the **federated coordination layer**, but VeriSimDB **is a database** in all three modes. The choice depends on your use case, not the technology's capabilities.

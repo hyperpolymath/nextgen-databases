@@ -1,0 +1,230 @@
+import React, { useState } from 'react';
+import { 
+  Database, 
+  Shield, 
+  Activity, 
+  Share2, 
+  Cpu, 
+  FileText, 
+  Layers, 
+  Zap, 
+  Lock, 
+  History,
+  CheckCircle2,
+  AlertCircle
+} from 'lucide-react';
+
+const App = () => {
+  const [activeStep, setActiveStep] = useState(0);
+
+  const steps = [
+    {
+      title: "1. The Heavy Handshake",
+      desc: "Client sends a sactify-php signed request. Controller Quorum (KRaft) verifies identity and registers the intent.",
+      icon: <Lock className="w-6 h-6" />,
+      color: "text-blue-500"
+    },
+    {
+      title: "2. Consensus & Commitment",
+      desc: "The Leader proposes the Hexad update. Once a majority of the Quorum agrees, it's committed to the log.",
+      icon: <CheckCircle2 className="w-6 h-6" />,
+      color: "text-green-500"
+    },
+    {
+      title: "3. Snapshotting & Truncation",
+      desc: "To keep the core 'tiny', the log is periodically collapsed into a snapshot. Old entries are discarded.",
+      icon: <Cpu className="w-6 h-6" />,
+      color: "text-purple-500"
+    },
+    {
+      title: "4. Federated Routing",
+      desc: "WASM Proxy uses the 'Trust Window' (symmetric key) for high-speed routing to Rust modality stores.",
+      icon: <Zap className="w-6 h-6" />,
+      color: "text-yellow-500"
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-8 font-sans">
+      <div className="max-w-6xl mx-auto">
+        <header className="mb-12 text-center">
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">VeriSimDB Architecture</h1>
+          <p className="text-xl text-slate-600">The "Tiny Core" Federated Knowledge Infrastructure</p>
+        </header>
+
+        {/* High Level Structure */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          {/* THE CORE */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Shield className="w-6 h-6 text-blue-600" />
+              </div>
+              <h2 className="text-xl font-bold">The Registry Quorum</h2>
+            </div>
+            <ul className="space-y-3 text-slate-600 text-sm">
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500"/> KRaft Consensus Layer</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500"/> ReScript Global Namespace</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500"/> Snapshot Management</li>
+            </ul>
+          </div>
+
+          {/* THE ORCHESTRATION */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Activity className="w-6 h-6 text-purple-600" />
+              </div>
+              <h2 className="text-xl font-bold">Orchestrator</h2>
+            </div>
+            <ul className="space-y-3 text-slate-600 text-sm">
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500"/> Elixir GenStage Pipelines</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500"/> Drift Detection Engine</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500"/> Trust Window Management</li>
+            </ul>
+          </div>
+
+          {/* THE STORES */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Share2 className="w-6 h-6 text-orange-600" />
+              </div>
+              <h2 className="text-xl font-bold">Federated Stores</h2>
+            </div>
+            <ul className="space-y-3 text-slate-600 text-sm">
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500"/> Rust Modality Crates</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500"/> Hexad Modality Payloads</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500"/> Local Sovereignty</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Interactive Sequence Flow */}
+        <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-xl overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-8 opacity-10">
+            <Layers className="w-64 h-64" />
+          </div>
+          
+          <h3 className="text-2xl font-bold mb-8">The Knowledge Lifecycle</h3>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              {steps.map((step, idx) => (
+                <div 
+                  key={idx}
+                  onClick={() => setActiveStep(idx)}
+                  className={`p-4 rounded-xl cursor-pointer transition-all duration-300 border-l-4 ${
+                    activeStep === idx 
+                      ? 'bg-slate-800 border-white translate-x-2' 
+                      : 'bg-transparent border-transparent opacity-50 hover:opacity-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={step.color}>{step.icon}</div>
+                    <div>
+                      <h4 className="font-bold">{step.title}</h4>
+                      <p className="text-sm text-slate-400">{step.desc}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Visual Logic Diagram */}
+            <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 min-h-[400px] flex flex-col justify-between">
+              <div className="flex justify-between items-center border-b border-slate-700 pb-4">
+                <span className="text-xs uppercase tracking-widest text-slate-500">System State</span>
+                <span className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded">HEALTHY</span>
+              </div>
+              
+              <div className="flex-grow flex items-center justify-center relative py-12">
+                {activeStep === 0 && (
+                   <div className="animate-pulse flex flex-col items-center">
+                      <Lock className="w-16 h-16 text-blue-400 mb-4" />
+                      <div className="h-1 w-32 bg-blue-400/30 rounded-full" />
+                      <p className="mt-4 text-blue-400 font-mono text-sm">VERIFYING_SIGNATURE...</p>
+                   </div>
+                )}
+                {activeStep === 1 && (
+                   <div className="flex flex-col items-center">
+                      <div className="flex gap-4 mb-4">
+                        <Database className="w-10 h-10 text-green-400" />
+                        <div className="w-8 h-px bg-slate-600 mt-5 border-dashed border-t" />
+                        <Database className="w-10 h-10 text-green-400" />
+                        <div className="w-8 h-px bg-slate-600 mt-5 border-dashed border-t" />
+                        <Database className="w-10 h-10 text-green-400" />
+                      </div>
+                      <p className="text-green-400 font-mono text-sm">MAJORITY_AGREED (2/3)</p>
+                   </div>
+                )}
+                {activeStep === 2 && (
+                   <div className="flex flex-col items-center">
+                      <History className="w-16 h-16 text-purple-400 mb-4" />
+                      <div className="flex gap-1 mb-2">
+                        {[1,2,3,4,5].map(i => <div key={i} className={`w-2 h-4 bg-slate-600 ${i < 4 ? 'bg-purple-400/50' : ''}`} />)}
+                      </div>
+                      <p className="text-purple-400 font-mono text-sm">LOG_TRUNCATED_AT_0x4F2</p>
+                   </div>
+                )}
+                {activeStep === 3 && (
+                   <div className="flex flex-col items-center w-full px-8">
+                      <div className="w-full flex justify-between mb-8">
+                        <div className="p-3 bg-slate-700 rounded-lg">WASM</div>
+                        <div className="flex-grow flex items-center px-4">
+                          <div className="w-full h-px bg-yellow-400 relative">
+                            <Zap className="w-4 h-4 text-yellow-400 absolute left-1/2 -top-2 animate-bounce" />
+                          </div>
+                        </div>
+                        <div className="p-3 bg-slate-700 rounded-lg">RUST</div>
+                      </div>
+                      <p className="text-yellow-400 font-mono text-sm">FAST_PATH_ENABLED</p>
+                   </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-700">
+                  <span className="block text-[10px] text-slate-500 uppercase">Registry Size</span>
+                  <span className="text-sm font-mono text-slate-300">4.2 KB</span>
+                </div>
+                <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-700">
+                  <span className="block text-[10px] text-slate-500 uppercase">Consensus Status</span>
+                  <span className="text-sm font-mono text-slate-300">Quorum: OK</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Hexad Structure Diagram */}
+        <div className="mt-16 p-8 bg-white rounded-3xl border border-slate-200">
+          <h3 className="text-2xl font-bold mb-8 text-slate-900">Logical Structure: The Hexad</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              { label: "GRAPH", type: "Oxigraph", icon: <Share2 className="w-5 h-5" /> },
+              { label: "VECTOR", type: "HNSW", icon: <Zap className="w-5 h-5" /> },
+              { label: "TENSOR", type: "ndarray", icon: <Cpu className="w-5 h-5" /> },
+              { label: "SEMANTIC", type: "CBOR", icon: <FileText className="w-5 h-5" /> },
+              { label: "DOCUMENT", type: "Tantivy", icon: <FileText className="w-5 h-5" /> },
+              { label: "TEMPORAL", type: "Merkle", icon: <History className="w-5 h-5" /> },
+            ].map((mod, i) => (
+              <div key={i} className="flex flex-col items-center p-4 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
+                <div className="p-2 bg-white rounded-lg shadow-sm mb-3 text-slate-700">{mod.icon}</div>
+                <span className="text-xs font-bold text-slate-900">{mod.label}</span>
+                <span className="text-[10px] text-slate-500 mt-1">{mod.type}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 pt-8 border-t border-slate-100 flex justify-center">
+            <div className="bg-blue-600 text-white px-6 py-3 rounded-full font-mono text-sm shadow-lg shadow-blue-200">
+              UUID: 0x12AB...990F
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;

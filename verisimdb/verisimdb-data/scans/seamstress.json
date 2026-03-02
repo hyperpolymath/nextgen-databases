@@ -1,0 +1,142 @@
+{
+  "program_path": "/var/mnt/eclipse/repos/seamstress",
+  "language": "rust",
+  "frameworks": [
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "services/seamstressd/lib/seamstressd/runner.ex",
+      "severity": "Medium",
+      "description": "System command execution in services/seamstressd/lib/seamstressd/runner.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 1676,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 1,
+    "io_operations": 8,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "tools/seamctl/src/graph.rs",
+      "lines": 101,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/seamctl/src/report.rs",
+      "lines": 92,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tools/seamctl/src/validate.rs",
+      "lines": 140,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "tools/seamctl/src/graph.rs",
+        "to": "tools/seamctl/src/report.rs",
+        "relation": "shared_dir:tools/seamctl/src",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/seamctl/src/report.rs",
+        "to": "tools/seamctl/src/validate.rs",
+        "relation": "shared_dir:tools/seamctl/src",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/seamctl/src/graph.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/seamctl/src/report.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tools/seamctl/src/validate.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "services/seamstressd/lib/seamstressd/runner.ex"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "services/seamstressd/lib/seamstressd/runner.ex"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

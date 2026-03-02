@@ -1,0 +1,762 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= Normalization Cascade Architecture
+:toc: left
+:toclevels: 4
+:sectnums:
+:stem: latexmath
+
+== Overview
+
+This document analyzes the **normalization cascade** in VeriSimDB - the hierarchical levels at which consistency is maintained, and whether normalization should be **pushed** (proactive propagation) or **pulled** (on-demand correction).
+
+**Core Question:** Is VeriSimDB responsible for:
+1. **Database-only normalization** - Ensuring its own internal consistency?
+2. **System-wide normalization** - Actively propagating changes across federated nodes?
+
+== ⭐ RECOMMENDATION: Hybrid Push/Pull with Database-Internal Focus
+
+[IMPORTANT]
+====
+**Decision:** VeriSimDB normalizes what it controls, advises on what it doesn't.
+
+**Core Philosophy:** Push is expensive - reserve for safety-critical issues. Pull scales better for optimization.
+====
+
+=== Strategy by Level (The Answer)
+
+[cols="1,2,1,3"]
+|===
+|Level |Scope |Strategy |Rationale
+
+|**L0: Intra-Modality**
+|Within single modality store
+|✅ **PULL**
+|Stores normalize on insert. VeriSimDB delegates to modality stores.
+
+|**L1: Cross-Modality**
+|Across modalities in hexad
+|✅ **HYBRID**
+|**PUSH:** Critical (integrity violations, retractions) +
+**PULL:** Optimization (title mismatches, cosmetic drift) +
+*This is VeriSimDB's unique value - multi-modal consistency*
+
+|**L2: Cross-Hexad**
+|Between related hexads
+|✅ **PULL**
+|Validate citations at query time. Most citations are valid, scales better.
+
+|**L3: Cross-Store**
+|Federated VeriSimDB instances
+|✅ **HYBRID**
+|**ASYNC PUSH:** Critical (retractions, access changes) +
+**PULL:** Version drift, schema updates +
+*Shared responsibility, no single authority*
+
+|**L4: Cross-Lineage**
+|External systems (arXiv, PubMed, etc.)
+|⚠️ **ADVISORY**
+|Best-effort validation, cache results, warn but don't enforce. +
+*VeriSimDB can't control external systems*
+|===
+
+=== What Gets Pushed vs Pulled
+
+**PUSH (Proactive Propagation):**
+
+- ❗ **Retractions** - Paper retracted → notify all citing papers
+- ❗ **Integrity violations** - Hash mismatch detected → immediate alert
+- ❗ **Access revocations** - User loses permission → propagate immediately
+- ⚠️ **Major version updates** - Schema change → background sync (async push)
+
+**PULL (On-Demand Repair):**
+
+- ✏️ **Title mismatches** - "ML Paper" vs "Machine Learning Paper" → repair at query time
+- ✏️ **Citation counts** - Derived data → recompute on demand
+- ✏️ **Cache invalidation** - Stale cache → refresh when accessed
+- ✏️ **External validation** - Check DOI exists → best-effort at query time
+
+=== Why This Works
+
+✅ **Scales:** Most drift is cosmetic, doesn't need immediate propagation
+
+✅ **Clear boundaries:** VeriSimDB controls L0-L2 (internal), collaborates on L3 (federation), advises on L4 (external)
+
+✅ **User control:** Conservative/Balanced/Aggressive modes let users tune aggressiveness
+
+✅ **Learns:** Adaptive learner can promote frequent drift from PULL→PUSH based on observations
+
+✅ **Safety-first:** Critical issues are pushed immediately, optimizations are pulled lazily
+
+=== Configuration Example
+
+```elixir
+# config/config.exs
+config :verisim, VeriSim.NormalizationCoordinator,
+  # Conservative: minimal push (retractions only)
+  # Balanced: push critical + important (DEFAULT)
+  # Aggressive: push nearly everything
+  mode: :balanced,
+
+  # What triggers immediate push?
+  push_critical: [
+    :retraction,           # Paper retracted
+    :integrity_violation,  # Hash mismatch
+    :access_revocation     # Permission removed
+  ],
+
+  # What triggers async push (background job)?
+  push_important: [
+    :schema_version,  # Schema updated
+    :major_update     # Significant change
+  ],
+
+  # Everything else: PULL (query-time repair)
+
+  # External systems
+  validate_external: true,     # Best-effort validation
+  external_timeout: 5_000,     # Don't wait > 5s
+  external_cache_ttl: :timer.hours(24)
+```
+
+=== The Answer to "Is This VeriSimDB's Job?"
+
+[cols="1,2,1"]
+|===
+|Level |VeriSimDB's Job? |Why?
+
+|L0-L1
+|✅ **Yes** (core responsibility)
+|Multi-modal consistency is VeriSimDB's unique value
+
+|L2
+|✅ **Yes** (internal graphs)
+|VeriSimDB can query its own graph store
+
+|L3
+|✅ **Yes** (federation)
+|VeriSimDB instances collaborate via KRaft
+
+|L4
+|⚠️ **Partial** (advisory)
+|External systems unreliable, can't enforce
+|===
+
+**Bottom line:** VeriSimDB normalizes L0-L3 (what it controls), advises on L4 (what it doesn't).
+
+== Normalization Cascade Levels
+
+We identify **five levels** of normalization scope:
+
+[cols="1,2,3,2"]
+|===
+|Level |Scope |What Normalizes |Responsibility
+
+|**L0: Intra-Modality**
+|Within a single modality store
+|Vector dimensions, tensor shapes, RDF consistency
+|**Modality store** (verisim-graph, verisim-vector, etc.)
+
+|**L1: Cross-Modality**
+|Across modalities within a hexad
+|Title in GRAPH matches DOCUMENT, embedding dimension matches metadata
+|**VeriSimDB core** (EntityServer, DriftMonitor)
+
+|**L2: Cross-Hexad**
+|Between hexads in same store
+|Citation targets exist, provenance chains valid
+|**VeriSimDB core** (via graph queries)
+
+|**L3: Cross-Store**
+|Between federated stores
+|Replicated hexads match across institutions
+|**Federation layer** (KRaft registry + drift policies)
+
+|**L4: Cross-Lineage**
+|Through citation/provenance chains
+|Retractions propagate, versioning cascades
+|**System-wide** (VeriSimDB + external services)
+|===
+
+=== Level Details
+
+==== L0: Intra-Modality Normalization
+
+**Scope:** Within a single modality store (e.g., verisim-vector)
+
+**Examples:**
+- Vector normalization (L2 norm = 1.0)
+- Tensor shape validation (declared rank matches data)
+- RDF triple deduplication
+- Document encoding consistency (UTF-8)
+
+**Responsibility:** **Modality store itself**
+
+**Rationale:** Each store knows its own invariants. VeriSimDB core shouldn't micromanage.
+
+**Implementation:**
+```rust
+// rust-core/verisim-vector/src/lib.rs
+impl VectorStore {
+    pub fn insert(&mut self, hexad_id: UUID, vector: Vec<f64>) -> Result<()> {
+        // L0 normalization: ensure vector is normalized
+        let norm = vector.iter().map(|x| x * x).sum::<f64>().sqrt();
+        let normalized = vector.iter().map(|x| x / norm).collect();
+
+        self.storage.insert(hexad_id, normalized)
+    }
+}
+```
+
+==== L1: Cross-Modality Normalization
+
+**Scope:** Across modalities within a single hexad
+
+**Examples:**
+- Title mismatch: GRAPH says "ML Paper", DOCUMENT says "Machine Learning Paper"
+- Embedding dimension: SEMANTIC metadata says 768-dim, VECTOR has 512-dim
+- Timestamp conflict: TEMPORAL shows updated 2025-01-20, GRAPH shows 2025-01-22
+
+**Responsibility:** **VeriSimDB core (DriftMonitor)**
+
+**Rationale:** Only VeriSimDB sees all modalities for a hexad. This is its core value-add.
+
+**Implementation:**
+```elixir
+# lib/verisim/drift_monitor.ex
+defmodule VeriSim.DriftMonitor do
+  def detect_cross_modal_drift(hexad_id) do
+    modalities = fetch_all_modalities(hexad_id)
+
+    # L1 normalization: check title consistency
+    titles = [
+      modalities.graph["title"],
+      modalities.document["title"],
+      modalities.semantic["title"]
+    ]
+
+    if length(Enum.uniq(titles)) > 1 do
+      {:drift_detected, :title_mismatch, titles}
+    else
+      :consistent
+    end
+  end
+end
+```
+
+==== L2: Cross-Hexad Normalization
+
+**Scope:** Between related hexads in the same store
+
+**Examples:**
+- Citation target exists: Paper A cites Paper B, ensure B exists
+- Provenance chain valid: Hexad derives from Parent, ensure Parent accessible
+- Circular reference detection: A → B → C → A (invalid)
+
+**Responsibility:** **VeriSimDB core (via graph queries)**
+
+**Rationale:** VeriSimDB can query its own graph store to validate relationships.
+
+**Implementation:**
+```elixir
+# lib/verisim/citation_validator.ex
+defmodule VeriSim.CitationValidator do
+  def validate_citations(hexad_id) do
+    # L2 normalization: ensure citation targets exist
+    citations = get_citations(hexad_id)
+
+    Enum.map(citations, fn cited_id ->
+      case EntityServer.exists?(cited_id) do
+        true -> {:ok, cited_id}
+        false -> {:error, :citation_target_missing, cited_id}
+      end
+    end)
+  end
+end
+```
+
+==== L3: Cross-Store Normalization
+
+**Scope:** Between federated stores (different institutions)
+
+**Examples:**
+- Replicated hexad mismatch: University A has version 3, University B has version 5
+- Schema drift: Store A uses new field "keywords", Store B doesn't
+- Trust boundary: Store A accepts update from Store B, need verification
+
+**Responsibility:** **Federation layer (shared between VeriSimDB instances)**
+
+**Rationale:** No single VeriSimDB instance has authority. Requires distributed consensus.
+
+**Implementation:**
+```elixir
+# lib/verisim/federation_normalizer.ex
+defmodule VeriSim.FederationNormalizer do
+  def normalize_across_stores(hexad_id, stores) do
+    # L3 normalization: quorum-based repair
+    versions = Enum.map(stores, fn store ->
+      fetch_version(store, hexad_id)
+    end)
+
+    case apply_drift_policy(:quorum, versions) do
+      {:ok, canonical_version} ->
+        # Push canonical version to minority stores
+        push_to_stores(canonical_version, stores)
+      {:error, :no_quorum} ->
+        # Escalate to manual resolution
+        {:manual_intervention_required, versions}
+    end
+  end
+end
+```
+
+==== L4: Cross-Lineage Normalization
+
+**Scope:** Through citation/provenance chains (potentially cross-system)
+
+**Examples:**
+- Paper retraction: Paper A is retracted → notify all papers citing A
+- Data correction: Dataset B is corrected → cascade to all analyses using B
+- Version update: Library C releases v2 → notify dependent projects
+
+**Responsibility:** **System-wide (VeriSimDB + external notification services)**
+
+**Rationale:** Lineage may span systems VeriSimDB doesn't control (external publishers, repositories).
+
+**Implementation:**
+```elixir
+# lib/verisim/lineage_propagator.ex
+defmodule VeriSim.LineagePropagator do
+  def propagate_retraction(retracted_hexad_id) do
+    # L4 normalization: notify citing hexads
+    citing_hexads = get_all_citations_to(retracted_hexad_id)
+
+    # Within VeriSimDB: update status
+    Enum.each(citing_hexads, fn citing_id ->
+      add_warning(citing_id, "Cites retracted work: #{retracted_hexad_id}")
+    end)
+
+    # System-wide: notify external systems
+    external_citations = get_external_citations(retracted_hexad_id)
+    Enum.each(external_citations, fn ext ->
+      notify_external_system(ext.system_url, :retraction_notice, retracted_hexad_id)
+    end)
+  end
+end
+```
+
+== Push vs Pull: Architectural Tradeoffs
+
+=== Push Model (Proactive Propagation)
+
+**Definition:** Changes are **actively propagated** to dependent entities.
+
+**Mechanism:** Database triggers, event sourcing, message queues
+
+**Example:**
+```
+Hexad A updated → DriftMonitor detects change → Pushes update to Hexad B (cites A)
+```
+
+==== Push Model: Pros
+
+✅ **Eventual consistency guaranteed** - All nodes converge without query intervention
+
+✅ **Proactive detection** - Drift is caught immediately, not at query time
+
+✅ **Audit trail** - Every propagation is logged (good for compliance)
+
+✅ **Predictable state** - System reaches consistency without external stimulus
+
+==== Push Model: Cons
+
+❌ **Cascade storms** - One change triggers avalanche of updates
+
+❌ **Network overhead** - Constant background traffic for federation
+
+❌ **Ordering issues** - Concurrent pushes may conflict
+
+❌ **Complexity** - Need distributed transaction coordination
+
+❌ **Wasted work** - Propagate changes to data that's never queried
+
+=== Pull Model (On-Demand Correction)
+
+**Definition:** Normalization happens **only when data is queried**.
+
+**Mechanism:** Lazy evaluation, cache invalidation, query-time drift detection
+
+**Example:**
+```
+Query Hexad A → Detect drift with Hexad B → Repair on-the-fly → Return normalized result
+```
+
+==== Pull Model: Pros
+
+✅ **No background work** - Zero overhead when data isn't accessed
+
+✅ **Scales better** - Only normalize hot data
+
+✅ **Simpler** - No distributed coordination for propagation
+
+✅ **Flexible repair** - Can choose strategy based on query context
+
+==== Pull Model: Cons
+
+❌ **Query latency** - First query after drift pays normalization cost
+
+❌ **Stale data** - Drift exists until queried
+
+❌ **Redundant work** - Multiple queries may re-normalize same data
+
+❌ **No proactive guarantees** - Cold data stays drifted indefinitely
+
+=== Hybrid Model (Tiered Push/Pull)
+
+**Definition:** Push critical changes, pull for optimizations.
+
+**Tiers:**
+
+[cols="1,2,2,1"]
+|===
+|Tier |Examples |Strategy |Rationale
+
+|**Critical (Push)**
+|Retraction, integrity violation, access revocation
+|Immediate propagation
+|Safety-critical, must be consistent
+
+|**Important (Async Push)**
+|Major version update, schema change
+|Background job (within 1 hour)
+|Should converge, but not blocking
+
+|**Optimization (Pull)**
+|Cache TTL, minor title mismatch
+|Query-time repair
+|Cosmetic, low impact
+
+|**Informational (Pull)**
+|Citation count, popularity metrics
+|Never pushed, computed on demand
+|Derived data, not canonical
+|===
+
+==== Hybrid Implementation
+
+```elixir
+# lib/verisim/normalization_coordinator.ex
+defmodule VeriSim.NormalizationCoordinator do
+  def handle_drift(drift_type, hexad_id, details) do
+    case classify_drift(drift_type) do
+      :critical ->
+        # PUSH: Immediate propagation
+        push_to_all_dependents(hexad_id, details)
+
+      :important ->
+        # ASYNC PUSH: Background job
+        Oban.insert(NormalizationJob.new(%{hexad_id: hexad_id, details: details}))
+
+      :optimization ->
+        # PULL: Mark as drifted, repair at query time
+        mark_drifted(hexad_id, drift_type)
+
+      :informational ->
+        # PULL: Do nothing, recompute on demand
+        :ok
+    end
+  end
+
+  defp classify_drift(:retraction), do: :critical
+  defp classify_drift(:integrity_violation), do: :critical
+  defp classify_drift(:schema_version), do: :important
+  defp classify_drift(:title_mismatch), do: :optimization
+  defp classify_drift(:citation_count), do: :informational
+end
+```
+
+== Database-Internal vs System-Wide
+
+=== Option A: Database-Only Normalization
+
+**Philosophy:** VeriSimDB ensures its own consistency. External systems handle their own.
+
+**Scope:**
+- ✅ L0: Intra-modality (modality stores)
+- ✅ L1: Cross-modality (VeriSimDB core)
+- ✅ L2: Cross-hexad (VeriSimDB graph queries)
+- ⚠️ L3: Cross-store (only if both stores are VeriSimDB instances)
+- ❌ L4: Cross-lineage (not VeriSimDB's job)
+
+**Pros:**
+- ✅ Clear responsibility boundary
+- ✅ VeriSimDB doesn't need to understand external systems
+- ✅ Simpler implementation
+
+**Cons:**
+- ❌ Federation is limited (only VeriSimDB ↔ VeriSimDB)
+- ❌ External citations can't be validated
+- ❌ System-wide retractions require manual coordination
+
+**Example:**
+```
+VeriSimDB detects Paper A cites Paper B (external arXiv)
+→ VeriSimDB stores citation, but does NOT validate B exists
+→ User must manually check arXiv
+```
+
+=== Option B: System-Wide Normalization
+
+**Philosophy:** VeriSimDB actively maintains consistency across all linked systems.
+
+**Scope:**
+- ✅ L0-L4: All levels, including external systems
+
+**Pros:**
+- ✅ End-to-end consistency guarantees
+- ✅ Can validate external citations (via APIs)
+- ✅ Retractions propagate everywhere
+
+**Cons:**
+- ❌ VeriSimDB becomes a "master coordinator" (single point of failure)
+- ❌ Must understand every external system (arXiv, PubMed, ORCID, etc.)
+- ❌ External systems may not support callbacks
+- ❌ Huge complexity explosion
+
+**Example:**
+```
+VeriSimDB detects Paper A cites Paper B (external arXiv)
+→ VeriSimDB calls arXiv API to validate B exists
+→ VeriSimDB subscribes to arXiv retraction feed
+→ If B is retracted, VeriSimDB pushes warning to A
+```
+
+=== Option C: Hybrid Boundary (RECOMMENDED)
+
+**Philosophy:** VeriSimDB normalizes internally and within its federation. External systems are **advisory**.
+
+**Scope:**
+- ✅ L0-L2: Full normalization (VeriSimDB internal)
+- ✅ L3: Full normalization (VeriSimDB federation)
+- ⚠️ L4: **Advisory only** (external systems)
+
+**External Citation Handling:**
+
+1. **Store external citations** (URL, DOI, identifier)
+2. **Validate at query time** (optional, best-effort)
+3. **Cache validation results** (with TTL)
+4. **Don't enforce** (warn if unreachable, but allow)
+
+**Implementation:**
+```elixir
+# lib/verisim/external_validator.ex
+defmodule VeriSim.ExternalValidator do
+  def validate_external_citation(doi) do
+    # Try to validate, but don't fail if we can't
+    case CrossrefAPI.resolve(doi) do
+      {:ok, metadata} ->
+        # Cache result
+        Cache.put("doi:#{doi}", metadata, ttl: :timer.hours(24))
+        {:ok, :validated, metadata}
+
+      {:error, :not_found} ->
+        # Warn but don't block
+        {:warning, :external_not_found, doi}
+
+      {:error, :network_error} ->
+        # Assume valid if we can't reach external system
+        {:ok, :assumed_valid, "Network unavailable"}
+    end
+  end
+end
+```
+
+== Recommendation: Hybrid Push/Pull + Hybrid Boundary
+
+=== Proposed Architecture
+
+**L0 (Intra-Modality):**
+- **Strategy:** PULL (modality stores normalize on insert/update)
+- **Responsibility:** Modality store
+
+**L1 (Cross-Modality):**
+- **Strategy:** HYBRID
+  - Critical: PUSH (integrity violations)
+  - Optimization: PULL (title mismatches)
+- **Responsibility:** VeriSimDB DriftMonitor
+
+**L2 (Cross-Hexad):**
+- **Strategy:** PULL (validate citations at query time)
+- **Responsibility:** VeriSimDB graph queries
+
+**L3 (Cross-Store):**
+- **Strategy:** HYBRID
+  - Critical: ASYNC PUSH (retractions, access changes)
+  - Optimization: PULL (version drift)
+- **Responsibility:** Federation layer (KRaft + drift policies)
+
+**L4 (Cross-Lineage):**
+- **Strategy:** ADVISORY (best-effort external validation)
+- **Responsibility:** VeriSimDB + user responsibility
+
+=== Decision Matrix
+
+[cols="1,2,2,2"]
+|===
+|Level |Strategy |Push or Pull? |VeriSimDB's Job?
+
+|L0
+|On-insert validation
+|PULL
+|✅ Yes (delegated to stores)
+
+|L1
+|Critical: push, Opt: pull
+|HYBRID
+|✅ Yes (core responsibility)
+
+|L2
+|Query-time validation
+|PULL
+|✅ Yes (internal graph)
+
+|L3
+|Critical: async push, Opt: pull
+|HYBRID
+|✅ Yes (federation layer)
+
+|L4
+|Best-effort advisory
+|PULL
+|⚠️ Partial (warn only)
+|===
+
+=== Rationale
+
+1. **Push is expensive** - Reserve for critical safety issues (retraction, access)
+2. **Pull scales better** - Most drift is cosmetic (title variations)
+3. **External systems are unreliable** - Don't block on them
+4. **VeriSimDB controls its boundary** - Internal + federation are its domain
+5. **Users own external validation** - VeriSimDB helps but doesn't enforce
+
+== Configuration
+
+Users can configure normalization aggressiveness:
+
+```elixir
+# config/config.exs
+config :verisim, VeriSim.NormalizationCoordinator,
+  # Conservative: minimal push, mostly pull
+  mode: :conservative,  # :conservative | :balanced | :aggressive
+
+  # What drift types trigger push?
+  push_critical: [:retraction, :integrity_violation, :access_revocation],
+  push_important: [:schema_version, :major_update],
+
+  # External validation
+  validate_external: true,  # Best-effort validation
+  external_timeout: 5_000,  # Don't wait > 5s
+
+  # Cross-store normalization
+  federation_sync_interval: :timer.hours(1),  # Background sync
+  drift_policy: :repair  # :strict | :repair | :tolerate | :latest
+```
+
+=== Conservative Mode
+
+- **Push:** Only retractions and security issues
+- **Pull:** Everything else
+- **Best for:** High-volume systems, performance-critical
+
+=== Balanced Mode (Default)
+
+- **Push:** Critical + important drift
+- **Pull:** Optimizations
+- **Best for:** Most deployments
+
+=== Aggressive Mode
+
+- **Push:** Nearly everything
+- **Pull:** Only informational metrics
+- **Best for:** High-assurance systems (medical, legal)
+
+== Integration with Adaptive Learner (v1) and miniKanren (v3)
+
+=== Adaptive Learner (v1)
+
+The normalization cascade can **learn optimal strategies** via feedback loops:
+
+```elixir
+# lib/verisim/adaptive_learner.ex
+defmodule VeriSim.AdaptiveLearner do
+  def learn_normalization_policy(state) do
+    # Observe: what drift types occur most?
+    drift_frequency = analyze_drift_frequency(state.observations)
+
+    # Decide: should we push this drift type?
+    Enum.map(drift_frequency, fn {drift_type, freq} ->
+      if freq > 0.1 do
+        # High frequency → switch to PUSH
+        recommend_push(drift_type)
+      else
+        # Low frequency → keep as PULL
+        recommend_pull(drift_type)
+      end
+    end)
+  end
+end
+```
+
+=== miniKanren (v3)
+
+In v3, miniKanren can **synthesize normalization rules** from examples:
+
+```scheme
+;; Learn: when should we push vs pull?
+(defrel (normalization-strategyo drift-examples strategy)
+  (fresh (frequency severity user-impact)
+    (analyze-exampleso drift-examples frequency severity user-impact)
+    (conde
+      ;; Rule 1: High frequency + high severity → PUSH
+      [(>o frequency 0.2)
+       (== severity 'high)
+       (== strategy 'push)]
+
+      ;; Rule 2: Low frequency → PULL
+      [(<o frequency 0.05)
+       (== strategy 'pull)]
+
+      ;; Rule 3: High user impact → ASYNC-PUSH
+      [(== user-impact 'high)
+       (== strategy 'async-push)])))
+
+;; Query: What strategy for title mismatches?
+(run* (strategy)
+  (normalization-strategyo
+    '((title-mismatch . 45)    ; 45 occurrences
+      (severity . low)
+      (user-impact . medium))
+    strategy))
+;; Output: (pull)  ; Low severity → PULL
+```
+
+== Open Questions for Discussion
+
+1. **Cross-store trust:** Should VeriSimDB trust all federated stores equally, or have a trust hierarchy?
+
+2. **Conflict resolution:** If 3 stores disagree (33% each), what's the quorum strategy?
+
+3. **Retraction propagation:** Should VeriSimDB actively notify external systems (push email, webhook), or just mark locally?
+
+4. **Cost model:** How much network/CPU budget for normalization? Should there be a cap?
+
+5. **User override:** Can users force PULL-only mode for specific hexads (performance-critical paths)?
+
+== References
+
+- link:drift-handling.adoc[Drift Handling Documentation]
+- link:backwards-compatibility.adoc[Backwards Compatibility Strategy]
+- link:adaptive_learner.ex[Adaptive Learner Implementation]
+- link:minikanren-integration-v3.adoc[miniKanren Integration (v3)]
+- Helland, P. (2007). *Life beyond Distributed Transactions: an Apostate's Opinion*. CIDR.
+- Bailis, P. et al. (2013). *Eventual Consistency Today: Limitations, Extensions, and Beyond*. ACM Queue.

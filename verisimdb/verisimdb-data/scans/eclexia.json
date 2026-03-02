@@ -1,0 +1,1435 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "OTP",
+    "Networking",
+    "Concurrent",
+    "WebServer"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "compiler/eclexia-codegen/src/vm.rs",
+      "severity": "Medium",
+      "description": "19 unwrap/expect calls in compiler/eclexia-codegen/src/vm.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "compiler/eclexia-parser/src/expr.rs",
+      "severity": "Medium",
+      "description": "31 unwrap/expect calls in compiler/eclexia-parser/src/expr.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "compiler/eclexia-parser/src/lib.rs",
+      "severity": "Medium",
+      "description": "92 unwrap/expect calls in compiler/eclexia-parser/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "runtime/eclexia-registry-server/src/lib.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in runtime/eclexia-registry-server/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "runtime/eclexia-rt-native/src/lib.rs",
+      "severity": "High",
+      "description": "7 unsafe blocks in runtime/eclexia-rt-native/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "ai-cli-crash-capture/recoverer-setup.sh",
+      "severity": "Medium",
+      "description": "47 potentially unquoted variable expansions in ai-cli-crash-capture/recoverer-setup.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "src/abi/ResourceABI.idr",
+      "severity": "Critical",
+      "description": "2 believe_me (type checker bypass) in src/abi/ResourceABI.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 73787,
+    "unsafe_blocks": 35,
+    "panic_sites": 102,
+    "unwrap_calls": 163,
+    "allocation_sites": 578,
+    "io_operations": 169,
+    "threading_constructs": 43
+  },
+  "file_statistics": [
+    {
+      "file_path": "compiler/eclexia-ast/src/dimension.rs",
+      "lines": 605,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-ast/src/types.rs",
+      "lines": 362,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-ast/src/lib.rs",
+      "lines": 1102,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-codegen/src/bytecode.rs",
+      "lines": 911,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-codegen/src/lib.rs",
+      "lines": 203,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-codegen/src/vm.rs",
+      "lines": 4276,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 19,
+      "allocation_sites": 28,
+      "io_operations": 2,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "compiler/eclexia-codegen/tests/integration_test.rs",
+      "lines": 192,
+      "unsafe_blocks": 0,
+      "panic_sites": 4,
+      "unwrap_calls": 0,
+      "allocation_sites": 12,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-codegen/tests/pipeline_test.rs",
+      "lines": 217,
+      "unsafe_blocks": 0,
+      "panic_sites": 18,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-hir/src/lib.rs",
+      "lines": 613,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-hir/src/lower.rs",
+      "lines": 1570,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-interp/src/builtins.rs",
+      "lines": 3139,
+      "unsafe_blocks": 0,
+      "panic_sites": 15,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 2,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "compiler/eclexia-interp/src/lib.rs",
+      "lines": 80,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-interp/src/eval.rs",
+      "lines": 2069,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-lexer/src/lib.rs",
+      "lines": 1071,
+      "unsafe_blocks": 0,
+      "panic_sites": 10,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-mir/src/lib.rs",
+      "lines": 449,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-mir/src/lower.rs",
+      "lines": 1613,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 29,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-mir/src/optimize.rs",
+      "lines": 367,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-parser/src/expr.rs",
+      "lines": 1264,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 31,
+      "allocation_sites": 20,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-parser/src/lib.rs",
+      "lines": 2483,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 92,
+      "allocation_sites": 54,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-typeck/src/env.rs",
+      "lines": 133,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-typeck/src/infer.rs",
+      "lines": 138,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-typeck/src/lib.rs",
+      "lines": 2535,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 100,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia/src/registry.rs",
+      "lines": 124,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia/src/package_manager.rs",
+      "lines": 101,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia/src/bench_runner.rs",
+      "lines": 495,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia/src/commands.rs",
+      "lines": 3577,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 15,
+      "io_operations": 69,
+      "threading_constructs": 4
+    },
+    {
+      "file_path": "compiler/eclexia/src/package.rs",
+      "lines": 197,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia/src/repl.rs",
+      "lines": 583,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia/src/resolver.rs",
+      "lines": 534,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia/src/test_runner.rs",
+      "lines": 243,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia/src/interop.rs",
+      "lines": 192,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia/tests/conformance_tests.rs",
+      "lines": 190,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia/tests/integration_tests.rs",
+      "lines": 440,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 10,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "compiler/eclexia-lsp/src/server.rs",
+      "lines": 956,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 13,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-lsp/src/symbols.rs",
+      "lines": 935,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-fmt/src/lib.rs",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-fmt/src/printer.rs",
+      "lines": 1203,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-lint/src/rules/unreachable_code.rs",
+      "lines": 52,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-lint/src/rules/long_line.rs",
+      "lines": 53,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-lint/src/rules/trailing_whitespace.rs",
+      "lines": 53,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-lint/src/rules/unbounded_resource.rs",
+      "lines": 82,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-lint/src/rules/negative_resource.rs",
+      "lines": 121,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-lint/src/rules/unused_variable.rs",
+      "lines": 212,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-lint/src/lib.rs",
+      "lines": 157,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 9,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-lint/src/diagnostics.rs",
+      "lines": 118,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-doc/src/lib.rs",
+      "lines": 266,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-db/src/lib.rs",
+      "lines": 349,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 4
+    },
+    {
+      "file_path": "compiler/eclexia-db/src/queries.rs",
+      "lines": 201,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "compiler/eclexia-db/src/vfs.rs",
+      "lines": 300,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 7,
+      "threading_constructs": 3
+    },
+    {
+      "file_path": "compiler/eclexia-modules/src/lib.rs",
+      "lines": 294,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-modules/src/interface.rs",
+      "lines": 390,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-modules/src/dep_graph.rs",
+      "lines": 362,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-modules/src/parallel.rs",
+      "lines": 425,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "compiler/eclexia-comptime/src/lib.rs",
+      "lines": 131,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-comptime/src/resource_verify.rs",
+      "lines": 265,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-absinterp/src/resource.rs",
+      "lines": 304,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-effects/src/lib.rs",
+      "lines": 197,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-effects/src/evidence.rs",
+      "lines": 318,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-specialize/src/binding_time.rs",
+      "lines": 354,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-specialize/src/residualize.rs",
+      "lines": 272,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-cranelift/src/lib.rs",
+      "lines": 1961,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 11,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-llvm/src/lib.rs",
+      "lines": 2967,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 46,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-wasm/src/lib.rs",
+      "lines": 2530,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 15,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-tiered/src/profile.rs",
+      "lines": 288,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "compiler/eclexia-tiered/src/watch.rs",
+      "lines": 291,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/carbon_aware.ecl",
+      "lines": 61,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/matrix_multiply.ecl",
+      "lines": 66,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/json_test.ecl",
+      "lines": 58,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/dimensional_types.ecl",
+      "lines": 89,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/budget_enforcement.ecl",
+      "lines": 49,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/hashmaps.ecl",
+      "lines": 53,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/comprehensive_opportunity.ecl",
+      "lines": 78,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/resource_tracking.ecl",
+      "lines": 46,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-runtime/src/adaptive.rs",
+      "lines": 448,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-runtime/src/lib.rs",
+      "lines": 348,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-runtime/src/profiler.rs",
+      "lines": 327,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "runtime/eclexia-runtime/src/resource_tracker.rs",
+      "lines": 187,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-runtime/src/scheduler.rs",
+      "lines": 385,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-runtime/src/health.rs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "runtime/eclexia-async/src/lib.rs",
+      "lines": 162,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-async/src/executor.rs",
+      "lines": 254,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "runtime/eclexia-async/src/task.rs",
+      "lines": 184,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "runtime/eclexia-async/src/parallel.rs",
+      "lines": 191,
+      "unsafe_blocks": 0,
+      "panic_sites": 3,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 5
+    },
+    {
+      "file_path": "runtime/eclexia-tea/src/lib.rs",
+      "lines": 380,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-dom/src/lib.rs",
+      "lines": 498,
+      "unsafe_blocks": 0,
+      "panic_sites": 6,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-carbon/src/lib.rs",
+      "lines": 718,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "runtime/eclexia-shadow/src/lib.rs",
+      "lines": 550,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-web-server/src/lib.rs",
+      "lines": 587,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 10,
+      "io_operations": 4,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "runtime/eclexia-rest/src/lib.rs",
+      "lines": 393,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "runtime/eclexia-graphql/src/lib.rs",
+      "lines": 249,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "runtime/eclexia-grpc/src/lib.rs",
+      "lines": 169,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "runtime/eclexia-websocket/src/lib.rs",
+      "lines": 192,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-queue/src/lib.rs",
+      "lines": 188,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-cache/src/lib.rs",
+      "lines": 160,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "runtime/eclexia-orm/src/lib.rs",
+      "lines": 296,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 21,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-auth/src/lib.rs",
+      "lines": 220,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-template/src/lib.rs",
+      "lines": 212,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-registry-server/src/lib.rs",
+      "lines": 275,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "runtime/eclexia-rt-native/src/lib.rs",
+      "lines": 178,
+      "unsafe_blocks": 7,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/conformance/invalid/resource_nested_overflow.ecl",
+      "lines": 21,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/conformance/invalid/resource_infinite_loop.ecl",
+      "lines": 18,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/conformance/invalid/adaptive_no_feasible_solution.ecl",
+      "lines": 20,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/conformance/invalid/resource_zero_budget.ecl",
+      "lines": 14,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/conformance/invalid/carbon_constraint_violation.ecl",
+      "lines": 22,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/conformance/invalid/energy_constraint_violation.ecl",
+      "lines": 22,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/conformance/invalid/time_constraint_violation.ecl",
+      "lines": 22,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/conformance/valid/resource_nested_calls.ecl",
+      "lines": 21,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/conformance/valid/resource_loop_tracking.ecl",
+      "lines": 19,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/conformance/valid/energy_constraint_satisfied.ecl",
+      "lines": 16,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/conformance/valid/time_constraint_satisfied.ecl",
+      "lines": 17,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "stdlib/collections.ecl",
+      "lines": 543,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "stdlib/io.ecl",
+      "lines": 76,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 14,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "stdlib/async.ecl",
+      "lines": 142,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "stdlib/dom.ecl",
+      "lines": 217,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ai-cli-crash-capture/recoverer-setup.sh",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/resource.zig",
+      "lines": 586,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/ResourceABI.idr",
+      "lines": 371,
+      "unsafe_blocks": 14,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "libraries/eclexia-uuid/src/lib.rs",
+      "lines": 162,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "libraries/eclexia-datetime/src/lib.rs",
+      "lines": 224,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "libraries/eclexia-encoding/src/lib.rs",
+      "lines": 174,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "libraries/eclexia-compression/src/lib.rs",
+      "lines": 159,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "libraries/eclexia-serialisation/src/lib.rs",
+      "lines": 578,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "libraries/eclexia-cli/src/lib.rs",
+      "lines": 159,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "libraries/eclexia-process/src/lib.rs",
+      "lines": 123,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "playground/public/app.js",
+      "lines": 305,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "playground/public/service-worker.js",
+      "lines": 46,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "playground/server.js",
+      "lines": 295,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "disk",
+    "concurrency"
+  ]
+}

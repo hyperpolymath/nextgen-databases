@@ -1,0 +1,839 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= Drift Handling in VeriSimDB
+:toc:
+:toc-placement!:
+
+Comprehensive drift detection, repair, and query integration for federated knowledge stores.
+
+toc::[]
+
+== Overview
+
+**Drift** occurs when the same Hexad exists in multiple modality stores with inconsistent representations. VeriSimDB provides:
+
+1. **Drift Detection** - Automatic monitoring across modalities
+2. **Drift Repair** - Reconciliation strategies to restore consistency
+3. **Drift-Aware Queries** - VQL extensions for querying drifted data
+4. **Drift Tolerance** - Configurable policies for acceptable inconsistency
+
+== Types of Drift
+
+=== Cross-Modal Drift
+
+**Definition:** Representations of the same Hexad differ across modalities.
+
+**Example:**
+
+```
+Hexad: 550e8400-e29b-41d4-a716-446655440000
+
+verisim:graph    → title: "Machine Learning Paper"
+verisim:document → title: "ML Paper"  ❌ DRIFT
+verisim:vector   → embedding: [0.1, 0.2, ...]  ✓ OK
+```
+
+**Causes:**
+
+- Partial update (only graph updated, document not refreshed)
+- Network partition during write
+- Concurrent updates from different clients
+
+=== Temporal Drift
+
+**Definition:** Data changes over time without proper versioning.
+
+**Example:**
+
+```
+t0: hexad.title = "Draft Paper"
+t1: hexad.title = "Published Paper"  (document updated)
+t1: hexad.graph still has "Draft Paper"  ❌ DRIFT
+```
+
+**Causes:**
+
+- Asynchronous replication lag
+- Cache staleness
+- Delayed batch updates
+
+=== Federation Drift
+
+**Definition:** Same Hexad stored at multiple organizations with divergent state.
+
+**Example:**
+
+```
+Hexad: 550e8400-e29b-41d4-a716-446655440000
+
+University A: retraction_status = "active"
+University B: retraction_status = "retracted"  ❌ DRIFT
+```
+
+**Causes:**
+
+- Network partitions
+- Conflicting updates
+- Malicious tampering (Byzantine drift)
+
+=== Semantic Drift
+
+**Definition:** Type annotations or contracts become inconsistent.
+
+**Example:**
+
+```
+verisim:semantic → types: ["http://schema.org/Paper", "http://schema.org/Article"]
+verisim:graph    → types: ["http://schema.org/Paper"]  ❌ DRIFT
+```
+
+**Causes:**
+
+- Schema evolution
+- Type inference errors
+- Manual type corrections
+
+== Drift Detection
+
+=== Automatic Detection
+
+**Continuous monitoring** (every 5 minutes by default):
+
+```elixir
+# lib/verisim/drift_monitor.ex
+defmodule VeriSim.DriftMonitor do
+  @doc """
+  Check all hexads for cross-modal drift.
+  """
+  def detect_all_drift do
+    hexad_ids = list_all_hexad_ids()
+
+    hexad_ids
+    |> Stream.chunk_every(100)
+    |> Enum.each(fn chunk ->
+      chunk
+      |> Task.async_stream(&detect_hexad_drift/1, max_concurrency: 10)
+      |> Stream.filter(fn {:ok, result} -> result.has_drift end)
+      |> Enum.each(&log_drift/1)
+    end)
+  end
+
+  defp detect_hexad_drift(hexad_id) do
+    # Fetch from all modalities
+    graph_rep = VeriSim.Graph.get(hexad_id)
+    vector_rep = VeriSim.Vector.get(hexad_id)
+    document_rep = VeriSim.Document.get(hexad_id)
+    semantic_rep = VeriSim.Semantic.get(hexad_id)
+    temporal_rep = VeriSim.Temporal.get(hexad_id)
+
+    # Check for inconsistencies
+    drifts = []
+
+    drifts = if graph_rep.title != document_rep.title do
+      [{:title_mismatch, graph_rep.title, document_rep.title} | drifts]
+    else
+      drifts
+    end
+
+    drifts = if graph_rep.updated_at != vector_rep.updated_at do
+      [{:timestamp_mismatch, graph_rep.updated_at, vector_rep.updated_at} | drifts]
+    else
+      drifts
+    end
+
+    %{hexad_id: hexad_id, has_drift: length(drifts) > 0, drifts: drifts}
+  end
+end
+```
+
+=== On-Demand Detection (VQL)
+
+**Explicit drift check query:**
+
+```vql
+DRIFT DETECT
+FROM verisim:graph
+WHERE hexad.id = @id;
+```
+
+**Response:**
+
+```json
+{
+  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "has_drift": true,
+  "drifts": [
+    {
+      "type": "title_mismatch",
+      "modalities": ["graph", "document"],
+      "values": {
+        "graph": "Machine Learning Paper",
+        "document": "ML Paper"
+      },
+      "detected_at": "2025-01-15T10:30:00Z",
+      "severity": "medium"
+    }
+  ]
+}
+```
+
+**Batch drift detection:**
+
+```vql
+DRIFT DETECT
+FROM verisim:graph
+WHERE hexad.types INCLUDES "http://schema.org/Paper"
+LIMIT 100;
+```
+
+== Drift Repair
+
+=== Repair Strategies
+
+**1. Latest Wins**
+
+Most recent update across all modalities becomes canonical.
+
+```vql
+DRIFT REPAIR
+FROM verisim:graph
+WHERE hexad.id = @id
+USING STRATEGY latest_wins;
+```
+
+**Implementation:**
+
+```rust
+// rust-core/verisim-drift/src/repair.rs
+
+pub fn repair_latest_wins(hexad_id: &Uuid) -> Result<RepairResult, Error> {
+    // Fetch from all modalities with timestamps
+    let reps = fetch_all_representations(hexad_id)?;
+
+    // Find representation with latest updated_at
+    let latest = reps.iter()
+        .max_by_key(|r| r.updated_at)
+        .ok_or(Error::NoRepresentations)?;
+
+    // Propagate latest to all modalities
+    for modality in &["graph", "vector", "document", "semantic", "temporal"] {
+        if modality != &latest.modality {
+            write_representation(modality, &latest)?;
+        }
+    }
+
+    Ok(RepairResult {
+        hexad_id: *hexad_id,
+        canonical_source: latest.modality.clone(),
+        repaired_modalities: reps.len() - 1,
+    })
+}
+```
+
+**2. Quorum Consensus**
+
+Value that appears in majority of modalities wins.
+
+```vql
+DRIFT REPAIR
+FROM verisim:graph
+WHERE hexad.id = @id
+USING STRATEGY quorum;
+```
+
+**Implementation:**
+
+```rust
+pub fn repair_quorum(hexad_id: &Uuid) -> Result<RepairResult, Error> {
+    let reps = fetch_all_representations(hexad_id)?;
+
+    // Group by value, count occurrences
+    let mut value_counts: HashMap<String, usize> = HashMap::new();
+
+    for rep in &reps {
+        *value_counts.entry(rep.title.clone()).or_insert(0) += 1;
+    }
+
+    // Find value with most votes
+    let (canonical_value, _count) = value_counts.iter()
+        .max_by_key(|(_, count)| *count)
+        .ok_or(Error::NoConsensus)?;
+
+    // Propagate canonical value
+    for rep in &reps {
+        if &rep.title != canonical_value {
+            update_representation(&rep.modality, hexad_id, canonical_value)?;
+        }
+    }
+
+    Ok(RepairResult { ... })
+}
+```
+
+**3. Manual Resolution**
+
+Present conflict to user for manual decision.
+
+```vql
+DRIFT REPAIR
+FROM verisim:graph
+WHERE hexad.id = @id
+USING STRATEGY manual;
+```
+
+**Response:**
+
+```json
+{
+  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "conflicts": [
+    {
+      "field": "title",
+      "options": [
+        {
+          "value": "Machine Learning Paper",
+          "modalities": ["graph", "semantic"],
+          "updated_at": "2025-01-15T10:00:00Z"
+        },
+        {
+          "value": "ML Paper",
+          "modalities": ["document", "vector"],
+          "updated_at": "2025-01-15T10:05:00Z"
+        }
+      ]
+    }
+  ],
+  "resolution_token": "abc123..."
+}
+```
+
+**User resolves manually:**
+
+```http
+POST /api/v1/drift/resolve HTTP/1.1
+
+{
+  "resolution_token": "abc123...",
+  "selected_value": "Machine Learning Paper"
+}
+```
+
+**4. Merge**
+
+Combine values intelligently (domain-specific).
+
+```vql
+DRIFT REPAIR
+FROM verisim:graph
+WHERE hexad.id = @id
+USING STRATEGY merge;
+```
+
+**Example: Merging tags**
+
+```
+graph:    tags = ["machine-learning", "neural-networks"]
+document: tags = ["deep-learning", "neural-networks"]
+
+merged:   tags = ["machine-learning", "neural-networks", "deep-learning"]
+```
+
+=== Automatic Repair
+
+**Triggered automatically** when drift exceeds tolerance threshold:
+
+```elixir
+# config.exs
+config :verisim,
+  drift_tolerance: 0.05,  # 5% of hexads can have drift
+  auto_repair: true,
+  repair_strategy: :latest_wins
+```
+
+**Repair workflow:**
+
+```
+1. Drift detection runs every 5 minutes
+2. If drift_rate > threshold → trigger repair
+3. Apply repair_strategy to all drifted hexads
+4. Log repair actions to verisim-temporal
+5. Verify repair success (re-check drift)
+```
+
+=== Drift Repair Verification
+
+**After repair, verify consistency:**
+
+```vql
+DRIFT VERIFY
+FROM verisim:graph
+WHERE hexad.id = @id;
+```
+
+**Response:**
+
+```json
+{
+  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "is_consistent": true,
+  "checked_modalities": ["graph", "vector", "document", "semantic", "temporal"],
+  "last_repair": "2025-01-15T10:30:00Z",
+  "verified_at": "2025-01-15T10:31:00Z"
+}
+```
+
+== Drift-Aware Queries
+
+=== Query with Drift Tolerance
+
+**Accept some drift** (performance optimization):
+
+```vql
+FROM verisim:graph
+WITH DRIFT TOLERANCE 0.1  -- Allow 10% drift
+WHERE hexad.types INCLUDES "http://schema.org/Paper"
+LIMIT 100;
+```
+
+**Behavior:**
+
+- Query returns results even if some hexads have drift
+- Drift warnings included in response metadata
+- Faster than strict consistency checks
+
+**Response:**
+
+```json
+{
+  "data": [...],
+  "metadata": {
+    "total_results": 100,
+    "drifted_results": 8,
+    "drift_rate": 0.08,
+    "drift_tolerance": 0.1,
+    "warning": "Some results may have inconsistent representations"
+  }
+}
+```
+
+=== Query with Strict Consistency
+
+**Require perfect consistency** (default):
+
+```vql
+FROM verisim:graph
+WITH DRIFT TOLERANCE 0.0  -- No drift allowed
+WHERE hexad.types INCLUDES "http://schema.org/Paper"
+LIMIT 100;
+```
+
+**Behavior:**
+
+- Query fails if ANY result has drift
+- Suggests running `DRIFT REPAIR` first
+- Slowest (checks all modalities)
+
+=== Query Before/After Drift Repair
+
+**Time-travel query** using temporal modality:
+
+```vql
+-- Query BEFORE repair (as of specific time)
+FROM verisim:temporal
+WHERE hexad.id = @id
+AS OF TIMESTAMP '2025-01-15T09:00:00Z';
+
+-- Query AFTER repair (latest)
+FROM verisim:graph
+WHERE hexad.id = @id;
+```
+
+**Use case:** Audit trail, rollback analysis, drift impact assessment
+
+=== Drift-Tolerant Federation
+
+**Query across federated stores with mixed drift:**
+
+```vql
+FROM verisim:federation
+WHERE hexad.types INCLUDES "http://schema.org/Paper"
+WITH DRIFT TOLERANCE 0.2  -- Tolerate 20% drift across federation
+MIN QUORUM 3;  -- At least 3 stores must respond
+```
+
+**Behavior:**
+
+- Query sent to all federated stores
+- Accept partial results if quorum met
+- Drift warnings per store
+- Aggregated drift rate in response
+
+== Drift Policies
+
+=== Policy Configuration
+
+**Per-modality drift policies:**
+
+```elixir
+# config.exs
+config :verisim,
+  drift_policies: %{
+    graph: %{
+      tolerance: 0.05,
+      auto_repair: true,
+      strategy: :latest_wins,
+      check_interval_ms: 300_000  # 5 minutes
+    },
+    vector: %{
+      tolerance: 0.1,  # Embeddings can have more drift
+      auto_repair: false,  # Manual review for embeddings
+      strategy: :manual
+    },
+    document: %{
+      tolerance: 0.0,  # Text must be consistent
+      auto_repair: true,
+      strategy: :latest_wins
+    },
+    semantic: %{
+      tolerance: 0.0,  # Types must be consistent
+      auto_repair: true,
+      strategy: :quorum
+    },
+    temporal: %{
+      tolerance: 0.0,  # History is immutable
+      auto_repair: false,
+      strategy: :none
+    }
+  }
+```
+
+=== Drift Severity Levels
+
+**Classify drift by impact:**
+
+| Severity | Description | Action |
+|----------|-------------|--------|
+| **LOW** | Formatting differences (e.g., "ML Paper" vs "ML Paper  ") | Log only |
+| **MEDIUM** | Content differences (e.g., title mismatch) | Alert + auto-repair |
+| **HIGH** | Semantic differences (e.g., retraction status) | Alert + manual review |
+| **CRITICAL** | Security differences (e.g., access control mismatch) | Block queries + escalate |
+
+**Severity detection:**
+
+```rust
+pub fn classify_drift_severity(drift: &Drift) -> DriftSeverity {
+    match drift.field {
+        "title" | "body" if drift.edit_distance() < 5 => DriftSeverity::Low,
+        "title" | "body" => DriftSeverity::Medium,
+        "retraction_status" | "access_control" => DriftSeverity::Critical,
+        "types" | "contracts" => DriftSeverity::High,
+        _ => DriftSeverity::Medium,
+    }
+}
+```
+
+== Federation Drift
+
+=== Cross-Organization Drift
+
+**Challenge:** Universities A and B have divergent state for the same Hexad.
+
+**Detection:**
+
+```vql
+DRIFT DETECT FEDERATION
+FROM verisim:federation
+WHERE hexad.id = @id
+STORES [@university_a, @university_b];
+```
+
+**Response:**
+
+```json
+{
+  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "federation_drift": true,
+  "stores": {
+    "university_a": {
+      "title": "Retracted Paper",
+      "retraction_status": "retracted",
+      "updated_at": "2025-01-15T10:00:00Z"
+    },
+    "university_b": {
+      "title": "Active Paper",
+      "retraction_status": "active",
+      "updated_at": "2025-01-14T09:00:00Z"
+    }
+  },
+  "conflict_type": "retraction_dispute",
+  "resolution": "governance_vote"
+}
+```
+
+=== Byzantine Drift
+
+**Definition:** Malicious or faulty node provides inconsistent data.
+
+**Detection:**
+
+1. **Quorum-based verification** - Majority vote determines truth
+2. **ZKP validation** - Verify cryptographic proofs
+3. **Temporal consistency** - Check version history
+
+**Example:**
+
+```
+Stores A, B, C, D all report: title = "Active Paper"
+Store E reports: title = "HACKED!!!"  ❌ BYZANTINE
+
+Action: Exclude Store E from quorum, investigate tampering
+```
+
+**VQL query with Byzantine tolerance:**
+
+```vql
+FROM verisim:federation
+WHERE hexad.id = @id
+WITH BYZANTINE TOLERANCE 1  -- Tolerate 1 faulty node
+MIN QUORUM 3;
+```
+
+=== Federated Repair Coordination
+
+**Multi-party repair protocol:**
+
+1. **Leader election** - One store coordinates repair
+2. **Consensus phase** - All stores vote on canonical value
+3. **Propagation phase** - Leader broadcasts canonical value
+4. **Verification phase** - All stores confirm consistency
+
+**VQL:**
+
+```vql
+DRIFT REPAIR FEDERATION
+FROM verisim:federation
+WHERE hexad.id = @id
+USING STRATEGY consensus
+COORDINATOR @university_a;
+```
+
+== Drift History and Audit
+
+=== Query Drift History
+
+**View all drift events for a Hexad:**
+
+```vql
+DRIFT HISTORY
+FROM verisim:temporal
+WHERE hexad.id = @id
+ORDER BY detected_at DESC
+LIMIT 10;
+```
+
+**Response:**
+
+```json
+{
+  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "drift_events": [
+    {
+      "detected_at": "2025-01-15T10:30:00Z",
+      "repaired_at": "2025-01-15T10:31:00Z",
+      "drift_type": "title_mismatch",
+      "affected_modalities": ["graph", "document"],
+      "repair_strategy": "latest_wins",
+      "canonical_value": "Machine Learning Paper"
+    },
+    {
+      "detected_at": "2025-01-14T15:00:00Z",
+      "repaired_at": "2025-01-14T15:02:00Z",
+      "drift_type": "timestamp_mismatch",
+      "affected_modalities": ["vector", "semantic"],
+      "repair_strategy": "latest_wins",
+      "canonical_value": "2025-01-14T14:58:00Z"
+    }
+  ]
+}
+```
+
+=== Drift Metrics Dashboard
+
+**System-wide drift statistics:**
+
+```vql
+DRIFT METRICS
+FROM verisim:system
+WHERE period = 'last_24_hours';
+```
+
+**Response:**
+
+```json
+{
+  "period": "2025-01-14T10:00:00Z to 2025-01-15T10:00:00Z",
+  "total_hexads": 100000,
+  "drifted_hexads": 850,
+  "drift_rate": 0.0085,
+  "drift_rate_threshold": 0.05,
+  "status": "healthy",
+  "drift_by_type": {
+    "title_mismatch": 400,
+    "timestamp_mismatch": 350,
+    "type_mismatch": 100
+  },
+  "drift_by_modality": {
+    "graph": 300,
+    "vector": 200,
+    "document": 250,
+    "semantic": 100
+  },
+  "repairs_performed": 820,
+  "repairs_pending": 30,
+  "repair_success_rate": 0.96
+}
+```
+
+== Drift Handling Best Practices
+
+=== Prevention
+
+**1. Atomic Writes**
+
+Write to all modalities in a transaction:
+
+```rust
+pub fn create_hexad_atomic(hexad: &Hexad) -> Result<Uuid, Error> {
+    let tx = begin_transaction()?;
+
+    tx.write_graph(&hexad)?;
+    tx.write_vector(&hexad)?;
+    tx.write_document(&hexad)?;
+    tx.write_semantic(&hexad)?;
+    tx.write_temporal(&hexad)?;
+
+    tx.commit()?;
+    Ok(hexad.id)
+}
+```
+
+**2. Cache Invalidation**
+
+Invalidate caches immediately after writes:
+
+```elixir
+def update_hexad(hexad) do
+  # Update all modalities
+  VeriSim.Graph.update(hexad)
+  VeriSim.Vector.update(hexad)
+  VeriSim.Document.update(hexad)
+
+  # Invalidate all caches
+  VeriSim.QueryCache.invalidate(hexad.id)
+end
+```
+
+**3. Version Vectors**
+
+Use version vectors to track causality:
+
+```json
+{
+  "hexad_id": "550e8400-...",
+  "version_vector": {
+    "graph": 5,
+    "vector": 5,
+    "document": 4,  // Out of sync!
+    "semantic": 5,
+    "temporal": 5
+  }
+}
+```
+
+=== Detection
+
+**1. Continuous Monitoring**
+
+Check for drift every 5 minutes (configurable):
+
+```elixir
+# Scheduled via Quantum or similar
+defmodule VeriSim.Scheduler do
+  def schedule_drift_detection do
+    every(5, :minutes, fn ->
+      VeriSim.DriftMonitor.detect_all_drift()
+    end)
+  end
+end
+```
+
+**2. Write-Time Verification**
+
+Check for drift immediately after writes:
+
+```rust
+pub fn update_hexad_with_verification(hexad: &Hexad) -> Result<(), Error> {
+    write_all_modalities(hexad)?;
+
+    // Immediate drift check
+    let drift = detect_drift(&hexad.id)?;
+
+    if drift.has_drift {
+        return Err(Error::DriftDetectedAfterWrite(drift));
+    }
+
+    Ok(())
+}
+```
+
+=== Repair
+
+**1. Gradual Repair**
+
+Don't repair everything at once (avoid system overload):
+
+```elixir
+def repair_drifted_hexads_gradually do
+  drifted = list_drifted_hexads(limit: 100)
+
+  drifted
+  |> Enum.chunk_every(10)
+  |> Enum.each(fn chunk ->
+    Enum.each(chunk, &repair_hexad/1)
+    Process.sleep(1000)  # Rate limit
+  end)
+end
+```
+
+**2. Repair During Off-Peak Hours**
+
+Schedule intensive repairs for low-traffic periods:
+
+```elixir
+# Repair at 3 AM UTC
+defmodule VeriSim.Scheduler do
+  def schedule_intensive_repair do
+    at("03:00", fn ->
+      VeriSim.DriftMonitor.repair_all_drift(strategy: :latest_wins)
+    end)
+  end
+end
+```
+
+== Summary
+
+VeriSimDB provides comprehensive drift handling through:
+
+1. **Detection** - Automatic monitoring + on-demand VQL queries
+2. **Repair** - Multiple strategies (latest_wins, quorum, manual, merge)
+3. **Query Integration** - Drift-aware VQL with tolerance controls
+4. **Federation** - Cross-org drift detection and Byzantine tolerance
+5. **Audit** - Complete drift history in verisim-temporal
+
+**Key Design Principles:**
+
+- **Prefer prevention over repair** - Atomic writes, version vectors
+- **Make drift visible** - Don't hide inconsistencies from users
+- **Provide escape hatches** - Manual resolution when automation fails
+- **Federation-first** - Drift is expected, not exceptional
+- **Safety over speed** - Default to strict consistency, opt-in to tolerance

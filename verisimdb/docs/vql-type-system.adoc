@@ -1,0 +1,922 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= VQL Type System Specification
+:toc: left
+:toclevels: 4
+:sectnums:
+:stem: latexmath
+
+== Overview
+
+This document specifies the **static type system** for VQL, including:
+
+1. Type syntax and semantics
+2. Typing rules for all VQL constructs
+3. Type checking algorithm
+4. Subtyping and type equivalence
+5. Differences between dependent-type and slipstream paths
+
+This complements link:vql-formal-semantics.adoc[VQL Formal Semantics] which covers operational semantics.
+
+== Type Language
+
+=== Type Syntax
+
+The VQL type language stem:[\tau] is defined by:
+
+[stem]
+++++
+\begin{aligned}
+\tau ::= &\ \text{UUID} \mid \text{String} \mid \text{Int} \mid \text{Float} \mid \text{Bool} \\
+       | &\ \text{Vector}[n] \mid \text{Tensor}[d_1, \ldots, d_k] \\
+       | &\ \text{Timestamp} \mid \text{RDFTriple} \\
+       | &\ \text{Hexad} \mid \text{HexadRef} \\
+       | &\ \text{Modality} \mid \text{ModalitySet} \\
+       | &\ \text{List}(\tau) \mid \text{Option}(\tau) \\
+       | &\ \tau_1 \times \tau_2 \quad \text{(product)} \\
+       | &\ \tau_1 \to \tau_2 \quad \text{(function)} \\
+       | &\ \{x : \tau \mid \phi(x)\} \quad \text{(refinement)} \\
+       | &\ \Pi x : \tau_1. \tau_2(x) \quad \text{(dependent product)} \\
+       | &\ \Sigma x : \tau_1. \tau_2(x) \quad \text{(dependent sum)} \\
+       | &\ \text{Proof}[\phi] \quad \text{(proof type)}
+\end{aligned}
+++++
+
+=== Type Constructors
+
+==== Product Types
+
+Represent pairs/tuples:
+
+[stem]
+++++
+\tau_1 \times \tau_2 = \{(v_1, v_2) \mid v_1 : \tau_1 \land v_2 : \tau_2\}
+++++
+
+**Example:** `(UUID, Timestamp)` - a hexad ID paired with a timestamp
+
+==== Function Types
+
+[stem]
+++++
+\tau_1 \to \tau_2 = \{f \mid \forall v : \tau_1. f(v) : \tau_2\}
+++++
+
+**Example:** `Hexad → Bool` - predicate on hexads (used in WHERE clauses)
+
+==== List Types
+
+[stem]
+++++
+\text{List}(\tau) = \{[], [v_1], [v_1, v_2], \ldots \mid v_i : \tau\}
+++++
+
+**Example:** `List(Hexad)` - query results
+
+==== Option Types
+
+[stem]
+++++
+\text{Option}(\tau) = \{\text{None}\} \cup \{\text{Some}(v) \mid v : \tau\}
+++++
+
+**Example:** `Option(Vector[n])` - optional embedding
+
+==== Refinement Types
+
+[stem]
+++++
+\{x : \tau \mid \phi(x)\} = \{v : \tau \mid \phi(v) = \text{true}\}
+++++
+
+**Example:** `{n : Int | n > 0}` - positive integers
+
+==== Dependent Product (Pi Types)
+
+[stem]
+++++
+\Pi x : \tau_1. \tau_2(x) = \{f \mid \forall v : \tau_1. f(v) : \tau_2(v)\}
+++++
+
+**Example:** Vector dimension-indexed types:
+
+[stem]
+++++
+\Pi n : \text{Nat}. \text{Vector}[n] \to \text{Float}
+++++
+
+A function that takes vectors of any dimension and returns a float (e.g., norm).
+
+==== Dependent Sum (Sigma Types)
+
+[stem]
+++++
+\Sigma x : \tau_1. \tau_2(x) = \{(v, w) \mid v : \tau_1 \land w : \tau_2(v)\}
+++++
+
+**Example:** Dimensioned vectors:
+
+[stem]
+++++
+\Sigma n : \text{Nat}. \text{Vector}[n]
+++++
+
+A pair of a dimension `n` and a vector of that dimension.
+
+=== Modality Types
+
+Each modality has an associated type:
+
+[cols="1,2"]
+|===
+|Modality |Type Signature
+
+|`GRAPH`
+|stem:[\text{Hexad} \to \text{Set}(\text{RDFTriple})]
+
+|`VECTOR`
+|stem:[\Pi n : \text{Nat}. \text{Hexad} \to \text{Option}(\text{Vector}[n])]
+
+|`TENSOR`
+|stem:[\Pi d_1, \ldots, d_k : \text{Nat}. \text{Hexad} \to \text{Option}(\text{Tensor}[d_1, \ldots, d_k])]
+
+|`SEMANTIC`
+|stem:[\text{Hexad} \to \text{Set}(\text{TypeAnnotation})]
+
+|`DOCUMENT`
+|stem:[\text{Hexad} \to \text{Option}(\text{String})]
+
+|`TEMPORAL`
+|stem:[\text{Hexad} \to \text{List}(\text{Version})]
+|===
+
+**Note:** Vector and tensor modalities have **dependent types** - the return type depends on the dimension parameters.
+
+== Type Environments
+
+=== Context (Type Environment)
+
+A **type environment** stem:[\Gamma] is a finite map from variables to types:
+
+[stem]
+++++
+\Gamma ::= \emptyset \mid \Gamma, x : \tau
+++++
+
+**Operations:**
+
+- stem:[\Gamma(x)] - lookup type of `x` in stem:[\Gamma]
+- stem:[\Gamma, x : \tau] - extend stem:[\Gamma] with binding `x : τ`
+- stem:[\text{dom}(\Gamma)] - domain of stem:[\Gamma] (set of variables)
+
+=== Well-Formed Environments
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash \tau : \text{Type} \quad
+  x \notin \text{dom}(\Gamma)
+}{
+  \Gamma, x : \tau \text{ well-formed}
+}
+++++
+
+== Typing Judgments
+
+We use the following typing judgments:
+
+[cols="1,3"]
+|===
+|Judgment |Meaning
+
+|stem:[\Gamma \vdash e : \tau]
+|Expression `e` has type stem:[\tau] in context stem:[\Gamma]
+
+|stem:[\Gamma \vdash Q : \tau]
+|Query `Q` has type stem:[\tau] in context stem:[\Gamma]
+
+|stem:[\Gamma \vdash C : \text{Hexad} \to \text{Bool}]
+|Condition `C` is a predicate on hexads
+
+|stem:[\Gamma \vdash \tau : \text{Type}]
+|stem:[\tau] is a well-formed type
+
+|stem:[\Gamma \vdash \tau_1 \leq \tau_2]
+|stem:[\tau_1] is a subtype of stem:[\tau_2]
+|===
+
+== Core Typing Rules
+
+=== Variables
+
+[stem]
+++++
+\frac{
+  x : \tau \in \Gamma
+}{
+  \Gamma \vdash x : \tau
+} \text{(T-Var)}
+++++
+
+=== Literals
+
+[stem]
+++++
+\frac{
+  n \in \mathbb{Z}
+}{
+  \Gamma \vdash n : \text{Int}
+} \text{(T-Int)}
+\quad
+\frac{
+  f \in \mathbb{R}
+}{
+  \Gamma \vdash f : \text{Float}
+} \text{(T-Float)}
+++++
+
+[stem]
+++++
+\frac{
+  s \in \text{UTF-8}
+}{
+  \Gamma \vdash s : \text{String}
+} \text{(T-String)}
+\quad
+\frac{
+  b \in \{\text{true}, \text{false}\}
+}{
+  \Gamma \vdash b : \text{Bool}
+} \text{(T-Bool)}
+++++
+
+=== UUID Literals
+
+[stem]
+++++
+\frac{
+  u \text{ matches UUID format}
+}{
+  \Gamma \vdash u : \text{UUID}
+} \text{(T-UUID)}
+++++
+
+=== Vector Literals
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash v_1 : \text{Float} \quad \cdots \quad \Gamma \vdash v_n : \text{Float}
+}{
+  \Gamma \vdash [v_1, \ldots, v_n] : \text{Vector}[n]
+} \text{(T-VectorLit)}
+++++
+
+=== List Construction
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash v_1 : \tau \quad \cdots \quad \Gamma \vdash v_n : \tau
+}{
+  \Gamma \vdash [v_1, \ldots, v_n] : \text{List}(\tau)
+} \text{(T-ListLit)}
+++++
+
+== Query Typing Rules
+
+=== Slipstream Query (No Proof)
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash \mathcal{M} : \text{ModalitySet} \quad
+  \Gamma \vdash S : \text{Source} \quad
+  \Gamma \vdash C : \text{Hexad} \to \text{Bool}
+}{
+  \Gamma \vdash \texttt{SELECT } \mathcal{M} \texttt{ FROM } S \texttt{ WHERE } C : \text{QueryResult}[\mathcal{M}]
+} \text{(T-SlipstreamQuery)}
+++++
+
+Where:
+
+[stem]
+++++
+\text{QueryResult}[\mathcal{M}] = \text{List}(\text{Hexad}_\mathcal{M})
+++++
+
+And:
+
+[stem]
+++++
+\text{Hexad}_\mathcal{M} = \{h : \text{Hexad} \mid \forall m \in \mathcal{M}. m(h) \neq \text{None}\}
+++++
+
+=== Dependent-Type Query (With Proof)
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash \mathcal{M} : \text{ModalitySet} \quad
+  \Gamma \vdash S : \text{Source} \quad
+  \Gamma \vdash C : \text{Hexad} \to \text{Bool} \quad
+  \Gamma \vdash P : \text{ProofSpec}[\phi]
+}{
+  \Gamma \vdash \texttt{SELECT } \mathcal{M} \texttt{ ... PROOF } P : \text{ProvedResult}[\mathcal{M}, \phi]
+} \text{(T-ProvedQuery)}
+++++
+
+Where:
+
+[stem]
+++++
+\text{ProvedResult}[\mathcal{M}, \phi] = \Sigma r : \text{QueryResult}[\mathcal{M}]. \text{Proof}[\phi(r)]
+++++
+
+**Interpretation:** A dependent sum - a pair of query results `r` and a proof that stem:[\phi(r)] holds.
+
+=== Modality Set Typing
+
+[stem]
+++++
+\frac{
+  \forall m \in \{m_1, \ldots, m_k\}. m \in \{\texttt{GRAPH}, \texttt{VECTOR}, \ldots\}
+}{
+  \Gamma \vdash \{m_1, \ldots, m_k\} : \text{ModalitySet}
+} \text{(T-ModalitySet)}
+++++
+
+[stem]
+++++
+\frac{
+}{
+  \Gamma \vdash * : \text{ModalitySet}
+} \text{(T-AllModalities)}
+++++
+
+=== Source Typing
+
+==== Hexad Source
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash u : \text{UUID}
+}{
+  \Gamma \vdash \texttt{HEXAD } u : \text{Source}
+} \text{(T-HexadSource)}
+++++
+
+==== Federation Source
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash p : \text{Pattern} \quad
+  \Gamma \vdash d : \text{DriftMode}
+}{
+  \Gamma \vdash \texttt{FEDERATION } p \texttt{ WITH DRIFT } d : \text{Source}
+} \text{(T-FederationSource)}
+++++
+
+==== Store Source
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash \text{id} : \text{String}
+}{
+  \Gamma \vdash \texttt{STORE } \text{id} : \text{Source}
+} \text{(T-StoreSource)}
+++++
+
+== Condition Typing Rules
+
+=== Simple Conditions
+
+==== Graph Condition (SPARQL Pattern)
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash p : \text{SPARQLPattern}
+}{
+  \Gamma \vdash p : \text{Hexad} \to \text{Bool}
+} \text{(T-GraphCond)}
+++++
+
+==== Vector Similarity
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash v : \text{Vector}[n] \quad
+  \Gamma \vdash t : \text{Float}
+}{
+  \Gamma \vdash \texttt{h.embedding SIMILAR TO } v \texttt{ WITHIN } t : \text{Hexad} \to \text{Bool}
+} \text{(T-VectorSimilarity)}
+++++
+
+==== Vector Nearest-K
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash k : \text{Int} \quad
+  k > 0 \quad
+  \Gamma \vdash m : \text{MetricType}
+}{
+  \Gamma \vdash \texttt{h.embedding NEAREST } k \texttt{ USING } m : \text{Hexad} \to \text{Bool}
+} \text{(T-VectorNearest)}
+++++
+
+==== Tensor Condition
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash \text{field} : \text{Hexad} \to \text{Tensor}[\ldots] \quad
+  \Gamma \vdash \text{op} : \text{TensorOp} \quad
+  \Gamma \vdash \text{literal} : \text{Tensor}[\ldots]
+}{
+  \Gamma \vdash \text{field op literal} : \text{Hexad} \to \text{Bool}
+} \text{(T-TensorCond)}
+++++
+
+==== Semantic Condition (Contract Satisfaction)
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash c : \text{Contract} \quad
+  \Gamma \vdash p : \text{Params}
+}{
+  \Gamma \vdash \texttt{SATISFIES } c(p) : \text{Hexad} \to \text{Bool}
+} \text{(T-SemanticCond)}
+++++
+
+==== Temporal Condition (As Of)
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash t : \text{Timestamp}
+}{
+  \Gamma \vdash \texttt{AS OF } t : \text{Hexad} \to \text{Bool}
+} \text{(T-TemporalAsOf)}
+++++
+
+=== Compound Conditions
+
+==== Conjunction
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash C_1 : \text{Hexad} \to \text{Bool} \quad
+  \Gamma \vdash C_2 : \text{Hexad} \to \text{Bool}
+}{
+  \Gamma \vdash C_1 \texttt{ AND } C_2 : \text{Hexad} \to \text{Bool}
+} \text{(T-And)}
+++++
+
+==== Disjunction
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash C_1 : \text{Hexad} \to \text{Bool} \quad
+  \Gamma \vdash C_2 : \text{Hexad} \to \text{Bool}
+}{
+  \Gamma \vdash C_1 \texttt{ OR } C_2 : \text{Hexad} \to \text{Bool}
+} \text{(T-Or)}
+++++
+
+==== Negation
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash C : \text{Hexad} \to \text{Bool}
+}{
+  \Gamma \vdash \texttt{NOT } C : \text{Hexad} \to \text{Bool}
+} \text{(T-Not)}
+++++
+
+== Proof Specification Typing
+
+=== Existence Proof
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash c : \text{ExistenceContract}
+}{
+  \Gamma \vdash \texttt{PROOF EXISTENCE}(c) : \text{ProofSpec}[\exists h. \text{Valid}(h)]
+} \text{(T-ProofExistence)}
+++++
+
+=== Citation Proof
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash c : \text{CitationContract}
+}{
+  \Gamma \vdash \texttt{PROOF CITATION}(c) : \text{ProofSpec}[\forall h. \text{CitationValid}(h)]
+} \text{(T-ProofCitation)}
+++++
+
+=== Access Proof
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash c : \text{AccessContract} \quad
+  \Gamma \vdash u : \text{User}
+}{
+  \Gamma \vdash \texttt{PROOF ACCESS}(c) : \text{ProofSpec}[\forall h. \text{hasPermission}(u, h)]
+} \text{(T-ProofAccess)}
+++++
+
+=== Integrity Proof
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash c : \text{IntegrityContract}
+}{
+  \Gamma \vdash \texttt{PROOF INTEGRITY}(c) : \text{ProofSpec}[\forall h. \text{Untampered}(h)]
+} \text{(T-ProofIntegrity)}
+++++
+
+=== Provenance Proof
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash c : \text{ProvenanceContract}
+}{
+  \Gamma \vdash \texttt{PROOF PROVENANCE}(c) : \text{ProofSpec}[\forall h. \text{ValidLineage}(h)]
+} \text{(T-ProofProvenance)}
+++++
+
+== Subtyping
+
+=== Subtyping Relation
+
+stem:[\tau_1 \leq \tau_2] means "stem:[\tau_1] is a subtype of stem:[\tau_2]" (values of type stem:[\tau_1] can be used where stem:[\tau_2] is expected).
+
+==== Reflexivity
+
+[stem]
+++++
+\frac{
+}{
+  \tau \leq \tau
+} \text{(Sub-Refl)}
+++++
+
+==== Transitivity
+
+[stem]
+++++
+\frac{
+  \tau_1 \leq \tau_2 \quad
+  \tau_2 \leq \tau_3
+}{
+  \tau_1 \leq \tau_3
+} \text{(Sub-Trans)}
+++++
+
+==== Refinement Subsumption
+
+[stem]
+++++
+\frac{
+  \forall v. \phi_1(v) \Rightarrow \phi_2(v)
+}{
+  \{x : \tau \mid \phi_1(x)\} \leq \{x : \tau \mid \phi_2(x)\}
+} \text{(Sub-Refine)}
+++++
+
+**Intuition:** If stem:[\phi_1] is stronger (more restrictive) than stem:[\phi_2], then the refined type with stem:[\phi_1] is a subtype.
+
+==== List Covariance
+
+[stem]
+++++
+\frac{
+  \tau_1 \leq \tau_2
+}{
+  \text{List}(\tau_1) \leq \text{List}(\tau_2)
+} \text{(Sub-List)}
+++++
+
+==== Function Contravariance (Input) and Covariance (Output)
+
+[stem]
+++++
+\frac{
+  \tau_1' \leq \tau_1 \quad
+  \tau_2 \leq \tau_2'
+}{
+  \tau_1 \to \tau_2 \leq \tau_1' \to \tau_2'
+} \text{(Sub-Arrow)}
+++++
+
+**Note:** Input is contravariant, output is covariant.
+
+==== Modality Subsumption
+
+[stem]
+++++
+\frac{
+  \mathcal{M}_1 \subseteq \mathcal{M}_2
+}{
+  \text{Hexad}_{\mathcal{M}_2} \leq \text{Hexad}_{\mathcal{M}_1}
+} \text{(Sub-Hexad)}
+++++
+
+**Intuition:** A hexad with more modalities can be used where fewer are required (contravariant).
+
+=== Subsumption in Typing
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash e : \tau_1 \quad
+  \tau_1 \leq \tau_2
+}{
+  \Gamma \vdash e : \tau_2
+} \text{(T-Sub)}
+++++
+
+== Type Equivalence
+
+=== Definitional Equality
+
+Two types stem:[\tau_1] and stem:[\tau_2] are **definitionally equal** (stem:[\tau_1 \equiv \tau_2]) if they are syntactically identical up to alpha-renaming.
+
+**Examples:**
+
+1. stem:[\text{Vector}[10] \equiv \text{Vector}[10]]
+2. stem:[\Pi x : \tau. \sigma \equiv \Pi y : \tau. \sigma[y/x]]
+
+=== Semantic Equality
+
+Two types are **semantically equal** if they denote the same set of values:
+
+[stem]
+++++
+\tau_1 \simeq \tau_2 \iff \forall v. (v : \tau_1 \iff v : \tau_2)
+++++
+
+**Example:**
+
+[stem]
+++++
+\{x : \text{Int} \mid x \geq 0\} \simeq \{x : \text{Int} \mid x > -1\}
+++++
+
+== Type Checking Algorithm
+
+=== Bidirectional Type Checking
+
+VQL uses **bidirectional type checking** with two modes:
+
+1. **Synthesis (stem:[\Uparrow])**: Infer type of an expression
+2. **Checking (stem:[\Downarrow])**: Check expression against expected type
+
+==== Synthesis Rules
+
+[stem]
+++++
+\Gamma \vdash e \Uparrow \tau
+++++
+
+"In context stem:[\Gamma], synthesize that expression `e` has type stem:[\tau]"
+
+**Examples:**
+
+[stem]
+++++
+\frac{
+  x : \tau \in \Gamma
+}{
+  \Gamma \vdash x \Uparrow \tau
+} \text{(Synth-Var)}
+++++
+
+[stem]
+++++
+\frac{
+  n \in \mathbb{Z}
+}{
+  \Gamma \vdash n \Uparrow \text{Int}
+} \text{(Synth-Int)}
+++++
+
+==== Checking Rules
+
+[stem]
+++++
+\Gamma \vdash e \Downarrow \tau
+++++
+
+"In context stem:[\Gamma], check that expression `e` has type stem:[\tau]"
+
+**Example:**
+
+[stem]
+++++
+\frac{
+  \Gamma \vdash e \Uparrow \tau' \quad
+  \tau' \leq \tau
+}{
+  \Gamma \vdash e \Downarrow \tau
+} \text{(Check-Sub)}
+++++
+
+=== Type Checking Queries
+
+==== Slipstream Query
+
+**Input:** Query `Q`, context stem:[\Gamma]
+**Output:** Type stem:[\tau] or type error
+
+[source,haskell]
+----
+check_slipstream_query Γ (SELECT M FROM S WHERE C) =
+  let τ_M = check_modalities Γ M in
+  let τ_S = check_source Γ S in
+  let τ_C = check_condition Γ C in
+  if τ_C ≡ (Hexad → Bool) then
+    QueryResult[M]
+  else
+    TypeError "Condition must be predicate on Hexad"
+----
+
+==== Dependent-Type Query
+
+**Input:** Query `Q` with `PROOF` clause, context stem:[\Gamma]
+**Output:** Proved result type or type error
+
+[source,haskell]
+----
+check_proved_query Γ (SELECT M ... PROOF P) =
+  let τ_base = check_slipstream_query Γ (SELECT M ...) in
+  let (ProofSpec[φ]) = check_proof_spec Γ P in
+  ProvedResult[M, φ]
+----
+
+=== Type Inference
+
+Some VQL constructs support **type inference**:
+
+==== Vector Dimension Inference
+
+From vector literal:
+
+[source,vql]
+----
+WHERE h.embedding SIMILAR TO [0.1, 0.2, 0.3]
+----
+
+Inferred: `Vector[3]`
+
+==== Refinement Predicate Inference
+
+From conditions:
+
+[source,vql]
+----
+WHERE h.embedding SIMILAR TO v WITHIN 0.8
+----
+
+Inferred: `{h : Hexad | similarity(h.embedding, v) ≥ 0.8}`
+
+== Type Safety Properties
+
+=== Progress
+
+**Theorem (Progress):**
+
+If stem:[\Gamma \vdash Q : \tau] and `Q` is a closed query (no free variables), then either:
+
+1. `Q` is a value, or
+2. stem:[\exists Q'. Q \rightarrow Q'] (Q can take a step)
+
+=== Preservation
+
+**Theorem (Preservation):**
+
+If stem:[\Gamma \vdash Q : \tau] and stem:[Q \rightarrow Q'], then stem:[\Gamma \vdash Q' : \tau].
+
+**Informal:** Type is preserved during evaluation.
+
+=== Soundness
+
+**Theorem (Type Soundness):**
+
+If stem:[\Gamma \vdash Q : \tau] and stem:[Q \Rightarrow^* v], then stem:[\Gamma \vdash v : \tau].
+
+**Informal:** Well-typed queries don't "go wrong" - they either diverge or produce a value of the expected type.
+
+== Dependent Types vs Slipstream Paths
+
+=== Type Differences
+
+[cols="2,3,3"]
+|===
+|Aspect |Slipstream Path |Dependent-Type Path
+
+|**Result Type**
+|stem:[\text{List}(\text{Hexad})]
+|stem:[\Sigma r : \text{List}(\text{Hexad}). \text{Proof}[\phi(r)]]
+
+|**Guarantees**
+|Best-effort filtering
+|Formally verified via ZKP
+
+|**Performance**
+|Fast (no proof overhead)
+|Slower (proof generation)
+
+|**Use Case**
+|Exploratory queries
+|Compliance, audits
+
+|**Type Complexity**
+|Simple (no dependent types)
+|Complex (refinements, dependent products)
+|===
+
+=== Type Erasure
+
+For runtime optimization, **dependent types can be erased** from slipstream queries:
+
+[stem]
+++++
+\text{erase}(\Pi x : \tau_1. \tau_2) = \text{erase}(\tau_1) \to \text{erase}(\tau_2)
+++++
+
+[stem]
+++++
+\text{erase}(\Sigma x : \tau_1. \tau_2) = \text{erase}(\tau_1) \times \text{erase}(\tau_2)
+++++
+
+[stem]
+++++
+\text{erase}(\{x : \tau \mid \phi\}) = \text{erase}(\tau)
+++++
+
+[stem]
+++++
+\text{erase}(\text{Proof}[\phi]) = \text{Unit}
+++++
+
+**Dependent-type path** performs full type checking with refinements.
+**Slipstream path** can use erased types for performance.
+
+== Type System Extensions
+
+=== Row Polymorphism (Future)
+
+Support for flexible hexad projections:
+
+[stem]
+++++
+\text{Hexad}\{\text{graph} : \text{Graph}, \text{vector} : \text{Vector} \mid r\}
+++++
+
+Where `r` is a row variable representing "possibly more modalities".
+
+=== Effect Types (Future)
+
+Track side effects in query execution:
+
+[stem]
+++++
+\text{Query} : \text{HexadSet} \xrightarrow{\{\text{IO}, \text{Network}\}} \text{List}(\text{Hexad})
+++++
+
+Indicating the query performs IO and network operations.
+
+=== Linear Types (Future)
+
+Ensure ZKP witnesses are used exactly once:
+
+[stem]
+++++
+\text{Witness} : \text{LinearType}
+++++
+
+== References
+
+- link:vql-formal-semantics.adoc[VQL Formal Semantics]
+- link:vql-grammar.ebnf[VQL Grammar]
+- Pierce, B. C. (2002). *Types and Programming Languages*. MIT Press.
+- Pierce, B. C. (ed.) (2005). *Advanced Topics in Types and Programming Languages*. MIT Press.
+- Chlipala, A. (2013). *Certified Programming with Dependent Types*. MIT Press.
+- Norell, U. (2007). *Towards a practical programming language based on dependent type theory*. PhD thesis, Chalmers.

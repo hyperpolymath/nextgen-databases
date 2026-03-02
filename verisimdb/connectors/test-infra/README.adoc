@@ -1,0 +1,344 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+//
+// Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+
+= VeriSimDB Test Infrastructure
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:source-highlighter: rouge
+
+Integration test database stack for VeriSimDB's 10 federation adapters.
+
+toc::[]
+
+== Overview
+
+VeriSimDB federates across 10 external database systems. This test infrastructure
+provides a containerised stack of 7 databases for integration testing. The remaining
+2 adapters (DuckDB, SQLite) are embedded databases tested via unit tests.
+
+.Database services
+[cols="1,2,1,2",options="header"]
+|===
+| Service | Image | Ports | Purpose
+
+| MongoDB
+| `cgr.dev/chainguard/mongodb:latest`
+| 27017
+| Document store federation (replica set for change streams)
+
+| Redis Stack
+| Custom (wolfi-base + modules)
+| 6379
+| In-memory store: RediSearch, RedisJSON, RedisTimeSeries
+
+| Neo4j
+| Custom (wolfi-base + Neo4j CE)
+| 7474, 7687
+| Graph database with APOC plugin
+
+| ClickHouse
+| Custom (wolfi-base + static binary)
+| 8123, 9000
+| Columnar analytics for aggregate drift queries
+
+| SurrealDB
+| Custom (wolfi-base + binary)
+| 8000
+| Multi-model database (document + graph)
+
+| InfluxDB 2
+| Custom (wolfi-base + binary)
+| 8086
+| Time-series for temporal modality federation
+
+| MinIO
+| `cgr.dev/chainguard/minio:latest`
+| 9002, 9001
+| S3-compatible object storage
+|===
+
+NOTE: MinIO's S3 API is mapped to port **9002** (not 9000) to avoid conflict
+with ClickHouse's native TCP port on 9000.
+
+== Prerequisites
+
+.Required
+* https://podman.io/[Podman] 4.0+ (container runtime)
+* https://github.com/hyperpolymath/stapeln[selur-compose] or
+  https://github.com/containers/podman-compose[podman-compose] (container orchestration)
+
+.Optional (for seeding and verification)
+* `redis-cli` -- seed Redis Stack
+* `cypher-shell` -- seed Neo4j
+* `clickhouse-client` -- seed ClickHouse
+* `surreal` CLI -- seed SurrealDB
+* `influx` CLI -- seed InfluxDB
+* `mc` (MinIO Client) -- seed MinIO
+* `ct` (cerro-torre CLI) -- pack `.ctp` bundles
+
+== Quick Start
+
+=== 1. Build custom images
+
+[source,bash]
+----
+cd connectors/test-infra
+./ct-build.sh
+----
+
+Or build in parallel for faster results:
+
+[source,bash]
+----
+./ct-build.sh --parallel
+----
+
+=== 2. Start the stack
+
+[source,bash]
+----
+# Preferred: selur-compose
+selur-compose up --detach
+
+# Fallback: podman-compose
+podman-compose up --detach
+----
+
+=== 3. Wait for health checks
+
+All services include health checks. Wait approximately 30 seconds for all
+services to become healthy, then verify:
+
+[source,bash]
+----
+selur-compose ps        # or: podman-compose ps
+----
+
+=== 4. Seed test data
+
+MongoDB seeds automatically on first startup via `/docker-entrypoint-initdb.d/init.js`.
+For the other databases:
+
+[source,bash]
+----
+# Redis Stack
+cd seed && ./redis-init.sh && cd ..
+
+# Neo4j (requires cypher-shell)
+cat seed/neo4j-init.cypher | cypher-shell -a bolt://localhost:7687
+
+# ClickHouse (requires clickhouse-client)
+clickhouse-client --multiquery < seed/clickhouse-init.sql
+
+# SurrealDB (requires surreal CLI)
+cat seed/surrealdb-init.surql | surreal sql \
+    --endpoint http://localhost:8000 --ns verisimdb --db test
+
+# InfluxDB 2
+cd seed && ./influxdb-init.sh && cd ..
+
+# MinIO (requires mc)
+cd seed && ./minio-init.sh && cd ..
+----
+
+=== 5. Run integration tests
+
+[source,bash]
+----
+# Rust integration tests (sequential to avoid port contention)
+cd ../../rust-core
+cargo test --test integration -- --test-threads=1
+
+# Elixir integration tests
+cd ../../elixir-orchestration
+mix test test/integration
+----
+
+=== 6. Tear down
+
+[source,bash]
+----
+# Stop services (preserve volumes)
+selur-compose down
+
+# Stop services and remove volumes
+selur-compose down --volumes
+----
+
+== Architecture
+
+=== Network Topology
+
+All 7 services communicate over a single network. The default network driver
+is `selur` (zero-copy IPC for same-host communication) with automatic fallback
+to the standard `bridge` driver when selur is unavailable.
+
+[source]
+----
+                    selur network (bridge fallback)
+            +--------------------------------------------------+
+            |                                                  |
+    +-------+-------+  +-----------+  +----------+  +---------+--------+
+    | MongoDB :27017|  | Redis     |  | Neo4j    |  | ClickHouse       |
+    |   (rs0)       |  | :6379     |  | :7474    |  | :8123 (HTTP)     |
+    +---------------+  +-----------+  | :7687    |  | :9000 (native)   |
+                                      +----------+  +------------------+
+    +---------------+  +-----------+  +-----------+
+    | SurrealDB     |  | InfluxDB  |  | MinIO     |
+    | :8000         |  | :8086     |  | :9002 (S3)|
+    +---------------+  +-----------+  | :9001 (UI)|
+                                      +-----------+
+----
+
+=== Volumes
+
+Each service has its own persistent volume for data storage. Volumes survive
+container restarts but are removed with `selur-compose down --volumes`.
+
+[cols="1,2",options="header"]
+|===
+| Volume | Purpose
+| `mongodb-data` | MongoDB data directory
+| `redis-data` | Redis RDB/AOF persistence
+| `neo4j-data` | Neo4j graph data
+| `neo4j-logs` | Neo4j server logs
+| `clickhouse-data` | ClickHouse MergeTree data
+| `influxdb-data` | InfluxDB 2 storage engine
+| `minio-data` | MinIO object storage
+|===
+
+=== Custom Containerfiles
+
+All custom images use multi-stage builds from `cgr.dev/chainguard/wolfi-base:latest`:
+
+* **Stage 1 (builder)**: Downloads and/or compiles the database and its plugins
+* **Stage 2 (runtime)**: Minimal image with only runtime dependencies
+
+All containers:
+
+* Run as non-root users
+* Include `HEALTHCHECK` instructions
+* Expose only necessary ports
+* Use the smallest possible set of runtime dependencies
+
+== Test Data
+
+Each seed script creates consistent test data across all databases:
+
+.Test hexads
+[cols="1,2,1,1",options="header"]
+|===
+| ID | Title | Drift Status | Modalities
+
+| `hexad-test-001`
+| Introduction to Cross-Modal Consistency
+| healthy (0.045)
+| document, vector, spatial, temporal, graph, provenance
+
+| `hexad-test-002`
+| Drift Detection Algorithms
+| drifted (0.213)
+| document, vector, spatial, graph
+
+| `hexad-test-003`
+| Self-Normalisation Process
+| healthy (0.0)
+| document, vector, semantic
+|===
+
+Each database's seed script includes these same entities in the appropriate
+format for that database system, ensuring cross-database consistency that
+the federation adapter tests can verify.
+
+== Troubleshooting
+
+=== Service fails to start
+
+Check the service logs:
+
+[source,bash]
+----
+selur-compose logs mongodb
+selur-compose logs redis-stack
+----
+
+=== Port conflicts
+
+If a port is already in use on the host, modify the port mapping in
+`compose.toml`. For example, to remap MongoDB to port 27018:
+
+[source,toml]
+----
+[services.mongodb]
+ports = ["27018:27017"]
+----
+
+=== MongoDB replica set not initialising
+
+The replica set initialisation is handled by `mongodb-init.js`. If it fails,
+initialise manually:
+
+[source,bash]
+----
+mongosh --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "localhost:27017"}]})'
+----
+
+=== Redis modules not loading
+
+If RediSearch or other modules fail to load, check that the module `.so` files
+exist in the image:
+
+[source,bash]
+----
+podman exec -it <redis-container> ls -la /opt/redis/lib/
+----
+
+=== ClickHouse or Neo4j out of memory
+
+These databases can be memory-hungry. Ensure at least 4 GB of RAM is
+available for the full test stack. Reduce the ClickHouse
+`mark_cache_size` in the Containerfile if needed.
+
+=== Seed script failures
+
+All seed scripts are idempotent -- they can be safely re-run. If a script
+fails partway through, fix the issue and run it again.
+
+== Customising Seed Data
+
+Seed scripts are in `seed/` and can be modified to add additional test data.
+When adding new test hexads, ensure:
+
+1. The hexad ID is unique across all seed scripts
+2. The same hexad is created in all relevant databases (for federation testing)
+3. Drift scores and provenance events reference valid hexad IDs
+4. Spatial coordinates use valid GeoJSON (for MongoDB's `2dsphere` index)
+
+== File Reference
+
+[cols="1,3",options="header"]
+|===
+| File | Purpose
+| `compose.toml` | selur-compose service definitions (7 services)
+| `manifest.toml` | Cerro-torre `.ctp` bundle manifest
+| `.gatekeeper.yaml` | Svalinn gatekeeper policy (permissive for testing)
+| `ct-build.sh` | Build pipeline for custom images
+| `vordr.toml` | Runtime health monitoring configuration
+| `deploy.k9.ncl` | k9-svc deployment component (Hunt level)
+| `0-AI-MANIFEST.a2ml` | AI-readable manifest
+| `images/Containerfile.redis-stack` | Redis + modules custom image
+| `images/Containerfile.neo4j` | Neo4j + APOC custom image
+| `images/Containerfile.clickhouse` | ClickHouse static binary custom image
+| `images/Containerfile.surrealdb` | SurrealDB custom image
+| `images/Containerfile.influxdb` | InfluxDB 2 custom image
+| `seed/mongodb-init.js` | MongoDB seed (runs automatically)
+| `seed/redis-init.sh` | Redis Stack seed (RediSearch + JSON + TimeSeries)
+| `seed/neo4j-init.cypher` | Neo4j seed (constraints, indexes, nodes, relationships)
+| `seed/clickhouse-init.sql` | ClickHouse seed (tables, materialized views, data)
+| `seed/surrealdb-init.surql` | SurrealDB seed (schema, edges, data)
+| `seed/influxdb-init.sh` | InfluxDB seed (buckets, metrics, federation health)
+| `seed/minio-init.sh` | MinIO seed (buckets, objects, metadata)
+|===

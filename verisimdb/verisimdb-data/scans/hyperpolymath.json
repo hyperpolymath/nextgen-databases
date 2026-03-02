@@ -1,0 +1,94 @@
+{
+  "program_path": ".",
+  "language": "shell",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "zotpress/install.sh",
+      "severity": "Medium",
+      "description": "29 potentially unquoted variable expansions in zotpress/install.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 1926,
+    "unsafe_blocks": 21,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 4,
+    "io_operations": 5,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "zotpress/scripts/build-js.res",
+      "lines": 3,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zotpress/src/rescript/Utils.res",
+      "lines": 178,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zotpress/src/rescript/Zotpress.res",
+      "lines": 522,
+      "unsafe_blocks": 21,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zotpress/src/js/zotpress.res",
+      "lines": 3,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "zotpress/src/rescript/Utils.res",
+        "to": "zotpress/src/rescript/Zotpress.res",
+        "relation": "shared_dir:zotpress/src/rescript",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "zotpress/install.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

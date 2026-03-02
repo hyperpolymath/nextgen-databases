@@ -1,0 +1,267 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/visual.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in src/analyzers/visual.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/accessibility.rs",
+      "severity": "Medium",
+      "description": "17 unwrap/expect calls in src/analyzers/accessibility.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/seo.rs",
+      "severity": "Medium",
+      "description": "12 unwrap/expect calls in src/analyzers/seo.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/machine.rs",
+      "severity": "Medium",
+      "description": "16 unwrap/expect calls in src/analyzers/machine.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/analyzers/git_seo_integration.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in src/analyzers/git_seo_integration.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/integration.rs",
+      "severity": "Medium",
+      "description": "25 unwrap/expect calls in tests/integration.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 4142,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 89,
+    "allocation_sites": 8,
+    "io_operations": 72,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "bot-integration/src/glambot_findings.lgt",
+      "lines": 148,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzers/mod.rs",
+      "lines": 219,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzers/visual.rs",
+      "lines": 384,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 1,
+      "io_operations": 10,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzers/accessibility.rs",
+      "lines": 401,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 17,
+      "allocation_sites": 1,
+      "io_operations": 12,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzers/seo.rs",
+      "lines": 417,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 12,
+      "allocation_sites": 1,
+      "io_operations": 14,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzers/machine.rs",
+      "lines": 498,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 16,
+      "allocation_sites": 1,
+      "io_operations": 18,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/analyzers/git_seo_integration.rs",
+      "lines": 428,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 1,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/config/mod.rs",
+      "lines": 168,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/error.rs",
+      "lines": 37,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/fleet.rs",
+      "lines": 220,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/integration.rs",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 25,
+      "allocation_sites": 0,
+      "io_operations": 11,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "memory",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/analyzers/mod.rs",
+        "to": "src/analyzers/visual.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/visual.rs",
+        "to": "src/analyzers/accessibility.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/accessibility.rs",
+        "to": "src/analyzers/seo.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/seo.rs",
+        "to": "src/analyzers/machine.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/analyzers/machine.rs",
+        "to": "src/analyzers/git_seo_integration.rs",
+        "relation": "shared_dir:src/analyzers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/error.rs",
+        "to": "src/fleet.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "src/analyzers/visual.rs",
+          "src/analyzers/accessibility.rs",
+          "src/analyzers/seo.rs",
+          "src/analyzers/machine.rs",
+          "src/analyzers/git_seo_integration.rs",
+          "tests/integration.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/analyzers/visual.rs",
+          "src/analyzers/accessibility.rs",
+          "src/analyzers/seo.rs",
+          "src/analyzers/machine.rs",
+          "src/analyzers/git_seo_integration.rs",
+          "tests/integration.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

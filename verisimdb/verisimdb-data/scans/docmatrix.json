@@ -1,0 +1,632 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "crates/formatrix-core/src/formats/djot.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in crates/formatrix-core/src/formats/djot.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/formatrix-core/src/formats/orgmode.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in crates/formatrix-core/src/formats/orgmode.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/formatrix-core/src/ast.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in crates/formatrix-core/src/ast.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "crates/formatrix-core/src/ffi.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in crates/formatrix-core/src/ffi.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "crates/formatrix-core/src/ffi.rs",
+      "severity": "High",
+      "description": "Raw pointer cast in crates/formatrix-core/src/ffi.rs",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/formatrix-core/src/file_ops.rs",
+      "severity": "Medium",
+      "description": "11 unwrap/expect calls in crates/formatrix-core/src/file_ops.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/formatrix-db/src/lib.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in crates/formatrix-db/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 12668,
+    "unsafe_blocks": 15,
+    "panic_sites": 2,
+    "unwrap_calls": 52,
+    "allocation_sites": 70,
+    "io_operations": 25,
+    "threading_constructs": 8
+  },
+  "file_statistics": [
+    {
+      "file_path": "bindings/zig/formatrix.zig",
+      "lines": 313,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-core/src/formats/asciidoc.rs",
+      "lines": 602,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-core/src/formats/djot.rs",
+      "lines": 693,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 6,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-core/src/formats/markdown.rs",
+      "lines": 598,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 2,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-core/src/formats/orgmode.rs",
+      "lines": 879,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 16,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-core/src/formats/plaintext.rs",
+      "lines": 164,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-core/src/formats/rst.rs",
+      "lines": 617,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-core/src/formats/typst.rs",
+      "lines": 583,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 8,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-core/src/ast.rs",
+      "lines": 766,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-core/src/ffi.rs",
+      "lines": 605,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-core/src/file_ops.rs",
+      "lines": 447,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 11,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-core/src/traits.rs",
+      "lines": 181,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-db/src/lib.rs",
+      "lines": 813,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 2,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "crates/formatrix-gui/src/commands.rs",
+      "lines": 488,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 5
+    },
+    {
+      "file_path": "crates/formatrix-gui/src/main.rs",
+      "lines": 50,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/formatrix-pipeline/src/lib.rs",
+      "lines": 107,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "nix/flake.nix",
+      "lines": 134,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/formatrix_tui-app.adb",
+      "lines": 218,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 13,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/formatrix_tui.adb",
+      "lines": 60,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/formatrix.zig",
+      "lines": 313,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "disk",
+    "cpu",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "crates/formatrix-core/src/ast.rs",
+        "to": "crates/formatrix-core/src/ffi.rs",
+        "relation": "shared_dir:crates/formatrix-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-core/src/ffi.rs",
+        "to": "crates/formatrix-core/src/file_ops.rs",
+        "relation": "shared_dir:crates/formatrix-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-core/src/file_ops.rs",
+        "to": "crates/formatrix-core/src/traits.rs",
+        "relation": "shared_dir:crates/formatrix-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-gui/src/commands.rs",
+        "to": "crates/formatrix-gui/src/main.rs",
+        "relation": "shared_dir:crates/formatrix-gui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/asciidoc.rs",
+        "to": "crates/formatrix-core/src/formats/djot.rs",
+        "relation": "shared_dir:crates/formatrix-core/src/formats",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/djot.rs",
+        "to": "crates/formatrix-core/src/formats/markdown.rs",
+        "relation": "shared_dir:crates/formatrix-core/src/formats",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/markdown.rs",
+        "to": "crates/formatrix-core/src/formats/orgmode.rs",
+        "relation": "shared_dir:crates/formatrix-core/src/formats",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/orgmode.rs",
+        "to": "crates/formatrix-core/src/formats/plaintext.rs",
+        "relation": "shared_dir:crates/formatrix-core/src/formats",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/plaintext.rs",
+        "to": "crates/formatrix-core/src/formats/rst.rs",
+        "relation": "shared_dir:crates/formatrix-core/src/formats",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/rst.rs",
+        "to": "crates/formatrix-core/src/formats/typst.rs",
+        "relation": "shared_dir:crates/formatrix-core/src/formats",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/formatrix_tui-app.adb",
+        "to": "tui/src/formatrix_tui.adb",
+        "relation": "shared_dir:tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bindings/zig/formatrix.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/asciidoc.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/djot.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/markdown.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/orgmode.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/plaintext.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/rst.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-core/src/formats/typst.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "crates/formatrix-core/src/ast.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "crates/formatrix-core/src/ffi.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "crates/formatrix-core/src/file_ops.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "crates/formatrix-core/src/traits.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/formatrix-db/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "crates/formatrix-gui/src/commands.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "crates/formatrix-gui/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "crates/formatrix-pipeline/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "nix/flake.nix",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/formatrix_tui-app.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui/src/formatrix_tui.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/formatrix.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "crates/formatrix-core/src/formats/djot.rs",
+          "crates/formatrix-core/src/formats/orgmode.rs",
+          "crates/formatrix-core/src/ast.rs",
+          "crates/formatrix-core/src/file_ops.rs",
+          "crates/formatrix-db/src/lib.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "crates/formatrix-core/src/ffi.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Concurrency"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "crates/formatrix-core/src/ffi.rs",
+          "crates/formatrix-core/src/ffi.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "crates/formatrix-core/src/formats/djot.rs",
+          "crates/formatrix-core/src/formats/orgmode.rs",
+          "crates/formatrix-core/src/ast.rs",
+          "crates/formatrix-core/src/file_ops.rs",
+          "crates/formatrix-db/src/lib.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

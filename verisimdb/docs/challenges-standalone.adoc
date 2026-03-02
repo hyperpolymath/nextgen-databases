@@ -1,0 +1,439 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= Challenges: Standalone Deployment Mode
+
+== Overview
+
+Standalone deployment runs VeriSimDB as a **traditional database** with all six modalities (Graph, Vector, Tensor, Semantic, Document, Temporal) hosted locally on the same machine or cluster. While this offers simplicity and performance, it introduces specific architectural, operational, and scaling challenges.
+
+This document details the **technical challenges** unique to standalone deployment and provides mitigation strategies where applicable.
+
+== 1. Architectural Challenges
+
+=== 1.1. Vertical Scaling Limits
+
+**Problem:** All modalities compete for shared resources (CPU, RAM, disk I/O).
+
+[cols="1,2,2"]
+|===
+|Resource |Constraint |Impact
+
+|**RAM**
+|Oxigraph (Graph) + HNSW (Vector) + ndarray (Tensor) all hold data structures in memory
+|OOM kills under heavy concurrent load
+
+|**Disk I/O**
+|Tantivy (Document) writes inverted indices while Temporal writes Merkle-tree snapshots
+|I/O contention degrades latency
+
+|**CPU**
+|Tensor operations (Burn inference) saturate cores during batch jobs
+|Query starvation for other modalities
+|===
+
+**Mitigation:**
+- Use **cgroup limits** to reserve resources per modality (e.g., `systemd` slices)
+- Run modality stores in separate **containers** with CPU/memory quotas
+- Profile with `perf` to identify hotspots and optimize Rust code paths
+
+=== 1.2. Single Point of Failure
+
+**Problem:** Loss of the standalone node means loss of all six modalities simultaneously.
+
+**Risk Scenarios:**
+1. Hardware failure → No Graph, Vector, Tensor, Semantic, Document, OR Temporal access
+2. Kernel panic → All GenServers crash (Elixir orchestrator down)
+3. Disk corruption → All modalities potentially compromised
+
+**Mitigation:**
+- **Replication:** Run multiple standalone nodes with **async replication** (see `verisim-temporal` Merkle-tree sync)
+- **Backups:** Snapshot all modality stores to S3/B2 every N hours
+- **High Availability:** Deploy behind HAProxy with health checks per modality
+
+**Trade-off:** Replication adds complexity approaching hybrid/federated mode challenges.
+
+=== 1.3. Modality Coupling
+
+**Problem:** All six modalities share the same **Elixir orchestration layer**, creating tight coupling.
+
+**Consequences:**
+- **Upgrade Hell:** Updating `verisim-graph-rs` (Oxigraph) requires restarting the entire stack
+- **Blast Radius:** A bug in `verisim-tensor-rs` can crash the GenServer supervision tree, taking down Document/Temporal
+- **Dependency Conflicts:** Rust crate version mismatches (e.g., `tokio` version across modalities) force global coordination
+
+**Mitigation:**
+- Use **modular Elixir releases** (`mix release`) with per-modality umbrella apps
+- Implement **graceful degradation**: if Vector modality crashes, Graph/Document continue serving
+- Adopt **interface-driven design**: all modality crates expose identical C-ABI functions
+
+== 2. Performance Challenges
+
+=== 2.1. Interference Between Modalities
+
+**Problem:** Workloads from different modalities compete unpredictably.
+
+**Example Scenario:**
+[source,text]
+----
+T=0:   Client A starts HNSW vector search (high CPU)
+T=5:   Client B starts Tantivy full-text query (high disk read)
+T=10:  Client C requests Oxigraph SPARQL (high RAM)
+Result: All three queries degrade due to resource contention
+----
+
+**Quantitative Impact:**
+- Vector search latency: 5ms → 50ms (10x)
+- Document queries: 20ms → 200ms (10x)
+- Graph queries: OOM → killed
+
+**Mitigation:**
+- **Query Scheduling:** Implement priority queues in `VeriSim.QueryRouter`
+- **Async I/O:** Use `tokio` async runtime in Rust crates to yield during I/O waits
+- **Read Replicas:** Add read-only replicas for heavy query workloads
+
+=== 2.2. Write Amplification
+
+**Problem:** A single Hexad update can trigger writes across **all six modalities**.
+
+**Example:**
+1. User updates Hexad `550e8400-...` with new document text
+2. **Document modality**: Tantivy reindexes (writes segments)
+3. **Vector modality**: Recomputes embedding, updates HNSW index (rebuilds layers)
+4. **Temporal modality**: Appends new Merkle-tree node (writes snapshot)
+5. **Semantic modality**: Validates CBOR proof (writes metadata)
+6. **Graph modality**: May add citation edges (writes RDF triples)
+
+**Write Amplification Factor:** ~6x per logical update
+
+**Consequences:**
+- **SSD Wear:** Premature SSD exhaustion (TBW limits)
+- **Latency Spikes:** Write storms block reads
+- **Replication Lag:** If using async replication, lag increases proportionally
+
+**Mitigation:**
+- **Lazy Updates:** Only write to modalities that actually changed
+- **Batching:** Buffer updates in memory, flush every N seconds
+- **Write Coalescing:** Merge multiple updates to same Hexad before persisting
+
+=== 2.3. Query Routing Overhead
+
+**Problem:** `VeriSim.QueryRouter` (Elixir GenServer) becomes bottleneck.
+
+**Bottleneck Analysis:**
+- All queries pass through single GenServer process
+- Erlang message passing adds ~1-5µs per routing decision
+- Under high load (>10k qps), GenServer mailbox saturates
+
+**Symptoms:**
+- Increasing `gen_server:call` timeouts
+- Queries queued despite modality stores idle
+- Orchestrator CPU at 100% (single core)
+
+**Mitigation:**
+- **Pooling:** Use `poolboy` to spawn N parallel routers (shard by Hexad UUID)
+- **Direct Dispatch:** For hot paths, bypass GenServer and call Rust NIFs directly
+- **Load Balancing:** Use `pg` (process groups) to distribute across BEAM scheduler cores
+
+== 3. Operational Challenges
+
+=== 3.1. Backup and Recovery Complexity
+
+**Problem:** Six modalities require **six separate backup strategies**.
+
+[cols="1,2,2"]
+|===
+|Modality |Backup Method |Recovery Complexity
+
+|**Graph**
+|Oxigraph RDF dump → `.nt` file
+|Restore requires full re-parse (slow for large graphs)
+
+|**Vector**
+|HNSW index serialization → binary blob
+|Cannot restore incrementally; all-or-nothing
+
+|**Tensor**
+|`ndarray` → HDF5 or `.npy` files
+|Must re-validate tensor shapes on restore
+
+|**Semantic**
+|CBOR blobs → JSON export
+|Schema validation may fail if CBOR spec evolved
+
+|**Document**
+|Tantivy segments → tarball
+|Index rebuild required if segments corrupted
+
+|**Temporal**
+|Merkle-tree nodes → recursive snapshot
+|Tree integrity check expensive on large histories
+|===
+
+**Operational Burden:**
+- **Inconsistent Snapshots:** Modalities backed up at different times → cross-modal inconsistency
+- **Restore Testing:** Must test restore for all 6 modalities (6x testing effort)
+- **Storage Costs:** 6 separate backups consume significant space
+
+**Mitigation:**
+- **Coordinated Snapshots:** Use `VeriSim.DriftMonitor` to trigger simultaneous backups
+- **Differential Backups:** Only back up changed modality stores (requires version tracking)
+- **Restore Automation:** Script full-stack restore and test in CI/CD
+
+=== 3.2. Monitoring and Observability
+
+**Problem:** Need to monitor **six independent data stores** plus orchestration layer.
+
+**Metrics to Track (per modality):**
+- Query latency (p50, p99, p999)
+- Write throughput (ops/sec)
+- Error rates (by error type)
+- Resource usage (CPU, RAM, disk I/O)
+- Cache hit rates (where applicable)
+
+**Operational Complexity:**
+- **7 dashboards** (6 modalities + orchestrator) → alert fatigue
+- **Correlation Difficulty:** Determining which modality caused a slowdown requires cross-dashboard analysis
+- **Logging Volume:** Combined logs from all modalities can reach GB/day
+
+**Mitigation:**
+- **Unified Metrics:** Export all modalities to Prometheus with consistent labels (`modality=graph`, etc.)
+- **Distributed Tracing:** Instrument with OpenTelemetry to trace queries across modalities
+- **Anomaly Detection:** Use ML-based tools (e.g., Prometheus Alertmanager + `aiops`) to detect correlated failures
+
+=== 3.3. Dependency Management Hell
+
+**Problem:** Six Rust crates with divergent dependency trees.
+
+**Conflict Example:**
+[source,toml]
+----
+# verisim-graph-rs/Cargo.toml
+tokio = { version = "1.35", features = ["rt-multi-thread"] }
+
+# verisim-vector-rs/Cargo.toml
+tokio = { version = "1.40", features = ["rt-multi-thread", "io-util"] }
+
+# Conflict: Both crates linked into same Elixir NIF → panic
+----
+
+**Consequences:**
+- **Build Failures:** Cargo refuses to resolve incompatible versions
+- **Runtime Panics:** Mismatched async runtimes cause deadlocks
+- **Security Vulnerabilities:** Stuck on old dependency versions due to conflicts
+
+**Mitigation:**
+- **Workspace Unification:** Use Cargo workspace to enforce single `tokio` version across all crates
+- **Feature Flags:** Abstract over incompatible features with conditional compilation
+- **Forking:** Fork problematic dependencies and vendor them (last resort)
+
+== 4. Scaling Challenges
+
+=== 4.1. Data Growth Without Horizontal Scaling
+
+**Problem:** Standalone mode lacks **horizontal partitioning** (sharding).
+
+**Growth Scenarios:**
+1. **Graph grows to 1B triples** → Oxigraph in-memory structures exceed RAM
+2. **Vector index reaches 100M embeddings** → HNSW construction time becomes prohibitive (hours)
+3. **Document corpus hits 10TB** → Tantivy segment count explodes, query latency degrades
+
+**Scaling Options (All Suboptimal):**
+- **Vertical Scaling:** Buy bigger machine → diminishing returns, CapEx explosion
+- **Manual Sharding:** Split Hexads across multiple standalone nodes → lose single-system image
+- **Migrate to Hybrid/Federated:** Requires architectural overhaul
+
+**Constraint:** Standalone architecture fundamentally incompatible with horizontal scaling.
+
+=== 4.2. Hot Modality Bottlenecks
+
+**Problem:** Some modalities become "hot" (high query rate) while others remain idle.
+
+**Example:**
+- **Vector modality:** 95% of queries (embedding search for RAG pipelines)
+- **Temporal modality:** 1% of queries (historical lookups)
+- **Result:** Vector store saturated, Temporal store wasted capacity
+
+**Consequences:**
+- **Inefficient Resource Use:** Paying for 6 modalities, using 1-2 heavily
+- **Cannot Scale Hot Path:** Standalone mode cannot add more Vector replicas without duplicating all modalities
+
+**Mitigation:**
+- **Read Replicas (Partial):** Add read-only Vector replicas behind load balancer
+- **Caching Layer:** Add Redis cache for hot Vector queries
+- **Profile-Driven Optimization:** Use query logs to identify hot modalities and optimize those code paths
+
+=== 4.3. Write Scaling Limits
+
+**Problem:** All writes funnel through single orchestrator GenServer.
+
+**Theoretical Limit:**
+- Elixir GenServer: ~50k messages/sec per process (microbenchmark)
+- Each write requires ~5 GenServer calls (validation, routing, 6 modality dispatches, logging)
+- **Practical Write Throughput:** ~10k writes/sec
+
+**Symptom Under Load:**
+- GenServer mailbox depth increases linearly
+- Timeout errors on `GenServer.call(..., 5000)` despite modality stores idle
+- Writes queued for seconds/minutes
+
+**Mitigation:**
+- **Pooling:** Use `poolboy` to spawn N parallel `EntityServer` processes
+- **Sharding:** Shard Hexads by UUID across multiple orchestrator nodes (requires migration to distributed Elixir)
+- **Async Writes:** Use `GenServer.cast` for non-critical writes (lose ordering guarantees)
+
+== 5. Security Challenges
+
+=== 5.1. Single Security Boundary
+
+**Problem:** Compromise of standalone node exposes **all six modalities** simultaneously.
+
+**Attack Scenarios:**
+1. **Container Escape:** Attacker gains root on host → accesses all modality stores
+2. **Elixir VM Exploit:** Remote code execution in Erlang VM → full database compromise
+3. **Rust NIF Bug:** Buffer overflow in modality crate → arbitrary code execution with DB privileges
+
+**Blast Radius:** 100% of data (all modalities, all Hexads)
+
+**Mitigation:**
+- **Defense in Depth:**
+  - Run modalities in **separate rootless containers** (`svalinn/vordr`)
+  - Use **seccomp profiles** to restrict syscalls per container
+  - Enable **SELinux/AppArmor** mandatory access control
+- **Least Privilege:** Modality stores run as non-root user with minimal file permissions
+- **Network Isolation:** Use **separate network namespaces** for modalities (Unix sockets instead of TCP)
+
+=== 5.2. Audit Log Single Point of Failure
+
+**Problem:** `verisim-temporal` (audit log) shares fate with other modalities.
+
+**Risk:**
+- If standalone node compromised, attacker can **modify or delete audit logs**
+- **No external verification** of log integrity
+
+**Mitigation:**
+- **Immutable Logs:** Use **append-only filesystems** (e.g., `chattr +a` on Linux)
+- **External Replication:** Stream audit logs to **remote syslog server** or **blockchain** (tamper-evident)
+- **Cryptographic Chaining:** Each log entry includes hash of previous entry (Merkle chain)
+
+== 6. Migration Challenges
+
+=== 6.1. Path to Federation
+
+**Problem:** If standalone deployment outgrows single machine, migration to federated mode is **non-trivial**.
+
+**Migration Steps Required:**
+1. **Split Modalities:** Decide which modalities move to which federated stores
+2. **Data Export:** Dump each modality's data (see Backup section for complexity)
+3. **Registry Setup:** Deploy ReScript registry with quorum (requires 3+ nodes for Raft)
+4. **Policy Rewrite:** Translate single-machine access policies to distributed policies
+5. **Re-import Data:** Load data into federated stores, register with registry
+6. **Cutover:** Update orchestrator config, test cross-store queries
+
+**Downtime:** Potentially hours-to-days depending on data volume
+
+**Risk:** Data inconsistency during migration if updates occur mid-process
+
+**Mitigation:**
+- **Dual-Write Phase:** Write to both standalone and federated stores during transition
+- **Shadow Mode:** Run federated cluster in parallel, compare results before cutover
+- **Rollback Plan:** Keep standalone node operational until federated cluster validated
+
+=== 6.2. Hybrid Mode Complexity
+
+**Problem:** Partial migration to hybrid (some modalities local, some remote) increases operational complexity.
+
+**Challenges:**
+- **Network Latency Variance:** Local modalities <1ms, remote modalities 10-100ms → unpredictable query times
+- **Cross-Modal Drift:** Drift detection now spans local/remote boundary → more complex reconciliation logic
+- **Configuration Explosion:** Must track which modalities are local vs remote per deployment
+
+**Recommendation:** Only migrate to hybrid if **clear performance/cost benefit** (e.g., archive old Temporal data remotely, keep hot Vector data local)
+
+== 7. Cost Challenges
+
+=== 7.1. Over-Provisioning
+
+**Problem:** Must provision hardware for **peak load across all six modalities**.
+
+**Example:**
+- Vector modality needs 64GB RAM for HNSW index
+- Graph modality needs 32GB RAM for RDF triples
+- Tensor modality needs 4x GPUs for inference
+- **Total:** 96GB RAM + 4 GPUs, even if modalities rarely peak simultaneously
+
+**Cost Impact:** Paying for capacity that sits idle 80% of the time
+
+**Alternative:** Federated/hybrid mode allows **independent scaling** per modality (pay-as-you-grow)
+
+=== 7.2. Maintenance Burden
+
+**Problem:** Single admin team must understand **six different data stores**.
+
+**Skill Requirements:**
+- Oxigraph (RDF/SPARQL)
+- HNSW (vector indexing algorithms)
+- ndarray/Burn (tensor operations, ML model serving)
+- CBOR (semantic proofs, schema validation)
+- Tantivy (full-text search, inverted indices)
+- Merkle trees (temporal versioning, cryptographic proofs)
+
+**Hiring Difficulty:** Finding engineers with all six skill sets is rare/expensive
+
+**Mitigation:**
+- **Specialization:** Split team into modality-specific sub-teams (requires larger org)
+- **Documentation:** Invest heavily in runbooks and operational guides
+- **Managed Service:** Consider offering VeriSimDB-as-a-Service (centralize expertise)
+
+== 8. Summary of Challenges
+
+[cols="1,2,1"]
+|===
+|Challenge Category |Key Issues |Severity
+
+|**Architecture**
+|Vertical scaling limits, SPOF, tight coupling
+|HIGH
+
+|**Performance**
+|Resource interference, write amplification, routing bottleneck
+|HIGH
+
+|**Operations**
+|Backup complexity, monitoring overhead, dependency hell
+|MEDIUM
+
+|**Scaling**
+|No horizontal scaling, hot modality bottlenecks, write limits
+|HIGH
+
+|**Security**
+|Single security boundary, audit log SPOF
+|MEDIUM
+
+|**Migration**
+|Complex path to federation/hybrid
+|MEDIUM
+
+|**Cost**
+|Over-provisioning, specialized maintenance burden
+|MEDIUM
+|===
+
+== 9. When to Choose Standalone Despite Challenges
+
+Standalone deployment is appropriate when:
+
+1. **Data Volume:** < 1TB total across all modalities
+2. **Query Rate:** < 1k qps sustained
+3. **Team Size:** < 5 engineers (federated coordination overhead not justified)
+4. **Latency Requirements:** Sub-millisecond response times critical
+5. **Simplicity Premium:** Operational simplicity outweighs scaling concerns
+
+For larger deployments, consider **hybrid** or **federated** mode to mitigate these challenges.
+
+== See Also
+
+- link:deployment-modes.adoc[Deployment Modes Overview]
+- link:challenges-hybrid.adoc[Challenges: Hybrid Mode]
+- link:challenges-federated.adoc[Challenges: Federated Mode]
+- link:../WHITEPAPER.md[VeriSimDB White Paper]

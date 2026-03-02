@@ -1,0 +1,872 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "scripts/posix/pathroot.sh",
+      "severity": "Critical",
+      "description": "eval usage in scripts/posix/pathroot.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/posix/pathroot.sh",
+      "severity": "Medium",
+      "description": "63 potentially unquoted variable expansions in scripts/posix/pathroot.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/test-shells.sh",
+      "severity": "Medium",
+      "description": "24 potentially unquoted variable expansions in scripts/test-shells.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/Discovery.res",
+      "severity": "Medium",
+      "description": "7 unsafe get calls in src/Discovery.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/nicaug/PlatformOrchestrator.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/nicaug/PlatformOrchestrator.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/nicaug/NicaugCLI.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/nicaug/NicaugCLI.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "lib/bs/src/nicaug/PlatformOrchestrator.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in lib/bs/src/nicaug/PlatformOrchestrator.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "lib/bs/src/nicaug/NicaugCLI.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in lib/bs/src/nicaug/NicaugCLI.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "lib/bs/src/Discovery.res",
+      "severity": "Medium",
+      "description": "7 unsafe get calls in lib/bs/src/Discovery.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "lib/ocaml/PlatformOrchestrator.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in lib/ocaml/PlatformOrchestrator.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "lib/ocaml/Discovery.res",
+      "severity": "Medium",
+      "description": "7 unsafe get calls in lib/ocaml/Discovery.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "lib/ocaml/NicaugCLI.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in lib/ocaml/NicaugCLI.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 14549,
+    "unsafe_blocks": 42,
+    "panic_sites": 0,
+    "unwrap_calls": 32,
+    "allocation_sites": 18,
+    "io_operations": 44,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "ada/tui/src/core/pathroot_tui-core-discovery.adb",
+      "lines": 178,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/tui/src/core/pathroot_tui-core-envbase.adb",
+      "lines": 162,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/tui/src/core/pathroot_tui-core-transactions.adb",
+      "lines": 242,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/tui/src/core/pathroot_tui-core-pathenv.adb",
+      "lines": 236,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/tui/src/core/pathroot_tui-core-pathenv.ads",
+      "lines": 51,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/tui/src/pathroot_tui.adb",
+      "lines": 133,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/tui/src/ui/pathroot_tui-ui-panels.adb",
+      "lines": 287,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rsr-adapter.adb",
+      "lines": 291,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/bootstrap.sh",
+      "lines": 63,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/posix/pathroot.sh",
+      "lines": 326,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/SymlinkTypes.idr",
+      "lines": 52,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/DenoBindings.res",
+      "lines": 55,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Discovery.res",
+      "lines": 153,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/nicaug/PlatformOrchestrator.res",
+      "lines": 176,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/nicaug/NicaugCLI.res",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "libs/ada-path-environment/src/path_environment.adb",
+      "lines": 457,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "libs/ada-path-environment/src/path_environment.ads",
+      "lines": 115,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "libs/ada-terminal-ansi/src/terminal_ansi.adb",
+      "lines": 305,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/symlink.zig",
+      "lines": 128,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 11,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "lib/bs/src/nicaug/PlatformOrchestrator.res",
+      "lines": 176,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/nicaug/NicaugCLI.res",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/DenoBindings.res",
+      "lines": 55,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/bs/src/Discovery.res",
+      "lines": 153,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/DenoBindings.res",
+      "lines": 55,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/PlatformOrchestrator.res",
+      "lines": 176,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/Discovery.res",
+      "lines": 153,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/ocaml/NicaugCLI.res",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust/mustfile-orchestrator/src/lib.rs",
+      "lines": 58,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust/mustfile-orchestrator/src/parser.rs",
+      "lines": 106,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust/mustfile-orchestrator/src/platform.rs",
+      "lines": 148,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust/mustfile-orchestrator/src/executor.rs",
+      "lines": 178,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "ada/tui/src/core/pathroot_tui-core-discovery.adb",
+        "to": "ada/tui/src/core/pathroot_tui-core-envbase.adb",
+        "relation": "shared_dir:ada/tui/src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/tui/src/core/pathroot_tui-core-envbase.adb",
+        "to": "ada/tui/src/core/pathroot_tui-core-transactions.adb",
+        "relation": "shared_dir:ada/tui/src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/tui/src/core/pathroot_tui-core-transactions.adb",
+        "to": "ada/tui/src/core/pathroot_tui-core-pathenv.adb",
+        "relation": "shared_dir:ada/tui/src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/tui/src/core/pathroot_tui-core-pathenv.adb",
+        "to": "ada/tui/src/core/pathroot_tui-core-pathenv.ads",
+        "relation": "shared_dir:ada/tui/src/core",
+        "weight": 1.0
+      },
+      {
+        "from": "src/nicaug/PlatformOrchestrator.res",
+        "to": "src/nicaug/NicaugCLI.res",
+        "relation": "shared_dir:src/nicaug",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/src/nicaug/PlatformOrchestrator.res",
+        "to": "lib/bs/src/nicaug/NicaugCLI.res",
+        "relation": "shared_dir:lib/bs/src/nicaug",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/mustfile-orchestrator/src/lib.rs",
+        "to": "rust/mustfile-orchestrator/src/parser.rs",
+        "relation": "shared_dir:rust/mustfile-orchestrator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/mustfile-orchestrator/src/parser.rs",
+        "to": "rust/mustfile-orchestrator/src/platform.rs",
+        "relation": "shared_dir:rust/mustfile-orchestrator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/mustfile-orchestrator/src/platform.rs",
+        "to": "rust/mustfile-orchestrator/src/executor.rs",
+        "relation": "shared_dir:rust/mustfile-orchestrator/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/DenoBindings.res",
+        "to": "src/Discovery.res",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/src/DenoBindings.res",
+        "to": "lib/bs/src/Discovery.res",
+        "relation": "shared_dir:lib/bs/src",
+        "weight": 1.0
+      },
+      {
+        "from": "libs/ada-path-environment/src/path_environment.adb",
+        "to": "libs/ada-path-environment/src/path_environment.ads",
+        "relation": "shared_dir:libs/ada-path-environment/src",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/DenoBindings.res",
+        "to": "lib/ocaml/PlatformOrchestrator.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/PlatformOrchestrator.res",
+        "to": "lib/ocaml/Discovery.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Discovery.res",
+        "to": "lib/ocaml/NicaugCLI.res",
+        "relation": "shared_dir:lib/ocaml",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "ffi/zig/src/symlink.zig",
+        "relation": "shared_dir:ffi/zig/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "src/abi/SymlinkTypes.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/tui/src/core/pathroot_tui-core-discovery.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/tui/src/core/pathroot_tui-core-envbase.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/tui/src/core/pathroot_tui-core-transactions.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/tui/src/core/pathroot_tui-core-pathenv.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/tui/src/core/pathroot_tui-core-pathenv.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/tui/src/pathroot_tui.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/tui/src/ui/pathroot_tui-ui-panels.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-adapter.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/bootstrap.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/posix/pathroot.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/SymlinkTypes.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/DenoBindings.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "src/Discovery.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/nicaug/PlatformOrchestrator.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/nicaug/NicaugCLI.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "libs/ada-path-environment/src/path_environment.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "libs/ada-path-environment/src/path_environment.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "libs/ada-terminal-ansi/src/terminal_ansi.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/symlink.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "lib/bs/src/nicaug/PlatformOrchestrator.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/src/nicaug/NicaugCLI.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/bs/src/DenoBindings.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "lib/bs/src/Discovery.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "lib/ocaml/DenoBindings.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "lib/ocaml/PlatformOrchestrator.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/ocaml/Discovery.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "lib/ocaml/NicaugCLI.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/mustfile-orchestrator/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/mustfile-orchestrator/src/parser.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "rust/mustfile-orchestrator/src/platform.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/mustfile-orchestrator/src/executor.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "scripts/posix/pathroot.sh"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "scripts/posix/pathroot.sh",
+          "scripts/posix/pathroot.sh",
+          "scripts/test-shells.sh"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/Discovery.res",
+          "src/nicaug/PlatformOrchestrator.res",
+          "src/nicaug/NicaugCLI.res",
+          "lib/bs/src/nicaug/PlatformOrchestrator.res",
+          "lib/bs/src/nicaug/NicaugCLI.res",
+          "lib/bs/src/Discovery.res",
+          "lib/ocaml/PlatformOrchestrator.res",
+          "lib/ocaml/Discovery.res",
+          "lib/ocaml/NicaugCLI.res"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

@@ -1,0 +1,243 @@
+{
+  "program_path": ".",
+  "language": "nickel",
+  "frameworks": [
+    "Database"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "deploy-full-stack.sh",
+      "severity": "Critical",
+      "description": "eval usage in deploy-full-stack.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "deploy-full-stack.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in deploy-full-stack.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "test-verified-stack.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in test-verified-stack.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 3200,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 1,
+    "io_operations": 35,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "deploy-full-stack.sh",
+      "lines": 308,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 13,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test-verified-stack.sh",
+      "lines": 382,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 20,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "demo-verified-containers.sh",
+      "lines": 112,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "deploy-full-stack.sh",
+        "to": "test-verified-stack.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "test-verified-stack.sh",
+        "to": "demo-verified-containers.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "src/abi/Types.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "deploy-full-stack.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test-verified-stack.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "demo-verified-containers.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "deploy-full-stack.sh"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "deploy-full-stack.sh",
+          "test-verified-stack.sh"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "deploy-full-stack.sh"
+        ],
+        "frameworks": [
+          "Database"
+        ],
+        "relation": "CommandInjection->Disk"
+      }
+    ]
+  }
+}

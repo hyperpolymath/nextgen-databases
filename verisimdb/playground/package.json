@@ -1,0 +1,23 @@
+{
+  "name": "vql-playground",
+  "version": "0.1.0",
+  "description": "VQL Playground — Interactive query editor for VeriSimDB",
+  "type": "module",
+  "license": "PMPL-1.0-or-later",
+  "author": "Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>",
+  "scripts": {
+    "res:build": "rescript",
+    "res:dev": "rescript -w",
+    "dev": "concurrently \"npm:res:dev\" \"npx serve public -l 3000\"",
+    "build": "rescript && node build.mjs",
+    "clean": "rescript clean"
+  },
+  "dependencies": {
+    "@rescript/core": "^1.0.0",
+    "rescript": "^11.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "esbuild": "^0.24.0"
+  }
+}

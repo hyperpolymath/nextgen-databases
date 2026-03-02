@@ -1,0 +1,509 @@
+= VeriSimDB Implementation Roadmap
+:toc:
+:toc-placement!:
+
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+[.lead]
+**Bringing VeriSimDB from 10% to 70% completion**
+
+toc::[]
+
+== Current Status
+
+* **Completion**: 10%
+* **Phase**: Implementation ramp-up
+* **What exists**: Architecture docs, VQL grammar, Rust crate scaffolds, Elixir stubs
+* **What's missing**: Actual modality store implementations, VQL execution engine
+
+== Goal
+
+**Week 16 target**: 70% completion
+- All 6 modality stores operational
+- VQL execution engine working
+- Testing framework complete
+- Basic federation capability
+
+---
+
+== Milestone V1: Rust Modality Stores (Weeks 1-6)
+
+=== Priority Order
+
+Implement in this sequence:
+
+1. **verisim-document** (Week 1-2) - Foundation, most familiar
+2. **verisim-temporal** (Week 2-3) - Version history, time-travel
+3. **verisim-graph** (Week 3-4) - RDF + property graph
+4. **verisim-vector** (Week 4-5) - HNSW embeddings
+5. **verisim-semantic** (Week 5-6) - Type annotations, CBOR
+6. **verisim-tensor** (Week 5-6) - ndarray storage
+
+=== Week 1-2: verisim-document
+
+**Goal**: Full-text search with Tantivy
+
+```rust
+// verisim-document/src/lib.rs
+use tantivy::schema::*;
+use tantivy::{Index, IndexWriter};
+use uuid::Uuid;
+
+pub struct DocumentStore {
+    index: Index,
+    schema: Schema,
+}
+
+impl DocumentStore {
+    pub fn create_document(&mut self, hexad_id: Uuid, title: &str, body: &str) -> Result<()>;
+    pub fn search(&self, query: &str, limit: usize) -> Result<Vec<SearchResult>>;
+    pub fn get(&self, hexad_id: Uuid) -> Result<Option<Document>>;
+    pub fn update(&mut self, hexad_id: Uuid, title: &str, body: &str) -> Result<()>;
+    pub fn delete(&mut self, hexad_id: Uuid) -> Result<()>;
+}
+```
+
+**Tests**:
+- Unit tests for CRUD operations
+- Property-based tests (proptest)
+- Search relevance tests
+
+**Deliverable**: `cargo test` passes, search works
+
+---
+
+=== Week 2-3: verisim-temporal
+
+**Goal**: Version history and time-travel queries
+
+```rust
+// verisim-temporal/src/lib.rs
+use chrono::{DateTime, Utc};
+use uuid::Uuid;
+
+pub struct TemporalStore {
+    // Version history storage
+}
+
+impl TemporalStore {
+    pub fn record_version(&mut self, hexad_id: Uuid, timestamp: DateTime<Utc>, data: &[u8]) -> Result<()>;
+    pub fn get_at_time(&self, hexad_id: Uuid, timestamp: DateTime<Utc>) -> Result<Option<Vec<u8>>>;
+    pub fn get_history(&self, hexad_id: Uuid, start: DateTime<Utc>, end: DateTime<Utc>) -> Result<Vec<Version>>;
+    pub fn diff(&self, hexad_id: Uuid, t1: DateTime<Utc>, t2: DateTime<Utc>) -> Result<Diff>;
+}
+```
+
+**Tests**:
+- Version recording and retrieval
+- Time-travel accuracy
+- Diff correctness
+
+**Deliverable**: Time-travel queries work
+
+---
+
+=== Week 3-4: verisim-graph
+
+**Goal**: RDF + property graph with Oxigraph
+
+```rust
+// verisim-graph/src/lib.rs
+use oxigraph::store::Store;
+use uuid::Uuid;
+
+pub struct GraphStore {
+    store: Store,
+}
+
+impl GraphStore {
+    pub fn add_triple(&mut self, subject: &str, predicate: &str, object: &str) -> Result<()>;
+    pub fn add_edge(&mut self, from: Uuid, to: Uuid, edge_type: &str, props: &HashMap<String, String>) -> Result<()>;
+    pub fn traverse(&self, from: Uuid, edge_type: &str, depth: usize) -> Result<Vec<Uuid>>;
+    pub fn sparql_query(&self, query: &str) -> Result<QueryResults>;
+}
+```
+
+**Tests**:
+- Triple insertion and retrieval
+- Graph traversal
+- SPARQL subset queries
+
+**Deliverable**: Graph queries work
+
+---
+
+=== Week 4-5: verisim-vector
+
+**Goal**: HNSW similarity search
+
+```rust
+// verisim-vector/src/lib.rs
+use uuid::Uuid;
+
+pub struct VectorStore {
+    // HNSW index
+}
+
+impl VectorStore {
+    pub fn insert(&mut self, hexad_id: Uuid, embedding: &[f32]) -> Result<()>;
+    pub fn search_similar(&self, query: &[f32], k: usize, threshold: f32) -> Result<Vec<(Uuid, f32)>>;
+    pub fn cosine_similarity(&self, v1: &[f32], v2: &[f32]) -> f32;
+    pub fn euclidean_distance(&self, v1: &[f32], v2: &[f32]) -> f32;
+}
+```
+
+**Tests**:
+- Embedding insertion
+- Similarity search correctness
+- Distance metric validation
+
+**Deliverable**: Vector similarity search works
+
+---
+
+=== Week 5-6: verisim-semantic + verisim-tensor
+
+**verisim-semantic**: Type annotations + CBOR proof blobs
+
+```rust
+// verisim-semantic/src/lib.rs
+pub struct SemanticStore {
+    // Type annotations
+}
+
+impl SemanticStore {
+    pub fn add_type(&mut self, hexad_id: Uuid, type_uri: &str) -> Result<()>;
+    pub fn get_types(&self, hexad_id: Uuid) -> Result<Vec<String>>;
+    pub fn store_proof_blob(&mut self, hexad_id: Uuid, contract: &str, blob: &[u8]) -> Result<()>;
+    pub fn verify_proof(&self, hexad_id: Uuid, contract: &str) -> Result<bool>;
+}
+```
+
+**verisim-tensor**: Multi-dimensional arrays
+
+```rust
+// verisim-tensor/src/lib.rs
+use ndarray::ArrayD;
+
+pub struct TensorStore {
+    // Tensor storage
+}
+
+impl TensorStore {
+    pub fn store(&mut self, hexad_id: Uuid, tensor: ArrayD<f64>) -> Result<()>;
+    pub fn get(&self, hexad_id: Uuid) -> Result<Option<ArrayD<f64>>>;
+    pub fn slice(&self, hexad_id: Uuid, indices: &[usize]) -> Result<ArrayD<f64>>;
+}
+```
+
+**Deliverable**: Both stores operational
+
+---
+
+== Milestone V2: Hexad Entity Layer (Weeks 7-8)
+
+**Goal**: Unified entity abstraction across modalities
+
+```rust
+// verisim-hexad/src/lib.rs
+use uuid::Uuid;
+
+pub struct Hexad {
+    pub id: Uuid,
+    pub document: Option<DocumentData>,
+    pub graph: Option<GraphData>,
+    pub vector: Option<VectorData>,
+    pub temporal: Option<TemporalData>,
+    pub semantic: Option<SemanticData>,
+    pub tensor: Option<TensorData>,
+}
+
+pub struct HexadStore {
+    document_store: DocumentStore,
+    graph_store: GraphStore,
+    vector_store: VectorStore,
+    temporal_store: TemporalStore,
+    semantic_store: SemanticStore,
+    tensor_store: TensorStore,
+}
+
+impl HexadStore {
+    pub fn create(&mut self, hexad: Hexad) -> Result<Uuid>;
+    pub fn get(&self, id: Uuid) -> Result<Option<Hexad>>;
+    pub fn update(&mut self, id: Uuid, hexad: Hexad) -> Result<()>;
+    pub fn query_cross_modal(&self, predicate: CrossModalPredicate) -> Result<Vec<Uuid>>;
+}
+```
+
+**Drift Detection**:
+
+```rust
+// verisim-drift/src/lib.rs
+pub struct DriftDetector {
+    // Drift detection logic
+}
+
+impl DriftDetector {
+    pub fn detect(&self, hexad_id: Uuid, modality1: Modality, modality2: Modality) -> Result<f32>;
+    pub fn repair(&mut self, hexad_id: Uuid, strategy: RepairStrategy) -> Result<()>;
+}
+```
+
+**Deliverable**: Cross-modal queries work, drift detection operational
+
+---
+
+== Milestone V3: VQL Execution Engine (Weeks 9-11)
+
+**Goal**: Execute VQL queries across all modalities
+
+=== Week 9: Parser Integration
+
+```rust
+// verisim-api/src/vql_bridge.rs
+use rescript_parser::VQLParser; // ReScript → Rust FFI
+
+pub fn parse_vql(query: &str) -> Result<VQLAst>;
+pub fn execute_vql(ast: VQLAst, hexad_store: &HexadStore) -> Result<QueryResult>;
+```
+
+**Integration**:
+- ReScript VQL parser → Rust execution engine
+- AST serialization (CBOR or JSON)
+
+---
+
+=== Week 10: Query Planner
+
+```rust
+// verisim-api/src/query_planner.rs
+pub struct QueryPlan {
+    pub steps: Vec<PlanStep>,
+    pub estimated_cost: f64,
+}
+
+pub fn plan_query(ast: VQLAst) -> Result<QueryPlan>;
+```
+
+**Optimization**:
+- Push predicates to modality stores
+- Minimize cross-modal joins
+- Cache query plans
+
+---
+
+=== Week 11: EXPLAIN Functionality
+
+```rust
+// verisim-api/src/explain.rs
+pub struct ExplainOutput {
+    pub plan: QueryPlan,
+    pub modalities_queried: Vec<Modality>,
+    pub estimated_time: f64,
+    pub hints: Vec<String>,
+}
+
+pub fn explain(query: &str) -> Result<ExplainOutput>;
+```
+
+**Deliverable**: VQL queries execute, EXPLAIN works
+
+---
+
+== Milestone V4: Testing & Stability (Weeks 12-14)
+
+=== Week 12: Property-Based Tests
+
+```toml
+# Cargo.toml
+[dev-dependencies]
+proptest = "1.4"
+```
+
+```rust
+// tests/property_tests.rs
+use proptest::prelude::*;
+
+proptest! {
+    #[test]
+    fn insert_then_retrieve(title in "\\w{1,50}", body in "\\w{10,200}") {
+        let mut store = HexadStore::new()?;
+        let id = store.create(hexad_with_document(title, body))?;
+        let retrieved = store.get(id)?;
+        assert!(retrieved.is_some());
+    }
+}
+```
+
+---
+
+=== Week 13: Fuzz Testing
+
+```yaml
+# .clusterfuzzlite/project.yaml
+language: rust
+```
+
+```rust
+// fuzz/fuzz_targets/fuzz_vql.rs
+#![no_main]
+use libfuzzer_sys::fuzz_target;
+use verisim_api::parse_vql;
+
+fuzz_target!(|data: &[u8]| {
+    if let Ok(s) = std::str::from_utf8(data) {
+        let _ = parse_vql(s);
+    }
+});
+```
+
+---
+
+=== Week 14: Integration Tests
+
+```rust
+// tests/integration_test.rs
+#[test]
+fn test_cross_modal_query() {
+    let store = setup_test_store();
+
+    // Insert document
+    let id = store.create_document("Test", "Body")?;
+
+    // Add embedding
+    store.add_vector(id, &[0.1, 0.2, 0.3])?;
+
+    // Cross-modal query
+    let query = "SELECT * FROM hexads WHERE DOCUMENT MATCHES 'Test' AND VECTOR SIMILAR TO [0.1, 0.2, 0.3]";
+    let results = store.query(query)?;
+
+    assert_eq!(results.len(), 1);
+}
+```
+
+**Deliverable**: Test coverage >80%
+
+---
+
+== Milestone V5: Performance & Documentation (Weeks 15-16)
+
+=== Week 15: Performance
+
+```rust
+// verisim-api/src/cache.rs
+use lru::LruCache;
+
+pub struct QueryCache {
+    plan_cache: LruCache<String, QueryPlan>,
+    result_cache: LruCache<String, QueryResult>,
+}
+```
+
+**Optimizations**:
+- Query plan caching
+- Connection pooling
+- Batch operations
+
+---
+
+=== Week 16: Documentation
+
+**Create**:
+- `QUICKSTART.adoc` - Get running in 5 minutes
+- `API-REFERENCE.adoc` - All Rust APIs documented
+- `VQL-TUTORIAL.adoc` - 10 example queries
+- `DEPLOYMENT-GUIDE.adoc` - Standalone mode setup
+
+**Deliverable**: VeriSimDB at 70% completion
+
+---
+
+== Weekly Progress Tracking
+
+**Every Friday**:
+
+```scheme
+;; Update STATE.scm
+(snapshot (date "2026-02-XX") (session "week-N")
+  (accomplishments
+    "Completed verisim-document CRUD"
+    "Property-based tests passing")
+  (blockers
+    "HNSW performance needs optimization")
+  (next-week
+    "Begin verisim-temporal implementation"))
+```
+
+---
+
+== Testing Strategy
+
+=== Unit Tests
+```bash
+cargo test --package verisim-document
+cargo test --package verisim-temporal
+# ... etc
+```
+
+=== Integration Tests
+```bash
+cargo test --test integration_test
+```
+
+=== Fuzz Tests
+```bash
+cargo fuzz run fuzz_vql -- -max_total_time=300
+```
+
+---
+
+## Checkpoints
+
+### Week 2
+- [ ] verisim-document complete
+- [ ] Property tests passing
+- [ ] Completion: 10% → 20%
+
+### Week 6
+- [ ] All 6 modality stores complete
+- [ ] Unit tests passing
+- [ ] Completion: 20% → 40%
+
+### Week 8
+- [ ] Hexad layer complete
+- [ ] Drift detection working
+- [ ] Completion: 40% → 55%
+
+### Week 11
+- [ ] VQL execution engine complete
+- [ ] EXPLAIN working
+- [ ] Completion: 55% → 65%
+
+### Week 16 ✓
+- [ ] **All milestones V1-V5 complete**
+- [ ] **Testing coverage >80%**
+- [ ] **Completion: 70%**
+- [ ] **Production-ready PoC**
+
+---
+
+## Next Steps
+
+1. **Today**: Review this roadmap
+2. **This week**: Begin verisim-document implementation
+3. **Friday**: Update STATE.scm with Week 1 progress
+
+---
+
+## No Integration with FormBD
+
+**Important**: This roadmap is VeriSimDB-only. FormBD is a separate project.
+
+**The only connection**: VeriSimDB could eventually federate to FormBD as an external data source:
+
+```sql
+-- VQL federating to FormBD (future feature)
+SELECT * FROM hexads@formbd_instance WHERE modality = 'document';
+```
+
+But that's just treating FormBD like any other database endpoint (PostgreSQL, MongoDB, etc.).

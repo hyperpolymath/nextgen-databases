@@ -1,0 +1,167 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+
+= Federation Readiness Assessment
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== What Federation Means in VeriSimDB
+
+Federation is the ability for multiple VeriSimDB instances to coordinate queries across their respective hexad stores. Each instance maintains its own six modality stores (Graph, Vector, Tensor, Semantic, Document, Temporal) and its own set of hexad entities. A federated query spans multiple instances, retrieving and correlating data from peers that may be geographically distributed, operated by different organizations, or running different versions of VeriSimDB.
+
+Federation in VeriSimDB is distinct from database replication. Replicated databases maintain identical copies of the same data. Federated VeriSimDB instances hold _different_ hexad entities that may reference each other through graph edges, share semantic vocabularies, or have vector embeddings in the same latent space. The federation layer coordinates cross-instance queries while each instance retains sovereignty over its own data.
+
+The VQL query language supports federation natively:
+
+[source,vql]
+----
+SELECT GRAPH, SEMANTIC
+FROM FEDERATION cross_org_research
+WHERE (h)-[:CITES]->(target)
+DRIFT POLICY strict_consistency
+----
+
+This query targets a named federation (`cross_org_research`), requests graph and semantic modalities, traverses citation edges that may span instances, and enforces a drift policy governing how cross-instance consistency is handled.
+
+== What Works Today
+
+=== API Routes for Peer Registration
+
+The `verisim-api` Rust crate includes API endpoints for federation peer management:
+
+* `POST /api/federation/peers` -- Register a new peer instance with its endpoint URL and capabilities.
+* `GET /api/federation/peers` -- List all registered peers.
+* `DELETE /api/federation/peers/:id` -- Deregister a peer.
+
+These routes accept and return JSON. Peer metadata includes the instance URL, supported modalities, version, and last-seen timestamp. Peer registration works and persists across restarts.
+
+=== VQL Parser Accepts FEDERATION Queries
+
+The VQL parser (ReScript) correctly parses `FROM FEDERATION <name>` clauses and `DRIFT POLICY <name>` directives. These produce valid AST nodes that flow through the query router. The parser also handles federation-scoped `WHERE` clauses and multi-modality `SELECT` statements against federation targets.
+
+=== Hypatia FileExecutor Handles FEDERATION Queries
+
+Hypatia's `FileExecutor` module can execute `FEDERATION` queries against local flat files (the verisimdb-data git-backed store). It performs cross-store matching by loading scan results from multiple repositories and correlating them by entity identifiers. This is a file-based simulation of federation, not true distributed query execution, but it validates the query structure and result format.
+
+== What VeriSimDB Loses Without VQL
+
+If VQL were removed or not used, VeriSimDB would lose the following federation-critical capabilities:
+
+* **No structured query language for multi-store coordination.** Without VQL, federated queries would require hand-written API calls to each peer, manual result merging, and no unified query plan. VQL provides a single declarative interface that the federation layer decomposes into per-peer sub-queries.
+
+* **No drift policy enforcement on federated queries.** Drift policies (`DRIFT POLICY strict_consistency`, `DRIFT POLICY eventual`, etc.) are expressed in VQL and enforced by the query router. Without VQL, there is no standard mechanism to declare or enforce consistency requirements across federated peers.
+
+* **No cross-modal consistency checks across instances.** VQL's `PROOF CONSISTENCY` clause can request verification that graph, vector, and semantic modalities agree across federation peers. Without VQL-DT, there is no way to express or verify cross-instance consistency at query time.
+
+* **No unified result format.** VQL queries return results in a consistent format regardless of whether the data came from one instance or twenty. Without VQL, each peer's API response format would need to be handled individually.
+
+== Current Gaps
+
+=== Normalizer Regeneration Strategies Are Stubs
+
+The `verisim-normalizer` crate's regeneration strategies currently return hardcoded `[regenerated]` placeholder values. When drift is detected and normalization is triggered, the normalizer identifies the authoritative modality and calls the appropriate regeneration strategy, but that strategy does not actually regenerate the drifted modality's data. Each of the six modalities needs a real regeneration implementation:
+
+* **Graph**: Re-derive edges from document content and semantic annotations.
+* **Vector**: Re-embed from document text using the configured embedding model.
+* **Tensor**: Re-compute tensor representation from source data.
+* **Semantic**: Re-extract type annotations and RDF triples from document and graph.
+* **Document**: Re-generate searchable text from graph, semantic, and temporal data.
+* **Temporal**: Re-build version chain from modification history.
+
+=== Federation Executor Always Returns Empty
+
+The federation executor in the Elixir orchestration layer (`VeriSim.FederationExecutor`) receives a parsed federation query and should decompose it into per-peer sub-queries, dispatch them, and merge results. Currently it always returns `{:ok, []}` regardless of the query or registered peers. This is a placeholder implementation.
+
+=== Federation Resolver Peer Queries Unimplemented
+
+Peers can be registered and listed, but the resolver cannot actually _query_ a registered peer. The `VeriSim.FederationResolver` module exists but its `query_peer/3` function is unimplemented. Calling it returns `{:error, :not_implemented}`.
+
+=== No Consensus Protocol for Cross-Instance Writes
+
+Federation currently has no mechanism for coordinated writes across instances. If entity A on instance 1 references entity B on instance 2 through a graph edge, and entity B is modified, there is no protocol to notify instance 1 or maintain referential integrity. The Raft consensus design (documented in link:challenges-federated.adoc[Challenges: Federated Deployment]) is specified but not implemented.
+
+=== Drift Auto-Trigger Missing
+
+Drift detection works: the `verisim-drift` crate computes drift scores across modalities, and the Elixir `DriftMonitor` can evaluate them against thresholds. However, drift detection and repair must be triggered manually (via API call or Elixir function invocation). There is no automatic trigger that runs on a schedule or fires on write events. In a federation context, this means cross-instance drift can accumulate undetected until someone manually checks.
+
+== Readiness Matrix
+
+[cols="2,1,3",options="header"]
+|===
+|Component |Readiness |Notes
+
+|**API (peer registration)**
+|Ready
+|Endpoints work, persistence confirmed. Peer metadata stored and retrievable.
+
+|**VQL Parser (FEDERATION syntax)**
+|Ready
+|Parses `FROM FEDERATION`, `DRIFT POLICY`, and federation-scoped queries correctly. Produces valid AST.
+
+|**Federation Executor**
+|Stub
+|Always returns `{:ok, []}`. No query decomposition, dispatch, or result merging implemented.
+
+|**Federation Resolver (peer queries)**
+|Stub
+|Cannot query registered peers. `query_peer/3` returns `{:error, :not_implemented}`.
+
+|**Normalizer (regeneration)**
+|Stub
+|Returns hardcoded `[regenerated]`. Six modality-specific strategies needed.
+
+|**Consensus Protocol**
+|Design only
+|Raft-based design documented in challenges-federated.adoc. No implementation exists.
+
+|**Drift Detection**
+|Working
+|Computes drift scores, evaluates thresholds. Functional but manual-trigger only.
+
+|**Drift Auto-Trigger**
+|Missing
+|No scheduled or event-driven drift detection. Manual only.
+
+|**Cross-Instance Consistency**
+|Missing
+|No mechanism to verify or enforce consistency across federation peers.
+
+|**VQL-DT PROOF over Federation**
+|Missing
+|PROOF clauses parse but do not generate real proofs, even for local queries. Federation adds no additional proof capability.
+|===
+
+== Roadmap to Production Federation
+
+=== Phase 1: Local Federation Simulation
+
+**Goal:** Validate the full query lifecycle against multiple local stores without network coordination.
+
+* Implement `FederationExecutor.execute/2` to decompose queries and dispatch to local store partitions.
+* Implement `FederationResolver.query_peer/3` for local-only peers (same instance, different store namespaces).
+* Add integration tests that create two logical "instances" in a single process and run cross-instance queries.
+* Wire drift auto-trigger to run on a configurable interval (GenServer timer in Elixir).
+* Implement at least one real normalizer regeneration strategy (Document is the most straightforward).
+
+=== Phase 2: Network Federation
+
+**Goal:** Federated queries across actual network boundaries.
+
+* Implement HTTP-based peer query protocol. `FederationResolver.query_peer/3` makes HTTP calls to peer endpoints.
+* Add authentication and authorization for peer-to-peer communication (mTLS or signed requests).
+* Implement query result merging in `FederationExecutor` with configurable merge strategies (union, intersection, ranked).
+* Add timeout and fallback handling for unreachable peers.
+* Implement remaining normalizer regeneration strategies for all six modalities.
+* Add federation-scoped drift detection: compute drift across instances, not just within one.
+
+=== Phase 3: Verified Federation
+
+**Goal:** VQL-DT proofs work across federation boundaries.
+
+* Wire Lean type checker into the VQL-DT execution path (prerequisite: VQL-DT Phase 3 from link:vql-vs-vql-dt.adoc[VQL Slipstream vs VQL-DT]).
+* Implement proof witness collection across peers: each peer contributes its portion of the proof.
+* Implement Raft consensus for coordinated writes (cross-instance referential integrity).
+* Implement `PROOF CONSISTENCY` verification across federation peers (cross-instance modal agreement).
+* Add sanctify ZKP integration for privacy-preserving proofs in multi-tenant federations.
+* Performance optimization: proof caching, incremental proof updates, parallel peer queries.

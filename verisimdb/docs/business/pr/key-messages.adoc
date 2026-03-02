@@ -1,0 +1,347 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB -- Key Messages and Talking Points
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-02-28
+:revremark: Audience-segmented talking points for press, conferences, and outreach
+:toc: macro
+:toclevels: 2
+:sectnums:
+:icons: font
+
+[abstract]
+Core messaging framework for VeriSimDB, segmented by audience. Each section
+provides the primary message, supporting points, proof points, and phrases to
+use and avoid. Intended for press interviews, conference talks, blog posts,
+and community outreach.
+
+toc::[]
+
+== Core Messages (All Audiences)
+
+=== The One-Line Pitch
+
+[quote]
+VeriSimDB is the world's first multimodal database with cross-modal drift
+detection and self-normalisation.
+
+=== The Three-Sentence Pitch
+
+[quote]
+The same entity -- a customer, a gene, a transaction -- is represented across
+5 to 10 different systems: a graph database, a vector index, a document store,
+a time-series database. When one representation changes, the others silently
+go stale. VeriSimDB detects this cross-modal drift and repairs it automatically,
+before downstream systems consume contradictory data.
+
+=== The Six Core Differentiators
+
+1. *Cross-modal drift detection* -- No other database detects when multiple
+   representations of the same entity diverge
+2. *8-modality octad model* -- Graph, vector, tensor, semantic, document,
+   temporal, provenance, and spatial in one entity
+3. *Self-normalisation* -- Automatic repair of drifted representations with
+   configurable resolution strategies
+4. *Proof-carrying queries (VQL-DT)* -- Optional dependent-type verification
+   of query correctness using Idris2
+5. *Heterogeneous federation* -- Unified querying across PostgreSQL, ArangoDB,
+   Elasticsearch, and Neo4j without data migration
+6. *Open source (PMPL)* -- Full-featured community edition with no artificial
+   restrictions
+
+== Technical Audience (Database Engineers, Backend Developers)
+
+=== Primary Message
+
+[quote]
+VeriSimDB introduces a new primitive to database systems: the coherence score.
+Every entity has a quantified measure of how consistent its representations are
+across all active modalities. This makes cross-modal drift a queryable, trackable,
+alertable condition -- not an invisible failure mode.
+
+=== Supporting Points
+
+* *Architecture*: Rust core for storage and drift algorithms, Elixir/OTP for
+  fault-tolerant orchestration. The BEAM VM provides supervision trees, hot code
+  reloading, and battle-tested concurrency. Rust provides near-C performance with
+  memory safety.
+
+* *VQL (Verisimilitude Query Language)*: Purpose-built query language for
+  cross-modal operations. Familiar to SQL users but supports modality-specific
+  operations (graph traversals, vector similarity, tensor ops, temporal
+  time-travel, spatial containment) in a unified syntax.
+
+* *VQL-DT*: Optional dependent-type layer using Idris2. Proves query type
+  correctness, semantic compatibility of cross-modal joins, and threshold
+  validity at compile time. Entirely opt-in -- plain VQL works without it.
+
+* *Federation*: Connectors translate between VQL and native query languages
+  (SQL, Cypher, AQL, Query DSL). Each connector independently tested with
+  fallback to local-only mode. No vendor lock-in.
+
+* *ABI/FFI*: Idris2 for ABI definitions with dependent-type proofs, Zig for
+  C-compatible FFI bindings. Generated C headers bridge the two. This is the
+  hyperpolymath standard for all projects, not VeriSimDB-specific.
+
+=== Proof Points
+
+* 662 tests (510 Rust + 152 Elixir), 0 failures
+* Drift detection algorithm: cosine distance between modality embeddings with
+  adaptive thresholds
+* No C/C++ build dependencies (Oxigraph feature-flagged off; redb pure-Rust
+  graph backend is default)
+* Container images build with zero external toolchain requirements
+* SLSA provenance and SBOM generation in CI/CD pipeline
+
+=== Use These Phrases
+
+* "Coherence score" (not "consistency check" -- it is continuous, not binary)
+* "Cross-modal drift" (not "data inconsistency" -- drift implies gradual
+  divergence, which is more accurate than sudden failure)
+* "Self-normalisation" (not "auto-repair" -- normalisation implies bringing
+  representations into agreement, not fixing broken data)
+* "Octad" (not "8 modalities" -- the octad is a unified model, not a feature list)
+* "Proof-carrying queries" (not "type-checked queries" -- proofs travel with the
+  query result, not just the query)
+
+=== Avoid These Phrases
+
+* "Better than Neo4j/Pinecone/Weaviate" -- VeriSimDB occupies a different category,
+  not a better version of the same category
+* "Replaces your database" -- VeriSimDB sits alongside existing databases
+  (federation) or operates standalone; it does not replace PostgreSQL
+* "AI-native database" -- VeriSimDB serves AI workloads (GraphRAG) but is not
+  limited to AI; the core value is data consistency
+* "NoSQL" -- VeriSimDB has its own query language (VQL); calling it NoSQL implies
+  it competes with document stores
+
+== Business Audience (CTOs, VP Engineering, Data Leaders)
+
+=== Primary Message
+
+[quote]
+Gartner estimates that poor data quality costs enterprises $12.9 million per year.
+The root cause is not dirty data at entry -- it is cross-system inconsistency.
+The same entity represented differently across 5-10 systems, with no mechanism to
+detect when those representations disagree. VeriSimDB detects this divergence
+continuously and repairs it automatically.
+
+=== Supporting Points
+
+* *ROI*: Cross-system inconsistency is the single largest driver of data quality
+  costs. Existing solutions (ETL, CDC, MDM) are reactive and partial. VeriSimDB
+  is proactive and comprehensive -- it monitors all representations of every entity
+  and catches drift before it reaches downstream consumers.
+
+* *Risk reduction*: In regulated industries (financial services, healthcare,
+  pharmaceuticals), cross-system inconsistency creates compliance risk. VeriSimDB's
+  proof certificates provide auditable evidence of query correctness and data
+  consistency.
+
+* *No rip-and-replace*: Federation mode brings drift detection to existing
+  infrastructure (PostgreSQL, Neo4j, ArangoDB, Elasticsearch) without data
+  migration. The value is additive -- VeriSimDB sits on top of what you already
+  have.
+
+* *Open core model*: The community edition is full-featured with no artificial
+  restrictions. Commercial support licenses provide SLAs, priority patches, and
+  deployment consulting. No bait-and-switch.
+
+* *Team size*: VeriSimDB is designed to be operated by existing data teams. It
+  does not require a dedicated "VeriSimDB team" -- it integrates into existing
+  data platform practices.
+
+=== Proof Points
+
+* Open source under PMPL (permissive licence, MPL-2.0 fallback available)
+* Enterprise support target ACV: $40,000/year
+* Built on battle-tested foundations: Rust (memory safety), Elixir/OTP
+  (fault tolerance, 99.9999% uptime heritage from telecom)
+
+=== Use These Phrases
+
+* "Data quality infrastructure" (not "database" -- CTOs hear "database" and think
+  "another system to manage")
+* "Cross-system consistency" (not "drift detection" -- "drift" requires explanation;
+  "consistency" is immediately understood)
+* "Proactive detection" (not "monitoring" -- monitoring implies dashboards;
+  proactive detection implies the system acts before humans notice)
+* "Open core" (not "freemium" -- open core is a respected OSS business model;
+  freemium has negative connotations)
+
+=== Avoid These Phrases
+
+* "8 modalities" or "octad" -- too technical for a business audience on first
+  hearing; lead with the problem (cross-system inconsistency), not the solution
+  architecture
+* "Dependent types" or "Idris2" -- these are implementation details that add
+  confusion in a business conversation; use "mathematically proven query
+  correctness" if the topic comes up
+* "Replacing your data infrastructure" -- CTOs will immediately push back;
+  VeriSimDB augments, not replaces
+
+== Academic Audience (Researchers, Conference Attendees)
+
+=== Primary Message
+
+[quote]
+VeriSimDB formalises the concept of cross-modal drift in multimodal data systems
+and provides an operational system for detecting, quantifying, and repairing
+representational divergence across 8 data modalities. The query language includes
+an optional dependent-type verification layer (VQL-DT) that provides compile-time
+proofs of query correctness.
+
+=== Supporting Points
+
+* *Novel contribution*: The coherence score -- a continuous, quantified measure of
+  cross-modal consistency -- is a new primitive in database theory. Existing
+  multi-model databases store multiple models but do not track inter-model
+  consistency.
+
+* *Formal semantics*: VQL has published formal semantics (denotational and
+  operational). VQL-DT extends these with dependent-type judgements formalised in
+  Idris2, providing machine-checkable proofs of query properties.
+
+* *Reproducibility*: The entire system is open source. Experiments can be
+  reproduced. The drift detection algorithm (cosine distance between modality
+  embeddings with adaptive thresholds) is fully documented.
+
+* *Cross-disciplinary relevance*: The octad model and drift detection have
+  applications in bioinformatics (multi-omics consistency), digital twins
+  (simulation-physical divergence), knowledge graph quality assurance (ontological
+  consistency), and climate science (cross-sensor calibration).
+
+* *Related work*: Builds on multi-model database theory (Lu & Holubova 2019),
+  data quality measurement (Batini et al. 2009), and dependent-type verification
+  (Brady 2013). Extends these with cross-modal drift as a first-class concept.
+
+=== Proof Points
+
+* Published technical report: "Cross-Modal Drift Detection and Self-Normalisation
+  in Heterogeneous Database Federations"
+* Case study: IDApTIK game level architecture with Idris2 dependent-type proofs
+* 14-module ABI with 5 cross-domain proofs, zero `believe_me` usage
+* Formal VQL grammar (EBNF) and type system specification
+
+=== Venues
+
+* VLDB (Very Large Data Bases) -- core database systems venue
+* SIGMOD (ACM Special Interest Group on Management of Data)
+* ICDE (IEEE International Conference on Data Engineering)
+* EDBT (Extending Database Technology) -- European venue
+* CIDR (Conference on Innovative Data Systems Research) -- systems/vision papers
+* POPL / ICFP (dependent types and formal methods angle)
+* CIKM (Conference on Information and Knowledge Management) -- knowledge graphs
+
+=== Use These Phrases
+
+* "Cross-modal drift" (the central concept; define it precisely)
+* "Coherence score" (the quantified measure; explain the algorithm)
+* "Dependent-type verification" (not "formal proofs" alone -- specify the
+  mechanism)
+* "Octad model" (the 8-modality framework; relate to existing multi-model
+  taxonomy)
+
+=== Avoid These Phrases
+
+* "World's first" -- academic audiences are sceptical of superlatives; lead with
+  the contribution, not the claim
+* "Enterprise-grade" -- irrelevant in an academic context
+* "$12.9 million" -- Gartner statistics are marketing, not research evidence
+
+== Open Source Community
+
+=== Primary Message
+
+[quote]
+VeriSimDB is a full-featured multimodal database released under a permissive
+open-source licence (PMPL-1.0-or-later, with MPL-2.0 fallback). All 8
+modalities, drift detection, self-normalisation, VQL, and federation are in the
+community edition. There is no "enterprise edition" that gates features.
+
+=== Supporting Points
+
+* *No bait-and-switch*: The commercial licence provides operational support (SLA,
+  priority patches, consulting), not additional features. Everything ships in the
+  open-source release.
+
+* *Contribution-friendly*: Multiple entry points for contributors -- Rust (core
+  engine), Elixir (orchestration), ReScript (registry), documentation, testing.
+  `CONTRIBUTING.md` with clear guidelines.
+
+* *Principled licensing*: PMPL-1.0-or-later is permissive. MPL-2.0 fallback for
+  ecosystems requiring OSI-approved licences. Third-party dependencies retain
+  their original licences.
+
+* *Part of a larger ecosystem*: VeriSimDB is one of 265+ hyperpolymath
+  repositories. It integrates with QuandleDB (dependent-type graph database),
+  LithoGlyph (provenance database), PanLL (unified mission control), and the
+  gitbot-fleet (automated repository maintenance).
+
+* *Tech stack choices*: Rust + Elixir is a deliberate architectural choice, not
+  an accident. Rust for performance-critical paths, Elixir/OTP for fault-tolerant
+  distributed coordination. No Python, no Go, no Node.js.
+
+=== Proof Points
+
+* Repository: https://github.com/hyperpolymath/verisimdb
+* 662 tests, 0 failures
+* CI/CD with SLSA provenance and SBOM generation
+* Containerfile for Podman/Docker deployment
+* Comprehensive documentation (40+ `.adoc` files)
+
+=== Community Channels
+
+* Elixir community (ElixirForum, Elixir Slack) -- OTP orchestration layer
+* Rust community (r/rust, Rust Users Forum) -- core engine, storage
+* BEAM community (Erlang/Elixir conferences, Code BEAM) -- fault tolerance
+* Database community (r/database, HN, Lobsters) -- novel architecture
+* Formal methods community (Idris2 Discourse, TYPES mailing list) -- VQL-DT
+
+=== Use These Phrases
+
+* "Full-featured community edition" (emphasise no feature gating)
+* "Permissive licence" (PMPL is permissive; say so explicitly)
+* "Contributions welcome in [Rust/Elixir/ReScript/docs]" (specific, not generic)
+
+=== Avoid These Phrases
+
+* "We" (until there is a team; "the project" or "VeriSimDB" is more honest for
+  a single-developer project)
+* "Production-ready" (the project is in alpha; be honest about maturity)
+* "Enterprise" (the OSS community is not the enterprise audience; lead with
+  technical merit)
+
+== Message Consistency Checklist
+
+Before any public communication, verify:
+
+[cols="1,4"]
+|===
+| Check | Requirement
+
+| Drift definition
+| Cross-modal drift is defined as divergence between representations of the *same
+entity* across modalities -- not divergence within a single modality
+
+| Octad completeness
+| All 8 modalities are listed correctly: graph, vector, tensor, semantic,
+document, temporal, provenance, spatial (in that order)
+
+| Competitor framing
+| Competitors are positioned as "different category," not "inferior product."
+VeriSimDB is a new category (cross-modal consistency infrastructure), not a
+better version of an existing category
+
+| Maturity honesty
+| Current status is alpha. 662 tests pass. Production deployment requires
+additional hardening. Do not oversell readiness.
+
+| Licence accuracy
+| PMPL-1.0-or-later (primary). MPL-2.0 (fallback where required). Not AGPL.
+Not MIT. Not Apache.
+
+| Author attribution
+| Jonathan D.A. Jewell. The Open University, UK. hyperpolymath.
+Not "the VeriSimDB team" (single developer).
+|===

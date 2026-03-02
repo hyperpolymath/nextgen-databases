@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# VeriSimDB Test Infrastructure — InfluxDB 2
+#
+# Builds InfluxDB 2 on Chainguard wolfi-base. Used for temporal modality
+# federation — time-series drift scores, query latency metrics, and
+# federation health telemetry.
+#
+# Provides:
+#   - HTTP API on port 8086 (Flux queries, Line Protocol writes)
+#   - /health endpoint for readiness checks
+#   - Pre-configured org "verisimdb" and bucket "metrics"
+#
+# Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+
+# ---------------------------------------------------------------------------
+# Stage 1: Download InfluxDB 2 binary
+# ---------------------------------------------------------------------------
+FROM cgr.dev/chainguard/wolfi-base:latest AS builder
+
+RUN apk add --no-cache \
+    curl \
+    tar
+
+ARG INFLUXDB_VERSION=2.7.11
+RUN curl -fsSL \
+    "https://download.influxdata.com/influxdb/releases/influxdb2-${INFLUXDB_VERSION}_linux_amd64.tar.gz" \
+    | tar xz -C /tmp \
+    && install -m 0755 "/tmp/influxdb2-${INFLUXDB_VERSION}/usr/bin/influxd" /usr/local/bin/influxd
+
+# Also grab the influx CLI for seed scripts
+ARG INFLUX_CLI_VERSION=2.7.5
+RUN curl -fsSL \
+    "https://download.influxdata.com/influxdb/releases/influxdb2-client-${INFLUX_CLI_VERSION}-linux-amd64.tar.gz" \
+    | tar xz -C /tmp \
+    && install -m 0755 /tmp/influx /usr/local/bin/influx
+
+# ---------------------------------------------------------------------------
+# Stage 2: Runtime image
+# ---------------------------------------------------------------------------
+FROM cgr.dev/chainguard/wolfi-base:latest
+
+RUN apk add --no-cache \
+    curl
+
+# Copy InfluxDB server and CLI
+COPY --from=builder /usr/local/bin/influxd /usr/bin/influxd
+COPY --from=builder /usr/local/bin/influx /usr/bin/influx
+
+# Create non-root user
+RUN addgroup -g 1000 influxdb \
+    && adduser -u 1000 -G influxdb -D -h /var/lib/influxdb2 influxdb
+
+# Create directories
+RUN mkdir -p /var/lib/influxdb2 /etc/influxdb2 \
+    && chown -R influxdb:influxdb /var/lib/influxdb2 /etc/influxdb2
+
+USER influxdb
+WORKDIR /var/lib/influxdb2
+
+EXPOSE 8086
+
+HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=15s \
+    CMD curl -sf http://localhost:8086/health || exit 1
+
+ENTRYPOINT ["influxd"]

@@ -1,0 +1,115 @@
+{
+  "program_path": ".",
+  "language": "nickel",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "http/ffi/zig/src/http.zig",
+      "severity": "High",
+      "description": "4 unsafe pointer casts in http/ffi/zig/src/http.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 6945,
+    "unsafe_blocks": 4,
+    "panic_sites": 4,
+    "unwrap_calls": 0,
+    "allocation_sites": 2,
+    "io_operations": 4,
+    "threading_constructs": 1
+  },
+  "file_statistics": [
+    {
+      "file_path": "http/bindings/ada/examples/url_example.adb",
+      "lines": 48,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "http/ffi/zig/src/http.zig",
+      "lines": 208,
+      "unsafe_blocks": 4,
+      "panic_sites": 4,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "malbolge-toolchain/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/app.rs",
+      "lines": 226,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui/src/event.rs",
+      "lines": 89,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "tui/src/app.rs",
+        "to": "tui/src/event.rs",
+        "relation": "shared_dir:tui/src",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "http/ffi/zig/src/http.zig"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Memory"
+      }
+    ]
+  }
+}

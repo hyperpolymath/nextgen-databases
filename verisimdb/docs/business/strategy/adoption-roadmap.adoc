@@ -1,0 +1,546 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB -- Adoption Roadmap
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:revdate: 2026-02-28
+:revremark: Three-phase adoption roadmap with milestones and success criteria
+:toc: macro
+:toclevels: 3
+:sectnums:
+:icons: font
+
+[abstract]
+Phased adoption roadmap for VeriSimDB, from open-source community building
+through institutional pilots to enterprise deployment. Each phase has specific
+milestones, success criteria, exit conditions, and contingency plans. The roadmap
+is designed to be achievable by a single developer (Phase 1) scaling to a small
+team (Phase 2-3).
+
+toc::[]
+
+== Roadmap Overview
+
+....
+Phase 1: GraphRAG Community        Phase 2: Biomedical/Research      Phase 3: Enterprise
+(Months 0-12)                      (Months 12-24)                    (Months 24-36)
+┌────────────────────┐             ┌────────────────────┐            ┌────────────────────┐
+│ Open source release│             │ Institutional pilots│            │ Commercial support │
+│ Community building │ ──exit──>   │ Academic papers     │ ──exit──> │ Managed service    │
+│ Content + talks    │ criteria    │ Consulting revenue  │ criteria  │ Enterprise sales   │
+│ GraphRAG demos     │             │ Domain-specific docs│            │ Partner channel    │
+└────────────────────┘             └────────────────────┘            └────────────────────┘
+....
+
+== Phase 1: GraphRAG Community (Months 0-12)
+
+=== Objective
+
+Establish VeriSimDB as the recognised solution for cross-modal drift detection,
+starting with the GraphRAG community where the problem is most acutely felt.
+
+=== Why GraphRAG First
+
+The GraphRAG community is the ideal starting point for three reasons:
+
+1. *Immediate pain point*: RAG pipelines that combine vector databases with
+   knowledge graphs suffer from embedding drift -- the exact problem VeriSimDB
+   detects. LangChain's documentation explicitly acknowledges the need for
+   "indexing APIs with cleanup processes" to keep vector stores synchronised
+   with source documents.
+
+2. *Technical alignment*: GraphRAG architectures use 3-4 of VeriSimDB's 8
+   modalities (graph, vector, document, sometimes semantic). This is enough to
+   demonstrate value without requiring the full octad.
+
+3. *Accessible community*: The GraphRAG community is active on GitHub, Discord,
+   and Reddit. It is developer-led, open-source-friendly, and values technical
+   demonstrations over marketing claims.
+
+=== Milestones
+
+[cols="1,3,2,1"]
+|===
+| Month | Milestone | Deliverable | Owner
+
+| 1
+| Public repository launch
+| README with architecture diagram, getting-started guide, VQL examples,
+CONTRIBUTING.md
+| Founder
+
+| 2
+| First blog post
+| "Introducing VeriSimDB: Cross-Modal Drift Detection for Multimodal Data"
+(1500-2000 words, published on GitHub Pages)
+| Founder
+
+| 3
+| GraphRAG demo
+| Working demo: create entities with graph + vector + document modalities,
+introduce drift, detect and repair. Screencast (5 minutes).
+| Founder
+
+| 4
+| GraphRAG integration guide
+| Tutorial: "Detecting Embedding Drift in RAG Pipelines with VeriSimDB"
+(step-by-step with code examples)
+| Founder
+
+| 5
+| Community engagement
+| Post in LangChain community showcase, Qdrant Discord, Weaviate Slack.
+Respond to all GitHub issues within 48 hours.
+| Founder
+
+| 6
+| Conference submission
+| Submit talk proposal to Code BEAM EU or EuroRust (whichever has earlier
+deadline)
+| Founder
+
+| 8
+| VQL tutorial series
+| 3-part tutorial: basic VQL queries, cross-modal queries, drift detection
+queries
+| Founder
+
+| 10
+| Comparison content
+| Blog post: "VeriSimDB vs. Great Expectations vs. Monte Carlo: Different
+Problems, Different Solutions"
+| Founder
+
+| 12
+| Phase 1 retrospective
+| Assess metrics, decide Phase 2 entry
+| Founder
+|===
+
+=== Success Criteria (Exit Conditions for Phase 2)
+
+Phase 2 entry requires meeting *at least 4 of 6* criteria:
+
+[cols="1,3,1"]
+|===
+| # | Criterion | Target
+
+| 1 | GitHub stars | >= 500
+| 2 | Monthly unique cloners | >= 100
+| 3 | External pull requests (merged) | >= 5
+| 4 | Open issues from external users | >= 15
+| 5 | Blog post cumulative views | >= 10,000
+| 6 | Conference talks given or accepted | >= 2
+|===
+
+=== Contingency: Phase 1 Stalls
+
+If fewer than 3 criteria are met at Month 12:
+
+* *Diagnose*: Analyse which content performed best, which communities engaged,
+  which demo resonated. The problem may be messaging, not product.
+* *Pivot community*: If GraphRAG is not responding, try the data quality
+  community (Great Expectations users) or the Elixir community (OTP angle).
+* *Extend Phase 1*: Add 6 months. The product is open source and self-funded --
+  there is no investor pressure to advance phases.
+* *Minimum threshold*: If GitHub stars < 100 at Month 12, reassess whether the
+  product-market fit hypothesis is correct. Consider a fundamental messaging
+  change.
+
+== Phase 2: Biomedical and Research Institutions (Months 12-24)
+
+=== Objective
+
+Secure 2-3 pilot deployments with research institutions where data quality is
+critical, multi-modal data is the norm, and the academic community provides
+credibility leverage.
+
+=== Why Biomedical/Research Second
+
+1. *Natural octad fit*: Biomedical data (multi-omics, clinical records, imaging)
+   uses 6-8 of VeriSimDB's modalities. The octad model is not an academic
+   abstraction -- it maps directly to how biological data exists.
+
+2. *Regulatory motivation*: FDA 21 CFR Part 11, EMA GxP requirements, and grant
+   agency data management plans create institutional demand for data consistency
+   tools with audit trails (provenance modality) and formal verification
+   (VQL-DT proof certificates).
+
+3. *Publication opportunity*: Successful pilot deployments generate academic
+   papers, which generate citations, which generate credibility. A VLDB or
+   SIGMOD publication is worth more than 1,000 GitHub stars for enterprise
+   credibility.
+
+4. *Budget availability*: Research institutions have grant budgets for data
+   infrastructure. These budgets are smaller than enterprise IT budgets but have
+   shorter procurement cycles and fewer compliance hurdles.
+
+=== Milestones
+
+[cols="1,3,2,1"]
+|===
+| Month | Milestone | Deliverable | Owner
+
+| 13
+| Academic paper submission
+| Submit to VLDB or SIGMOD: "Cross-Modal Drift Detection and Self-Normalisation
+in Heterogeneous Database Federations" (12-page research paper)
+| Founder
+
+| 14
+| Domain-specific documentation
+| Tutorial: "Multi-Omics Entity Consistency with VeriSimDB" (bioinformatics
+audience)
+| Founder / DevRel
+
+| 15
+| Conference presentation
+| Present at ISMB, BOSC, or domain-specific conference (bioinformatics,
+clinical informatics, or digital humanities)
+| Founder
+
+| 16
+| First pilot engagement
+| Identify and engage pilot institution. Begin architecture review for their
+specific data consistency challenge.
+| Founder
+
+| 18
+| Pilot deployment
+| VeriSimDB deployed in pilot institution's staging environment. Initial data
+ingestion and drift detection running.
+| Founder + Pilot Partner
+
+| 20
+| Pilot evaluation
+| Quantified results from pilot: drift detection accuracy, false positive rate,
+performance metrics. Draft case study.
+| Founder + Pilot Partner
+
+| 22
+| Second pilot
+| Begin second pilot deployment (different institution or domain) to validate
+generalisability
+| Founder
+
+| 24
+| Phase 2 retrospective
+| Assess metrics, publish case studies, decide Phase 3 entry
+| Founder
+|===
+
+=== Target Institutions
+
+[cols="2,2,3"]
+|===
+| Type | Examples | VeriSimDB Value
+
+| *Bioinformatics labs*
+| EBI (Cambridge), Sanger Institute, Broad Institute
+| Multi-omics data consistency across genomic, proteomic, and metabolomic
+representations
+
+| *Clinical research centres*
+| NHS Digital, academic medical centres
+| Cross-system patient record consistency (EHR + pharmacy + lab + imaging)
+
+| *Digital humanities*
+| Wikidata, British Library, Europeana
+| Knowledge graph quality assurance, ontological consistency at scale
+
+| *Climate science*
+| CEDA (UK), DKRZ (Germany), ESA CCI
+| Cross-sensor calibration verification, multi-archive federation
+|===
+
+=== Engagement Model
+
+1. *Initial contact*: Through academic conference, community forum, or direct
+   outreach to data management teams
+2. *Architecture review*: Free 2-hour consultation to understand their data
+   consistency challenges and assess VeriSimDB fit
+3. *Pilot agreement*: Formal agreement covering scope, timeline, success metrics,
+   and publication rights
+4. *Deployment support*: Free deployment support for the pilot (investment in
+   case study material)
+5. *Evaluation and publication*: Joint paper or case study documenting results
+
+=== Revenue Model (Phase 2)
+
+Revenue comes from consulting, not software licences:
+
+[cols="2,1,3"]
+|===
+| Service | Price | Description
+
+| Architecture review
+| $5,000-$15,000
+| Assessment of data consistency challenges, VeriSimDB fit, deployment plan
+
+| Custom federation connector
+| $10,000-$25,000
+| Development of a federation connector for the institution's specific backend
+(e.g., OpenClinica, REDCap, iRODS)
+
+| Training workshop
+| $2,000-$5,000
+| Half-day or full-day VQL training for the institution's development team
+
+| Ongoing consulting
+| $150-$250/hour
+| Architecture guidance, performance tuning, VQL query optimisation
+|===
+
+*Target:* 3-5 consulting engagements, $50,000-$150,000 total revenue.
+
+=== Success Criteria (Exit Conditions for Phase 3)
+
+Phase 3 entry requires meeting *at least 4 of 6* criteria:
+
+[cols="1,3,1"]
+|===
+| # | Criterion | Target
+
+| 1 | Pilot deployments completed | >= 2
+| 2 | Academic papers published or accepted | >= 1
+| 3 | Consulting revenue (cumulative) | >= $50,000
+| 4 | GitHub stars | >= 2,000
+| 5 | External contributors (active in last 90 days) | >= 10
+| 6 | Conference talks given (cumulative) | >= 5
+|===
+
+=== Contingency: Phase 2 Stalls
+
+If fewer than 3 criteria are met at Month 24:
+
+* *Pivot domain*: If bioinformatics is not responding, try digital twins
+  (manufacturing) or data mesh (enterprise data teams). Different domains have
+  different adoption timescales.
+* *Strengthen Phase 1*: More community content, more conference talks, more
+  integration guides. Phase 2 may fail because Phase 1 did not build enough
+  awareness.
+* *Reassess product-market fit*: If no institution is willing to pilot, the
+  problem may be less acute than hypothesised. Consider whether drift detection
+  is a "nice to have" versus "must have" for the target audience.
+
+== Phase 3: Enterprise Expansion (Months 24-36)
+
+=== Objective
+
+Launch commercial support licences and expand into enterprise markets where
+cross-system data consistency has measurable financial impact ($12.9M/year
+per Gartner).
+
+=== Why Enterprise Third
+
+1. *Credibility required*: Enterprise buyers require proof of capability --
+   case studies, academic publications, and production deployments. Phases 1-2
+   build this credibility.
+
+2. *Procurement cycles*: Enterprise procurement takes 6-12 months. Starting
+   enterprise sales in Phase 1 would mean no revenue until Month 18-24 anyway.
+   Building community and institutional credibility during that period is a
+   better use of time.
+
+3. *Product maturity*: Enterprise deployment requires production hardening,
+   security review, monitoring tooling, and operational documentation that are
+   not needed for community or research use.
+
+=== Target Verticals
+
+[cols="2,2,1,2"]
+|===
+| Vertical | Use Case | Target ACV | Entry Point
+
+| *Financial services*
+| AML/KYC cross-system entity consistency
+| $50,000+
+| Compliance teams at tier-2 banks and fintech
+
+| *Manufacturing*
+| Digital twin synchronisation, IoT data consistency
+| $40,000+
+| Engineering teams at mid-size manufacturers
+
+| *Pharmaceuticals*
+| Clinical trial data consistency, FDA compliance
+| $60,000+
+| Data management teams at CROs and pharma
+
+| *Supply chain*
+| Traceability, certification expiry detection
+| $35,000+
+| Data platform teams at logistics providers
+|===
+
+=== Milestones
+
+[cols="1,3,2"]
+|===
+| Month | Milestone | Deliverable
+
+| 25
+| Commercial support launch
+| Support tier structure published, pricing page live, billing infrastructure
+operational
+
+| 26
+| Enterprise content
+| Case studies from Phase 2 pilots, ROI calculator, compliance guides
+(SOC 2 readiness, GDPR cross-system erasure)
+
+| 27
+| First enterprise prospect
+| Qualified enterprise prospect in pipeline (identified through community
+adoption or conference contact)
+
+| 28
+| Container hardening
+| Production-grade container images with security scanning, minimal base
+images (Chainguard Wolfi), SBOM, SLSA attestation
+
+| 30
+| First enterprise customer
+| Signed commercial support contract
+
+| 32
+| Managed service pilot
+| Managed VeriSimDB instance for 1-2 customers (hosted on Fly.io or equivalent)
+
+| 34
+| Second and third enterprise customers
+| Pipeline conversion from Phase 1-2 community and institutional contacts
+
+| 36
+| Phase 3 retrospective
+| ARR assessment, team scaling decision, managed service viability
+|===
+
+=== Sales Motion
+
+==== Developer-Led (Primary)
+
+The expected enterprise sales motion for VeriSimDB is bottom-up:
+
+1. A data engineer discovers VeriSimDB through a blog post, conference talk,
+   or community recommendation
+2. The engineer evaluates VeriSimDB in a staging environment, running drift
+   detection on a subset of production data
+3. The engineer demonstrates results to their team lead or VP Engineering,
+   showing quantified drift across existing systems
+4. The team requests an architecture review (consulting engagement, $5K-$15K)
+5. Successful evaluation leads to a commercial support licence purchase
+
+This motion has a *low CAC* ($8,000 estimated) because the developer does the
+evaluation and internal selling. Traditional enterprise sales (outbound SDR,
+demo, POC, procurement) costs $30,000-$50,000 per customer.
+
+==== Partner Channel (Secondary, Phase 3b)
+
+After establishing 5-10 commercial customers:
+
+* Engage system integrators (Accenture, Deloitte, Thoughtworks) who advise
+  enterprise clients on data infrastructure
+* Create partner training programme (VQL certification)
+* Provide referral incentives (10-15% of first-year ACV)
+
+=== Success Criteria (Phase 3)
+
+[cols="1,3,1"]
+|===
+| # | Criterion | Target
+
+| 1 | Commercial support customers | >= 5
+| 2 | ARR | >= $200,000
+| 3 | GitHub stars | >= 5,000
+| 4 | External contributors (active in last 90 days) | >= 25
+| 5 | Managed service users (pilot) | >= 2
+| 6 | Published case studies | >= 3
+|===
+
+== Technical Readiness by Phase
+
+Each phase requires specific technical capabilities. These are development
+priorities, not marketing milestones.
+
+[cols="3,1,1,1"]
+|===
+| Capability | Phase 1 | Phase 2 | Phase 3
+
+| Core octad storage (all 8 modalities) | Required | Required | Required
+| Drift detection and coherence scoring | Required | Required | Required
+| Self-normalisation (configurable strategies) | Required | Required | Required
+| VQL parser and query execution | Required | Required | Required
+| Getting-started guide and VQL examples | Required | Required | Required
+| Federation (PostgreSQL connector) | Demo quality | Production quality | Production quality
+| Federation (ArangoDB, Elasticsearch, Neo4j) | Not required | Demo quality | Production quality
+| VQL-DT proof certificates | Documented design | Prototype | Production quality
+| Container images (Podman/Docker) | Basic | Hardened | Production-grade
+| Monitoring and alerting (Prometheus) | Basic | Comprehensive | SLA-grade
+| RBAC and access control | Not required | Basic | Comprehensive
+| Backup and restore | Not required | Basic | Automated
+| Multi-node deployment | Not required | Not required | Documented + tested
+| Managed service infrastructure | Not required | Not required | Pilot
+|===
+
+== Risk Register
+
+[cols="1,2,1,3"]
+|===
+| Phase | Risk | Likelihood | Mitigation
+
+| 1
+| Low community adoption
+| Medium
+| Diversify community targets (GraphRAG, Elixir, Rust, data quality). Create
+compelling demo. Engage consistently.
+
+| 1
+| Competitor adds drift detection
+| Low
+| Architectural depth (octad + VQL-DT) is difficult to retrofit. First-mover
+advantage in category definition.
+
+| 2
+| No institution willing to pilot
+| Medium
+| Offer free deployment support. Lower barrier: "let us run drift detection
+on your data for free." Publication incentive for academics.
+
+| 2
+| Academic paper rejected
+| Medium
+| Submit to multiple venues. Prepare demo paper as backup. Publish preprint
+on arXiv regardless.
+
+| 3
+| Enterprise procurement delay (6-12 months)
+| High
+| Consulting revenue bridges gap. Developer-led adoption reduces procurement
+friction. Start enterprise conversations 6 months before Phase 3.
+
+| 3
+| Single-founder scaling limit
+| High
+| First hire (DevRel) at Month 12. Second hire (Rust engineer) at Month 18.
+Revenue from Phase 2 consulting funds initial hires.
+
+| All
+| Burnout (single developer, 36-month plan)
+| High
+| Sustainable pace: no artificial urgency. VeriSimDB is self-funded; there
+are no investor milestones. Take breaks. The project advances when it advances.
+|===
+
+== Summary Timeline
+
+....
+Month 0     Month 6     Month 12    Month 18    Month 24    Month 30    Month 36
+  |           |           |           |           |           |           |
+  v           v           v           v           v           v           v
+  Launch      GraphRAG    Phase 1     First       Phase 2     First       Phase 3
+  repo        demo        review      pilot       review      enterprise  review
+              Blog        500 stars   deployed    2000 stars  customer    5000 stars
+              posts       100 clones  Paper       $50K        ARR $200K   ARR target
+              Talks       5 PRs       submitted   consulting  Managed     $400K+
+                                                              service
+....

@@ -1,0 +1,94 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# VeriSimDB selur-compose configuration
+#
+# Orchestrates the full VeriSimDB stack as verified container bundles (.ctp).
+# Uses selur zero-copy IPC between services on the same host.
+#
+# Usage:
+#   selur-compose up                     # Start all services
+#   selur-compose up --detach            # Start in background
+#   selur-compose verify                 # Verify all .ctp signatures
+#   selur-compose ps                     # Check status
+#   selur-compose logs -f rust-core      # Stream logs
+#   selur-compose down                   # Stop all services
+
+version = "1.0"
+
+# ============================================================================
+# Services
+# ============================================================================
+
+# Rust core: modality stores, drift detection, HTTP/gRPC API
+[services.rust-core]
+image = "ghcr.io/hyperpolymath/verisimdb-rust:latest.ctp"
+ports = ["8080:8080", "50051:50051"]
+environment = {
+  RUST_LOG = "info",
+  VERISIM_HOST = "[::]",
+  VERISIM_PORT = "8080",
+  VERISIM_LOG_FORMAT = "json",
+  VERISIM_PERSISTENCE_DIR = "/data",
+}
+volumes = ["verisimdb-data:/data"]
+restart = "always"
+healthcheck = { test = "curl -sf http://localhost:8080/health", interval = "30s", timeout = "5s", retries = 3 }
+
+# Elixir orchestration: entity servers, drift monitor, federation, query router
+[services.elixir-orchestration]
+image = "ghcr.io/hyperpolymath/verisimdb-elixir:latest.ctp"
+ports = ["4000:4000"]
+environment = {
+  VERISIM_RUST_CORE_URL = "http://rust-core:8080/api/v1",
+  VERISIM_LOG_FORMAT = "json",
+  MIX_ENV = "prod",
+}
+depends_on = ["rust-core"]
+restart = "always"
+healthcheck = { test = "curl -sf http://localhost:4000/health", interval = "30s", timeout = "5s", retries = 3 }
+
+# Svalinn edge gateway: validates requests, enforces policies, OAuth2/JWT auth
+[services.svalinn]
+image = "ghcr.io/hyperpolymath/svalinn:latest.ctp"
+ports = ["443:443", "80:80"]
+environment = {
+  SVALINN_BACKEND = "http://rust-core:8080",
+  SVALINN_ELIXIR_BACKEND = "http://elixir-orchestration:4000",
+  SVALINN_POLICY_FILE = "/etc/svalinn/gatekeeper.yaml",
+  SVALINN_TLS_AUTO = "true",
+}
+volumes = ["svalinn-config:/etc/svalinn:ro"]
+depends_on = ["rust-core", "elixir-orchestration"]
+restart = "always"
+healthcheck = { test = "curl -sf http://localhost:80/health", interval = "30s", timeout = "5s", retries = 3 }
+
+# Rokur secrets manager (stub — placeholder until panic-attacker containerization completes)
+# Uncomment when rokur has a real implementation:
+# [services.rokur]
+# image = "ghcr.io/hyperpolymath/rokur:latest.ctp"
+# ports = ["8443:8443"]
+# environment = { ROKUR_POLICY = "strict" }
+# volumes = ["rokur-secrets:/var/lib/rokur"]
+# restart = "always"
+
+# ============================================================================
+# Volumes
+# ============================================================================
+
+[volumes.verisimdb-data]
+driver = "local"
+
+[volumes.svalinn-config]
+driver = "local"
+
+# [volumes.rokur-secrets]
+# driver = "local"
+
+# ============================================================================
+# Networks
+# ============================================================================
+
+# Use selur zero-copy IPC for inter-service communication on the same host.
+# Falls back to standard bridge networking when selur driver is unavailable.
+[networks.default]
+driver = "selur"

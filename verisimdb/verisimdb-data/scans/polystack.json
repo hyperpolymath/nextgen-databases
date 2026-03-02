@@ -1,0 +1,3681 @@
+{
+  "program_path": "/var/mnt/eclipse/repos/polystack",
+  "language": "rescript",
+  "frameworks": [
+    "OTP",
+    "Database",
+    "Cache",
+    "Concurrent",
+    "WebServer",
+    "MessageQueue"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "poly-cloud/lsp/lib/adapters/aws.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-cloud/lsp/lib/adapters/aws.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-cloud/lsp/lib/adapters/azure.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-cloud/lsp/lib/adapters/azure.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-cloud/lsp/lib/adapters/digitalocean.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-cloud/lsp/lib/adapters/digitalocean.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-cloud/lsp/lib/adapters/gcp.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-cloud/lsp/lib/adapters/gcp.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-cloud/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in poly-cloud/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-container/lsp/lib/adapters/docker.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-container/lsp/lib/adapters/docker.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-container/lsp/lib/adapters/nerdctl.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-container/lsp/lib/adapters/nerdctl.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-container/lsp/lib/adapters/podman.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-container/lsp/lib/adapters/podman.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "poly-container/mcp/lib/bs/src/adapters/Docker.res",
+      "severity": "High",
+      "description": "3 JSON.parseExn calls in poly-container/mcp/lib/bs/src/adapters/Docker.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "poly-container/mcp/lib/ocaml/Docker.res",
+      "severity": "High",
+      "description": "3 JSON.parseExn calls in poly-container/mcp/lib/ocaml/Docker.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "poly-container/mcp/bundle.js",
+      "severity": "Medium",
+      "description": "13 HTTP (non-HTTPS) URLs in poly-container/mcp/bundle.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-container/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in poly-container/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-db/lsp/lib/adapters/mongodb.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-db/lsp/lib/adapters/mongodb.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-db/lsp/lib/adapters/mysql.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-db/lsp/lib/adapters/mysql.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-db/lsp/lib/adapters/neo4j.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-db/lsp/lib/adapters/neo4j.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-db/lsp/lib/adapters/postgresql.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-db/lsp/lib/adapters/postgresql.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-db/lsp/lib/adapters/redis.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-db/lsp/lib/adapters/redis.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-db/lsp/lib/adapters/sqlite.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-db/lsp/lib/adapters/sqlite.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-db/mcp/src/bindings/SQLite.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in poly-db/mcp/src/bindings/SQLite.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-git/lsp/lib/adapters/gitea.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-git/lsp/lib/adapters/gitea.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-git/lsp/lib/adapters/github.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-git/lsp/lib/adapters/github.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-git/lsp/lib/adapters/gitlab.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-git/lsp/lib/adapters/gitlab.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-git/shim/src/lib.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in poly-git/shim/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-git/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in poly-git/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-git/src/main.zig",
+      "severity": "High",
+      "description": "1 unsafe pointer casts in poly-git/src/main.zig",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-iac/ffi/cue/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in poly-iac/ffi/cue/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-iac/ffi/nickel/shim/src/lib.rs",
+      "severity": "High",
+      "description": "4 unsafe blocks in poly-iac/ffi/nickel/shim/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-iac/ffi/nickel/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in poly-iac/ffi/nickel/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-iac/lsp/lib/adapters/behaviour.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in poly-iac/lsp/lib/adapters/behaviour.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-iac/lsp/lib/adapters/opentofu.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-iac/lsp/lib/adapters/opentofu.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-iac/lsp/lib/adapters/opentofu.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in poly-iac/lsp/lib/adapters/opentofu.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-iac/lsp/lib/adapters/pulumi.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-iac/lsp/lib/adapters/pulumi.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-iac/lsp/lib/adapters/pulumi.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in poly-iac/lsp/lib/adapters/pulumi.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-iac/lsp/lib/lsp/handlers/diagnostics.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-iac/lsp/lib/lsp/handlers/diagnostics.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-iac/lsp/lib/lsp/handlers/hover.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in poly-iac/lsp/lib/lsp/handlers/hover.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "poly-iac/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in poly-iac/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "poly-iac/mcp/lib/ocaml/Pulumi.res",
+      "severity": "High",
+      "description": "2 JSON.parseExn calls in poly-iac/mcp/lib/ocaml/Pulumi.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-iac/mcp/lib/ocaml/Terraform.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in poly-iac/mcp/lib/ocaml/Terraform.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "poly-iac/mcp/src/adapters/Pulumi.res",
+      "severity": "High",
+      "description": "2 JSON.parseExn calls in poly-iac/mcp/src/adapters/Pulumi.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-iac/mcp/src/adapters/Terraform.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in poly-iac/mcp/src/adapters/Terraform.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "poly-iac/mcp/bundle.js",
+      "severity": "Medium",
+      "description": "13 HTTP (non-HTTPS) URLs in poly-iac/mcp/bundle.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-k8s/lsp/lib/adapters/behaviour.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in poly-k8s/lsp/lib/adapters/behaviour.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-k8s/lsp/lib/adapters/helm.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-k8s/lsp/lib/adapters/helm.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-k8s/lsp/lib/adapters/helm.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in poly-k8s/lsp/lib/adapters/helm.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-k8s/lsp/lib/adapters/kubectl.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-k8s/lsp/lib/adapters/kubectl.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-k8s/lsp/lib/adapters/kubectl.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in poly-k8s/lsp/lib/adapters/kubectl.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-k8s/lsp/lib/adapters/kustomize.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-k8s/lsp/lib/adapters/kustomize.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-k8s/lsp/lib/adapters/kustomize.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in poly-k8s/lsp/lib/adapters/kustomize.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "poly-k8s/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in poly-k8s/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "ExcessivePermissions",
+      "location": "poly-k8s/mcp/run-test.sh",
+      "severity": "High",
+      "description": "Deno -A (all permissions) in poly-k8s/mcp/run-test.sh",
+      "recommended_attack": [
+        "network",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-observability/lsp/lib/adapters/grafana.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-observability/lsp/lib/adapters/grafana.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-observability/lsp/lib/adapters/jaeger.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-observability/lsp/lib/adapters/jaeger.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-observability/lsp/lib/adapters/loki.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-observability/lsp/lib/adapters/loki.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-observability/lsp/lib/adapters/prometheus.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-observability/lsp/lib/adapters/prometheus.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-observability/lsp/lib/lsp/handlers/diagnostics.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-observability/lsp/lib/lsp/handlers/diagnostics.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "poly-observability/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in poly-observability/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-orchestrator-lsp/ai-cli-crash-capture/recoverer-setup.sh",
+      "severity": "Medium",
+      "description": "47 potentially unquoted variable expansions in poly-orchestrator-lsp/ai-cli-crash-capture/recoverer-setup.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "poly-orchestrator-lsp/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in poly-orchestrator-lsp/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-orchestrator-lsp/lib/orchestrator/lsp_client.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-orchestrator-lsp/lib/orchestrator/lsp_client.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-orchestrator-lsp/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in poly-orchestrator-lsp/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-proof/lsp/lib/adapters/agda.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-proof/lsp/lib/adapters/agda.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-proof/lsp/lib/adapters/coq.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-proof/lsp/lib/adapters/coq.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-proof/lsp/lib/adapters/isabelle.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-proof/lsp/lib/adapters/isabelle.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-proof/lsp/lib/adapters/lean.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-proof/lsp/lib/adapters/lean.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-proof/lsp/lib/lsp/handlers/diagnostics.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-proof/lsp/lib/lsp/handlers/diagnostics.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-proof/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in poly-proof/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-queue/lsp/lib/adapters/behaviour.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-queue/lsp/lib/adapters/behaviour.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-queue/lsp/lib/adapters/nats.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-queue/lsp/lib/adapters/nats.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-queue/lsp/lib/adapters/rabbitmq.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-queue/lsp/lib/adapters/rabbitmq.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-queue/lsp/lib/adapters/redis_streams.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-queue/lsp/lib/adapters/redis_streams.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "poly-queue/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in poly-queue/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "poly-queue/mcp/lib/ocaml/NATS.res",
+      "severity": "High",
+      "description": "5 JSON.parseExn calls in poly-queue/mcp/lib/ocaml/NATS.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "poly-queue/mcp/src/adapters/NATS.res",
+      "severity": "High",
+      "description": "5 JSON.parseExn calls in poly-queue/mcp/src/adapters/NATS.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "poly-queue/mcp/bundle-index.js",
+      "severity": "Medium",
+      "description": "12 HTTP (non-HTTPS) URLs in poly-queue/mcp/bundle-index.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "poly-queue/mcp/bundle.js",
+      "severity": "Medium",
+      "description": "13 HTTP (non-HTTPS) URLs in poly-queue/mcp/bundle.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "ExcessivePermissions",
+      "location": "poly-queue/mcp/test-mcp.js",
+      "severity": "High",
+      "description": "Deno -A (all permissions) in poly-queue/mcp/test-mcp.js",
+      "recommended_attack": [
+        "network",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-queue/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in poly-queue/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-secret/lsp/lib/adapters/sops.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-secret/lsp/lib/adapters/sops.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-secret/lsp/lib/adapters/vault.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-secret/lsp/lib/adapters/vault.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-secret/lsp/lib/lsp/handlers/diagnostics.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-secret/lsp/lib/lsp/handlers/diagnostics.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "poly-secret/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in poly-secret/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "poly-secret/mcp/lib/ocaml/SOPS.res",
+      "severity": "High",
+      "description": "2 JSON.parseExn calls in poly-secret/mcp/lib/ocaml/SOPS.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "poly-secret/mcp/lib/ocaml/Vault.res",
+      "severity": "High",
+      "description": "7 JSON.parseExn calls in poly-secret/mcp/lib/ocaml/Vault.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "poly-secret/mcp/src/adapters/SOPS.res",
+      "severity": "High",
+      "description": "2 JSON.parseExn calls in poly-secret/mcp/src/adapters/SOPS.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "poly-secret/mcp/src/adapters/Vault.res",
+      "severity": "High",
+      "description": "7 JSON.parseExn calls in poly-secret/mcp/src/adapters/Vault.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "poly-secret/mcp/bundle.js",
+      "severity": "Medium",
+      "description": "13 HTTP (non-HTTPS) URLs in poly-secret/mcp/bundle.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "poly-secret/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in poly-secret/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "poly-ssg/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in poly-ssg/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "poly-ssg/engines/terrapin-ssg/terrapin-ssg.py",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in poly-ssg/engines/terrapin-ssg/terrapin-ssg.py",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-ssg/lsp/lib/adapters/franklin.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-ssg/lsp/lib/adapters/franklin.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-ssg/lsp/lib/adapters/hakyll.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-ssg/lsp/lib/adapters/hakyll.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-ssg/lsp/lib/adapters/hugo.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-ssg/lsp/lib/adapters/hugo.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-ssg/lsp/lib/adapters/jekyll.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-ssg/lsp/lib/adapters/jekyll.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-ssg/lsp/lib/adapters/mdbook.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-ssg/lsp/lib/adapters/mdbook.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-ssg/lsp/lib/adapters/zola.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-ssg/lsp/lib/adapters/zola.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-ssg/lsp/lib/lsp/handlers/diagnostics.ex",
+      "severity": "Medium",
+      "description": "System command execution in poly-ssg/lsp/lib/lsp/handlers/diagnostics.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "poly-ssg/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in poly-ssg/mcp/contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-ssg/mcp/lib/ocaml/Server.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in poly-ssg/mcp/lib/ocaml/Server.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-ssg/mcp/src/Server.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in poly-ssg/mcp/src/Server.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-ssg/satellites/eclipse-ssg/ssg/src/build.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in poly-ssg/satellites/eclipse-ssg/ssg/src/build.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-ssg/satellites/hackenbush-ssg/life-lang/src/lsp/server.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in poly-ssg/satellites/hackenbush-ssg/life-lang/src/lsp/server.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-ssg/satellites/hackenbush-ssg/life-lang/src/compiler.res",
+      "severity": "Medium",
+      "description": "9 unsafe get calls in poly-ssg/satellites/hackenbush-ssg/life-lang/src/compiler.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-ssg/satellites/hackenbush-ssg/life-lang/src/interpreter.res",
+      "severity": "Medium",
+      "description": "12 unsafe get calls in poly-ssg/satellites/hackenbush-ssg/life-lang/src/interpreter.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-ssg/satellites/hackenbush-ssg/life-lang/src/parser.res",
+      "severity": "Medium",
+      "description": "3 unsafe get calls in poly-ssg/satellites/hackenbush-ssg/life-lang/src/parser.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-ssg/satellites/labnote-ssg/tests/adapter_test.js",
+      "severity": "Critical",
+      "description": "eval() usage in poly-ssg/satellites/labnote-ssg/tests/adapter_test.js",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-ssg/satellites/macrauchenia-ssg/tests/security/validation_test.js",
+      "severity": "Critical",
+      "description": "eval() usage in poly-ssg/satellites/macrauchenia-ssg/tests/security/validation_test.js",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-ssg/satellites/odd-ssg/src/noteg-lang/Parser.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in poly-ssg/satellites/odd-ssg/src/noteg-lang/Parser.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "poly-ssg/satellites/odd-ssg/src/ssg/Build.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in poly-ssg/satellites/odd-ssg/src/ssg/Build.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-ssg/satellites/qed-ssg/tests/integration/adapter_integration_test.ts",
+      "severity": "Critical",
+      "description": "eval() usage in poly-ssg/satellites/qed-ssg/tests/integration/adapter_integration_test.ts",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "poly-ssg/satellites/saur-ssg/tests/security_test.js",
+      "severity": "Critical",
+      "description": "eval() usage in poly-ssg/satellites/saur-ssg/tests/security_test.js",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-ssg/scripts/test-all.sh",
+      "severity": "Medium",
+      "description": "126 potentially unquoted variable expansions in poly-ssg/scripts/test-all.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-ssg/scripts/test-harness.sh",
+      "severity": "Medium",
+      "description": "52 potentially unquoted variable expansions in poly-ssg/scripts/test-harness.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-ssg/scripts/validate-output.sh",
+      "severity": "Medium",
+      "description": "52 potentially unquoted variable expansions in poly-ssg/scripts/validate-output.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "poly-ssg/sites-build/build-all-sites.sh",
+      "severity": "Medium",
+      "description": "87 potentially unquoted variable expansions in poly-ssg/sites-build/build-all-sites.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "poly-ssg/sites-build/build-all-sites.sh",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in poly-ssg/sites-build/build-all-sites.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "contractiles/k9/template-hunt.k9.ncl",
+      "severity": "Low",
+      "description": "14 TODO/FIXME/HACK markers in contractiles/k9/template-hunt.k9.ncl",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 267601,
+    "unsafe_blocks": 301,
+    "panic_sites": 38,
+    "unwrap_calls": 43,
+    "allocation_sites": 148,
+    "io_operations": 157,
+    "threading_constructs": 85
+  },
+  "file_statistics": [
+    {
+      "file_path": "poly-cloud/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-cloud/lsp/lib/adapters/aws.ex",
+      "lines": 201,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-cloud/lsp/lib/adapters/azure.ex",
+      "lines": 253,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-cloud/lsp/lib/adapters/digitalocean.ex",
+      "lines": 232,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-cloud/lsp/lib/adapters/gcp.ex",
+      "lines": 228,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-cloud/lsp/lib/lsp/server.ex",
+      "lines": 231,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-cloud/lsp/test/adapters/aws_test.exs",
+      "lines": 65,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/lsp/test/adapters/azure_test.exs",
+      "lines": 55,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/lsp/test/adapters/digitalocean_test.exs",
+      "lines": 59,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/lsp/test/adapters/gcp_test.exs",
+      "lines": 55,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/mcp/lib/bs/src/bindings/Deno.res",
+      "lines": 67,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/mcp/lib/ocaml/Deno.res",
+      "lines": 67,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/mcp/src/bindings/Deno.res",
+      "lines": 67,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/src/c.zig",
+      "lines": 40,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/src/main.zig",
+      "lines": 85,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-cloud/src/rate_limit.zig",
+      "lines": 79,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-container/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-container/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-container/lsp/lib/adapters/docker.ex",
+      "lines": 216,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-container/lsp/lib/adapters/nerdctl.ex",
+      "lines": 215,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-container/lsp/lib/adapters/podman.ex",
+      "lines": 220,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-container/lsp/lib/lsp/server.ex",
+      "lines": 153,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-container/mcp/lib/bs/src/adapters/Docker.res",
+      "lines": 419,
+      "unsafe_blocks": 0,
+      "panic_sites": 3,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-container/mcp/lib/ocaml/Docker.res",
+      "lines": 419,
+      "unsafe_blocks": 0,
+      "panic_sites": 3,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-container/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-container/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-container/src/main.zig",
+      "lines": 59,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/lsp/lib/adapters/mongodb.ex",
+      "lines": 199,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-db/lsp/lib/adapters/mysql.ex",
+      "lines": 214,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-db/lsp/lib/adapters/neo4j.ex",
+      "lines": 188,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-db/lsp/lib/adapters/postgresql.ex",
+      "lines": 207,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-db/lsp/lib/adapters/redis.ex",
+      "lines": 175,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-db/lsp/lib/adapters/sqlite.ex",
+      "lines": 183,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-db/lsp/lib/lsp/server.ex",
+      "lines": 153,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-db/mcp/adapters/verisimdb.js",
+      "lines": 213,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/mcp/src/adapters/Dragonfly.res",
+      "lines": 329,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/mcp/src/adapters/Elasticsearch.res",
+      "lines": 262,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/mcp/src/adapters/Mongodb.res",
+      "lines": 329,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/mcp/src/adapters/Postgresql.res",
+      "lines": 281,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/mcp/src/adapters/Sqlite.res",
+      "lines": 283,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/mcp/src/bindings/Deno.res",
+      "lines": 35,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/mcp/src/bindings/Fetch.res",
+      "lines": 45,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/mcp/src/bindings/MongoDB.res",
+      "lines": 56,
+      "unsafe_blocks": 25,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/mcp/src/bindings/Postgres.res",
+      "lines": 29,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/mcp/src/bindings/Redis.res",
+      "lines": 72,
+      "unsafe_blocks": 43,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-db/mcp/src/bindings/SQLite.res",
+      "lines": 49,
+      "unsafe_blocks": 11,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-git/lsp/lib/adapters/behaviour.ex",
+      "lines": 126,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/lsp/lib/adapters/bitbucket.ex",
+      "lines": 99,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-git/lsp/lib/adapters/gitea.ex",
+      "lines": 195,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-git/lsp/lib/adapters/github.ex",
+      "lines": 170,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-git/lsp/lib/adapters/gitlab.ex",
+      "lines": 183,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-git/lsp/lib/lsp/server.ex",
+      "lines": 190,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-git/mcp/lib/bs/src/adapters/Bitbucket.res",
+      "lines": 206,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/mcp/lib/bs/src/bindings/Deno.res",
+      "lines": 129,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/mcp/lib/es6/src/bindings/Deno.res.js",
+      "lines": 172,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/mcp/lib/ocaml/Bitbucket.res",
+      "lines": 206,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/mcp/lib/ocaml/Deno.res",
+      "lines": 129,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/mcp/src/adapters/Bitbucket.res",
+      "lines": 206,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/mcp/src/bindings/Deno.res",
+      "lines": 129,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/mcp/bundle.js",
+      "lines": 1816,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/mcp/mcp-server-config-schema.k9.ncl",
+      "lines": 381,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/shim/src/lib.rs",
+      "lines": 169,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-git/src/main.zig",
+      "lines": 227,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/ffi/cue/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/ffi/cue/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-iac/ffi/cue/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/ffi/cue/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/ffi/cue/src/main.zig",
+      "lines": 72,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/ffi/nickel/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/ffi/nickel/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-iac/ffi/nickel/shim/src/lib.rs",
+      "lines": 124,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/ffi/nickel/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/ffi/nickel/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/ffi/nickel/src/main.zig",
+      "lines": 147,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/lsp/lib/adapters/opentofu.ex",
+      "lines": 310,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-iac/lsp/lib/adapters/pulumi.ex",
+      "lines": 285,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-iac/lsp/lib/lsp/server.ex",
+      "lines": 224,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-iac/mcp/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/mcp/lib/ocaml/Deno.res",
+      "lines": 45,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/mcp/lib/ocaml/Pulumi.res",
+      "lines": 399,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/mcp/lib/ocaml/Terraform.res",
+      "lines": 230,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/mcp/src/adapters/Pulumi.res",
+      "lines": 399,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/mcp/src/adapters/Terraform.res",
+      "lines": 230,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-iac/mcp/src/bindings/Deno.res",
+      "lines": 45,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-k8s/lsp/lib/adapters/helm.ex",
+      "lines": 177,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-k8s/lsp/lib/adapters/kubectl.ex",
+      "lines": 228,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-k8s/lsp/lib/adapters/kustomize.ex",
+      "lines": 135,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-k8s/lsp/lib/lsp/server.ex",
+      "lines": 164,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-k8s/mcp/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-k8s/mcp/lib/bs/src/adapters/Kubectl.res",
+      "lines": 342,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-k8s/mcp/lib/bs/src/adapters/Kustomize.res",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-k8s/mcp/lib/bs/src/bindings/Deno.res",
+      "lines": 70,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-k8s/mcp/lib/ocaml/Deno.res",
+      "lines": 70,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-k8s/mcp/lib/ocaml/Kubectl.res",
+      "lines": 342,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-k8s/mcp/lib/ocaml/Kustomize.res",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-k8s/mcp/src/adapters/Kubectl.res",
+      "lines": 342,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-k8s/mcp/src/adapters/Kustomize.res",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-k8s/mcp/src/bindings/Deno.res",
+      "lines": 70,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/lsp/lib/adapters/grafana.ex",
+      "lines": 176,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-observability/lsp/lib/adapters/jaeger.ex",
+      "lines": 188,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-observability/lsp/lib/adapters/loki.ex",
+      "lines": 150,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-observability/lsp/lib/adapters/prometheus.ex",
+      "lines": 152,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-observability/lsp/lib/lsp/handlers/diagnostics.ex",
+      "lines": 164,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/lsp/lib/lsp/server.ex",
+      "lines": 227,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-observability/mcp/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/mcp/lib/es6/src/bindings/Deno.res.js",
+      "lines": 110,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/mcp/lib/ocaml/Deno.res",
+      "lines": 91,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/mcp/lib/ocaml/Grafana.res",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/mcp/lib/ocaml/Jaeger.res",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/mcp/lib/ocaml/Loki.res",
+      "lines": 291,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/mcp/lib/ocaml/Prometheus.res",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/mcp/src/adapters/Grafana.res",
+      "lines": 225,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/mcp/src/adapters/Jaeger.res",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/mcp/src/adapters/Loki.res",
+      "lines": 291,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/mcp/src/adapters/Prometheus.res",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-observability/mcp/src/bindings/Deno.res",
+      "lines": 91,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/ai-cli-crash-capture/recoverer-setup.sh",
+      "lines": 155,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/lib/orchestrator/executor.ex",
+      "lines": 421,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/lib/orchestrator/lsp_client.ex",
+      "lines": 306,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/lib/orchestrator/stack_parser.ex",
+      "lines": 226,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/vscode-extension/src/Extension.res",
+      "lines": 283,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/vscode-extension/src/LanguageClient.res",
+      "lines": 47,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/vscode-extension/src/Process.res",
+      "lines": 11,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/vscode-extension/src/Vscode.res",
+      "lines": 65,
+      "unsafe_blocks": 5,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-orchestrator-lsp/test_orchestrator.exs",
+      "lines": 81,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-proof/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-proof/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-proof/lsp/lib/adapters/agda.ex",
+      "lines": 150,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-proof/lsp/lib/adapters/coq.ex",
+      "lines": 150,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-proof/lsp/lib/adapters/isabelle.ex",
+      "lines": 152,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-proof/lsp/lib/adapters/lean.ex",
+      "lines": 144,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-proof/lsp/lib/lsp/server.ex",
+      "lines": 222,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-proof/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-proof/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-proof/src/main.zig",
+      "lines": 381,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-queue/lsp/lib/adapters/nats.ex",
+      "lines": 236,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-queue/lsp/lib/adapters/rabbitmq.ex",
+      "lines": 217,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-queue/lsp/lib/adapters/redis_streams.ex",
+      "lines": 231,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-queue/lsp/lib/lsp/handlers/diagnostics.ex",
+      "lines": 206,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/lsp/lib/lsp/server.ex",
+      "lines": 219,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-queue/mcp/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/mcp/lib/es6/src/bindings/Deno.res.js",
+      "lines": 144,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/mcp/lib/ocaml/Deno.res",
+      "lines": 108,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/mcp/lib/ocaml/NATS.res",
+      "lines": 249,
+      "unsafe_blocks": 0,
+      "panic_sites": 5,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/mcp/lib/ocaml/RabbitMQ.res",
+      "lines": 243,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/mcp/lib/ocaml/Redis.res",
+      "lines": 352,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/mcp/src/adapters/NATS.res",
+      "lines": 249,
+      "unsafe_blocks": 0,
+      "panic_sites": 5,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/mcp/src/adapters/RabbitMQ.res",
+      "lines": 243,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/mcp/src/adapters/Redis.res",
+      "lines": 352,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/mcp/src/bindings/Deno.res",
+      "lines": 108,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/mcp/bundle.js",
+      "lines": 22373,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-queue/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/examples/tunnel.zig",
+      "lines": 37,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-secret/lsp/lib/adapters/sops.ex",
+      "lines": 283,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-secret/lsp/lib/adapters/vault.ex",
+      "lines": 208,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-secret/lsp/lib/lsp/handlers/diagnostics.ex",
+      "lines": 193,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/lsp/lib/lsp/server.ex",
+      "lines": 216,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-secret/mcp/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/mcp/lib/ocaml/Deno.res",
+      "lines": 45,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/mcp/lib/ocaml/SOPS.res",
+      "lines": 233,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/mcp/lib/ocaml/Vault.res",
+      "lines": 260,
+      "unsafe_blocks": 0,
+      "panic_sites": 7,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/mcp/src/adapters/SOPS.res",
+      "lines": 233,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/mcp/src/adapters/Vault.res",
+      "lines": 260,
+      "unsafe_blocks": 0,
+      "panic_sites": 7,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/mcp/src/bindings/Deno.res",
+      "lines": 45,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/src/c.zig",
+      "lines": 6,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-secret/src/peer.zig",
+      "lines": 34,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/engines/casket-ssg/Casket.hs",
+      "lines": 307,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/engines/rescript-wasm/bin/main.ml",
+      "lines": 322,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/engines/rescript-wasm/lib/wasm_binary.ml",
+      "lines": 404,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/engines/rescript-wasm/lib/wasm_sourcemap.ml",
+      "lines": 206,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/engines/webforge-ssg/webforge.adb",
+      "lines": 255,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/lib/ocaml/Tea.res",
+      "lines": 69,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/lsp/lib/adapters/franklin.ex",
+      "lines": 110,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-ssg/lsp/lib/adapters/hakyll.ex",
+      "lines": 117,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-ssg/lsp/lib/adapters/hugo.ex",
+      "lines": 110,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-ssg/lsp/lib/adapters/jekyll.ex",
+      "lines": 116,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-ssg/lsp/lib/adapters/mdbook.ex",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-ssg/lsp/lib/adapters/zola.ex",
+      "lines": 125,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "poly-ssg/lsp/lib/lsp/handlers/diagnostics.ex",
+      "lines": 166,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/lsp/lib/lsp/server.ex",
+      "lines": 228,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "poly-ssg/lsp/test/adapters/franklin_test.exs",
+      "lines": 72,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/lsp/test/adapters/hakyll_test.exs",
+      "lines": 55,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/lsp/test/adapters/hugo_test.exs",
+      "lines": 80,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/lsp/test/adapters/jekyll_test.exs",
+      "lines": 68,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/lsp/test/adapters/mdbook_test.exs",
+      "lines": 64,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/lsp/test/adapters/zola_test.exs",
+      "lines": 64,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/lsp/test/lsp/server_test.exs",
+      "lines": 36,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/lsp/test/integration_test.exs",
+      "lines": 119,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/mcp/contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/mcp/lib/ocaml/Main.res",
+      "lines": 261,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/mcp/lib/ocaml/Http.res",
+      "lines": 85,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/mcp/lib/ocaml/Server.res",
+      "lines": 404,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/mcp/lib/ocaml/StreamableHttp.res",
+      "lines": 512,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/mcp/src/bindings/Http.res",
+      "lines": 85,
+      "unsafe_blocks": 4,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/mcp/src/transport/StreamableHttp.res",
+      "lines": 512,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/mcp/src/Main.res",
+      "lines": 343,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/mcp/src/Server.res",
+      "lines": 404,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/mcp/flake.nix",
+      "lines": 158,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/mcp/guix.scm",
+      "lines": 98,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/casket-ssg/src/Casket.hs",
+      "lines": 307,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/casket-ssg/Casket.hs",
+      "lines": 307,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/eclipse-ssg/ssg/src/build.res",
+      "lines": 151,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/hackenbush-ssg/life-lang/src/lsp/server.res",
+      "lines": 221,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/hackenbush-ssg/life-lang/src/compiler.res",
+      "lines": 207,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 9,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/hackenbush-ssg/life-lang/src/interpreter.res",
+      "lines": 165,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 12,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/hackenbush-ssg/life-lang/src/parser.res",
+      "lines": 168,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/odd-ssg/src/engine/Core.res",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/odd-ssg/src/noteg-lang/Lexer.res",
+      "lines": 371,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/odd-ssg/src/noteg-lang/Parser.res",
+      "lines": 522,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 9,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/odd-ssg/src/ssg/Build.res",
+      "lines": 288,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/pharos-ssg/engine/src/noteg_engine.adb",
+      "lines": 200,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/pharos-ssg/noteg-lang/src/lsp/Server.res",
+      "lines": 376,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/pharos-ssg/noteg-lang/src/Interpreter.res",
+      "lines": 520,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 12,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/pharos-ssg/noteg-lang/src/Lexer.res",
+      "lines": 408,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/pharos-ssg/ssg/src/Build.res",
+      "lines": 195,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/prodigy-ssg/engine/src/prodigy_core.pl",
+      "lines": 246,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/prodigy-ssg/engine/src/prodigy_template.pl",
+      "lines": 230,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/prodigy-ssg/tests/e2e/e2e_runner.pl",
+      "lines": 135,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/rats-ssg/src/Logger.res",
+      "lines": 41,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/satellites/rescribe-ssg/adapters/src/RescribeAdapter.res",
+      "lines": 162,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/scripts/test-all.sh",
+      "lines": 476,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/scripts/validate-output.sh",
+      "lines": 164,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/src/Tea.res",
+      "lines": 69,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/sites-build/site-generator.sh",
+      "lines": 169,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/sites-build/build-all-sites.sh",
+      "lines": 205,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/sites-build/generators/generate-home.sh",
+      "lines": 508,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/sites-build/generators/generate-aibdp.sh",
+      "lines": 61,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/sites-build/generators/generate-policies.sh",
+      "lines": 253,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/sites-build/generators/generate-contact.sh",
+      "lines": 133,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/sites-build/generators/generate-about.sh",
+      "lines": 90,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/sites-build/generators/generate-gallery.sh",
+      "lines": 30,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/sites-build/generators/generate-docs.sh",
+      "lines": 41,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "poly-ssg/sites-build/generators/generate-headers.sh",
+      "lines": 38,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "network",
+    "memory",
+    "cpu",
+    "concurrency"
+  ]
+}

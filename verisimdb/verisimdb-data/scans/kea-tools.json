@@ -1,0 +1,327 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "bivouac/src/playbook/executor.rs",
+      "severity": "Medium",
+      "description": "9 unwrap/expect calls in bivouac/src/playbook/executor.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "bivouac/src/playbook/mod.rs",
+      "severity": "Medium",
+      "description": "9 unwrap/expect calls in bivouac/src/playbook/mod.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "bivouac/src/playbook/parser.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in bivouac/src/playbook/parser.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "bivouac/tests/integration_test.rs",
+      "severity": "Medium",
+      "description": "35 unwrap/expect calls in bivouac/tests/integration_test.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "mandible/crates/kea-beak/src/lib.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in mandible/crates/kea-beak/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "mandible/crates/wp-praxis/src/lib.rs",
+      "severity": "Medium",
+      "description": "9 unwrap/expect calls in mandible/crates/wp-praxis/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 5552,
+    "unsafe_blocks": 0,
+    "panic_sites": 4,
+    "unwrap_calls": 87,
+    "allocation_sites": 22,
+    "io_operations": 27,
+    "threading_constructs": 1
+  },
+  "file_statistics": [
+    {
+      "file_path": "bivouac/src/playbook/executor.rs",
+      "lines": 460,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 9,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bivouac/src/playbook/mod.rs",
+      "lines": 100,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 9,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bivouac/src/playbook/parser.rs",
+      "lines": 442,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 8,
+      "allocation_sites": 4,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bivouac/src/config.rs",
+      "lines": 252,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bivouac/src/error.rs",
+      "lines": 59,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bivouac/src/main.rs",
+      "lines": 392,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "bivouac/tests/integration_test.rs",
+      "lines": 316,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 35,
+      "allocation_sites": 0,
+      "io_operations": 13,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "mandible/crates/kea-beak/src/lib.rs",
+      "lines": 656,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 3,
+      "io_operations": 3,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "mandible/crates/kea-mandible/src/main.rs",
+      "lines": 456,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "mandible/crates/slop-gate/src/lib.rs",
+      "lines": 792,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "mandible/crates/wp-praxis/src/lib.rs",
+      "lines": 838,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 9,
+      "allocation_sites": 6,
+      "io_operations": 5,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "bivouac/src/playbook/executor.rs",
+        "to": "bivouac/src/playbook/mod.rs",
+        "relation": "shared_dir:bivouac/src/playbook",
+        "weight": 1.0
+      },
+      {
+        "from": "bivouac/src/playbook/mod.rs",
+        "to": "bivouac/src/playbook/parser.rs",
+        "relation": "shared_dir:bivouac/src/playbook",
+        "weight": 1.0
+      },
+      {
+        "from": "bivouac/src/config.rs",
+        "to": "bivouac/src/error.rs",
+        "relation": "shared_dir:bivouac/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bivouac/src/error.rs",
+        "to": "bivouac/src/main.rs",
+        "relation": "shared_dir:bivouac/src",
+        "weight": 1.0
+      },
+      {
+        "from": "bivouac/src/playbook/executor.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "bivouac/src/playbook/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "bivouac/src/playbook/parser.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "bivouac/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bivouac/src/error.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "bivouac/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "bivouac/tests/integration_test.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 35.0
+      },
+      {
+        "from": "mandible/crates/kea-beak/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "mandible/crates/kea-mandible/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "mandible/crates/slop-gate/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "mandible/crates/wp-praxis/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "bivouac/src/playbook/executor.rs",
+          "bivouac/src/playbook/mod.rs",
+          "bivouac/src/playbook/parser.rs",
+          "bivouac/tests/integration_test.rs",
+          "mandible/crates/kea-beak/src/lib.rs",
+          "mandible/crates/wp-praxis/src/lib.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "bivouac/src/playbook/executor.rs",
+          "bivouac/src/playbook/mod.rs",
+          "bivouac/src/playbook/parser.rs",
+          "bivouac/tests/integration_test.rs",
+          "mandible/crates/kea-beak/src/lib.rs",
+          "mandible/crates/wp-praxis/src/lib.rs"
+        ],
+        "frameworks": [
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

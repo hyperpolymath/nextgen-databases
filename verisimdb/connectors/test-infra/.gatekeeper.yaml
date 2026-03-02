@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# Svalinn gatekeeper policy for VeriSimDB test infrastructure
+#
+# Permissive policy for local integration testing. No authentication
+# required, no rate limiting, all origins allowed. This policy is
+# intentionally relaxed — do NOT use in production.
+#
+# See: stapeln/container-stack/svalinn/
+
+version: "1.0"
+
+# Authentication requirements — NONE for testing
+auth:
+  # All endpoints are public (no auth required)
+  public:
+    - path: "/*"
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"]
+
+  # No authenticated endpoints — everything is open
+  authenticated: []
+
+  # No federation PSK requirements
+  federation: []
+
+# Rate limiting — DISABLED for testing
+rate_limits:
+  global:
+    requests_per_second: 0
+    burst: 0
+
+# Container trust policy — RELAXED for testing
+trust:
+  # No trusted signers required for test images
+  trusted_signers: []
+
+  # No attestations required
+  required_attestations: []
+
+  # Accept unsigned images (test images are built with --no-sign)
+  reject_unsigned: false
+
+# Request validation — RELAXED for testing
+validation:
+  # Large body size for bulk test data uploads
+  max_body_size: "128MB"
+
+  # Do not reject NaN/Inf (useful for testing edge cases)
+  reject_nan_inf: false
+
+  # Large vector dimension limit for testing
+  max_vector_dimension: 16384
+
+  # Large result limit for testing
+  max_result_limit: 100000
+
+# CORS policy — WIDE OPEN for testing
+cors:
+  allow_origins: ["*"]
+  allow_methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"]
+  allow_headers: ["*"]
+  max_age: 86400
+
+# Logging — verbose for testing
+logging:
+  format: "text"
+  level: "debug"
+  audit_paths: []

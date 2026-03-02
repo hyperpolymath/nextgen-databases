@@ -1,0 +1,271 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "WebServer",
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "InsecureProtocol",
+      "location": "src/sanitize.rs",
+      "severity": "Medium",
+      "description": "2 HTTP (non-HTTPS) URLs in src/sanitize.rs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/integration_tests.rs",
+      "severity": "Medium",
+      "description": "51 unwrap/expect calls in tests/integration_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 4695,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 51,
+    "allocation_sites": 4,
+    "io_operations": 10,
+    "threading_constructs": 1
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/config.rs",
+      "lines": 62,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rsr.rs",
+      "lines": 740,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/webhook.rs",
+      "lines": 386,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/main.rs",
+      "lines": 191,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/fleet.rs",
+      "lines": 218,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/integration_tests.rs",
+      "lines": 1346,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 51,
+      "allocation_sites": 1,
+      "io_operations": 5,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk",
+    "memory",
+    "network"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/config.rs",
+        "to": "src/rsr.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr.rs",
+        "to": "src/webhook.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/webhook.rs",
+        "to": "src/main.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "src/fleet.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/config.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rsr.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/webhook.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/webhook.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/fleet.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/fleet.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tests/integration_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 51.0
+      },
+      {
+        "from": "tests/integration_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 51.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "tests/integration_tests.rs"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "tests/integration_tests.rs"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "src/sanitize.rs"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "InsecureProtocol->Network"
+      }
+    ]
+  }
+}

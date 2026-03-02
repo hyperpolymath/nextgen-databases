@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+
+[package]
+name = "verisim-repl"
+description = "Interactive VQL REPL for VeriSimDB"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "vql"
+path = "src/main.rs"
+
+[dependencies]
+# HTTP client for verisim-api communication
+reqwest = { workspace = true, features = ["json", "blocking"] }
+rustls.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+# REPL framework and CLI
+rustyline = "15"
+rustyline-derive = "0.11"
+clap = { version = "4", features = ["derive"] }
+
+# Output formatting
+comfy-table = "7"
+colored = "3"
+
+# Home directory resolution (history file, .vqlrc)
+dirs = "6"

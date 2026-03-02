@@ -1,0 +1,1259 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= VQL Error Handling Strategy
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+VeriSimDB's error handling provides **comprehensive, actionable feedback** across all failure modes while maintaining **type safety** and **recoverability**.
+
+**Key Principles:**
+
+1. **Structured Errors** - Type-safe error representations (ReScript variants)
+2. **Helpful Messages** - Context-rich error descriptions with hints
+3. **Graceful Degradation** - Partial results when possible, fallback strategies
+4. **Audit Trail** - All errors logged to verisim-temporal for compliance
+5. **Recovery Strategies** - Automatic retry, circuit breakers, compensating transactions
+
+== Error Taxonomy
+
+=== Five Error Categories
+
+[cols="1,2,1,2"]
+|===
+|Category |When It Happens |Recoverable? |Example
+
+|**Parse Errors**
+|Invalid VQL syntax
+|No (client fix)
+|`SELECT GRPH FROM ...` (typo)
+
+|**Type Errors**
+|Dependent-type verification fails
+|No (contract violation)
+|ZKP proof generation failed
+
+|**Runtime Errors**
+|Execution failures
+|Sometimes
+|Store unavailable, timeout
+
+|**Modality Errors**
+|Modality-specific failures
+|Sometimes
+|Dimension mismatch (vector), cycle detected (graph)
+
+|**Federation Errors**
+|Cross-org coordination failures
+|Often (partial results)
+|Remote store unreachable, consensus timeout
+|===
+
+== Parse Errors
+
+**Cause:** Invalid VQL syntax detected by parser
+
+**Characteristics:**
+
+- Caught early (before execution)
+- Always non-recoverable (client must fix)
+- Include line/column information
+- Provide helpful hints
+
+=== Example: Unexpected Token
+
+[source,vql]
+----
+SELECT GRAPH, VECTRO FROM hexad abc-123
+                ^^^^^^
+                typo here
+----
+
+**Error Message:**
+
+[source,text]
+----
+Parse Error at 1:14-1:20: Expected 'VECTOR', 'TENSOR', 'SEMANTIC', 'DOCUMENT', 'TEMPORAL', found 'VECTRO'
+  Hint: Did you mean 'VECTOR'?
+----
+
+**ReScript Error Type:**
+
+[source,rescript]
+----
+ParseError({
+  kind: UnexpectedToken({
+    expected: ["VECTOR", "TENSOR", "SEMANTIC", "DOCUMENT", "TEMPORAL"],
+    found: "VECTRO"
+  }),
+  span: {
+    start: {line: 1, column: 14, offset: 14},
+    end_: {line: 1, column: 20, offset: 20}
+  },
+  source: "SELECT GRAPH, VECTRO FROM hexad abc-123",
+  hint: Some("Did you mean 'VECTOR'?")
+})
+----
+
+=== Common Parse Errors
+
+[cols="1,2,2"]
+|===
+|Error |Query |Hint
+
+|**Missing FROM**
+|`SELECT GRAPH WHERE ...`
+|Every query needs a FROM clause
+
+|**Invalid Modality**
+|`SELECT GRPH FROM ...`
+|Valid: GRAPH, VECTOR, TENSOR, SEMANTIC, DOCUMENT, TEMPORAL
+
+|**Invalid Drift Policy**
+|`WITH DRIFT IGNORE`
+|Valid: STRICT, REPAIR, TOLERATE, LATEST
+
+|**Unterminated String**
+|`SELECT GRAPH FROM hexad "abc-123`
+|Missing closing quote
+
+|**Invalid Proof Type**
+|`PROOF VALIDITY(...)`
+|Valid: EXISTENCE, CITATION, ACCESS, INTEGRITY, PROVENANCE
+|===
+
+== Type Errors
+
+**Cause:** Dependent-type verification fails (ZKP proof cannot be generated or verified)
+
+**Characteristics:**
+
+- Only occur in **dependent-type path** (not slipstream)
+- Non-recoverable (contract violated or not found)
+- Include contract name and reason
+- Logged for compliance auditing
+
+=== Example: Contract Violation
+
+[source,vql]
+----
+SELECT SEMANTIC FROM hexad abc-123
+  PROOF ACCESS(EthicsApprovalContract)
+----
+
+**Error Message:**
+
+[source,text]
+----
+Type Error [hexad: abc-123, modality: SEMANTIC]: Contract 'EthicsApprovalContract' violated: ethics approval expired on 2025-11-01
+  Context: Query requires valid ethics approval for medical data access
+----
+
+**ReScript Error Type:**
+
+[source,rescript]
+----
+TypeError({
+  kind: ContractViolation({
+    contract: "EthicsApprovalContract",
+    reason: "ethics approval expired on 2025-11-01"
+  }),
+  hexad_id: Some("abc-123"),
+  modality: Some("SEMANTIC"),
+  context: "Query requires valid ethics approval for medical data access"
+})
+----
+
+=== Common Type Errors
+
+[cols="1,2"]
+|===
+|Error |Meaning
+
+|**ContractNotFound**
+|The specified contract doesn't exist in the registry
+
+|**ContractViolation**
+|Data doesn't satisfy contract requirements
+
+|**ProofGenerationFailed**
+|ZKP proof couldn't be generated (insufficient witness)
+
+|**ProofVerificationFailed**
+|ZKP proof verification failed (data tampered or invalid)
+
+|**TypeMismatch**
+|Expected type doesn't match actual type
+
+|**CircularDependency**
+|Contracts have circular dependencies (A depends on B depends on A)
+|===
+
+== Runtime Errors
+
+**Cause:** Failures during query execution
+
+**Characteristics:**
+
+- May be recoverable (retry, fallback)
+- Include timestamp and query ID for debugging
+- Circuit breaker pattern for failing stores
+- Partial results may be available
+
+=== Example: Store Unavailable
+
+[source,vql]
+----
+SELECT GRAPH FROM store milvus-1 WHERE ...
+----
+
+**Error Message:**
+
+[source,text]
+----
+Runtime Error [recoverable]: Store 'milvus-1' unavailable: connection timeout after 5000ms
+----
+
+**Recovery Strategy:**
+
+[source,elixir]
+----
+case execute_with_retry(query, max_retries: 3) do
+  {:ok, result} -> {:ok, result}
+  {:error, {:store_unavailable, store_id}} ->
+    # Fallback to replica
+    execute_on_replica(query, store_id)
+end
+----
+
+=== Recoverable vs Non-Recoverable
+
+[cols="1,1,2"]
+|===
+|Error |Recoverable? |Strategy
+
+|**StoreUnavailable**
+|✅ Yes
+|Retry with backoff, fallback to replica
+
+|**QueryTimeout**
+|✅ Yes
+|Increase timeout, use cached result if available
+
+|**DriftDetected**
+|✅ Yes
+|Trigger repair, re-execute after repair
+
+|**PermissionDenied**
+|❌ No
+|Fail immediately, audit log
+
+|**ResourceExhausted**
+|⚠️ Sometimes
+|Clear cache, wait for resources, fail if persistent
+
+|**InvalidHexadId**
+|❌ No
+|Fail immediately, client error
+
+|**NetworkError**
+|✅ Yes
+|Retry with exponential backoff
+
+|**InternalError**
+|❌ No
+|Fail, log for investigation
+|===
+
+== Modality-Specific Errors
+
+Each modality has its own error types due to domain-specific constraints.
+
+=== Graph Errors
+
+[cols="1,2,1"]
+|===
+|Error |Example |Recovery
+
+|**MalformedRDF**
+|`<invalid RDF syntax>`
+|Sanitize input, validate before insert
+
+|**CycleDetected**
+|`A → B → C → A`
+|Use DAG constraint, limit traversal depth
+
+|**TraversalDepthExceeded**
+|Depth > 10
+|Increase limit or optimize query
+|===
+
+=== Vector Errors
+
+[cols="1,2,1"]
+|===
+|Error |Example |Recovery
+
+|**DimensionMismatch**
+|Query: 768-dim, Stored: 1536-dim
+|Re-embed with correct model
+
+|**InvalidDistanceMetric**
+|`DISTANCE "euclidian"` (typo)
+|Use valid metric: euclidean, cosine, dot
+
+|**ANNIndexUnavailable**
+|HNSW index not built yet
+|Wait for indexing, use brute-force search
+|===
+
+=== Semantic Errors
+
+[cols="1,2,1"]
+|===
+|Error |Example |Recovery
+
+|**ZKPVerificationFailed**
+|Proof doesn't match data
+|Re-generate proof, investigate tampering
+
+|**WitnessGenerationFailed**
+|Insufficient data for proof
+|Enrich data, relax contract requirements
+
+|**ContractExpired**
+|Contract valid until 2025-11-01
+|Renew contract, use new contract version
+|===
+
+=== Temporal Errors
+
+[cols="1,2,1"]
+|===
+|Error |Example |Recovery
+
+|**VersionNotFound**
+|`AS OF '2024-01-01'` (no data)
+|Query earlier/later version, check date format
+
+|**MerkleVerificationFailed**
+|Merkle proof invalid
+|Investigate corruption, use backup
+
+|**TemporalConflict**
+|Concurrent writes to same version
+|Use conflict resolution policy
+|===
+
+== Federation Errors
+
+**Cause:** Failures in cross-organization coordination
+
+**Characteristics:**
+
+- Often result in **partial results** (some stores succeeded)
+- May indicate Byzantine faults
+- Require consensus timeout handling
+- Access control across org boundaries
+
+=== Example: Partial Results
+
+[source,vql]
+----
+SELECT GRAPH FROM FEDERATION /universities/* LIMIT 100
+----
+
+**Error Message:**
+
+[source,text]
+----
+Federation Error [/universities/*]: Partial results: succeeded=[oxford, cambridge, mit], failed=[stanford, berkeley]
+----
+
+**Recovery Strategy:**
+
+[source,elixir]
+----
+case execute_federated(query) do
+  {:ok, results} -> {:ok, results}
+  {:partial, results, failed_stores} ->
+    Logger.warn("Partial results from federation: failed=#{inspect(failed_stores)}")
+
+    # Return what we have with warning
+    {:ok, %{
+      data: results,
+      partial: true,
+      failed_stores: failed_stores,
+      warning: "Not all stores responded"
+    }}
+end
+----
+
+=== Federation Error Handling Strategies
+
+[cols="1,2"]
+|===
+|Error |Strategy
+
+|**RemoteStoreUnreachable**
+|Timeout with backoff, exclude from quorum, retry later
+
+|**PartialResults**
+|Return what succeeded + warning, log for monitoring
+
+|**CrossOrgAccessDenied**
+|Fail immediately, audit log, notify org admin
+
+|**ByzantineFaultDetected**
+|Isolate suspicious nodes, trigger investigation, use trusted subset
+
+|**ConsensusTimeout**
+|Use partial quorum if safe, fail if critical (e.g., writes)
+
+|**FederationPolicyViolation**
+|Fail, audit log, review federation agreements
+|===
+
+== Error Recovery Strategies
+
+=== 1. Retry with Exponential Backoff
+
+For transient failures (network errors, store unavailable):
+
+[source,elixir]
+----
+defmodule VeriSim.ErrorRecovery do
+  def retry_with_backoff(func, opts \\ []) do
+    max_retries = Keyword.get(opts, :max_retries, 3)
+    base_delay_ms = Keyword.get(opts, :base_delay_ms, 100)
+
+    retry(func, max_retries, base_delay_ms, 0)
+  end
+
+  defp retry(func, max_retries, base_delay_ms, attempt) when attempt < max_retries do
+    case func.() do
+      {:ok, result} -> {:ok, result}
+      {:error, error} when is_recoverable?(error) ->
+        delay_ms = base_delay_ms * :math.pow(2, attempt) |> round()
+        Logger.debug("Retry attempt #{attempt + 1}/#{max_retries} after #{delay_ms}ms")
+        Process.sleep(delay_ms)
+        retry(func, max_retries, base_delay_ms, attempt + 1)
+
+      {:error, error} ->
+        {:error, error}
+    end
+  end
+
+  defp retry(_func, _max_retries, _base_delay_ms, _attempt) do
+    {:error, :max_retries_exceeded}
+  end
+
+  defp is_recoverable?({:store_unavailable, _}), do: true
+  defp is_recoverable?({:network_error, _}), do: true
+  defp is_recoverable?({:timeout, _}), do: true
+  defp is_recoverable?(_), do: false
+end
+----
+
+=== 2. Circuit Breaker Pattern
+
+Prevent cascading failures by stopping requests to failing stores:
+
+[source,elixir]
+----
+defmodule VeriSim.CircuitBreaker do
+  use GenServer
+
+  # States: :closed (normal), :open (failing), :half_open (testing recovery)
+  defstruct [
+    state: :closed,
+    failure_count: 0,
+    failure_threshold: 5,
+    timeout_ms: 60_000,  # 1 minute
+    last_failure: nil
+  ]
+
+  def call_with_breaker(store_id, func) do
+    case get_state(store_id) do
+      :open ->
+        {:error, {:circuit_open, "Store #{store_id} circuit breaker is open"}}
+
+      :half_open ->
+        case func.() do
+          {:ok, result} ->
+            record_success(store_id)
+            {:ok, result}
+
+          {:error, _} = error ->
+            record_failure(store_id)
+            error
+        end
+
+      :closed ->
+        case func.() do
+          {:ok, result} ->
+            {:ok, result}
+
+          {:error, _} = error ->
+            record_failure(store_id)
+            error
+        end
+    end
+  end
+end
+----
+
+=== 3. Fallback to Cached Results
+
+When fresh execution fails, use cached results if available:
+
+[source,elixir]
+----
+def execute_with_fallback(query) do
+  case VeriSim.QueryRouter.execute(query) do
+    {:ok, result} -> {:ok, result}
+
+    {:error, {:store_unavailable, _}} ->
+      # Try cache even if expired
+      case VeriSim.QueryCache.get(query, allow_stale: true) do
+        {:ok, cached} ->
+          Logger.warn("Using stale cached result due to store unavailability")
+          {:ok, %{cached | stale: true, warning: "Data may be outdated"}}
+
+        {:error, :not_found} ->
+          {:error, :no_fallback_available}
+      end
+  end
+end
+----
+
+=== 4. Partial Results Handling
+
+For federation queries, return what succeeded:
+
+[source,elixir]
+----
+def execute_federated_with_partial(query) do
+  stores = get_stores_for_federation(query.federation_pattern)
+
+  results = stores
+  |> Task.async_stream(fn store ->
+    execute_on_store(store, query)
+  end, timeout: query.timeout_ms)
+  |> Enum.to_list()
+
+  succeeded = results
+  |> Enum.filter(fn
+    {:ok, {:ok, _}} -> true
+    _ -> false
+  end)
+  |> Enum.map(fn {:ok, {:ok, result}} -> result end)
+
+  failed = results
+  |> Enum.filter(fn
+    {:ok, {:error, _}} -> true
+    {:exit, _} -> true
+    _ -> false
+  end)
+
+  cond do
+    Enum.empty?(failed) ->
+      # All succeeded
+      {:ok, Enum.flat_map(succeeded, & &1.data)}
+
+    Enum.empty?(succeeded) ->
+      # All failed
+      {:error, :all_stores_failed}
+
+    length(succeeded) >= query.min_quorum ->
+      # Enough succeeded for partial results
+      {:partial, Enum.flat_map(succeeded, & &1.data), failed}
+
+    true ->
+      # Not enough succeeded
+      {:error, {:insufficient_quorum, length(succeeded), query.min_quorum}}
+  end
+end
+----
+
+=== 5. Compensating Transactions
+
+For mutations that partially fail, roll back changes:
+
+[source,elixir]
+----
+def execute_mutation_with_compensation(mutation) do
+  # Track what we've done for potential rollback
+  saga = Saga.new(mutation.id)
+
+  try do
+    # Step 1: Update GRAPH modality
+    {:ok, graph_result} = update_graph(mutation)
+    Saga.add_step(saga, :graph, graph_result, fn -> rollback_graph(graph_result) end)
+
+    # Step 2: Update VECTOR modality
+    {:ok, vector_result} = update_vector(mutation)
+    Saga.add_step(saga, :vector, vector_result, fn -> rollback_vector(vector_result) end)
+
+    # Step 3: Update TEMPORAL log
+    {:ok, temporal_result} = append_to_temporal(mutation)
+
+    Saga.commit(saga)
+    {:ok, %{graph: graph_result, vector: vector_result, temporal: temporal_result}}
+  rescue
+    error ->
+      Logger.error("Mutation failed, rolling back: #{inspect(error)}")
+      Saga.rollback(saga)
+      {:error, {:mutation_failed, error}}
+  end
+end
+----
+
+== Error Audit Trail
+
+**All errors are logged to verisim-temporal for compliance:**
+
+[source,elixir]
+----
+defmodule VeriSim.ErrorLogger do
+  def log_error(error, context) do
+    entry = %{
+      timestamp: DateTime.utc_now(),
+      error_code: VQLError.get_error_code(error),
+      error_message: VQLError.format(error),
+      query_id: context.query_id,
+      user_id: context.user_id,
+      hexad_ids: context.hexad_ids,
+      recoverable: VQLError.is_recoverable?(error),
+      recovery_attempted: context.recovery_attempted,
+      recovery_successful: context.recovery_successful
+    }
+
+    VeriSim.Temporal.append_audit_log("errors", entry)
+  end
+end
+----
+
+**Audit queries:**
+
+[source,vql]
+----
+-- Find all errors for a user
+SELECT TEMPORAL FROM audit_log
+WHERE event_type = 'error'
+  AND user_id = 'alice'
+  AS OF 'last 7 days'
+
+-- Find all non-recoverable errors
+SELECT TEMPORAL FROM audit_log
+WHERE event_type = 'error'
+  AND recoverable = false
+  AS OF 'last 30 days'
+
+-- Find stores with high error rates
+SELECT TEMPORAL FROM audit_log
+WHERE event_type = 'error'
+  AND error_code LIKE 'VQL_STORE_%'
+GROUP BY store_id
+ORDER BY COUNT(*) DESC
+----
+
+== Error Response Format
+
+=== HTTP API Error Response
+
+[source,json]
+----
+{
+  "error": {
+    "code": "VQL_PARSE_ERROR",
+    "message": "Parse Error at 1:14-1:20: Expected 'VECTOR', found 'VECTRO'",
+    "hint": "Did you mean 'VECTOR'?",
+    "recoverable": false,
+    "details": {
+      "line": 1,
+      "column": 14,
+      "span": {
+        "start": 14,
+        "end": 20
+      },
+      "query": "SELECT GRAPH, VECTRO FROM hexad abc-123"
+    }
+  },
+  "request_id": "req_abc123",
+  "timestamp": "2026-01-22T15:30:00Z"
+}
+----
+
+=== Elixir Error Tuples
+
+[source,elixir]
+----
+# Success
+{:ok, result}
+
+# Recoverable error
+{:error, {:store_unavailable, "milvus-1"}}
+
+# Non-recoverable error
+{:error, {:permission_denied, "User cannot access hexad abc-123"}}
+
+# Partial success
+{:partial, results, failed_stores}
+----
+
+=== ReScript Result Type
+
+[source,rescript]
+----
+type queryResult<'a> =
+  | Ok('a)
+  | Error(vqlError)
+  | Partial({data: 'a, failed: array<string>})
+----
+
+== Best Practices
+
+=== 1. Always Handle Errors Explicitly
+
+[source,elixir]
+----
+# ❌ Bad: Ignoring errors
+result = execute_query(query)
+process(result)
+
+# ✅ Good: Explicit error handling
+case execute_query(query) do
+  {:ok, result} -> process(result)
+  {:error, error} -> handle_error(error)
+end
+----
+
+=== 2. Use Pattern Matching for Error Types
+
+[source,elixir]
+----
+case execute_query(query) do
+  {:ok, result} ->
+    {:ok, result}
+
+  {:error, {:store_unavailable, store_id}} ->
+    execute_on_replica(query, store_id)
+
+  {:error, {:timeout, _}} ->
+    execute_with_cache_fallback(query)
+
+  {:error, {:permission_denied, _}} ->
+    {:error, :unauthorized}
+
+  {:error, error} ->
+    Logger.error("Unexpected error: #{inspect(error)}")
+    {:error, :internal_error}
+end
+----
+
+=== 3. Log Errors with Context
+
+[source,elixir]
+----
+Logger.error("Query execution failed",
+  error: inspect(error),
+  query_id: query.id,
+  user_id: query.user_id,
+  hexad_ids: query.hexad_ids,
+  duration_ms: duration,
+  retry_count: retry_count
+)
+----
+
+=== 4. Fail Fast for Non-Recoverable Errors
+
+[source,elixir]
+----
+case VQLParser.parse(query_string) do
+  {:ok, ast} -> execute(ast)
+  {:error, parse_error} ->
+    # Don't retry parse errors
+    {:error, parse_error}
+end
+----
+
+=== 5. Set Reasonable Timeouts
+
+[source,elixir]
+----
+# Per-modality timeouts
+@timeout_config %{
+  "GRAPH" => 5_000,     # 5 seconds
+  "VECTOR" => 10_000,   # 10 seconds (ANN search)
+  "SEMANTIC" => 30_000, # 30 seconds (ZKP generation)
+  "TEMPORAL" => 5_000   # 5 seconds
+}
+----
+
+== Error Monitoring
+
+=== Metrics to Track
+
+[cols="1,2,1"]
+|===
+|Metric |Description |Alert Threshold
+
+|**Error Rate**
+|Errors / Total Requests
+|> 5%
+
+|**Store Availability**
+|% of successful store requests
+|< 95%
+
+|**Retry Success Rate**
+|% of retries that succeed
+|< 50%
+
+|**Circuit Breaker Opens**
+|Count of circuit breaker activations
+|> 3 per hour
+
+|**Partial Result Rate**
+|% of federation queries with partial results
+|> 10%
+
+|**Error Recovery Time**
+|Time to recover from errors
+|> 5 minutes
+|===
+
+=== Alerting Rules
+
+[source,elixir]
+----
+defmodule VeriSim.ErrorMonitor do
+  def check_error_thresholds do
+    stats = get_error_stats(last: 5.minutes)
+
+    # Alert on high error rate
+    if stats.error_rate > 0.05 do
+      alert(:high_error_rate, "Error rate: #{stats.error_rate * 100}%")
+    end
+
+    # Alert on store unavailability
+    Enum.each(stats.store_availability, fn {store_id, availability} ->
+      if availability < 0.95 do
+        alert(:store_unavailable, "Store #{store_id} availability: #{availability * 100}%")
+      end
+    end)
+  end
+end
+----
+
+== Verbosity Levels
+
+VQL supports **four verbosity levels** for error and diagnostic output:
+
+[cols="1,2,3"]
+|===
+|Level |Use Case |Output
+
+|**`SILENT`**
+|Production batch jobs, CI/CD
+|No output except fatal errors
+
+|**`NORMAL`** (default)
+|Interactive queries, REPL
+|Errors + warnings + query results
+
+|**`VERBOSE`**
+|Debugging, development
+|Errors + warnings + execution plan + timing
+
+|**`DEBUG`**
+|System debugging, troubleshooting
+|Full trace: parse tree, type checking, store calls, drift detection
+|===
+
+=== Configuration
+
+**Command-line:**
+[source,bash]
+----
+verisim query --verbosity=verbose query.vql
+verisim query --verbosity=silent query.vql  # CI/CD mode
+----
+
+**VQL pragma:**
+[source,vql]
+----
+SET VERBOSITY VERBOSE;
+
+SELECT GRAPH, DOCUMENT
+FROM verisim:semantic
+WHERE hexad.types INCLUDES "Paper"
+LIMIT 10;
+----
+
+**Environment variable:**
+[source,bash]
+----
+export VERISIM_VERBOSITY=debug
+verisim query query.vql
+----
+
+=== Verbosity Output Examples
+
+==== SILENT Mode
+
+[source,text]
+----
+# No output unless fatal error
+# Query succeeded: 0 bytes output
+----
+
+==== NORMAL Mode
+
+[source,text]
+----
+Warning: Store 'university-archive' cache expired, refreshing...
+Query returned 10 results in 234ms
+----
+
+==== VERBOSE Mode
+
+[source,text]
+----
+[PLAN] Query plan selected: federated-quorum (3 stores)
+[EXEC] Querying store 1/3: university-archive
+[EXEC] Querying store 2/3: research-lab
+[EXEC] Querying store 3/3: corporate-db
+[DRIFT] Detected title mismatch: "ML Paper" vs "Machine Learning Paper"
+[DRIFT] Repair strategy: quorum (2/3 agree on "Machine Learning Paper")
+[RESULT] Query returned 10 results in 1.2s
+[TIMING] Parse: 5ms, Type check: 12ms, Execute: 1183ms
+----
+
+==== DEBUG Mode
+
+[source,text]
+----
+[PARSE] Tokens: [SELECT, GRAPH, COMMA, DOCUMENT, FROM, ...]
+[PARSE] AST:
+  Query {
+    modalities: [GRAPH, DOCUMENT],
+    source: Source::Semantic("verisim:semantic"),
+    condition: Some(Condition::Includes(...))
+  }
+[TYPE] Checking modalities: GRAPH, DOCUMENT
+[TYPE] Hexad type: {h : Hexad | Graph(h) ≠ None ∧ Document(h) ≠ None}
+[TYPE] Condition type: Hexad → Bool
+[TYPE] Query type: QueryResult[{GRAPH, DOCUMENT}]
+[EXEC] HTTP GET https://university-archive.edu/verisim/query
+[EXEC] Response: 200 OK, 3 hexads
+[EXEC] HTTP GET https://research-lab.org/verisim/query
+[EXEC] Response: 200 OK, 5 hexads
+[EXEC] HTTP GET https://corporate-db.com/verisim/query
+[EXEC] Response: 504 Gateway Timeout (retry 1/3)
+[EXEC] Response: 200 OK, 2 hexads
+[DRIFT] Store 1 title: "ML Paper"
+[DRIFT] Store 2 title: "Machine Learning Paper"
+[DRIFT] Store 3 title: "Machine Learning Paper"
+[DRIFT] Quorum result: "Machine Learning Paper" (2/3)
+[RESULT] Merged 10 hexads with drift repair
+[TIMING] Total: 1.2s (Parse: 5ms, Type: 12ms, Execute: 1183ms)
+----
+
+== Friendly Notices and Warnings
+
+Beyond errors, VQL provides **helpful notices** for non-error situations:
+
+=== Notice Types
+
+[cols="1,2,3"]
+|===
+|Type |When Shown |Example
+
+|**Info**
+|Informational messages
+|"Cache hit for query XYZ (saved 2.3s)"
+
+|**Warning**
+|Potential issues, not errors
+|"Query uses deprecated syntax (VERSION 0.9)"
+
+|**Hint**
+|Performance/style suggestions
+|"Consider adding LIMIT clause for large result sets"
+
+|**Deprecation**
+|Features scheduled for removal
+|"FULLTEXT CONTAINS is deprecated, use FULLTEXT MATCHES instead (removal: v2.0)"
+|===
+
+=== Example Notices
+
+==== Cache Hit (Info)
+
+[source,text]
+----
+ℹ Cache hit for query SHA256:a1b2c3... (saved 1.8s)
+Query returned 10 results in 23ms
+----
+
+==== Deprecated Syntax (Warning)
+
+[source,vql]
+----
+VERSION 0.9;
+SELECT * FROM HEXAD abc-123;
+----
+
+[source,text]
+----
+⚠ Warning: VERSION 0.9 is deprecated (current: 1.0, removal: v2.0)
+  Migration guide: https://verisimdb.org/migration/v0.9-to-v1.0
+----
+
+==== Missing LIMIT (Hint)
+
+[source,vql]
+----
+SELECT GRAPH, DOCUMENT
+FROM FEDERATION /universities/*
+WHERE hexad.types INCLUDES "Paper";
+----
+
+[source,text]
+----
+💡 Hint: Federated query without LIMIT may return large result sets
+  Consider adding: LIMIT 100
+----
+
+==== Slow Query (Warning)
+
+[source,text]
+----
+⚠ Warning: Query took 5.2s (threshold: 1s)
+  Consider adding modality-specific filters to reduce result set
+----
+
+=== Configuration
+
+**Suppress warnings:**
+[source,bash]
+----
+verisim query --no-warnings query.vql
+----
+
+**Suppress hints:**
+[source,bash]
+----
+verisim query --no-hints query.vql
+----
+
+**Strict mode (warnings as errors):**
+[source,bash]
+----
+verisim query --strict query.vql
+# Exit code 1 on any warning
+----
+
+== Learning Hooks (v3 - miniKanren Integration)
+
+**Status:** STUB - Planned for v3.0
+
+VQL error handling will integrate with **miniKanren** (link:minikanren-integration-v3.adoc[see roadmap]) to:
+
+1. **Learn error patterns** - Synthesize predicates from error examples
+2. **Suggest fixes** - Generate correction rules from observed errors
+3. **Optimize recovery** - Infer optimal retry/fallback strategies
+
+=== Learning Hook Architecture (v3)
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────┐
+│  Error Handling Pipeline                                │
+│    ├── Error Detection (current v1)                     │
+│    ├── Error Logging (current v1)                       │
+│    ├── Error Recovery (current v1)                      │
+│    └── Error Learning (v3 - miniKanren) ◄─ NEW         │
+│              ↓                                           │
+├─────────────────────────────────────────────────────────┤
+│  miniKanren Learning Engine                             │
+│    ├── Pattern Synthesis (learn from examples)          │
+│    ├── Fix Generation (suggest corrections)             │
+│    └── Strategy Optimization (infer recovery policies)  │
+└─────────────────────────────────────────────────────────┘
+----
+
+=== Use Case 1: Pattern Synthesis (v3)
+
+**Problem:** Detect common error patterns across queries
+
+**miniKanren approach:**
+
+[source,scheme]
+----
+;; Learn error predicate from positive/negative examples
+(defrel (error-patterno examples pattern)
+  (fresh (error-examples success-examples)
+    (partition-errorso examples error-examples success-examples)
+    (pattern-matches-allo pattern error-examples)
+    (pattern-rejects-allo pattern success-examples)
+    (pattern-is-minimalo pattern)))
+
+;; Example: Learn that missing modality causes errors
+(run 1 (pattern)
+  (error-patterno
+    '((query "SELECT FROM hexad abc" . error)
+      (query "SELECT GRAPH FROM hexad abc" . ok)
+      (query "SELECT FROM store xyz" . error))
+    pattern))
+;; Output: (pattern (missing-modality-in-select))
+----
+
+=== Use Case 2: Fix Generation (v3)
+
+**Problem:** Suggest corrections for common syntax errors
+
+**miniKanren approach:**
+
+[source,scheme]
+----
+;; Relational specification of fixes
+(defrel (fix-suggestiono error-query fixed-query)
+  (conde
+    ;; Fix 1: Add missing modality
+    [(missing-modalityo error-query)
+     (add-default-modalityo error-query fixed-query)]
+
+    ;; Fix 2: Correct typo
+    [(typoo error-query field)
+     (correct-typoo error-query field fixed-query)]
+
+    ;; Fix 3: Add missing LIMIT
+    [(unbounded-queryo error-query)
+     (add-limito error-query 100 fixed-query)]))
+
+;; Query: What fix for this error?
+(run* (fixed)
+  (fix-suggestiono
+    "SELECT GRPH FROM hexad abc"  ;; Typo: GRPH
+    fixed))
+;; Output: ("SELECT GRAPH FROM hexad abc")
+----
+
+=== Use Case 3: Strategy Optimization (v3)
+
+**Problem:** Given error history, infer optimal retry/fallback strategy
+
+**miniKanren approach:**
+
+[source,scheme]
+----
+;; Learn retry strategy from error history
+(defrel (retry-strategyo error-history strategy)
+  (fresh (error-type frequency transient?)
+    (classify-errorso error-history error-type frequency)
+    (transient-erroro? error-type transient?)
+    (conde
+      ;; High-frequency transient: exponential backoff
+      [(>o frequency 0.3)
+       (== transient? #t)
+       (== strategy 'exponential-backoff)]
+
+      ;; Low-frequency transient: simple retry
+      [(<o frequency 0.1)
+       (== transient? #t)
+       (== strategy 'simple-retry)]
+
+      ;; Permanent error: no retry
+      [(== transient? #f)
+       (== strategy 'fail-fast)])))
+----
+
+=== Integration Points (v3)
+
+**Error collection:**
+
+[source,elixir]
+----
+# lib/verisim/error_recovery.ex (v1 - collect data)
+defmodule VeriSim.ErrorRecovery do
+  def handle_error(error, context) do
+    # v1: Log error
+    ErrorLogger.log(error, context)
+
+    # v3: Send to miniKanren for learning
+    if @enable_learning do
+      MiniKanren.record_error_example(error, context)
+    end
+
+    # Recovery strategy
+    apply_recovery_strategy(error)
+  end
+end
+----
+
+**Fix suggestion:**
+
+[source,elixir]
+----
+# lib/verisim/query_parser.ex (v3 - suggest fixes)
+defmodule VeriSim.QueryParser do
+  def parse(query_string) do
+    case VQLParser.parse(query_string) do
+      {:ok, ast} -> {:ok, ast}
+      {:error, parse_error} ->
+        # v3: Ask miniKanren for fix suggestions
+        suggested_fixes = MiniKanren.suggest_fixes(parse_error, query_string)
+
+        {:error, parse_error, suggestions: suggested_fixes}
+    end
+  end
+end
+----
+
+**Output example (v3):**
+
+[source,text]
+----
+Parse Error at 1:8: Expected 'GRAPH', 'VECTOR', ..., found 'GRPH'
+  Hint: Did you mean 'GRAPH'?
+  Suggested fix (confidence: 95%):
+    SELECT GRAPH FROM HEXAD abc-123
+            ^^^^^
+  [miniKanren learned from 47 similar errors]
+----
+
+== Summary
+
+**Error Handling Guarantees:**
+
+✅ **Structured Errors** - Type-safe error representation across all languages (ReScript, Elixir)
+
+✅ **Helpful Messages** - Context-rich errors with hints for common mistakes
+
+✅ **Graceful Degradation** - Partial results, cache fallback, retry with backoff
+
+✅ **Audit Trail** - All errors logged to verisim-temporal for compliance
+
+✅ **Recovery Strategies** - Circuit breakers, compensating transactions, quorum-based consensus
+
+✅ **Monitoring** - Real-time error metrics, alerting on thresholds
+
+**Error Recovery Time:**
+
+- Transient errors: < 1 second (retry with backoff)
+- Store unavailable: < 5 seconds (replica fallback)
+- Federation timeout: < 30 seconds (partial results)
+- Circuit breaker recovery: < 60 seconds (half-open test)
+
+== References
+
+- link:vql-architecture.adoc[VQL Architecture]
+- link:caching-strategy.adoc[Caching Strategy]
+- link:reversibility-design.adoc[Reversibility Design]
+- link:../src/vql/VQLError.res[VQL Error Types]
+- link:../lib/verisim/error_recovery.ex[Error Recovery Implementation]

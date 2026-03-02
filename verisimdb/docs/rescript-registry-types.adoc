@@ -1,0 +1,71 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= VeriSimDB: ReScript Registry Type Definitions
+
+These definitions form the backbone of the "Tiny Core". They ensure that every Hexad resolved by the WASM proxy is type-safe and consistent with the KRaft controller's state.
+
+== 1. Core Hexad Types
+
+[source,rescript]
+----
+type uuid = string // 128-bit UUID represented as hex
+type did = string  // Decentralized Identifier for the owner
+
+type modalityType =
+  | Graph
+  | Vector
+  | Tensor
+  | Semantic
+  | Document
+  | Temporal
+
+type storeMeta = {
+  endpoint: string,
+  supportedModalities: array<modalityType>,
+  policyHash: string,
+}
+
+type hexad = {
+  id: uuid,
+  owner: did,
+  modalities: Belt.Map.String.t<storeMeta>,
+  policyHash: string,
+  lastModified: float,
+}
+----
+
+== 2. KRaft Metadata Log Types
+
+To support the KRaft-style quorum, the registry must understand log indices and terms.
+
+[source,rescript]
+----
+type term = int
+type index = int
+
+type logEntry = {
+  term: term,
+  index: index,
+  command:
+    | RegisterHexad(hexad)
+    | UpdatePolicy(uuid, string)
+    | RevokeStore(string)
+}
+
+type registryState = {
+  lastIncludedIndex: index,
+  lastIncludedTerm: term,
+  hexads: Belt.Map.String.t<hexad>,
+}
+----
+
+== 3. The Resolution Logic
+
+This is the primary function invoked by the WASM proxy during a lookup.
+
+[source,rescript]
+----
+let resolveHexad = (registry: registryState, id: uuid): option<hexad> => {
+  Belt.Map.String.get(registry.hexads, id)
+}
+----

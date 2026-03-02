@@ -1,0 +1,281 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+
+= VQL Slipstream vs VQL-DT (Dependent Types)
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+VQL operates in two distinct execution modes, determined by the presence or absence of a `PROOF` clause in the query:
+
+1. **Slipstream** -- Fast, unverified queries. No proof generation, no type-checking beyond basic parsing. This is the default path when no `PROOF` clause is present.
+
+2. **VQL-DT (Dependent Types)** -- Formally verified queries. The `PROOF` clause triggers dependent type checking, proof obligation generation, and a proof certificate attached to the result. This path is slower but provides verifiable guarantees about the returned data.
+
+Both modes use the same parser and produce the same AST. They diverge at the query router, which inspects the AST for a `PROOF` node and selects the appropriate execution pipeline.
+
+== When to Use Each Mode
+
+=== Slipstream (No PROOF Clause)
+
+Use Slipstream for:
+
+* **Analytics and exploration** -- Browsing data, running ad-hoc queries during development, investigating hexad contents.
+* **Non-critical reads** -- Queries where correctness matters but formal verification is overkill (e.g., populating a dashboard).
+* **Performance-sensitive workloads** -- When latency budgets are tight and the cost of proof generation is unacceptable.
+* **Development and debugging** -- Iterating on query structure before adding verification.
+
+Example:
+[source,vql]
+----
+SELECT GRAPH, DOCUMENT
+FROM STORE research_papers
+WHERE CONTAINS(h.content, "neural network")
+LIMIT 50
+----
+
+=== VQL-DT (With PROOF Clause)
+
+Use VQL-DT for:
+
+* **Security assertions** -- Verifying that data has not been tampered with, that access controls were enforced.
+* **Compliance and audit** -- Producing proof certificates that regulators or auditors can independently verify.
+* **Provenance chains** -- Proving the lineage of data through transformations and cross-modal synchronizations.
+* **Audit trails** -- Generating cryptographic evidence that a query was executed correctly against authentic data.
+* **Cross-instance federation** -- When querying across federated VeriSimDB instances where trust is not assumed.
+
+Example:
+[source,vql]
+----
+SELECT *
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+PROOF INTEGRITY(DataIntegrityContract)
+----
+
+== The Six PROOF Types
+
+VQL-DT supports six proof types, each verifying a different property of the query result. Every `PROOF` clause takes the form `PROOF <TYPE>(<Contract>)` where the contract names a specific verification policy.
+
+=== EXISTENCE
+
+**What it verifies:** The requested hexad entity actually exists in the target store and has data in the requested modalities. The proof certificate attests that the entity was present at query time.
+
+**Use case:** Confirming that a referenced entity has not been deleted or that a federated peer genuinely holds the claimed data.
+
+[source,vql]
+----
+SELECT *
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+PROOF EXISTENCE(ExistenceContract)
+----
+
+=== INTEGRITY
+
+**What it verifies:** The returned data matches the stored data exactly. No bits were flipped, no fields were silently modified, no partial results were substituted. The proof certificate includes a Merkle root or hash chain demonstrating data integrity.
+
+**Use case:** High-assurance reads where the consumer needs to verify that what they received is what was stored. Critical for financial, medical, or legal data.
+
+[source,vql]
+----
+SELECT DOCUMENT, SEMANTIC
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+PROOF INTEGRITY(DataIntegrityContract)
+----
+
+=== CONSISTENCY
+
+**What it verifies:** All six modalities of the hexad are mutually consistent. The graph edges match the document content, the vector embedding reflects the semantic annotations, and the temporal history is coherent. The proof certificate attests that no drift has been detected across modalities.
+
+**Use case:** Before making decisions based on cross-modal data (e.g., using both the graph structure and the vector embedding), verify that the modalities agree.
+
+[source,vql]
+----
+SELECT *
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+PROOF CONSISTENCY(CrossModalConsistencyContract)
+----
+
+=== PROVENANCE
+
+**What it verifies:** The chain of custody for the data. Where did it come from? What transformations were applied? Which normalizations occurred? The proof certificate traces the data's lineage through creation, updates, drift repairs, and cross-modal synchronizations.
+
+**Use case:** Regulatory compliance (GDPR data lineage, HIPAA audit), supply chain verification, scientific reproducibility.
+
+[source,vql]
+----
+SELECT TEMPORAL, SEMANTIC
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+PROOF PROVENANCE(DataLineageContract)
+----
+
+=== FRESHNESS
+
+**What it verifies:** The returned data is no older than a specified time bound. The proof certificate includes a timestamp attestation demonstrating that the data was read from a store that was synchronized within the freshness window.
+
+**Use case:** Time-sensitive queries where stale data could cause incorrect decisions. Federated queries where one peer's store may lag behind others.
+
+[source,vql]
+----
+SELECT VECTOR
+FROM STORE real_time_feeds
+WHERE h.embedding SIMILAR TO [0.5, 0.3, 0.1, 0.8]
+PROOF FRESHNESS(FreshnessContract)
+LIMIT 10
+----
+
+=== AUTHORIZATION
+
+**What it verifies:** The requesting entity has the appropriate permissions to access the returned data. The proof certificate attests that access control policies were evaluated and the query was authorized before execution.
+
+**Use case:** Multi-tenant environments, federated queries across organizational boundaries, queries involving sensitive or classified data.
+
+[source,vql]
+----
+SELECT *
+FROM FEDERATION cross_org_research
+WHERE CONTAINS(h.content, "confidential prototype")
+PROOF AUTHORIZATION(AccessControlContract)
+----
+
+== Performance Implications
+
+VQL-DT queries are inherently slower than Slipstream queries because they perform additional work:
+
+[cols="2,2,2",options="header"]
+|===
+|Phase |Slipstream |VQL-DT
+
+|Parsing
+|Same
+|Same
+
+|AST validation
+|Basic type check
+|Full dependent type check
+
+|Proof obligation generation
+|Skipped
+|Required (generates proof terms)
+
+|Query execution
+|Direct store access
+|Store access + proof witness collection
+
+|Result assembly
+|Data only
+|Data + proof certificate
+
+|Typical overhead
+|Baseline
+|2x-10x depending on proof type
+|===
+
+**CONSISTENCY** proofs are the most expensive because they require reading all six modalities and verifying cross-modal invariants. **EXISTENCE** proofs are the cheapest because they only confirm presence. **PROVENANCE** proofs can be expensive if the entity has a long modification history.
+
+The exact overhead depends on:
+
+* The proof type requested
+* The number of modalities selected
+* The depth of the entity's temporal history (for PROVENANCE)
+* Whether the proof cache has a recent valid proof for the same entity
+
+== What Is NOT Yet Implemented
+
+**Honest status as of 2026-02:** The VQL-DT architecture is designed and the types are defined, but the dependent type verification pipeline is not fully wired to runtime execution.
+
+Specifically:
+
+* **VQL-DT Lean types are defined** in the `vql-dt/` directory. These specify the type-theoretic contracts for each proof type.
+* **The VQL parser correctly parses `PROOF` clauses** and produces AST nodes with the proof type and contract name.
+* **The query router detects `PROOF` clauses** and routes to the dependent-type path.
+* **The dependent-type execution path is a stub.** It does not currently invoke the Lean type checker. Queries with `PROOF` clauses execute but do not generate real proof certificates.
+* **ZKP integration (sanctify) is documented but not implemented.** The link:zkp-and-sanctify-integration.adoc[sanctify integration design] exists as a consultation paper.
+
+In short: VQL-DT queries parse and execute, but the proof certificates they produce are placeholders, not cryptographically or type-theoretically valid.
+
+== Architecture
+
+[source,text]
+----
+                  ┌──────────────────┐
+                  │  VQL Query       │
+                  │  (raw string)    │
+                  └────────┬─────────┘
+                           │
+                  ┌────────▼─────────┐
+                  │  VQL Parser      │
+                  │  (ReScript)      │
+                  └────────┬─────────┘
+                           │
+                  ┌────────▼─────────┐
+                  │   AST            │
+                  └────┬────────┬────┘
+                       │        │
+           ┌───────────┘        └───────────┐
+           │                                │
+   Has PROOF clause?                 No PROOF clause
+           │                                │
+   ┌───────▼────────┐           ┌──────────▼──────────┐
+   │  VQL-DT Path   │           │  Slipstream Path    │
+   │                │           │                     │
+   │  1. Lean type  │           │  1. Direct store    │
+   │     checker    │           │     dispatch        │
+   │  2. Proof      │           │  2. Modality store  │
+   │     obligation │           │     execution       │
+   │     generation │           │  3. Result assembly │
+   │  3. Store      │           │                     │
+   │     execution  │           └──────────┬──────────┘
+   │     + witness  │                      │
+   │  4. Proof      │               ┌──────▼──────┐
+   │     certificate│               │  { data }   │
+   │     generation │               └─────────────┘
+   │                │
+   └───────┬────────┘
+           │
+   ┌───────▼────────┐
+   │ { data,        │
+   │   proof: {     │
+   │     type,      │
+   │     contract,  │
+   │     certificate│
+   │   }            │
+   │ }              │
+   └────────────────┘
+----
+
+The key difference is that VQL-DT returns a tuple of `(data, proof_certificate)` while Slipstream returns only `data`. The proof certificate is a structured object containing the proof type, the contract that was satisfied, and the cryptographic or type-theoretic evidence.
+
+== Roadmap to Full Implementation
+
+[cols="1,3,1",options="header"]
+|===
+|Phase |Work |Status
+
+|Phase 1
+|VQL parser handles PROOF clauses, AST includes proof nodes, query router branches correctly.
+|Done
+
+|Phase 2
+|Lean type definitions for all six proof types with contract specifications.
+|Done (vql-dt/)
+
+|Phase 3
+|Wire Lean type checker into the VQL-DT execution path. Proof obligations generated from AST, checked against Lean definitions.
+|Not started
+
+|Phase 4
+|Implement proof witness collection in each modality store (Rust core). Each store returns evidence alongside data.
+|Not started
+
+|Phase 5
+|Proof certificate assembly. Combine witnesses into a verifiable certificate. Integrate sanctify for ZKP where applicable.
+|Not started
+
+|Phase 6
+|Proof cache. Cache valid proofs with TTL to avoid re-verification for repeated queries against unchanged data.
+|Not started
+|===
+
+Phases 3-6 represent the remaining work to make VQL-DT produce real, verifiable proof certificates rather than placeholders.

@@ -1,0 +1,240 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+
+= VQL vs SQL: A Comparative Guide
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Introduction
+
+VQL (VeriSim Query Language) is the query language for VeriSimDB, a 6-core multimodal database. While VQL borrows familiar keywords from SQL (`SELECT`, `FROM`, `WHERE`, `LIMIT`, `OFFSET`), it serves a fundamentally different purpose.
+
+VQL is **read-only**. It does not support `INSERT`, `UPDATE`, or `DELETE` statements. All mutations go through the Hexad API (Rust core or Elixir orchestration layer). This is a deliberate design choice: VeriSimDB treats writes as coordinated multi-modal operations that must maintain consistency across all six modality stores (Graph, Vector, Tensor, Semantic, Document, Temporal). A simple `INSERT` statement cannot express the cross-modal invariants that a Hexad write requires.
+
+VQL is **multimodal**. Where SQL selects columns from relational tables, VQL selects _modalities_ from _hexad stores_ or _federations_. A single VQL query can retrieve graph edges, vector embeddings, tensor slices, semantic annotations, document text, and temporal versions in one pass.
+
+VQL is **federation-aware**. Queries can target a local `STORE`, a specific `HEXAD` entity, or a `FEDERATION` of distributed VeriSimDB instances, with configurable drift policies governing cross-instance consistency.
+
+== Concept Comparison
+
+[cols="2,3,3",options="header"]
+|===
+|Concept |VQL |SQL
+
+|**Column/Field Selection**
+|`SELECT` with _modalities_: `GRAPH`, `VECTOR`, `TENSOR`, `SEMANTIC`, `DOCUMENT`, `TEMPORAL`, or `*` (all six). Modalities can be combined: `SELECT GRAPH, VECTOR, SEMANTIC`.
+|`SELECT` with _column names_ or `*` for all columns.
+
+|**Data Source**
+|`FROM STORE <name>`, `FROM HEXAD <uuid>`, or `FROM FEDERATION <name>`. A STORE is a collection of hexad entities. A HEXAD is a single entity addressed by UUID. A FEDERATION spans multiple VeriSimDB instances.
+|`FROM <table>` or `FROM <table> AS <alias>`. Tables are flat relational structures.
+
+|**Filtering**
+|`WHERE` supports field conditions (`h.field = value`) and full-text predicates: `CONTAINS(h.content, "term")` for substring matching, `MATCHES(h.content, "pattern")` for pattern matching. Graph traversal uses Cypher-inspired syntax: `(h)-[:EDGE_TYPE]->(target)`. Vector similarity uses `SIMILAR TO [...]`.
+|`WHERE` supports standard comparison operators, `LIKE`, `IN`, `BETWEEN`, `IS NULL`, boolean combinators (`AND`, `OR`, `NOT`), and subqueries.
+
+|**Joins**
+|**No JOINs.** Graph modality replaces relational joins entirely. Relationships are first-class: `(h)-[:CITES]->(target)` traverses edges without explicit join syntax. Cross-modal correlation is implicit within a hexad.
+|`JOIN`, `LEFT JOIN`, `RIGHT JOIN`, `FULL OUTER JOIN`, `CROSS JOIN` with `ON` conditions.
+
+|**Mutations**
+|**None.** VQL is strictly read-only. All writes go through the Hexad API: `POST /api/hexads` (create), `PUT /api/hexads/:id` (update), `DELETE /api/hexads/:id` (delete). This ensures cross-modal consistency.
+|`INSERT INTO`, `UPDATE ... SET`, `DELETE FROM`, `MERGE`, `TRUNCATE`.
+
+|**Verification**
+|`PROOF <type>(<contract>)` clause requests a verifiable guarantee about the result. Six proof types: `EXISTENCE`, `INTEGRITY`, `CONSISTENCY`, `PROVENANCE`, `FRESHNESS`, `AUTHORIZATION`. No SQL equivalent exists.
+|No equivalent. SQL has no mechanism for cryptographic or type-theoretic verification of query results.
+
+|**Pagination**
+|`LIMIT n` and `OFFSET n` work identically to SQL.
+|`LIMIT n` and `OFFSET n` (or vendor-specific: `TOP`, `FETCH FIRST`).
+|===
+
+== What VQL Lacks That SQL Has
+
+VQL is intentionally minimal. The following SQL features have no VQL equivalent:
+
+[cols="2,3",options="header"]
+|===
+|SQL Feature |VQL Status
+
+|`GROUP BY`
+|Not supported. Aggregation is performed application-side or through the Elixir orchestration layer.
+
+|`ORDER BY`
+|Not supported. Result ordering is determined by the modality store (e.g., vector similarity ranking, graph traversal order, temporal chronological order).
+
+|Aggregate functions (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`)
+|Not supported. VQL returns raw data; aggregation is a consumer responsibility.
+
+|Subqueries
+|Not supported. Queries are flat. Compose results in application code or use the Elixir query router for multi-step workflows.
+
+|`DISTINCT`
+|Not supported. Hexad entities are inherently unique (UUID-addressed), so deduplication is rarely needed.
+
+|`HAVING`
+|Not supported (requires `GROUP BY`).
+
+|`UNION` / `INTERSECT` / `EXCEPT`
+|Not supported. Use multiple queries and combine results application-side.
+
+|`CREATE TABLE` / DDL
+|Not supported. Schema is managed through the ReScript registry and Elixir `SchemaRegistry`.
+
+|Window functions (`ROW_NUMBER`, `RANK`, `OVER`)
+|Not supported.
+
+|Stored procedures / triggers
+|Not supported. Business logic lives in the Elixir orchestration layer.
+|===
+
+== What VQL Has That SQL Lacks
+
+[cols="2,3",options="header"]
+|===
+|VQL Feature |Description
+
+|`PROOF` clause
+|Requests a verifiable proof certificate alongside query results. Six proof types cover existence, integrity, consistency, provenance, freshness, and authorization guarantees. Enables dependent-type verification via the VQL-DT path.
+
+|Multimodal `SELECT`
+|Select specific modalities (`GRAPH`, `VECTOR`, `TENSOR`, `SEMANTIC`, `DOCUMENT`, `TEMPORAL`) or all (`*`). No SQL equivalent for querying fundamentally different data representations of the same entity.
+
+|`FEDERATION` queries
+|Target distributed VeriSimDB instances: `FROM FEDERATION <name>`. Includes drift policies that govern how cross-instance consistency is enforced during query execution.
+
+|Drift policies
+|`DRIFT POLICY <name>` attaches consistency enforcement rules to federated queries. Drift detection and repair are first-class query concerns.
+
+|Hexad entity addressing
+|`FROM HEXAD <uuid>` addresses a single cross-modal entity by its UUID. All six modalities are accessible through one query against one identifier.
+
+|Graph traversal syntax
+|Cypher-inspired patterns directly in `WHERE`: `(h)-[:RELATES_TO]->(target)`. No need for separate graph query language or JOIN emulation.
+
+|Vector similarity
+|`WHERE h.embedding SIMILAR TO [0.1, 0.2, ...]` performs nearest-neighbor search natively. SQL requires extensions (pgvector) or external systems.
+
+|Full-text predicates
+|`CONTAINS(h.content, "term")` and `MATCHES(h.content, "pattern")` are built-in, backed by the Tantivy-powered document store.
+|===
+
+== Example Comparisons
+
+=== Retrieving an Entity
+
+**SQL:**
+[source,sql]
+----
+SELECT *
+FROM entities
+WHERE id = '550e8400-e29b-41d4-a716-446655440000';
+----
+
+**VQL (Slipstream):**
+[source,vql]
+----
+SELECT *
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+----
+
+The VQL version returns all six modalities for that hexad. The SQL version returns only the columns in the `entities` table.
+
+=== Finding Related Entities
+
+**SQL (requires JOIN):**
+[source,sql]
+----
+SELECT e2.*
+FROM entities e1
+JOIN relationships r ON e1.id = r.source_id
+JOIN entities e2 ON r.target_id = e2.id
+WHERE e1.id = '550e8400-e29b-41d4-a716-446655440000'
+  AND r.type = 'CITES';
+----
+
+**VQL (graph traversal):**
+[source,vql]
+----
+SELECT GRAPH
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+WHERE (h)-[:CITES]->(target)
+----
+
+VQL eliminates the triple-table JOIN pattern entirely. Graph relationships are native.
+
+=== Full-Text Search
+
+**SQL (PostgreSQL example):**
+[source,sql]
+----
+SELECT *
+FROM documents
+WHERE to_tsvector('english', content) @@ to_tsquery('quantum & computing');
+----
+
+**VQL:**
+[source,vql]
+----
+SELECT DOCUMENT
+FROM STORE research_papers
+WHERE CONTAINS(h.content, "quantum computing")
+LIMIT 20
+----
+
+=== Similarity Search
+
+**SQL (requires pgvector extension):**
+[source,sql]
+----
+SELECT *, embedding <-> '[0.1, 0.2, 0.3, 0.4]' AS distance
+FROM entities
+ORDER BY embedding <-> '[0.1, 0.2, 0.3, 0.4]'
+LIMIT 10;
+----
+
+**VQL:**
+[source,vql]
+----
+SELECT VECTOR
+FROM STORE research_papers
+WHERE h.embedding SIMILAR TO [0.1, 0.2, 0.3, 0.4]
+LIMIT 10
+----
+
+=== Verified Query (No SQL Equivalent)
+
+**VQL-DT (dependent type path):**
+[source,vql]
+----
+SELECT *
+FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
+PROOF INTEGRITY(DataIntegrityContract)
+----
+
+This returns the hexad data _plus_ a cryptographic proof certificate asserting data integrity. SQL has no mechanism for this.
+
+== Summary
+
+[cols="2,1,1",options="header"]
+|===
+|Capability |SQL |VQL
+
+|Relational queries |Yes |No
+|Multimodal queries |No |Yes
+|Mutations (INSERT/UPDATE/DELETE) |Yes |No (API only)
+|JOINs |Yes |No (graph modality)
+|Aggregation (GROUP BY, COUNT, SUM) |Yes |No
+|Subqueries |Yes |No
+|PROOF verification |No |Yes
+|Federation with drift policies |No |Yes
+|Graph traversal |No (or extensions) |Yes (native)
+|Vector similarity |No (or extensions) |Yes (native)
+|Full-text search |Extensions |Yes (native)
+|Ordering (ORDER BY) |Yes |No
+|Pagination (LIMIT/OFFSET) |Yes |Yes
+|===
+
+VQL is not a replacement for SQL. It is a purpose-built query language for a multimodal database that treats entities as six simultaneous representations rather than rows in flat tables. Use SQL when you need relational algebra. Use VQL when you need to query across modalities with optional formal verification.

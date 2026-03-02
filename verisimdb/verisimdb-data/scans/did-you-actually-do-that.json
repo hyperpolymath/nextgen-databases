@@ -1,0 +1,1412 @@
+{
+  "program_path": ".",
+  "language": "elixir",
+  "frameworks": [
+    "Networking",
+    "OTP",
+    "WebServer"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/mcp_server.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in src/mcp_server.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/claim_extractor.rs",
+      "severity": "Medium",
+      "description": "9 unwrap/expect calls in src/claim_extractor.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/verifiers/content_hash.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in src/verifiers/content_hash.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/verifiers/diff_coherence.rs",
+      "severity": "Medium",
+      "description": "22 unwrap/expect calls in src/verifiers/diff_coherence.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/verifiers/syntactic.rs",
+      "severity": "Medium",
+      "description": "21 unwrap/expect calls in src/verifiers/syntactic.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/verifiers/dependency.rs",
+      "severity": "Medium",
+      "description": "22 unwrap/expect calls in src/verifiers/dependency.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/port_protocol.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in src/port_protocol.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/proptest_tests.rs",
+      "severity": "Medium",
+      "description": "18 unwrap/expect calls in tests/proptest_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "tests/integration_tests.rs",
+      "severity": "Medium",
+      "description": "29 unwrap/expect calls in tests/integration_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "benches/verification.rs",
+      "severity": "Medium",
+      "description": "13 unwrap/expect calls in benches/verification.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "dyadt_brain/lib/dyadt_brain/ports/rust_port.ex",
+      "severity": "Medium",
+      "description": "System command execution in dyadt_brain/lib/dyadt_brain/ports/rust_port.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "dyadt_brain/lib/dyadt_brain/test_runner.ex",
+      "severity": "Medium",
+      "description": "System command execution in dyadt_brain/lib/dyadt_brain/test_runner.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 16106,
+    "unsafe_blocks": 12,
+    "panic_sites": 5,
+    "unwrap_calls": 168,
+    "allocation_sites": 58,
+    "io_operations": 33,
+    "threading_constructs": 11
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/lib.rs",
+      "lines": 533,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/main.rs",
+      "lines": 693,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 2,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/async_checks.rs",
+      "lines": 457,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/watch.rs",
+      "lines": 133,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/mcp_server.rs",
+      "lines": 611,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 3,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/claim_extractor.rs",
+      "lines": 448,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 9,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/hooks.rs",
+      "lines": 415,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verifiers/file_existence.rs",
+      "lines": 94,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verifiers/content_hash.rs",
+      "lines": 85,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verifiers/semantic.rs",
+      "lines": 237,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verifiers/diff_coherence.rs",
+      "lines": 322,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 22,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verifiers/syntactic.rs",
+      "lines": 238,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 21,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verifiers/dependency.rs",
+      "lines": 429,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 22,
+      "allocation_sites": 4,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verifiers/cross_reference.rs",
+      "lines": 502,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 9,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verifiers/completeness.rs",
+      "lines": 540,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 1,
+      "allocation_sites": 5,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/port_protocol.rs",
+      "lines": 442,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 3,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/slm/mod.rs",
+      "lines": 186,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/slm/policy_oracle.rs",
+      "lines": 325,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/slm/ensemble.rs",
+      "lines": 305,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 15,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/slm/graph_of_thought.rs",
+      "lines": 435,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/slm/mixture_of_experts.rs",
+      "lines": 528,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/proptest_tests.rs",
+      "lines": 319,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 18,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/integration_tests.rs",
+      "lines": 258,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 29,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "benches/verification.rs",
+      "lines": 191,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 13,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 599,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dyadt_brain/lib/dyadt_brain/claim_registry.ex",
+      "lines": 92,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "dyadt_brain/lib/dyadt_brain/verification_manager.ex",
+      "lines": 143,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "dyadt_brain/lib/dyadt_brain/verdict_engine.ex",
+      "lines": 56,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "dyadt_brain/lib/dyadt_brain/ports/rust_port.ex",
+      "lines": 276,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "dyadt_brain/lib/dyadt_brain/surveillance_supervisor.ex",
+      "lines": 280,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "dyadt_brain/lib/dyadt_brain/verisimdb/client.ex",
+      "lines": 93,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "dyadt_brain/lib/dyadt_brain/pattern_learner.ex",
+      "lines": 137,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "dyadt_brain/lib/dyadt_brain/regression_baseline.ex",
+      "lines": 203,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "dyadt_brain/lib/dyadt_brain/grpc/endpoint.ex",
+      "lines": 126,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "dyadt_brain/test/regression_baseline_test.exs",
+      "lines": 127,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "concurrency",
+    "memory",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "tests/proptest_tests.rs",
+        "to": "tests/integration_tests.rs",
+        "relation": "shared_dir:tests",
+        "weight": 1.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/claim_registry.ex",
+        "to": "dyadt_brain/lib/dyadt_brain/verification_manager.ex",
+        "relation": "shared_dir:dyadt_brain/lib/dyadt_brain",
+        "weight": 1.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/verification_manager.ex",
+        "to": "dyadt_brain/lib/dyadt_brain/verdict_engine.ex",
+        "relation": "shared_dir:dyadt_brain/lib/dyadt_brain",
+        "weight": 1.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/verdict_engine.ex",
+        "to": "dyadt_brain/lib/dyadt_brain/surveillance_supervisor.ex",
+        "relation": "shared_dir:dyadt_brain/lib/dyadt_brain",
+        "weight": 1.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/surveillance_supervisor.ex",
+        "to": "dyadt_brain/lib/dyadt_brain/pattern_learner.ex",
+        "relation": "shared_dir:dyadt_brain/lib/dyadt_brain",
+        "weight": 1.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/pattern_learner.ex",
+        "to": "dyadt_brain/lib/dyadt_brain/regression_baseline.ex",
+        "relation": "shared_dir:dyadt_brain/lib/dyadt_brain",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/file_existence.rs",
+        "to": "src/verifiers/content_hash.rs",
+        "relation": "shared_dir:src/verifiers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/content_hash.rs",
+        "to": "src/verifiers/semantic.rs",
+        "relation": "shared_dir:src/verifiers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/semantic.rs",
+        "to": "src/verifiers/diff_coherence.rs",
+        "relation": "shared_dir:src/verifiers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/diff_coherence.rs",
+        "to": "src/verifiers/syntactic.rs",
+        "relation": "shared_dir:src/verifiers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/syntactic.rs",
+        "to": "src/verifiers/dependency.rs",
+        "relation": "shared_dir:src/verifiers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/dependency.rs",
+        "to": "src/verifiers/cross_reference.rs",
+        "relation": "shared_dir:src/verifiers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/cross_reference.rs",
+        "to": "src/verifiers/completeness.rs",
+        "relation": "shared_dir:src/verifiers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/lib.rs",
+        "to": "src/main.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "src/async_checks.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/async_checks.rs",
+        "to": "src/watch.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/watch.rs",
+        "to": "src/mcp_server.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/mcp_server.rs",
+        "to": "src/claim_extractor.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/claim_extractor.rs",
+        "to": "src/hooks.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/hooks.rs",
+        "to": "src/port_protocol.rs",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/slm/mod.rs",
+        "to": "src/slm/policy_oracle.rs",
+        "relation": "shared_dir:src/slm",
+        "weight": 1.0
+      },
+      {
+        "from": "src/slm/policy_oracle.rs",
+        "to": "src/slm/ensemble.rs",
+        "relation": "shared_dir:src/slm",
+        "weight": 1.0
+      },
+      {
+        "from": "src/slm/ensemble.rs",
+        "to": "src/slm/graph_of_thought.rs",
+        "relation": "shared_dir:src/slm",
+        "weight": 1.0
+      },
+      {
+        "from": "src/slm/graph_of_thought.rs",
+        "to": "src/slm/mixture_of_experts.rs",
+        "relation": "shared_dir:src/slm",
+        "weight": 1.0
+      },
+      {
+        "from": "src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/async_checks.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/async_checks.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/async_checks.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/watch.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/watch.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/watch.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/mcp_server.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/mcp_server.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/mcp_server.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/claim_extractor.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "src/claim_extractor.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "src/claim_extractor.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 11.0
+      },
+      {
+        "from": "src/hooks.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/hooks.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/hooks.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/verifiers/file_existence.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/verifiers/file_existence.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/verifiers/file_existence.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "src/verifiers/content_hash.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/verifiers/content_hash.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/verifiers/content_hash.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/verifiers/semantic.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/semantic.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/semantic.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/diff_coherence.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 22.0
+      },
+      {
+        "from": "src/verifiers/diff_coherence.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 22.0
+      },
+      {
+        "from": "src/verifiers/diff_coherence.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 22.0
+      },
+      {
+        "from": "src/verifiers/syntactic.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "src/verifiers/syntactic.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "src/verifiers/syntactic.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 21.0
+      },
+      {
+        "from": "src/verifiers/dependency.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 22.0
+      },
+      {
+        "from": "src/verifiers/dependency.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 22.0
+      },
+      {
+        "from": "src/verifiers/dependency.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 22.0
+      },
+      {
+        "from": "src/verifiers/cross_reference.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/cross_reference.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/cross_reference.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verifiers/completeness.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/verifiers/completeness.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/verifiers/completeness.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/port_protocol.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/port_protocol.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/port_protocol.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "src/slm/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/slm/mod.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/slm/mod.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/slm/policy_oracle.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/slm/policy_oracle.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/slm/policy_oracle.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/slm/ensemble.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/slm/ensemble.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/slm/ensemble.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/slm/graph_of_thought.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/slm/graph_of_thought.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/slm/graph_of_thought.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/slm/mixture_of_experts.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/slm/mixture_of_experts.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/slm/mixture_of_experts.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "tests/proptest_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "tests/proptest_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "tests/proptest_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "tests/integration_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 29.0
+      },
+      {
+        "from": "tests/integration_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 29.0
+      },
+      {
+        "from": "tests/integration_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 29.0
+      },
+      {
+        "from": "benches/verification.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "benches/verification.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "benches/verification.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/claim_registry.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/claim_registry.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/claim_registry.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/verification_manager.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/verification_manager.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/verification_manager.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/verdict_engine.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/verdict_engine.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/verdict_engine.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/ports/rust_port.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/ports/rust_port.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/ports/rust_port.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/surveillance_supervisor.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/surveillance_supervisor.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/surveillance_supervisor.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/verisimdb/client.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/verisimdb/client.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/verisimdb/client.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/pattern_learner.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/pattern_learner.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/pattern_learner.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/regression_baseline.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/regression_baseline.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/regression_baseline.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/grpc/endpoint.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/grpc/endpoint.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "dyadt_brain/lib/dyadt_brain/grpc/endpoint.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "dyadt_brain/test/regression_baseline_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dyadt_brain/test/regression_baseline_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "dyadt_brain/test/regression_baseline_test.exs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "src/mcp_server.rs",
+          "src/claim_extractor.rs",
+          "src/verifiers/content_hash.rs",
+          "src/verifiers/diff_coherence.rs",
+          "src/verifiers/syntactic.rs",
+          "src/verifiers/dependency.rs",
+          "src/port_protocol.rs",
+          "tests/proptest_tests.rs",
+          "tests/integration_tests.rs",
+          "benches/verification.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "dyadt_brain/lib/dyadt_brain/ports/rust_port.ex",
+          "dyadt_brain/lib/dyadt_brain/test_runner.ex"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/mcp_server.rs",
+          "src/claim_extractor.rs",
+          "src/verifiers/content_hash.rs",
+          "src/verifiers/diff_coherence.rs",
+          "src/verifiers/syntactic.rs",
+          "src/verifiers/dependency.rs",
+          "src/port_protocol.rs",
+          "tests/proptest_tests.rs",
+          "tests/integration_tests.rs",
+          "benches/verification.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "dyadt_brain/lib/dyadt_brain/ports/rust_port.ex",
+          "dyadt_brain/lib/dyadt_brain/test_runner.ex"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP",
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

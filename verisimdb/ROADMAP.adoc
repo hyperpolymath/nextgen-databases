@@ -1,0 +1,69 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= YOUR Template Repo Roadmap
+
+== Current Status
+
+Initial development phase.
+
+== Milestones
+
+=== v0.1.0 - Foundation
+* [ ] Core functionality
+* [ ] Basic documentation
+* [ ] CI/CD pipeline
+
+=== v1.0.0 - Stable Release
+* [ ] Full feature set
+* [ ] Comprehensive tests
+* [ ] Production ready
+
+== Future Directions
+
+_To be determined based on community feedback._
+
+== Enhancements Identified (2026-02-08)
+
+=== Immediate Fixes
+
+* Fix tensor reduction operations (max/min/prod use sum_axis - TODO in code)
+* Fix unused variable warnings (verisim-normalizer)
+* Implement document search highlighting (TODO in code)
+* Add binary target to verisim-api for `cargo run` (currently fails with "a bin target must be available")
+
+=== Integration
+
+* panic-attack result schema: define a hexad schema for storing static analysis results
+** Document modality: full JSON report as searchable text
+** Graph modality: file -> weakness -> attack-recommendation triples
+** Temporal modality: track results over time
+** Vector modality: embed weakness descriptions for similarity search
+* MCP server mode: expose verisimdb as an MCP tool
+
+=== Storage
+
+* Default to persistent storage backends (RocksDB for graph, file-based for document)
+* Add configuration file for storage paths and options
+* Implement proper data directory management
+
+=== Query Language (VQL)
+
+* Complete the ReScript parser integration with the Rust API
+* Add VQL endpoint to HTTP API
+* VQL REPL for interactive querying
+
+=== Observability
+
+* Prometheus metrics endpoint
+* Structured logging with tracing
+* Health dashboard
+
+== OPSM Integration
+
+[source]
+----
+OPSM Core
+  |
+  v
+verisimdb (storage backend candidate for OPSM metadata and audits)
+
+----

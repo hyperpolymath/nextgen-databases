@@ -1,0 +1,97 @@
+{
+  "program_path": ".",
+  "language": "shell",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "validation/run-validation.sh",
+      "severity": "Medium",
+      "description": "91 potentially unquoted variable expansions in validation/run-validation.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "validation/run-validation.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in validation/run-validation.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "HardcodedSecret",
+      "location": "validation/run-validation.sh",
+      "severity": "Critical",
+      "description": "Possible hardcoded secret in validation/run-validation.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 591,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 6,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "validation/run-validation.sh",
+      "lines": 367,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "network",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": []
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "validation/run-validation.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "validation/run-validation.sh"
+        ],
+        "frameworks": [],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "HardcodedSecret",
+        "sink_axis": "network",
+        "severity_value": 5.0,
+        "files": [
+          "validation/run-validation.sh"
+        ],
+        "frameworks": [],
+        "relation": "HardcodedSecret->Network"
+      }
+    ]
+  }
+}

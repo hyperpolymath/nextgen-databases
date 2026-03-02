@@ -1,0 +1,225 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "scripts/salt_robot.sh",
+      "severity": "Medium",
+      "description": "34 potentially unquoted variable expansions in scripts/salt_robot.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/salt_robot.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/salt_robot.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/engine/FogTrailVisualizer.bs.js",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in src/engine/FogTrailVisualizer.bs.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/engine/FogTrailVisualizer.res",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in src/engine/FogTrailVisualizer.res",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/wasm/crypto/src/lib.rs",
+      "severity": "Medium",
+      "description": "9 unwrap/expect calls in src/wasm/crypto/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "lib/bs/src/engine/FogTrailVisualizer.res",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in lib/bs/src/engine/FogTrailVisualizer.res",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "lib/bs/src/engine/FogTrailVisualizer.bs.js",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in lib/bs/src/engine/FogTrailVisualizer.bs.js",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "lib/ocaml/FogTrailVisualizer.res",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in lib/ocaml/FogTrailVisualizer.res",
+      "recommended_attack": [
+        "network"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 13529,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 9,
+    "allocation_sites": 1,
+    "io_operations": 1,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/wasm/crypto/src/lib.rs",
+      "lines": 441,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 9,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "cpu",
+    "disk",
+    "network"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/salt_robot.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/salt_robot.sh"
+        ],
+        "frameworks": [],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "src/engine/FogTrailVisualizer.bs.js",
+          "src/engine/FogTrailVisualizer.res",
+          "lib/bs/src/engine/FogTrailVisualizer.res",
+          "lib/bs/src/engine/FogTrailVisualizer.bs.js",
+          "lib/ocaml/FogTrailVisualizer.res"
+        ],
+        "frameworks": [],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "src/wasm/crypto/src/lib.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/wasm/crypto/src/lib.rs"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

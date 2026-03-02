@@ -1,0 +1,412 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "UnsafeCode",
+      "location": "projects/beamdeno/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in projects/beamdeno/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "projects/bundeno/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in projects/bundeno/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "projects/bundeno/src/compat/Process.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in projects/bundeno/src/compat/Process.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "projects/deno-bunbridge/src/BunFile.res",
+      "severity": "High",
+      "description": "1 JSON.parseExn calls in projects/deno-bunbridge/src/BunFile.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "projects/deno-bunbridge/src/BunSpawn.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in projects/deno-bunbridge/src/BunSpawn.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "projects/deno-bunbridge/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in projects/deno-bunbridge/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "projects/v-deno/src/abi/Foreign.idr",
+      "severity": "Critical",
+      "description": "1 believe_me (type checker bypass) in projects/v-deno/src/abi/Foreign.idr",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 7150,
+    "unsafe_blocks": 65,
+    "panic_sites": 1,
+    "unwrap_calls": 2,
+    "allocation_sites": 4,
+    "io_operations": 6,
+    "threading_constructs": 8
+  },
+  "file_statistics": [
+    {
+      "file_path": "projects/beamdeno/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/beamdeno/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/beamdeno/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/beamdeno/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "projects/bundeno/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/bundeno/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/bundeno/src/compat/Process.res",
+      "lines": 98,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/bundeno/src/compat/Fs.res",
+      "lines": 78,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/bundeno/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/bundeno/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "projects/deno-bunbridge/src/BunFile.res",
+      "lines": 46,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/deno-bunbridge/src/BunServe.res",
+      "lines": 41,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/deno-bunbridge/src/BunSpawn.res",
+      "lines": 40,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/deno-bunbridge/src/bindings/Deno.res",
+      "lines": 56,
+      "unsafe_blocks": 9,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/deno-bunbridge/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/deno-bunbridge/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/deno-bunbridge/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/deno-bunbridge/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "projects/v-deno/src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/v-deno/src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 13,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/v-deno/ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "projects/v-deno/ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk",
+    "concurrency",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "projects/beamdeno/src/abi/Types.idr",
+        "to": "projects/beamdeno/src/abi/Foreign.idr",
+        "relation": "shared_dir:projects/beamdeno/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "projects/bundeno/src/compat/Process.res",
+        "to": "projects/bundeno/src/compat/Fs.res",
+        "relation": "shared_dir:projects/bundeno/src/compat",
+        "weight": 1.0
+      },
+      {
+        "from": "projects/deno-bunbridge/src/BunFile.res",
+        "to": "projects/deno-bunbridge/src/BunServe.res",
+        "relation": "shared_dir:projects/deno-bunbridge/src",
+        "weight": 1.0
+      },
+      {
+        "from": "projects/deno-bunbridge/src/BunServe.res",
+        "to": "projects/deno-bunbridge/src/BunSpawn.res",
+        "relation": "shared_dir:projects/deno-bunbridge/src",
+        "weight": 1.0
+      },
+      {
+        "from": "projects/deno-bunbridge/src/abi/Types.idr",
+        "to": "projects/deno-bunbridge/src/abi/Foreign.idr",
+        "relation": "shared_dir:projects/deno-bunbridge/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "projects/v-deno/src/abi/Types.idr",
+        "to": "projects/v-deno/src/abi/Foreign.idr",
+        "relation": "shared_dir:projects/v-deno/src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "projects/bundeno/src/abi/Types.idr",
+        "to": "projects/bundeno/src/abi/Foreign.idr",
+        "relation": "shared_dir:projects/bundeno/src/abi",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "projects/deno-bunbridge/src/BunFile.res"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeDeserialization->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "projects/bundeno/src/compat/Process.res",
+          "projects/deno-bunbridge/src/BunSpawn.res"
+        ],
+        "frameworks": [],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 5.0,
+        "files": [
+          "projects/beamdeno/src/abi/Foreign.idr",
+          "projects/bundeno/src/abi/Foreign.idr",
+          "projects/deno-bunbridge/src/abi/Foreign.idr",
+          "projects/v-deno/src/abi/Foreign.idr"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "projects/deno-bunbridge/src/BunFile.res"
+        ],
+        "frameworks": [],
+        "relation": "UnsafeDeserialization->Cpu"
+      }
+    ]
+  }
+}

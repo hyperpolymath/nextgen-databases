@@ -1,0 +1,24 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- 08-proof-existence.vql
+-- Proof-carrying query: verify entity existence across all modalities
+--
+-- VQL-DT (Dependent Type) extends VQL with PROOF clauses that attach
+-- machine-checkable proof certificates to query results. This is
+-- VeriSimDB's distinguishing feature: not just returning data, but
+-- returning data with formal guarantees.
+--
+-- PROOF EXISTENCE(entity-id) verifies that:
+--   1. The entity exists in the primary store
+--   2. All eight modality representations are present and non-null
+--   3. The entity ID is consistent across all modality indices
+--
+-- The proof certificate is returned as a separate field in the result
+-- and can be independently verified by any Idris2-compatible checker.
+--
+-- Expected result: entity-001 exists with all modalities populated,
+-- so the proof should succeed and the certificate should be attached.
+
+SELECT * FROM hexads
+WHERE id = 'entity-001'
+PROOF EXISTENCE(entity-001)

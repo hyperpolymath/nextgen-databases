@@ -1,0 +1,37 @@
+{
+  "id": "issue-014",
+  "source": "known-issues",
+  "created_at": "2026-02-13T16:20:00Z",
+  "document": {
+    "title": "Proof Verification Was No-Op",
+    "body": "\\n**Location:** `elixir-orchestration/lib/verisim/query/vql_executor.ex`\\n\\n**Resolved:** 2026-02-13. `verify_single_proof/1` now validates proof type, extracts contract names, and checks contract existence against the semantic store. It properly rejects queries with invalid or missing contracts for CITATION, INTEGRITY, and CUSTOM proof types. Previously it always returned `:ok`.\\n\\n**Original issue:** PROOF clauses in VQL queries were parsed but never verified. All proofs silently passed, making the entire proof system decorative.\\n\\n",
+    "fields": {
+      "type": "known_issue",
+      "status": "resolved",
+      "severity": "resolved"
+    }
+  },
+  "graph": {
+    "relationships": [{"predicate": "documented_in", "target": "file:KNOWN-ISSUES.adoc"}]
+  },
+  "vector": {
+    "embedding": [-0.328125,0.359375,0.335937,0.828125,-0.882812,0.234375,-0.203125,-0.023437,-0.187500,-0.968750,-0.976562,-0.335937,0.460937,0.195312,-0.796875,-0.203125,0.625000,0.085937,0.328125,0.765625,-0.984375,-0.851562,0.515625,-0.539062,0.765625,-0.390625,-0.007812,-0.125000,-0.765625,0.703125,-0.890625,0.945312,-0.328125,0.359375,0.335937,0.828125,-0.882812,0.234375,-0.203125,-0.023437,-0.187500,-0.968750,-0.976562,-0.335937,0.460937,0.195312,-0.796875,-0.203125,0.625000,0.085937,0.328125,0.765625,-0.984375,-0.851562,0.515625,-0.539062,0.765625,-0.390625,-0.007812,-0.125000,-0.765625,0.703125,-0.890625,0.945312],
+    "model": "sha256-hash-64d"
+  },
+  "tensor": {
+    "shape": [1, 2],
+    "data": [1.0, 0.0]
+  },
+  "semantic": {
+    "types": ["https://verisim.db/self/type/KnownIssue", "https://verisim.db/self/type/resolved"],
+    "properties": {
+      "status": "resolved",
+      "severity": "resolved"
+    }
+  },
+  "temporal": {
+    "timestamp": "2026-02-13T16:20:00Z",
+    "version": 1,
+    "author": "self-ingest"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "issue-017",
+  "source": "known-issues",
+  "created_at": "2026-02-13T16:20:01Z",
+  "document": {
+    "title": "No ETS Caching in RustClient",
+    "body": "\\n**Location:** `elixir-orchestration/lib/verisim/rust_client.ex`\\n\\n**Resolved:** 2026-02-13. Added ETS-based read-through cache with configurable TTL (30s default for hexads, 10s for drift scores). Cache is invalidated on writes (update/delete). Provides `init_cache/0`, `clear_cache/0`, and `invalidate_cache/1` for cache management.\\n\\n**Original issue:** Every RustClient call made a fresh HTTP request to the Rust core, with no caching. Repeated reads of the same hexad in a query pipeline (e.g., cross-modal evaluation fetching the same entity multiple times) each incurred full HTTP round-trip latency.\\n\\n",
+    "fields": {
+      "type": "known_issue",
+      "status": "resolved",
+      "severity": "resolved"
+    }
+  },
+  "graph": {
+    "relationships": [{"predicate": "documented_in", "target": "file:KNOWN-ISSUES.adoc"}]
+  },
+  "vector": {
+    "embedding": [-0.914062,-0.343750,-0.382812,0.078125,-0.304687,-0.640625,-0.117187,0.398437,0.468750,0.429687,0.906250,0.570312,-0.695312,-0.140625,-0.523437,0.804687,-0.234375,-0.960937,0.601562,-0.046875,0.585937,0.007812,0.421875,-0.242187,0.359375,-0.437500,-0.640625,0.875000,0.843750,-0.640625,0.734375,0.296875,-0.914062,-0.343750,-0.382812,0.078125,-0.304687,-0.640625,-0.117187,0.398437,0.468750,0.429687,0.906250,0.570312,-0.695312,-0.140625,-0.523437,0.804687,-0.234375,-0.960937,0.601562,-0.046875,0.585937,0.007812,0.421875,-0.242187,0.359375,-0.437500,-0.640625,0.875000,0.843750,-0.640625,0.734375,0.296875],
+    "model": "sha256-hash-64d"
+  },
+  "tensor": {
+    "shape": [1, 2],
+    "data": [1.0, 0.0]
+  },
+  "semantic": {
+    "types": ["https://verisim.db/self/type/KnownIssue", "https://verisim.db/self/type/resolved"],
+    "properties": {
+      "status": "resolved",
+      "severity": "resolved"
+    }
+  },
+  "temporal": {
+    "timestamp": "2026-02-13T16:20:01Z",
+    "version": 1,
+    "author": "self-ingest"
+  }
+}

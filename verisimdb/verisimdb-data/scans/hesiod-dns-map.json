@@ -1,0 +1,283 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "WebServer",
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "crates/hesiod-lib/src/records.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in crates/hesiod-lib/src/records.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "crates/hesiod-lib/src/zone.rs",
+      "severity": "Medium",
+      "description": "6 unwrap/expect calls in crates/hesiod-lib/src/zone.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 2190,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 20,
+    "allocation_sites": 1,
+    "io_operations": 5,
+    "threading_constructs": 6
+  },
+  "file_statistics": [
+    {
+      "file_path": "crates/hesiod-lib/src/records.rs",
+      "lines": 368,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/hesiod-lib/src/config.rs",
+      "lines": 137,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/hesiod-lib/src/zone.rs",
+      "lines": 242,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 6,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "crates/hesiod-lib/src/server.rs",
+      "lines": 205,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 4
+    },
+    {
+      "file_path": "crates/hesiod-lib/src/health.rs",
+      "lines": 76,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "crates/hesinfo/src/main.rs",
+      "lines": 269,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "configs/hesiod/flatracoon.ncl",
+      "lines": 90,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "concurrency",
+    "disk",
+    "cpu",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "crates/hesiod-lib/src/records.rs",
+        "to": "crates/hesiod-lib/src/config.rs",
+        "relation": "shared_dir:crates/hesiod-lib/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/config.rs",
+        "to": "crates/hesiod-lib/src/zone.rs",
+        "relation": "shared_dir:crates/hesiod-lib/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/zone.rs",
+        "to": "crates/hesiod-lib/src/server.rs",
+        "relation": "shared_dir:crates/hesiod-lib/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/server.rs",
+        "to": "crates/hesiod-lib/src/health.rs",
+        "relation": "shared_dir:crates/hesiod-lib/src",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/records.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/records.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/config.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/zone.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/zone.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/server.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/server.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/health.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "crates/hesiod-lib/src/health.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "crates/hesinfo/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "crates/hesinfo/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "configs/hesiod/flatracoon.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "configs/hesiod/flatracoon.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "crates/hesiod-lib/src/records.rs",
+          "crates/hesiod-lib/src/zone.rs"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "crates/hesiod-lib/src/records.rs",
+          "crates/hesiod-lib/src/zone.rs"
+        ],
+        "frameworks": [
+          "WebServer",
+          "Networking"
+        ],
+        "relation": "PanicPath->Memory"
+      }
+    ]
+  }
+}

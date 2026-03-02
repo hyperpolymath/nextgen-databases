@@ -1,0 +1,5051 @@
+{
+  "program_path": ".",
+  "language": "javascript",
+  "frameworks": [
+    "Phoenix",
+    "Database",
+    "OTP",
+    "Networking",
+    "WebServer"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation/echidnabot.ex",
+      "severity": "Medium",
+      "description": "System command execution in satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation/echidnabot.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/github.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/github.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/gitlab.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/gitlab.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "satellites/git-tools/gitvisor/backend/lib/gitvisor_web.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in satellites/git-tools/gitvisor/backend/lib/gitvisor_web.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/backend.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/backend.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot/attestation.ex",
+      "severity": "Medium",
+      "description": "System command execution in satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot/attestation.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot/config.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot/config.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot/verifier.ex",
+      "severity": "Medium",
+      "description": "System command execution in satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot/verifier.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/badge.ex",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/badge.ex",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/checker.ex",
+      "severity": "Medium",
+      "description": "System command execution in satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/checker.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/cli.ex",
+      "severity": "High",
+      "description": "2 String.to_atom calls in satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/cli.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "satellites/git-tools/gitloom/audit/lib/loom_audit/resolvers.ex",
+      "severity": "Medium",
+      "description": "System command execution in satellites/git-tools/gitloom/audit/lib/loom_audit/resolvers.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/audit_log.rs",
+      "severity": "Medium",
+      "description": "30 unwrap/expect calls in satellites/git-tools/polysafe-gitfixer/crates/capability/src/audit_log.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/dir_capability.rs",
+      "severity": "Medium",
+      "description": "26 unwrap/expect calls in satellites/git-tools/polysafe-gitfixer/crates/capability/src/dir_capability.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/git-tools/polysafe-gitfixer/crates/fs_ops/src/transaction.rs",
+      "severity": "Medium",
+      "description": "47 unwrap/expect calls in satellites/git-tools/polysafe-gitfixer/crates/fs_ops/src/transaction.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/git-tools/polysafe-gitfixer/crates/git_ops/src/lib.rs",
+      "severity": "Medium",
+      "description": "28 unwrap/expect calls in satellites/git-tools/polysafe-gitfixer/crates/git_ops/src/lib.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UncheckedError",
+      "location": "satellites/git-tools/polysafe-gitfixer/crates/polysafe_nifs/src/lib.rs",
+      "severity": "Low",
+      "description": "12 TODO/FIXME/HACK markers in satellites/git-tools/polysafe-gitfixer/crates/polysafe_nifs/src/lib.rs",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/git-tools/vext/vext-tools/src/hooks/Git.res",
+      "severity": "Medium",
+      "description": "12 unsafe get calls in satellites/git-tools/vext/vext-tools/src/hooks/Git.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "satellites/repo-management/oikos/policy-engine/deepproblog/eco_problog.pl",
+      "severity": "Medium",
+      "description": "2 HTTP (non-HTTPS) URLs in satellites/repo-management/oikos/policy-engine/deepproblog/eco_problog.pl",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/repo-management/robot-repo-automaton/src/detector.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in satellites/repo-management/robot-repo-automaton/src/detector.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/repo-management/robot-repo-automaton/tests/catalog_tests.rs",
+      "severity": "Medium",
+      "description": "10 unwrap/expect calls in satellites/repo-management/robot-repo-automaton/tests/catalog_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/repo-management/robot-repo-automaton/tests/detector_tests.rs",
+      "severity": "Medium",
+      "description": "27 unwrap/expect calls in satellites/repo-management/robot-repo-automaton/tests/detector_tests.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/repo-management/grim-repo/src/Utils.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in satellites/repo-management/grim-repo/src/Utils.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/developer-ux/rescript-evangeliser/src/Narrative.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in satellites/developer-ux/rescript-evangeliser/src/Narrative.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/developer-ux/recon-silly-ation/src/ArangoClient.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in satellites/developer-ux/recon-silly-ation/src/ArangoClient.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "satellites/developer-ux/recon-silly-ation/src/CLI.res",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in satellites/developer-ux/recon-silly-ation/src/CLI.res",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/developer-ux/recon-silly-ation/src/ConflictResolver.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in satellites/developer-ux/recon-silly-ation/src/ConflictResolver.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/developer-ux/recon-silly-ation/src/HaskellBridge.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in satellites/developer-ux/recon-silly-ation/src/HaskellBridge.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/developer-ux/recon-silly-ation/src/Pipeline.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in satellites/developer-ux/recon-silly-ation/src/Pipeline.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "ExcessivePermissions",
+      "location": "satellites/developer-ux/recon-silly-ation/src/main.js",
+      "severity": "High",
+      "description": "Deno -A (all permissions) in satellites/developer-ux/recon-silly-ation/src/main.js",
+      "recommended_attack": [
+        "network",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/vm.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/vm.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 77395,
+    "unsafe_blocks": 64,
+    "panic_sites": 2,
+    "unwrap_calls": 233,
+    "allocation_sites": 90,
+    "io_operations": 105,
+    "threading_constructs": 11
+  },
+  "file_statistics": [
+    {
+      "file_path": "satellites/git-tools/gitvisor/analytics/src/GitvisorAnalytics.jl",
+      "lines": 360,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation/echidnabot.ex",
+      "lines": 346,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/github.ex",
+      "lines": 341,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/gitlab.ex",
+      "lines": 211,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/arangodb_adapter.ex",
+      "lines": 147,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/xtdb_adapter.ex",
+      "lines": 150,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation.ex",
+      "lines": 427,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo.ex",
+      "lines": 81,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/frontend/src/Api.res",
+      "lines": 144,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/backend.ex",
+      "lines": 116,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/middleware.ex",
+      "lines": 112,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router.ex",
+      "lines": 139,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot.ex",
+      "lines": 83,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/checker.ex",
+      "lines": 256,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/fixer.ex",
+      "lines": 228,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/tui/src/gitvisor-ui.adb",
+      "lines": 294,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/tui/src/gitvisor_tui.adb",
+      "lines": 55,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitvisor/flake.nix",
+      "lines": 172,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitloom/ada/src/badge.adb",
+      "lines": 20,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitloom/ada/src/diagnose.adb",
+      "lines": 38,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitloom/ada/src/loom_mittens_parser.adb",
+      "lines": 115,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitloom/ada/src/loom_overlay_emitter.adb",
+      "lines": 27,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitloom/ada/src/loom_trace_renderer.adb",
+      "lines": 22,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitloom/audit/lib/loom_audit/kanren_generator.ex",
+      "lines": 19,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitloom/audit/lib/loom_audit/resolvers.ex",
+      "lines": 48,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitloom/batch-auditor/src/main.rs",
+      "lines": 236,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitloom/grammar/normalize.ncl",
+      "lines": 28,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/gitloom/logic/loom_index.pl",
+      "lines": 8,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/git-seo/src/analyzers.jl",
+      "lines": 191,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/git-seo/src/cli.jl",
+      "lines": 272,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/polysafe-gitfixer/config/default.ncl",
+      "lines": 54,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/audit_log.rs",
+      "lines": 448,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 30,
+      "allocation_sites": 2,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/dir_capability.rs",
+      "lines": 399,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 26,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/polysafe-gitfixer/crates/fs_ops/src/transaction.rs",
+      "lines": 602,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 47,
+      "allocation_sites": 2,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/polysafe-gitfixer/crates/git_ops/src/lib.rs",
+      "lines": 533,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 28,
+      "allocation_sites": 3,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/vext/tools/rsr_checker.py",
+      "lines": 759,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-core/src/bin/send.rs",
+      "lines": 99,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-core/src/config.rs",
+      "lines": 184,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-core/src/error.rs",
+      "lines": 64,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-core/src/irc_client.rs",
+      "lines": 275,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-core/src/listener.rs",
+      "lines": 189,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-core/src/main.rs",
+      "lines": 114,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-core/src/pool.rs",
+      "lines": 228,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-core/src/protocol.rs",
+      "lines": 235,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-core/tests/integration.rs",
+      "lines": 191,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 4,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-tools/src/bindings/Deno.res",
+      "lines": 81,
+      "unsafe_blocks": 10,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-tools/src/hooks/Git.res",
+      "lines": 394,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 12,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/git-tools/vext/vext-tools/src/hooks/Install.res",
+      "lines": 166,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Analysis.hs",
+      "lines": 357,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Pareto.hs",
+      "lines": 150,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/bot-integration/bindings/Deno.res",
+      "lines": 160,
+      "unsafe_blocks": 19,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/bot-integration/bindings/Fetch.res",
+      "lines": 13,
+      "unsafe_blocks": 6,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/bot-integration/src/Analysis.res",
+      "lines": 120,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/bot-integration/src/Analysis.res.js",
+      "lines": 161,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res",
+      "lines": 177,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res.js",
+      "lines": 205,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res",
+      "lines": 234,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res.js",
+      "lines": 240,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/bot-integration/src/Router.res",
+      "lines": 190,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/bot-integration/scripts/smee-client.js",
+      "lines": 101,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/nix/flake.nix",
+      "lines": 231,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/oikos/flake.nix",
+      "lines": 66,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-repo-automaton/src/catalog.rs",
+      "lines": 401,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 12,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-repo-automaton/src/cicd_hyper_a.rs",
+      "lines": 387,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 2,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-repo-automaton/src/config.rs",
+      "lines": 157,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-repo-automaton/src/detector.rs",
+      "lines": 281,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 2,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-repo-automaton/src/error.rs",
+      "lines": 62,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-repo-automaton/src/fixer.rs",
+      "lines": 322,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-repo-automaton/src/github.rs",
+      "lines": 314,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-repo-automaton/src/hooks.rs",
+      "lines": 332,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-repo-automaton/src/main.rs",
+      "lines": 549,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-repo-automaton/tests/catalog_tests.rs",
+      "lines": 173,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 10,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-repo-automaton/tests/detector_tests.rs",
+      "lines": 175,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 27,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/grim-repo/src/Utils.res",
+      "lines": 214,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/pathfinding.rs",
+      "lines": 217,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 3,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/robot.rs",
+      "lines": 323,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/repo-management/robot-vacuum-cleaner/flake.nix",
+      "lines": 91,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/scaffolding/scaffoldia/builder/main.ncl",
+      "lines": 306,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/scaffolding/scaffoldia/cli/scaffoldia.hs",
+      "lines": 426,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/scaffolding/scaffoldia/registry/rust/library.ncl",
+      "lines": 224,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Builder.hs",
+      "lines": 126,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Registry.hs",
+      "lines": 171,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Template.hs",
+      "lines": 163,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/rescript-evangeliser/src/Glyphs.res",
+      "lines": 304,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/rescript-evangeliser/src/Narrative.res",
+      "lines": 329,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/rescript-evangeliser/src/Patterns.res",
+      "lines": 541,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/src/ArangoClient.res",
+      "lines": 328,
+      "unsafe_blocks": 10,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/src/ConflictResolver.res",
+      "lines": 348,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/src/Deduplicator.res",
+      "lines": 224,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/src/HaskellBridge.res",
+      "lines": 160,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/src/Pipeline.res",
+      "lines": 426,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/src/Docubot.res",
+      "lines": 641,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/tests/TestRunner.res",
+      "lines": 297,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/validator/Main.hs",
+      "lines": 61,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/lib.rs",
+      "lines": 230,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/builtins.rs",
+      "lines": 955,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/formats.rs",
+      "lines": 479,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+      "lines": 313,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/types.rs",
+      "lines": 365,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/vm.rs",
+      "lines": 402,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "memory",
+    "concurrency",
+    "network",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Analysis.hs",
+        "to": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Pareto.hs",
+        "relation": "shared_dir:satellites/repo-management/oikos/analyzers/code-haskell/src/Eco",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/pathfinding.rs",
+        "to": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/robot.rs",
+        "relation": "shared_dir:satellites/repo-management/robot-vacuum-cleaner/src/rust/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/bindings/Deno.res",
+        "to": "satellites/repo-management/oikos/bot-integration/bindings/Fetch.res",
+        "relation": "shared_dir:satellites/repo-management/oikos/bot-integration/bindings",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/tests/catalog_tests.rs",
+        "to": "satellites/repo-management/robot-repo-automaton/tests/detector_tests.rs",
+        "relation": "shared_dir:satellites/repo-management/robot-repo-automaton/tests",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/arangodb_adapter.ex",
+        "to": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/xtdb_adapter.ex",
+        "relation": "shared_dir:satellites/git-tools/gitvisor/backend/lib/gitvisor/repo",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/checker.ex",
+        "to": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/fixer.ex",
+        "relation": "shared_dir:satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Glyphs.res",
+        "to": "satellites/developer-ux/rescript-evangeliser/src/Narrative.res",
+        "relation": "shared_dir:satellites/developer-ux/rescript-evangeliser/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Narrative.res",
+        "to": "satellites/developer-ux/rescript-evangeliser/src/Patterns.res",
+        "relation": "shared_dir:satellites/developer-ux/rescript-evangeliser/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/github.ex",
+        "to": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/gitlab.ex",
+        "relation": "shared_dir:satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/builtins.rs",
+        "to": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/formats.rs",
+        "relation": "shared_dir:satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/formats.rs",
+        "to": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+        "relation": "shared_dir:satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+        "to": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/types.rs",
+        "relation": "shared_dir:satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/types.rs",
+        "to": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/vm.rs",
+        "relation": "shared_dir:satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res",
+        "to": "satellites/repo-management/oikos/bot-integration/src/Analysis.res.js",
+        "relation": "shared_dir:satellites/repo-management/oikos/bot-integration/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res.js",
+        "to": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res",
+        "relation": "shared_dir:satellites/repo-management/oikos/bot-integration/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res",
+        "to": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res.js",
+        "relation": "shared_dir:satellites/repo-management/oikos/bot-integration/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res.js",
+        "to": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res",
+        "relation": "shared_dir:satellites/repo-management/oikos/bot-integration/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res",
+        "to": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res.js",
+        "relation": "shared_dir:satellites/repo-management/oikos/bot-integration/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res.js",
+        "to": "satellites/repo-management/oikos/bot-integration/src/Router.res",
+        "relation": "shared_dir:satellites/repo-management/oikos/bot-integration/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/config.rs",
+        "to": "satellites/git-tools/vext/vext-core/src/error.rs",
+        "relation": "shared_dir:satellites/git-tools/vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/error.rs",
+        "to": "satellites/git-tools/vext/vext-core/src/irc_client.rs",
+        "relation": "shared_dir:satellites/git-tools/vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/irc_client.rs",
+        "to": "satellites/git-tools/vext/vext-core/src/listener.rs",
+        "relation": "shared_dir:satellites/git-tools/vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/listener.rs",
+        "to": "satellites/git-tools/vext/vext-core/src/main.rs",
+        "relation": "shared_dir:satellites/git-tools/vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/main.rs",
+        "to": "satellites/git-tools/vext/vext-core/src/pool.rs",
+        "relation": "shared_dir:satellites/git-tools/vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/pool.rs",
+        "to": "satellites/git-tools/vext/vext-core/src/protocol.rs",
+        "relation": "shared_dir:satellites/git-tools/vext/vext-core/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ArangoClient.res",
+        "to": "satellites/developer-ux/recon-silly-ation/src/ConflictResolver.res",
+        "relation": "shared_dir:satellites/developer-ux/recon-silly-ation/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ConflictResolver.res",
+        "to": "satellites/developer-ux/recon-silly-ation/src/Deduplicator.res",
+        "relation": "shared_dir:satellites/developer-ux/recon-silly-ation/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Deduplicator.res",
+        "to": "satellites/developer-ux/recon-silly-ation/src/HaskellBridge.res",
+        "relation": "shared_dir:satellites/developer-ux/recon-silly-ation/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/HaskellBridge.res",
+        "to": "satellites/developer-ux/recon-silly-ation/src/Pipeline.res",
+        "relation": "shared_dir:satellites/developer-ux/recon-silly-ation/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Pipeline.res",
+        "to": "satellites/developer-ux/recon-silly-ation/src/Docubot.res",
+        "relation": "shared_dir:satellites/developer-ux/recon-silly-ation/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/catalog.rs",
+        "to": "satellites/repo-management/robot-repo-automaton/src/cicd_hyper_a.rs",
+        "relation": "shared_dir:satellites/repo-management/robot-repo-automaton/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/cicd_hyper_a.rs",
+        "to": "satellites/repo-management/robot-repo-automaton/src/config.rs",
+        "relation": "shared_dir:satellites/repo-management/robot-repo-automaton/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/config.rs",
+        "to": "satellites/repo-management/robot-repo-automaton/src/detector.rs",
+        "relation": "shared_dir:satellites/repo-management/robot-repo-automaton/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/detector.rs",
+        "to": "satellites/repo-management/robot-repo-automaton/src/error.rs",
+        "relation": "shared_dir:satellites/repo-management/robot-repo-automaton/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/error.rs",
+        "to": "satellites/repo-management/robot-repo-automaton/src/fixer.rs",
+        "relation": "shared_dir:satellites/repo-management/robot-repo-automaton/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/fixer.rs",
+        "to": "satellites/repo-management/robot-repo-automaton/src/github.rs",
+        "relation": "shared_dir:satellites/repo-management/robot-repo-automaton/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/github.rs",
+        "to": "satellites/repo-management/robot-repo-automaton/src/hooks.rs",
+        "relation": "shared_dir:satellites/repo-management/robot-repo-automaton/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/hooks.rs",
+        "to": "satellites/repo-management/robot-repo-automaton/src/main.rs",
+        "relation": "shared_dir:satellites/repo-management/robot-repo-automaton/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/tui/src/gitvisor-ui.adb",
+        "to": "satellites/git-tools/gitvisor/tui/src/gitvisor_tui.adb",
+        "relation": "shared_dir:satellites/git-tools/gitvisor/tui/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/badge.adb",
+        "to": "satellites/git-tools/gitloom/ada/src/diagnose.adb",
+        "relation": "shared_dir:satellites/git-tools/gitloom/ada/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/diagnose.adb",
+        "to": "satellites/git-tools/gitloom/ada/src/loom_mittens_parser.adb",
+        "relation": "shared_dir:satellites/git-tools/gitloom/ada/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_mittens_parser.adb",
+        "to": "satellites/git-tools/gitloom/ada/src/loom_overlay_emitter.adb",
+        "relation": "shared_dir:satellites/git-tools/gitloom/ada/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_overlay_emitter.adb",
+        "to": "satellites/git-tools/gitloom/ada/src/loom_trace_renderer.adb",
+        "relation": "shared_dir:satellites/git-tools/gitloom/ada/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/git-seo/src/analyzers.jl",
+        "to": "satellites/git-tools/git-seo/src/cli.jl",
+        "relation": "shared_dir:satellites/git-tools/git-seo/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation.ex",
+        "to": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo.ex",
+        "relation": "shared_dir:satellites/git-tools/gitvisor/backend/lib/gitvisor",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/audit_log.rs",
+        "to": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/dir_capability.rs",
+        "relation": "shared_dir:satellites/git-tools/polysafe-gitfixer/crates/capability/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Builder.hs",
+        "to": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Registry.hs",
+        "relation": "shared_dir:satellites/scaffolding/scaffoldia/src/Scaffoldia",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Registry.hs",
+        "to": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Template.hs",
+        "relation": "shared_dir:satellites/scaffolding/scaffoldia/src/Scaffoldia",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/hooks/Git.res",
+        "to": "satellites/git-tools/vext/vext-tools/src/hooks/Install.res",
+        "relation": "shared_dir:satellites/git-tools/vext/vext-tools/src/hooks",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/audit/lib/loom_audit/kanren_generator.ex",
+        "to": "satellites/git-tools/gitloom/audit/lib/loom_audit/resolvers.ex",
+        "relation": "shared_dir:satellites/git-tools/gitloom/audit/lib/loom_audit",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/backend.ex",
+        "to": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/middleware.ex",
+        "relation": "shared_dir:satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/analytics/src/GitvisorAnalytics.jl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/analytics/src/GitvisorAnalytics.jl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/analytics/src/GitvisorAnalytics.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/analytics/src/GitvisorAnalytics.jl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/analytics/src/GitvisorAnalytics.jl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation/echidnabot.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation/echidnabot.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation/echidnabot.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation/echidnabot.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation/echidnabot.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/github.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/github.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/github.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/github.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/github.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/gitlab.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/gitlab.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/gitlab.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/gitlab.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/gitlab.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/arangodb_adapter.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/arangodb_adapter.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/arangodb_adapter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/arangodb_adapter.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/arangodb_adapter.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/xtdb_adapter.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/xtdb_adapter.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/xtdb_adapter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/xtdb_adapter.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo/xtdb_adapter.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/backend/lib/gitvisor/repo.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/frontend/src/Api.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/frontend/src/Api.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/frontend/src/Api.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/frontend/src/Api.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/frontend/src/Api.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/backend.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/backend.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/backend.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/backend.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/backend.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/middleware.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/middleware.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/middleware.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/middleware.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/middleware.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/checker.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/checker.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/checker.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/checker.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/checker.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/fixer.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/fixer.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/fixer.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/fixer.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/fixer.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/tui/src/gitvisor-ui.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/tui/src/gitvisor-ui.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/tui/src/gitvisor-ui.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/tui/src/gitvisor-ui.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/tui/src/gitvisor-ui.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/tui/src/gitvisor_tui.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/tui/src/gitvisor_tui.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/tui/src/gitvisor_tui.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/tui/src/gitvisor_tui.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/tui/src/gitvisor_tui.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/flake.nix",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/flake.nix",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/flake.nix",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/flake.nix",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitvisor/flake.nix",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/badge.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/badge.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/badge.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/badge.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/badge.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/diagnose.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/diagnose.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/diagnose.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/diagnose.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/diagnose.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_mittens_parser.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_mittens_parser.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_mittens_parser.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_mittens_parser.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_mittens_parser.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_overlay_emitter.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_overlay_emitter.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_overlay_emitter.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_overlay_emitter.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_overlay_emitter.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_trace_renderer.adb",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_trace_renderer.adb",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_trace_renderer.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_trace_renderer.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/ada/src/loom_trace_renderer.adb",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/audit/lib/loom_audit/kanren_generator.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/audit/lib/loom_audit/kanren_generator.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/audit/lib/loom_audit/kanren_generator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/audit/lib/loom_audit/kanren_generator.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/audit/lib/loom_audit/kanren_generator.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/audit/lib/loom_audit/resolvers.ex",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/audit/lib/loom_audit/resolvers.ex",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/audit/lib/loom_audit/resolvers.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/audit/lib/loom_audit/resolvers.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/audit/lib/loom_audit/resolvers.ex",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/batch-auditor/src/main.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/batch-auditor/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/batch-auditor/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/batch-auditor/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/batch-auditor/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/grammar/normalize.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/grammar/normalize.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/grammar/normalize.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/grammar/normalize.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/grammar/normalize.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/logic/loom_index.pl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/logic/loom_index.pl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/logic/loom_index.pl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/logic/loom_index.pl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/gitloom/logic/loom_index.pl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/git-seo/src/analyzers.jl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/git-seo/src/analyzers.jl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/git-seo/src/analyzers.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/git-seo/src/analyzers.jl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/git-seo/src/analyzers.jl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/git-seo/src/cli.jl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/git-seo/src/cli.jl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/git-seo/src/cli.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/git-seo/src/cli.jl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/git-seo/src/cli.jl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/config/default.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/config/default.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/config/default.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/config/default.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/config/default.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/audit_log.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 34.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/audit_log.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 34.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/audit_log.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 34.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/audit_log.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 34.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/audit_log.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 34.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/dir_capability.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 26.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/dir_capability.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 26.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/dir_capability.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 26.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/dir_capability.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 26.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/capability/src/dir_capability.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 26.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/fs_ops/src/transaction.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 47.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/fs_ops/src/transaction.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 47.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/fs_ops/src/transaction.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 47.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/fs_ops/src/transaction.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 47.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/fs_ops/src/transaction.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 47.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/git_ops/src/lib.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 28.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/git_ops/src/lib.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 28.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/git_ops/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 28.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/git_ops/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 28.0
+      },
+      {
+        "from": "satellites/git-tools/polysafe-gitfixer/crates/git_ops/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 28.0
+      },
+      {
+        "from": "satellites/git-tools/vext/tools/rsr_checker.py",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/tools/rsr_checker.py",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/tools/rsr_checker.py",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/tools/rsr_checker.py",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/tools/rsr_checker.py",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/bin/send.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/bin/send.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/bin/send.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/bin/send.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/bin/send.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/config.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/config.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/config.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/config.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/error.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/error.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/error.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/error.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/error.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/irc_client.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/irc_client.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/irc_client.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/irc_client.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/irc_client.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/listener.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/listener.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/listener.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/listener.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/listener.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/main.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/pool.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/pool.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/pool.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/pool.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/pool.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/protocol.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/protocol.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/protocol.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/protocol.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/src/protocol.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/tests/integration.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/tests/integration.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/tests/integration.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/tests/integration.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-core/tests/integration.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/bindings/Deno.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/bindings/Deno.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/bindings/Deno.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/bindings/Deno.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/bindings/Deno.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 30.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/hooks/Git.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/hooks/Git.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/hooks/Git.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/hooks/Git.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/hooks/Git.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 12.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/hooks/Install.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/hooks/Install.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/hooks/Install.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/hooks/Install.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/git-tools/vext/vext-tools/src/hooks/Install.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Analysis.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Analysis.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Analysis.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Analysis.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Analysis.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Pareto.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Pareto.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Pareto.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Pareto.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/analyzers/code-haskell/src/Eco/Pareto.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/bindings/Deno.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/bindings/Deno.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/bindings/Deno.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/bindings/Deno.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/bindings/Deno.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 57.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/bindings/Fetch.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/bindings/Fetch.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/bindings/Fetch.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/bindings/Fetch.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/bindings/Fetch.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 18.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res.js",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res.js",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Analysis.res.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res.js",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res.js",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubAPI.res.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res.js",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res.js",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/GitHubApp.res.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Router.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Router.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Router.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Router.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/src/Router.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/scripts/smee-client.js",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/scripts/smee-client.js",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/scripts/smee-client.js",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/scripts/smee-client.js",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/bot-integration/scripts/smee-client.js",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/nix/flake.nix",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/nix/flake.nix",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/nix/flake.nix",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/nix/flake.nix",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/nix/flake.nix",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/flake.nix",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/flake.nix",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/flake.nix",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/flake.nix",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/oikos/flake.nix",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/catalog.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/catalog.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/catalog.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/catalog.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/catalog.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/cicd_hyper_a.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/cicd_hyper_a.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/cicd_hyper_a.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/cicd_hyper_a.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/cicd_hyper_a.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/config.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/config.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/config.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/config.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/config.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/detector.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/detector.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/detector.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/detector.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/detector.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/error.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/error.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/error.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/error.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/error.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/fixer.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/fixer.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/fixer.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/fixer.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/fixer.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/github.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/github.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/github.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/github.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/github.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/hooks.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/hooks.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/hooks.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/hooks.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/hooks.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/main.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/main.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/tests/catalog_tests.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/tests/catalog_tests.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/tests/catalog_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/tests/catalog_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/tests/catalog_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/tests/detector_tests.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/tests/detector_tests.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/tests/detector_tests.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/tests/detector_tests.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "satellites/repo-management/robot-repo-automaton/tests/detector_tests.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 27.0
+      },
+      {
+        "from": "satellites/repo-management/grim-repo/src/Utils.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/repo-management/grim-repo/src/Utils.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/repo-management/grim-repo/src/Utils.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/repo-management/grim-repo/src/Utils.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/repo-management/grim-repo/src/Utils.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/pathfinding.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/pathfinding.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/pathfinding.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/pathfinding.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/pathfinding.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/robot.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/robot.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/robot.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/robot.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/src/rust/src/robot.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/flake.nix",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/flake.nix",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/flake.nix",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/flake.nix",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/repo-management/robot-vacuum-cleaner/flake.nix",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/builder/main.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/builder/main.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/builder/main.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/builder/main.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/builder/main.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/cli/scaffoldia.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/cli/scaffoldia.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/cli/scaffoldia.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/cli/scaffoldia.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/cli/scaffoldia.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/registry/rust/library.ncl",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/registry/rust/library.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/registry/rust/library.ncl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/registry/rust/library.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/registry/rust/library.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Builder.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Builder.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Builder.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Builder.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Builder.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Registry.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Registry.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Registry.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Registry.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Registry.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Template.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Template.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Template.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Template.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/scaffolding/scaffoldia/src/Scaffoldia/Template.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Glyphs.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Glyphs.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Glyphs.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Glyphs.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Glyphs.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Narrative.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Narrative.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Narrative.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Narrative.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Narrative.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Patterns.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Patterns.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Patterns.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Patterns.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/developer-ux/rescript-evangeliser/src/Patterns.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ArangoClient.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 32.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ArangoClient.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 32.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ArangoClient.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 32.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ArangoClient.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 32.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ArangoClient.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 32.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ConflictResolver.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ConflictResolver.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ConflictResolver.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ConflictResolver.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/ConflictResolver.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Deduplicator.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Deduplicator.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Deduplicator.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Deduplicator.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Deduplicator.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/HaskellBridge.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/HaskellBridge.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/HaskellBridge.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/HaskellBridge.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/HaskellBridge.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Pipeline.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Pipeline.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Pipeline.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Pipeline.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Pipeline.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Docubot.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Docubot.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Docubot.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Docubot.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/src/Docubot.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/tests/TestRunner.res",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/tests/TestRunner.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/tests/TestRunner.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/tests/TestRunner.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/tests/TestRunner.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/validator/Main.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/validator/Main.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/validator/Main.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/validator/Main.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/validator/Main.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/lib.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/lib.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/lib.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/builtins.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/builtins.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/builtins.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/builtins.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/builtins.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/formats.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/formats.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/formats.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/formats.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/formats.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/types.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/types.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/types.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/types.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/types.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/vm.rs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/vm.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/vm.rs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/vm.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/vm.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Phoenix",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 36.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "satellites/git-tools/polysafe-gitfixer/crates/capability/src/audit_log.rs",
+          "satellites/git-tools/polysafe-gitfixer/crates/capability/src/dir_capability.rs",
+          "satellites/git-tools/polysafe-gitfixer/crates/fs_ops/src/transaction.rs",
+          "satellites/git-tools/polysafe-gitfixer/crates/git_ops/src/lib.rs",
+          "satellites/git-tools/vext/vext-tools/src/hooks/Git.res",
+          "satellites/repo-management/robot-repo-automaton/src/detector.rs",
+          "satellites/repo-management/robot-repo-automaton/tests/catalog_tests.rs",
+          "satellites/repo-management/robot-repo-automaton/tests/detector_tests.rs",
+          "satellites/repo-management/grim-repo/src/Utils.res",
+          "satellites/developer-ux/rescript-evangeliser/src/Narrative.res",
+          "satellites/developer-ux/recon-silly-ation/src/ArangoClient.res",
+          "satellites/developer-ux/recon-silly-ation/src/ConflictResolver.res",
+          "satellites/developer-ux/recon-silly-ation/src/HaskellBridge.res",
+          "satellites/developer-ux/recon-silly-ation/src/Pipeline.res",
+          "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+          "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/vm.rs"
+        ],
+        "frameworks": [
+          "Phoenix",
+          "Database",
+          "OTP",
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "AtomExhaustion",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "satellites/git-tools/gitvisor/satellite-repos/cadre-router/lib/cadre/router/backend.ex",
+          "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot/config.ex",
+          "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/cli.ex"
+        ],
+        "frameworks": [
+          "Phoenix",
+          "Database",
+          "OTP",
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "AtomExhaustion->Memory"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          "satellites/developer-ux/recon-silly-ation/src/main.js"
+        ],
+        "frameworks": [
+          "Phoenix",
+          "Database",
+          "OTP",
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "ExcessivePermissions->Disk"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/badge.ex",
+          "satellites/repo-management/oikos/policy-engine/deepproblog/eco_problog.pl",
+          "satellites/developer-ux/recon-silly-ation/src/CLI.res"
+        ],
+        "frameworks": [
+          "Phoenix",
+          "Database",
+          "OTP",
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation/echidnabot.ex",
+          "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot/attestation.ex",
+          "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot/verifier.ex",
+          "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/checker.ex",
+          "satellites/git-tools/gitloom/audit/lib/loom_audit/resolvers.ex"
+        ],
+        "frameworks": [
+          "Phoenix",
+          "Database",
+          "OTP",
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "satellites/git-tools/polysafe-gitfixer/crates/capability/src/audit_log.rs",
+          "satellites/git-tools/polysafe-gitfixer/crates/capability/src/dir_capability.rs",
+          "satellites/git-tools/polysafe-gitfixer/crates/fs_ops/src/transaction.rs",
+          "satellites/git-tools/polysafe-gitfixer/crates/git_ops/src/lib.rs",
+          "satellites/repo-management/robot-repo-automaton/src/detector.rs",
+          "satellites/repo-management/robot-repo-automaton/tests/catalog_tests.rs",
+          "satellites/repo-management/robot-repo-automaton/tests/detector_tests.rs",
+          "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/lexer.rs",
+          "satellites/developer-ux/recon-silly-ation/wasm-modules/src/reconforth/vm.rs"
+        ],
+        "frameworks": [
+          "Phoenix",
+          "Database",
+          "OTP",
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "UncheckedError",
+        "sink_axis": "cpu",
+        "severity_value": 1.0,
+        "files": [
+          "satellites/git-tools/polysafe-gitfixer/crates/polysafe_nifs/src/lib.rs"
+        ],
+        "frameworks": [
+          "Phoenix",
+          "Database",
+          "OTP",
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "UncheckedError->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "satellites/git-tools/gitvisor/backend/lib/gitvisor/attestation/echidnabot.ex",
+          "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot/attestation.ex",
+          "satellites/git-tools/gitvisor/satellite-repos/echidnabot/lib/echidnabot/verifier.ex",
+          "satellites/git-tools/gitvisor/satellite-repos/rhodibot/.archive/lib/rhodibot/checker.ex",
+          "satellites/git-tools/gitloom/audit/lib/loom_audit/resolvers.ex"
+        ],
+        "frameworks": [
+          "Phoenix",
+          "Database",
+          "OTP",
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/github.ex",
+          "satellites/git-tools/gitvisor/backend/lib/gitvisor/platforms/gitlab.ex",
+          "satellites/git-tools/gitvisor/backend/lib/gitvisor_web.ex"
+        ],
+        "frameworks": [
+          "Phoenix",
+          "Database",
+          "OTP",
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "satellites/developer-ux/recon-silly-ation/src/main.js"
+        ],
+        "frameworks": [
+          "Phoenix",
+          "Database",
+          "OTP",
+          "Networking",
+          "WebServer"
+        ],
+        "relation": "ExcessivePermissions->Network"
+      }
+    ]
+  }
+}

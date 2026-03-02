@@ -1,0 +1,729 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "UnsafeDeserialization",
+      "location": "src/api/DigitalBiblePlatform.res",
+      "severity": "High",
+      "description": "1 JSON.parseExn calls in src/api/DigitalBiblePlatform.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "src/crawlers/BibleCloud.res",
+      "severity": "High",
+      "description": "3 JSON.parseExn calls in src/crawlers/BibleCloud.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/crawlers/BibleCloud.res",
+      "severity": "Medium",
+      "description": "3 unsafe get calls in src/crawlers/BibleCloud.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "src/crawlers/BibleCom.res",
+      "severity": "High",
+      "description": "1 JSON.parseExn calls in src/crawlers/BibleCom.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/crawlers/PngScriptures.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in src/crawlers/PngScriptures.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/crawlers/EBible.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in src/crawlers/EBible.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "src/crawlers/FindBible.res",
+      "severity": "High",
+      "description": "2 JSON.parseExn calls in src/crawlers/FindBible.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/utils/Statistics.res",
+      "severity": "Medium",
+      "description": "13 unsafe get calls in src/utils/Statistics.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeDeserialization",
+      "location": "src/utils/Http.res",
+      "severity": "High",
+      "description": "1 JSON.parseExn calls in src/utils/Http.res (use JSON.parse for safe Result)",
+      "recommended_attack": [
+        "memory",
+        "cpu"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/Lang1000.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in src/Lang1000.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/verisimdb/CorpusAnalyzer.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in src/verisimdb/CorpusAnalyzer.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "test/utils/Statistics_test.res",
+      "severity": "Medium",
+      "description": "5 unsafe get calls in test/utils/Statistics_test.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "ExcessivePermissions",
+      "location": "scripts/verisimdb-ingest.sh",
+      "severity": "High",
+      "description": "Deno -A (all permissions) in scripts/verisimdb-ingest.sh",
+      "recommended_attack": [
+        "network",
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/verisimdb-ingest.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/verisimdb-ingest.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "orchestrator/lib/lol/crawler_worker.ex",
+      "severity": "Medium",
+      "description": "System command execution in orchestrator/lib/lol/crawler_worker.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "orchestrator/lib/lol/verisimdb_reporter.ex",
+      "severity": "Medium",
+      "description": "System command execution in orchestrator/lib/lol/verisimdb_reporter.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "orchestrator/lib/lol/julia_bridge.ex",
+      "severity": "Medium",
+      "description": "System command execution in orchestrator/lib/lol/julia_bridge.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 7559,
+    "unsafe_blocks": 27,
+    "panic_sites": 8,
+    "unwrap_calls": 29,
+    "allocation_sites": 16,
+    "io_operations": 13,
+    "threading_constructs": 6
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/api/DigitalBiblePlatform.res",
+      "lines": 379,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/crawlers/BibleCloud.res",
+      "lines": 292,
+      "unsafe_blocks": 0,
+      "panic_sites": 3,
+      "unwrap_calls": 3,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/crawlers/BibleCom.res",
+      "lines": 260,
+      "unsafe_blocks": 0,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/crawlers/PngScriptures.res",
+      "lines": 271,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/crawlers/EBible.res",
+      "lines": 186,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/crawlers/FindBible.res",
+      "lines": 249,
+      "unsafe_blocks": 0,
+      "panic_sites": 2,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/utils/Statistics.res",
+      "lines": 246,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 13,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/utils/Http.res",
+      "lines": 143,
+      "unsafe_blocks": 9,
+      "panic_sites": 1,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Lang1000.res",
+      "lines": 295,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verisimdb/CorpusAnalyzer.res",
+      "lines": 346,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verisimdb/Export.res",
+      "lines": 81,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test/utils/Statistics_test.res",
+      "lines": 236,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 5,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test/Vitest.res",
+      "lines": 62,
+      "unsafe_blocks": 18,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "analysis/src/server.jl",
+      "lines": 112,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "orchestrator/lib/lol/crawler_worker.ex",
+      "lines": 135,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "orchestrator/lib/lol/corpus_aggregator.ex",
+      "lines": 143,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "orchestrator/lib/lol/verisimdb_reporter.ex",
+      "lines": 150,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "orchestrator/lib/lol/julia_bridge.ex",
+      "lines": 146,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "orchestrator/lib/lol/rate_limiter.ex",
+      "lines": 96,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "orchestrator/lib/lol/source_registry.ex",
+      "lines": 74,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "orchestrator/test/crawler_worker_test.exs",
+      "lines": 27,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "cpu",
+    "network",
+    "memory",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "orchestrator/lib/lol/crawler_worker.ex",
+        "to": "orchestrator/lib/lol/corpus_aggregator.ex",
+        "relation": "shared_dir:orchestrator/lib/lol",
+        "weight": 1.0
+      },
+      {
+        "from": "orchestrator/lib/lol/corpus_aggregator.ex",
+        "to": "orchestrator/lib/lol/verisimdb_reporter.ex",
+        "relation": "shared_dir:orchestrator/lib/lol",
+        "weight": 1.0
+      },
+      {
+        "from": "orchestrator/lib/lol/verisimdb_reporter.ex",
+        "to": "orchestrator/lib/lol/julia_bridge.ex",
+        "relation": "shared_dir:orchestrator/lib/lol",
+        "weight": 1.0
+      },
+      {
+        "from": "orchestrator/lib/lol/julia_bridge.ex",
+        "to": "orchestrator/lib/lol/rate_limiter.ex",
+        "relation": "shared_dir:orchestrator/lib/lol",
+        "weight": 1.0
+      },
+      {
+        "from": "orchestrator/lib/lol/rate_limiter.ex",
+        "to": "orchestrator/lib/lol/source_registry.ex",
+        "relation": "shared_dir:orchestrator/lib/lol",
+        "weight": 1.0
+      },
+      {
+        "from": "src/crawlers/BibleCloud.res",
+        "to": "src/crawlers/BibleCom.res",
+        "relation": "shared_dir:src/crawlers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/crawlers/BibleCom.res",
+        "to": "src/crawlers/PngScriptures.res",
+        "relation": "shared_dir:src/crawlers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/crawlers/PngScriptures.res",
+        "to": "src/crawlers/EBible.res",
+        "relation": "shared_dir:src/crawlers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/crawlers/EBible.res",
+        "to": "src/crawlers/FindBible.res",
+        "relation": "shared_dir:src/crawlers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verisimdb/CorpusAnalyzer.res",
+        "to": "src/verisimdb/Export.res",
+        "relation": "shared_dir:src/verisimdb",
+        "weight": 1.0
+      },
+      {
+        "from": "src/utils/Statistics.res",
+        "to": "src/utils/Http.res",
+        "relation": "shared_dir:src/utils",
+        "weight": 1.0
+      },
+      {
+        "from": "src/api/DigitalBiblePlatform.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/crawlers/BibleCloud.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "src/crawlers/BibleCom.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/crawlers/PngScriptures.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/crawlers/EBible.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/crawlers/FindBible.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/utils/Statistics.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 13.0
+      },
+      {
+        "from": "src/utils/Http.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 29.0
+      },
+      {
+        "from": "src/Lang1000.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/verisimdb/CorpusAnalyzer.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/verisimdb/Export.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test/utils/Statistics_test.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 5.0
+      },
+      {
+        "from": "test/Vitest.res",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 54.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "analysis/src/server.jl",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "orchestrator/lib/lol/crawler_worker.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "orchestrator/lib/lol/corpus_aggregator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "orchestrator/lib/lol/verisimdb_reporter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "orchestrator/lib/lol/julia_bridge.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "orchestrator/lib/lol/rate_limiter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "orchestrator/lib/lol/source_registry.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "orchestrator/test/crawler_worker_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "orchestrator/lib/lol/crawler_worker.ex",
+          "orchestrator/lib/lol/verisimdb_reporter.ex",
+          "orchestrator/lib/lol/julia_bridge.ex"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Disk"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "scripts/verisimdb-ingest.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "ExcessivePermissions->Network"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "src/api/DigitalBiblePlatform.res",
+          "src/crawlers/BibleCloud.res",
+          "src/crawlers/BibleCom.res",
+          "src/crawlers/FindBible.res",
+          "src/utils/Http.res"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeDeserialization->Cpu"
+      },
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/verisimdb-ingest.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "orchestrator/lib/lol/crawler_worker.ex",
+          "orchestrator/lib/lol/verisimdb_reporter.ex",
+          "orchestrator/lib/lol/julia_bridge.ex"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/crawlers/BibleCloud.res",
+          "src/crawlers/PngScriptures.res",
+          "src/crawlers/EBible.res",
+          "src/utils/Statistics.res",
+          "src/Lang1000.res",
+          "src/verisimdb/CorpusAnalyzer.res",
+          "test/utils/Statistics_test.res"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "UnsafeDeserialization",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "src/api/DigitalBiblePlatform.res",
+          "src/crawlers/BibleCloud.res",
+          "src/crawlers/BibleCom.res",
+          "src/crawlers/FindBible.res",
+          "src/utils/Http.res"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "UnsafeDeserialization->Memory"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          "scripts/verisimdb-ingest.sh"
+        ],
+        "frameworks": [
+          "OTP"
+        ],
+        "relation": "ExcessivePermissions->Disk"
+      }
+    ]
+  }
+}

@@ -1,0 +1,414 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)
+//
+// Protobuf definitions for VeriSimDB federation protocol.
+//
+// This file defines the gRPC service and message types used for
+// inter-instance federation.  VeriSimDB instances form a federated
+// mesh where each peer can register, discover, query, and monitor
+// other peers while maintaining local autonomy.
+//
+// The federation protocol is drift-aware: query results are annotated
+// with drift status, and the coordinator can apply drift policies
+// (strict, repair, tolerate, latest) to filter or annotate results.
+
+syntax = "proto3";
+
+package verisim.federation;
+
+option java_package = "db.verisim.federation";
+option java_outer_classname = "VeriSimFederationProto";
+option go_package = "verisim/federation";
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+// Modality identifies one of the 8 octad modality dimensions.
+// Each hexad entity can have data in any combination of these modalities.
+enum Modality {
+  // Unspecified / unknown modality (protobuf default).
+  MODALITY_UNSPECIFIED = 0;
+
+  // RDF triples and property-graph edges.
+  MODALITY_GRAPH = 1;
+
+  // Dense embedding vector for similarity search.
+  MODALITY_VECTOR = 2;
+
+  // Multi-dimensional numeric tensor (shape + data).
+  MODALITY_TENSOR = 3;
+
+  // Ontological type annotations and property maps.
+  MODALITY_SEMANTIC = 4;
+
+  // Full-text searchable document content.
+  MODALITY_DOCUMENT = 5;
+
+  // Version history and time-travel queries.
+  MODALITY_TEMPORAL = 6;
+
+  // Origin tracking, transformation chain, actor trail (hash chain).
+  MODALITY_PROVENANCE = 7;
+
+  // Geospatial coordinates, geometry types, proximity queries.
+  MODALITY_SPATIAL = 8;
+}
+
+// DriftPolicy controls how the federation coordinator handles
+// drift when aggregating results from peer stores.
+enum DriftPolicy {
+  // Unspecified policy (defaults to TOLERATE).
+  DRIFT_POLICY_UNSPECIFIED = 0;
+
+  // Only return results from stores with drift below threshold.
+  DRIFT_POLICY_STRICT = 1;
+
+  // Return results and trigger normalisation on drifted stores.
+  DRIFT_POLICY_REPAIR = 2;
+
+  // Return all results, annotating drifted ones (default).
+  DRIFT_POLICY_TOLERATE = 3;
+
+  // Return only the most recent version from each store.
+  DRIFT_POLICY_LATEST = 4;
+}
+
+// ---------------------------------------------------------------------------
+// Authentication
+// ---------------------------------------------------------------------------
+
+// BasicAuth credentials for adapter connections to external stores.
+message BasicAuth {
+  // Username for authentication.
+  string username = 1;
+
+  // Password (transmitted over TLS; stored hashed at rest).
+  string password = 2;
+}
+
+// BearerToken for OAuth2 / JWT authentication.
+message BearerToken {
+  // The bearer token string.
+  string token = 1;
+}
+
+// ApiKey for key-based authentication.
+message ApiKey {
+  // The API key string.
+  string key = 1;
+
+  // Header name for the API key (e.g. "X-API-Key", "Authorization").
+  // Defaults to "X-API-Key" if empty.
+  string header_name = 2;
+}
+
+// AuthConfig wraps the supported authentication methods.
+// Exactly one method should be set.
+message AuthConfig {
+  oneof method {
+    // HTTP Basic authentication.
+    BasicAuth basic_auth = 1;
+
+    // Bearer token (OAuth2 / JWT).
+    BearerToken bearer_token = 2;
+
+    // API key in a custom header.
+    ApiKey api_key = 3;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Peer Registration
+// ---------------------------------------------------------------------------
+
+// AdapterConfig describes how to connect to a specific external store
+// via a federation adapter.
+message AdapterConfig {
+  // Adapter type identifier (e.g. "postgres", "neo4j", "elasticsearch",
+  // "qdrant", "mongodb", "redis", "duckdb", "clickhouse", "weaviate",
+  // "milvus", "surrealdb", "influxdb", "tigergraph", "pinecone").
+  string adapter_type = 1;
+
+  // Adapter-specific connection parameters (e.g. "host", "port",
+  // "database", "index_name", "collection", "timeout_ms").
+  map<string, string> params = 2;
+
+  // Authentication configuration for the adapter's connection to
+  // the external store.
+  AuthConfig auth = 3;
+}
+
+// PeerInfo describes a peer store registering with the federation.
+message PeerInfo {
+  // Unique store identifier within the federation (e.g. "store-1",
+  // "/universities/oxford").  Must be alphanumeric plus dash, underscore,
+  // and slash.  Maximum 128 characters.
+  string store_id = 1;
+
+  // HTTP/gRPC endpoint URL for the peer's VeriSimDB API
+  // (e.g. "https://store-2.verisimdb.example.com:8080/api/v1").
+  string endpoint = 2;
+
+  // Which modalities this peer supports.
+  repeated Modality supported_modalities = 3;
+
+  // Adapter configuration for connecting to this peer's backing store.
+  AdapterConfig config = 4;
+
+  // Pre-shared key for federation authentication (sent once at
+  // registration, stored as SHA-256 hash on the coordinator).
+  string secret = 5;
+}
+
+// RegisterResponse returned after successful peer registration.
+message RegisterResponse {
+  // Whether the registration was successful.
+  bool success = 1;
+
+  // The coordinator's own store_id (for the peer to record).
+  string coordinator_store_id = 2;
+
+  // Human-readable message (e.g. "Peer registered successfully").
+  string message = 3;
+}
+
+// ---------------------------------------------------------------------------
+// Federation Queries
+// ---------------------------------------------------------------------------
+
+// TextQuery searches the document modality using full-text matching.
+message TextQuery {
+  // The text search string.
+  string query = 1;
+}
+
+// VectorQuery searches the vector modality using similarity search.
+message VectorQuery {
+  // The query embedding vector (float32).
+  repeated float vector = 1;
+
+  // Number of nearest neighbours to return.
+  int32 k = 2;
+}
+
+// GraphQuery searches the graph modality using a pattern.
+message GraphQuery {
+  // Graph traversal pattern.  Syntax is adapter-dependent (SPARQL,
+  // Cypher, simplified triple pattern, etc.).
+  string pattern = 1;
+}
+
+// SpatialQuery searches the spatial modality.
+message SpatialQuery {
+  // Centre latitude (WGS84).
+  double latitude = 1;
+
+  // Centre longitude (WGS84).
+  double longitude = 2;
+
+  // Search radius in kilometres (for radius search).
+  double radius_km = 3;
+
+  // Alternatively, a bounding box (for bounds search).
+  BoundingBox bounds = 4;
+
+  // Number of nearest neighbours (for k-nearest search).
+  int32 k = 5;
+}
+
+// BoundingBox for spatial bounding-box queries.
+message BoundingBox {
+  // Southern latitude boundary.
+  double min_lat = 1;
+
+  // Western longitude boundary.
+  double min_lon = 2;
+
+  // Northern latitude boundary.
+  double max_lat = 3;
+
+  // Eastern longitude boundary.
+  double max_lon = 4;
+}
+
+// TemporalQuery filters by time range.
+message TemporalQuery {
+  // Start of the time range (RFC 3339).
+  string start = 1;
+
+  // End of the time range (RFC 3339).
+  string end = 2;
+}
+
+// FederationQuery is the primary query message sent to the federation
+// coordinator.  It specifies which modalities to search, the query
+// payload, result limits, and drift handling policy.
+message FederationQuery {
+  // Which modalities to include in the query.
+  repeated Modality modalities = 1;
+
+  // Maximum results to return per peer (capped at 10000).
+  int32 limit = 2;
+
+  // Drift handling policy (defaults to TOLERATE).
+  DriftPolicy drift_policy = 3;
+
+  // The query payload.  Exactly one should be set.
+  oneof query {
+    // Full-text search.
+    TextQuery text_query = 10;
+
+    // Vector similarity search.
+    VectorQuery vector_query = 11;
+
+    // Graph pattern traversal.
+    GraphQuery graph_query = 12;
+
+    // Spatial proximity search.
+    SpatialQuery spatial_query = 13;
+
+    // Temporal range filter.
+    TemporalQuery temporal_query = 14;
+  }
+
+  // Optional glob pattern to match peer store IDs
+  // (e.g. "*", "/universities/*", "store-1").
+  string store_pattern = 20;
+}
+
+// FederationResult is a single result from a federated query.
+// Results are streamed from the coordinator to the client as they
+// arrive from peer stores.
+message FederationResult {
+  // Which peer store provided this result.
+  string source_store = 1;
+
+  // Hexad entity identifier within the source store.
+  string hexad_id = 2;
+
+  // Relevance score normalised to [0.0, 1.0].
+  double score = 3;
+
+  // Whether the source store has drift issues for this entity.
+  bool drifted = 4;
+
+  // Serialised result data (JSON-encoded hexad or modality-specific payload).
+  bytes data = 5;
+
+  // Time in milliseconds the source store took to respond.
+  int64 response_time_ms = 6;
+}
+
+// ---------------------------------------------------------------------------
+// Health Check
+// ---------------------------------------------------------------------------
+
+// HealthRequest asks a peer for its current health status.
+message HealthRequest {
+  // The requesting store's identifier (for logging and auditing).
+  string store_id = 1;
+}
+
+// HealthResponse reports a peer's health status.
+message HealthResponse {
+  // Whether the peer considers itself healthy.
+  bool healthy = 1;
+
+  // Round-trip latency of the health check in milliseconds.
+  int64 latency_ms = 2;
+
+  // Per-modality drift scores (modality name -> score).
+  map<string, double> drift_scores = 3;
+
+  // Overall drift health status.
+  string drift_status = 4;
+
+  // Number of hexad entities stored by this peer.
+  int64 entity_count = 5;
+}
+
+// ---------------------------------------------------------------------------
+// Peer Management
+// ---------------------------------------------------------------------------
+
+// ListPeersRequest asks the coordinator for all registered peers.
+message ListPeersRequest {
+  // Optional modality filter: only return peers supporting this modality.
+  Modality modality_filter = 1;
+}
+
+// PeerSummary provides a summary of a registered peer.
+message PeerSummary {
+  // Peer's store identifier.
+  string store_id = 1;
+
+  // Peer's endpoint URL.
+  string endpoint = 2;
+
+  // Modalities the peer supports.
+  repeated Modality supported_modalities = 3;
+
+  // Trust level (0.0 - 1.0).
+  double trust_level = 4;
+
+  // Last time the peer was seen (RFC 3339 timestamp).
+  string last_seen = 5;
+
+  // Average response time in milliseconds.
+  int64 avg_response_time_ms = 6;
+}
+
+// ListPeersResponse returns all registered peers.
+message ListPeersResponse {
+  // List of registered peer summaries.
+  repeated PeerSummary peers = 1;
+}
+
+// DeregisterRequest removes a peer from the federation.
+message DeregisterRequest {
+  // Store identifier of the peer to remove.
+  string store_id = 1;
+}
+
+// DeregisterResponse confirms peer removal.
+message DeregisterResponse {
+  // Whether the deregistration was successful.
+  bool success = 1;
+
+  // Human-readable message.
+  string message = 2;
+}
+
+// ---------------------------------------------------------------------------
+// Service Definition
+// ---------------------------------------------------------------------------
+
+// FederationService is the gRPC service for VeriSimDB federation.
+//
+// It provides peer registration, discovery, federated querying with
+// streaming results, and health monitoring.  All RPCs require TLS
+// and federation PSK authentication (via the X-Federation-PSK header
+// or the PeerInfo.secret field at registration time).
+service FederationService {
+  // RegisterPeer registers a new peer store with the federation
+  // coordinator.  Requires a valid pre-shared key matching the
+  // coordinator's VERISIM_FEDERATION_KEYS configuration.
+  rpc RegisterPeer(PeerInfo) returns (RegisterResponse);
+
+  // Query executes a federated query across matching peer stores.
+  // Results are streamed as they arrive from each peer, allowing
+  // the client to process results incrementally.
+  rpc Query(FederationQuery) returns (stream FederationResult);
+
+  // HealthCheck performs a health probe against a specific peer.
+  // Returns the peer's self-reported health status and drift scores.
+  rpc HealthCheck(HealthRequest) returns (HealthResponse);
+
+  // ListPeers returns all peers registered with the coordinator,
+  // optionally filtered by supported modality.
+  rpc ListPeers(ListPeersRequest) returns (ListPeersResponse);
+
+  // DeregisterPeer removes a peer from the federation.
+  rpc DeregisterPeer(DeregisterRequest) returns (DeregisterResponse);
+}

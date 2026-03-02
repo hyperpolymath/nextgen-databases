@@ -1,0 +1,2319 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Networking",
+    "Cache",
+    "Database",
+    "WebServer",
+    "Ecto"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "examples/enterprise-service/src/handlers.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in examples/enterprise-service/src/handlers.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "satellites/palimpsest-license/TOOLS/validation/haskell/test/Integration/PipelineSpec.hs",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in satellites/palimpsest-license/TOOLS/validation/haskell/test/Integration/PipelineSpec.hs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "satellites/palimpsest-license/TOOLS/validation/haskell/test/Palimpsest/Validator/MetadataSpec.hs",
+      "severity": "Medium",
+      "description": "4 HTTP (non-HTTPS) URLs in satellites/palimpsest-license/TOOLS/validation/haskell/test/Palimpsest/Validator/MetadataSpec.hs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "satellites/palimpsest-license/TOOLS/validation/haskell/test/Palimpsest/Validator/ReferenceSpec.hs",
+      "severity": "Medium",
+      "description": "3 HTTP (non-HTTPS) URLs in satellites/palimpsest-license/TOOLS/validation/haskell/test/Palimpsest/Validator/ReferenceSpec.hs",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "satellites/palimpsest-license/assets/conversion-scripts/convert.sh",
+      "severity": "Medium",
+      "description": "103 potentially unquoted variable expansions in satellites/palimpsest-license/assets/conversion-scripts/convert.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "satellites/palimpsest-license/bof-meetings/presentations/demo-dns-discovery.sh",
+      "severity": "Critical",
+      "description": "eval usage in satellites/palimpsest-license/bof-meetings/presentations/demo-dns-discovery.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+      "severity": "Critical",
+      "description": "eval usage in satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "satellites/palimpsest-license/integrations/server/ruby/lib/palimpsest/generator.rb",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in satellites/palimpsest-license/integrations/server/ruby/lib/palimpsest/generator.rb",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "satellites/palimpsest-license/scripts/setup-hooks.sh",
+      "severity": "Medium",
+      "description": "82 potentially unquoted variable expansions in satellites/palimpsest-license/scripts/setup-hooks.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "UnboundedLoop",
+      "location": "satellites/cccp/satellites/nextgen-languages/scripts/repo-reconcile.py",
+      "severity": "High",
+      "description": "Unbounded while True loop in satellites/cccp/satellites/nextgen-languages/scripts/repo-reconcile.py",
+      "recommended_attack": [
+        "cpu",
+        "time"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "rsr-audit.sh",
+      "severity": "Critical",
+      "description": "eval usage in rsr-audit.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "rsr-audit.sh",
+      "severity": "Medium",
+      "description": "160 potentially unquoted variable expansions in rsr-audit.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 30363,
+    "unsafe_blocks": 4,
+    "panic_sites": 0,
+    "unwrap_calls": 21,
+    "allocation_sites": 34,
+    "io_operations": 83,
+    "threading_constructs": 4
+  },
+  "file_statistics": [
+    {
+      "file_path": "examples/ai-ml-project/python/train.py",
+      "lines": 84,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/ai-ml-project/src/bin/server.rs",
+      "lines": 33,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/enterprise-service/benches/api_benchmarks.rs",
+      "lines": 36,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "examples/enterprise-service/build.rs",
+      "lines": 7,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/enterprise-service/src/handlers.rs",
+      "lines": 149,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "examples/enterprise-service/src/state.rs",
+      "lines": 46,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "examples/enterprise-service/src/main.rs",
+      "lines": 79,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "examples/rhodium-minimal/flake.nix",
+      "lines": 117,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/rhodium-minimal/src/main.rs",
+      "lines": 106,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "examples/standard-library/src/lib.rs",
+      "lines": 304,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "flake.nix",
+      "lines": 158,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/state.scm/lib/state-graph.scm",
+      "lines": 487,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/palimpsest-license/TOOLS/scripts/scaffold.sh",
+      "lines": 39,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator.hs",
+      "lines": 165,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Bilingual.hs",
+      "lines": 219,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/License.hs",
+      "lines": 272,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Metadata.hs",
+      "lines": 301,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Reference.hs",
+      "lines": 239,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Utils.hs",
+      "lines": 102,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/palimpsest-license/TOOLS/validation/install.sh",
+      "lines": 97,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/palimpsest-license/bof-meetings/presentations/demo-dns-discovery.sh",
+      "lines": 266,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+      "lines": 377,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 15,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/palimpsest-license/scripts/generate-structure.sh",
+      "lines": 127,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/cccp/satellites/nextgen-languages/scripts/repo-reconcile.py",
+      "lines": 280,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/cccp/satellites/sanctify-php/app/Main.hs",
+      "lines": 220,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Security.hs",
+      "lines": 387,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Types.hs",
+      "lines": 424,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Parser.hs",
+      "lines": 528,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Transform/TypeHints.hs",
+      "lines": 258,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/consent-aware-http/examples/reference-implementations/python/aibdp_middleware.py",
+      "lines": 436,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/consent-aware-http/src/Aibdp.res",
+      "lines": 229,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/consent-aware-http/src/Express.res",
+      "lines": 15,
+      "unsafe_blocks": 3,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/consent-aware-http/src/Node.res",
+      "lines": 11,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-certifier/engine/src/adapters/bitbucket.rs",
+      "lines": 198,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-certifier/engine/src/adapters/mod.rs",
+      "lines": 118,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-certifier/engine/src/compliance/bronze.rs",
+      "lines": 400,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-certifier/engine/src/compliance/gold.rs",
+      "lines": 445,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-certifier/engine/src/compliance/mod.rs",
+      "lines": 181,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-certifier/engine/src/compliance/rhodium.rs",
+      "lines": 445,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-certifier/engine/src/compliance/silver.rs",
+      "lines": 431,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-certifier/engine/src/lib.rs",
+      "lines": 162,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-certifier/engine/src/main.rs",
+      "lines": 301,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-certifier/extensions/vscode/src/extension.ts",
+      "lines": 379,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-certifier/lsp/src/main.rs",
+      "lines": 242,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "satellites/rsr-deployer/scripts/bootstrap.sh",
+      "lines": 63,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rsr-check.scm",
+      "lines": 496,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rsr-audit.sh",
+      "lines": 928,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rsr-compliance-checklist.k9.ncl",
+      "lines": 180,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "cpu",
+    "disk",
+    "time",
+    "memory",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "satellites/rsr-certifier/engine/src/adapters/bitbucket.rs",
+        "to": "satellites/rsr-certifier/engine/src/adapters/mod.rs",
+        "relation": "shared_dir:satellites/rsr-certifier/engine/src/adapters",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/enterprise-service/src/handlers.rs",
+        "to": "examples/enterprise-service/src/state.rs",
+        "relation": "shared_dir:examples/enterprise-service/src",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/enterprise-service/src/state.rs",
+        "to": "examples/enterprise-service/src/main.rs",
+        "relation": "shared_dir:examples/enterprise-service/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Security.hs",
+        "to": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Types.hs",
+        "relation": "shared_dir:satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Bilingual.hs",
+        "to": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/License.hs",
+        "relation": "shared_dir:satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/License.hs",
+        "to": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Metadata.hs",
+        "relation": "shared_dir:satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Metadata.hs",
+        "to": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Reference.hs",
+        "relation": "shared_dir:satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Reference.hs",
+        "to": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Utils.hs",
+        "relation": "shared_dir:satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Aibdp.res",
+        "to": "satellites/consent-aware-http/src/Express.res",
+        "relation": "shared_dir:satellites/consent-aware-http/src",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Express.res",
+        "to": "satellites/consent-aware-http/src/Node.res",
+        "relation": "shared_dir:satellites/consent-aware-http/src",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "rsr-check.scm",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-check.scm",
+        "to": "rsr-audit.sh",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-audit.sh",
+        "to": "rsr-compliance-checklist.k9.ncl",
+        "relation": "shared_dir:",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/bronze.rs",
+        "to": "satellites/rsr-certifier/engine/src/compliance/gold.rs",
+        "relation": "shared_dir:satellites/rsr-certifier/engine/src/compliance",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/gold.rs",
+        "to": "satellites/rsr-certifier/engine/src/compliance/mod.rs",
+        "relation": "shared_dir:satellites/rsr-certifier/engine/src/compliance",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/mod.rs",
+        "to": "satellites/rsr-certifier/engine/src/compliance/rhodium.rs",
+        "relation": "shared_dir:satellites/rsr-certifier/engine/src/compliance",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/rhodium.rs",
+        "to": "satellites/rsr-certifier/engine/src/compliance/silver.rs",
+        "relation": "shared_dir:satellites/rsr-certifier/engine/src/compliance",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/bof-meetings/presentations/demo-dns-discovery.sh",
+        "to": "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+        "relation": "shared_dir:satellites/palimpsest-license/bof-meetings/presentations",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/lib.rs",
+        "to": "satellites/rsr-certifier/engine/src/main.rs",
+        "relation": "shared_dir:satellites/rsr-certifier/engine/src",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/ai-ml-project/python/train.py",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/ai-ml-project/python/train.py",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/ai-ml-project/python/train.py",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/ai-ml-project/python/train.py",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/ai-ml-project/python/train.py",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/ai-ml-project/src/bin/server.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/ai-ml-project/src/bin/server.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/ai-ml-project/src/bin/server.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/ai-ml-project/src/bin/server.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/ai-ml-project/src/bin/server.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/enterprise-service/benches/api_benchmarks.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "examples/enterprise-service/benches/api_benchmarks.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "examples/enterprise-service/benches/api_benchmarks.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "examples/enterprise-service/benches/api_benchmarks.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "examples/enterprise-service/benches/api_benchmarks.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "examples/enterprise-service/build.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/enterprise-service/build.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/enterprise-service/build.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/enterprise-service/build.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/enterprise-service/build.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/enterprise-service/src/handlers.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "examples/enterprise-service/src/handlers.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "examples/enterprise-service/src/handlers.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "examples/enterprise-service/src/handlers.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "examples/enterprise-service/src/handlers.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "examples/enterprise-service/src/state.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/enterprise-service/src/state.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/enterprise-service/src/state.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/enterprise-service/src/state.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/enterprise-service/src/state.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/enterprise-service/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/enterprise-service/src/main.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/enterprise-service/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/enterprise-service/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/enterprise-service/src/main.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/rhodium-minimal/flake.nix",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/rhodium-minimal/flake.nix",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/rhodium-minimal/flake.nix",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/rhodium-minimal/flake.nix",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/rhodium-minimal/flake.nix",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/rhodium-minimal/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/rhodium-minimal/src/main.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/rhodium-minimal/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/rhodium-minimal/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/rhodium-minimal/src/main.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "examples/standard-library/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/standard-library/src/lib.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/standard-library/src/lib.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/standard-library/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "examples/standard-library/src/lib.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "flake.nix",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/state.scm/lib/state-graph.scm",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/state.scm/lib/state-graph.scm",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/state.scm/lib/state-graph.scm",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/state.scm/lib/state-graph.scm",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/state.scm/lib/state-graph.scm",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/scripts/scaffold.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/scripts/scaffold.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/scripts/scaffold.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/scripts/scaffold.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/scripts/scaffold.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Bilingual.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Bilingual.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Bilingual.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Bilingual.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Bilingual.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/License.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/License.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/License.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/License.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/License.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Metadata.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Metadata.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Metadata.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Metadata.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Metadata.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Reference.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Reference.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Reference.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Reference.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Reference.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Utils.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Utils.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Utils.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Utils.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/haskell/src/Palimpsest/Validator/Utils.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/install.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/install.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/install.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/install.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/TOOLS/validation/install.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/bof-meetings/presentations/demo-dns-discovery.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/bof-meetings/presentations/demo-dns-discovery.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/bof-meetings/presentations/demo-dns-discovery.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/bof-meetings/presentations/demo-dns-discovery.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/bof-meetings/presentations/demo-dns-discovery.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/scripts/generate-structure.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/scripts/generate-structure.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/scripts/generate-structure.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/scripts/generate-structure.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/palimpsest-license/scripts/generate-structure.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/nextgen-languages/scripts/repo-reconcile.py",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/nextgen-languages/scripts/repo-reconcile.py",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/nextgen-languages/scripts/repo-reconcile.py",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/nextgen-languages/scripts/repo-reconcile.py",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/nextgen-languages/scripts/repo-reconcile.py",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/app/Main.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/app/Main.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/app/Main.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/app/Main.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/app/Main.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Security.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Security.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Security.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Security.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Security.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Types.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Types.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Types.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Types.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Analysis/Types.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Parser.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Parser.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Parser.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Parser.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Parser.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Transform/TypeHints.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Transform/TypeHints.hs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Transform/TypeHints.hs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Transform/TypeHints.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/cccp/satellites/sanctify-php/src/Sanctify/Transform/TypeHints.hs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/examples/reference-implementations/python/aibdp_middleware.py",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/examples/reference-implementations/python/aibdp_middleware.py",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/examples/reference-implementations/python/aibdp_middleware.py",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/examples/reference-implementations/python/aibdp_middleware.py",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/examples/reference-implementations/python/aibdp_middleware.py",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Aibdp.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Aibdp.res",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Aibdp.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Aibdp.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Aibdp.res",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Express.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Express.res",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Express.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Express.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Express.res",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 9.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Node.res",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Node.res",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Node.res",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Node.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/consent-aware-http/src/Node.res",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/adapters/bitbucket.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/adapters/bitbucket.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/adapters/bitbucket.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/adapters/bitbucket.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/adapters/bitbucket.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/adapters/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/adapters/mod.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/adapters/mod.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/adapters/mod.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/adapters/mod.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/bronze.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/bronze.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/bronze.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/bronze.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/bronze.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/gold.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/gold.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/gold.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/gold.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/gold.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/mod.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/mod.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/mod.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/mod.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/rhodium.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/rhodium.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/rhodium.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/rhodium.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/rhodium.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/silver.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/silver.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/silver.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/silver.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/compliance/silver.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/lib.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/lib.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/lib.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/lib.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/main.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/engine/src/main.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/extensions/vscode/src/extension.ts",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/extensions/vscode/src/extension.ts",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/extensions/vscode/src/extension.ts",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/extensions/vscode/src/extension.ts",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/extensions/vscode/src/extension.ts",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-certifier/lsp/src/main.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/rsr-certifier/lsp/src/main.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/rsr-certifier/lsp/src/main.rs",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/rsr-certifier/lsp/src/main.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/rsr-certifier/lsp/src/main.rs",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "satellites/rsr-deployer/scripts/bootstrap.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-deployer/scripts/bootstrap.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-deployer/scripts/bootstrap.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-deployer/scripts/bootstrap.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "satellites/rsr-deployer/scripts/bootstrap.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-check.scm",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-check.scm",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-check.scm",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-check.scm",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-check.scm",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-audit.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-audit.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-audit.sh",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-audit.sh",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-audit.sh",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-compliance-checklist.k9.ncl",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-compliance-checklist.k9.ncl",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-compliance-checklist.k9.ncl",
+        "to": "Database",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-compliance-checklist.k9.ncl",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rsr-compliance-checklist.k9.ncl",
+        "to": "Ecto",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "UnboundedLoop",
+        "sink_axis": "time",
+        "severity_value": 3.5,
+        "files": [
+          "satellites/cccp/satellites/nextgen-languages/scripts/repo-reconcile.py"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Database",
+          "WebServer",
+          "Ecto"
+        ],
+        "relation": "UnboundedLoop->Time"
+      },
+      {
+        "source_category": "UnboundedLoop",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "satellites/cccp/satellites/nextgen-languages/scripts/repo-reconcile.py"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Database",
+          "WebServer",
+          "Ecto"
+        ],
+        "relation": "UnboundedLoop->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "satellites/palimpsest-license/assets/conversion-scripts/convert.sh",
+          "satellites/palimpsest-license/bof-meetings/presentations/demo-dns-discovery.sh",
+          "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+          "satellites/palimpsest-license/scripts/setup-hooks.sh",
+          "rsr-audit.sh",
+          "rsr-audit.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Database",
+          "WebServer",
+          "Ecto"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "examples/enterprise-service/src/handlers.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Database",
+          "WebServer",
+          "Ecto"
+        ],
+        "relation": "PanicPath->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "examples/enterprise-service/src/handlers.rs"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Database",
+          "WebServer",
+          "Ecto"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "satellites/palimpsest-license/TOOLS/validation/haskell/test/Integration/PipelineSpec.hs",
+          "satellites/palimpsest-license/TOOLS/validation/haskell/test/Palimpsest/Validator/MetadataSpec.hs",
+          "satellites/palimpsest-license/TOOLS/validation/haskell/test/Palimpsest/Validator/ReferenceSpec.hs",
+          "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+          "satellites/palimpsest-license/integrations/server/ruby/lib/palimpsest/generator.rb"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Database",
+          "WebServer",
+          "Ecto"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "satellites/palimpsest-license/bof-meetings/presentations/demo-dns-discovery.sh",
+          "satellites/palimpsest-license/bof-meetings/presentations/demo-http-headers.sh",
+          "rsr-audit.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache",
+          "Database",
+          "WebServer",
+          "Ecto"
+        ],
+        "relation": "CommandInjection->Disk"
+      }
+    ]
+  }
+}

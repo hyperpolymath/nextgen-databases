@@ -1,0 +1,749 @@
+{
+  "program_path": ".",
+  "language": "julia",
+  "frameworks": [
+    "Concurrent"
+  ],
+  "weak_points": [
+    {
+      "category": "DynamicCodeExecution",
+      "location": "ext/AxiomSMTExt.jl",
+      "severity": "High",
+      "description": "eval/Meta.parse in ext/AxiomSMTExt.jl",
+      "recommended_attack": [
+        "cpu",
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeFFI",
+      "location": "ext/AxiomSMTExt.jl",
+      "severity": "Medium",
+      "description": "2 ccall/FFI calls in ext/AxiomSMTExt.jl",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "rust/src/ffi.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in rust/src/ffi.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust/src/ffi.rs",
+      "severity": "Medium",
+      "description": "50 unwrap/expect calls in rust/src/ffi.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust/src/ops/activations.rs",
+      "severity": "Medium",
+      "description": "8 unwrap/expect calls in rust/src/ops/activations.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "rust/src/ops/norm.rs",
+      "severity": "Medium",
+      "description": "16 unwrap/expect calls in rust/src/ops/norm.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "rust/src/tensor.rs",
+      "severity": "High",
+      "description": "2 unsafe blocks in rust/src/tensor.rs",
+      "recommended_attack": [
+        "memory",
+        "concurrency"
+      ]
+    },
+    {
+      "category": "UnsafeFFI",
+      "location": "src/backends/rust_ffi.jl",
+      "severity": "Medium",
+      "description": "1 ccall/FFI calls in src/backends/rust_ffi.jl",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeFFI",
+      "location": "src/backends/abstract.jl",
+      "severity": "Medium",
+      "description": "1 ccall/FFI calls in src/backends/abstract.jl",
+      "recommended_attack": [
+        "memory"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 21050,
+    "unsafe_blocks": 21,
+    "panic_sites": 0,
+    "unwrap_calls": 78,
+    "allocation_sites": 101,
+    "io_operations": 21,
+    "threading_constructs": 3
+  },
+  "file_statistics": [
+    {
+      "file_path": "ext/AxiomSMTExt.jl",
+      "lines": 278,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust/src/ffi.rs",
+      "lines": 703,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 50,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust/src/lib.rs",
+      "lines": 27,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust/src/ops/activations.rs",
+      "lines": 238,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 8,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust/src/ops/norm.rs",
+      "lines": 334,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 16,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust/src/ops/pool.rs",
+      "lines": 280,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "rust/src/tensor.rs",
+      "lines": 108,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "src/backends/julia_backend.jl",
+      "lines": 275,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 14,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/backends/rust_ffi.jl",
+      "lines": 591,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 24,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/backends/abstract.jl",
+      "lines": 493,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/layers/abstract.jl",
+      "lines": 600,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/layers/dense.jl",
+      "lines": 559,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/layers/normalization.jl",
+      "lines": 330,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/layers/conv.jl",
+      "lines": 640,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 4,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/training/train.jl",
+      "lines": 328,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/types/tensor.jl",
+      "lines": 574,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 10,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/utils/initialization.jl",
+      "lines": 188,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 9,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verification/certificates.jl",
+      "lines": 337,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/verification/serialization.jl",
+      "lines": 334,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/model_metadata.jl",
+      "lines": 451,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/proof_export.jl",
+      "lines": 492,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "zig/src/bench.zig",
+      "lines": 234,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 22,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "packages/SMTLib.jl/src/SMTLib.jl",
+      "lines": 745,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "packages/SMTLib.jl/test/runtests.jl",
+      "lines": 122,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    }
+  ],
+  "recommended_attacks": [
+    "concurrency",
+    "disk",
+    "cpu",
+    "memory"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "src/backends/julia_backend.jl",
+        "to": "src/backends/rust_ffi.jl",
+        "relation": "shared_dir:src/backends",
+        "weight": 1.0
+      },
+      {
+        "from": "src/backends/rust_ffi.jl",
+        "to": "src/backends/abstract.jl",
+        "relation": "shared_dir:src/backends",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/src/ffi.rs",
+        "to": "rust/src/lib.rs",
+        "relation": "shared_dir:rust/src",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/src/lib.rs",
+        "to": "rust/src/tensor.rs",
+        "relation": "shared_dir:rust/src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/layers/abstract.jl",
+        "to": "src/layers/dense.jl",
+        "relation": "shared_dir:src/layers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/layers/dense.jl",
+        "to": "src/layers/normalization.jl",
+        "relation": "shared_dir:src/layers",
+        "weight": 1.0
+      },
+      {
+        "from": "src/layers/normalization.jl",
+        "to": "src/layers/conv.jl",
+        "relation": "shared_dir:src/layers",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/src/ops/activations.rs",
+        "to": "rust/src/ops/norm.rs",
+        "relation": "shared_dir:rust/src/ops",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/src/ops/norm.rs",
+        "to": "rust/src/ops/pool.rs",
+        "relation": "shared_dir:rust/src/ops",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verification/certificates.jl",
+        "to": "src/verification/serialization.jl",
+        "relation": "shared_dir:src/verification",
+        "weight": 1.0
+      },
+      {
+        "from": "src/model_metadata.jl",
+        "to": "src/proof_export.jl",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "src/abi/Types.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "ext/AxiomSMTExt.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "rust/src/ffi.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 56.0
+      },
+      {
+        "from": "rust/src/lib.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/src/ops/activations.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "rust/src/ops/norm.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 16.0
+      },
+      {
+        "from": "rust/src/ops/pool.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "rust/src/tensor.rs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 10.0
+      },
+      {
+        "from": "src/backends/julia_backend.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/backends/rust_ffi.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/backends/abstract.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/layers/abstract.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/layers/dense.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/layers/normalization.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/layers/conv.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/training/train.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/types/tensor.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/utils/initialization.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verification/certificates.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/verification/serialization.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/model_metadata.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/proof_export.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "zig/src/bench.zig",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "packages/SMTLib.jl/src/SMTLib.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "packages/SMTLib.jl/test/runtests.jl",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Concurrent",
+        "relation": "framework",
+        "weight": 4.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "ext/AxiomSMTExt.jl"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "DynamicCodeExecution->Memory"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "rust/src/ffi.rs",
+          "rust/src/ops/activations.rs",
+          "rust/src/ops/norm.rs"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "UnsafeFFI",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "ext/AxiomSMTExt.jl",
+          "src/backends/rust_ffi.jl",
+          "src/backends/abstract.jl"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "UnsafeFFI->Memory"
+      },
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "ext/AxiomSMTExt.jl"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "rust/src/ffi.rs",
+          "rust/src/tensor.rs"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "UnsafeCode->Memory"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "concurrency",
+        "severity_value": 3.5,
+        "files": [
+          "rust/src/ffi.rs",
+          "rust/src/tensor.rs"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "UnsafeCode->Concurrency"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "rust/src/ffi.rs",
+          "rust/src/ops/activations.rs",
+          "rust/src/ops/norm.rs"
+        ],
+        "frameworks": [
+          "Concurrent"
+        ],
+        "relation": "PanicPath->Disk"
+      }
+    ]
+  }
+}

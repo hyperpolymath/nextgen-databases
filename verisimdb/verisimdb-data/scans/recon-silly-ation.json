@@ -1,0 +1,425 @@
+{
+  "program_path": ".",
+  "language": "rescript",
+  "frameworks": [
+    "WebServer"
+  ],
+  "weak_points": [
+    {
+      "category": "PanicPath",
+      "location": "src/ArangoClient.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in src/ArangoClient.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "InsecureProtocol",
+      "location": "src/CLI.res",
+      "severity": "Medium",
+      "description": "1 HTTP (non-HTTPS) URLs in src/CLI.res",
+      "recommended_attack": [
+        "network"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/ConflictResolver.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in src/ConflictResolver.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/HaskellBridge.res",
+      "severity": "Medium",
+      "description": "1 unsafe get calls in src/HaskellBridge.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "src/Pipeline.res",
+      "severity": "Medium",
+      "description": "2 unsafe get calls in src/Pipeline.res",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "ExcessivePermissions",
+      "location": "src/main.js",
+      "severity": "High",
+      "description": "Deno -A (all permissions) in src/main.js",
+      "recommended_attack": [
+        "network",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wasm-modules/src/reconforth/lexer.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in wasm-modules/src/reconforth/lexer.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    },
+    {
+      "category": "PanicPath",
+      "location": "wasm-modules/src/reconforth/vm.rs",
+      "severity": "Medium",
+      "description": "7 unwrap/expect calls in wasm-modules/src/reconforth/vm.rs",
+      "recommended_attack": [
+        "memory",
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 8706,
+    "unsafe_blocks": 14,
+    "panic_sites": 0,
+    "unwrap_calls": 25,
+    "allocation_sites": 21,
+    "io_operations": 2,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/ArangoClient.res",
+      "lines": 328,
+      "unsafe_blocks": 10,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ConflictResolver.res",
+      "lines": 348,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Deduplicator.res",
+      "lines": 224,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/HaskellBridge.res",
+      "lines": 160,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/Pipeline.res",
+      "lines": 426,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tests/TestRunner.res",
+      "lines": 297,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "validator/Main.hs",
+      "lines": 61,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wasm-modules/src/reconforth/formats.rs",
+      "lines": 479,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 6,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wasm-modules/src/reconforth/lexer.rs",
+      "lines": 313,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wasm-modules/src/reconforth/types.rs",
+      "lines": 365,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wasm-modules/src/reconforth/vm.rs",
+      "lines": 402,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 7,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "wasm-modules/src/lib.rs",
+      "lines": 230,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 2,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "network",
+    "memory",
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "wasm-modules/src/reconforth/formats.rs",
+        "to": "wasm-modules/src/reconforth/lexer.rs",
+        "relation": "shared_dir:wasm-modules/src/reconforth",
+        "weight": 1.0
+      },
+      {
+        "from": "wasm-modules/src/reconforth/lexer.rs",
+        "to": "wasm-modules/src/reconforth/types.rs",
+        "relation": "shared_dir:wasm-modules/src/reconforth",
+        "weight": 1.0
+      },
+      {
+        "from": "wasm-modules/src/reconforth/types.rs",
+        "to": "wasm-modules/src/reconforth/vm.rs",
+        "relation": "shared_dir:wasm-modules/src/reconforth",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ArangoClient.res",
+        "to": "src/ConflictResolver.res",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ConflictResolver.res",
+        "to": "src/Deduplicator.res",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Deduplicator.res",
+        "to": "src/HaskellBridge.res",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/HaskellBridge.res",
+        "to": "src/Pipeline.res",
+        "relation": "shared_dir:src",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ArangoClient.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 32.0
+      },
+      {
+        "from": "src/ConflictResolver.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "src/Deduplicator.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "src/HaskellBridge.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/Pipeline.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 8.0
+      },
+      {
+        "from": "tests/TestRunner.res",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "validator/Main.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wasm-modules/src/reconforth/formats.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "wasm-modules/src/reconforth/lexer.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "wasm-modules/src/reconforth/types.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "wasm-modules/src/reconforth/vm.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 7.0
+      },
+      {
+        "from": "wasm-modules/src/lib.rs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "WebServer",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "InsecureProtocol",
+        "sink_axis": "network",
+        "severity_value": 2.5,
+        "files": [
+          "src/CLI.res"
+        ],
+        "frameworks": [
+          "WebServer"
+        ],
+        "relation": "InsecureProtocol->Network"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "network",
+        "severity_value": 3.5,
+        "files": [
+          "src/main.js"
+        ],
+        "frameworks": [
+          "WebServer"
+        ],
+        "relation": "ExcessivePermissions->Network"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "memory",
+        "severity_value": 2.5,
+        "files": [
+          "src/ArangoClient.res",
+          "src/ConflictResolver.res",
+          "src/HaskellBridge.res",
+          "src/Pipeline.res",
+          "wasm-modules/src/reconforth/lexer.rs",
+          "wasm-modules/src/reconforth/vm.rs"
+        ],
+        "frameworks": [
+          "WebServer"
+        ],
+        "relation": "PanicPath->Memory"
+      },
+      {
+        "source_category": "ExcessivePermissions",
+        "sink_axis": "disk",
+        "severity_value": 3.5,
+        "files": [
+          "src/main.js"
+        ],
+        "frameworks": [
+          "WebServer"
+        ],
+        "relation": "ExcessivePermissions->Disk"
+      },
+      {
+        "source_category": "PanicPath",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "wasm-modules/src/reconforth/lexer.rs",
+          "wasm-modules/src/reconforth/vm.rs"
+        ],
+        "frameworks": [
+          "WebServer"
+        ],
+        "relation": "PanicPath->Disk"
+      }
+    ]
+  }
+}

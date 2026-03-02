@@ -1,0 +1,21 @@
+{
+  "action": "substitute_text",
+  "auto_fixable": true,
+  "confidence": 0.99,
+  "description": "Replace heredoc piped to shell with proper install commands",
+  "failed_fixes": 0,
+  "fix_script": "fix-heredoc-install.sh",
+  "id": "recipe-heredoc-to-install",
+  "languages": [
+    "shell"
+  ],
+  "match": "curl ... | sh or heredoc piped to eval/bash",
+  "pattern_ids": [
+    "PA009-shell-heredoc-eval"
+  ],
+  "proven_module": null,
+  "replacement": "Direct package manager install or pinned script download with checksum verification",
+  "successful_fixes": 791,
+  "total_attempts": 791,
+  "triangle_tier": "eliminate"
+}

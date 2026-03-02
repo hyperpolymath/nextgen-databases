@@ -1,0 +1,325 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// PanLL Module Audit: Systematic Evaluation of hyperpolymath Repos
+// Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+// Date: 2026-02-28
+
+= PanLL Module Audit
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+2026-02-28
+:toc: left
+:toclevels: 3
+:icons: font
+:sectnums:
+
+== Purpose
+
+Systematically evaluate which of the ~265 hyperpolymath repos map to PanLL
+modules using the three-pane model:
+
+* **Pane-L** (Left): Constraints — types, proofs, policies, invariants
+* **Pane-N** (Centre): Agent reasoning — planning, analysis, decision-making
+* **Pane-W** (Right): Results — output, visualisation, artefacts
+
+PanLL is the unified mission control / accessibility layer for the entire
+hyperpolymath ecosystem — a "multi-monitor trader desk" with neurosymbolic
+intelligence behind each panel.
+
+== Evaluation Criteria
+
+[cols="1,3"]
+|===
+| Rating | Definition
+
+| **Strong fit**
+| Clear 3-pane mapping, immediate value. The repo naturally decomposes into
+  constraints (Pane-L), reasoning (Pane-N), and output (Pane-W). Could be
+  integrated as a PanLL module in 1-2 sessions.
+
+| **Moderate fit**
+| Partial mapping — maybe 2 of 3 panes are clear, or the fit is for a
+  future evolution of the repo. Worth tracking but not immediate.
+
+| **Not applicable**
+| Libraries, utilities, archived repos, or repos that are consumed by other
+  modules rather than being modules themselves.
+|===
+
+== Already Mapped (8 modules)
+
+These repos are already identified as PanLL modules:
+
+[cols="1,2,3"]
+|===
+| Module | Repo | Pane Mapping
+
+| **VeriSimDB**
+| `nextgen-databases/verisimdb`
+| L: VQL-DT proofs, drift thresholds. N: Query planning, drift analysis. W: Entity data, drift heatmap.
+
+| **QuandleDB**
+| `nextgen-databases/quandledb`
+| L: Quandle algebra constraints. N: Query optimisation. W: Query results, algebraic visualisation.
+
+| **LithoGlyph**
+| `nextgen-databases/lithoglyph`
+| L: Schema types, formal specs. N: Query decomposition. W: Glyph rendering, results.
+
+| **reposystem**
+| `reposystem/`
+| L: RSR compliance rules. N: Template selection, scaffolding logic. W: Generated repo structure.
+
+| **gitbot-fleet**
+| `gitbot-fleet/`
+| L: Bot policies, confidence thresholds. N: Issue analysis, PR review. W: Bot actions, reports.
+
+| **IDApTIK**
+| `idaptik/`
+| L: Dependent type level validation. N: Level design reasoning. W: Game UI, level preview.
+
+| **panic-attack**
+| `panic-attack/`
+| L: Security rules, vulnerability patterns. N: Static analysis, threat modelling. W: Scan reports, findings.
+
+| **hypatia**
+| `hypatia/`
+| L: CI/CD policies, scan thresholds. N: Pattern correlation, dispatch planning. W: Dashboard, alerts.
+|===
+
+== Strong Fit (18 candidates)
+
+[cols="1,2,3"]
+|===
+| Repo | Monorepo | Pane Mapping
+
+| **airie**
+| standalone
+| L: Network topology constraints, routing policies. N: Simulation engine, traffic analysis. W: Network visualisation, latency maps.
+
+| **proven**
+| standalone
+| L: Formal proof obligations, type safety rules. N: Proof search, verification. W: Proof certificates, audit trail.
+
+| **stapeln**
+| `ambientops`
+| L: Container policies, supply chain rules. N: Build orchestration, layer optimisation. W: Container images, SBOM.
+
+| **echidna**
+| standalone
+| L: Code safety rules (believe_me bans). N: AST analysis, pattern matching. W: Lint reports, fix suggestions.
+
+| **Eclexia**
+| `nextgen-languages/eclexia`
+| L: Grammar rules, type system. N: Parse/typecheck/evaluate. W: REPL output, AST visualisation.
+
+| **AffineScript**
+| `nextgen-languages/affinescript`
+| L: Affine type constraints, linearity. N: Type inference, borrow checking. W: Compiled output, type errors.
+
+| **Anvomidav**
+| `nextgen-languages/anvomidav`
+| L: Language grammar, type rules. N: Compilation, optimisation. W: Compiled artefacts.
+
+| **protocol-squisher**
+| standalone
+| L: Protocol specs, compression constraints. N: Compression strategy selection. W: Compressed output, stats.
+
+| **squisher-corpus**
+| standalone
+| L: Corpus validation rules. N: Benchmark analysis, comparison. W: Benchmark results, charts.
+
+| **PanLL itself**
+| standalone
+| L: Module registry, pane layout constraints. N: Module coordination, routing. W: The dashboard UI itself.
+
+| **ambientops/volumod**
+| `ambientops`
+| L: Volume/mount policies. N: Storage analysis, allocation. W: Volume status, usage reports.
+
+| **ambientops/displace**
+| `ambientops`
+| L: Deployment constraints. N: Deployment planning, rollback logic. W: Deployment status, logs.
+
+| **claim-forge**
+| `reposystem`
+| L: Claim validation rules. N: Claim analysis, evidence gathering. W: Claim reports, certificates.
+
+| **scaffoldia**
+| `reposystem`
+| L: Template constraints, RSR rules. N: Template selection, customisation. W: Generated project.
+
+| **bitfuckit**
+| `reposystem`
+| L: Bitbucket API constraints. N: Repo analysis, migration planning. W: Migration reports, API responses.
+
+| **Axiom.jl**
+| `developer-ecosystem/julia-ecosystem`
+| L: Mathematical axioms, type constraints. N: Computation, proof search. W: Results, proofs.
+
+| **filesoup/fslint**
+| `filesoup`
+| L: Lint rules, file quality policies. N: File analysis, deduplication. W: Lint reports, cleanup actions.
+
+| **social-media-tools**
+| `social-media-tools`
+| L: Platform API constraints, rate limits. N: Content scheduling, analytics. W: Post status, engagement metrics.
+|===
+
+== Moderate Fit (22 candidates)
+
+[cols="1,2,3"]
+|===
+| Repo | Reason for Moderate | Notes
+
+| **polystack/poly-*components**
+| `polystack`
+| Partial — the individual components are libraries, but the stack as a whole has a 3-pane mapping. Could be a meta-module.
+
+| **developer-ecosystem/deno-ecosystem**
+| `developer-ecosystem`
+| Deno project management tools have some 3-pane potential (L: package policies, N: dependency analysis, W: project status). But many are thin wrappers.
+
+| **developer-ecosystem/zig-ecosystem**
+| `developer-ecosystem`
+| Build system tools could map to PanLL for cross-compilation management.
+
+| **developer-ecosystem/rescript-ecosystem**
+| `developer-ecosystem`
+| ReScript tooling ecosystem — compiler/formatter integration could be a PanLL dev-tools module.
+
+| **developer-ecosystem/idris2-ecosystem**
+| `developer-ecosystem`
+| Idris2 package management. Moderate fit for type theory module.
+
+| **developer-ecosystem/elixir-ecosystem**
+| `developer-ecosystem`
+| OTP project management. Could integrate with VeriSimDB's Elixir layer.
+
+| **nickel-augmentation**
+| `nickel-augmentation`
+| Nickel config management has strong L-pane (schemas) but weaker N/W panes.
+
+| **ipv6-tools**
+| `ipv6-tools`
+| Network tools — L: RFC compliance. N: Address analysis. W: Connectivity reports. But narrow scope.
+
+| **standards/axel-protocol**
+| `standards`
+| Protocol definition — strong L-pane, but the standard itself isn't runtime software.
+
+| **standards/a2ml**
+| `standards`
+| Markup language spec — more of a consumed standard than an interactive module.
+
+| **standards/rhodium-standard-repositories**
+| `standards`
+| RSR spec — consumed by reposystem tools, not interactive itself.
+
+| **nextgen-languages/wokelang**
+| `nextgen-languages`
+| Language design — could be Eclexia-like module but less developed.
+
+| **nextgen-languages/ephapax**
+| `nextgen-languages`
+| Concatenative language — moderate fit for language design module.
+
+| **nextgen-languages/betlang**
+| `nextgen-languages`
+| Domain-specific language — narrow scope.
+
+| **games/phantom-metal-taste**
+| `games`
+| Game project — could be IDApTIK-like but different genre.
+
+| **games/dicti0nary-attack**
+| `games`
+| Word game — lightweight, less module potential.
+
+| **games/candy-crash**
+| `games`
+| Game — similar to above.
+
+| **asdf-tool-plugins (74 repos)**
+| `asdf-tool-plugins`
+| Plugin ecosystem — could be a toolchain management module collectively. L: version constraints. N: version resolution. W: installed tools.
+
+| **patallm-gallery/echomesh**
+| `patallm-gallery`
+| Network mesh — moderate fit for distributed systems module.
+
+| **patallm-gallery/elegant-state**
+| `patallm-gallery`
+| State management — could integrate with PanLL's own state.
+
+| **patallm-gallery/claude-integrations**
+| `patallm-gallery`
+| AI integrations — moderate fit, depends on direction.
+
+| **0-ai-gatekeeper-protocol**
+| standalone
+| AI manifest protocol — strong L-pane (rules), but it's a consumed spec not an interactive module.
+|===
+
+== Not Applicable (215+ repos)
+
+The remaining ~215 repos fall into categories that don't map to PanLL modules:
+
+[cols="1,1,2"]
+|===
+| Category | Count | Reason
+
+| **hyperpolymath-archive**
+| 113
+| Archived repos — historical, not active
+
+| **asdf-tool-plugins (individual)**
+| 74
+| Each individual plugin is too thin — they work collectively (see moderate fit above)
+
+| **Library dependencies**
+| ~15
+| Consumed by other modules, not interactive themselves (e.g., language-bridges, cadre-router)
+
+| **Mirror/practice repos**
+| ~8
+| Practice mirrors, forks, not original work
+
+| **Config/infrastructure**
+| ~5
+| .git-private-farm, farm manifests, CI config
+|===
+
+== Recommended Next Steps
+
+1. **Immediate**: Register the 8 already-mapped modules in PanLL's DatabaseRegistry (VeriSimDB, QuandleDB, LithoGlyph) and create a parallel LanguageRegistry (Eclexia, AffineScript) and ToolRegistry (panic-attack, hypatia, gitbot-fleet)
+
+2. **Short-term**: Implement the top 5 strong-fit candidates as PanLL modules: airie, proven, stapeln, echidna, Eclexia
+
+3. **Medium-term**: Evaluate whether the moderate-fit repos would benefit from a lighter-weight "PanLL widget" concept (single-pane display) vs full 3-pane modules
+
+4. **Long-term**: Dedicated session to systematically implement the remaining strong-fit candidates
+
+== Summary
+
+[cols="1,1"]
+|===
+| Category | Count
+
+| Already mapped
+| 8
+
+| Strong fit
+| 18
+
+| Moderate fit
+| 22
+
+| Not applicable
+| 215+
+
+| **Total evaluated**
+| **~265**
+|===
+
+The hyperpolymath ecosystem has **26 repos** (8 + 18) that naturally fit the PanLL
+three-pane model. With the 22 moderate-fit candidates, up to **48 PanLL modules**
+could eventually populate the "multi-monitor trader desk" vision.

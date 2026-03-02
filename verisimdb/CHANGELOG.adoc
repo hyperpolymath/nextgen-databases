@@ -1,0 +1,93 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+
+= VeriSimDB Changelog
+:toc: left
+:toclevels: 2
+
+All notable changes to VeriSimDB are documented here. This project uses https://semver.org/[Semantic Versioning].
+
+== [Unreleased]
+
+=== Added
+
+==== Security Hardening (Phase 1)
+- **RwLock poisoning protection**: 35+ locations across 7 Rust files converted from `.expect("poisoned")` panics to graceful `map_err` error propagation. Server no longer crashes on lock contention.
+- **API error sanitization**: Internal Rust error strings no longer leak to clients. All `ApiError::Internal` responses now log the real error via tracing and return a generic "Internal server error" to the client.
+- **Input validation**: All search/list endpoints cap `limit` at 1000. Vector inputs checked for NaN/Inf. Hexad IDs validated (≤128 chars, alphanumeric + dash + underscore). Empty query strings return 400.
+- **Federation PSK authentication**: Peer registration requires `X-Federation-PSK` header. Configured via `VERISIM_FEDERATION_KEYS` env var. Federation disabled by default when keys are unset.
+
+==== Supply Chain & CI (Phase 2)
+- **deny.toml**: Cargo dependency auditing with vulnerability deny, license allowlist, and wildcard dependency blocking.
+- **CODEOWNERS**: All paths owned by @hyperpolymath.
+- **SUPPORT.md**: Standard support policy.
+- **quality.yml**: CI workflow for cargo deny, clippy, test, fmt, mix test, TruffleHog, EditorConfig.
+
+==== Operational Hardening (Phase 3)
+- **IPv6-only default**: Server binds to `[::]` by default. `VERISIM_ENABLE_IPV4=true` enables dual-stack binding.
+- **TLS support**: Optional HTTPS via `VERISIM_TLS_CERT` + `VERISIM_TLS_KEY` env vars using axum-server + rustls.
+- **Container hardening**: Non-root user (`verisim`), OCI labels, IPv6 defaults in Containerfile.
+- **Prometheus /metrics**: Drift gauge per type, uptime counter. Text/plain format for Prometheus scraping.
+- **Readiness probe**: `/ready` checks hexad store accessibility and drift detector health. Returns 503 when degraded.
+- **Health check**: `/health` reports drift detector status with degraded reason when drift is critical.
+- **Structured JSON logging**: `VERISIM_LOG_FORMAT=json` (default) enables JSON-formatted tracing output.
+
+==== Elixir Stub Completion (Phase 4)
+- **QueryRouter**: Semantic queries via `search_text("type:<iri>")`, temporal queries via `/hexads/{id}/versions`.
+- **Federation Resolver**: Real repair via `Req.post` to peer normalizer. Modality-based routing (vector/graph/text/default).
+- **SchemaRegistry**: Unknown constraint types now return `{:error, "Unknown constraint type"}` instead of silent `:ok`.
+- **EntityServer**: Snapshots state before normalization. Selective modality normalization based on drift scores.
+- **HealthChecker GenServer**: Periodic (30s) checks of Rust core, entity registry, and ETS cache. Emits telemetry events.
+- **Application supervisor**: Changed to `:rest_for_one` strategy with `max_restarts: 10`.
+
+==== Rust Stub Completion (Phase 5)
+- **TensorRegenerationStrategy**: Regenerates tensor from vector embedding reshape or document TF-IDF.
+- **TemporalRepairStrategy**: Fixes timestamp ordering, version sanity, version_count consistency.
+- **QualityReconciliationStrategy**: Cascades all strategies in priority order.
+- **Adaptive drift thresholds**: `ThresholdPolicy::Adaptive { base, sensitivity }` with `effective_threshold()` method. Threshold = base + (moving_avg * sensitivity).
+
+==== Custom Circuits — ZKP Infrastructure (Phase 6)
+- **Circuit Registry** (`circuit_registry.rs`): In-memory registry mapping circuit names to compiled R1CS verification functions.
+- **Circuit Compiler** (`circuit_compiler.rs`): DSL gates (AND, OR, XOR, NOT, LinearCombination) compiled to R1CS constraints.
+- **Verification Key Store** (`verification_keys.rs`): Per-circuit keys with rotation, federation export/import as `KeyExportBundle`.
+- **VQL Circuit DSL** (`VQLCircuit.res`): ReScript types for circuit definition with `parseCustomProof` and `serializeCircuitDef`.
+
+==== Homoiconicity — Queries as Hexads (Phase 7)
+- **QueryHexadBuilder** (`query_hexad.rs`): Stores VQL queries as hexads across all 6 modalities (document=query text, graph=parse tree, vector=embedding, tensor=cost vector, semantic=proof obligations, temporal=execution history).
+- **API endpoints**: `POST /queries` stores a query as hexad. `POST /queries/similar` finds similar past queries by vector similarity. `PUT /queries/{id}/optimize` re-plans and updates cost vector.
+- **VQL REFLECT keyword**: `SELECT * FROM REFLECT WHERE FULLTEXT CONTAINS 'drift'` queries the query store itself. Meta-circular: REFLECT queries are themselves stored as hexads.
+- **Elixir REFLECT executor**: Routes REFLECT source queries to the query store via text search.
+
+=== Changed
+- Default bind address changed from `0.0.0.0` to `[::]` (IPv6).
+- Elixir `runtime.exs` now reads `VERISIM_RUST_CORE_URL` from env (default: `http://[::1]:8080/api/v1`).
+- Application supervisor strategy changed from `:one_for_one` to `:rest_for_one`.
+- `DriftThresholds` now uses adaptive policies when configured.
+- `create_default_normalizer()` registers all 5 strategies (was 2).
+
+=== Fixed
+- RwLock poisoning panics in 7 Rust files (35+ locations).
+- API error leakage exposing internal Rust error strings.
+- Missing input validation on all search endpoints.
+- Federation open to unauthenticated peer registration.
+- Normalizer returning hardcoded placeholder strings.
+- Federation resolver returning `{:error, :not_implemented}`.
+- SchemaRegistry silently accepting unknown constraint types.
+
+== [0.1.0-alpha] — 2026-02-08
+
+=== Added
+- Initial alpha release with 6 modality stores (Graph, Vector, Tensor, Semantic, Document, Temporal).
+- VQL parser (ReScript) with dependent-type and slipstream execution paths.
+- Elixir/OTP orchestration layer with GenServers.
+- Rust HTTP API server (verisim-api) with REST endpoints.
+- Hexad entity management (create, read, update, delete, search).
+- Drift detection with 6 drift types and configurable thresholds.
+- Self-normalization with vector and document regeneration strategies.
+- Federation architecture with KRaft-inspired consensus.
+- GitHub CI integration via verisimdb-data git-backed repo.
+- Hypatia VeriSimDB connector for pattern detection.
+- Criterion benchmarks for all modality stores.
+- VQL grammar (ISO/IEC 14977 EBNF compliant).
+- VQL formal semantics (operational + type system).
+- Comprehensive documentation (WHITEPAPER, consultation papers, deployment guide).

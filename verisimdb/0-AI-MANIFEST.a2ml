@@ -1,0 +1,99 @@
+; SPDX-License-Identifier: PMPL-1.0-or-later
+; SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath)
+;
+; 0-AI-MANIFEST.a2ml — Universal AI entry point for VeriSimDB
+; Media-Type: application/a2ml
+
+(manifest
+  (identity
+    (name "VeriSimDB")
+    (full-name "Veridical Simulacrum Database")
+    (version "0.1.0-alpha")
+    (repo "https://github.com/hyperpolymath/verisimdb")
+    (license "PMPL-1.0-or-later")
+    (author "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>")
+    (monorepo-parent "nextgen-databases"))
+
+  (purpose
+    "8-modality (octad) database with self-normalization. Each entity
+     exists simultaneously across 8 modalities — Graph, Vector, Tensor,
+     Semantic, Document, Temporal, Provenance, Spatial — with drift
+     detection and automatic consistency maintenance.")
+
+  (canonical-locations
+    (ai-instructions ".claude/CLAUDE.md")
+    (state ".machine_readable/STATE.scm")
+    (meta ".machine_readable/META.scm")
+    (ecosystem ".machine_readable/ECOSYSTEM.scm")
+    (topology "TOPOLOGY.md")
+    (build "justfile")
+    (container-build "container/Containerfile")
+    (container-deploy "container/compose.toml")
+    (test-infra "connectors/test-infra/compose.toml")
+    (test-infra-manifest "connectors/test-infra/0-AI-MANIFEST.a2ml")
+    (integration-tests "elixir-orchestration/test/verisim/federation/adapters/integration/")
+    (known-issues "KNOWN-ISSUES.adoc")
+    (changelog "CHANGELOG.adoc")
+    (deployment "DEPLOYMENT.adoc")
+    (security ".well-known/security.txt"))
+
+  (tech-stack
+    (primary "Rust" "Elixir/OTP")
+    (secondary "ReScript" "Idris2" "Zig")
+    (query-language "VQL")
+    (container-runtime "Podman")
+    (base-image "cgr.dev/chainguard/wolfi-base:latest"))
+
+  (architecture
+    (rust-core
+      (description "Performance-critical modality stores")
+      (location "rust-core/")
+      (crates "verisim-graph" "verisim-vector" "verisim-tensor"
+              "verisim-semantic" "verisim-document" "verisim-temporal"
+              "verisim-hexad" "verisim-drift" "verisim-normalizer"
+              "verisim-api"))
+    (elixir-otp
+      (description "Distributed coordination and supervision")
+      (location "elixir-orchestration/"))
+    (abi-ffi
+      (description "Idris2 ABI definitions + Zig FFI bridge")
+      (abi-location "src/abi/")
+      (ffi-location "ffi/zig/"))
+    (data-store
+      (description "Git-backed flat-file data repo")
+      (location "verisimdb-data/"))
+    (test-infra
+      (description "Containerised test stack for federation adapter integration testing")
+      (location "connectors/test-infra/")
+      (services "mongodb" "redis-stack" "neo4j" "clickhouse" "surrealdb" "influxdb" "minio"))
+    (connectors
+      (description "Federation adapters (10) and client SDKs (6)")
+      (location "connectors/")
+      (adapters "MongoDB" "Redis" "DuckDB" "ClickHouse" "SurrealDB" "SQLite" "Neo4j" "VectorDB" "InfluxDB" "ObjectStorage")
+      (sdks "Rust" "V" "Elixir" "ReScript" "Julia" "Gleam")))
+
+  (critical-invariants
+    (rule "SCM files ONLY in .machine_readable/ — never root")
+    (rule "All shell scripts must validate untrusted input")
+    (rule "No hardcoded secrets — use env vars with ${VAR:-} defaults")
+    (rule "Container images MUST use Chainguard base (cgr.dev)")
+    (rule "Container runtime is Podman — never Docker")
+    (rule "VQL is the query language — never raw SQL")
+    (rule "Octad entities must maintain 8-modality consistency")
+    (rule "Drift thresholds gate all automatic normalization"))
+
+  (container-ecosystem
+    (selur "container/compose.toml — deployment orchestration")
+    (stapeln "stapeln.toml — layer-based container builds")
+    (svalinn "TLS gateway with policy enforcement")
+    (vordr "Runtime verification and formal proof checking")
+    (cerro-torre "Image signing with ML-DSA-87 post-quantum crypto")
+    (rokur "Secret rotation with argon2id"))
+
+  (related-projects
+    (hypatia "Neurosymbolic CI/CD scanner — consumes verisimdb data")
+    (gitbot-fleet "Bot orchestration — dispatches fixes from verisimdb findings")
+    (panic-attacker "Static analysis scanner — produces scan data for verisimdb")
+    (proven "Formally verified safety library — provides SafeString, SafeJson, etc.")
+    (lithoglyph "Graph database sibling — shares GQL/GQL-DT patterns")
+    (quandledb "Knot-theoretic database sibling — KQL query language")))

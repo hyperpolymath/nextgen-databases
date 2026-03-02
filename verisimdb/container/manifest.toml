@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# Cerro Torre manifest for VeriSimDB .ctp bundle
+#
+# This manifest describes the VeriSimDB container image for verified
+# container packaging. Used by `ct pack` to create .ctp bundles.
+
+[metadata]
+name = "verisimdb"
+version = "0.1.0"
+revision = 1
+summary = "Cross-system entity consistency engine with 8-modality drift detection"
+description = """
+VeriSimDB (Veridical Simulacrum Database) is a cross-system entity consistency
+engine that detects and repairs drift across 8 modality representations of the
+same entity: Graph, Vector, Tensor, Semantic, Document, Temporal, Provenance,
+and Spatial. Operates as a standalone database or heterogeneous federation
+coordinator over PostgreSQL, ArangoDB, Elasticsearch, and other VeriSimDB
+instances.
+"""
+license = "PMPL-1.0-or-later"
+homepage = "https://github.com/hyperpolymath/verisimdb"
+maintainer = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"
+
+[provenance]
+upstream = "https://github.com/hyperpolymath/verisimdb"
+import_date = 2026-02-28T00:00:00Z
+
+[dependencies]
+runtime = ["ca-certificates", "curl", "libstdc++", "ncurses"]
+build = ["rust", "pkgconf", "build-base", "erl27-elixir-1.18", "erlang-27"]
+
+[build]
+system = "cargo"
+
+[build.environment]
+RUST_LOG = "info"
+VERISIM_HOST = "[::]"
+VERISIM_PORT = "8080"
+
+[outputs]
+primary = "verisimdb"
+split = ["verisimdb-rust", "verisimdb-elixir"]
+
+[attestations]
+require = ["source-signature", "sbom-complete"]
+recommend = ["security-audit", "reproducible-build"]
+
+# Runtime security profile
+[security]
+user = "verisim"
+group = "verisim"
+read_only_root = false
+no_new_privileges = true
+
+[security.capabilities]
+drop = ["ALL"]
+add = ["NET_BIND_SERVICE"]
+
+[security.network]
+listen_tcp = [8080, 50051]
+
+[security.filesystem]
+read = ["/app/", "/data/"]
+write = ["/data/", "/tmp/"]
+execute = ["/app/verisim-api", "/app/elixir/bin/verisim"]

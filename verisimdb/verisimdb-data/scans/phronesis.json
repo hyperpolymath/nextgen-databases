@@ -1,0 +1,809 @@
+{
+  "program_path": ".",
+  "language": "elixir",
+  "frameworks": [
+    "OTP",
+    "Networking"
+  ],
+  "weak_points": [
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/phronesis/consensus/raft/rpc.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/phronesis/consensus/raft/rpc.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/phronesis/consensus/supervisor.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/phronesis/consensus/supervisor.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "DynamicCodeExecution",
+      "location": "lib/phronesis/consensus/server/machine.ex",
+      "severity": "Medium",
+      "description": "Dynamic apply/3 in lib/phronesis/consensus/server/machine.ex",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/phronesis/cli.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/phronesis/cli.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/phronesis/compiler.ex",
+      "severity": "High",
+      "description": "2 String.to_atom calls in lib/phronesis/compiler.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "lib/phronesis/interpreter.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in lib/phronesis/interpreter.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "UnsafeCode",
+      "location": "academic/formal-verification/lean4/Phronesis.lean",
+      "severity": "High",
+      "description": "2 sorry (unproven proposition) in academic/formal-verification/lean4/Phronesis.lean",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 24139,
+    "unsafe_blocks": 2,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 49,
+    "threading_constructs": 7
+  },
+  "file_statistics": [
+    {
+      "file_path": "lib/phronesis/consensus/raft.ex",
+      "lines": 629,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/phronesis/consensus/server.ex",
+      "lines": 263,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/phronesis/stdlib/rpki_validator.ex",
+      "lines": 350,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/phronesis/test/property.ex",
+      "lines": 553,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "lib/phronesis/cli.ex",
+      "lines": 701,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/compiler.ex",
+      "lines": 759,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/demo.ex",
+      "lines": 314,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/formatter.ex",
+      "lines": 381,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/linter.ex",
+      "lines": 466,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/test_framework.ex",
+      "lines": 352,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/lsp/server.ex",
+      "lines": 544,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/phronesis/debugger.ex",
+      "lines": 408,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/profiler.ex",
+      "lines": 576,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/profiler/reporter.ex",
+      "lines": 460,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/doc_generator.ex",
+      "lines": 786,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 8,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/analyzer.ex",
+      "lines": 566,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/package_manager.ex",
+      "lines": 278,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/package_manager/manifest.ex",
+      "lines": 129,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/package_manager/registry.ex",
+      "lines": 206,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "lib/phronesis/hot_reload.ex",
+      "lines": 236,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "lib/phronesis.ex",
+      "lines": 207,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test/compiler_test.exs",
+      "lines": 207,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test/conformance_test.exs",
+      "lines": 99,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test/doc_generator_test.exs",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 5,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "test/analyzer_test.exs",
+      "lines": 244,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "academic/formal-verification/lean4/Phronesis.lean",
+      "lines": 309,
+      "unsafe_blocks": 2,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "memory",
+    "disk",
+    "cpu",
+    "concurrency"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "lib/phronesis/package_manager/manifest.ex",
+        "to": "lib/phronesis/package_manager/registry.ex",
+        "relation": "shared_dir:lib/phronesis/package_manager",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/cli.ex",
+        "to": "lib/phronesis/compiler.ex",
+        "relation": "shared_dir:lib/phronesis",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/compiler.ex",
+        "to": "lib/phronesis/demo.ex",
+        "relation": "shared_dir:lib/phronesis",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/demo.ex",
+        "to": "lib/phronesis/formatter.ex",
+        "relation": "shared_dir:lib/phronesis",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/formatter.ex",
+        "to": "lib/phronesis/linter.ex",
+        "relation": "shared_dir:lib/phronesis",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/linter.ex",
+        "to": "lib/phronesis/test_framework.ex",
+        "relation": "shared_dir:lib/phronesis",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/test_framework.ex",
+        "to": "lib/phronesis/debugger.ex",
+        "relation": "shared_dir:lib/phronesis",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/debugger.ex",
+        "to": "lib/phronesis/profiler.ex",
+        "relation": "shared_dir:lib/phronesis",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/profiler.ex",
+        "to": "lib/phronesis/doc_generator.ex",
+        "relation": "shared_dir:lib/phronesis",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/doc_generator.ex",
+        "to": "lib/phronesis/analyzer.ex",
+        "relation": "shared_dir:lib/phronesis",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/analyzer.ex",
+        "to": "lib/phronesis/package_manager.ex",
+        "relation": "shared_dir:lib/phronesis",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/package_manager.ex",
+        "to": "lib/phronesis/hot_reload.ex",
+        "relation": "shared_dir:lib/phronesis",
+        "weight": 1.0
+      },
+      {
+        "from": "test/compiler_test.exs",
+        "to": "test/conformance_test.exs",
+        "relation": "shared_dir:test",
+        "weight": 1.0
+      },
+      {
+        "from": "test/conformance_test.exs",
+        "to": "test/doc_generator_test.exs",
+        "relation": "shared_dir:test",
+        "weight": 1.0
+      },
+      {
+        "from": "test/doc_generator_test.exs",
+        "to": "test/analyzer_test.exs",
+        "relation": "shared_dir:test",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/consensus/raft.ex",
+        "to": "lib/phronesis/consensus/server.ex",
+        "relation": "shared_dir:lib/phronesis/consensus",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/consensus/raft.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/phronesis/consensus/raft.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/phronesis/consensus/server.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/phronesis/consensus/server.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/phronesis/stdlib/rpki_validator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/phronesis/stdlib/rpki_validator.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/phronesis/test/property.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "lib/phronesis/test/property.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "lib/phronesis/cli.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/cli.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/compiler.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/compiler.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/demo.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/demo.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/formatter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/formatter.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/linter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/linter.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/test_framework.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/test_framework.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/lsp/server.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/phronesis/lsp/server.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/phronesis/debugger.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/debugger.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/profiler.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/profiler.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/profiler/reporter.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/profiler/reporter.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/doc_generator.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/doc_generator.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/analyzer.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/analyzer.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/package_manager.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/package_manager.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/package_manager/manifest.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/package_manager/manifest.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/package_manager/registry.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/package_manager/registry.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis/hot_reload.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/phronesis/hot_reload.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "lib/phronesis.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "lib/phronesis.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test/compiler_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test/compiler_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test/conformance_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test/conformance_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test/doc_generator_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test/doc_generator_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test/analyzer_test.exs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "test/analyzer_test.exs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "academic/formal-verification/lean4/Phronesis.lean",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 6.0
+      },
+      {
+        "from": "academic/formal-verification/lean4/Phronesis.lean",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 6.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "DynamicCodeExecution",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "lib/phronesis/consensus/server/machine.ex"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "DynamicCodeExecution->Cpu"
+      },
+      {
+        "source_category": "UnsafeCode",
+        "sink_axis": "cpu",
+        "severity_value": 3.5,
+        "files": [
+          "academic/formal-verification/lean4/Phronesis.lean"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "UnsafeCode->Cpu"
+      },
+      {
+        "source_category": "AtomExhaustion",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "lib/phronesis/consensus/raft/rpc.ex",
+          "lib/phronesis/consensus/supervisor.ex",
+          "lib/phronesis/cli.ex",
+          "lib/phronesis/compiler.ex",
+          "lib/phronesis/interpreter.ex"
+        ],
+        "frameworks": [
+          "OTP",
+          "Networking"
+        ],
+        "relation": "AtomExhaustion->Memory"
+      }
+    ]
+  }
+}

@@ -1,0 +1,152 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# VeriSimDB Test Infrastructure — selur-compose configuration
+#
+# Orchestrates 7 containerised databases for integration testing of the
+# 10 federation adapters. DuckDB and SQLite are embedded and tested via
+# unit tests; the remaining 8 adapters (MongoDB, Redis, Neo4j, ClickHouse,
+# SurrealDB, InfluxDB, object storage, vector DB) are tested here.
+#
+# MinIO provides S3-compatible object storage. The vector DB adapter is
+# tested against the native verisim-vector store (no external service needed).
+#
+# Usage:
+#   selur-compose up                     # Start all services
+#   selur-compose up --detach            # Start in background
+#   selur-compose ps                     # Check status
+#   selur-compose logs -f mongodb        # Stream logs
+#   selur-compose down                   # Stop all services
+#   selur-compose down --volumes         # Stop and remove test volumes
+#
+# Fallback (without selur):
+#   podman-compose up --detach
+#   podman-compose down
+
+version = "1.0"
+
+# ============================================================================
+# Services
+# ============================================================================
+
+# MongoDB — document store federation adapter
+# Replica set required for change streams (used by drift monitor)
+[services.mongodb]
+image = "cgr.dev/chainguard/mongodb:latest"
+ports = ["27017:27017"]
+environment = {
+  MONGO_INITDB_DATABASE = "verisimdb",
+}
+volumes = [
+  "mongodb-data:/data/db",
+  "./seed/mongodb-init.js:/docker-entrypoint-initdb.d/init.js:ro",
+]
+command = ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+restart = "unless-stopped"
+healthcheck = { test = "mongosh --eval 'db.adminCommand({ping:1})' --quiet", interval = "10s", timeout = "5s", retries = 10, start_period = "30s" }
+
+# Redis Stack — in-memory store with RediSearch, RedisJSON, RedisTimeSeries
+[services.redis-stack]
+build = { context = "./images", containerfile = "Containerfile.redis-stack" }
+ports = ["6379:6379"]
+volumes = ["redis-data:/data"]
+restart = "unless-stopped"
+healthcheck = { test = "redis-cli ping | grep -q PONG", interval = "10s", timeout = "5s", retries = 5, start_period = "10s" }
+
+# Neo4j Community — graph database for graph modality federation
+[services.neo4j]
+build = { context = "./images", containerfile = "Containerfile.neo4j" }
+ports = ["7474:7474", "7687:7687"]
+environment = {
+  NEO4J_AUTH = "none",
+  NEO4J_PLUGINS = '["apoc"]',
+  NEO4J_dbms_security_auth__enabled = "false",
+}
+volumes = [
+  "neo4j-data:/data",
+  "neo4j-logs:/logs",
+]
+restart = "unless-stopped"
+healthcheck = { test = "curl -sf http://localhost:7474/ || exit 1", interval = "10s", timeout = "5s", retries = 10, start_period = "30s" }
+
+# ClickHouse — columnar analytics for aggregate drift queries
+[services.clickhouse]
+build = { context = "./images", containerfile = "Containerfile.clickhouse" }
+ports = ["8123:8123", "9000:9000"]
+environment = {
+  CLICKHOUSE_DB = "verisimdb",
+  CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT = "1",
+}
+volumes = ["clickhouse-data:/var/lib/clickhouse"]
+restart = "unless-stopped"
+healthcheck = { test = "curl -sf http://localhost:8123/ping || exit 1", interval = "10s", timeout = "5s", retries = 5, start_period = "15s" }
+
+# SurrealDB — multi-model database (document + graph in one)
+[services.surrealdb]
+build = { context = "./images", containerfile = "Containerfile.surrealdb" }
+ports = ["8000:8000"]
+command = ["start", "--log", "info", "memory"]
+restart = "unless-stopped"
+healthcheck = { test = "curl -sf http://localhost:8000/health || exit 1", interval = "10s", timeout = "5s", retries = 5, start_period = "10s" }
+
+# InfluxDB 2 — time-series database for temporal modality federation
+[services.influxdb]
+build = { context = "./images", containerfile = "Containerfile.influxdb" }
+ports = ["8086:8086"]
+environment = {
+  DOCKER_INFLUXDB_INIT_MODE = "setup",
+  DOCKER_INFLUXDB_INIT_USERNAME = "verisim",
+  DOCKER_INFLUXDB_INIT_PASSWORD = "verisim-test-password",
+  DOCKER_INFLUXDB_INIT_ORG = "verisimdb",
+  DOCKER_INFLUXDB_INIT_BUCKET = "metrics",
+  DOCKER_INFLUXDB_INIT_ADMIN_TOKEN = "verisim-test-token-do-not-use-in-production",
+}
+volumes = ["influxdb-data:/var/lib/influxdb2"]
+restart = "unless-stopped"
+healthcheck = { test = "curl -sf http://localhost:8086/health || exit 1", interval = "10s", timeout = "5s", retries = 5, start_period = "15s" }
+
+# MinIO — S3-compatible object storage for binary blob modalities
+[services.minio]
+image = "cgr.dev/chainguard/minio:latest"
+ports = ["9002:9000", "9001:9001"]
+environment = {
+  MINIO_ROOT_USER = "verisim",
+  MINIO_ROOT_PASSWORD = "verisim-test-password",
+}
+command = ["server", "/data", "--console-address", ":9001"]
+volumes = ["minio-data:/data"]
+restart = "unless-stopped"
+healthcheck = { test = "curl -sf http://localhost:9000/minio/health/live || exit 1", interval = "10s", timeout = "5s", retries = 5, start_period = "10s" }
+
+# ============================================================================
+# Volumes
+# ============================================================================
+
+[volumes.mongodb-data]
+driver = "local"
+
+[volumes.redis-data]
+driver = "local"
+
+[volumes.neo4j-data]
+driver = "local"
+
+[volumes.neo4j-logs]
+driver = "local"
+
+[volumes.clickhouse-data]
+driver = "local"
+
+[volumes.influxdb-data]
+driver = "local"
+
+[volumes.minio-data]
+driver = "local"
+
+# ============================================================================
+# Networks
+# ============================================================================
+
+# Use selur zero-copy IPC for inter-service communication on the same host.
+# Falls back to standard bridge networking when selur driver is unavailable.
+[networks.default]
+driver = "selur"

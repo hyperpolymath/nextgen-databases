@@ -1,0 +1,67 @@
+{
+  "program_path": "/var/mnt/eclipse/repos/.git-private-farm",
+  "language": "scheme",
+  "frameworks": [],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "scripts/bootstrap-hookset.sh",
+      "severity": "Medium",
+      "description": "70 potentially unquoted variable expansions in scripts/bootstrap-hookset.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "maintenance.sh",
+      "severity": "Medium",
+      "description": "29 potentially unquoted variable expansions in maintenance.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 1114,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 0,
+    "io_operations": 4,
+    "threading_constructs": 0
+  },
+  "file_statistics": [
+    {
+      "file_path": "scripts/bootstrap-hookset.sh",
+      "lines": 552,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": []
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/bootstrap-hookset.sh",
+          "maintenance.sh"
+        ],
+        "frameworks": [],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

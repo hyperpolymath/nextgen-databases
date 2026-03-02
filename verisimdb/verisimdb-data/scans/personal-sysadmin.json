@@ -1,0 +1,815 @@
+{
+  "program_path": ".",
+  "language": "rust",
+  "frameworks": [
+    "Networking",
+    "Cache"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "scripts/github-admin/add-community-health.sh",
+      "severity": "Medium",
+      "description": "22 potentially unquoted variable expansions in scripts/github-admin/add-community-health.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/github-admin/add-community-health.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/github-admin/add-community-health.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/github-admin/add-descriptions.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/github-admin/add-descriptions.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/github-admin/add-justfile-mustfile.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/github-admin/add-justfile-mustfile.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/github-admin/add-language-blockers.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/github-admin/add-language-blockers.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/github-admin/add-license-badges.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/github-admin/add-license-badges.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/github-admin/add-missing-files.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/github-admin/add-missing-files.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/github-admin/add-readme-roadmap.sh",
+      "severity": "Medium",
+      "description": "35 potentially unquoted variable expansions in scripts/github-admin/add-readme-roadmap.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/github-admin/add-readme-roadmap.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/github-admin/add-readme-roadmap.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/github-admin/add-scm-files.sh",
+      "severity": "Medium",
+      "description": "27 potentially unquoted variable expansions in scripts/github-admin/add-scm-files.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/github-admin/add-scm-files.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/github-admin/add-scm-files.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/github-admin/advanced-security-config.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/github-admin/advanced-security-config.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/github-admin/configure-all-repos.sh",
+      "severity": "Medium",
+      "description": "24 potentially unquoted variable expansions in scripts/github-admin/configure-all-repos.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/github-admin/configure-all-repos.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/github-admin/configure-all-repos.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/github-admin/setup-palimpsest.sh",
+      "severity": "Medium",
+      "description": "27 potentially unquoted variable expansions in scripts/github-admin/setup-palimpsest.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/github-admin/setup-palimpsest.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/github-admin/setup-palimpsest.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "scripts/setup-new-repo.sh",
+      "severity": "Medium",
+      "description": "27 potentially unquoted variable expansions in scripts/setup-new-repo.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    },
+    {
+      "category": "PathTraversal",
+      "location": "scripts/setup-new-repo.sh",
+      "severity": "Medium",
+      "description": "Hardcoded /tmp/ path without mktemp in scripts/setup-new-repo.sh",
+      "recommended_attack": [
+        "disk"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 6813,
+    "unsafe_blocks": 0,
+    "panic_sites": 0,
+    "unwrap_calls": 1,
+    "allocation_sites": 9,
+    "io_operations": 52,
+    "threading_constructs": 2
+  },
+  "file_statistics": [
+    {
+      "file_path": "src/reasoning/mod.rs",
+      "lines": 267,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 1,
+      "allocation_sites": 2,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/storage/mod.rs",
+      "lines": 123,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/tools/crisis.rs",
+      "lines": 311,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 3,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/tools/network.rs",
+      "lines": 293,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 6,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/tools/security.rs",
+      "lines": 185,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/tools/service.rs",
+      "lines": 116,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/ai/mod.rs",
+      "lines": 101,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/forum/mod.rs",
+      "lines": 78,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/rules/mod.rs",
+      "lines": 585,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/daemon/mod.rs",
+      "lines": 548,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 4,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/correlation.rs",
+      "lines": 90,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "tui-ada/src/psa_client.adb",
+      "lines": 138,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui-ada/src/psa_tui.adb",
+      "lines": 195,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "tui-ada/src/psa_ui.adb",
+      "lines": 375,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/github-admin/add-community-health.sh",
+      "lines": 119,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/github-admin/add-justfile-mustfile.sh",
+      "lines": 85,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/github-admin/add-language-blockers.sh",
+      "lines": 33,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/github-admin/add-license-badges.sh",
+      "lines": 63,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/github-admin/add-missing-files.sh",
+      "lines": 92,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/github-admin/add-readme-roadmap.sh",
+      "lines": 120,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/github-admin/add-scm-files.sh",
+      "lines": 168,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 7,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/github-admin/setup-palimpsest.sh",
+      "lines": 78,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "scripts/setup-new-repo.sh",
+      "lines": 142,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 3,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "cpu",
+    "disk"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "tui-ada/src/psa_client.adb",
+        "to": "tui-ada/src/psa_tui.adb",
+        "relation": "shared_dir:tui-ada/src",
+        "weight": 1.0
+      },
+      {
+        "from": "tui-ada/src/psa_tui.adb",
+        "to": "tui-ada/src/psa_ui.adb",
+        "relation": "shared_dir:tui-ada/src",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-community-health.sh",
+        "to": "scripts/github-admin/add-justfile-mustfile.sh",
+        "relation": "shared_dir:scripts/github-admin",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-justfile-mustfile.sh",
+        "to": "scripts/github-admin/add-language-blockers.sh",
+        "relation": "shared_dir:scripts/github-admin",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-language-blockers.sh",
+        "to": "scripts/github-admin/add-license-badges.sh",
+        "relation": "shared_dir:scripts/github-admin",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-license-badges.sh",
+        "to": "scripts/github-admin/add-missing-files.sh",
+        "relation": "shared_dir:scripts/github-admin",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-missing-files.sh",
+        "to": "scripts/github-admin/add-readme-roadmap.sh",
+        "relation": "shared_dir:scripts/github-admin",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-readme-roadmap.sh",
+        "to": "scripts/github-admin/add-scm-files.sh",
+        "relation": "shared_dir:scripts/github-admin",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-scm-files.sh",
+        "to": "scripts/github-admin/setup-palimpsest.sh",
+        "relation": "shared_dir:scripts/github-admin",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tools/crisis.rs",
+        "to": "src/tools/network.rs",
+        "relation": "shared_dir:src/tools",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tools/network.rs",
+        "to": "src/tools/security.rs",
+        "relation": "shared_dir:src/tools",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tools/security.rs",
+        "to": "src/tools/service.rs",
+        "relation": "shared_dir:src/tools",
+        "weight": 1.0
+      },
+      {
+        "from": "src/reasoning/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/reasoning/mod.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/storage/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/storage/mod.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tools/crisis.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tools/crisis.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tools/network.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tools/network.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tools/security.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tools/security.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tools/service.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/tools/service.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ai/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/ai/mod.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/forum/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/forum/mod.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rules/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/rules/mod.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/daemon/mod.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/daemon/mod.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "src/correlation.rs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/correlation.rs",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "tui-ada/src/psa_client.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui-ada/src/psa_client.adb",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui-ada/src/psa_tui.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui-ada/src/psa_tui.adb",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui-ada/src/psa_ui.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "tui-ada/src/psa_ui.adb",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-community-health.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-community-health.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-justfile-mustfile.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-justfile-mustfile.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-language-blockers.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-language-blockers.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-license-badges.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-license-badges.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-missing-files.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-missing-files.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-readme-roadmap.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-readme-roadmap.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-scm-files.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/add-scm-files.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/setup-palimpsest.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/github-admin/setup-palimpsest.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/setup-new-repo.sh",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "scripts/setup-new-repo.sh",
+        "to": "Cache",
+        "relation": "framework",
+        "weight": 1.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "PathTraversal",
+        "sink_axis": "disk",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/github-admin/add-community-health.sh",
+          "scripts/github-admin/add-descriptions.sh",
+          "scripts/github-admin/add-justfile-mustfile.sh",
+          "scripts/github-admin/add-language-blockers.sh",
+          "scripts/github-admin/add-license-badges.sh",
+          "scripts/github-admin/add-missing-files.sh",
+          "scripts/github-admin/add-readme-roadmap.sh",
+          "scripts/github-admin/add-scm-files.sh",
+          "scripts/github-admin/advanced-security-config.sh",
+          "scripts/github-admin/configure-all-repos.sh",
+          "scripts/github-admin/setup-palimpsest.sh",
+          "scripts/setup-new-repo.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache"
+        ],
+        "relation": "PathTraversal->Disk"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 2.5,
+        "files": [
+          "scripts/github-admin/add-community-health.sh",
+          "scripts/github-admin/add-readme-roadmap.sh",
+          "scripts/github-admin/add-scm-files.sh",
+          "scripts/github-admin/configure-all-repos.sh",
+          "scripts/github-admin/setup-palimpsest.sh",
+          "scripts/setup-new-repo.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "Cache"
+        ],
+        "relation": "CommandInjection->Cpu"
+      }
+    ]
+  }
+}

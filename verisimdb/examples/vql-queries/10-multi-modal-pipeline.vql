@@ -1,0 +1,32 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+--
+-- 10-multi-modal-pipeline.vql
+-- Multi-modal pipeline: query all 8 octad modalities for a single entity
+--
+-- This is the "full octad query" — VeriSimDB's most comprehensive query
+-- type. It retrieves all eight modality representations of an entity in
+-- a single result, demonstrating the database's unique ability to unify
+-- heterogeneous data models under one roof.
+--
+-- The eight modalities are:
+--   1. graph     — edges connecting this entity to others
+--   2. vector    — dense embedding for similarity search
+--   3. tensor    — multi-dimensional array representation
+--   4. semantic  — schema.org types and structured properties
+--   5. document  — full-text title, content, and tags
+--   6. temporal  — creation time, modification time, version
+--   7. provenance — origin, actor, and transformation chain
+--   8. spatial   — latitude, longitude, and location label
+--
+-- The PROOF clause combines two checks:
+--   - EXISTENCE: all modalities are present and populated
+--   - PROVENANCE: the provenance chain is well-formed and each step
+--     references a valid actor
+--
+-- Expected result: complete octad data for entity-001 (the VeriSimDB
+-- paper) with both proof certificates attached.
+
+SELECT graph, vector, tensor, semantic, document, temporal, provenance, spatial
+FROM hexads
+WHERE id = 'entity-001'
+PROOF EXISTENCE(entity-001) AND PROVENANCE(entity-001)

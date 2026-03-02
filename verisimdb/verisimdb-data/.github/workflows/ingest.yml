@@ -1,0 +1,61 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+
+name: Ingest Scan Results
+
+on:
+  repository_dispatch:
+    types: [scan_result]
+  workflow_dispatch:
+    inputs:
+      repo_name:
+        description: 'Repository name'
+        required: true
+      scan_data:
+        description: 'JSON scan data'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Store scan result
+        run: |
+          REPO_NAME="${{ github.event.client_payload.repo_name || github.event.inputs.repo_name }}"
+          SCAN_DATA='${{ github.event.client_payload.scan_data || github.event.inputs.scan_data }}'
+
+          echo "$SCAN_DATA" > "scans/${REPO_NAME}.json"
+
+          # Update index.json (simple jq append)
+          jq --arg repo "$REPO_NAME" \
+             --arg time "$(date -Iseconds)" \
+             --argjson scan_data "$SCAN_DATA" \
+             '.repos[$repo] = {
+                last_scan: $time,
+                weak_points: ($scan_data.weak_points | length),
+                summary: $scan_data.summary
+              } |
+              .total_scans += 1 |
+              .last_updated = $time' \
+             index.json > index.tmp && mv index.tmp index.json
+
+      - name: Commit changes
+        run: |
+          REPO_NAME="${{ github.event.client_payload.repo_name || github.event.inputs.repo_name }}"
+
+          git config user.name "VeriSimDB Bot"
+          git config user.email "bot@verisimdb.org"
+          git add scans/ index.json
+          git commit -m "$(cat <<'EOF'
+scan: update ${REPO_NAME} results
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+EOF
+)"
+          git push

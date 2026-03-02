@@ -1,0 +1,82 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# VeriSimDB Test Infrastructure — Neo4j Community Edition
+#
+# Builds Neo4j Community with APOC plugin on Chainguard wolfi-base.
+# Auth is disabled for testing (NEO4J_AUTH=none).
+#
+# Provides:
+#   - Bolt protocol on port 7687 (driver access)
+#   - HTTP API on port 7474 (browser + REST)
+#   - APOC plugin for advanced graph procedures
+#
+# Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+
+# ---------------------------------------------------------------------------
+# Stage 1: Download and prepare Neo4j + APOC
+# ---------------------------------------------------------------------------
+FROM cgr.dev/chainguard/wolfi-base:latest AS builder
+
+RUN apk add --no-cache \
+    curl \
+    tar
+
+ARG NEO4J_VERSION=5.26.3
+ARG APOC_VERSION=5.26.0
+
+# Download Neo4j Community
+RUN curl -fsSL \
+    "https://dist.neo4j.org/neo4j-community-${NEO4J_VERSION}-unix.tar.gz" \
+    | tar xz -C /opt \
+    && mv "/opt/neo4j-community-${NEO4J_VERSION}" /opt/neo4j
+
+# Download APOC Core plugin
+RUN curl -fsSL \
+    "https://github.com/neo4j/apoc/releases/download/${APOC_VERSION}/apoc-${APOC_VERSION}-core.jar" \
+    -o /opt/neo4j/plugins/apoc-core.jar
+
+# ---------------------------------------------------------------------------
+# Stage 2: Runtime image
+# ---------------------------------------------------------------------------
+FROM cgr.dev/chainguard/wolfi-base:latest
+
+RUN apk add --no-cache \
+    openjdk-17-jre-headless \
+    curl \
+    bash
+
+# Copy Neo4j installation
+COPY --from=builder /opt/neo4j /opt/neo4j
+
+# Create non-root user
+RUN addgroup -g 7474 neo4j \
+    && adduser -u 7474 -G neo4j -D -h /var/lib/neo4j neo4j
+
+# Create data and log directories
+RUN mkdir -p /data /logs /var/lib/neo4j \
+    && chown -R neo4j:neo4j /opt/neo4j /data /logs /var/lib/neo4j
+
+# Configure Neo4j for test use
+RUN printf '%s\n' \
+    "server.default_listen_address=0.0.0.0" \
+    "server.bolt.listen_address=:7687" \
+    "server.http.listen_address=:7474" \
+    "dbms.security.auth_enabled=false" \
+    "server.directories.data=/data" \
+    "server.directories.logs=/logs" \
+    "dbms.security.procedures.unrestricted=apoc.*" \
+    "dbms.security.procedures.allowlist=apoc.*" \
+    > /opt/neo4j/conf/neo4j.conf
+
+ENV PATH="/opt/neo4j/bin:${PATH}"
+ENV NEO4J_HOME="/opt/neo4j"
+
+USER neo4j
+WORKDIR /var/lib/neo4j
+
+EXPOSE 7474 7687
+
+HEALTHCHECK --interval=10s --timeout=5s --retries=10 --start-period=30s \
+    CMD curl -sf http://localhost:7474/ || exit 1
+
+ENTRYPOINT ["neo4j", "console"]

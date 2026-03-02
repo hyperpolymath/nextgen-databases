@@ -1,0 +1,1115 @@
+{
+  "program_path": ".",
+  "language": "ada",
+  "frameworks": [
+    "Networking",
+    "OTP"
+  ],
+  "weak_points": [
+    {
+      "category": "CommandInjection",
+      "location": "elixir/dnfinition/lib/dnfinition/backends/guix_backend.ex",
+      "severity": "Medium",
+      "description": "System command execution in elixir/dnfinition/lib/dnfinition/backends/guix_backend.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "elixir/dnfinition/lib/dnfinition/backends/nix_backend.ex",
+      "severity": "Medium",
+      "description": "System command execution in elixir/dnfinition/lib/dnfinition/backends/nix_backend.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "elixir/dnfinition/lib/dnfinition/ada_wrapper.ex",
+      "severity": "Medium",
+      "description": "System command execution in elixir/dnfinition/lib/dnfinition/ada_wrapper.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "elixir/dnfinition/lib/dnfinition/snapshot_manager.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in elixir/dnfinition/lib/dnfinition/snapshot_manager.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "elixir/dnfinition/lib/dnfinition/snapshot_manager.ex",
+      "severity": "Medium",
+      "description": "System command execution in elixir/dnfinition/lib/dnfinition/snapshot_manager.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "AtomExhaustion",
+      "location": "elixir/totalupdate/lib/totalupdate/daemon.ex",
+      "severity": "High",
+      "description": "1 String.to_atom calls in elixir/totalupdate/lib/totalupdate/daemon.ex (use String.to_existing_atom)",
+      "recommended_attack": [
+        "memory"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "elixir/totalupdate/lib/totalupdate/daemon.ex",
+      "severity": "Medium",
+      "description": "System command execution in elixir/totalupdate/lib/totalupdate/daemon.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "elixir/totalupdate/lib/totalupdate/download_manager.ex",
+      "severity": "Medium",
+      "description": "System command execution in elixir/totalupdate/lib/totalupdate/download_manager.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "elixir/totalupdate/lib/totalupdate/strategy_engine.ex",
+      "severity": "Medium",
+      "description": "System command execution in elixir/totalupdate/lib/totalupdate/strategy_engine.ex",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "test/skeleton_test.sh",
+      "severity": "Critical",
+      "description": "eval usage in test/skeleton_test.sh",
+      "recommended_attack": [
+        "cpu",
+        "disk"
+      ]
+    },
+    {
+      "category": "CommandInjection",
+      "location": "test/skeleton_test.sh",
+      "severity": "Medium",
+      "description": "26 potentially unquoted variable expansions in test/skeleton_test.sh",
+      "recommended_attack": [
+        "cpu"
+      ]
+    }
+  ],
+  "statistics": {
+    "total_lines": 16050,
+    "unsafe_blocks": 13,
+    "panic_sites": 0,
+    "unwrap_calls": 0,
+    "allocation_sites": 38,
+    "io_operations": 48,
+    "threading_constructs": 15
+  },
+  "file_statistics": [
+    {
+      "file_path": "ada/dnfinition/src/backends/backend_guix.adb",
+      "lines": 488,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/backends/backend_guix.ads",
+      "lines": 178,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/backends/backend_interface.ads",
+      "lines": 207,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 2,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/backends/backend_nix.adb",
+      "lines": 491,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 6,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/backends/backend_nix.ads",
+      "lines": 178,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 5,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/platform/platform_detection.adb",
+      "lines": 483,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 14,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/plugins/plugin_registry.adb",
+      "lines": 443,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 7,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/plugins/plugin_registry.ads",
+      "lines": 202,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/reversibility/reversibility_types.ads",
+      "lines": 140,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/reversibility/snapshot_manager.adb",
+      "lines": 432,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/reversibility/snapshot_manager.ads",
+      "lines": 178,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/tui/tui-main_window.adb",
+      "lines": 146,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/dnfinition/src/dnfinition.adb",
+      "lines": 493,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/totalupdate/src/totalupdate-config.adb",
+      "lines": 152,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 9,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/totalupdate/src/totalupdate-daemon.adb",
+      "lines": 173,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/totalupdate/src/totalupdate-logging.adb",
+      "lines": 126,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ada/totalupdate/src/totalupdate_main.adb",
+      "lines": 192,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "elixir/dnfinition/lib/dnfinition/backends/guix_backend.ex",
+      "lines": 496,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/dnfinition/lib/dnfinition/backends/nix_backend.ex",
+      "lines": 526,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/dnfinition/lib/dnfinition/plugins/plugin_registry.ex",
+      "lines": 414,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/dnfinition/lib/dnfinition/plugins/strategy_matrix.ex",
+      "lines": 523,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "elixir/dnfinition/lib/dnfinition/ada_wrapper.ex",
+      "lines": 219,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/dnfinition/lib/dnfinition/recovery.ex",
+      "lines": 181,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/dnfinition/lib/dnfinition/snapshot_manager.ex",
+      "lines": 447,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/dnfinition/lib/dnfinition/transaction_log.ex",
+      "lines": 191,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 2,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/totalupdate/lib/totalupdate/daemon.ex",
+      "lines": 362,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/totalupdate/lib/totalupdate/download_manager.ex",
+      "lines": 279,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/totalupdate/lib/totalupdate/plugin_manager.ex",
+      "lines": 346,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/totalupdate/lib/totalupdate/scheduler.ex",
+      "lines": 198,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/totalupdate/lib/totalupdate/strategy_engine.ex",
+      "lines": 671,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "elixir/totalupdate/lib/totalupdate/watcher.ex",
+      "lines": 195,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 1
+    },
+    {
+      "file_path": "contractiles/trust/Trustfile.hs",
+      "lines": 105,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 1,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/src/main.zig",
+      "lines": 274,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 1,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "ffi/zig/test/integration_test.zig",
+      "lines": 182,
+      "unsafe_blocks": 0,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 2
+    },
+    {
+      "file_path": "src/abi/Types.idr",
+      "lines": 231,
+      "unsafe_blocks": 1,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    },
+    {
+      "file_path": "src/abi/Foreign.idr",
+      "lines": 216,
+      "unsafe_blocks": 12,
+      "panic_sites": 0,
+      "unwrap_calls": 0,
+      "allocation_sites": 0,
+      "io_operations": 0,
+      "threading_constructs": 0
+    }
+  ],
+  "recommended_attacks": [
+    "disk",
+    "concurrency",
+    "memory",
+    "cpu"
+  ],
+  "dependency_graph": {
+    "edges": [
+      {
+        "from": "ada/dnfinition/src/plugins/plugin_registry.adb",
+        "to": "ada/dnfinition/src/plugins/plugin_registry.ads",
+        "relation": "shared_dir:ada/dnfinition/src/plugins",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/reversibility/reversibility_types.ads",
+        "to": "ada/dnfinition/src/reversibility/snapshot_manager.adb",
+        "relation": "shared_dir:ada/dnfinition/src/reversibility",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/reversibility/snapshot_manager.adb",
+        "to": "ada/dnfinition/src/reversibility/snapshot_manager.ads",
+        "relation": "shared_dir:ada/dnfinition/src/reversibility",
+        "weight": 1.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "src/abi/Foreign.idr",
+        "relation": "shared_dir:src/abi",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/ada_wrapper.ex",
+        "to": "elixir/dnfinition/lib/dnfinition/recovery.ex",
+        "relation": "shared_dir:elixir/dnfinition/lib/dnfinition",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/recovery.ex",
+        "to": "elixir/dnfinition/lib/dnfinition/snapshot_manager.ex",
+        "relation": "shared_dir:elixir/dnfinition/lib/dnfinition",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/snapshot_manager.ex",
+        "to": "elixir/dnfinition/lib/dnfinition/transaction_log.ex",
+        "relation": "shared_dir:elixir/dnfinition/lib/dnfinition",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/backends/guix_backend.ex",
+        "to": "elixir/dnfinition/lib/dnfinition/backends/nix_backend.ex",
+        "relation": "shared_dir:elixir/dnfinition/lib/dnfinition/backends",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/totalupdate/src/totalupdate-config.adb",
+        "to": "ada/totalupdate/src/totalupdate-daemon.adb",
+        "relation": "shared_dir:ada/totalupdate/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/totalupdate/src/totalupdate-daemon.adb",
+        "to": "ada/totalupdate/src/totalupdate-logging.adb",
+        "relation": "shared_dir:ada/totalupdate/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/totalupdate/src/totalupdate-logging.adb",
+        "to": "ada/totalupdate/src/totalupdate_main.adb",
+        "relation": "shared_dir:ada/totalupdate/src",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_guix.adb",
+        "to": "ada/dnfinition/src/backends/backend_guix.ads",
+        "relation": "shared_dir:ada/dnfinition/src/backends",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_guix.ads",
+        "to": "ada/dnfinition/src/backends/backend_interface.ads",
+        "relation": "shared_dir:ada/dnfinition/src/backends",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_interface.ads",
+        "to": "ada/dnfinition/src/backends/backend_nix.adb",
+        "relation": "shared_dir:ada/dnfinition/src/backends",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_nix.adb",
+        "to": "ada/dnfinition/src/backends/backend_nix.ads",
+        "relation": "shared_dir:ada/dnfinition/src/backends",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/plugins/plugin_registry.ex",
+        "to": "elixir/dnfinition/lib/dnfinition/plugins/strategy_matrix.ex",
+        "relation": "shared_dir:elixir/dnfinition/lib/dnfinition/plugins",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/daemon.ex",
+        "to": "elixir/totalupdate/lib/totalupdate/download_manager.ex",
+        "relation": "shared_dir:elixir/totalupdate/lib/totalupdate",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/download_manager.ex",
+        "to": "elixir/totalupdate/lib/totalupdate/plugin_manager.ex",
+        "relation": "shared_dir:elixir/totalupdate/lib/totalupdate",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/plugin_manager.ex",
+        "to": "elixir/totalupdate/lib/totalupdate/scheduler.ex",
+        "relation": "shared_dir:elixir/totalupdate/lib/totalupdate",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/scheduler.ex",
+        "to": "elixir/totalupdate/lib/totalupdate/strategy_engine.ex",
+        "relation": "shared_dir:elixir/totalupdate/lib/totalupdate",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/strategy_engine.ex",
+        "to": "elixir/totalupdate/lib/totalupdate/watcher.ex",
+        "relation": "shared_dir:elixir/totalupdate/lib/totalupdate",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_guix.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_guix.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_guix.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_guix.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_interface.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_interface.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_nix.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_nix.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_nix.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/backends/backend_nix.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/platform/platform_detection.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/platform/platform_detection.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/plugins/plugin_registry.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/plugins/plugin_registry.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/plugins/plugin_registry.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/plugins/plugin_registry.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/reversibility/reversibility_types.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/reversibility/reversibility_types.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/reversibility/snapshot_manager.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/reversibility/snapshot_manager.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/reversibility/snapshot_manager.ads",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/reversibility/snapshot_manager.ads",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/tui/tui-main_window.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/tui/tui-main_window.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/dnfinition.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/dnfinition/src/dnfinition.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/totalupdate/src/totalupdate-config.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/totalupdate/src/totalupdate-config.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/totalupdate/src/totalupdate-daemon.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/totalupdate/src/totalupdate-daemon.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/totalupdate/src/totalupdate-logging.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/totalupdate/src/totalupdate-logging.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/totalupdate/src/totalupdate_main.adb",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ada/totalupdate/src/totalupdate_main.adb",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/backends/guix_backend.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/backends/guix_backend.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/backends/nix_backend.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/backends/nix_backend.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/plugins/plugin_registry.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/plugins/plugin_registry.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/plugins/strategy_matrix.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/plugins/strategy_matrix.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/ada_wrapper.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/ada_wrapper.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/recovery.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/recovery.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/snapshot_manager.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/snapshot_manager.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/transaction_log.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/dnfinition/lib/dnfinition/transaction_log.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/daemon.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/daemon.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/download_manager.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/download_manager.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/plugin_manager.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/plugin_manager.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/scheduler.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/scheduler.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/strategy_engine.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/strategy_engine.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/watcher.ex",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "elixir/totalupdate/lib/totalupdate/watcher.ex",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 2.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "contractiles/trust/Trustfile.hs",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/src/main.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 1.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "ffi/zig/test/integration_test.zig",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 4.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Types.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 3.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "Networking",
+        "relation": "framework",
+        "weight": 36.0
+      },
+      {
+        "from": "src/abi/Foreign.idr",
+        "to": "OTP",
+        "relation": "framework",
+        "weight": 36.0
+      }
+    ]
+  },
+  "taint_matrix": {
+    "rows": [
+      {
+        "source_category": "AtomExhaustion",
+        "sink_axis": "memory",
+        "severity_value": 3.5,
+        "files": [
+          "elixir/dnfinition/lib/dnfinition/snapshot_manager.ex",
+          "elixir/totalupdate/lib/totalupdate/daemon.ex"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP"
+        ],
+        "relation": "AtomExhaustion->Memory"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "cpu",
+        "severity_value": 5.0,
+        "files": [
+          "elixir/dnfinition/lib/dnfinition/backends/guix_backend.ex",
+          "elixir/dnfinition/lib/dnfinition/backends/nix_backend.ex",
+          "elixir/dnfinition/lib/dnfinition/ada_wrapper.ex",
+          "elixir/dnfinition/lib/dnfinition/snapshot_manager.ex",
+          "elixir/totalupdate/lib/totalupdate/daemon.ex",
+          "elixir/totalupdate/lib/totalupdate/download_manager.ex",
+          "elixir/totalupdate/lib/totalupdate/strategy_engine.ex",
+          "test/skeleton_test.sh",
+          "test/skeleton_test.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP"
+        ],
+        "relation": "CommandInjection->Cpu"
+      },
+      {
+        "source_category": "CommandInjection",
+        "sink_axis": "disk",
+        "severity_value": 5.0,
+        "files": [
+          "elixir/dnfinition/lib/dnfinition/backends/guix_backend.ex",
+          "elixir/dnfinition/lib/dnfinition/backends/nix_backend.ex",
+          "elixir/dnfinition/lib/dnfinition/ada_wrapper.ex",
+          "elixir/dnfinition/lib/dnfinition/snapshot_manager.ex",
+          "elixir/totalupdate/lib/totalupdate/daemon.ex",
+          "elixir/totalupdate/lib/totalupdate/download_manager.ex",
+          "elixir/totalupdate/lib/totalupdate/strategy_engine.ex",
+          "test/skeleton_test.sh"
+        ],
+        "frameworks": [
+          "Networking",
+          "OTP"
+        ],
+        "relation": "CommandInjection->Disk"
+      }
+    ]
+  }
+}
