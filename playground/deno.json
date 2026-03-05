@@ -1,0 +1,17 @@
+{
+  "name": "vql-playground",
+  "version": "0.1.0",
+  "tasks": {
+    "res:build": "rescript",
+    "res:dev": "rescript -w",
+    "dev": "concurrently \"npm:res:dev\" \"npx serve public -l 3000\"",
+    "build": "rescript && deno run -A build.mjs",
+    "clean": "rescript clean"
+  },
+  "imports": {
+    "@rescript/core": "npm:@rescript/core@^1.0.0",
+    "rescript": "^12.0.0",
+    "concurrently": "npm:concurrently@^9.0.0",
+    "esbuild": "npm:esbuild@^0.24.0"
+  }
+}
