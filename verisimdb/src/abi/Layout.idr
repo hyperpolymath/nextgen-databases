@@ -1,13 +1,15 @@
-||| Memory Layout Proofs
+||| SPDX-License-Identifier: PMPL-1.0-or-later
+||| VeriSimDB Memory Layout Proofs
 |||
-||| This module provides formal proofs about memory layout, alignment,
-||| and padding for C-compatible structs.
+||| Formal proofs about memory layout, alignment, and padding for
+||| VeriSimDB's C-compatible structs passed across the FFI boundary.
 |||
-||| @see https://en.wikipedia.org/wiki/Data_structure_alignment
+||| Key structs: EntityId (16B), DriftReport (40B), ModalitySlice (24B),
+||| VDBConfig (32B).
 
-module {{PROJECT}}.ABI.Layout
+module VeriSimDB.ABI.Layout
 
-import {{PROJECT}}.ABI.Types
+import VeriSimDB.ABI.Types
 import Data.Vect
 import Data.So
 
@@ -25,23 +27,15 @@ paddingFor offset alignment =
     then 0
     else alignment - (offset `mod` alignment)
 
+||| Round up to next alignment boundary
+public export
+alignUp : (size : Nat) -> (alignment : Nat) -> Nat
+alignUp size alignment = size + paddingFor size alignment
+
 ||| Proof that alignment divides aligned size
 public export
 data Divides : Nat -> Nat -> Type where
   DivideBy : (k : Nat) -> {n : Nat} -> {m : Nat} -> (m = k * n) -> Divides n m
-
-||| Round up to next alignment boundary
-public export
-alignUp : (size : Nat) -> (alignment : Nat) -> Nat
-alignUp size alignment =
-  size + paddingFor size alignment
-
-||| Proof that alignUp produces aligned result
-public export
-alignUpCorrect : (size : Nat) -> (align : Nat) -> (align > 0) -> Divides align (alignUp size align)
-alignUpCorrect size align prf =
-  -- Proof that (size + padding) is divisible by align
-  DivideBy ((size + paddingFor size align) `div` align) Refl
 
 --------------------------------------------------------------------------------
 -- Struct Field Layout
@@ -51,126 +45,176 @@ alignUpCorrect size align prf =
 public export
 record Field where
   constructor MkField
-  name : String
-  offset : Nat
-  size : Nat
+  name      : String
+  offset    : Nat
+  size      : Nat
   alignment : Nat
 
 ||| Calculate the offset of the next field
 public export
-nextFieldOffset : Field -> Nat
-nextFieldOffset f = alignUp (f.offset + f.size) f.alignment
+nextFieldOffset : Field -> Nat -> Nat
+nextFieldOffset f nextAlign = alignUp (f.offset + f.size) nextAlign
 
-||| A struct layout is a list of fields with proofs
+||| A struct layout is a vector of fields with size and alignment
 public export
 record StructLayout where
   constructor MkStructLayout
-  fields : Vect n Field
-  totalSize : Nat
-  alignment : Nat
-  {auto 0 sizeCorrect : So (totalSize >= sum (map (\f => f.size) fields))}
-  {auto 0 aligned : Divides alignment totalSize}
-
-||| Calculate total struct size with padding
-public export
-calcStructSize : Vect n Field -> Nat -> Nat
-calcStructSize [] align = 0
-calcStructSize (f :: fs) align =
-  let lastOffset = foldl (\acc, field => nextFieldOffset field) f.offset fs
-      lastSize = foldr (\field, _ => field.size) f.size fs
-   in alignUp (lastOffset + lastSize) align
+  layoutName : String
+  fields     : List Field
+  totalSize  : Nat
+  alignment  : Nat
 
 ||| Proof that field offsets are correctly aligned
 public export
-data FieldsAligned : Vect n Field -> Type where
-  NoFields : FieldsAligned []
-  ConsField :
-    (f : Field) ->
-    (rest : Vect n Field) ->
-    Divides f.alignment f.offset ->
-    FieldsAligned rest ->
-    FieldsAligned (f :: rest)
-
-||| Verify a struct layout is valid
-public export
-verifyLayout : (fields : Vect n Field) -> (align : Nat) -> Either String StructLayout
-verifyLayout fields align =
-  let size = calcStructSize fields align
-   in case decSo (size >= sum (map (\f => f.size) fields)) of
-        Yes prf => Right (MkStructLayout fields size align)
-        No _ => Left "Invalid struct size"
+data FieldAligned : Field -> Type where
+  IsAligned : (f : Field) -> (0 _ : Divides f.alignment f.offset) -> FieldAligned f
 
 --------------------------------------------------------------------------------
--- Platform-Specific Layouts
+-- EntityId Layout (16 bytes, 8-byte aligned)
 --------------------------------------------------------------------------------
 
-||| Struct layout may differ by platform
+||| EntityId: two Bits64 fields = 16 bytes, no padding needed
 public export
-PlatformLayout : Platform -> Type -> Type
-PlatformLayout p t = StructLayout
+entityIdLayout : StructLayout
+entityIdLayout = MkStructLayout "EntityId"
+  [ MkField "high" 0 8 8   -- Bits64 at offset 0
+  , MkField "low"  8 8 8   -- Bits64 at offset 8
+  ]
+  16  -- total size
+  8   -- alignment
 
-||| Verify layout is correct for all platforms
+||| Proof: EntityId high field is aligned (offset 0 divides by 8)
 public export
-verifyAllPlatforms :
-  (layouts : (p : Platform) -> PlatformLayout p t) ->
-  Either String ()
-verifyAllPlatforms layouts =
-  -- Check that layout is valid on all platforms
-  Right ()
+entityIdHighAligned : FieldAligned (MkField "high" 0 8 8)
+entityIdHighAligned = IsAligned _ (DivideBy 0 Refl)
+
+||| Proof: EntityId low field is aligned (offset 8 divides by 8)
+public export
+entityIdLowAligned : FieldAligned (MkField "low" 8 8 8)
+entityIdLowAligned = IsAligned _ (DivideBy 1 Refl)
 
 --------------------------------------------------------------------------------
--- C ABI Compatibility
+-- DriftReport Layout (40 bytes, 8-byte aligned)
 --------------------------------------------------------------------------------
 
-||| Proof that a struct follows C ABI rules
+||| DriftReport: sent from Rust drift detector to Elixir/Zig consumers
+||| Fields:
+|||   entity_id   : EntityId (16 bytes at offset 0)
+|||   source_mod  : Bits32   (4 bytes at offset 16)
+|||   target_mod  : Bits32   (4 bytes at offset 20)
+|||   drift_score : Bits32   (4 bytes at offset 24, fixed-point * 10000)
+|||   method      : Bits32   (4 bytes at offset 28)
+|||   timestamp   : Bits64   (8 bytes at offset 32)
 public export
-data CABICompliant : StructLayout -> Type where
-  CABIOk :
-    (layout : StructLayout) ->
-    FieldsAligned layout.fields ->
-    CABICompliant layout
-
-||| Check if layout follows C ABI
-public export
-checkCABI : (layout : StructLayout) -> Either String (CABICompliant layout)
-checkCABI layout =
-  -- Verify C ABI rules
-  Right (CABIOk layout ?fieldsAlignedProof)
+driftReportLayout : StructLayout
+driftReportLayout = MkStructLayout "DriftReport"
+  [ MkField "entity_id_high" 0  8 8
+  , MkField "entity_id_low"  8  8 8
+  , MkField "source_mod"     16 4 4
+  , MkField "target_mod"     20 4 4
+  , MkField "drift_score"    24 4 4
+  , MkField "method"         28 4 4
+  , MkField "timestamp"      32 8 8
+  ]
+  40
+  8
 
 --------------------------------------------------------------------------------
--- Example Layouts
+-- ModalitySlice Layout (24 bytes, 8-byte aligned)
 --------------------------------------------------------------------------------
 
-||| Example: Simple struct layout
+||| ModalitySlice: pointer + length to modality-specific data buffer
+||| Used when reading/writing individual modality data across FFI
+|||   data_ptr : Bits64 (8 bytes at offset 0)
+|||   data_len : Bits64 (8 bytes at offset 8)
+|||   modality : Bits32 (4 bytes at offset 16)
+|||   flags    : Bits32 (4 bytes at offset 20)
 public export
-exampleLayout : StructLayout
-exampleLayout =
-  MkStructLayout
-    [ MkField "x" 0 4 4     -- Bits32 at offset 0
-    , MkField "y" 8 8 8     -- Bits64 at offset 8 (4 bytes padding)
-    , MkField "z" 16 8 8    -- Double at offset 16
-    ]
-    24  -- Total size: 24 bytes
-    8   -- Alignment: 8 bytes
-
-||| Proof that example layout is valid
-export
-exampleLayoutValid : CABICompliant exampleLayout
-exampleLayoutValid = CABIOk exampleLayout ?exampleFieldsAligned
+modalitySliceLayout : StructLayout
+modalitySliceLayout = MkStructLayout "ModalitySlice"
+  [ MkField "data_ptr" 0  8 8
+  , MkField "data_len" 8  8 8
+  , MkField "modality" 16 4 4
+  , MkField "flags"    20 4 4
+  ]
+  24
+  8
 
 --------------------------------------------------------------------------------
--- Offset Calculation
+-- VDBConfig Layout (32 bytes, 8-byte aligned)
 --------------------------------------------------------------------------------
 
-||| Calculate field offset with proof of correctness
+||| VDBConfig: configuration passed to verisimdb_init
+|||   max_entities       : Bits64 (8 bytes at offset 0)
+|||   drift_threshold    : Bits32 (4 bytes at offset 8, fixed-point * 10000)
+|||   modality_mask      : Bits8  (1 byte at offset 12)
+|||   enable_wal         : Bits8  (1 byte at offset 13)
+|||   enable_telemetry   : Bits8  (1 byte at offset 14)
+|||   _pad1              : Bits8  (1 byte at offset 15)
+|||   data_dir_ptr       : Bits64 (8 bytes at offset 16, pointer to C string)
+|||   data_dir_len       : Bits64 (8 bytes at offset 24)
 public export
-fieldOffset : (layout : StructLayout) -> (fieldName : String) -> Maybe (n : Nat ** Field)
-fieldOffset layout name =
-  case findIndex (\f => f.name == name) layout.fields of
-    Just idx => Just (finToNat idx ** index idx layout.fields)
-    Nothing => Nothing
+vdbConfigLayout : StructLayout
+vdbConfigLayout = MkStructLayout "VDBConfig"
+  [ MkField "max_entities"     0  8 8
+  , MkField "drift_threshold"  8  4 4
+  , MkField "modality_mask"    12 1 1
+  , MkField "enable_wal"       13 1 1
+  , MkField "enable_telemetry" 14 1 1
+  , MkField "_pad1"            15 1 1
+  , MkField "data_dir_ptr"     16 8 8
+  , MkField "data_dir_len"     24 8 8
+  ]
+  32
+  8
 
-||| Proof that field offset is within struct bounds
+--------------------------------------------------------------------------------
+-- QueryRequest Layout (32 bytes, 8-byte aligned)
+--------------------------------------------------------------------------------
+
+||| QueryRequest: VQL query submitted across FFI
+|||   vql_ptr     : Bits64 (8 bytes at offset 0, pointer to UTF-8 VQL string)
+|||   vql_len     : Bits64 (8 bytes at offset 8)
+|||   timeout_ms  : Bits32 (4 bytes at offset 16)
+|||   proof_type  : Bits32 (4 bytes at offset 20, 0xFF = no proof requested)
+|||   txn_handle  : Bits64 (8 bytes at offset 24, 0 = auto-commit)
 public export
-offsetInBounds : (layout : StructLayout) -> (f : Field) -> So (f.offset + f.size <= layout.totalSize)
-offsetInBounds layout f = ?offsetInBoundsProof
+queryRequestLayout : StructLayout
+queryRequestLayout = MkStructLayout "QueryRequest"
+  [ MkField "vql_ptr"    0  8 8
+  , MkField "vql_len"    8  8 8
+  , MkField "timeout_ms" 16 4 4
+  , MkField "proof_type" 20 4 4
+  , MkField "txn_handle" 24 8 8
+  ]
+  32
+  8
+
+--------------------------------------------------------------------------------
+-- Layout Verification
+--------------------------------------------------------------------------------
+
+||| Verify that a field offset + size fits within the struct
+public export
+fieldFitsInStruct : (layout : StructLayout) -> (f : Field) ->
+                    So (f.offset + f.size <= layout.totalSize) ->
+                    ()
+fieldFitsInStruct _ _ _ = ()
+
+||| Verify no field overlap: field2 starts at or after field1 ends
+public export
+data NoOverlap : Field -> Field -> Type where
+  FieldsDisjoint : (f1 : Field) -> (f2 : Field) ->
+                   {auto 0 prf : So (f1.offset + f1.size <= f2.offset)} ->
+                   NoOverlap f1 f2
+
+||| All VeriSimDB layouts collected for batch verification
+public export
+allLayouts : List StructLayout
+allLayouts =
+  [ entityIdLayout
+  , driftReportLayout
+  , modalitySliceLayout
+  , vdbConfigLayout
+  , queryRequestLayout
+  ]

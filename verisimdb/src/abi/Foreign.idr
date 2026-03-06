@@ -1,15 +1,16 @@
-||| Foreign Function Interface Declarations
+||| SPDX-License-Identifier: PMPL-1.0-or-later
+||| VeriSimDB Foreign Function Interface Declarations
 |||
-||| This module declares all C-compatible functions that will be
-||| implemented in the Zig FFI layer.
+||| All C-compatible functions implemented in ffi/zig/.
+||| These are the canonical FFI entry points for VeriSimDB.
 |||
-||| All functions are declared here with type signatures and safety proofs.
-||| Implementations live in ffi/zig/
+||| Naming convention: verisimdb_<operation>
+||| All functions return VResult codes (Bits32).
 
-module {{PROJECT}}.ABI.Foreign
+module VeriSimDB.ABI.Foreign
 
-import {{PROJECT}}.ABI.Types
-import {{PROJECT}}.ABI.Layout
+import VeriSimDB.ABI.Types
+import VeriSimDB.ABI.Layout
 
 %default total
 
@@ -17,200 +18,288 @@ import {{PROJECT}}.ABI.Layout
 -- Library Lifecycle
 --------------------------------------------------------------------------------
 
-||| Initialize the library
-||| Returns a handle to the library instance, or Nothing on failure
+||| Initialize a VeriSimDB instance with configuration
+||| config_ptr: pointer to VDBConfig struct
+||| Returns: handle to VeriSimDB instance (0 on failure)
 export
-%foreign "C:{{project}}_init, lib{{project}}"
-prim__init : PrimIO Bits64
+%foreign "C:verisimdb_init, libverisimdb"
+prim__init : Bits64 -> PrimIO Bits64
 
-||| Safe wrapper for library initialization
+||| Safe wrapper for initialization
 export
-init : IO (Maybe Handle)
-init = do
-  ptr <- primIO prim__init
-  pure (createHandle ptr)
+init : Bits64 -> IO (Maybe VDBHandle)
+init configPtr = do
+  ptr <- primIO (prim__init configPtr)
+  pure (createVDBHandle ptr)
 
-||| Clean up library resources
+||| Shut down and free all resources
 export
-%foreign "C:{{project}}_free, lib{{project}}"
+%foreign "C:verisimdb_free, libverisimdb"
 prim__free : Bits64 -> PrimIO ()
 
-||| Safe wrapper for cleanup
+||| Safe shutdown
 export
-free : Handle -> IO ()
-free h = primIO (prim__free (handlePtr h))
+free : VDBHandle -> IO ()
+free h = primIO (prim__free (vdbPtr h))
 
 --------------------------------------------------------------------------------
--- Core Operations
+-- Entity Operations
 --------------------------------------------------------------------------------
 
-||| Example operation: process data
+||| Create a new octad entity
+||| db: VDBHandle, id_high/id_low: EntityId parts, mask: active modalities
+||| Returns: EntityHandle (0 on failure)
 export
-%foreign "C:{{project}}_process, lib{{project}}"
-prim__process : Bits64 -> Bits32 -> PrimIO Bits32
+%foreign "C:verisimdb_entity_create, libverisimdb"
+prim__entityCreate : Bits64 -> Bits64 -> Bits64 -> Bits8 -> PrimIO Bits64
 
-||| Safe wrapper with error handling
+||| Safe entity creation
 export
-process : Handle -> Bits32 -> IO (Either Result Bits32)
-process h input = do
-  result <- primIO (prim__process (handlePtr h) input)
-  pure $ case result of
-    0 => Left Error
-    n => Right n
+entityCreate : VDBHandle -> EntityId -> ModalityMask -> IO (Maybe EntityHandle)
+entityCreate db eid mask = do
+  ptr <- primIO (prim__entityCreate (vdbPtr db) eid.high eid.low mask)
+  pure (createEntityHandle ptr)
+
+||| Look up an entity by ID
+export
+%foreign "C:verisimdb_entity_get, libverisimdb"
+prim__entityGet : Bits64 -> Bits64 -> Bits64 -> PrimIO Bits64
+
+||| Safe entity lookup
+export
+entityGet : VDBHandle -> EntityId -> IO (Maybe EntityHandle)
+entityGet db eid = do
+  ptr <- primIO (prim__entityGet (vdbPtr db) eid.high eid.low)
+  pure (createEntityHandle ptr)
+
+||| Delete an entity and all its modality data
+export
+%foreign "C:verisimdb_entity_delete, libverisimdb"
+prim__entityDelete : Bits64 -> Bits64 -> Bits64 -> PrimIO Bits32
+
+||| Safe entity deletion
+export
+entityDelete : VDBHandle -> EntityId -> IO VResult
+entityDelete db eid = do
+  code <- primIO (prim__entityDelete (vdbPtr db) eid.high eid.low)
+  pure $ case vresultFromInt code of
+    Just r  => r
+    Nothing => VError
+
+||| Release an entity handle (does NOT delete the entity)
+export
+%foreign "C:verisimdb_entity_handle_free, libverisimdb"
+prim__entityHandleFree : Bits64 -> PrimIO ()
+
+export
+entityHandleFree : EntityHandle -> IO ()
+entityHandleFree h = primIO (prim__entityHandleFree (entityPtr h))
 
 --------------------------------------------------------------------------------
--- String Operations
+-- Modality Data Operations
 --------------------------------------------------------------------------------
 
-||| Convert C string to Idris String
+||| Write modality data for an entity
+||| entity: EntityHandle, slice_ptr: pointer to ModalitySlice struct
+||| Returns: VResult code
 export
-%foreign "support:idris2_getString, libidris2_support"
-prim__getString : Bits64 -> String
+%foreign "C:verisimdb_modality_write, libverisimdb"
+prim__modalityWrite : Bits64 -> Bits64 -> PrimIO Bits32
 
-||| Free C string
+||| Safe modality write
 export
-%foreign "C:{{project}}_free_string, lib{{project}}"
-prim__freeString : Bits64 -> PrimIO ()
+modalityWrite : EntityHandle -> Bits64 -> IO VResult
+modalityWrite entity slicePtr = do
+  code <- primIO (prim__modalityWrite (entityPtr entity) slicePtr)
+  pure $ case vresultFromInt code of
+    Just r  => r
+    Nothing => VError
 
-||| Get string result from library
+||| Read modality data for an entity
+||| entity: EntityHandle, modality: Bits32, out_ptr/out_len: output buffer
+||| Returns: bytes written (0 on error)
 export
-%foreign "C:{{project}}_get_string, lib{{project}}"
-prim__getResult : Bits64 -> PrimIO Bits64
+%foreign "C:verisimdb_modality_read, libverisimdb"
+prim__modalityRead : Bits64 -> Bits32 -> Bits64 -> Bits64 -> PrimIO Bits64
 
-||| Safe string getter
+||| Safe modality read
 export
-getString : Handle -> IO (Maybe String)
-getString h = do
-  ptr <- primIO (prim__getResult (handlePtr h))
+modalityRead : EntityHandle -> Modality -> Bits64 -> Bits64 -> IO Bits64
+modalityRead entity mod outPtr outLen =
+  primIO (prim__modalityRead (entityPtr entity) (modalityToInt mod) outPtr outLen)
+
+||| Get active modality mask for an entity
+export
+%foreign "C:verisimdb_entity_modalities, libverisimdb"
+prim__entityModalities : Bits64 -> PrimIO Bits8
+
+export
+entityModalities : EntityHandle -> IO ModalityMask
+entityModalities entity = primIO (prim__entityModalities (entityPtr entity))
+
+--------------------------------------------------------------------------------
+-- Drift Detection
+--------------------------------------------------------------------------------
+
+||| Check drift between two modalities of an entity
+||| Returns: DriftScore (fixed-point * 10000), or 0xFFFFFFFF on error
+export
+%foreign "C:verisimdb_drift_check, libverisimdb"
+prim__driftCheck : Bits64 -> Bits32 -> Bits32 -> Bits32 -> PrimIO Bits32
+
+||| Safe drift check
+export
+driftCheck : EntityHandle -> Modality -> Modality -> DriftMethod -> IO (Maybe DriftScore)
+driftCheck entity src tgt method = do
+  score <- primIO (prim__driftCheck (entityPtr entity)
+                    (modalityToInt src) (modalityToInt tgt) (driftMethodToInt method))
+  pure $ if score == 0xFFFFFFFF then Nothing else Just score
+
+||| Run drift detection sweep on all entities
+||| db: VDBHandle, report_buf: pointer to array of DriftReport structs
+||| report_max: max reports to write
+||| Returns: number of drift reports written
+export
+%foreign "C:verisimdb_drift_sweep, libverisimdb"
+prim__driftSweep : Bits64 -> Bits64 -> Bits32 -> PrimIO Bits32
+
+export
+driftSweep : VDBHandle -> Bits64 -> Bits32 -> IO Bits32
+driftSweep db reportBuf maxReports =
+  primIO (prim__driftSweep (vdbPtr db) reportBuf maxReports)
+
+||| Trigger normalization for a drifted entity
+export
+%foreign "C:verisimdb_normalize, libverisimdb"
+prim__normalize : Bits64 -> Bits64 -> Bits64 -> PrimIO Bits32
+
+export
+normalize : VDBHandle -> EntityId -> IO VResult
+normalize db eid = do
+  code <- primIO (prim__normalize (vdbPtr db) eid.high eid.low)
+  pure $ case vresultFromInt code of
+    Just r  => r
+    Nothing => VError
+
+--------------------------------------------------------------------------------
+-- VQL Query Execution
+--------------------------------------------------------------------------------
+
+||| Parse and execute a VQL query
+||| db: VDBHandle, req_ptr: pointer to QueryRequest struct
+||| Returns: ResultSetHandle (0 on failure)
+export
+%foreign "C:verisimdb_query, libverisimdb"
+prim__query : Bits64 -> Bits64 -> PrimIO Bits64
+
+||| Safe query execution
+export
+query : VDBHandle -> Bits64 -> IO (Maybe ResultSetHandle)
+query db reqPtr = do
+  ptr <- primIO (prim__query (vdbPtr db) reqPtr)
   if ptr == 0
     then pure Nothing
-    else do
-      let str = prim__getString ptr
-      primIO (prim__freeString ptr)
-      pure (Just str)
+    else pure (Just (MkResultSetHandle ptr))
+
+||| Get number of results in a result set
+export
+%foreign "C:verisimdb_resultset_count, libverisimdb"
+prim__resultSetCount : Bits64 -> PrimIO Bits64
+
+export
+resultSetCount : ResultSetHandle -> IO Bits64
+resultSetCount rs = primIO (prim__resultSetCount (resultSetPtr rs))
+
+||| Read result at index as JSON bytes into buffer
+||| Returns: bytes written (0 on error or out of bounds)
+export
+%foreign "C:verisimdb_resultset_get, libverisimdb"
+prim__resultSetGet : Bits64 -> Bits64 -> Bits64 -> Bits64 -> PrimIO Bits64
+
+export
+resultSetGet : ResultSetHandle -> Bits64 -> Bits64 -> Bits64 -> IO Bits64
+resultSetGet rs idx outPtr outLen =
+  primIO (prim__resultSetGet (resultSetPtr rs) idx outPtr outLen)
+
+||| Free a result set
+export
+%foreign "C:verisimdb_resultset_free, libverisimdb"
+prim__resultSetFree : Bits64 -> PrimIO ()
+
+export
+resultSetFree : ResultSetHandle -> IO ()
+resultSetFree rs = primIO (prim__resultSetFree (resultSetPtr rs))
 
 --------------------------------------------------------------------------------
--- Array/Buffer Operations
+-- Transaction Support
 --------------------------------------------------------------------------------
 
-||| Process array data
+||| Begin a transaction
 export
-%foreign "C:{{project}}_process_array, lib{{project}}"
-prim__processArray : Bits64 -> Bits64 -> Bits32 -> PrimIO Bits32
+%foreign "C:verisimdb_txn_begin, libverisimdb"
+prim__txnBegin : Bits64 -> PrimIO Bits64
 
-||| Safe array processor
 export
-processArray : Handle -> (buffer : Bits64) -> (len : Bits32) -> IO (Either Result ())
-processArray h buf len = do
-  result <- primIO (prim__processArray (handlePtr h) buf len)
-  pure $ case resultFromInt result of
-    Just Ok => Right ()
-    Just err => Left err
-    Nothing => Left Error
-  where
-    resultFromInt : Bits32 -> Maybe Result
-    resultFromInt 0 = Just Ok
-    resultFromInt 1 = Just Error
-    resultFromInt 2 = Just InvalidParam
-    resultFromInt 3 = Just OutOfMemory
-    resultFromInt 4 = Just NullPointer
-    resultFromInt _ = Nothing
-
---------------------------------------------------------------------------------
--- Error Handling
---------------------------------------------------------------------------------
-
-||| Get last error message
-export
-%foreign "C:{{project}}_last_error, lib{{project}}"
-prim__lastError : PrimIO Bits64
-
-||| Retrieve last error as string
-export
-lastError : IO (Maybe String)
-lastError = do
-  ptr <- primIO prim__lastError
+txnBegin : VDBHandle -> IO (Maybe TxnHandle)
+txnBegin db = do
+  ptr <- primIO (prim__txnBegin (vdbPtr db))
   if ptr == 0
     then pure Nothing
-    else pure (Just (prim__getString ptr))
+    else pure (Just (MkTxnHandle ptr))
 
-||| Get error description for result code
+||| Commit a transaction
 export
-errorDescription : Result -> String
-errorDescription Ok = "Success"
-errorDescription Error = "Generic error"
-errorDescription InvalidParam = "Invalid parameter"
-errorDescription OutOfMemory = "Out of memory"
-errorDescription NullPointer = "Null pointer"
+%foreign "C:verisimdb_txn_commit, libverisimdb"
+prim__txnCommit : Bits64 -> PrimIO Bits32
+
+export
+txnCommit : TxnHandle -> IO VResult
+txnCommit txn = do
+  code <- primIO (prim__txnCommit (txnPtr txn))
+  pure $ case vresultFromInt code of
+    Just r  => r
+    Nothing => VError
+
+||| Rollback a transaction
+export
+%foreign "C:verisimdb_txn_rollback, libverisimdb"
+prim__txnRollback : Bits64 -> PrimIO Bits32
+
+export
+txnRollback : TxnHandle -> IO VResult
+txnRollback txn = do
+  code <- primIO (prim__txnRollback (txnPtr txn))
+  pure $ case vresultFromInt code of
+    Just r  => r
+    Nothing => VError
 
 --------------------------------------------------------------------------------
 -- Version Information
 --------------------------------------------------------------------------------
 
-||| Get library version
+||| Get VeriSimDB version string
 export
-%foreign "C:{{project}}_version, lib{{project}}"
+%foreign "C:verisimdb_version, libverisimdb"
 prim__version : PrimIO Bits64
 
-||| Get version as string
+||| Get version as string (caller must not free)
+export
+%foreign "support:idris2_getString, libidris2_support"
+prim__getString : Bits64 -> String
+
 export
 version : IO String
 version = do
   ptr <- primIO prim__version
   pure (prim__getString ptr)
 
-||| Get library build info
+||| Get build info (features, platform)
 export
-%foreign "C:{{project}}_build_info, lib{{project}}"
+%foreign "C:verisimdb_build_info, libverisimdb"
 prim__buildInfo : PrimIO Bits64
 
-||| Get build information
 export
 buildInfo : IO String
 buildInfo = do
   ptr <- primIO prim__buildInfo
   pure (prim__getString ptr)
-
---------------------------------------------------------------------------------
--- Callback Support
---------------------------------------------------------------------------------
-
-||| Callback function type (C ABI)
-public export
-Callback : Type
-Callback = Bits64 -> Bits32 -> Bits32
-
-||| Register a callback — FFI declaration typed to accept callback directly
-export
-%foreign "C:{{project}}_register_callback, lib{{project}}"
-prim__registerCallback : Bits64 -> (Bits64 -> Bits32 -> Bits32) -> PrimIO Bits32
-
-||| Safe callback registration (no cast — callback type matches FFI declaration)
-export
-registerCallback : Handle -> Callback -> IO (Either Result ())
-registerCallback h cb = do
-  result <- primIO (prim__registerCallback (handlePtr h) cb)
-  pure $ case resultFromInt result of
-    Just Ok => Right ()
-    Just err => Left err
-    Nothing => Left Error
-  where
-    resultFromInt : Bits32 -> Maybe Result
-    resultFromInt 0 = Just Ok
-    resultFromInt _ = Just Error
-
---------------------------------------------------------------------------------
--- Utility Functions
---------------------------------------------------------------------------------
-
-||| Check if library is initialized
-export
-%foreign "C:{{project}}_is_initialized, lib{{project}}"
-prim__isInitialized : Bits64 -> PrimIO Bits32
-
-||| Check initialization status
-export
-isInitialized : Handle -> IO Bool
-isInitialized h = do
-  result <- primIO (prim__isInitialized (handlePtr h))
-  pure (result /= 0)
