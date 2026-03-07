@@ -1,0 +1,18 @@
+{
+  "license": "PMPL-1.0-or-later",
+  "id": "recipe-scorecard-sast",
+  "name": "OpenSSF Scorecard: SAST",
+  "description": "Verify that the project runs static analysis security testing tools such as CodeQL, Semgrep, or SonarQube on pull requests or the default branch. SAST detects injection flaws, buffer overflows, authentication bypasses, and other vulnerability classes before deployment.",
+  "category": "Scorecard-Testing",
+  "target_categories": ["Scorecard-Testing", "StaticAnalysis"],
+  "pa_rule": "PA114",
+  "languages": ["*"],
+  "confidence": 0.90,
+  "auto_fixable": true,
+  "action": "add_file",
+  "match": "no SAST tool (CodeQL, Semgrep, SonarQube) configured in CI workflows",
+  "replacement": "add .github/workflows/codeql.yml with appropriate language matrix and scheduled analysis",
+  "fix_script": "none",
+  "proven_module": null,
+  "formally_proven": false
+}

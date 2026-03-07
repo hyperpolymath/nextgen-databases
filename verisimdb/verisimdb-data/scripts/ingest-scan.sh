@@ -45,11 +45,31 @@ TIMESTAMP="$(date -Iseconds)"
 
 jq --arg repo "$REPO_NAME" \
    --arg time "$TIMESTAMP" \
+   --arg scan_date "${TIMESTAMP:0:10}" \
    --argjson scan_data "$SCAN_DATA" \
-   '.repos[$repo] = {
+   '
+    # Auto-generate summary from scan data (scan files do not carry a summary field)
+    ($scan_data.weak_points | length) as $wp_count |
+    ($scan_data.language // "unknown") as $lang |
+    (if $wp_count == 0 then
+       "0 weak points; clean scan; lang: \($lang); scanned: \($scan_date)"
+     else
+       # Severity breakdown
+       ([$scan_data.weak_points[].severity] | group_by(.) | map({(.[0]): length}) | add) as $sevs |
+       # Top 3 categories
+       ([$scan_data.weak_points[].category] | group_by(.) | map({key: .[0], count: length}) | sort_by(-.count) | .[0:3] |
+        map("\(.key) (\(.count))") | join(", ")) as $top_cats |
+       # Severity string (ordered: Critical, High, Medium, Low)
+       ([if $sevs.Critical then "\($sevs.Critical) Critical" else empty end,
+         if $sevs.High then "\($sevs.High) High" else empty end,
+         if $sevs.Medium then "\($sevs.Medium) Medium" else empty end,
+         if $sevs.Low then "\($sevs.Low) Low" else empty end] | join(", ")) as $sev_str |
+       "\($wp_count) weak points (\($sev_str)); top: \($top_cats); lang: \($lang); scanned: \($scan_date)"
+     end) as $summary |
+    .repos[$repo] = {
       last_scan: $time,
-      weak_points: ($scan_data.weak_points | length),
-      summary: $scan_data.summary,
+      weak_points: $wp_count,
+      summary: $summary,
       pattern_ids: (.repos[$repo].pattern_ids // []),
       fixes_applied: (.repos[$repo].fixes_applied // 0),
       fixes_pending: (.repos[$repo].fixes_pending // 0),

@@ -1,0 +1,18 @@
+{
+  "license": "PMPL-1.0-or-later",
+  "id": "recipe-scorecard-token-permissions",
+  "name": "OpenSSF Scorecard: Token-Permissions",
+  "description": "Verify that GitHub Actions workflows declare explicit least-privilege permissions for the GITHUB_TOKEN rather than using the default read-write scope. Overprivileged tokens in compromised workflows allow attackers to push malicious code, create releases, or exfiltrate secrets.",
+  "category": "Scorecard-AccessControl",
+  "target_categories": ["Scorecard-AccessControl", "TokenPermissions"],
+  "pa_rule": "PA118",
+  "languages": ["*"],
+  "confidence": 0.95,
+  "auto_fixable": true,
+  "action": "edit_workflow",
+  "match": "workflow files missing top-level permissions block or using write-all default",
+  "replacement": "add 'permissions: read-all' at workflow level, grant specific write permissions only to jobs that need them",
+  "fix_script": "fix-workflow-permissions.sh",
+  "proven_module": null,
+  "formally_proven": false
+}
