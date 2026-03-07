@@ -1,0 +1,18 @@
+{
+  "license": "PMPL-1.0-or-later",
+  "id": "recipe-scorecard-sbom",
+  "name": "OpenSSF Scorecard: SBOM",
+  "description": "Check whether the project generates a Software Bill of Materials in SPDX or CycloneDX format. SBOMs provide a machine-readable inventory of all components, enabling automated vulnerability correlation, license compliance auditing, and supply chain transparency.",
+  "category": "Scorecard-SupplyChain",
+  "target_categories": ["Scorecard-SupplyChain", "SoftwareBOM"],
+  "pa_rule": "PA115",
+  "languages": ["*"],
+  "confidence": 0.90,
+  "auto_fixable": false,
+  "action": "report",
+  "match": "no SBOM generation in release workflow, no SPDX or CycloneDX output detected",
+  "replacement": "add SBOM generation step to release workflow using syft, cdxgen, or spdx-sbom-generator",
+  "fix_script": "none",
+  "proven_module": null,
+  "formally_proven": false
+}

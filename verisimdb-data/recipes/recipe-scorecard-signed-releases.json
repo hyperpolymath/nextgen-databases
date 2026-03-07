@@ -1,0 +1,18 @@
+{
+  "license": "PMPL-1.0-or-later",
+  "id": "recipe-scorecard-signed-releases",
+  "name": "OpenSSF Scorecard: Signed-Releases",
+  "description": "Verify that the project cryptographically signs its release artifacts using GPG, Sigstore cosign, or SLSA provenance attestations. Signed releases allow consumers to verify artifact integrity and authenticity, preventing tampering in transit or at rest.",
+  "category": "Scorecard-SupplyChain",
+  "target_categories": ["Scorecard-SupplyChain", "ReleaseSigning"],
+  "pa_rule": "PA117",
+  "languages": ["*"],
+  "confidence": 0.95,
+  "auto_fixable": false,
+  "action": "configure",
+  "match": "release artifacts lack GPG signatures, Sigstore attestations, or SLSA provenance",
+  "replacement": "sign releases with cosign or GPG, generate SLSA provenance via slsa-github-generator, attach .sig/.intoto files to releases",
+  "fix_script": "none",
+  "proven_module": null,
+  "formally_proven": false
+}

@@ -1,0 +1,18 @@
+{
+  "license": "PMPL-1.0-or-later",
+  "id": "recipe-scorecard-vulnerabilities",
+  "name": "OpenSSF Scorecard: Vulnerabilities",
+  "description": "Check whether the project has unfixed vulnerabilities reported in the OSV database. Open vulnerabilities in dependencies or the project itself expose downstream consumers to known exploits.",
+  "category": "Scorecard-Vulnerability",
+  "target_categories": ["Scorecard-Vulnerability", "KnownVulnerabilities"],
+  "pa_rule": "PA119",
+  "languages": ["*"],
+  "confidence": 0.95,
+  "auto_fixable": false,
+  "action": "report",
+  "match": "open CVEs or OSV entries linked to this project or its dependencies",
+  "replacement": "patch or upgrade affected dependencies, request CVE dispute if false positive",
+  "fix_script": "none",
+  "proven_module": null,
+  "formally_proven": false
+}
