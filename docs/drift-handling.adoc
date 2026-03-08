@@ -83,8 +83,8 @@ University B: retraction_status = "retracted"  ❌ DRIFT
 **Example:**
 
 ```
-verisim:semantic → types: ["http://schema.org/Paper", "http://schema.org/Article"]
-verisim:graph    → types: ["http://schema.org/Paper"]  ❌ DRIFT
+verisim:semantic → types: ["https://schema.org/Paper", "https://schema.org/Article"]
+verisim:graph    → types: ["https://schema.org/Paper"]  ❌ DRIFT
 ```
 
 **Causes:**
@@ -182,7 +182,7 @@ WHERE hexad.id = @id;
 ```vql
 DRIFT DETECT
 FROM verisim:graph
-WHERE hexad.types INCLUDES "http://schema.org/Paper"
+WHERE hexad.types INCLUDES "https://schema.org/Paper"
 LIMIT 100;
 ```
 
@@ -391,7 +391,7 @@ WHERE hexad.id = @id;
 ```vql
 FROM verisim:graph
 WITH DRIFT TOLERANCE 0.1  -- Allow 10% drift
-WHERE hexad.types INCLUDES "http://schema.org/Paper"
+WHERE hexad.types INCLUDES "https://schema.org/Paper"
 LIMIT 100;
 ```
 
@@ -423,7 +423,7 @@ LIMIT 100;
 ```vql
 FROM verisim:graph
 WITH DRIFT TOLERANCE 0.0  -- No drift allowed
-WHERE hexad.types INCLUDES "http://schema.org/Paper"
+WHERE hexad.types INCLUDES "https://schema.org/Paper"
 LIMIT 100;
 ```
 
@@ -456,7 +456,7 @@ WHERE hexad.id = @id;
 
 ```vql
 FROM verisim:federation
-WHERE hexad.types INCLUDES "http://schema.org/Paper"
+WHERE hexad.types INCLUDES "https://schema.org/Paper"
 WITH DRIFT TOLERANCE 0.2  -- Tolerate 20% drift across federation
 MIN QUORUM 3;  -- At least 3 stores must respond
 ```
