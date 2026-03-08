@@ -107,7 +107,7 @@ ${CLI} JSON.SET "hexad:test-001" '$' "$(cat <<ENDJSON
         {
             "type": "graph",
             "data": {
-                "types": ["http://schema.org/Article", "http://verisimdb.org/ontology/Entity"],
+                "types": ["https://schema.org/Article", "http://verisimdb.org/ontology/Entity"],
                 "relationships": [
                     {"predicate": "relates_to", "target": "hexad-test-002", "weight": 0.85}
                 ]

@@ -176,7 +176,7 @@ db.hexads.insertMany([
                 type: "graph",
                 data: {
                     types: [
-                        "http://schema.org/Article",
+                        "https://schema.org/Article",
                         "http://verisimdb.org/ontology/Entity",
                     ],
                     relationships: [
@@ -249,7 +249,7 @@ db.hexads.insertMany([
             {
                 type: "graph",
                 data: {
-                    types: ["http://schema.org/TechArticle"],
+                    types: ["https://schema.org/TechArticle"],
                     relationships: [
                         {
                             predicate: "relates_to",
