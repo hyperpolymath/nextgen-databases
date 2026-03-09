@@ -718,20 +718,20 @@ defmodule VeriSim.Consensus.KRaftNode do
     update_in(registry, [:stores], &Map.delete(&1, store_id))
   end
 
-  defp apply_command(registry, {:map_hexad, hexad_id, locations}) do
+  defp apply_command(registry, {:map_octad, octad_id, locations}) do
     mapping = %{
-      hexad_id: hexad_id,
+      octad_id: octad_id,
       locations: locations,
       primary_store: nil,
       created: DateTime.utc_now(),
       modified: DateTime.utc_now()
     }
 
-    put_in(registry, [:mappings, hexad_id], mapping)
+    put_in(registry, [:mappings, octad_id], mapping)
   end
 
-  defp apply_command(registry, {:unmap_hexad, hexad_id}) do
-    update_in(registry, [:mappings], &Map.delete(&1, hexad_id))
+  defp apply_command(registry, {:unmap_octad, octad_id}) do
+    update_in(registry, [:mappings], &Map.delete(&1, octad_id))
   end
 
   defp apply_command(registry, {:update_trust, store_id, new_trust}) do

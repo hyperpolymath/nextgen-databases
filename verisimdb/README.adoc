@@ -216,7 +216,7 @@ VeriSimDB runs as a two-layer system: Elixir/OTP for distributed coordination, R
 │    ├── verisim-vector     ├── verisim-document              │
 │    ├── verisim-tensor     ├── verisim-temporal              │
 │    ├── verisim-provenance ├── verisim-spatial               │
-│    ├── verisim-hexad      ├── verisim-drift                 │
+│    ├── verisim-octad      ├── verisim-drift                 │
 │    └── verisim-normalizer └── verisim-api                   │
 └─────────────────────────────────────────────────────────────┘
 ----
@@ -348,11 +348,11 @@ podman run -p 8080:8080 verisimdb:latest
 
 == API Examples
 
-=== Create a Hexad
+=== Create a Octad
 
 [source,bash]
 ----
-curl -X POST http://localhost:8080/api/v1/hexads \
+curl -X POST http://localhost:8080/api/v1/octads \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Machine Learning Paper",
@@ -400,12 +400,12 @@ grpcurl -plaintext localhost:50051 list
 grpcurl -plaintext localhost:50051 verisimdb.VeriSimService/Health
 
 # Execute a VQL query
-grpcurl -plaintext -d '{"query": "SELECT * FROM hexads LIMIT 10"}' \
+grpcurl -plaintext -d '{"query": "SELECT * FROM octads LIMIT 10"}' \
   localhost:50051 verisimdb.VeriSimService/Query
 
-# Get a specific hexad
+# Get a specific octad
 grpcurl -plaintext -d '{"id": "entity-001"}' \
-  localhost:50051 verisimdb.VeriSimService/GetHexad
+  localhost:50051 verisimdb.VeriSimService/GetOctad
 ----
 
 == Project Structure
@@ -421,7 +421,7 @@ verisimdb/
 │   ├── verisim-temporal/      # Temporal (version history)
 │   ├── verisim-provenance/    # Provenance (hash-chain lineage)
 │   ├── verisim-spatial/       # Spatial (R-tree geospatial)
-│   ├── verisim-hexad/         # Unified octad entity
+│   ├── verisim-octad/         # Unified octad entity
 │   ├── verisim-drift/         # Drift detection
 │   ├── verisim-normalizer/    # Self-normalisation
 │   ├── verisim-wal/           # Write-ahead log

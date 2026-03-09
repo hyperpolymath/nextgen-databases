@@ -81,11 +81,11 @@ pub struct BufferedOperation {
 /// Types of operations that can be buffered in a transaction.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum OperationType {
-    /// Create a new hexad
+    /// Create a new octad
     Create,
-    /// Update an existing hexad
+    /// Update an existing octad
     Update,
-    /// Delete a hexad
+    /// Delete a octad
     Delete,
 }
 
@@ -247,7 +247,7 @@ impl TransactionManager {
     /// Commit a transaction — marks all buffered operations as committed.
     ///
     /// Returns the list of buffered operations so the caller (API layer)
-    /// can apply them to the hexad store.
+    /// can apply them to the octad store.
     pub async fn commit(
         &self,
         txn_id: &TransactionId,

@@ -26,7 +26,7 @@ VeriSimDB operates as both a standalone database (like PostgreSQL) and a federat
 - Two execution paths: Slipstream (fast) and Dependent-type (verified)
 
 ### 🗄️ Six Modalities (80% Complete)
-Every hexad (entity) exists simultaneously across six synchronized representations:
+Every octad (entity) exists simultaneously across six synchronized representations:
 
 1. **Graph** (244 LOC) - RDF triples and property graphs via Oxigraph
 2. **Vector** (248+ LOC) - HNSW similarity search for embeddings
@@ -36,7 +36,7 @@ Every hexad (entity) exists simultaneously across six synchronized representatio
 6. **Temporal** (377+ LOC) - Version history and time-travel queries
 
 **Additional Components:**
-- **Hexad Store** (400+ LOC) - Unified entity management
+- **Octad Store** (400+ LOC) - Unified entity management
 - **Drift Detection** (484+ LOC) - Cross-modal consistency monitoring
 - **Normalizer** (406 LOC) - Self-normalization when drift exceeds thresholds
 - **HTTP API** (782 LOC) - RESTful API server with Axum
@@ -67,7 +67,7 @@ The "tiny core" (<5K LOC) enabling federated deployments:
 Comprehensive test coverage:
 
 **Rust Tests (12 tests):**
-- Hexad CRUD operations
+- Octad CRUD operations
 - Cross-modal consistency
 - Drift detection
 - Vector similarity search
@@ -92,7 +92,7 @@ Criterion-based benchmarks for:
 - Document store: create, search (1K docs)
 - Vector store: insert, similarity search across 128/384/768 dimensions (10K vectors)
 - Graph store: node/edge operations
-- Hexad operations: create, retrieve
+- Octad operations: create, retrieve
 - Drift detection: calculation performance
 - Cross-modal queries: combined vector + fulltext
 
@@ -218,9 +218,9 @@ curl http://localhost:8080/api/v1/health
 
 ### Example Usage
 
-**Create a Hexad:**
+**Create a Octad:**
 ```bash
-curl -X POST http://localhost:8080/api/v1/hexads \
+curl -X POST http://localhost:8080/api/v1/octads \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Research Paper",
@@ -235,7 +235,7 @@ curl -X POST http://localhost:8080/api/v1/hexads \
 curl -X POST http://localhost:4000/api/v1/query \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "SELECT GRAPH, VECTOR FROM HEXAD abc-123 WHERE FULLTEXT CONTAINS \"machine learning\" LIMIT 10"
+    "query": "SELECT GRAPH, VECTOR FROM OCTAD abc-123 WHERE FULLTEXT CONTAINS \"machine learning\" LIMIT 10"
   }'
 ```
 
@@ -264,7 +264,7 @@ Expected performance characteristics (preliminary benchmarks):
 |-----------|------------|---------------|
 | Document Index | ~1K docs/sec | <50ms |
 | Vector Search (10K vectors) | ~500 queries/sec | <100ms |
-| Hexad Create | ~200 ops/sec | <200ms |
+| Octad Create | ~200 ops/sec | <200ms |
 | Fulltext Search | ~1K queries/sec | <50ms |
 | Cross-modal Query | ~100 queries/sec | <500ms |
 
@@ -378,7 +378,7 @@ See `LICENSE` for full terms.
 
 1. **Deploy:** Follow `DEPLOYMENT.adoc` for your environment
 2. **Test:** Run integration tests and benchmarks
-3. **Experiment:** Create hexads and run VQL queries
+3. **Experiment:** Create octads and run VQL queries
 4. **Feedback:** Report issues and contribute
 5. **Community:** Join discussions and share use cases
 

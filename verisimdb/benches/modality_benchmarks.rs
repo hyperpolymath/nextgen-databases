@@ -9,9 +9,9 @@ use tokio::runtime::Runtime;
 use verisim_document::{Document, DocumentStore, TantivyDocumentStore};
 use verisim_drift::{DriftDetector, DriftThresholds, DriftType};
 use verisim_graph::{GraphEdge, GraphNode, GraphObject, GraphStore, OxiGraphStore};
-use verisim_hexad::{
-    HexadConfig, HexadDocumentInput, HexadId, HexadInput, HexadSnapshot, HexadStore,
-    HexadVectorInput, HexadSemanticInput, InMemoryHexadStore,
+use verisim_octad::{
+    OctadConfig, OctadDocumentInput, OctadId, OctadInput, OctadSnapshot, OctadStore,
+    OctadVectorInput, OctadSemanticInput, InMemoryOctadStore,
 };
 use verisim_semantic::{
     InMemorySemanticStore, ProofBlob, ProofType, SemanticStore, SemanticType,
@@ -183,23 +183,23 @@ fn bench_graph_operations(c: &mut Criterion) {
 }
 
 // ============================================================================
-// Hexad Store Benchmarks
+// Octad Store Benchmarks
 // ============================================================================
 
-fn bench_hexad_operations(c: &mut Criterion) {
+fn bench_octad_operations(c: &mut Criterion) {
     let rt = Runtime::new().unwrap();
-    let mut group = c.benchmark_group("hexad");
+    let mut group = c.benchmark_group("octad");
 
     let graph_store = Arc::new(OxiGraphStore::in_memory().unwrap());
     let vector_store = Arc::new(HnswVectorStore::new(384, DistanceMetric::Cosine, HnswConfig::default()));
     let document_store = Arc::new(TantivyDocumentStore::in_memory().unwrap());
     let tensor_store = Arc::new(InMemoryTensorStore::new());
     let semantic_store = Arc::new(InMemorySemanticStore::new());
-    let temporal_store: Arc<InMemoryVersionStore<HexadSnapshot>> = Arc::new(InMemoryVersionStore::new());
+    let temporal_store: Arc<InMemoryVersionStore<OctadSnapshot>> = Arc::new(InMemoryVersionStore::new());
 
-    let config = HexadConfig::default();
+    let config = OctadConfig::default();
 
-    let store = InMemoryHexadStore::new(
+    let store = InMemoryOctadStore::new(
         config,
         graph_store,
         vector_store,
@@ -209,15 +209,15 @@ fn bench_hexad_operations(c: &mut Criterion) {
         temporal_store,
     );
 
-    group.bench_function("create_hexad", |b| {
+    group.bench_function("create_octad", |b| {
         b.to_async(&rt).iter(|| async {
-            let input = HexadInput {
-                document: Some(HexadDocumentInput {
-                    title: "Benchmark Hexad".to_string(),
-                    body: "Testing hexad creation performance.".to_string(),
+            let input = OctadInput {
+                document: Some(OctadDocumentInput {
+                    title: "Benchmark Octad".to_string(),
+                    body: "Testing octad creation performance.".to_string(),
                     fields: HashMap::new(),
                 }),
-                vector: Some(HexadVectorInput {
+                vector: Some(OctadVectorInput {
                     embedding: vec![0.5; 384],
                     model: None,
                 }),
@@ -227,29 +227,29 @@ fn bench_hexad_operations(c: &mut Criterion) {
         });
     });
 
-    // Create hexads for retrieval benchmark
-    let mut hexad_ids = vec![];
+    // Create octads for retrieval benchmark
+    let mut octad_ids = vec![];
     rt.block_on(async {
         for i in 0..100 {
-            let input = HexadInput {
-                document: Some(HexadDocumentInput {
-                    title: format!("Hexad {}", i),
+            let input = OctadInput {
+                document: Some(OctadDocumentInput {
+                    title: format!("Octad {}", i),
                     body: format!("Content {}", i),
                     fields: HashMap::new(),
                 }),
-                vector: Some(HexadVectorInput {
+                vector: Some(OctadVectorInput {
                     embedding: vec![i as f32 / 100.0; 384],
                     model: None,
                 }),
                 ..Default::default()
             };
-            let hexad = store.create(input).await.unwrap();
-            hexad_ids.push(hexad.id.clone());
+            let octad = store.create(input).await.unwrap();
+            octad_ids.push(octad.id.clone());
         }
     });
 
-    group.bench_function("get_hexad", |b| {
-        let id = hexad_ids[0].clone();
+    group.bench_function("get_octad", |b| {
+        let id = octad_ids[0].clone();
         b.to_async(&rt).iter(|| async {
             black_box(store.get(&id).await.unwrap())
         });
@@ -305,11 +305,11 @@ fn bench_cross_modal_query(c: &mut Criterion) {
     let document_store = Arc::new(TantivyDocumentStore::in_memory().unwrap());
     let tensor_store = Arc::new(InMemoryTensorStore::new());
     let semantic_store = Arc::new(InMemorySemanticStore::new());
-    let temporal_store: Arc<InMemoryVersionStore<HexadSnapshot>> = Arc::new(InMemoryVersionStore::new());
+    let temporal_store: Arc<InMemoryVersionStore<OctadSnapshot>> = Arc::new(InMemoryVersionStore::new());
 
-    let config = HexadConfig::default();
+    let config = OctadConfig::default();
 
-    let store = InMemoryHexadStore::new(
+    let store = InMemoryOctadStore::new(
         config,
         graph_store,
         vector_store,
@@ -319,23 +319,23 @@ fn bench_cross_modal_query(c: &mut Criterion) {
         temporal_store,
     );
 
-    // Create 1000 hexads with multiple modalities
+    // Create 1000 octads with multiple modalities
     rt.block_on(async {
         for i in 0..1000 {
             let mut embedding = vec![0.0f32; 384];
             embedding[0] = (i as f32) / 1000.0;
 
-            let input = HexadInput {
-                document: Some(HexadDocumentInput {
+            let input = OctadInput {
+                document: Some(OctadDocumentInput {
                     title: format!("Multi-modal Document {}", i),
                     body: format!("Content about machine learning topic {}", i),
                     fields: HashMap::new(),
                 }),
-                vector: Some(HexadVectorInput {
+                vector: Some(OctadVectorInput {
                     embedding,
                     model: None,
                 }),
-                semantic: Some(HexadSemanticInput {
+                semantic: Some(OctadSemanticInput {
                     types: vec!["https://example.org/Document".to_string()],
                     properties: HashMap::new(),
                 }),
@@ -572,8 +572,8 @@ criterion_group!(
 );
 
 criterion_group!(
-    hexad_benches,
-    bench_hexad_operations
+    octad_benches,
+    bench_octad_operations
 );
 
 criterion_group!(
@@ -605,7 +605,7 @@ criterion_main!(
     document_benches,
     vector_benches,
     graph_benches,
-    hexad_benches,
+    octad_benches,
     drift_benches,
     cross_modal_benches,
     tensor_benches,

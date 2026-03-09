@@ -31,7 +31,7 @@ The following files in `.machine_readable/` contain structured project metadata:
 │    ├── verisim-temporal (versioning/time-series)            │
 │    ├── verisim-provenance (origin/lineage tracking)          │
 │    ├── verisim-spatial (geospatial/R-tree)                   │
-│    ├── verisim-hexad (unified entity → octad evolution)     │
+│    ├── verisim-octad (unified entity → octad evolution)     │
 │    ├── verisim-drift (drift detection)                      │
 │    └── verisim-normalizer (self-normalization)              │
 └─────────────────────────────────────────────────────────────┘
@@ -148,7 +148,7 @@ All images use `cgr.dev/chainguard/wolfi-base:latest`.
 
 ## Key Concepts
 
-### Octad Entity (formerly Hexad)
+### Octad Entity (formerly Octad)
 An Octad is one entity with 8 synchronized representations:
 - **Graph**: RDF triples and property graph edges
 - **Vector**: Embedding for similarity search
@@ -177,16 +177,16 @@ When drift exceeds thresholds, the normalizer:
 
 ## Code Patterns
 
-### Creating a Hexad (Rust)
+### Creating a Octad (Rust)
 ```rust
-let input = HexadBuilder::new()
+let input = OctadBuilder::new()
     .with_document("Title", "Body content")
     .with_embedding(vec![0.1, 0.2, ...])
     .with_types(vec!["http://example.org/Document"])
     .with_relationships(vec![("relates_to", "other-entity-id")])
     .build();
 
-let hexad = store.create(input).await?;
+let octad = store.create(input).await?;
 ```
 
 ### Entity Server (Elixir)
@@ -242,7 +242,7 @@ hyperpolymath/verisimdb-data (new repo)
 │   └── latest-scan.json
 ├── drift/                    # drift detection snapshots
 │   └── drift-status.json
-├── index.json                # Master index of all hexads
+├── index.json                # Master index of all octads
 └── .github/workflows/
     └── ingest.yml            # Workflow: receive data, update index
 ```
@@ -277,13 +277,13 @@ When ready to scale beyond flat files:
 ### Data Flow (IMPLEMENTED)
 
 ```
-panic-attack assail → ScanIngester → octad hexads → PatternQuery → DispatchBridge → gitbot-fleet
+panic-attack assail → ScanIngester → octad octads → PatternQuery → DispatchBridge → gitbot-fleet
                       ↑ WORKS        ↑ WORKS        ↑ WORKS        ↑ WORKS          ↑ JSONL logged
 ```
 
 ### VeriSimDB-Side Modules (elixir-orchestration/lib/verisim/hypatia/)
 
-1. **ScanIngester** (`scan_ingester.ex`): Ingests panic-attack scan results as octad hexad entities
+1. **ScanIngester** (`scan_ingester.ex`): Ingests panic-attack scan results as octad octad entities
    - Builds Document (searchable text), Graph (triples), Temporal (timestamps), Vector (embeddings),
      Provenance (scanner origin), Semantic (category tags) modalities
    - Falls back to ETS (`:hypatia_scans`) when Rust core unavailable
@@ -351,7 +351,7 @@ Resolved in recent sessions:
 ## Hypatia Integration Status
 
 **Working (VeriSimDB side — 3 modules, 37 tests):**
-- ScanIngester: panic-attack JSON → octad hexads (Document, Graph, Temporal, Vector, Provenance, Semantic)
+- ScanIngester: panic-attack JSON → octad octads (Document, Graph, Temporal, Vector, Provenance, Semantic)
 - PatternQuery: cross-repo analytics (pipeline health, severity distribution, temporal trends, hotspots)
 - DispatchBridge: reads JSONL dispatch manifests, summarizes outcomes, feeds drift tracking
 - Hypatia VQL layer reads verisimdb-data flat files directly
@@ -380,7 +380,7 @@ verisimdb/
 │   ├── verisim-semantic/
 │   ├── verisim-document/
 │   ├── verisim-temporal/
-│   ├── verisim-hexad/
+│   ├── verisim-octad/
 │   ├── verisim-drift/
 │   ├── verisim-normalizer/
 │   └── verisim-api/

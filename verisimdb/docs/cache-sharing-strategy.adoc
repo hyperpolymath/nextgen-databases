@@ -186,14 +186,14 @@ This diagram shows how invalidation propagates when drift is detected:
 DriftMonitor         Node A           Node A-L1     L2 Cluster    Node B-L1    Node C-L1
      │                 │                  │              │            │            │
      │  Drift detected │                  │              │            │            │
-     │  (hexad:abc-123)│                  │              │            │            │
+     │  (octad:abc-123)│                  │              │            │            │
      ├────────────────►│                  │              │            │            │
      │                 │                  │              │            │            │
      │                 │  1. Invalidate   │              │            │            │
      │                 │     local L1     │              │            │            │
      │                 ├─────────────────►│              │            │            │
      │                 │                  │ Delete       │            │            │
-     │                 │                  │ hexad:abc*   │            │            │
+     │                 │                  │ octad:abc*   │            │            │
      │                 │◄─────────────────┤              │            │            │
      │                 │  Invalidated     │              │            │            │
      │                 │                  │              │            │            │
@@ -232,7 +232,7 @@ PROPAGATION TIMES:
 GUARANTEES:
 ✓ All nodes in organization receive invalidation within 50ms
 ✓ Audit trail in verisim-temporal for compliance
-✓ Tag-based invalidation (can invalidate by hexad, modality, federation)
+✓ Tag-based invalidation (can invalidate by octad, modality, federation)
 ✓ No stale data served after drift detection
 ----
 
@@ -240,11 +240,11 @@ GUARANTEES:
 
 [source,text]
 ----
-SCENARIO 1: Hexad-Specific Drift
-  invalidate_by_tag("hexad:abc-123")
+SCENARIO 1: Octad-Specific Drift
+  invalidate_by_tag("octad:abc-123")
   ↓
   Invalidates:
-  • All query results for hexad abc-123
+  • All query results for octad abc-123
   • All modalities (GRAPH, VECTOR, DOCUMENT, etc.)
   • Across all cache layers (L1, L2, L3)
 
@@ -253,7 +253,7 @@ SCENARIO 2: Modality Store Update
   ↓
   Invalidates:
   • All GRAPH query results
-  • All hexads that have GRAPH data
+  • All octads that have GRAPH data
   • Statistics and execution plans for GRAPH
 
 SCENARIO 3: Federation-Wide Invalidation
@@ -276,7 +276,7 @@ SCENARIO 4: Organization-Scoped Invalidation
 TAG COMPOSITION:
   Cache entries can have multiple tags:
   tags: [
-    "hexad:abc-123",
+    "octad:abc-123",
     "modality:GRAPH",
     "federation:/universities/*",
     "org:university-a"
@@ -327,7 +327,7 @@ TAG COMPOSITION:
 [source,elixir]
 ----
 # L1 cache is node-local
-Node A: Caches query result for "SELECT GRAPH FROM hexad abc-123"
+Node A: Caches query result for "SELECT GRAPH FROM octad abc-123"
 Node B: Doesn't have this cached, must fetch separately
 
 # Invalidation is per-node
@@ -659,7 +659,7 @@ def get_with_access_check(key, user_id) do
   case get_from_cache(key) do
     {:ok, cached_result} ->
       # Verify user still has access
-      if AccessControl.can_read?(user_id, cached_result.hexad_id) do
+      if AccessControl.can_read?(user_id, cached_result.octad_id) do
         {:ok, cached_result}
       else
         Logger.warn("Access denied to cached data: #{key}")

@@ -22,7 +22,7 @@ pub:
 // execute_vql executes a VQL query and returns the result set.
 //
 // VQL queries can combine modalities — for example:
-//   FIND hexads WHERE vector_similar($embedding, 0.8)
+//   FIND octads WHERE vector_similar($embedding, 0.8)
 //     AND spatial_within(51.5, -0.1, 10km)
 //     AND graph_connected("category:science", depth: 2)
 //

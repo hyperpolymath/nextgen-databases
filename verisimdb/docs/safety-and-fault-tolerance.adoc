@@ -32,10 +32,10 @@ defmodule VeriSim.Application do
 
   def start(_type, _args) do
     children = [
-      # Registry for hexad servers
+      # Registry for octad servers
       {Registry, keys: :unique, name: VeriSim.EntityRegistry},
 
-      # DynamicSupervisor for hexad entities
+      # DynamicSupervisor for octad entities
       {DynamicSupervisor, name: VeriSim.EntitySupervisor, strategy: :one_for_one},
 
       # Query router (restart if crashes)
@@ -89,16 +89,16 @@ end
 defmodule VeriSim.EntityServer do
   use GenServer, restart: :transient  # Restart only if abnormal exit
 
-  def init(hexad_id) do
+  def init(octad_id) do
     # Restore state from verisim-temporal
-    case VeriSim.Temporal.load_hexad_state(hexad_id) do
+    case VeriSim.Temporal.load_octad_state(octad_id) do
       {:ok, state} ->
-        Logger.info("Restored hexad #{hexad_id} from temporal log")
+        Logger.info("Restored octad #{octad_id} from temporal log")
         {:ok, state}
 
       {:error, :not_found} ->
         # First time initialization
-        {:ok, %{hexad_id: hexad_id, data: %{}}}
+        {:ok, %{octad_id: octad_id, data: %{}}}
     end
   end
 end
@@ -152,20 +152,20 @@ end
 ----
 # Automatic drift repair when detected
 defmodule VeriSim.DriftMonitor do
-  def handle_drift_detected(hexad_id, drift_details) do
-    Logger.warn("Drift detected for hexad #{hexad_id}: #{inspect(drift_details)}")
+  def handle_drift_detected(octad_id, drift_details) do
+    Logger.warn("Drift detected for octad #{octad_id}: #{inspect(drift_details)}")
 
-    case get_repair_policy(hexad_id) do
+    case get_repair_policy(octad_id) do
       :auto_repair ->
-        Logger.info("Auto-repairing hexad #{hexad_id}")
-        VeriSim.DriftRepair.repair(hexad_id, drift_details)
+        Logger.info("Auto-repairing octad #{octad_id}")
+        VeriSim.DriftRepair.repair(octad_id, drift_details)
 
       :manual ->
-        Logger.warn("Manual repair required for hexad #{hexad_id}")
-        notify_admin(hexad_id, drift_details)
+        Logger.warn("Manual repair required for octad #{octad_id}")
+        notify_admin(octad_id, drift_details)
 
       :tolerate ->
-        Logger.info("Tolerating drift for hexad #{hexad_id}")
+        Logger.info("Tolerating drift for octad #{octad_id}")
         :ok
     end
   end
@@ -181,21 +181,21 @@ end
 [source,rust]
 ----
 // SAFE: Ownership prevents use-after-free
-fn process_hexad(hexad: Hexad) {
-    let graph = hexad.graph;  // Ownership transferred
+fn process_octad(octad: Octad) {
+    let graph = octad.graph;  // Ownership transferred
     analyze_graph(graph);
-    // hexad.graph cannot be accessed here (ownership moved)
+    // octad.graph cannot be accessed here (ownership moved)
 }
 
 // SAFE: Borrowing allows temporary access
-fn analyze_hexad(hexad: &Hexad) {
-    println!("Hexad ID: {}", hexad.id);
-    // hexad remains valid after function returns
+fn analyze_octad(octad: &Octad) {
+    println!("Octad ID: {}", octad.id);
+    // octad remains valid after function returns
 }
 
 // SAFE: Lifetimes ensure references don't outlive data
-fn get_hexad_id<'a>(hexad: &'a Hexad) -> &'a str {
-    &hexad.id  // Lifetime 'a ensures this reference is valid
+fn get_octad_id<'a>(octad: &'a Octad) -> &'a str {
+    &octad.id  // Lifetime 'a ensures this reference is valid
 }
 ----
 
@@ -218,13 +218,13 @@ unsafe fn read_raw_memory(ptr: *const u8, len: usize) -> &'static [u8] {
 [source,elixir]
 ----
 # Immutable data structures prevent accidental mutation
-hexad = %{id: "abc-123", data: %{title: "Original"}}
+octad = %{id: "abc-123", data: %{title: "Original"}}
 
 # This creates a NEW map, doesn't mutate original
-updated = Map.put(hexad, :data, %{title: "Updated"})
+updated = Map.put(octad, :data, %{title: "Updated"})
 
 # Original remains unchanged
-IO.inspect(hexad.data.title)  # => "Original"
+IO.inspect(octad.data.title)  # => "Original"
 IO.inspect(updated.data.title)  # => "Updated"
 ----
 
@@ -689,8 +689,8 @@ end
 defmodule VeriSim.Capability do
   @type capability :: :read | :write | :execute | :admin
 
-  def check_capability(user, hexad_id, required_cap) do
-    user_caps = get_capabilities(user, hexad_id)
+  def check_capability(user, octad_id, required_cap) do
+    user_caps = get_capabilities(user, octad_id)
 
     if required_cap in user_caps do
       :ok
@@ -701,8 +701,8 @@ defmodule VeriSim.Capability do
 end
 
 # Usage
-case Capability.check_capability(user, hexad_id, :write) do
-  :ok -> update_hexad(hexad_id, new_data)
+case Capability.check_capability(user, octad_id, :write) do
+  :ok -> update_octad(octad_id, new_data)
   {:error, reason} -> {:error, reason}
 end
 ----
@@ -946,17 +946,17 @@ execute(safeQuery)  // OK
 
 [source,elixir]
 ----
-defmodule VeriSim.Hexad do
-  @type hexad_id :: String.t()
+defmodule VeriSim.Octad do
+  @type octad_id :: String.t()
   @type modality :: :graph | :vector | :tensor | :semantic | :document | :temporal
 
-  @spec get_hexad(hexad_id()) :: {:ok, map()} | {:error, atom()}
-  def get_hexad(hexad_id) when is_binary(hexad_id) do
+  @spec get_octad(octad_id()) :: {:ok, map()} | {:error, atom()}
+  def get_octad(octad_id) when is_binary(octad_id) do
     # Implementation
   end
 
   # Dialyzer catches type mismatches at compile time
-  # get_hexad(123)  # WARNING: function expects binary, got integer
+  # get_octad(123)  # WARNING: function expects binary, got integer
 end
 ----
 
@@ -967,16 +967,16 @@ end
 Contract: CitationContract
 
 Precondition:
-  ∀ citation ∈ hexad.citations,
-    ∃ cited_hexad ∈ registry,
-      hexad.timestamp > cited_hexad.timestamp
+  ∀ citation ∈ octad.citations,
+    ∃ cited_octad ∈ registry,
+      octad.timestamp > cited_octad.timestamp
 
 Postcondition:
-  proof ← generate_zkp(hexad, CitationContract)
+  proof ← generate_zkp(octad, CitationContract)
   verify_zkp(proof, public_inputs) = true
 
 Invariant:
-  Citations cannot reference future hexads
+  Citations cannot reference future octads
 ----
 
 == Socio-Technical Safety

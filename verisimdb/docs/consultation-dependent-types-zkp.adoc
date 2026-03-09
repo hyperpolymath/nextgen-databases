@@ -56,8 +56,8 @@ VeriSimDB must support **two fundamentally different query execution models**:
 -- Dependent-type query: Prove that ALL results satisfy predicate
 SELECT GRAPH, DOCUMENT
 FROM verisim:semantic
-WHERE hexad.types INCLUDES "Paper"
-  AND VERIFIED(hexad.document.peer_reviewed = true)
+WHERE octad.types INCLUDES "Paper"
+  AND VERIFIED(octad.document.peer_reviewed = true)
 PROOF EXISTENCE {
   ∀ r ∈ Result. r.document.peer_reviewed = true
 }
@@ -205,7 +205,7 @@ PROOF EXISTENCE {
 ```
 Γ ⊢ modalities : M
 Γ ⊢ source : Source
-Γ ⊢ condition : Hexad → Bool
+Γ ⊢ condition : Octad → Bool
 ────────────────────────────────────────
 Γ ⊢ SELECT M FROM source WHERE condition : QueryResult[M]
 ```
@@ -225,7 +225,7 @@ PROOF EXISTENCE {
 ```
 Γ ⊢ modalities : M
 Γ ⊢ source : Source
-Γ ⊢ condition : Hexad → Bool
+Γ ⊢ condition : Octad → Bool
 Γ ⊢ proof-spec : ProofSpec[φ]
 Γ ⊢ φ : QueryResult[M] → Bool
 ────────────────────────────────────────
@@ -304,11 +304,11 @@ let rec check ctx expr expected_type =
 -- Query
 SELECT GRAPH
 FROM verisim:semantic
-WHERE hexad.graph.citation_count > 10
-      AND VERIFIED(hexad.graph.peer_reviewed = true)
+WHERE octad.graph.citation_count > 10
+      AND VERIFIED(octad.graph.peer_reviewed = true)
 
 -- Type checking steps:
--- 1. Synthesize: hexad.graph.citation_count → Int
+-- 1. Synthesize: octad.graph.citation_count → Int
 -- 2. Check: citation_count > 10 → Bool
 -- 3. Synthesize: VERIFIED(...) → {b : Bool | b = true}
 -- 4. Check: overall condition → {b : Bool | b = true}
@@ -378,7 +378,7 @@ let implies (phi1 : expr) (phi2 : expr) : bool =
 -- EXISTENCE proof: At least one peer-reviewed paper exists
 SELECT *
 FROM verisim:semantic
-WHERE hexad.types INCLUDES "Paper"
+WHERE octad.types INCLUDES "Paper"
 PROOF EXISTENCE {
   ∃ r ∈ Result. r.document.peer_reviewed = true
 };
@@ -386,7 +386,7 @@ PROOF EXISTENCE {
 -- UNIVERSAL proof: All results are peer-reviewed
 SELECT *
 FROM verisim:semantic
-WHERE hexad.types INCLUDES "Paper"
+WHERE octad.types INCLUDES "Paper"
 PROOF UNIVERSAL {
   ∀ r ∈ Result. r.document.peer_reviewed = true
 };
@@ -394,7 +394,7 @@ PROOF UNIVERSAL {
 -- ACCESS proof: User authorized for all results
 SELECT *
 FROM verisim:restricted
-WHERE hexad.types INCLUDES "MedicalRecord"
+WHERE octad.types INCLUDES "MedicalRecord"
 PROOF ACCESS {
   ∀ r ∈ Result. has_permission(user, r, "read")
 };
@@ -538,8 +538,8 @@ fn compute_witness(
         ContractType::Universal => {
             // For ∀ r ∈ Result. φ(r):
             // Witness = [φ(r₁), φ(r₂), ..., φ(rₙ)]
-            for hexad in &result.hexads {
-                let satisfied = evaluate_predicate(&contract.predicate, hexad)?;
+            for octad in &result.octads {
+                let satisfied = evaluate_predicate(&contract.predicate, octad)?;
                 witness.add_boolean(satisfied);
             }
         }
@@ -547,7 +547,7 @@ fn compute_witness(
         ContractType::Existence => {
             // For ∃ r ∈ Result. φ(r):
             // Witness = (index i, φ(rᵢ) = true)
-            let index = result.hexads.iter()
+            let index = result.octads.iter()
                 .position(|h| evaluate_predicate(&contract.predicate, h).unwrap_or(false))
                 .ok_or(WitnessError::NoExistentialWitness)?;
             witness.add_integer(index as i64);
@@ -632,7 +632,7 @@ pub fn verify_proof(
 -- Attacker tries to prove false statement
 SELECT *
 FROM verisim:semantic
-WHERE hexad.types INCLUDES "Paper"
+WHERE octad.types INCLUDES "Paper"
 PROOF UNIVERSAL {
   ∀ r ∈ Result. r.document.h_index > 100  -- FALSE for many results
 };
@@ -642,10 +642,10 @@ PROOF UNIVERSAL {
 
 ```rust
 // In generate_proof():
-let satisfied = evaluate_predicate(&contract.predicate, hexad)?;
+let satisfied = evaluate_predicate(&contract.predicate, octad)?;
 if !satisfied {
     return Err(ProofError::PredicateViolation {
-        hexad_id: hexad.id,
+        octad_id: octad.id,
         predicate: contract.predicate.clone(),
     });
 }
@@ -663,7 +663,7 @@ Attacker tries to construct fake proof without executing query.
 -- Attacker tries to confuse type checker
 SELECT GRAPH
 FROM verisim:semantic
-WHERE VERIFIED(hexad.graph.node_count > "foo")  -- Type error
+WHERE VERIFIED(octad.graph.node_count > "foo")  -- Type error
 PROOF EXISTENCE { ... };
 ```
 
@@ -671,7 +671,7 @@ PROOF EXISTENCE { ... };
 
 ```ocaml
 (* In type_check_condition: *)
-let t1 = synthesize ctx (EField (EVar "hexad", "graph", "node_count")) in
+let t1 = synthesize ctx (EField (EVar "octad", "graph", "node_count")) in
 let t2 = synthesize ctx (EString "foo") in
 if not (equal_type t1 TInt && equal_type t2 TInt) then
   raise (TypeError "Cannot compare Int with String")
@@ -1126,7 +1126,7 @@ See docs/vql-type-system.adoc for full 30+ typing rules.
 ```vql
 SELECT *
 FROM verisim:semantic
-WHERE hexad.types INCLUDES "Paper"
+WHERE octad.types INCLUDES "Paper"
 PROOF EXISTENCE {
   ∃ r ∈ Result. r.document.peer_reviewed = true
 };
@@ -1148,7 +1148,7 @@ Output: proof π
 ```vql
 SELECT *
 FROM verisim:restricted
-WHERE hexad.types INCLUDES "MedicalRecord"
+WHERE octad.types INCLUDES "MedicalRecord"
 PROOF UNIVERSAL {
   ∀ r ∈ Result. has_permission(user_id, r, "read")
 };

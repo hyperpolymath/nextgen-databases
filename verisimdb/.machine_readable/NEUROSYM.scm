@@ -89,7 +89,7 @@
         (examples
           "- NonEmptyList[T] = {xs : List[T] | length(xs) > 0}
            - ValidOrcid = {s : String | matches(s, /^\\d{4}-\\d{4}-\\d{4}-\\d{3}[\\dX]$/)}
-           - VerifiedPeerReviewed = {h : Hexad | h.document.peer_reviewed = true}")
+           - VerifiedPeerReviewed = {h : Octad | h.document.peer_reviewed = true}")
         (reasoning
           "- Implication checking: Does φ₁ ⇒ φ₂? (Z3 SMT solver)
            - Subsumption: {x : τ | φ₁} <: {x : τ | φ₂} if φ₁ ⇒ φ₂
@@ -155,32 +155,32 @@
 (define subsymbolic-learning
   '((vector-embeddings
       (semantic-search
-        (description . "Find similar hexads based on semantic meaning, not exact keywords")
+        (description . "Find similar octads based on semantic meaning, not exact keywords")
         (model . "Sentence-BERT or similar transformer-based embedding model")
         (dimension . "384 or 768 dimensions")
         (similarity . "Cosine similarity or L2 distance")
         (examples
           "Query: 'machine learning papers'
            Embedding: [0.23, -0.15, 0.87, ...] (768-dim vector)
-           Similar hexads: Papers about ML, AI, neural networks (via vector similarity)"))
+           Similar octads: Papers about ML, AI, neural networks (via vector similarity)"))
 
       (clustering
-        (description . "Group related hexads without manual labels")
+        (description . "Group related octads without manual labels")
         (algorithm . "K-means or HDBSCAN on vector embeddings")
         (use-cases
           "- Discover research communities (clusters of citing papers)
-           - Detect duplicate hexads (very high similarity)
-           - Suggest related hexads (same cluster)"))
+           - Detect duplicate octads (very high similarity)
+           - Suggest related octads (same cluster)"))
 
       (dimensionality-reduction
         (description . "Visualize high-dimensional embeddings in 2D/3D")
         (algorithm . "t-SNE or UMAP")
-        (use-case . "VeriSimDB Debugger (v2) visualizes hexad clusters in 2D")))
+        (use-case . "VeriSimDB Debugger (v2) visualizes octad clusters in 2D")))
 
     (neural-classification
       (drift-severity-classifier
         (architecture
-          "Input: Drift features (type, frequency, field, modality, affected_hexads_count)
+          "Input: Drift features (type, frequency, field, modality, affected_octads_count)
            Hidden: 2 layers, 128 units each, ReLU activation
            Output: Softmax over 4 classes (critical, high, medium, low)")
         (training

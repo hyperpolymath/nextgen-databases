@@ -18,7 +18,7 @@
                     │  │ Server   │ │ Monitor          │  │
                     │  │(GenServer│ │(threshold-gated) │  │
                     │  │ per      │ │                  │  │
-                    │  │ hexad)   │ │ Schema Registry  │  │
+                    │  │ octad)   │ │ Schema Registry  │  │
                     │  └──────────┘ └──────────────────┘  │
                     │  ┌──────────┐ ┌──────────────────┐  │
                     │  │ Query    │ │ VQL Parser        │  │
@@ -36,7 +36,7 @@
     │  │ property │ │ search   │ │ compute  │ │                  │  │
     │  └──────────┘ └──────────┘ └──────────┘ └──────────────────┘  │
     │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │
-    │  │ Document │ │ Temporal │ │  Hexad   │ │   Normalizer     │  │
+    │  │ Document │ │ Temporal │ │  Octad   │ │   Normalizer     │  │
     │  │ Tantivy  │ │ version  │ │ unified  │ │ self-normalizing │  │
     │  │ full-text│ │ + time   │ │ entity   │ │ drift repair     │  │
     │  │ index    │ │ series   │ │ 6-modal  │ │                  │  │
@@ -66,7 +66,7 @@
 | verisim-semantic       | `██████░░░░` 60%             | Active       |
 | verisim-document       | `████████░░` 80%             | Active       |
 | verisim-temporal       | `███████░░░` 70%             | Active       |
-| verisim-hexad          | `████████░░` 80%             | Active       |
+| verisim-octad          | `████████░░` 80%             | Active       |
 | verisim-drift          | `███████░░░` 70%             | Active       |
 | verisim-normalizer     | `██████░░░░` 60%             | Active       |
 | verisim-api            | `████████░░` 80%             | Active       |

@@ -43,7 +43,7 @@ pub enum DType {
 /// A named tensor with metadata
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Tensor {
-    /// Unique identifier (matches Hexad entity ID)
+    /// Unique identifier (matches Octad entity ID)
     pub id: String,
     /// Shape of the tensor
     pub shape: Vec<usize>,

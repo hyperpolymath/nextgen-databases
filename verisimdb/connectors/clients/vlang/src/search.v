@@ -48,10 +48,10 @@ pub:
 	limit   int = 20
 }
 
-// NearestParams configures a nearest-neighbour search by hexad ID.
+// NearestParams configures a nearest-neighbour search by octad ID.
 pub struct NearestParams {
 pub:
-	hexad_id string
+	octad_id string
 	top_k    int = 10
 	modality Modality = .vector
 }
@@ -59,13 +59,13 @@ pub:
 // RelatedParams configures a relationship traversal search.
 pub struct RelatedParams {
 pub:
-	hexad_id  string
+	octad_id  string
 	rel_type  ?string
 	depth     int = 1
 	limit     int = 20
 }
 
-// search_text performs a full-text search across hexad content.
+// search_text performs a full-text search across octad content.
 //
 // Parameters:
 //   c      — The authenticated Client.
@@ -99,7 +99,7 @@ pub fn (c Client) search_vector(params VectorSearchParams) ![]SearchResult {
 	return json.decode([]SearchResult, resp.body)
 }
 
-// search_spatial_radius finds hexads within a given radius of a point.
+// search_spatial_radius finds octads within a given radius of a point.
 //
 // Parameters:
 //   c      — The authenticated Client.
@@ -116,7 +116,7 @@ pub fn (c Client) search_spatial_radius(params SpatialRadiusParams) ![]SearchRes
 	return json.decode([]SearchResult, resp.body)
 }
 
-// search_spatial_bounds finds hexads within a rectangular bounding box.
+// search_spatial_bounds finds octads within a rectangular bounding box.
 //
 // Parameters:
 //   c      — The authenticated Client.
@@ -133,11 +133,11 @@ pub fn (c Client) search_spatial_bounds(params SpatialBoundsParams) ![]SearchRes
 	return json.decode([]SearchResult, resp.body)
 }
 
-// search_nearest finds the nearest neighbours of a given hexad.
+// search_nearest finds the nearest neighbours of a given octad.
 //
 // Parameters:
 //   c      — The authenticated Client.
-//   params — The hexad ID and number of neighbours to return.
+//   params — The octad ID and number of neighbours to return.
 //
 // Returns:
 //   A list of SearchResult items ordered by proximity, or an error.
@@ -150,11 +150,11 @@ pub fn (c Client) search_nearest(params NearestParams) ![]SearchResult {
 	return json.decode([]SearchResult, resp.body)
 }
 
-// search_related traverses relationships from a given hexad.
+// search_related traverses relationships from a given octad.
 //
 // Parameters:
 //   c      — The authenticated Client.
-//   params — The source hexad ID, optional relationship type filter, and traversal depth.
+//   params — The source octad ID, optional relationship type filter, and traversal depth.
 //
 // Returns:
 //   A list of SearchResult items connected by the specified relationships, or an error.

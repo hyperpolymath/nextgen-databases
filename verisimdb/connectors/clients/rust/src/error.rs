@@ -16,7 +16,7 @@ use thiserror::Error;
 /// surface a user-facing message, or escalate.
 #[derive(Error, Debug)]
 pub enum VeriSimError {
-    /// The requested entity (hexad, peer, provenance record) was not found.
+    /// The requested entity (octad, peer, provenance record) was not found.
     #[error("Entity not found: {0}")]
     NotFound(String),
 

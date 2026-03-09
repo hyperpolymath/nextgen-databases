@@ -13,7 +13,7 @@
 #   cd elixir-orchestration && mix run ../demos/drift-detection/run_demo.exs
 #
 # The demo works in two modes:
-#   - LIVE mode:  Rust core is running — real hexads, real drift, real repair
+#   - LIVE mode:  Rust core is running — real octads, real drift, real repair
 #   - LOCAL mode: Rust core unavailable — Elixir-level simulation via DriftMonitor
 
 defmodule VeriSimDB.Demo.DriftDetection do
@@ -143,15 +143,15 @@ defmodule VeriSimDB.Demo.DriftDetection do
   # ── Phase 1: Create Entities ───────────────────────────────────────────
 
   defp create_entities(:live) do
-    IO.puts("  Creating #{@entity_count} hexads via Rust core...")
+    IO.puts("  Creating #{@entity_count} octads via Rust core...")
 
     entities =
       1..@entity_count
       |> Enum.map(fn i ->
-        input = build_hexad_input(i)
-        case RustClient.create_hexad(input) do
-          {:ok, hexad} ->
-            id = hexad["id"] || "entity-#{String.pad_leading(Integer.to_string(i), 6, "0")}"
+        input = build_octad_input(i)
+        case RustClient.create_octad(input) do
+          {:ok, octad} ->
+            id = octad["id"] || "entity-#{String.pad_leading(Integer.to_string(i), 6, "0")}"
             if rem(i, 200) == 0, do: IO.write("  ... #{i}/#{@entity_count}\r")
             id
           {:error, _reason} ->
@@ -160,7 +160,7 @@ defmodule VeriSimDB.Demo.DriftDetection do
         end
       end)
 
-    IO.puts("  Created #{length(entities)} hexads                    ")
+    IO.puts("  Created #{length(entities)} octads                    ")
     entities
   end
 
@@ -189,7 +189,7 @@ defmodule VeriSimDB.Demo.DriftDetection do
     entities
   end
 
-  defp build_hexad_input(i) do
+  defp build_octad_input(i) do
     # Generate realistic-looking data for all 8 modalities
     lat = 51.5 + :rand.uniform() * 0.1 - 0.05
     lon = -0.12 + :rand.uniform() * 0.1 - 0.05
@@ -257,7 +257,7 @@ defmodule VeriSimDB.Demo.DriftDetection do
   end
 
   defp corrupt_live(entity_id, pattern) do
-    # In live mode, update the hexad to introduce inconsistency
+    # In live mode, update the octad to introduce inconsistency
     corruption_payload = case pattern.type do
       :semantic_vector ->
         # Change embedding without updating document
@@ -284,7 +284,7 @@ defmodule VeriSimDB.Demo.DriftDetection do
         %{body: "", embedding: Enum.map(1..384, fn _ -> 0.0 end)}
     end
 
-    RustClient.update_hexad(entity_id, corruption_payload)
+    RustClient.update_octad(entity_id, corruption_payload)
 
     # Report the drift to DriftMonitor
     DriftMonitor.report_drift(entity_id, pattern.score, pattern.type)
@@ -434,7 +434,7 @@ defmodule VeriSimDB.Demo.DriftDetection do
   defp print_mode(:live) do
     IO.puts("""
       Mode: LIVE (Rust core connected)
-      Hexads will be created, corrupted, and repaired via the Rust API.
+      Octads will be created, corrupted, and repaired via the Rust API.
     """)
   end
 

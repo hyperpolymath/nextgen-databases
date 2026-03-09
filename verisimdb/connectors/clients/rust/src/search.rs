@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
-//! Search operations across VeriSimDB's multi-modal hexad entities.
+//! Search operations across VeriSimDB's multi-modal octad entities.
 //!
 //! Supports full-text search, vector similarity (k-NN), graph-relational
 //! traversal, and geospatial queries (radius, bounding box, nearest-neighbour).
@@ -10,7 +10,7 @@ use serde::Serialize;
 
 use crate::client::VeriSimClient;
 use crate::error::Result;
-use crate::types::Hexad;
+use crate::types::Octad;
 
 // ---------------------------------------------------------------------------
 // Internal request bodies
@@ -51,13 +51,13 @@ struct SpatialNearestRequest {
 }
 
 impl VeriSimClient {
-    /// Full-text search across hexad names, descriptions, and document content.
+    /// Full-text search across octad names, descriptions, and document content.
     ///
     /// # Arguments
     ///
     /// * `query` — The search query string (supports simple keyword matching).
     /// * `limit` — Maximum number of results to return.
-    pub async fn search_text(&self, query: &str, limit: usize) -> Result<Vec<Hexad>> {
+    pub async fn search_text(&self, query: &str, limit: usize) -> Result<Vec<Octad>> {
         let path = format!(
             "/api/v1/search/text?q={}&limit={limit}",
             urlencoding_encode(query)
@@ -67,14 +67,14 @@ impl VeriSimClient {
 
     /// Vector similarity search (k-nearest neighbours).
     ///
-    /// Finds the `k` hexads whose stored vector embeddings are closest to the
+    /// Finds the `k` octads whose stored vector embeddings are closest to the
     /// provided `vector` (cosine similarity by default).
     ///
     /// # Arguments
     ///
     /// * `vector` — The query embedding.
     /// * `k`      — Number of nearest neighbours to return.
-    pub async fn search_vector(&self, vector: &[f32], k: usize) -> Result<Vec<Hexad>> {
+    pub async fn search_vector(&self, vector: &[f32], k: usize) -> Result<Vec<Octad>> {
         let body = VectorSearchRequest {
             vector: vector.to_vec(),
             k,
@@ -82,20 +82,20 @@ impl VeriSimClient {
         self.post("/api/v1/search/vector", &body).await
     }
 
-    /// Find hexads related to the given entity via graph edges.
+    /// Find octads related to the given entity via graph edges.
     ///
     /// Traverses one hop of the graph modality and returns all directly
-    /// connected hexads.
+    /// connected octads.
     ///
     /// # Arguments
     ///
-    /// * `id` — The hexad identifier to find relations for.
-    pub async fn search_related(&self, id: &str) -> Result<Vec<Hexad>> {
+    /// * `id` — The octad identifier to find relations for.
+    pub async fn search_related(&self, id: &str) -> Result<Vec<Octad>> {
         let path = format!("/api/v1/search/related/{id}");
         self.get(&path).await
     }
 
-    /// Spatial search: find hexads within a given radius of a point.
+    /// Spatial search: find octads within a given radius of a point.
     ///
     /// # Arguments
     ///
@@ -109,7 +109,7 @@ impl VeriSimClient {
         lon: f64,
         radius_km: f64,
         limit: usize,
-    ) -> Result<Vec<Hexad>> {
+    ) -> Result<Vec<Octad>> {
         let body = SpatialRadiusRequest {
             latitude: lat,
             longitude: lon,
@@ -119,7 +119,7 @@ impl VeriSimClient {
         self.post("/api/v1/search/spatial/radius", &body).await
     }
 
-    /// Spatial search: find hexads within a rectangular bounding box.
+    /// Spatial search: find octads within a rectangular bounding box.
     ///
     /// # Arguments
     ///
@@ -135,7 +135,7 @@ impl VeriSimClient {
         max_lat: f64,
         max_lon: f64,
         limit: usize,
-    ) -> Result<Vec<Hexad>> {
+    ) -> Result<Vec<Octad>> {
         let body = SpatialBoundsRequest {
             min_lat,
             min_lon,
@@ -146,7 +146,7 @@ impl VeriSimClient {
         self.post("/api/v1/search/spatial/bounds", &body).await
     }
 
-    /// Spatial search: find the `k` nearest hexads to a given point.
+    /// Spatial search: find the `k` nearest octads to a given point.
     ///
     /// # Arguments
     ///
@@ -158,7 +158,7 @@ impl VeriSimClient {
         lat: f64,
         lon: f64,
         k: usize,
-    ) -> Result<Vec<Hexad>> {
+    ) -> Result<Vec<Octad>> {
         let body = SpatialNearestRequest {
             latitude: lat,
             longitude: lon,

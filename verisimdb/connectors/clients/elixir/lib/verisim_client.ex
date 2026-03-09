@@ -6,7 +6,7 @@ defmodule VeriSimClient do
   Main client module for connecting to a VeriSimDB instance.
 
   Holds connection configuration (base URL, authentication, timeout) and
-  provides low-level HTTP helpers that the domain modules (`Hexad`, `Search`,
+  provides low-level HTTP helpers that the domain modules (`Octad`, `Search`,
   `Drift`, `Provenance`, `Vql`, `Federation`) delegate to.
 
   ## Quick Start

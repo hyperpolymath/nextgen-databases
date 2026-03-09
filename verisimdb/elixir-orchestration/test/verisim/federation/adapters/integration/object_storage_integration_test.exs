@@ -9,14 +9,14 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageIntegrationTest do
 
   - Buckets: `verisimdb-objects`, `verisimdb-backups`, `verisimdb-embeddings`
   - `verisimdb-objects` bucket:
-    - `hexads/hexad-test-001/metadata.json` — hexad metadata
-    - `hexads/hexad-test-001/document.txt` — document modality content
-    - `hexads/hexad-test-001/provenance.cbor` — provenance placeholder
-    - `hexads/hexad-test-002/metadata.json` — hexad metadata
-    - `hexads/hexad-test-002/document.txt` — document modality content
+    - `octads/octad-test-001/metadata.json` — octad metadata
+    - `octads/octad-test-001/document.txt` — document modality content
+    - `octads/octad-test-001/provenance.cbor` — provenance placeholder
+    - `octads/octad-test-002/metadata.json` — octad metadata
+    - `octads/octad-test-002/document.txt` — document modality content
   - `verisimdb-embeddings` bucket:
-    - `hexad-test-001.bin` — embedding binary blob (512 bytes)
-    - `hexad-test-002.bin` — embedding binary blob (512 bytes)
+    - `octad-test-001.bin` — embedding binary blob (512 bytes)
+    - `octad-test-002.bin` — embedding binary blob (512 bytes)
   - `verisimdb-backups` bucket:
     - `snapshots/snap-test-001/metadata.json` — backup snapshot metadata
   - Anonymous download policy on `verisimdb-objects`
@@ -63,7 +63,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageIntegrationTest do
     }
   }
 
-  @integration_prefix "hexad-integration"
+  @integration_prefix "octad-integration"
 
   # ---------------------------------------------------------------------------
   # Setup / Teardown
@@ -125,23 +125,23 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageIntegrationTest do
 
       Enum.each(results, fn result ->
         assert result.source_store == "minio-integration"
-        assert is_binary(result.hexad_id)
+        assert is_binary(result.octad_id)
         assert result.drifted == false
       end)
     end
 
-    test "listing with prefix 'hexads/' returns hexad-related objects", context do
+    test "listing with prefix 'octads/' returns octad-related objects", context do
       skip_if_unavailable(context)
 
       query_params = %{
         modalities: [:document],
-        text_query: "hexads/",
+        text_query: "octads/",
         limit: 100
       }
 
       assert {:ok, results} = ObjectStorage.query(@peer_info, query_params)
       assert is_list(results)
-      # Should find at least the 5 objects under hexads/ prefix
+      # Should find at least the 5 objects under octads/ prefix
       assert length(results) >= 2
     end
   end
@@ -155,7 +155,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageIntegrationTest do
       skip_if_unavailable(context)
 
       raw_obj = %{
-        "Key" => "hexads/hexad-test-001/metadata.json",
+        "Key" => "octads/octad-test-001/metadata.json",
         "LastModified" => "2026-02-28T00:00:00Z",
         "Size" => 512,
         "ETag" => "\"abc123def456\""
@@ -165,7 +165,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageIntegrationTest do
 
       assert normalised.source_store == "minio-integration"
       # The adapter extracts ID by stripping prefix and extension
-      assert normalised.hexad_id == "hexad-test-001/metadata"
+      assert normalised.octad_id == "octad-test-001/metadata"
       assert normalised.drifted == false
     end
 
@@ -173,7 +173,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageIntegrationTest do
       skip_if_unavailable(context)
 
       raw_obj = %{
-        "key" => "hexads/hexad-test-002/document.txt",
+        "key" => "octads/octad-test-002/document.txt",
         "last_modified" => "2026-02-27T23:00:00Z",
         "size" => 256,
         "etag" => "\"xyz789\""
@@ -182,7 +182,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageIntegrationTest do
       [normalised] = ObjectStorage.translate_results([raw_obj], @peer_info)
 
       assert normalised.source_store == "minio-integration"
-      assert is_binary(normalised.hexad_id)
+      assert is_binary(normalised.octad_id)
     end
   end
 
@@ -197,7 +197,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageIntegrationTest do
       test_id = "#{@integration_prefix}-minio-#{System.unique_integer([:positive])}"
 
       raw_obj = %{
-        "Key" => "hexads/#{test_id}/metadata.json",
+        "Key" => "octads/#{test_id}/metadata.json",
         "LastModified" => DateTime.to_iso8601(DateTime.utc_now()),
         "Size" => 128,
         "ETag" => "\"integration-test-etag\""
@@ -206,7 +206,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageIntegrationTest do
       [normalised] = ObjectStorage.translate_results([raw_obj], @peer_info)
 
       assert normalised.source_store == "minio-integration"
-      assert String.contains?(normalised.hexad_id, test_id)
+      assert String.contains?(normalised.octad_id, test_id)
       assert normalised.drifted == false
     end
   end
@@ -291,7 +291,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageIntegrationTest do
   describe "error handling against real MinIO" do
     test "accessing a nonexistent object via translate_results handles gracefully" do
       raw_obj = %{
-        "Key" => "hexads/nonexistent-object/metadata.json",
+        "Key" => "octads/nonexistent-object/metadata.json",
         "LastModified" => "2026-02-28T00:00:00Z",
         "Size" => 0,
         "ETag" => "\"\""
@@ -301,7 +301,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageIntegrationTest do
 
       # translate_results should still produce a valid normalised result
       assert normalised.source_store == "minio-integration"
-      assert is_binary(normalised.hexad_id)
+      assert is_binary(normalised.octad_id)
     end
 
     test "health_check on nonexistent bucket returns bucket_not_found error" do

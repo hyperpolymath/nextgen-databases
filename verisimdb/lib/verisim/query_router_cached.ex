@@ -208,14 +208,14 @@ defmodule VeriSim.QueryRouter.Cached do
   # === Drift-Aware Invalidation ===
 
   @doc """
-  Invalidate cache when drift is detected for a hexad.
+  Invalidate cache when drift is detected for a octad.
   Should be called by DriftMonitor when drift detected.
   """
-  def invalidate_on_drift(hexad_id) do
-    Logger.info("Invalidating cache due to drift for hexad: #{hexad_id}")
+  def invalidate_on_drift(octad_id) do
+    Logger.info("Invalidating cache due to drift for octad: #{octad_id}")
 
-    # Invalidate all queries involving this hexad
-    QueryCache.invalidate_by_tag("hexad:#{hexad_id}")
+    # Invalidate all queries involving this octad
+    QueryCache.invalidate_by_tag("octad:#{octad_id}")
 
     :ok
   end
@@ -290,10 +290,10 @@ defmodule VeriSim.QueryRouter.Cached do
       String.contains?(query, "FEDERATION") ->
         case Regex.run(~r/FEDERATION\s+(\S+)/, query) do
           [_, pattern] -> {:federation, pattern, %{}}
-          _ -> {:hexad, "unknown"}
+          _ -> {:octad, "unknown"}
         end
       true ->
-        {:hexad, "unknown"}
+        {:octad, "unknown"}
     end
   end
 
@@ -305,9 +305,9 @@ defmodule VeriSim.QueryRouter.Cached do
   defp extract_tags_from_ast(ast) do
     tags = []
 
-    # Add hexad tags
-    hexad_tags = case ast.source do
-      {:hexad, id} -> ["hexad:#{id}"]
+    # Add octad tags
+    octad_tags = case ast.source do
+      {:octad, id} -> ["octad:#{id}"]
       {:federation, pattern, _} -> ["federation:#{pattern}"]
       {:store, store_id} -> ["store:#{store_id}"]
       _ -> []
@@ -318,7 +318,7 @@ defmodule VeriSim.QueryRouter.Cached do
       "modality:#{modality_to_string(mod)}"
     end)
 
-    tags ++ hexad_tags ++ modality_tags
+    tags ++ octad_tags ++ modality_tags
   end
 
   defp modality_to_string(modality) when is_binary(modality), do: modality

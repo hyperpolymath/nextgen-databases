@@ -65,11 +65,11 @@ defmodule VeriSim.Query.VQLExecutor do
       %{TAG: "Insert", modalities: modality_data, proof: proof} ->
         execute_insert(modality_data, proof, timeout)
 
-      %{TAG: "Update", hexadId: hexad_id, sets: sets, proof: proof} ->
-        execute_update(hexad_id, sets, proof, timeout)
+      %{TAG: "Update", octadId: octad_id, sets: sets, proof: proof} ->
+        execute_update(octad_id, sets, proof, timeout)
 
-      %{TAG: "Delete", hexadId: hexad_id, proof: proof} ->
-        execute_delete(hexad_id, proof, timeout)
+      %{TAG: "Delete", octadId: octad_id, proof: proof} ->
+        execute_delete(octad_id, proof, timeout)
 
       _ ->
         {:error, {:invalid_mutation, "Unknown mutation type"}}
@@ -296,8 +296,8 @@ defmodule VeriSim.Query.VQLExecutor do
   # Shared: route query to the appropriate source
   defp execute_by_source(source, modalities, pushdown_conditions, limit, offset, timeout) do
     case source do
-      {:hexad, entity_id} ->
-        execute_hexad_query(entity_id, modalities, pushdown_conditions, limit, offset, timeout)
+      {:octad, entity_id} ->
+        execute_octad_query(entity_id, modalities, pushdown_conditions, limit, offset, timeout)
 
       {:federation, pattern, drift_policy} ->
         execute_federation_query(pattern, drift_policy, modalities, pushdown_conditions, limit, offset, timeout)
@@ -355,69 +355,69 @@ defmodule VeriSim.Query.VQLExecutor do
 
   defp maybe_evaluate_cross_modal(rows, []), do: rows
   defp maybe_evaluate_cross_modal(rows, cross_modal_conditions) do
-    Enum.filter(rows, fn hexad ->
+    Enum.filter(rows, fn octad ->
       Enum.all?(cross_modal_conditions, fn condition ->
-        evaluate_cross_modal(hexad, condition)
+        evaluate_cross_modal(octad, condition)
       end)
     end)
   end
 
-  defp evaluate_cross_modal(hexad, condition) do
+  defp evaluate_cross_modal(octad, condition) do
     case condition do
       %{TAG: "CrossModalFieldCompare",
         _0: mod1, _1: field1, _2: op, _3: mod2, _4: field2} ->
-        val1 = get_modality_field(hexad, mod1, field1)
-        val2 = get_modality_field(hexad, mod2, field2)
+        val1 = get_modality_field(octad, mod1, field1)
+        val2 = get_modality_field(octad, mod2, field2)
         compare_values_with_op(val1, op, val2)
 
       %{TAG: "ModalityDrift", _0: mod1, _1: mod2, _2: threshold} ->
-        drift = compute_modality_drift(hexad, mod1, mod2)
+        drift = compute_modality_drift(octad, mod1, mod2)
         drift > threshold
 
       %{TAG: "ModalityExists", _0: modality} ->
-        has_modality_data?(hexad, modality)
+        has_modality_data?(octad, modality)
 
       %{TAG: "ModalityNotExists", _0: modality} ->
-        not has_modality_data?(hexad, modality)
+        not has_modality_data?(octad, modality)
 
       %{TAG: "ModalityConsistency", _0: mod1, _1: mod2, _2: metric} ->
-        compute_consistency(hexad, mod1, mod2, metric) > 0.0
+        compute_consistency(octad, mod1, mod2, metric) > 0.0
 
       _ -> true
     end
   end
 
-  defp get_modality_field(hexad, modality, field) do
+  defp get_modality_field(octad, modality, field) do
     mod_str = modality_to_string(modality)
-    mod_data = Map.get(hexad, mod_str, %{})
-    Map.get(mod_data, field) || Map.get(hexad, "#{mod_str}.#{field}")
+    mod_data = Map.get(octad, mod_str, %{})
+    Map.get(mod_data, field) || Map.get(octad, "#{mod_str}.#{field}")
   end
 
-  defp has_modality_data?(hexad, modality) do
+  defp has_modality_data?(octad, modality) do
     mod_str = modality_to_string(modality)
-    case Map.get(hexad, mod_str) do
+    case Map.get(octad, mod_str) do
       nil -> false
       data when data == %{} -> false
       _ -> true
     end
   end
 
-  defp compute_modality_drift(hexad, mod1, mod2) do
+  defp compute_modality_drift(octad, mod1, mod2) do
     # Compute drift between two modality representations.
     # Uses the Rust drift API when both modalities have data,
     # falling back to embedding-based comparison.
     mod1_str = modality_to_string(mod1)
     mod2_str = modality_to_string(mod2)
 
-    case {Map.get(hexad, mod1_str), Map.get(hexad, mod2_str)} do
+    case {Map.get(octad, mod1_str), Map.get(octad, mod2_str)} do
       {nil, _} -> 1.0  # Missing modality = maximum drift
       {_, nil} -> 1.0
 
       {data1, data2} ->
-        # Try to get drift from the Rust drift detector via hexad ID
-        hexad_id = Map.get(hexad, "id") || Map.get(hexad, :id)
+        # Try to get drift from the Rust drift detector via octad ID
+        octad_id = Map.get(octad, "id") || Map.get(octad, :id)
 
-        case hexad_id && RustClient.get_drift_score(hexad_id) do
+        case octad_id && RustClient.get_drift_score(octad_id) do
           {:ok, score} when is_number(score) ->
             score
 
@@ -475,14 +475,14 @@ defmodule VeriSim.Query.VQLExecutor do
     end
   end
 
-  defp compute_consistency(hexad, mod1, mod2, metric) do
+  defp compute_consistency(octad, mod1, mod2, metric) do
     # Compute consistency score between two modalities using the specified metric.
     # Returns a score in [0.0, 1.0] where 1.0 = perfectly consistent.
     mod1_str = modality_to_string(mod1)
     mod2_str = modality_to_string(mod2)
 
-    data1 = Map.get(hexad, mod1_str)
-    data2 = Map.get(hexad, mod2_str)
+    data1 = Map.get(octad, mod1_str)
+    data2 = Map.get(octad, mod2_str)
 
     case {data1, data2} do
       {nil, _} -> 0.0
@@ -597,8 +597,8 @@ defmodule VeriSim.Query.VQLExecutor do
         {:error, {:write_proof_failed, reason}}
 
       {:ok, _artifacts} ->
-        case RustClient.create_hexad(modality_data) do
-          {:ok, hexad_id} -> {:ok, %{hexad_id: hexad_id, operation: :insert}}
+        case RustClient.create_octad(modality_data) do
+          {:ok, octad_id} -> {:ok, %{octad_id: octad_id, operation: :insert}}
           {:error, reason} -> {:error, {:insert_failed, reason}}
         end
     end
@@ -606,7 +606,7 @@ defmodule VeriSim.Query.VQLExecutor do
     e -> {:error, {:insert_failed, Exception.message(e)}}
   end
 
-  defp execute_update(hexad_id, sets, proof, _timeout) do
+  defp execute_update(octad_id, sets, proof, _timeout) do
     proof_result = if proof, do: verify_multi_proof(nil, proof), else: {:ok, []}
 
     case proof_result do
@@ -618,8 +618,8 @@ defmodule VeriSim.Query.VQLExecutor do
           {field_ref, value}
         end)
 
-        case RustClient.update_hexad(hexad_id, field_updates) do
-          {:ok, _} -> {:ok, %{hexad_id: hexad_id, operation: :update, fields_updated: length(sets)}}
+        case RustClient.update_octad(octad_id, field_updates) do
+          {:ok, _} -> {:ok, %{octad_id: octad_id, operation: :update, fields_updated: length(sets)}}
           {:error, reason} -> {:error, {:update_failed, reason}}
         end
     end
@@ -627,7 +627,7 @@ defmodule VeriSim.Query.VQLExecutor do
     e -> {:error, {:update_failed, Exception.message(e)}}
   end
 
-  defp execute_delete(hexad_id, proof, _timeout) do
+  defp execute_delete(octad_id, proof, _timeout) do
     proof_result = if proof, do: verify_multi_proof(nil, proof), else: {:ok, []}
 
     case proof_result do
@@ -635,8 +635,8 @@ defmodule VeriSim.Query.VQLExecutor do
         {:error, {:write_proof_failed, reason}}
 
       {:ok, _artifacts} ->
-        case RustClient.delete_hexad(hexad_id) do
-          {:ok, _} -> {:ok, %{hexad_id: hexad_id, operation: :delete}}
+        case RustClient.delete_octad(octad_id) do
+          {:ok, _} -> {:ok, %{octad_id: octad_id, operation: :delete}}
           {:error, reason} -> {:error, {:delete_failed, reason}}
         end
     end
@@ -682,14 +682,14 @@ defmodule VeriSim.Query.VQLExecutor do
 
     case proof_type do
       :existence ->
-        # Existence proofs verify the hexad exists and is accessible.
+        # Existence proofs verify the octad exists and is accessible.
         entity_id = contract_name || extract_entity_from_proof(proof_spec)
 
         if entity_id do
-          case RustClient.get_hexad(entity_id) do
-            {:ok, hexad} ->
+          case RustClient.get_octad(entity_id) do
+            {:ok, octad} ->
               {:ok, %{type: :existence, entity_id: entity_id, verified: true,
-                       status: Map.get(hexad, "status", %{})}}
+                       status: Map.get(octad, "status", %{})}}
             {:error, :not_found} ->
               {:error, {:existence_failed, "Entity '#{entity_id}' does not exist"}}
             {:error, reason} ->
@@ -813,13 +813,13 @@ defmodule VeriSim.Query.VQLExecutor do
         entity_id = contract_name || extract_entity_from_proof(proof_spec)
 
         if entity_id do
-          case RustClient.get_hexad(entity_id) do
-            {:ok, hexad} ->
+          case RustClient.get_octad(entity_id) do
+            {:ok, octad} ->
               max_age_ms = Map.get(proof_spec, :max_age_ms, 3_600_000)
-              temporal = Map.get(hexad, "temporal", %{})
+              temporal = Map.get(octad, "temporal", %{})
               last_modified = Map.get(temporal, "last_modified") ||
                               Map.get(temporal, "updated_at") ||
-                              Map.get(hexad, "updated_at")
+                              Map.get(octad, "updated_at")
 
               if last_modified do
                 age_ms = case DateTime.from_iso8601(to_string(last_modified)) do
@@ -992,8 +992,8 @@ defmodule VeriSim.Query.VQLExecutor do
 
   defp extract_entity_from_proof(%{entity_id: id}), do: id
   defp extract_entity_from_proof(%{entityId: id}), do: id
-  defp extract_entity_from_proof(%{hexad_id: id}), do: id
-  defp extract_entity_from_proof(%{hexadId: id}), do: id
+  defp extract_entity_from_proof(%{octad_id: id}), do: id
+  defp extract_entity_from_proof(%{octadId: id}), do: id
   defp extract_entity_from_proof(_), do: nil
 
   # ---------------------------------------------------------------------------
@@ -1008,10 +1008,10 @@ defmodule VeriSim.Query.VQLExecutor do
   # Query execution by source type
   # ===========================================================================
 
-  defp execute_hexad_query(entity_id, modalities, where_clause, limit, offset, _timeout) do
-    case RustClient.get_hexad(entity_id) do
-      {:ok, hexad} ->
-        filtered = filter_hexad(hexad, modalities, where_clause)
+  defp execute_octad_query(entity_id, modalities, where_clause, limit, offset, _timeout) do
+    case RustClient.get_octad(entity_id) do
+      {:ok, octad} ->
+        filtered = filter_octad(octad, modalities, where_clause)
         paginated = paginate_results([filtered], limit, offset)
         {:ok, paginated}
 
@@ -1109,7 +1109,7 @@ defmodule VeriSim.Query.VQLExecutor do
 
   defp execute_reflect_query(modalities, where_clause, limit, _offset, _timeout) do
     # REFLECT queries the query store itself — meta-circular homoiconicity.
-    # Stored queries are hexads, so we search them via the /queries/similar
+    # Stored queries are octads, so we search them via the /queries/similar
     # and /search/text endpoints filtered to type=vql_query.
     Logger.info("REFLECT query: querying the query store")
 
@@ -1161,11 +1161,11 @@ defmodule VeriSim.Query.VQLExecutor do
     end))
   end
 
-  defp filter_hexad(hexad, modalities, _where_clause) do
+  defp filter_octad(octad, modalities, _where_clause) do
     if :all in modalities do
-      hexad
+      octad
     else
-      Map.take(hexad, modalities |> Enum.map(&to_string/1))
+      Map.take(octad, modalities |> Enum.map(&to_string/1))
     end
   end
 
@@ -1625,7 +1625,7 @@ defmodule VeriSim.Query.VQLExecutor do
 
         # Step 3: Route to stores
         {source_type, source_cost, source_notes} = case source do
-          {:hexad, id} -> {"Hexad lookup", 2, "Direct ID: #{id}"}
+          {:octad, id} -> {"Octad lookup", 2, "Direct ID: #{id}"}
           {:federation, pattern, _} -> {"Federation fan-out", 100, "Pattern: #{inspect(pattern)}"}
           {:store, id} -> {"Store query", 15, "Store: #{id}"}
           :reflect -> {"REFLECT (meta-query)", 20, "Query the query store itself"}
@@ -1786,7 +1786,7 @@ defmodule VeriSim.Query.VQLExecutor do
 
   defp extract_modalities(query_ast), do: Map.get(query_ast, :modalities, [:all])
   defp extract_source(query_ast) do
-    case Map.get(query_ast, :source, {:hexad, "default"}) do
+    case Map.get(query_ast, :source, {:octad, "default"}) do
       %{TAG: "Reflect"} -> :reflect
       :reflect -> :reflect
       "REFLECT" -> :reflect

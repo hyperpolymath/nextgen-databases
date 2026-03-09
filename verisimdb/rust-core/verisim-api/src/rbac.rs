@@ -9,7 +9,7 @@
 //! - **Global permissions**: Apply to all resources (e.g., Admin can do everything).
 //! - **Per-modality permissions**: Grant read/write/execute per VeriSimDB modality
 //!   (graph, vector, tensor, semantic, document, temporal).
-//! - **Entity-level ACLs**: Override permissions for specific hexad entities.
+//! - **Entity-level ACLs**: Override permissions for specific octad entities.
 //! - **Audit logging**: Every access decision is recorded with timestamps.
 //!
 //! # Integration with auth middleware
@@ -38,7 +38,7 @@ use tracing::{info, warn};
 pub enum Permission {
     /// Read data (GET requests, search, list).
     Read,
-    /// Write data (POST, PUT, DELETE on hexads and related resources).
+    /// Write data (POST, PUT, DELETE on octads and related resources).
     Write,
     /// Administrative operations (config changes, normalizer triggers, key management).
     Admin,
@@ -121,7 +121,7 @@ impl RoleDefinition {
 pub struct RbacPolicy {
     /// Named role definitions. Key is the role name (lowercase).
     pub roles: HashMap<String, RoleDefinition>,
-    /// Entity-level ACL overrides. Outer key is the entity (hexad) ID,
+    /// Entity-level ACL overrides. Outer key is the entity (octad) ID,
     /// inner tuples are `(client_id, Vec<Permission>)` pairs.
     pub entity_acls: HashMap<String, Vec<(String, Vec<Permission>)>>,
 }
@@ -439,7 +439,7 @@ fn is_execute_path(method: &Method, path: &str) -> bool {
 /// Extract the modality name from a resource path, if applicable.
 ///
 /// Returns `None` when the path does not target a specific modality.
-/// For hexad-level paths we return `None` because hexads span all modalities.
+/// For octad-level paths we return `None` because octads span all modalities.
 pub fn modality_from_path(path: &str) -> Option<&str> {
     if path.starts_with("/search/vector") {
         return Some("vector");
@@ -456,10 +456,10 @@ pub fn modality_from_path(path: &str) -> Option<&str> {
     None
 }
 
-/// Extract the entity (hexad) ID from a resource path, if applicable.
+/// Extract the entity (octad) ID from a resource path, if applicable.
 pub fn entity_from_path(path: &str) -> Option<&str> {
-    // Matches /hexads/{id} and sub-paths.
-    if let Some(rest) = path.strip_prefix("/hexads/") {
+    // Matches /octads/{id} and sub-paths.
+    if let Some(rest) = path.strip_prefix("/octads/") {
         let id = rest.split('/').next().unwrap_or(rest);
         if !id.is_empty() {
             return Some(id);
@@ -684,9 +684,9 @@ mod tests {
         let admin = identity("admin-user", ClientRole::Admin);
 
         // Read
-        assert!(check_access(&admin, "/hexads", &Method::GET, &rbac).is_ok());
+        assert!(check_access(&admin, "/octads", &Method::GET, &rbac).is_ok());
         // Write
-        assert!(check_access(&admin, "/hexads", &Method::POST, &rbac).is_ok());
+        assert!(check_access(&admin, "/octads", &Method::POST, &rbac).is_ok());
         // Execute
         assert!(check_access(&admin, "/query/plan", &Method::POST, &rbac).is_ok());
         // Admin
@@ -713,18 +713,18 @@ mod tests {
         let reader = identity("reader-user", ClientRole::Reader);
 
         // Write should be denied.
-        let result = check_access(&reader, "/hexads", &Method::POST, &rbac);
+        let result = check_access(&reader, "/octads", &Method::POST, &rbac);
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert_eq!(err.code, 403);
         assert_eq!(err.required_permission, "write");
 
         // PUT should be denied.
-        let result = check_access(&reader, "/hexads/some-id", &Method::PUT, &rbac);
+        let result = check_access(&reader, "/octads/some-id", &Method::PUT, &rbac);
         assert!(result.is_err());
 
         // DELETE should be denied.
-        let result = check_access(&reader, "/hexads/some-id", &Method::DELETE, &rbac);
+        let result = check_access(&reader, "/octads/some-id", &Method::DELETE, &rbac);
         assert!(result.is_err());
     }
 
@@ -737,8 +737,8 @@ mod tests {
         let reader = identity("reader-user", ClientRole::Reader);
 
         // Read is allowed.
-        assert!(check_access(&reader, "/hexads", &Method::GET, &rbac).is_ok());
-        assert!(check_access(&reader, "/hexads/abc", &Method::GET, &rbac).is_ok());
+        assert!(check_access(&reader, "/octads", &Method::GET, &rbac).is_ok());
+        assert!(check_access(&reader, "/octads/abc", &Method::GET, &rbac).is_ok());
         assert!(check_access(&reader, "/drift/status", &Method::GET, &rbac).is_ok());
 
         // Execute is allowed (query endpoints).
@@ -756,12 +756,12 @@ mod tests {
         let writer = identity("writer-user", ClientRole::Writer);
 
         // Write is allowed.
-        assert!(check_access(&writer, "/hexads", &Method::POST, &rbac).is_ok());
-        assert!(check_access(&writer, "/hexads/abc", &Method::PUT, &rbac).is_ok());
-        assert!(check_access(&writer, "/hexads/abc", &Method::DELETE, &rbac).is_ok());
+        assert!(check_access(&writer, "/octads", &Method::POST, &rbac).is_ok());
+        assert!(check_access(&writer, "/octads/abc", &Method::PUT, &rbac).is_ok());
+        assert!(check_access(&writer, "/octads/abc", &Method::DELETE, &rbac).is_ok());
 
         // Read and execute also allowed.
-        assert!(check_access(&writer, "/hexads", &Method::GET, &rbac).is_ok());
+        assert!(check_access(&writer, "/octads", &Method::GET, &rbac).is_ok());
         assert!(check_access(&writer, "/query/plan", &Method::POST, &rbac).is_ok());
 
         // Admin is denied.
@@ -830,7 +830,7 @@ mod tests {
         let mut policy = RbacPolicy::default();
 
         // Grant the reader "writer-user" write access to a specific entity.
-        policy.add_entity_acl("secret-hexad", "special-reader", vec![Permission::Write]);
+        policy.add_entity_acl("secret-octad", "special-reader", vec![Permission::Write]);
 
         let rbac = RbacState::new(policy);
         let reader = identity("special-reader", ClientRole::Reader);
@@ -838,16 +838,16 @@ mod tests {
         // Normally a reader cannot write.
         let result = check_access(
             &reader,
-            "/hexads/other-hexad",
+            "/octads/other-octad",
             &Method::PUT,
             &rbac,
         );
         assert!(result.is_err());
 
-        // But the entity ACL grants write on "secret-hexad".
+        // But the entity ACL grants write on "secret-octad".
         assert!(check_access(
             &reader,
-            "/hexads/secret-hexad",
+            "/octads/secret-octad",
             &Method::PUT,
             &rbac,
         ).is_ok());
@@ -863,9 +863,9 @@ mod tests {
         let reader = identity("audit-reader", ClientRole::Reader);
 
         // Successful access.
-        let _ = check_access(&admin, "/hexads", &Method::GET, &rbac);
+        let _ = check_access(&admin, "/octads", &Method::GET, &rbac);
         // Denied access.
-        let _ = check_access(&reader, "/hexads", &Method::POST, &rbac);
+        let _ = check_access(&reader, "/octads", &Method::POST, &rbac);
 
         let entries = rbac.audit_log.entries();
         assert!(entries.len() >= 2, "Expected at least 2 audit entries, got {}", entries.len());
@@ -923,14 +923,14 @@ mod tests {
     #[test]
     fn test_required_permission_derivation() {
         // Read
-        assert_eq!(required_permission(&Method::GET, "/hexads"), Permission::Read);
-        assert_eq!(required_permission(&Method::HEAD, "/hexads"), Permission::Read);
+        assert_eq!(required_permission(&Method::GET, "/octads"), Permission::Read);
+        assert_eq!(required_permission(&Method::HEAD, "/octads"), Permission::Read);
         assert_eq!(required_permission(&Method::OPTIONS, "/anything"), Permission::Read);
 
         // Write
-        assert_eq!(required_permission(&Method::POST, "/hexads"), Permission::Write);
-        assert_eq!(required_permission(&Method::PUT, "/hexads/abc"), Permission::Write);
-        assert_eq!(required_permission(&Method::DELETE, "/hexads/abc"), Permission::Write);
+        assert_eq!(required_permission(&Method::POST, "/octads"), Permission::Write);
+        assert_eq!(required_permission(&Method::PUT, "/octads/abc"), Permission::Write);
+        assert_eq!(required_permission(&Method::DELETE, "/octads/abc"), Permission::Write);
 
         // Execute
         assert_eq!(required_permission(&Method::POST, "/query/plan"), Permission::Execute);
@@ -956,11 +956,11 @@ mod tests {
     #[test]
     fn test_entity_and_modality_extraction() {
         // Entity extraction
-        assert_eq!(entity_from_path("/hexads/my-entity"), Some("my-entity"));
-        assert_eq!(entity_from_path("/hexads/abc/sub"), Some("abc"));
+        assert_eq!(entity_from_path("/octads/my-entity"), Some("my-entity"));
+        assert_eq!(entity_from_path("/octads/abc/sub"), Some("abc"));
         assert_eq!(entity_from_path("/drift/entity/drift-id"), Some("drift-id"));
         assert_eq!(entity_from_path("/normalizer/trigger/norm-id"), Some("norm-id"));
-        assert_eq!(entity_from_path("/hexads"), None);
+        assert_eq!(entity_from_path("/octads"), None);
         assert_eq!(entity_from_path("/search/text"), None);
 
         // Modality extraction
@@ -968,7 +968,7 @@ mod tests {
         assert_eq!(modality_from_path("/search/text"), Some("document"));
         assert_eq!(modality_from_path("/search/related/xyz"), Some("graph"));
         assert_eq!(modality_from_path("/drift/status"), Some("temporal"));
-        assert_eq!(modality_from_path("/hexads"), None);
+        assert_eq!(modality_from_path("/octads"), None);
         assert_eq!(modality_from_path("/query/plan"), None);
     }
 
@@ -995,13 +995,13 @@ mod tests {
         let writer = identity("custom-writer", ClientRole::Writer);
 
         // Global read → allowed.
-        assert!(check_access(&writer, "/hexads", &Method::GET, &rbac).is_ok());
+        assert!(check_access(&writer, "/octads", &Method::GET, &rbac).is_ok());
 
         // Vector write → allowed (modality grant).
         assert!(check_access(&writer, "/search/vector", &Method::POST, &rbac).is_ok());
 
-        // Hexad write → denied (no global write, no modality for hexad paths).
-        let result = check_access(&writer, "/hexads", &Method::POST, &rbac);
+        // Octad write → denied (no global write, no modality for octad paths).
+        let result = check_access(&writer, "/octads", &Method::POST, &rbac);
         assert!(result.is_err());
     }
 
@@ -1015,7 +1015,7 @@ mod tests {
         let rbac = RbacState::new(policy);
         let reader = identity("orphan-user", ClientRole::Reader);
 
-        let result = check_access(&reader, "/hexads", &Method::GET, &rbac);
+        let result = check_access(&reader, "/octads", &Method::GET, &rbac);
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert!(err.error.contains("No role definition found"));
@@ -1031,10 +1031,10 @@ mod tests {
         let reader = identity("wrapper-reader", ClientRole::Reader);
 
         // Admin should pass.
-        assert!(check_authorization(&admin, "/hexads", &Method::POST, &rbac).is_ok());
+        assert!(check_authorization(&admin, "/octads", &Method::POST, &rbac).is_ok());
 
         // Reader write should fail.
-        assert!(check_authorization(&reader, "/hexads", &Method::POST, &rbac).is_err());
+        assert!(check_authorization(&reader, "/octads", &Method::POST, &rbac).is_err());
     }
 
     // ------------------------------------------------------------------
@@ -1049,17 +1049,17 @@ mod tests {
         let reader = identity("reader-x", ClientRole::Reader);
 
         // Write to entity-alpha → allowed via ACL.
-        assert!(check_access(&reader, "/hexads/entity-alpha", &Method::PUT, &rbac).is_ok());
+        assert!(check_access(&reader, "/octads/entity-alpha", &Method::PUT, &rbac).is_ok());
 
         // Write to entity-beta → denied (no ACL for this entity).
-        let result = check_access(&reader, "/hexads/entity-beta", &Method::PUT, &rbac);
+        let result = check_access(&reader, "/octads/entity-beta", &Method::PUT, &rbac);
         assert!(result.is_err());
 
         // Write to entity-alpha by a DIFFERENT client → denied.
         let other_reader = identity("reader-y", ClientRole::Reader);
         let result = check_access(
             &other_reader,
-            "/hexads/entity-alpha",
+            "/octads/entity-alpha",
             &Method::PUT,
             &rbac,
         );
@@ -1074,7 +1074,7 @@ mod tests {
         let rbac = default_rbac();
         let admin = identity("clear-admin", ClientRole::Admin);
 
-        let _ = check_access(&admin, "/hexads", &Method::GET, &rbac);
+        let _ = check_access(&admin, "/octads", &Method::GET, &rbac);
         assert!(!rbac.audit_log.is_empty());
 
         rbac.audit_log.clear();

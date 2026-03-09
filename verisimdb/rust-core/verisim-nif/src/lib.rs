@@ -5,16 +5,16 @@
 //!
 //! This crate exposes core VeriSimDB operations as Rustler NIFs, bypassing HTTP
 //! for same-node deployments. When used alongside the Elixir orchestration layer,
-//! NIF transport provides 10-100x lower latency than HTTP for hexad CRUD operations.
+//! NIF transport provides 10-100x lower latency than HTTP for octad CRUD operations.
 //!
 //! ## Supported Operations (MVP)
 //!
-//! - `create_hexad/1` — Create a new hexad entity from JSON input
-//! - `get_hexad/1` — Retrieve a hexad by ID (all 8 modalities)
-//! - `delete_hexad/1` — Delete a hexad entity
+//! - `create_octad/1` — Create a new octad entity from JSON input
+//! - `get_octad/1` — Retrieve a octad by ID (all 8 modalities)
+//! - `delete_octad/1` — Delete a octad entity
 //! - `search_text/2` — Full-text search across document modality
 //! - `search_vector/2` — Vector similarity search
-//! - `list_hexads/2` — Paginated entity listing
+//! - `list_octads/2` — Paginated entity listing
 //! - `get_drift_score/1` — Get drift scores for an entity
 //! - `trigger_normalise/1` — Trigger normalisation for a drifted entity
 //!
@@ -56,17 +56,17 @@ fn runtime() -> &'static Runtime {
 // NIF functions
 // ---------------------------------------------------------------------------
 
-/// Create a new hexad entity from a JSON string.
+/// Create a new octad entity from a JSON string.
 ///
-/// Accepts a JSON string matching the `HexadInput` schema (same as the HTTP
-/// POST /api/v1/hexads body). Returns `{:ok, json_string}` on success or
+/// Accepts a JSON string matching the `OctadInput` schema (same as the HTTP
+/// POST /api/v1/octads body). Returns `{:ok, json_string}` on success or
 /// `{:error, reason}` on failure.
 #[rustler::nif(schedule = "DirtyCpu")]
-fn create_hexad(json_input: String) -> NifResult<String> {
+fn create_octad(json_input: String) -> NifResult<String> {
     let input: Value = serde_json::from_str(&json_input)
         .map_err(|e| Error::Term(Box::new(format!("invalid JSON: {e}"))))?;
 
-    // Placeholder: in full integration, this calls InMemoryHexadStore::create()
+    // Placeholder: in full integration, this calls InMemoryOctadStore::create()
     // via the shared store instance. For now, return the parsed input as
     // confirmation that the NIF bridge is functional.
     let result = serde_json::json!({
@@ -79,14 +79,14 @@ fn create_hexad(json_input: String) -> NifResult<String> {
         .map_err(|e| Error::Term(Box::new(format!("serialization error: {e}"))))
 }
 
-/// Retrieve a hexad by ID.
+/// Retrieve a octad by ID.
 ///
-/// Returns the full hexad JSON (all 8 octad modalities) or an error if not found.
+/// Returns the full octad JSON (all 8 octad modalities) or an error if not found.
 #[rustler::nif(schedule = "DirtyCpu")]
-fn get_hexad(hexad_id: String) -> NifResult<String> {
-    // Placeholder: will call store.get(&hexad_id) via the shared runtime
+fn get_octad(octad_id: String) -> NifResult<String> {
+    // Placeholder: will call store.get(&octad_id) via the shared runtime
     let result = serde_json::json!({
-        "id": hexad_id,
+        "id": octad_id,
         "status": "nif_placeholder",
         "transport": "nif",
         "message": "NIF bridge operational — store integration pending"
@@ -96,11 +96,11 @@ fn get_hexad(hexad_id: String) -> NifResult<String> {
         .map_err(|e| Error::Term(Box::new(format!("serialization error: {e}"))))
 }
 
-/// Delete a hexad entity by ID.
+/// Delete a octad entity by ID.
 #[rustler::nif(schedule = "DirtyCpu")]
-fn delete_hexad(hexad_id: String) -> NifResult<String> {
+fn delete_octad(octad_id: String) -> NifResult<String> {
     let result = serde_json::json!({
-        "id": hexad_id,
+        "id": octad_id,
         "status": "deleted",
         "transport": "nif"
     });
@@ -111,7 +111,7 @@ fn delete_hexad(hexad_id: String) -> NifResult<String> {
 
 /// Full-text search across the document modality.
 ///
-/// Accepts a query string and result limit. Returns a JSON array of matching hexads.
+/// Accepts a query string and result limit. Returns a JSON array of matching octads.
 #[rustler::nif(schedule = "DirtyCpu")]
 fn search_text(query: String, limit: usize) -> NifResult<String> {
     let result = serde_json::json!({
@@ -143,13 +143,13 @@ fn search_vector(embedding_json: String, k: usize) -> NifResult<String> {
         .map_err(|e| Error::Term(Box::new(format!("serialization error: {e}"))))
 }
 
-/// Paginated listing of hexad entities.
+/// Paginated listing of octad entities.
 #[rustler::nif(schedule = "DirtyCpu")]
-fn list_hexads(limit: usize, offset: usize) -> NifResult<String> {
+fn list_octads(limit: usize, offset: usize) -> NifResult<String> {
     let result = serde_json::json!({
         "limit": limit,
         "offset": offset,
-        "hexads": [],
+        "octads": [],
         "total": 0,
         "transport": "nif"
     });
@@ -162,9 +162,9 @@ fn list_hexads(limit: usize, offset: usize) -> NifResult<String> {
 ///
 /// Returns drift scores across all 8 octad modalities (0.0 = no drift, 1.0 = max).
 #[rustler::nif(schedule = "DirtyCpu")]
-fn get_drift_score(hexad_id: String) -> NifResult<String> {
+fn get_drift_score(octad_id: String) -> NifResult<String> {
     let result = serde_json::json!({
-        "entity_id": hexad_id,
+        "entity_id": octad_id,
         "graph": 0.0,
         "vector": 0.0,
         "tensor": 0.0,
@@ -185,9 +185,9 @@ fn get_drift_score(hexad_id: String) -> NifResult<String> {
 ///
 /// Returns the normalisation result status.
 #[rustler::nif(schedule = "DirtyCpu")]
-fn trigger_normalise(hexad_id: String) -> NifResult<String> {
+fn trigger_normalise(octad_id: String) -> NifResult<String> {
     let result = serde_json::json!({
-        "entity_id": hexad_id,
+        "entity_id": octad_id,
         "status": "normalisation_triggered",
         "transport": "nif"
     });
@@ -203,12 +203,12 @@ fn trigger_normalise(hexad_id: String) -> NifResult<String> {
 rustler::init!(
     "Elixir.VeriSim.NifBridge",
     [
-        create_hexad,
-        get_hexad,
-        delete_hexad,
+        create_octad,
+        get_octad,
+        delete_octad,
         search_text,
         search_vector,
-        list_hexads,
+        list_octads,
         get_drift_score,
         trigger_normalise,
     ]

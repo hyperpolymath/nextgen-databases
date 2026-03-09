@@ -25,7 +25,7 @@ option go_package = "verisim/federation";
 // ---------------------------------------------------------------------------
 
 // Modality identifies one of the 8 octad modality dimensions.
-// Each hexad entity can have data in any combination of these modalities.
+// Each octad entity can have data in any combination of these modalities.
 enum Modality {
   // Unspecified / unknown modality (protobuf default).
   MODALITY_UNSPECIFIED = 0;
@@ -284,8 +284,8 @@ message FederationResult {
   // Which peer store provided this result.
   string source_store = 1;
 
-  // Hexad entity identifier within the source store.
-  string hexad_id = 2;
+  // Octad entity identifier within the source store.
+  string octad_id = 2;
 
   // Relevance score normalised to [0.0, 1.0].
   double score = 3;
@@ -293,7 +293,7 @@ message FederationResult {
   // Whether the source store has drift issues for this entity.
   bool drifted = 4;
 
-  // Serialised result data (JSON-encoded hexad or modality-specific payload).
+  // Serialised result data (JSON-encoded octad or modality-specific payload).
   bytes data = 5;
 
   // Time in milliseconds the source store took to respond.
@@ -324,7 +324,7 @@ message HealthResponse {
   // Overall drift health status.
   string drift_status = 4;
 
-  // Number of hexad entities stored by this peer.
+  // Number of octad entities stored by this peer.
   int64 entity_count = 5;
 }
 

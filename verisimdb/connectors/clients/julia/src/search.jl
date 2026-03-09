@@ -10,7 +10,7 @@
 """
     search_text(client, query; modalities=Modality[], limit=20, offset=0) -> Vector{SearchResult}
 
-Perform a full-text search across hexad content.
+Perform a full-text search across octad content.
 
 # Arguments
 - `client::Client` — The authenticated client.
@@ -75,7 +75,7 @@ end
 """
     search_spatial_radius(client; latitude, longitude, radius_km, limit=20) -> Vector{SearchResult}
 
-Find hexads within a given radius of a geographic point.
+Find octads within a given radius of a geographic point.
 """
 function search_spatial_radius(
     client::Client;
@@ -97,7 +97,7 @@ end
 """
     search_spatial_bounds(client; min_lat, min_lon, max_lat, max_lon, limit=20) -> Vector{SearchResult}
 
-Find hexads within a rectangular bounding box.
+Find octads within a rectangular bounding box.
 """
 function search_spatial_bounds(
     client::Client;
@@ -119,18 +119,18 @@ function search_spatial_bounds(
 end
 
 """
-    search_nearest(client, hexad_id; top_k=10, modality=Vector) -> Vector{SearchResult}
+    search_nearest(client, octad_id; top_k=10, modality=Vector) -> Vector{SearchResult}
 
-Find the nearest neighbours of a given hexad.
+Find the nearest neighbours of a given octad.
 """
 function search_nearest(
     client::Client,
-    hexad_id::String;
+    octad_id::String;
     top_k::Int=10,
     modality::Modality=Vector
 )::Vector{SearchResult}
     body = Dict(
-        "hexad_id" => hexad_id,
+        "octad_id" => octad_id,
         "top_k" => top_k,
         "modality" => string(modality)
     )
@@ -139,19 +139,19 @@ function search_nearest(
 end
 
 """
-    search_related(client, hexad_id; rel_type=nothing, depth=1, limit=20) -> Vector{SearchResult}
+    search_related(client, octad_id; rel_type=nothing, depth=1, limit=20) -> Vector{SearchResult}
 
-Traverse relationships from a given hexad.
+Traverse relationships from a given octad.
 """
 function search_related(
     client::Client,
-    hexad_id::String;
+    octad_id::String;
     rel_type::Union{String,Nothing}=nothing,
     depth::Int=1,
     limit::Int=20
 )::Vector{SearchResult}
     body = Dict{String,Any}(
-        "hexad_id" => hexad_id,
+        "octad_id" => octad_id,
         "depth" => depth,
         "limit" => limit
     )

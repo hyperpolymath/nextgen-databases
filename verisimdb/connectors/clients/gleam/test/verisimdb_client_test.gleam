@@ -151,9 +151,9 @@ pub fn default_modality_status_test() {
   should.be_false(ms.spatial)
 }
 
-pub fn hexad_input_construction_test() {
+pub fn octad_input_construction_test() {
   let input =
-    types.HexadInput(
+    types.OctadInput(
       graph_data: option.None,
       vector_data: option.None,
       tensor_data: option.None,

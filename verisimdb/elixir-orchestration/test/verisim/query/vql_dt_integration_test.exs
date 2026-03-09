@@ -155,7 +155,7 @@ defmodule VeriSim.Query.VQLDTIntegrationTest do
       # INTEGRITY requires a contract name — passing just whitespace should fail
       ast = %{
         modalities: [:graph],
-        source: {:hexad, "entity-001"},
+        source: {:octad, "entity-001"},
         where: nil,
         proof: [%{proofType: "INTEGRITY"}],  # No contractName
         limit: nil,
@@ -244,7 +244,7 @@ defmodule VeriSim.Query.VQLDTIntegrationTest do
       # Build a well-formed AST that will go through the VQL-DT path
       ast = %{
         modalities: [:graph],
-        source: {:hexad, "entity-001"},
+        source: {:octad, "entity-001"},
         where: nil,
         proof: [%{proofType: "EXISTENCE", contractName: "entity-001"}],
         limit: nil,
@@ -291,7 +291,7 @@ defmodule VeriSim.Query.VQLDTIntegrationTest do
     test "proof_certificate includes obligations list" do
       ast = %{
         modalities: [:graph],
-        source: {:hexad, "entity-001"},
+        source: {:octad, "entity-001"},
         where: nil,
         proof: [%{proofType: "EXISTENCE", contractName: "entity-001"}],
         limit: nil,

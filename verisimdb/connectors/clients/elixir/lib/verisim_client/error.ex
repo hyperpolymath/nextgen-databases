@@ -16,7 +16,7 @@ defmodule VeriSimClient.Error do
   # ---------------------------------------------------------------------------
 
   defmodule NotFound do
-    @moduledoc "The requested entity (hexad, peer, provenance record) was not found."
+    @moduledoc "The requested entity (octad, peer, provenance record) was not found."
     defexception [:message]
 
     @impl true

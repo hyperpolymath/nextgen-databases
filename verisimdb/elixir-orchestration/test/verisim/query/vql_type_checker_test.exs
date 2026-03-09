@@ -280,7 +280,7 @@ defmodule VeriSim.Query.VQLTypeCheckerTest do
       obligation = Enum.at(info.proof_obligations, 0)
 
       assert is_list(obligation.witness_fields)
-      assert "hexad_id" in obligation.witness_fields
+      assert "octad_id" in obligation.witness_fields
       assert "timestamp" in obligation.witness_fields
     end
 

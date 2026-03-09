@@ -22,7 +22,7 @@ target store.
 **Inbound (Client SDKs)**:: External applications reach _in_ to VeriSimDB
 through idiomatic client libraries.  Each SDK wraps the REST / gRPC API,
 handles authentication, connection pooling, and provides type-safe access to
-hexad entities, VQL queries, and drift reports.
+octad entities, VQL queries, and drift reports.
 
 === Architecture Diagram
 
@@ -74,7 +74,7 @@ hexad entities, VQL queries, and drift reports.
 Federation adapters allow VeriSimDB to coordinate with external databases,
 treating them as modality-specialised peers in a federated mesh.  Each adapter
 translates the VeriSimDB federation protocol into the native query language of
-the target store, maps results back into octad hexad entities, and reports drift
+the target store, maps results back into octad octad entities, and reports drift
 scores so the normaliser can maintain cross-modal consistency.
 
 All adapters implement the `FederationAdapter` trait (Rust) or the
@@ -167,9 +167,9 @@ All adapters implement the `FederationAdapter` trait (Rust) or the
 == Client SDKs
 
 Client SDKs provide idiomatic language bindings for applications that need to
-read, write, and query VeriSimDB hexad entities.  Each SDK wraps the REST API
+read, write, and query VeriSimDB octad entities.  Each SDK wraps the REST API
 (and optionally gRPC for streaming) with connection pooling, retry logic,
-serialisation, and type-safe hexad construction.
+serialisation, and type-safe octad construction.
 
 [cols="1,2,1"]
 |===
@@ -202,7 +202,7 @@ serialisation, and type-safe hexad construction.
 
 == Octad Modality Mapping
 
-Every hexad entity in VeriSimDB maintains up to 8 synchronized modality
+Every octad entity in VeriSimDB maintains up to 8 synchronized modality
 representations.  Federation adapters map between these canonical modalities and
 the capabilities of each external store.
 
@@ -261,9 +261,9 @@ format.
 ----
 shared/
 ├── json-schema/               # JSON Schema (2020-12) definitions
-│   ├── hexad.json             # Full hexad entity
-│   ├── hexad-input.json       # Create/update input
-│   ├── hexad-status.json      # Entity status across modalities
+│   ├── octad.json             # Full octad entity
+│   ├── octad-input.json       # Create/update input
+│   ├── octad-status.json      # Entity status across modalities
 │   ├── modality.json          # Modality enum
 │   ├── query-params.json      # Federation query parameters
 │   ├── federation-result.json # Normalised federation result
@@ -307,4 +307,4 @@ across REST, gRPC, and SDK code generation.
 * link:../WHITEPAPER.md[Whitepaper] -- formal description of the octad model
 * link:../docs/[docs/] -- design documents and architecture decisions
 * link:../rust-core/verisim-api/src/federation.rs[federation.rs] -- Rust federation implementation
-* link:../rust-core/verisim-hexad/src/lib.rs[hexad lib.rs] -- canonical Hexad type definitions
+* link:../rust-core/verisim-octad/src/lib.rs[octad lib.rs] -- canonical Octad type definitions

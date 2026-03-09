@@ -122,7 +122,7 @@ This separation ensures that architectural decisions are traceable to the proble
 
 The octad comprises eight modalities, each addressing a distinct representational need.
 The choice of eight is not arbitrary -- it emerges from an analysis of the irreducible representation types required by real-world data systems.
-Earlier versions of VeriSimDB used a hexad (six modalities), but operational experience demonstrated that provenance and spatial data require first-class treatment rather than being subsumed into other modalities.
+Earlier versions of VeriSimDB used a octad (six modalities), but operational experience demonstrated that provenance and spatial data require first-class treatment rather than being subsumed into other modalities.
 
 .The eight modalities of the VeriSimDB octad
 [cols="1,2,2,1",options="header"]
@@ -173,7 +173,7 @@ Earlier versions of VeriSimDB used a hexad (six modalities), but operational exp
 === Entity Lifecycle
 
 An octad entity is created by supplying data to one or more modalities.
-VeriSimDB assigns a unique Hexad identifier (UUID v7, time-sortable) and initialises all eight modality slots.
+VeriSimDB assigns a unique Octad identifier (UUID v7, time-sortable) and initialises all eight modality slots.
 Unpopulated modalities are marked as `absent` rather than null, distinguishing "no data provided" from "data was deleted."
 
 The lifecycle comprises four states:
@@ -198,10 +198,10 @@ VeriSimDB defines a _drift interaction matrix_ that specifies which pairs are mo
 
 The drift interaction matrix is configurable per deployment, allowing operators to focus monitoring on the modality pairs most relevant to their data.
 
-=== Hexad Identifier and Cross-Modal Linking
+=== Octad Identifier and Cross-Modal Linking
 
-The Hexad ID serves as the universal join key across all eight modality stores.
-Each store maintains its own index structures, but cross-modal queries are resolved by Hexad ID lookup rather than by full-table scans.
+The Octad ID serves as the universal join key across all eight modality stores.
+Each store maintains its own index structures, but cross-modal queries are resolved by Octad ID lookup rather than by full-table scans.
 The ID is stored as a 128-bit UUID in each modality's index, enabling constant-time cross-modal joins.
 
 
@@ -514,7 +514,7 @@ When a federated query targets multiple peers, the QueryRouter decomposes it int
 1. The federation registry is consulted to determine which peers hold relevant data.
 2. Each sub-query is scoped to the modalities available at the target peer.
 3. Sub-queries are dispatched concurrently via the Elixir Task module.
-4. Results are merged by Hexad ID, with per-modality data assembled from whichever peer provided it.
+4. Results are merged by Octad ID, with per-modality data assembled from whichever peer provided it.
 
 When multiple peers provide data for the same modality of the same entity, conflict resolution is governed by the query's drift policy.
 
@@ -548,7 +548,7 @@ Key crates include:
 - **verisim-normalizer**: The self-normalisation engine with five strategies, authority ranking, conflict resolution, and audit logging.
 - **verisim-provenance**: Hash-chain-based lineage tracking with actor search and integrity verification.
 - **verisim-spatial**: R-tree index for geospatial queries (radius, bounding box, k-nearest).
-- **verisim-hexad**: The octad entity abstraction, builder pattern, and cross-modal linking logic.
+- **verisim-octad**: The octad entity abstraction, builder pattern, and cross-modal linking logic.
 - **verisim-api**: Actix-web HTTP server exposing RESTful endpoints for all operations plus federation peer management.
 - **verisim-wal**: Write-ahead log for crash recovery and atomic multi-modality commits.
 

@@ -85,7 +85,7 @@
 
         ((phase "Quorum Testing")
          (steps
-           "1. Create test hexad on Store A
+           "1. Create test octad on Store A
             2. Query from Store B: SELECT * FROM FEDERATION /stores/* WHERE id = <test-id>
             3. Verify quorum: Check logs for quorum voting
             4. Simulate Byzantine fault: Stop Store C, verify quorum still works")
@@ -99,23 +99,23 @@
 ;; ============================================================================
 
 (define operational-runbooks
-  '((hexad-not-found
-      (symptom . "Query returns 'Hexad not found' for valid ID")
+  '((octad-not-found
+      (symptom . "Query returns 'Octad not found' for valid ID")
       (diagnosis
-        "1. Check if hexad exists in any modality:
-            $ ./verisimdb-cli inspect-hexad <id>
+        "1. Check if octad exists in any modality:
+            $ ./verisimdb-cli inspect-octad <id>
          2. Check drift detection logs:
             $ grep 'drift:' logs/verisimdb.log | grep <id>
          3. Verify federation connectivity:
             $ ./verisimdb-cli federation-status")
       (resolution
-        "If hexad exists but not found:
+        "If octad exists but not found:
          - Option A: Trigger normalization repair:
-           $ ./verisimdb-cli repair-drift --hexad <id> --level L1
+           $ ./verisimdb-cli repair-drift --octad <id> --level L1
          - Option B: Rebuild cross-modal index:
            $ ./verisimdb-cli rebuild-index --modality ALL
          - Option C: If federated, check quorum:
-           $ ./verisimdb-cli quorum-check --hexad <id>")
+           $ ./verisimdb-cli quorum-check --octad <id>")
       (prevention
         "- Enable adaptive learning to auto-tune drift detection
          - Increase cache TTL if false negatives common
@@ -245,7 +245,7 @@
 
       (drift-detection-rate
         (description . "Number of drift events detected per hour")
-        (target . "< 100 events/hour (1% of 10k hexads)")
+        (target . "< 100 events/hour (1% of 10k octads)")
         (alert-threshold . "> 1000 events/hour (indicates systemic issue)")
         (dashboard . "VeriSimDB Drift Monitor"))
 
@@ -335,7 +335,7 @@
       (frequency . "Daily (midnight)")
       (procedure
         "1. Backup temporal log: ./verisimdb-cli backup-temporal --since $(date -d 'yesterday' +%Y-%m-%d)
-         2. Backup changed hexads: ./verisimdb-cli backup-incremental --output /backups/incremental-$(date +%Y%m%d).tar.gz
+         2. Backup changed octads: ./verisimdb-cli backup-incremental --output /backups/incremental-$(date +%Y%m%d).tar.gz
          3. Verify incremental: ./verisimdb-cli verify-backup /backups/incremental-*.tar.gz
          4. Upload to object storage: aws s3 cp /backups/incremental-*.tar.gz s3://backups/incremental/")
       (retention . "7 days (rolling)"))

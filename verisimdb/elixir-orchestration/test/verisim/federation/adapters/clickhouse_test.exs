@@ -15,7 +15,7 @@ defmodule VeriSim.Federation.Adapters.ClickHouseTest do
   @peer_info %{
     store_id: "ch-test",
     endpoint: "http://clickhouse:8123",
-    adapter_config: %{database: "verisimdb", table: "hexads"}
+    adapter_config: %{database: "verisimdb", table: "octads"}
   }
 
   describe "supported_modalities/1" do
@@ -40,7 +40,7 @@ defmodule VeriSim.Federation.Adapters.ClickHouseTest do
 
       [result] = ClickHouse.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "ch-001"
+      assert result.octad_id == "ch-001"
       assert result.score == 0.65
       assert result.source_store == "ch-test"
     end

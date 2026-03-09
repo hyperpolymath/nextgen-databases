@@ -28,9 +28,9 @@ defmodule VeriSim.Federation.Adapters.InfluxDB do
         host: "influxdb.internal",
         port: 8086,
         org: "verisim-org",
-        bucket: "hexads",
+        bucket: "octads",
         token: "your-influxdb-token",
-        measurement: "hexad_events"
+        measurement: "octad_events"
       }
 
   ## InfluxDB v2 HTTP API
@@ -43,9 +43,9 @@ defmodule VeriSim.Federation.Adapters.InfluxDB do
 
   Flux is a functional data scripting language designed for InfluxDB:
 
-      from(bucket: "hexads")
+      from(bucket: "octads")
         |> range(start: -1h)
-        |> filter(fn: (r) => r._measurement == "hexad_events")
+        |> filter(fn: (r) => r._measurement == "octad_events")
         |> sort(columns: ["_time"], desc: true)
         |> limit(n: 100)
   """
@@ -145,7 +145,7 @@ defmodule VeriSim.Federation.Adapters.InfluxDB do
     |> Enum.map(fn row ->
       %{
         source_store: peer_info.store_id,
-        hexad_id: extract_id(row),
+        octad_id: extract_id(row),
         score: parse_score(row),
         drifted: false,
         data: row,
@@ -160,8 +160,8 @@ defmodule VeriSim.Federation.Adapters.InfluxDB do
 
   defp build_flux(modalities, query_params, limit, peer_info) do
     config = peer_info.adapter_config
-    bucket = Map.get(config, :bucket, "hexads")
-    measurement = Map.get(config, :measurement, "hexad_events")
+    bucket = Map.get(config, :bucket, "octads")
+    measurement = Map.get(config, :measurement, "octad_events")
 
     cond do
       :temporal in modalities && Map.has_key?(query_params, :temporal_range) ->

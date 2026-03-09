@@ -218,7 +218,7 @@ impl std::error::Error for CacheError {}
 /// let cache = PlanCache::new(CacheConfig::default());
 ///
 /// let plan = LogicalPlan {
-///     source: QuerySource::Hexad,
+///     source: QuerySource::Octad,
 ///     nodes: vec![],
 ///     post_processing: vec![],
 /// };
@@ -424,7 +424,7 @@ impl PlanCache {
     ///    AND, OR, NOT, JOIN, ON, AS, HAVING, INSERT, UPDATE, DELETE, SET, INTO, VALUES,
     ///    WITH, UNION, INTERSECT, EXCEPT, EXISTS, BETWEEN, LIKE, IN, IS, NULL, TRUE, FALSE,
     ///    ASC, DESC, DISTINCT, ALL, ANY, SOME, CASE, WHEN, THEN, ELSE, END, PROOF, VERIFY,
-    ///    DRIFT, HEXAD, MODALITY).
+    ///    DRIFT, OCTAD, MODALITY).
     /// 4. SHA-256 hash the normalized text and return as hex.
     pub fn fingerprint(query: &str) -> String {
         let normalized = Self::normalize_query(query);
@@ -618,7 +618,7 @@ impl PlanCache {
             "ASC", "DESC", "DISTINCT", "ALL", "ANY", "SOME", "CASE", "WHEN", "THEN",
             "ELSE", "END",
             // VeriSimDB-specific keywords
-            "PROOF", "VERIFY", "DRIFT", "HEXAD", "MODALITY", "TYPE",
+            "PROOF", "VERIFY", "DRIFT", "OCTAD", "MODALITY", "TYPE",
             // Modality names (treated as keywords for normalization)
             "GRAPH", "VECTOR", "TENSOR", "SEMANTIC", "DOCUMENT", "TEMPORAL",
         ];
@@ -679,7 +679,7 @@ mod tests {
     /// Helper: build a simple logical plan with one graph node.
     fn sample_logical_plan() -> LogicalPlan {
         LogicalPlan {
-            source: QuerySource::Hexad,
+            source: QuerySource::Octad,
             nodes: vec![PlanNode {
                 modality: Modality::Graph,
                 conditions: vec![ConditionKind::Traversal {

@@ -81,7 +81,7 @@ async-graphql-axum = "7"
 ```graphql
 type Query {
   health: Health!
-  hexad(id: ID!): Hexad
+  octad(id: ID!): Octad
   searchText(query: String!, limit: Int): [SearchResult!]!
   driftStatus: [DriftStatus!]!
   plannerConfig: PlannerConfig!
@@ -90,9 +90,9 @@ type Query {
 }
 
 type Mutation {
-  createHexad(input: HexadInput!): Hexad!
-  updateHexad(id: ID!, input: HexadInput!): Hexad!
-  deleteHexad(id: ID!): Boolean!
+  createOctad(input: OctadInput!): Octad!
+  updateOctad(id: ID!, input: OctadInput!): Octad!
+  deleteOctad(id: ID!): Boolean!
   optimizePlan(plan: LogicalPlanInput!): PhysicalPlan!
   updatePlannerConfig(config: PlannerConfigInput!): PlannerConfig!
 }
@@ -128,11 +128,11 @@ service VeriSimPlanner {
   rpc GetStats(Empty) returns (StatsSnapshot);
 }
 
-service VeriSimHexad {
-  rpc Create(HexadRequest) returns (HexadResponse);
-  rpc Get(HexadId) returns (HexadResponse);
-  rpc Update(UpdateHexadRequest) returns (HexadResponse);
-  rpc Delete(HexadId) returns (Empty);
+service VeriSimOctad {
+  rpc Create(OctadRequest) returns (OctadResponse);
+  rpc Get(OctadId) returns (OctadResponse);
+  rpc Update(UpdateOctadRequest) returns (OctadResponse);
+  rpc Delete(OctadId) returns (Empty);
   rpc SearchText(TextSearchRequest) returns (SearchResults);
   rpc SearchVector(VectorSearchRequest) returns (SearchResults);
 }
@@ -148,7 +148,7 @@ service VeriSimHexad {
 
 **Key mappings:**
 - `AST.modality` → `Modality` (direct, except `All` → expand to 6)
-- `AST.source` → `QuerySource` (Hexad/Federation/Store)
+- `AST.source` → `QuerySource` (Octad/Federation/Store)
 - `AST.simpleCondition` variants → `ConditionKind` variants
 - `AST.query.limit` → `PlanNode.early_limit`
 - `AST.query.proof` → proof obligation nodes (Phase 4)

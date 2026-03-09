@@ -173,7 +173,7 @@ defmodule VeriSim.QueryCache do
   Used for drift-aware invalidation.
 
   Examples:
-    invalidate_by_tag("hexad:abc-123")  # Invalidate all queries for hexad
+    invalidate_by_tag("octad:abc-123")  # Invalidate all queries for octad
     invalidate_by_tag("modality:GRAPH") # Invalidate all graph queries
     invalidate_by_tag("federation:/universities/*") # Invalidate federation
   """
@@ -236,16 +236,16 @@ defmodule VeriSim.QueryCache do
   @doc """
   Generate cache key for registry lookup.
   """
-  def registry_key(hexad_id) do
-    "registry:#{hexad_id}"
+  def registry_key(octad_id) do
+    "registry:#{octad_id}"
   end
 
   @doc """
   Generate cache key for temporal version.
   """
-  def temporal_version_key(hexad_id, timestamp) do
+  def temporal_version_key(octad_id, timestamp) do
     ts_str = DateTime.to_iso8601(timestamp)
-    "temporal:#{hexad_id}:#{ts_str}"
+    "temporal:#{octad_id}:#{ts_str}"
   end
 
   # === Cache Policy Enforcement ===

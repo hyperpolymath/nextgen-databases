@@ -51,23 +51,23 @@ defmodule VeriSim.NifBridge do
   end
 
   @doc """
-  Create a new hexad entity from a JSON string.
+  Create a new octad entity from a JSON string.
 
   Returns `{:ok, json}` on success, `{:error, reason}` on failure.
   """
-  def create_hexad(_json_input), do: {:error, :nif_not_loaded}
+  def create_octad(_json_input), do: {:error, :nif_not_loaded}
 
   @doc """
-  Retrieve a hexad by ID.
+  Retrieve a octad by ID.
 
-  Returns the full hexad JSON with all 8 octad modalities.
+  Returns the full octad JSON with all 8 octad modalities.
   """
-  def get_hexad(_hexad_id), do: {:error, :nif_not_loaded}
+  def get_octad(_octad_id), do: {:error, :nif_not_loaded}
 
   @doc """
-  Delete a hexad entity by ID.
+  Delete a octad entity by ID.
   """
-  def delete_hexad(_hexad_id), do: {:error, :nif_not_loaded}
+  def delete_octad(_octad_id), do: {:error, :nif_not_loaded}
 
   @doc """
   Full-text search across the document modality.
@@ -82,27 +82,27 @@ defmodule VeriSim.NifBridge do
   def search_vector(_embedding_json, _k), do: {:error, :nif_not_loaded}
 
   @doc """
-  Paginated listing of hexad entities.
+  Paginated listing of octad entities.
   """
-  def list_hexads(_limit, _offset), do: {:error, :nif_not_loaded}
+  def list_octads(_limit, _offset), do: {:error, :nif_not_loaded}
 
   @doc """
   Get drift detection scores for a specific entity.
 
   Returns drift scores across all 8 octad modalities.
   """
-  def get_drift_score(_hexad_id), do: {:error, :nif_not_loaded}
+  def get_drift_score(_octad_id), do: {:error, :nif_not_loaded}
 
   @doc """
   Trigger normalisation (self-repair) for a drifted entity.
   """
-  def trigger_normalise(_hexad_id), do: {:error, :nif_not_loaded}
+  def trigger_normalise(_octad_id), do: {:error, :nif_not_loaded}
 
   @doc """
   Check whether the NIF bridge is loaded and operational.
   """
   def loaded? do
-    case get_hexad("__health_check__") do
+    case get_octad("__health_check__") do
       {:error, :nif_not_loaded} -> false
       _ -> true
     end

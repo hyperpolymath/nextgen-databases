@@ -407,7 +407,7 @@ defmodule VeriSim.Query.VQLBridge do
   defp strip_comma(rest), do: rest
 
   defp parse_from(["FROM", "HEXAD", uuid | rest]) do
-    {:ok, {:hexad, uuid}, rest}
+    {:ok, {:octad, uuid}, rest}
   end
 
   defp parse_from(["FROM", "FEDERATION", pattern | rest]) do
@@ -681,7 +681,7 @@ defmodule VeriSim.Query.VQLBridge do
     {:ok, proof, _rest} = parse_proof(rest)
     {:ok, %{
       TAG: "Update",
-      hexadId: uuid,
+      octadId: uuid,
       sets: sets,
       proof: proof
     }}
@@ -691,7 +691,7 @@ defmodule VeriSim.Query.VQLBridge do
     {:ok, proof, _rest} = parse_proof(rest)
     {:ok, %{
       TAG: "Delete",
-      hexadId: uuid,
+      octadId: uuid,
       proof: proof
     }}
   end

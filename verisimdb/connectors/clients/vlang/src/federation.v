@@ -4,7 +4,7 @@
 // VeriSimDB V Client — Federation operations.
 //
 // VeriSimDB supports federated operation where multiple VeriSimDB instances
-// form a cluster, sharing and synchronising hexad data across peers. This
+// form a cluster, sharing and synchronising octad data across peers. This
 // module provides functions to register and manage federation peers, and
 // to execute queries that span multiple federated nodes.
 

@@ -57,7 +57,7 @@ impl From<tantivy::directory::error::OpenDirectoryError> for DocumentError {
 /// A document for full-text indexing
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Document {
-    /// Unique identifier (matches Hexad entity ID)
+    /// Unique identifier (matches Octad entity ID)
     pub id: String,
     /// Document title
     pub title: String,

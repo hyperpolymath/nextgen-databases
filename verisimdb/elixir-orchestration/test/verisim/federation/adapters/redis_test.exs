@@ -65,7 +65,7 @@ defmodule VeriSim.Federation.Adapters.RedisTest do
       [result] = Redis.translate_results(raw, @peer_info)
 
       assert result.source_store == "redis-test"
-      assert result.hexad_id == "redis:key:1"
+      assert result.octad_id == "redis:key:1"
       assert result.score == 0.8
     end
 

@@ -88,7 +88,7 @@ module VQL = {
     timestamp: float,
     usedDependentTypes: bool,
     proof: option<ZKP.t>,
-    hexadIds: array<string>,
+    octadIds: array<string>,
   }
 
   let handleQuery = (rawQuery: string, useDependentTypes: bool) => {
@@ -116,7 +116,7 @@ module VQL = {
 
   // Store metadata in ReScript registry (NOT CockroachDB)
   let storeQueryMetadata = (metadata: queryMetadata) => {
-    Registry.updateHexadMetadata(metadata.hexadIds, {
+    Registry.updateOctadMetadata(metadata.octadIds, {
       lastQueried: metadata.timestamp,
       queryCount: Registry.incrementCounter,
     })
@@ -155,7 +155,7 @@ defmodule VeriSim.QueryRouter do
   def handle_query(%{typed: true} = query) do
     # Dependent-Type Path
     with {:ok, proof} <- ProvenLibrary.generate_zkp(query.ast),
-         {:ok, _} <- DriftMonitor.check_consistency(query.hexad_ids),
+         {:ok, _} <- DriftMonitor.check_consistency(query.octad_ids),
          {:ok, results} <- distribute_to_stores(query),
          :ok <- TemporalLog.append(query.id, results, proof) do
       {:ok, %{data: results, proof: proof, verified: true}}
@@ -222,22 +222,22 @@ defmodule VeriSim.RaftMetadata do
   @type log_entry :: %{
     term: integer(),
     index: integer(),
-    command: :register_hexad | :update_metadata | :register_node,
+    command: :register_octad | :update_metadata | :register_node,
     data: map()
   }
 
-  def register_hexad(hexad_id, store_id, modalities) do
+  def register_octad(octad_id, store_id, modalities) do
     # Append to Raft log (consensus required)
     entry = %{
-      command: :register_hexad,
-      data: %{hexad_id: hexad_id, store_id: store_id, modalities: modalities}
+      command: :register_octad,
+      data: %{octad_id: octad_id, store_id: store_id, modalities: modalities}
     }
     GenServer.call(__MODULE__, {:append_entry, entry})
   end
 
-  def lookup_hexad(hexad_id) do
+  def lookup_octad(octad_id) do
     # Read from replicated state (no consensus needed)
-    GenServer.call(__MODULE__, {:lookup, hexad_id})
+    GenServer.call(__MODULE__, {:lookup, octad_id})
   end
 end
 ----
@@ -366,8 +366,8 @@ defmodule VeriSim.DriftMonitor do
 
   use GenServer
 
-  def check_consistency(hexad_ids) do
-    hexad_ids
+  def check_consistency(octad_ids) do
+    octad_ids
     |> Enum.map(&fetch_versions_from_nodes/1)
     |> detect_drift()
     |> case do
@@ -378,7 +378,7 @@ defmodule VeriSim.DriftMonitor do
 
   def repair_and_retry(query) do
     # Statistical drift repair per whitepaper Section 4
-    case apply_repair_policy(query.hexad_ids, query.drift_policy) do
+    case apply_repair_policy(query.octad_ids, query.drift_policy) do
       {:ok, :repaired} ->
         # Retry query after repair
         VeriSim.QueryRouter.handle_query(query)
@@ -387,11 +387,11 @@ defmodule VeriSim.DriftMonitor do
     end
   end
 
-  defp fetch_versions_from_nodes(hexad_id) do
+  defp fetch_versions_from_nodes(octad_id) do
     # Query all nodes in federation for versions
-    nodes = Registry.get_nodes_for_hexad(hexad_id)
+    nodes = Registry.get_nodes_for_octad(octad_id)
     Enum.map(nodes, fn node ->
-      {node, TemporalLog.get_latest_version(node, hexad_id)}
+      {node, TemporalLog.get_latest_version(node, octad_id)}
     end)
   end
 

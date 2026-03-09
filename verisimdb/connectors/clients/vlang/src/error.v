@@ -29,7 +29,7 @@ pub enum VeriSimErrorCode {
 	internal_error       // 500 — unexpected server error
 	service_unavailable  // 503 — server temporarily unavailable
 	// Domain-specific errors
-	hexad_not_found      // Hexad with given ID does not exist
+	octad_not_found      // Octad with given ID does not exist
 	modality_unavailable // Requested modality is not enabled
 	drift_computation    // Drift score computation failed
 	provenance_invalid   // Provenance chain integrity failure
@@ -108,7 +108,7 @@ fn string_to_error_code(s string) VeriSimErrorCode {
 		'RATE_LIMITED' { .rate_limited }
 		'INTERNAL_ERROR' { .internal_error }
 		'SERVICE_UNAVAILABLE' { .service_unavailable }
-		'HEXAD_NOT_FOUND' { .hexad_not_found }
+		'HEXAD_NOT_FOUND' { .octad_not_found }
 		'MODALITY_UNAVAILABLE' { .modality_unavailable }
 		'DRIFT_COMPUTATION' { .drift_computation }
 		'PROVENANCE_INVALID' { .provenance_invalid }

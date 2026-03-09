@@ -16,7 +16,7 @@ defmodule VeriSim.Federation.Adapters.VectorDBTest do
   @peer_info %{
     store_id: "vector-test",
     endpoint: "http://qdrant:6333",
-    adapter_config: %{collection: "hexads", backend: :qdrant}
+    adapter_config: %{collection: "octads", backend: :qdrant}
   }
 
   describe "supported_modalities/1" do
@@ -47,7 +47,7 @@ defmodule VeriSim.Federation.Adapters.VectorDBTest do
 
       [result] = VectorDB.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "vec-001"
+      assert result.octad_id == "vec-001"
       assert result.score == 0.98
       assert result.source_store == "vector-test"
     end

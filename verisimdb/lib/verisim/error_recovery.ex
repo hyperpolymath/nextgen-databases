@@ -403,7 +403,7 @@ defmodule VeriSim.ErrorRecovery do
       error_recoverable: is_recoverable?(error),
       query_id: context[:query_id],
       user_id: context[:user_id],
-      hexad_ids: context[:hexad_ids],
+      octad_ids: context[:octad_ids],
       recovery_attempted: context[:recovery_attempted],
       recovery_successful: context[:recovery_successful],
       retry_count: context[:retry_count]

@@ -151,7 +151,7 @@ defmodule VeriSim.Federation.Adapters.Neo4j do
 
       %{
         source_store: peer_info.store_id,
-        hexad_id: node_data["id"] || node_data["elementId"] || node_data["_id"] || "unknown",
+        octad_id: node_data["id"] || node_data["elementId"] || node_data["_id"] || "unknown",
         score: parse_score(node_data),
         drifted: false,
         data: node_data,
@@ -166,7 +166,7 @@ defmodule VeriSim.Federation.Adapters.Neo4j do
 
   defp build_cypher(modalities, query_params, limit, peer_info) do
     config = peer_info.adapter_config
-    label = Map.get(config, :label, "Hexad")
+    label = Map.get(config, :label, "Octad")
 
     cond do
       :graph in modalities && Map.has_key?(query_params, :graph_pattern) ->
@@ -189,7 +189,7 @@ defmodule VeriSim.Federation.Adapters.Neo4j do
       :vector in modalities && Map.has_key?(query_params, :vector_query) ->
         # Neo4j 5.11+ vector index query
         embedding = query_params.vector_query
-        index_name = Map.get(config, :vector_index, "hexad_embedding_index")
+        index_name = Map.get(config, :vector_index, "octad_embedding_index")
 
         cypher = """
         CALL db.index.vector.queryNodes($index_name, $limit, $embedding)
@@ -209,7 +209,7 @@ defmodule VeriSim.Federation.Adapters.Neo4j do
       :document in modalities && Map.has_key?(query_params, :text_query) ->
         # Neo4j full-text index (Lucene-backed)
         text = query_params.text_query
-        index_name = Map.get(config, :fulltext_index, "hexad_fulltext")
+        index_name = Map.get(config, :fulltext_index, "octad_fulltext")
 
         cypher = """
         CALL db.index.fulltext.queryNodes($index_name, $query)

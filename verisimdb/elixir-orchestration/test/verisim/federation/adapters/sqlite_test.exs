@@ -15,7 +15,7 @@ defmodule VeriSim.Federation.Adapters.SQLiteTest do
   @peer_info %{
     store_id: "sqlite-test",
     endpoint: "http://sqlite-proxy:8080",
-    adapter_config: %{path: "/data/verisim.db", table: "hexads"}
+    adapter_config: %{path: "/data/verisim.db", table: "octads"}
   }
 
   describe "supported_modalities/1" do
@@ -46,7 +46,7 @@ defmodule VeriSim.Federation.Adapters.SQLiteTest do
 
       [result] = SQLite.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "sqlite-001"
+      assert result.octad_id == "sqlite-001"
       assert result.score == 0.72
       assert result.source_store == "sqlite-test"
     end

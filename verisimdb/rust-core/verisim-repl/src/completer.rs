@@ -18,7 +18,7 @@ const KEYWORDS: &[&str] = &[
     "EXISTS", "CONTAINS", "SIMILAR", "TO", "TRAVERSE", "DEPTH", "THRESHOLD",
     "DRIFT", "CONSISTENCY", "AT", "TIME", "EXPLAIN", "INSERT", "UPDATE",
     "DELETE", "SET", "INTO", "VALUES", "CREATE", "DROP", "ALTER", "JOIN",
-    "ON", "WITH", "FEDERATION", "STORE", "HEXAD", "ALL", "ASC", "DESC",
+    "ON", "WITH", "FEDERATION", "STORE", "OCTAD", "ALL", "ASC", "DESC",
     "COUNT", "SUM", "AVG", "MIN", "MAX", "DISTINCT",
 ];
 

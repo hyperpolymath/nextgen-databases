@@ -5,7 +5,7 @@ defmodule VeriSimClient.MixProject do
   @moduledoc """
   Mix project configuration for the VeriSimDB Elixir client SDK.
 
-  Provides hexad entity management, multi-modal search (text, vector, spatial),
+  Provides octad entity management, multi-modal search (text, vector, spatial),
   drift detection, provenance chain operations, VQL query execution, and
   federation across distributed VeriSimDB instances.
   """

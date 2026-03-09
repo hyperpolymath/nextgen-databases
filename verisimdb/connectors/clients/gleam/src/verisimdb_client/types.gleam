@@ -8,7 +8,7 @@
 //// SDK and the VeriSimDB server. Types are defined as Gleam custom types,
 //// designed for use with gleam_json for serialization/deserialization.
 ////
-//// The central entity is the Hexad — a six-faceted data object unifying graph,
+//// The central entity is the Octad — a six-faceted data object unifying graph,
 //// vector, tensor, semantic, document, temporal, provenance, and spatial modalities.
 
 import gleam/dict.{type Dict}
@@ -18,8 +18,8 @@ import gleam/option.{type Option}
 // Modality
 // ---------------------------------------------------------------------------
 
-/// The eight data modalities supported by VeriSimDB hexads.
-/// A single hexad can participate in multiple modalities simultaneously.
+/// The eight data modalities supported by VeriSimDB octads.
+/// A single octad can participate in multiple modalities simultaneously.
 pub type Modality {
   Graph
   Vector
@@ -64,7 +64,7 @@ pub fn modality_from_string(s: String) -> Option(Modality) {
 // Modality status
 // ---------------------------------------------------------------------------
 
-/// Which modalities are active on a given hexad.
+/// Which modalities are active on a given octad.
 pub type ModalityStatus {
   ModalityStatus(
     graph: Bool,
@@ -93,11 +93,11 @@ pub fn default_modality_status() -> ModalityStatus {
 }
 
 // ---------------------------------------------------------------------------
-// Hexad status
+// Octad status
 // ---------------------------------------------------------------------------
 
-/// Lifecycle state of a hexad.
-pub type HexadStatus {
+/// Lifecycle state of a octad.
+pub type OctadStatus {
   Active
   Archived
   Draft
@@ -108,7 +108,7 @@ pub type HexadStatus {
 // Graph modality data
 // ---------------------------------------------------------------------------
 
-/// A directed edge between two hexads in the graph modality.
+/// A directed edge between two octads in the graph modality.
 pub type GraphEdge {
   GraphEdge(
     source: String,
@@ -172,14 +172,14 @@ pub type SpatialData {
 }
 
 // ---------------------------------------------------------------------------
-// Hexad (core entity)
+// Octad (core entity)
 // ---------------------------------------------------------------------------
 
 /// The core entity in VeriSimDB — a multi-modal data object.
-pub type Hexad {
-  Hexad(
+pub type Octad {
+  Octad(
     id: String,
-    status: HexadStatus,
+    status: OctadStatus,
     modalities: ModalityStatus,
     created_at: String,
     updated_at: String,
@@ -193,12 +193,12 @@ pub type Hexad {
 }
 
 // ---------------------------------------------------------------------------
-// Hexad input (for create/update)
+// Octad input (for create/update)
 // ---------------------------------------------------------------------------
 
-/// Input structure for creating or updating a hexad.
-pub type HexadInput {
-  HexadInput(
+/// Input structure for creating or updating a octad.
+pub type OctadInput {
+  OctadInput(
     graph_data: Option(GraphData),
     vector_data: Option(VectorData),
     tensor_data: Option(TensorData),
@@ -216,7 +216,7 @@ pub type HexadInput {
 /// Drift score measurement. Score ranges from 0.0 (no drift) to 1.0 (maximum).
 pub type DriftScore {
   DriftScore(
-    hexad_id: String,
+    octad_id: String,
     score: Float,
     components: Dict(String, Float),
     measured_at: String,
@@ -236,7 +236,7 @@ pub type DriftLevel {
 /// Drift status report with classification and score.
 pub type DriftStatusReport {
   DriftStatusReport(
-    hexad_id: String,
+    octad_id: String,
     level: DriftLevel,
     score: DriftScore,
     message: String,
@@ -247,11 +247,11 @@ pub type DriftStatusReport {
 // Provenance types
 // ---------------------------------------------------------------------------
 
-/// A single event in a hexad's provenance chain.
+/// A single event in a octad's provenance chain.
 pub type ProvenanceEvent {
   ProvenanceEvent(
     event_id: String,
-    hexad_id: String,
+    octad_id: String,
     event_type: String,
     actor: String,
     timestamp: String,
@@ -260,10 +260,10 @@ pub type ProvenanceEvent {
   )
 }
 
-/// Complete provenance chain for a hexad.
+/// Complete provenance chain for a octad.
 pub type ProvenanceChain {
   ProvenanceChain(
-    hexad_id: String,
+    octad_id: String,
     events: List(ProvenanceEvent),
     verified: Bool,
   )
@@ -282,10 +282,10 @@ pub type ProvenanceEventInput {
 // Pagination
 // ---------------------------------------------------------------------------
 
-/// Paginated response wrapping a list of hexads.
+/// Paginated response wrapping a list of octads.
 pub type PaginatedResponse {
   PaginatedResponse(
-    items: List(Hexad),
+    items: List(Octad),
     total: Int,
     page: Int,
     per_page: Int,
@@ -297,9 +297,9 @@ pub type PaginatedResponse {
 // Search types
 // ---------------------------------------------------------------------------
 
-/// A search result pairing a hexad with a relevance score.
+/// A search result pairing a octad with a relevance score.
 pub type SearchResult {
-  SearchResult(hexad: Hexad, score: Float)
+  SearchResult(octad: Octad, score: Float)
 }
 
 // ---------------------------------------------------------------------------

@@ -3,12 +3,12 @@
 //!
 //! Tests the full stack: Rust stores → HTTP API → Elixir orchestration → VQL
 
-use verisim_api::{ApiConfig, ConcreteHexadStore};
+use verisim_api::{ApiConfig, ConcreteOctadStore};
 use verisim_document::{Document, TantivyDocumentStore};
 use verisim_drift::{DriftDetector, DriftMetrics, DriftThresholds, DriftType};
 use verisim_graph::{GraphEdge, GraphNode, OxiGraphStore};
-use verisim_hexad::{
-    HexadConfig, HexadDocumentInput, HexadId, HexadInput, HexadStore, InMemoryHexadStore,
+use verisim_octad::{
+    OctadConfig, OctadDocumentInput, OctadId, OctadInput, OctadStore, InMemoryOctadStore,
 };
 use verisim_normalizer::{create_default_normalizer, Normalizer};
 use verisim_semantic::InMemorySemanticStore;
@@ -19,8 +19,8 @@ use verisim_vector::{DistanceMetric, Embedding, HnswVectorStore};
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-/// Helper to create a test hexad store
-fn create_test_store() -> ConcreteHexadStore {
+/// Helper to create a test octad store
+fn create_test_store() -> ConcreteOctadStore {
     let graph_store = OxiGraphStore::new_in_memory().unwrap();
 
     let vector_store = HnswVectorStore::new(384, DistanceMetric::Cosine).unwrap();
@@ -33,14 +33,14 @@ fn create_test_store() -> ConcreteHexadStore {
     let semantic_store = InMemorySemanticStore::new();
     let temporal_store = InMemoryVersionStore::new();
 
-    let config = HexadConfig {
+    let config = OctadConfig {
         enable_drift_detection: true,
         drift_thresholds: DriftThresholds::default(),
         enable_auto_normalization: true,
         ..Default::default()
     };
 
-    InMemoryHexadStore::new(
+    InMemoryOctadStore::new(
         graph_store,
         vector_store,
         document_store,
@@ -52,13 +52,13 @@ fn create_test_store() -> ConcreteHexadStore {
 }
 
 #[tokio::test]
-async fn test_hexad_create_and_retrieve() {
+async fn test_octad_create_and_retrieve() {
     let mut store = create_test_store();
 
-    // Create a hexad with document and vector
+    // Create a octad with document and vector
     let embedding = vec![0.1; 384];
-    let input = HexadInput {
-        document: Some(HexadDocumentInput {
+    let input = OctadInput {
+        document: Some(OctadDocumentInput {
             title: "Test Document".to_string(),
             body: "This is a test document for VeriSimDB integration testing.".to_string(),
             fields: HashMap::new(),
@@ -67,10 +67,10 @@ async fn test_hexad_create_and_retrieve() {
         ..Default::default()
     };
 
-    let hexad_id = store.create(input).await.unwrap();
+    let octad_id = store.create(input).await.unwrap();
 
-    // Retrieve the hexad
-    let snapshot = store.get(&hexad_id).await.unwrap().unwrap();
+    // Retrieve the octad
+    let snapshot = store.get(&octad_id).await.unwrap().unwrap();
 
     // Verify document modality
     assert_eq!(snapshot.document.as_ref().unwrap().title, "Test Document");
@@ -87,8 +87,8 @@ async fn test_hexad_create_and_retrieve() {
 async fn test_cross_modal_consistency() {
     let mut store = create_test_store();
 
-    let input = HexadInput {
-        document: Some(HexadDocumentInput {
+    let input = OctadInput {
+        document: Some(OctadDocumentInput {
             title: "Consistency Test".to_string(),
             body: "Testing cross-modal consistency.".to_string(),
             fields: HashMap::new(),
@@ -98,10 +98,10 @@ async fn test_cross_modal_consistency() {
         ..Default::default()
     };
 
-    let hexad_id = store.create(input).await.unwrap();
+    let octad_id = store.create(input).await.unwrap();
 
     // Get snapshot
-    let snapshot = store.get(&hexad_id).await.unwrap().unwrap();
+    let snapshot = store.get(&octad_id).await.unwrap().unwrap();
 
     // Verify all modalities present
     assert!(snapshot.document.is_some());
@@ -113,8 +113,8 @@ async fn test_cross_modal_consistency() {
 async fn test_drift_detection() {
     let mut store = create_test_store();
 
-    let input = HexadInput {
-        document: Some(HexadDocumentInput {
+    let input = OctadInput {
+        document: Some(OctadDocumentInput {
             title: "Drift Test".to_string(),
             body: "Testing drift detection.".to_string(),
             fields: HashMap::new(),
@@ -123,10 +123,10 @@ async fn test_drift_detection() {
         ..Default::default()
     };
 
-    let hexad_id = store.create(input).await.unwrap();
+    let octad_id = store.create(input).await.unwrap();
 
     // Check initial drift (should be low)
-    let initial_drift = store.check_drift(&hexad_id).await.unwrap();
+    let initial_drift = store.check_drift(&octad_id).await.unwrap();
     assert!(initial_drift.overall_score < 0.1);
 
     // Modify document without updating vector (simulate drift)
@@ -137,13 +137,13 @@ async fn test_drift_detection() {
 async fn test_vector_similarity_search() {
     let mut store = create_test_store();
 
-    // Create multiple hexads with different embeddings
+    // Create multiple octads with different embeddings
     for i in 0..10 {
         let mut embedding = vec![0.0; 384];
         embedding[0] = i as f32 / 10.0;
 
-        let input = HexadInput {
-            document: Some(HexadDocumentInput {
+        let input = OctadInput {
+            document: Some(OctadDocumentInput {
                 title: format!("Document {}", i),
                 body: format!("Content {}", i),
                 fields: HashMap::new(),
@@ -162,7 +162,7 @@ async fn test_vector_similarity_search() {
         .await
         .unwrap();
 
-    // Should find similar hexads
+    // Should find similar octads
     assert!(results.len() > 0 && results.len() <= 5);
 }
 
@@ -170,7 +170,7 @@ async fn test_vector_similarity_search() {
 async fn test_fulltext_search() {
     let mut store = create_test_store();
 
-    // Create hexads with searchable text
+    // Create octads with searchable text
     let documents = vec![
         ("Machine Learning Basics", "Introduction to machine learning algorithms and neural networks."),
         ("Deep Learning Tutorial", "Advanced deep learning techniques including transformers."),
@@ -178,8 +178,8 @@ async fn test_fulltext_search() {
     ];
 
     for (title, body) in documents {
-        let input = HexadInput {
-            document: Some(HexadDocumentInput {
+        let input = OctadInput {
+            document: Some(OctadDocumentInput {
                 title: title.to_string(),
                 body: body.to_string(),
                 fields: HashMap::new(),
@@ -202,8 +202,8 @@ async fn test_fulltext_search() {
 async fn test_temporal_versioning() {
     let mut store = create_test_store();
 
-    let input = HexadInput {
-        document: Some(HexadDocumentInput {
+    let input = OctadInput {
+        document: Some(OctadDocumentInput {
             title: "Version Test".to_string(),
             body: "Initial version".to_string(),
             fields: HashMap::new(),
@@ -211,13 +211,13 @@ async fn test_temporal_versioning() {
         ..Default::default()
     };
 
-    let hexad_id = store.create(input).await.unwrap();
+    let octad_id = store.create(input).await.unwrap();
 
     // Get initial version
-    let v1 = store.get(&hexad_id).await.unwrap().unwrap();
+    let v1 = store.get(&octad_id).await.unwrap().unwrap();
     let v1_version = v1.status.version;
 
-    // Update the hexad
+    // Update the octad
     // In a full implementation, would update and verify version increments
 }
 
@@ -225,9 +225,9 @@ async fn test_temporal_versioning() {
 async fn test_graph_relationships() {
     let mut store = create_test_store();
 
-    // Create two related hexads
-    let input1 = HexadInput {
-        document: Some(HexadDocumentInput {
+    // Create two related octads
+    let input1 = OctadInput {
+        document: Some(OctadDocumentInput {
             title: "Paper 1".to_string(),
             body: "First research paper.".to_string(),
             fields: HashMap::new(),
@@ -237,8 +237,8 @@ async fn test_graph_relationships() {
 
     let id1 = store.create(input1).await.unwrap();
 
-    let input2 = HexadInput {
-        document: Some(HexadDocumentInput {
+    let input2 = OctadInput {
+        document: Some(OctadDocumentInput {
             title: "Paper 2".to_string(),
             body: "Second research paper.".to_string(),
             fields: HashMap::new(),
@@ -257,8 +257,8 @@ async fn test_graph_relationships() {
 async fn test_normalization() {
     let mut store = create_test_store();
 
-    let input = HexadInput {
-        document: Some(HexadDocumentInput {
+    let input = OctadInput {
+        document: Some(OctadDocumentInput {
             title: "Normalization Test".to_string(),
             body: "Testing self-normalization.".to_string(),
             fields: HashMap::new(),
@@ -267,10 +267,10 @@ async fn test_normalization() {
         ..Default::default()
     };
 
-    let hexad_id = store.create(input).await.unwrap();
+    let octad_id = store.create(input).await.unwrap();
 
     // Check drift
-    let drift = store.check_drift(&hexad_id).await.unwrap();
+    let drift = store.check_drift(&octad_id).await.unwrap();
 
     // If drift exceeds threshold, normalization should trigger
     // In full implementation, would verify normalization occurs
@@ -280,9 +280,9 @@ async fn test_normalization() {
 async fn test_multi_modal_query() {
     let mut store = create_test_store();
 
-    // Create hexad with multiple modalities
-    let input = HexadInput {
-        document: Some(HexadDocumentInput {
+    // Create octad with multiple modalities
+    let input = OctadInput {
+        document: Some(OctadDocumentInput {
             title: "Multi-modal Test".to_string(),
             body: "Testing multi-modal queries with semantic types.".to_string(),
             fields: HashMap::new(),
@@ -292,7 +292,7 @@ async fn test_multi_modal_query() {
         ..Default::default()
     };
 
-    let hexad_id = store.create(input).await.unwrap();
+    let octad_id = store.create(input).await.unwrap();
 
     // Query combining text search, vector similarity, and semantic types
     // In full implementation, would use VQL multi-modal query
@@ -302,14 +302,14 @@ async fn test_multi_modal_query() {
 async fn test_concurrent_operations() {
     let mut store = create_test_store();
 
-    // Create multiple hexads concurrently
+    // Create multiple octads concurrently
     let mut handles = vec![];
 
     for i in 0..10 {
         let mut store_clone = store.clone();
         let handle = tokio::spawn(async move {
-            let input = HexadInput {
-                document: Some(HexadDocumentInput {
+            let input = OctadInput {
+                document: Some(OctadDocumentInput {
                     title: format!("Concurrent {}", i),
                     body: format!("Testing concurrency {}", i),
                     fields: HashMap::new(),

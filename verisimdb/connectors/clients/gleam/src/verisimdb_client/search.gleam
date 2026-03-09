@@ -57,22 +57,22 @@ pub type SpatialBoundsParams {
   )
 }
 
-/// Parameters for a nearest-neighbour search by hexad ID.
+/// Parameters for a nearest-neighbour search by octad ID.
 pub type NearestParams {
-  NearestParams(hexad_id: String, top_k: Int, modality: Modality)
+  NearestParams(octad_id: String, top_k: Int, modality: Modality)
 }
 
 /// Parameters for a relationship traversal search.
 pub type RelatedParams {
   RelatedParams(
-    hexad_id: String,
+    octad_id: String,
     rel_type: Option(String),
     depth: Int,
     limit: Int,
   )
 }
 
-/// Perform a full-text search across hexad content.
+/// Perform a full-text search across octad content.
 ///
 /// Returns a list of SearchResult items ranked by relevance, or an error.
 pub fn text(
@@ -125,7 +125,7 @@ pub fn vector(
   }
 }
 
-/// Find hexads within a given radius of a geographic point.
+/// Find octads within a given radius of a geographic point.
 ///
 /// Returns a list of SearchResult items within the radius, or an error.
 pub fn spatial_radius(
@@ -149,7 +149,7 @@ pub fn spatial_radius(
   }
 }
 
-/// Find hexads within a rectangular bounding box.
+/// Find octads within a rectangular bounding box.
 ///
 /// Returns a list of SearchResult items within the bounds, or an error.
 pub fn spatial_bounds(
@@ -174,7 +174,7 @@ pub fn spatial_bounds(
   }
 }
 
-/// Find the nearest neighbours of a given hexad.
+/// Find the nearest neighbours of a given octad.
 ///
 /// Returns a list of SearchResult items ordered by proximity, or an error.
 pub fn nearest(
@@ -183,7 +183,7 @@ pub fn nearest(
 ) -> Result(List(SearchResult), VeriSimError) {
   let body =
     json.to_string(json.object([
-      #("hexad_id", json.string(params.hexad_id)),
+      #("octad_id", json.string(params.octad_id)),
       #("top_k", json.int(params.top_k)),
       #("modality", json.string(types.modality_to_string(params.modality))),
     ]))
@@ -197,7 +197,7 @@ pub fn nearest(
   }
 }
 
-/// Traverse relationships from a given hexad.
+/// Traverse relationships from a given octad.
 ///
 /// Returns a list of SearchResult items connected by relationships, or an error.
 pub fn related(
@@ -205,7 +205,7 @@ pub fn related(
   params: RelatedParams,
 ) -> Result(List(SearchResult), VeriSimError) {
   let base_fields = [
-    #("hexad_id", json.string(params.hexad_id)),
+    #("octad_id", json.string(params.octad_id)),
     #("depth", json.int(params.depth)),
     #("limit", json.int(params.limit)),
   ]

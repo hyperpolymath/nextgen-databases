@@ -23,18 +23,18 @@ service VeriSimPlanner {
 }
 
 // ============================================================================
-// Hexad Service
+// Octad Service
 // ============================================================================
 
-service VeriSimHexad {
-  // Create a new hexad.
-  rpc Create(HexadCreateRequest) returns (HexadResponse);
-  // Get a hexad by ID.
-  rpc Get(HexadIdRequest) returns (HexadResponse);
-  // Update an existing hexad.
-  rpc Update(HexadUpdateRequest) returns (HexadResponse);
-  // Delete a hexad.
-  rpc Delete(HexadIdRequest) returns (Empty);
+service VeriSimOctad {
+  // Create a new octad.
+  rpc Create(OctadCreateRequest) returns (OctadResponse);
+  // Get a octad by ID.
+  rpc Get(OctadIdRequest) returns (OctadResponse);
+  // Update an existing octad.
+  rpc Update(OctadUpdateRequest) returns (OctadResponse);
+  // Delete a octad.
+  rpc Delete(OctadIdRequest) returns (Empty);
   // Full-text search.
   rpc SearchText(TextSearchRequest) returns (SearchResponse);
   // Vector similarity search.
@@ -122,21 +122,21 @@ message StatsResponse {
 }
 
 // ============================================================================
-// Hexad Messages
+// Octad Messages
 // ============================================================================
 
-message HexadCreateRequest {
+message OctadCreateRequest {
   string title = 1;
   string body = 2;
   repeated float embedding = 3;
   repeated string types = 4;
 }
 
-message HexadIdRequest {
+message OctadIdRequest {
   string id = 1;
 }
 
-message HexadUpdateRequest {
+message OctadUpdateRequest {
   string id = 1;
   string title = 2;
   string body = 3;
@@ -144,7 +144,7 @@ message HexadUpdateRequest {
   repeated string types = 5;
 }
 
-message HexadResponse {
+message OctadResponse {
   string id = 1;
   string created_at = 2;
   string modified_at = 3;

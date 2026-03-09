@@ -2,7 +2,7 @@
 
 = ZK-Historiography: Proven & Sactify-PHP Integration
 
-This specification details the generation and verification of Non-Interactive Zero-Knowledge Proofs (NIZKs) within the VeriSimDB ecosystem. This allows for "Privacy-Preserving Veracity," where a third party can verify the logical integrity of a Hexad without accessing the underlying data.
+This specification details the generation and verification of Non-Interactive Zero-Knowledge Proofs (NIZKs) within the VeriSimDB ecosystem. This allows for "Privacy-Preserving Veracity," where a third party can verify the logical integrity of a Octad without accessing the underlying data.
 
 == 1. The ZKP Generation Workflow
 
@@ -20,12 +20,12 @@ The integration relies on `proven` to act as the arithmetic circuit generator an
 
 === A. The Proven Witness
 
-The `proven` engine generates a succinct witness hash that represents the logical state of the Hexad at the moment of verification.
+The `proven` engine generates a succinct witness hash that represents the logical state of the Octad at the moment of verification.
 
 [source,javascript]
 ----
 // Witness generation logic
-witness CitationWitness(h: Hexad) {
+witness CitationWitness(h: Octad) {
     apply CitationContract(h);
     return extract_proof_witness();
 }
@@ -39,7 +39,7 @@ witness CitationWitness(h: Hexad) {
 ----
 // sactify-php pseudo-implementation
 $payload = [
-    'hexad_id' => '0x12AB...',
+    'octad_id' => '0x12AB...',
     'contract_hash' => 'sha256(...)',
     'zk_witness' => $provenWitness, // The NIZK from proven
     'timestamp' => time()

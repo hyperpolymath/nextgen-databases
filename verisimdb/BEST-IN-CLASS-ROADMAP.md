@@ -34,7 +34,7 @@ for exploration and debugging.
 **Criticality: HIGH** | Effort: Small | Module: `VeriSim.VQL.IEx`
 
 - `use VeriSim.VQL.IEx` in IEx sessions
-- `vql("SELECT GRAPH FROM HEXAD ...")` function
+- `vql("SELECT GRAPH FROM OCTAD ...")` function
 - Pretty-printed results with modality indicators
 - `vql_explain/1` for EXPLAIN output
 - Direct in-process execution (no HTTP round-trip)
@@ -73,9 +73,9 @@ Without WAL, any crash loses all data. Non-negotiable for deployment.
 - Per-modality WAL segments for parallel recovery
 
 ### 2.2 ACID Transactions
-**Criticality: CRITICAL** | Effort: Large | Module in `verisim-hexad`
+**Criticality: CRITICAL** | Effort: Large | Module in `verisim-octad`
 
-Cross-modality atomicity. A hexad update must either succeed across all
+Cross-modality atomicity. A octad update must either succeed across all
 modalities or fail completely.
 
 - Transaction manager with begin/commit/rollback
@@ -236,7 +236,7 @@ Close the loop between estimated and actual costs.
 ### 6.2 Sharding
 **Criticality: MEDIUM** | Effort: Large
 
-- Hexad ID-based consistent hashing
+- Octad ID-based consistent hashing
 - Per-modality shard assignment
 - Cross-shard query routing
 - Rebalancing without downtime

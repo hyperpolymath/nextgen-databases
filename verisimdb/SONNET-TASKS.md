@@ -25,7 +25,7 @@
 - `rust-core/verisim-drift/` — drift detection works (11 tests pass)
 - `rust-core/verisim-normalizer/` — normalization strategies work
 - `rust-core/verisim-api/src/lib.rs` — HTTP API works (do NOT rewrite)
-- `rust-core/verisim-hexad/src/store.rs` — InMemoryHexadStore works (7 tests pass)
+- `rust-core/verisim-octad/src/store.rs` — InMemoryOctadStore works (7 tests pass)
 - `rust-core/verisim-document/src/lib.rs` — Tantivy + snippets work (2 tests pass)
 - `lib/verisim/adaptive_learner.ex` — fully implemented, 4 domains
 - `lib/verisim/query_cache.ex` — L1/L2/L3 all implemented (Round 1)
@@ -265,7 +265,7 @@ SerializationError(String),
 
 ### After implementing all four stores
 
-Remove the `#[ignore]` annotations from the 4 persistence tests in `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-hexad/tests/integration_tests.rs` and update them:
+Remove the `#[ignore]` annotations from the 4 persistence tests in `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-octad/tests/integration_tests.rs` and update them:
 
 **test_vector_persistence** (line ~218):
 ```rust
@@ -406,7 +406,7 @@ cargo test -p verisim-semantic
 cargo test -p verisim-temporal
 
 # Integration tests (should now have 0 ignored)
-cargo test -p verisim-hexad --test integration_tests
+cargo test -p verisim-octad --test integration_tests
 # Must see: 11 passed, 0 ignored, 0 failed
 
 # Full workspace
@@ -468,19 +468,19 @@ cargo test -p verisim-temporal
 
 ---
 
-## Task 3: Add HexadBuilder Convenience Methods
+## Task 3: Add OctadBuilder Convenience Methods
 
 **Priority:** LOW — improves API ergonomics
 
 ### Files
-- `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-hexad/src/lib.rs`
+- `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-octad/src/lib.rs`
 
 ### Problem
 The builder has `with_types(Vec<&str>)` and `with_relationships(Vec<(&str, &str)>)`, but no singular convenience methods. The integration tests originally used `.with_semantic()` and `.with_relationship()` (singular), which is a more natural API for adding one item.
 
 ### What to do
 
-Add these methods to `HexadBuilder` (after the existing methods, around line 335):
+Add these methods to `OctadBuilder` (after the existing methods, around line 335):
 
 ```rust
 /// Add a single relationship
@@ -496,11 +496,11 @@ pub fn with_semantic(mut self, type_iris: Vec<String>) -> Self {
 
 /// Add semantic properties
 pub fn with_properties(mut self, properties: std::collections::HashMap<String, String>) -> Self {
-    let existing = self.input.semantic.take().unwrap_or(HexadSemanticInput {
+    let existing = self.input.semantic.take().unwrap_or(OctadSemanticInput {
         types: Vec::new(),
         properties: std::collections::HashMap::new(),
     });
-    self.input.semantic = Some(HexadSemanticInput {
+    self.input.semantic = Some(OctadSemanticInput {
         types: existing.types,
         properties,
     });
@@ -510,8 +510,8 @@ pub fn with_properties(mut self, properties: std::collections::HashMap<String, S
 
 ### Verification
 ```bash
-cargo test -p verisim-hexad
-cargo clippy -p verisim-hexad
+cargo test -p verisim-octad
+cargo clippy -p verisim-octad
 # All tests pass, no warnings
 ```
 
@@ -686,7 +686,7 @@ impl NormalizationStrategy for TemporalRepairStrategy {
 
     async fn normalize(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         _drift_event: &DriftEvent,
     ) -> Result<NormalizationResult, NormalizerError> {
         // Repair temporal consistency by re-indexing version history
@@ -699,7 +699,7 @@ impl NormalizationStrategy for TemporalRepairStrategy {
         }];
 
         Ok(NormalizationResult {
-            entity_id: hexad.id.clone(),
+            entity_id: octad.id.clone(),
             normalization_type: NormalizationType::TemporalRepair,
             success: true,
             changes,
@@ -724,7 +724,7 @@ impl NormalizationStrategy for TensorSyncStrategy {
 
     async fn normalize(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         _drift_event: &DriftEvent,
     ) -> Result<NormalizationResult, NormalizerError> {
         let changes = vec![NormalizationChange {
@@ -736,7 +736,7 @@ impl NormalizationStrategy for TensorSyncStrategy {
         }];
 
         Ok(NormalizationResult {
-            entity_id: hexad.id.clone(),
+            entity_id: octad.id.clone(),
             normalization_type: NormalizationType::TensorSync,
             success: true,
             changes,
@@ -761,7 +761,7 @@ impl NormalizationStrategy for SchemaRepairStrategy {
 
     async fn normalize(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         _drift_event: &DriftEvent,
     ) -> Result<NormalizationResult, NormalizerError> {
         let changes = vec![NormalizationChange {
@@ -773,7 +773,7 @@ impl NormalizationStrategy for SchemaRepairStrategy {
         }];
 
         Ok(NormalizationResult {
-            entity_id: hexad.id.clone(),
+            entity_id: octad.id.clone(),
             normalization_type: NormalizationType::FullReconciliation,
             success: true,
             changes,
@@ -798,7 +798,7 @@ impl NormalizationStrategy for QualityReconciliationStrategy {
 
     async fn normalize(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         _drift_event: &DriftEvent,
     ) -> Result<NormalizationResult, NormalizerError> {
         let changes = vec![NormalizationChange {
@@ -810,7 +810,7 @@ impl NormalizationStrategy for QualityReconciliationStrategy {
         }];
 
         Ok(NormalizationResult {
-            entity_id: hexad.id.clone(),
+            entity_id: octad.id.clone(),
             normalization_type: NormalizationType::FullReconciliation,
             success: true,
             changes,
@@ -859,10 +859,10 @@ async fn test_handle_tensor_drift() {
     let drift_detector = Arc::new(DriftDetector::new(DriftThresholds::default()));
     let normalizer = create_default_normalizer(drift_detector).await;
 
-    let hexad = create_test_hexad();
+    let octad = create_test_octad();
     let event = DriftEvent::new(DriftType::TensorDrift, 0.5, "Test tensor drift");
 
-    let result = normalizer.handle_drift(&hexad, &event).await.unwrap();
+    let result = normalizer.handle_drift(&octad, &event).await.unwrap();
     assert!(result.is_some());
     assert!(result.unwrap().success);
 }
@@ -905,7 +905,7 @@ After completing Tasks 1-6, update:
     "- Implemented save_to_file/load_from_file on all 4 modality stores
      - Unignored 4 persistence integration tests
      - Fixed panic in temporal diff compare_values
-     - Added HexadBuilder convenience methods
+     - Added OctadBuilder convenience methods
      - Added drift summary HTTP endpoint
      - Made query cache configuration dynamic
      - Added 4 remaining normalizer strategies (6/6 drift types covered)
@@ -962,7 +962,7 @@ git commit -m "feat: add store persistence, normalizer strategies, and polish
 
 - Implement save_to_file/load_from_file on all 4 modality stores (postcard)
 - Fix panic in temporal diff compare_values(None, None)
-- Add HexadBuilder convenience methods (with_relationship, with_semantic)
+- Add OctadBuilder convenience methods (with_relationship, with_semantic)
 - Add GET /api/drift/summary endpoint for Elixir integration
 - Make query cache configuration dynamic
 - Add 4 remaining normalizer strategies (6/6 drift types covered)

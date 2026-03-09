@@ -29,7 +29,7 @@ use thiserror::Error;
 use tokio::sync::{mpsc, RwLock};
 
 use verisim_drift::{DriftDetector, DriftEvent, DriftType};
-use verisim_hexad::{Hexad, HexadId, HexadStore};
+use verisim_octad::{Octad, OctadId, OctadStore};
 
 /// Normalizer errors
 #[derive(Error, Debug)]
@@ -40,8 +40,8 @@ pub enum NormalizerError {
     #[error("Strategy not found: {0}")]
     StrategyNotFound(String),
 
-    #[error("Hexad error: {0}")]
-    HexadError(String),
+    #[error("Octad error: {0}")]
+    OctadError(String),
 
     #[error("Channel error: {0}")]
     ChannelError(String),
@@ -51,7 +51,7 @@ pub enum NormalizerError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NormalizationResult {
     /// Entity that was normalized
-    pub entity_id: HexadId,
+    pub entity_id: OctadId,
     /// Type of normalization performed
     pub normalization_type: NormalizationType,
     /// Whether normalization succeeded
@@ -106,7 +106,7 @@ pub trait NormalizationStrategy: Send + Sync {
     /// Perform normalization
     async fn normalize(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         drift_event: &DriftEvent,
     ) -> Result<NormalizationResult, NormalizerError>;
 }
@@ -200,7 +200,7 @@ impl Normalizer {
     /// Handle a drift event
     pub async fn handle_drift(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         event: &DriftEvent,
     ) -> Result<Option<NormalizationResult>, NormalizerError> {
         if event.score < self.config.min_score {
@@ -227,7 +227,7 @@ impl Normalizer {
 
         // Perform normalization
         let start = std::time::Instant::now();
-        let result = strategy.normalize(hexad, event).await;
+        let result = strategy.normalize(octad, event).await;
 
         // Update status
         {
@@ -288,23 +288,23 @@ impl NormalizationStrategy for SemanticVectorStrategy {
 
     async fn normalize(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         drift_event: &DriftEvent,
     ) -> Result<NormalizationResult, NormalizerError> {
         let start = std::time::Instant::now();
 
         // Identify authoritative source for vector regeneration
-        let has_document = hexad.document.is_some();
-        let has_semantic = hexad.semantic.is_some();
+        let has_document = octad.document.is_some();
+        let has_semantic = octad.semantic.is_some();
 
         if !has_document && !has_semantic {
             return Err(NormalizerError::NormalizationFailed {
-                entity_id: hexad.id.to_string(),
+                entity_id: octad.id.to_string(),
                 message: "Cannot regenerate vector: no document or semantic source available".into(),
             });
         }
 
-        let old_embedding_info = hexad
+        let old_embedding_info = octad
             .embedding
             .as_ref()
             .map(|e| format!("{}d vector", e.vector.len()))
@@ -313,7 +313,7 @@ impl NormalizationStrategy for SemanticVectorStrategy {
         let mut changes = Vec::new();
 
         // Record what authoritative source will be used
-        if let Some(ref doc) = hexad.document {
+        if let Some(ref doc) = octad.document {
             changes.push(NormalizationChange {
                 modality: "vector".to_string(),
                 field: "embedding".to_string(),
@@ -326,7 +326,7 @@ impl NormalizationStrategy for SemanticVectorStrategy {
             });
         }
 
-        if let Some(ref sem) = hexad.semantic {
+        if let Some(ref sem) = octad.semantic {
             let type_summary = format!("{} semantic types", sem.types.len());
             changes.push(NormalizationChange {
                 modality: "vector".to_string(),
@@ -340,7 +340,7 @@ impl NormalizationStrategy for SemanticVectorStrategy {
         let duration_ms = start.elapsed().as_millis() as u64;
 
         Ok(NormalizationResult {
-            entity_id: hexad.id.clone(),
+            entity_id: octad.id.clone(),
             normalization_type: NormalizationType::VectorRegeneration,
             success: true,
             changes,
@@ -365,21 +365,21 @@ impl NormalizationStrategy for GraphDocumentStrategy {
 
     async fn normalize(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         drift_event: &DriftEvent,
     ) -> Result<NormalizationResult, NormalizerError> {
         let start = std::time::Instant::now();
 
-        let has_document = hexad.document.is_some();
-        let has_graph = hexad.graph_node.is_some();
+        let has_document = octad.document.is_some();
+        let has_graph = octad.graph_node.is_some();
 
         let mut changes = Vec::new();
 
         match (has_document, has_graph) {
             (true, true) => {
                 // Both present — graph needs reconstruction from document (document authoritative)
-                let doc = hexad.document.as_ref().unwrap();
-                let graph = hexad.graph_node.as_ref().unwrap();
+                let doc = octad.document.as_ref().unwrap();
+                let graph = octad.graph_node.as_ref().unwrap();
                 changes.push(NormalizationChange {
                     modality: "graph".to_string(),
                     field: "relationships".to_string(),
@@ -393,7 +393,7 @@ impl NormalizationStrategy for GraphDocumentStrategy {
             }
             (true, false) => {
                 // Only document — graph modality needs creation
-                let doc = hexad.document.as_ref().unwrap();
+                let doc = octad.document.as_ref().unwrap();
                 changes.push(NormalizationChange {
                     modality: "graph".to_string(),
                     field: "graph_node".to_string(),
@@ -404,7 +404,7 @@ impl NormalizationStrategy for GraphDocumentStrategy {
             }
             (false, true) => {
                 // Only graph — document modality needs creation
-                let graph = hexad.graph_node.as_ref().unwrap();
+                let graph = octad.graph_node.as_ref().unwrap();
                 changes.push(NormalizationChange {
                     modality: "document".to_string(),
                     field: "document".to_string(),
@@ -415,7 +415,7 @@ impl NormalizationStrategy for GraphDocumentStrategy {
             }
             (false, false) => {
                 return Err(NormalizerError::NormalizationFailed {
-                    entity_id: hexad.id.to_string(),
+                    entity_id: octad.id.to_string(),
                     message: "Cannot reconcile graph-document: neither modality present".into(),
                 });
             }
@@ -424,7 +424,7 @@ impl NormalizationStrategy for GraphDocumentStrategy {
         let duration_ms = start.elapsed().as_millis() as u64;
 
         Ok(NormalizationResult {
-            entity_id: hexad.id.clone(),
+            entity_id: octad.id.clone(),
             normalization_type: NormalizationType::GraphReconstruction,
             success: true,
             changes,
@@ -449,25 +449,25 @@ impl NormalizationStrategy for TensorRegenerationStrategy {
 
     async fn normalize(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         drift_event: &DriftEvent,
     ) -> Result<NormalizationResult, NormalizerError> {
         let start = std::time::Instant::now();
         let mut changes = Vec::new();
 
-        let has_vector = hexad.embedding.is_some();
-        let has_document = hexad.document.is_some();
-        let has_tensor = hexad.tensor.is_some();
+        let has_vector = octad.embedding.is_some();
+        let has_document = octad.document.is_some();
+        let has_tensor = octad.tensor.is_some();
 
         if !has_vector && !has_document {
             return Err(NormalizerError::NormalizationFailed {
-                entity_id: hexad.id.to_string(),
+                entity_id: octad.id.to_string(),
                 message: "Cannot regenerate tensor: no vector or document source available".into(),
             });
         }
 
         let old_tensor_info = if has_tensor {
-            hexad
+            octad
                 .tensor
                 .as_ref()
                 .map(|t| format!("shape {:?}", t.shape))
@@ -477,7 +477,7 @@ impl NormalizationStrategy for TensorRegenerationStrategy {
         };
 
         // Prefer vector embedding as source for tensor regeneration (reshape)
-        if let Some(ref emb) = hexad.embedding {
+        if let Some(ref emb) = octad.embedding {
             let dim = emb.vector.len();
             changes.push(NormalizationChange {
                 modality: "tensor".to_string(),
@@ -492,7 +492,7 @@ impl NormalizationStrategy for TensorRegenerationStrategy {
         }
 
         // If document is available, incorporate TF-IDF features
-        if let Some(ref doc) = hexad.document {
+        if let Some(ref doc) = octad.document {
             changes.push(NormalizationChange {
                 modality: "tensor".to_string(),
                 field: "features".to_string(),
@@ -505,7 +505,7 @@ impl NormalizationStrategy for TensorRegenerationStrategy {
         let duration_ms = start.elapsed().as_millis() as u64;
 
         Ok(NormalizationResult {
-            entity_id: hexad.id.clone(),
+            entity_id: octad.id.clone(),
             normalization_type: NormalizationType::TensorSync,
             success: true,
             changes,
@@ -530,25 +530,25 @@ impl NormalizationStrategy for TemporalRepairStrategy {
 
     async fn normalize(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         drift_event: &DriftEvent,
     ) -> Result<NormalizationResult, NormalizerError> {
         let start = std::time::Instant::now();
         let mut changes = Vec::new();
 
         // Timestamp ordering: ensure created_at <= modified_at
-        if hexad.status.created_at > hexad.status.modified_at {
+        if octad.status.created_at > octad.status.modified_at {
             changes.push(NormalizationChange {
                 modality: "temporal".to_string(),
                 field: "modified_at".to_string(),
-                old_value: Some(hexad.status.modified_at.to_rfc3339()),
-                new_value: hexad.status.created_at.to_rfc3339(),
+                old_value: Some(octad.status.modified_at.to_rfc3339()),
+                new_value: octad.status.created_at.to_rfc3339(),
                 reason: "modified_at was before created_at — correcting to created_at".into(),
             });
         }
 
         // Version sanity: version should be >= 1
-        if hexad.status.version == 0 {
+        if octad.status.version == 0 {
             changes.push(NormalizationChange {
                 modality: "temporal".to_string(),
                 field: "version".to_string(),
@@ -559,15 +559,15 @@ impl NormalizationStrategy for TemporalRepairStrategy {
         }
 
         // Version count vs version consistency
-        if hexad.version_count > 0 && hexad.status.version > hexad.version_count {
+        if octad.version_count > 0 && octad.status.version > octad.version_count {
             changes.push(NormalizationChange {
                 modality: "temporal".to_string(),
                 field: "version_count".to_string(),
-                old_value: Some(hexad.version_count.to_string()),
-                new_value: hexad.status.version.to_string(),
+                old_value: Some(octad.version_count.to_string()),
+                new_value: octad.status.version.to_string(),
                 reason: format!(
                     "Temporal drift score {:.3} — version_count ({}) < version ({})",
-                    drift_event.score, hexad.version_count, hexad.status.version
+                    drift_event.score, octad.version_count, octad.status.version
                 ),
             });
         }
@@ -589,7 +589,7 @@ impl NormalizationStrategy for TemporalRepairStrategy {
         let duration_ms = start.elapsed().as_millis() as u64;
 
         Ok(NormalizationResult {
-            entity_id: hexad.id.clone(),
+            entity_id: octad.id.clone(),
             normalization_type: NormalizationType::TemporalRepair,
             success: true,
             changes,
@@ -631,7 +631,7 @@ impl NormalizationStrategy for QualityReconciliationStrategy {
 
     async fn normalize(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         drift_event: &DriftEvent,
     ) -> Result<NormalizationResult, NormalizerError> {
         let start = std::time::Instant::now();
@@ -640,7 +640,7 @@ impl NormalizationStrategy for QualityReconciliationStrategy {
 
         // Cascade through all inner strategies
         for strategy in &self.inner {
-            match strategy.normalize(hexad, drift_event).await {
+            match strategy.normalize(octad, drift_event).await {
                 Ok(result) => {
                     all_changes.extend(result.changes);
                 }
@@ -664,7 +664,7 @@ impl NormalizationStrategy for QualityReconciliationStrategy {
         let duration_ms = start.elapsed().as_millis() as u64;
 
         Ok(NormalizationResult {
-            entity_id: hexad.id.clone(),
+            entity_id: octad.id.clone(),
             normalization_type: NormalizationType::FullReconciliation,
             success: !any_failure,
             changes: all_changes,
@@ -700,14 +700,14 @@ mod tests {
     use super::*;
     use verisim_document::Document;
     use verisim_drift::DriftThresholds;
-    use verisim_hexad::{HexadStatus, ModalityStatus};
+    use verisim_octad::{OctadStatus, ModalityStatus};
     use verisim_vector::Embedding;
 
-    fn create_test_hexad() -> Hexad {
-        Hexad {
-            id: HexadId::new("test-1"),
-            status: HexadStatus {
-                id: HexadId::new("test-1"),
+    fn create_test_octad() -> Octad {
+        Octad {
+            id: OctadId::new("test-1"),
+            status: OctadStatus {
+                id: OctadId::new("test-1"),
                 created_at: Utc::now(),
                 modified_at: Utc::now(),
                 version: 1,
@@ -724,11 +724,11 @@ mod tests {
         }
     }
 
-    fn create_empty_hexad() -> Hexad {
-        Hexad {
-            id: HexadId::new("empty-1"),
-            status: HexadStatus {
-                id: HexadId::new("empty-1"),
+    fn create_empty_octad() -> Octad {
+        Octad {
+            id: OctadId::new("empty-1"),
+            status: OctadStatus {
+                id: OctadId::new("empty-1"),
                 created_at: Utc::now(),
                 modified_at: Utc::now(),
                 version: 1,
@@ -760,14 +760,14 @@ mod tests {
         let drift_detector = Arc::new(DriftDetector::new(DriftThresholds::default()));
         let normalizer = create_default_normalizer(drift_detector).await;
 
-        let hexad = create_test_hexad();
+        let octad = create_test_octad();
         let event = DriftEvent::new(
             DriftType::SemanticVectorDrift,
             0.5,
             "Test drift",
         );
 
-        let result = normalizer.handle_drift(&hexad, &event).await.unwrap();
+        let result = normalizer.handle_drift(&octad, &event).await.unwrap();
         assert!(result.is_some());
         let result = result.unwrap();
         assert!(result.success);
@@ -776,45 +776,45 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_semantic_vector_strategy_empty_hexad_errors() {
+    async fn test_semantic_vector_strategy_empty_octad_errors() {
         let strategy = SemanticVectorStrategy;
-        let hexad = create_empty_hexad();
+        let octad = create_empty_octad();
         let event = DriftEvent::new(
             DriftType::SemanticVectorDrift,
             0.8,
             "Critical drift",
         );
 
-        let result = strategy.normalize(&hexad, &event).await;
+        let result = strategy.normalize(&octad, &event).await;
         assert!(result.is_err());
     }
 
     #[tokio::test]
-    async fn test_graph_document_strategy_empty_hexad_errors() {
+    async fn test_graph_document_strategy_empty_octad_errors() {
         let strategy = GraphDocumentStrategy;
-        let hexad = create_empty_hexad();
+        let octad = create_empty_octad();
         let event = DriftEvent::new(
             DriftType::GraphDocumentDrift,
             0.8,
             "Critical drift",
         );
 
-        let result = strategy.normalize(&hexad, &event).await;
+        let result = strategy.normalize(&octad, &event).await;
         assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_graph_document_strategy_with_document() {
         let strategy = GraphDocumentStrategy;
-        let mut hexad = create_test_hexad();
-        hexad.graph_node = None; // Only document present
+        let mut octad = create_test_octad();
+        octad.graph_node = None; // Only document present
         let event = DriftEvent::new(
             DriftType::GraphDocumentDrift,
             0.5,
             "Graph missing",
         );
 
-        let result = strategy.normalize(&hexad, &event).await.unwrap();
+        let result = strategy.normalize(&octad, &event).await.unwrap();
         assert!(result.success);
         assert_eq!(result.changes[0].modality, "graph");
         assert!(result.changes[0].new_value.contains("Test Document"));

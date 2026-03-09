@@ -16,7 +16,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageTest do
   @peer_info %{
     store_id: "minio-test",
     endpoint: "http://minio:9000",
-    adapter_config: %{bucket: "verisim-hexads", backend: :minio}
+    adapter_config: %{bucket: "verisim-octads", backend: :minio}
   }
 
   describe "supported_modalities/1" do
@@ -39,7 +39,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageTest do
     test "normalises S3 ListObjects results" do
       raw = [
         %{
-          "Key" => "hexads/obj-001.json",
+          "Key" => "octads/obj-001.json",
           "LastModified" => "2026-02-28T12:00:00Z",
           "Size" => 1024,
           "ETag" => "\"abc123\""
@@ -48,7 +48,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorageTest do
 
       [result] = ObjectStorage.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "obj-001"
+      assert result.octad_id == "obj-001"
       assert result.source_store == "minio-test"
     end
 

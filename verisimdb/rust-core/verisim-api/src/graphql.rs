@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 //! GraphQL API for VeriSimDB.
 //!
-//! Exposes planner, hexad, search, drift, and normalizer operations
+//! Exposes planner, octad, search, drift, and normalizer operations
 //! via a GraphQL schema at `/graphql`.
 
 use async_graphql::{
@@ -36,9 +36,9 @@ struct Health {
     uptime_seconds: u64,
 }
 
-/// Hexad summary.
+/// Octad summary.
 #[derive(SimpleObject)]
-struct Hexad {
+struct Octad {
     id: String,
     created_at: String,
     modified_at: String,
@@ -146,9 +146,9 @@ struct PlannerStats {
 // GraphQL Input Types
 // ============================================================================
 
-/// Hexad creation/update input.
+/// Octad creation/update input.
 #[derive(InputObject)]
-struct HexadInput {
+struct OctadInput {
     title: Option<String>,
     body: Option<String>,
     embedding: Option<Vec<f32>>,
@@ -184,14 +184,14 @@ impl QueryRoot {
         })
     }
 
-    /// Get a hexad by ID.
-    async fn hexad(&self, ctx: &Context<'_>, id: String) -> async_graphql::Result<Option<Hexad>> {
+    /// Get a octad by ID.
+    async fn octad(&self, ctx: &Context<'_>, id: String) -> async_graphql::Result<Option<Octad>> {
         let state = ctx.data::<AppState>()?;
-        let hexad_id = verisim_hexad::HexadId::new(&id);
+        let octad_id = verisim_octad::OctadId::new(&id);
 
-        use verisim_hexad::HexadStore;
-        match state.hexad_store.get(&hexad_id).await {
-            Ok(Some(h)) => Ok(Some(Hexad {
+        use verisim_octad::OctadStore;
+        match state.octad_store.get(&octad_id).await {
+            Ok(Some(h)) => Ok(Some(Octad {
                 id: h.id.to_string(),
                 created_at: h.status.created_at.to_rfc3339(),
                 modified_at: h.status.modified_at.to_rfc3339(),
@@ -205,7 +205,7 @@ impl QueryRoot {
             })),
             Ok(None) => Ok(None),
             Err(e) => {
-                error!(error = %e, "GraphQL hexad query failed");
+                error!(error = %e, "GraphQL octad query failed");
                 Err(async_graphql::Error::new("Internal server error"))
             }
         }
@@ -221,9 +221,9 @@ impl QueryRoot {
         let state = ctx.data::<AppState>()?;
         let limit = limit.unwrap_or(10) as usize;
 
-        use verisim_hexad::HexadStore;
-        let hexads = state
-            .hexad_store
+        use verisim_octad::OctadStore;
+        let octads = state
+            .octad_store
             .search_text(&query, limit)
             .await
             .map_err(|e| {
@@ -231,7 +231,7 @@ impl QueryRoot {
                 async_graphql::Error::new("Internal server error")
             })?;
 
-        Ok(hexads
+        Ok(octads
             .iter()
             .enumerate()
             .map(|(i, h)| SearchResult {
@@ -327,46 +327,46 @@ pub struct MutationRoot;
 
 #[Object]
 impl MutationRoot {
-    /// Create a new hexad.
-    async fn create_hexad(
+    /// Create a new octad.
+    async fn create_octad(
         &self,
         ctx: &Context<'_>,
-        input: HexadInput,
-    ) -> async_graphql::Result<Hexad> {
+        input: OctadInput,
+    ) -> async_graphql::Result<Octad> {
         let state = ctx.data::<AppState>()?;
 
-        let mut hexad_input = verisim_hexad::HexadInput::default();
+        let mut octad_input = verisim_octad::OctadInput::default();
         if let Some(title) = &input.title {
-            hexad_input.document = Some(verisim_hexad::HexadDocumentInput {
+            octad_input.document = Some(verisim_octad::OctadDocumentInput {
                 title: title.clone(),
                 body: input.body.clone().unwrap_or_default(),
                 fields: std::collections::HashMap::new(),
             });
         }
         if let Some(embedding) = &input.embedding {
-            hexad_input.vector = Some(verisim_hexad::HexadVectorInput {
+            octad_input.vector = Some(verisim_octad::OctadVectorInput {
                 embedding: embedding.clone(),
                 model: None,
             });
         }
         if let Some(types) = &input.types {
-            hexad_input.semantic = Some(verisim_hexad::HexadSemanticInput {
+            octad_input.semantic = Some(verisim_octad::OctadSemanticInput {
                 types: types.clone(),
                 properties: std::collections::HashMap::new(),
             });
         }
 
-        use verisim_hexad::HexadStore;
+        use verisim_octad::OctadStore;
         let h = state
-            .hexad_store
-            .create(hexad_input)
+            .octad_store
+            .create(octad_input)
             .await
             .map_err(|e| {
-                error!(error = %e, "GraphQL hexad creation failed");
+                error!(error = %e, "GraphQL octad creation failed");
                 async_graphql::Error::new("Internal server error")
             })?;
 
-        Ok(Hexad {
+        Ok(Octad {
             id: h.id.to_string(),
             created_at: h.status.created_at.to_rfc3339(),
             modified_at: h.status.modified_at.to_rfc3339(),
@@ -380,18 +380,18 @@ impl MutationRoot {
         })
     }
 
-    /// Delete a hexad.
-    async fn delete_hexad(&self, ctx: &Context<'_>, id: String) -> async_graphql::Result<bool> {
+    /// Delete a octad.
+    async fn delete_octad(&self, ctx: &Context<'_>, id: String) -> async_graphql::Result<bool> {
         let state = ctx.data::<AppState>()?;
-        let hexad_id = verisim_hexad::HexadId::new(&id);
+        let octad_id = verisim_octad::OctadId::new(&id);
 
-        use verisim_hexad::HexadStore;
+        use verisim_octad::OctadStore;
         state
-            .hexad_store
-            .delete(&hexad_id)
+            .octad_store
+            .delete(&octad_id)
             .await
             .map_err(|e| {
-                error!(error = %e, "GraphQL hexad deletion failed");
+                error!(error = %e, "GraphQL octad deletion failed");
                 async_graphql::Error::new("Internal server error")
             })?;
 

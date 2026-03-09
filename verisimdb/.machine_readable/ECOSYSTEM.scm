@@ -54,7 +54,7 @@
       (project "datomic")
       (relationship "architectural-inspiration")
       (url "https://www.datomic.com")
-      (rationale "Datomic's immutable temporal log and separation of storage/query influenced VeriSimDB's temporal modality and hexad architecture."))
+      (rationale "Datomic's immutable temporal log and separation of storage/query influenced VeriSimDB's temporal modality and octad architecture."))
 
     (inspiration
       (project "apache-kafka")

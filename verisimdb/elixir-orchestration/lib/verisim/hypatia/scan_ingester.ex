@@ -2,7 +2,7 @@
 
 defmodule VeriSim.Hypatia.ScanIngester do
   @moduledoc """
-  Ingests panic-attack scan results and stores them as VeriSimDB hexad entities.
+  Ingests panic-attack scan results and stores them as VeriSimDB octad entities.
 
   Each scan report becomes an octad entity with:
   - **Document**: Full JSON report as searchable text
@@ -29,13 +29,13 @@ defmodule VeriSim.Hypatia.ScanIngester do
   ## Usage
 
       # Ingest a single scan result
-      {:ok, hexad_id} = ScanIngester.ingest_scan(scan_json)
+      {:ok, octad_id} = ScanIngester.ingest_scan(scan_json)
 
       # Ingest all scans from verisimdb-data/scans/ directory
       {:ok, results} = ScanIngester.ingest_directory("/path/to/verisimdb-data/scans")
 
       # Ingest from a panic-attack JSON file
-      {:ok, hexad_id} = ScanIngester.ingest_file("/path/to/scan.json")
+      {:ok, octad_id} = ScanIngester.ingest_file("/path/to/scan.json")
   """
 
   require Logger
@@ -63,20 +63,20 @@ defmodule VeriSim.Hypatia.ScanIngester do
   - `frameworks` — detected frameworks
   - `weak_points` — list of weakness findings
 
-  Returns `{:ok, hexad_id}` or `{:error, reason}`.
+  Returns `{:ok, octad_id}` or `{:error, reason}`.
   """
   def ingest_scan(scan_report) when is_map(scan_report) do
     report = scan_report["assail_report"] || scan_report
 
     repo_name = extract_repo_name(report["program_path"])
-    hexad_id = "scan:#{repo_name}:#{timestamp_id()}"
+    octad_id = "scan:#{repo_name}:#{timestamp_id()}"
 
-    hexad_input = build_hexad(hexad_id, repo_name, report)
+    octad_input = build_octad(octad_id, repo_name, report)
 
-    case RustClient.create_hexad(hexad_input) do
+    case RustClient.create_octad(octad_input) do
       {:ok, _result} ->
-        Logger.info("Hypatia: ingested scan for #{repo_name} as #{hexad_id}")
-        {:ok, hexad_id}
+        Logger.info("Hypatia: ingested scan for #{repo_name} as #{octad_id}")
+        {:ok, octad_id}
 
       {:error, reason} ->
         Logger.warning(
@@ -85,8 +85,8 @@ defmodule VeriSim.Hypatia.ScanIngester do
         )
 
         # Fallback: store in ETS for local querying
-        store_local(hexad_id, hexad_input)
-        {:ok, hexad_id}
+        store_local(octad_id, octad_input)
+        {:ok, octad_id}
     end
   end
 
@@ -95,7 +95,7 @@ defmodule VeriSim.Hypatia.ScanIngester do
   @doc """
   Ingest a scan result from a JSON file on disk.
 
-  Returns `{:ok, hexad_id}` or `{:error, reason}`.
+  Returns `{:ok, octad_id}` or `{:error, reason}`.
   """
   def ingest_file(path) when is_binary(path) do
     case File.read(path) do
@@ -114,7 +114,7 @@ defmodule VeriSim.Hypatia.ScanIngester do
   Ingest all scan JSON files from a directory.
 
   Returns `{:ok, results}` where results is a list of
-  `{filename, {:ok, hexad_id}}` or `{filename, {:error, reason}}`.
+  `{filename, {:ok, octad_id}}` or `{filename, {:error, reason}}`.
   """
   def ingest_directory(dir_path) when is_binary(dir_path) do
     case File.ls(dir_path) do
@@ -144,7 +144,7 @@ defmodule VeriSim.Hypatia.ScanIngester do
     ensure_ets_table()
 
     :ets.tab2list(:hypatia_scans)
-    |> Enum.map(fn {id, data} -> Map.put(data, :hexad_id, id) end)
+    |> Enum.map(fn {id, data} -> Map.put(data, :octad_id, id) end)
   end
 
   @doc """
@@ -158,22 +158,22 @@ defmodule VeriSim.Hypatia.ScanIngester do
       get_in(data, [:metadata, :repo_name]) == repo_name
     end)
     |> case do
-      {id, data} -> {:ok, Map.put(data, :hexad_id, id)}
+      {id, data} -> {:ok, Map.put(data, :octad_id, id)}
       nil -> {:error, :not_found}
     end
   end
 
   # ---------------------------------------------------------------------------
-  # Private: Hexad Construction
+  # Private: Octad Construction
   # ---------------------------------------------------------------------------
 
-  defp build_hexad(hexad_id, repo_name, report) do
+  defp build_octad(octad_id, repo_name, report) do
     weak_points = report["weak_points"] || []
     language = report["language"] || "unknown"
     frameworks = report["frameworks"] || []
 
     %{
-      hexad_id: hexad_id,
+      octad_id: octad_id,
       metadata: %{
         repo_name: repo_name,
         language: language,
@@ -192,7 +192,7 @@ defmodule VeriSim.Hypatia.ScanIngester do
 
       # Graph modality: file → weakness → recommendation triples
       graph: %{
-        triples: build_graph_triples(hexad_id, repo_name, weak_points)
+        triples: build_graph_triples(octad_id, repo_name, weak_points)
       },
 
       # Temporal modality: scan timestamp for drift tracking
@@ -242,23 +242,23 @@ defmodule VeriSim.Hypatia.ScanIngester do
     """
   end
 
-  defp build_graph_triples(hexad_id, repo_name, weak_points) do
+  defp build_graph_triples(octad_id, repo_name, weak_points) do
     repo_node = "repo:#{repo_name}"
 
     # repo → has_scan → scan (lists for JSON compatibility)
-    base = [[repo_node, "has_scan", hexad_id]]
+    base = [[repo_node, "has_scan", octad_id]]
 
     # For each weak point: scan → has_weakness → weakness, weakness → in_file → file
     weakness_triples =
       weak_points
       |> Enum.with_index()
       |> Enum.flat_map(fn {wp, idx} ->
-        weakness_id = "#{hexad_id}:wp:#{idx}"
+        weakness_id = "#{octad_id}:wp:#{idx}"
         file = wp["location"] || "unknown"
         category = wp["category"] || "unknown"
 
         [
-          [hexad_id, "has_weakness", weakness_id],
+          [octad_id, "has_weakness", weakness_id],
           [weakness_id, "in_file", "file:#{file}"],
           [weakness_id, "has_category", "category:#{category}"],
           [weakness_id, "has_severity", "severity:#{wp["severity"] || "unknown"}"]
@@ -324,9 +324,9 @@ defmodule VeriSim.Hypatia.ScanIngester do
     end
   end
 
-  defp store_local(hexad_id, hexad_input) do
+  defp store_local(octad_id, octad_input) do
     ensure_ets_table()
-    :ets.insert(:hypatia_scans, {hexad_id, hexad_input})
+    :ets.insert(:hypatia_scans, {octad_id, octad_input})
     :ok
   end
 end

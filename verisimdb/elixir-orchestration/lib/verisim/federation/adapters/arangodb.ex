@@ -27,8 +27,8 @@ defmodule VeriSim.Federation.Adapters.ArangoDB do
 
       %{
         database: "_system",         # ArangoDB database name
-        collection: "hexads",        # Default document collection
-        graph_name: "hexad_graph",   # Named graph for traversals
+        collection: "octads",        # Default document collection
+        graph_name: "octad_graph",   # Named graph for traversals
         auth: {:basic, "root", "password"}
       }
 
@@ -127,7 +127,7 @@ defmodule VeriSim.Federation.Adapters.ArangoDB do
     |> Enum.map(fn doc ->
       %{
         source_store: peer_info.store_id,
-        hexad_id: extract_id(doc),
+        octad_id: extract_id(doc),
         score: doc["_score"] || doc["score"] || 0.0,
         drifted: false,
         data: doc,
@@ -142,11 +142,11 @@ defmodule VeriSim.Federation.Adapters.ArangoDB do
 
   defp build_aql(modalities, query_params, limit, peer_info) do
     config = peer_info.adapter_config
-    collection = Map.get(config, :collection, "hexads")
+    collection = Map.get(config, :collection, "octads")
 
     cond do
       :graph in modalities && Map.has_key?(query_params, :graph_pattern) ->
-        graph_name = Map.get(config, :graph_name, "hexad_graph")
+        graph_name = Map.get(config, :graph_name, "octad_graph")
         start_vertex = query_params.graph_pattern
 
         aql = """

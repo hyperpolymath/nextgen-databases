@@ -29,7 +29,7 @@ defmodule VeriSim.Federation.Adapters.MongoDB do
         host: "cluster0.example.mongodb.net",
         port: 27017,
         database: "verisimdb",
-        collection: "hexads",
+        collection: "octads",
         auth: {:basic, "verisim_user", "password"},
         replica_set: "rs0",
         data_api: true  # Use MongoDB Data API (HTTP) instead of wire protocol
@@ -153,7 +153,7 @@ defmodule VeriSim.Federation.Adapters.MongoDB do
     |> Enum.map(fn doc ->
       %{
         source_store: peer_info.store_id,
-        hexad_id: extract_id(doc),
+        octad_id: extract_id(doc),
         score: parse_score(doc),
         drifted: false,
         data: doc,
@@ -168,7 +168,7 @@ defmodule VeriSim.Federation.Adapters.MongoDB do
 
   defp build_pipeline(modalities, query_params, limit, peer_info) do
     config = peer_info.adapter_config
-    _collection = Map.get(config, :collection, "hexads")
+    _collection = Map.get(config, :collection, "octads")
 
     cond do
       :vector in modalities && Map.has_key?(query_params, :vector_query) ->
@@ -325,7 +325,7 @@ defmodule VeriSim.Federation.Adapters.MongoDB do
   defp execute_aggregate(peer_info, pipeline, timeout) do
     config = peer_info.adapter_config
     db = Map.get(config, :database, "verisimdb")
-    collection = Map.get(config, :collection, "hexads")
+    collection = Map.get(config, :collection, "octads")
     headers = auth_headers(config)
 
     url = "#{peer_info.endpoint}/action/aggregate"

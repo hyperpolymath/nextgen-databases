@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 
 /// The eight modalities supported by VeriSimDB's octad data model.
 ///
-/// Each hexad entity can participate in any combination of these modalities,
+/// Each octad entity can participate in any combination of these modalities,
 /// enabling truly multi-modal storage and querying.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -46,7 +46,7 @@ pub enum Modality {
 // ModalityStatus
 // ---------------------------------------------------------------------------
 
-/// Boolean flags indicating which modalities are currently active for a hexad.
+/// Boolean flags indicating which modalities are currently active for a octad.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ModalityStatus {
     /// Whether graph data is present.
@@ -68,13 +68,13 @@ pub struct ModalityStatus {
 }
 
 // ---------------------------------------------------------------------------
-// HexadStatus
+// OctadStatus
 // ---------------------------------------------------------------------------
 
-/// Lightweight status summary for a hexad entity, returned by list/search
+/// Lightweight status summary for a octad entity, returned by list/search
 /// endpoints that do not need full payloads.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HexadStatus {
+pub struct OctadStatus {
     /// Unique identifier.
     pub id: String,
     /// Creation timestamp.
@@ -88,15 +88,15 @@ pub struct HexadStatus {
 }
 
 // ---------------------------------------------------------------------------
-// Hexad (full entity)
+// Octad (full entity)
 // ---------------------------------------------------------------------------
 
-/// A complete hexad entity encompassing all eight modality payloads.
+/// A complete octad entity encompassing all eight modality payloads.
 ///
-/// This is the primary read model returned by `get_hexad` and single-entity
+/// This is the primary read model returned by `get_octad` and single-entity
 /// search results.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Hexad {
+pub struct Octad {
     /// Unique identifier (UUID v4).
     pub id: String,
     /// Human-readable label.
@@ -132,15 +132,15 @@ pub struct Hexad {
 }
 
 // ---------------------------------------------------------------------------
-// HexadInput (create / update payload)
+// OctadInput (create / update payload)
 // ---------------------------------------------------------------------------
 
-/// Input payload for creating or updating a hexad entity.
+/// Input payload for creating or updating a octad entity.
 ///
 /// All fields are optional so that partial updates are possible. The server
 /// merges the provided fields into the existing entity on update.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct HexadInput {
+pub struct OctadInput {
     /// Human-readable label.
     pub name: Option<String>,
     /// Free-text description.
@@ -148,21 +148,21 @@ pub struct HexadInput {
     /// Arbitrary user-defined metadata.
     pub metadata: Option<serde_json::Value>,
     /// Graph modality input.
-    pub graph: Option<HexadGraphInput>,
+    pub graph: Option<OctadGraphInput>,
     /// Vector modality input.
-    pub vector: Option<HexadVectorInput>,
+    pub vector: Option<OctadVectorInput>,
     /// Tensor modality input.
-    pub tensor: Option<HexadTensorInput>,
+    pub tensor: Option<OctadTensorInput>,
     /// Semantic modality input.
-    pub semantic: Option<HexadSemanticInput>,
+    pub semantic: Option<OctadSemanticInput>,
     /// Document modality input.
-    pub document: Option<HexadDocumentInput>,
+    pub document: Option<OctadDocumentInput>,
     /// Temporal modality input.
-    pub temporal: Option<HexadTemporalInput>,
+    pub temporal: Option<OctadTemporalInput>,
     /// Provenance modality input.
-    pub provenance: Option<HexadProvenanceInput>,
+    pub provenance: Option<OctadProvenanceInput>,
     /// Spatial modality input.
-    pub spatial: Option<HexadSpatialInput>,
+    pub spatial: Option<OctadSpatialInput>,
 }
 
 // ---------------------------------------------------------------------------
@@ -171,8 +171,8 @@ pub struct HexadInput {
 
 /// Graph modality input: nodes, edges, and properties.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HexadGraphInput {
-    /// List of node identifiers to associate with this hexad.
+pub struct OctadGraphInput {
+    /// List of node identifiers to associate with this octad.
     pub nodes: Option<Vec<String>>,
     /// List of edges, each a (source, target, label) triple.
     pub edges: Option<Vec<GraphEdge>>,
@@ -195,7 +195,7 @@ pub struct GraphEdge {
 
 /// Vector modality input: dense embeddings for similarity search.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HexadVectorInput {
+pub struct OctadVectorInput {
     /// The embedding vector (list of f32 values).
     pub embedding: Vec<f32>,
     /// Dimensionality (inferred from `embedding.len()` if omitted).
@@ -206,7 +206,7 @@ pub struct HexadVectorInput {
 
 /// Tensor modality input: multi-dimensional numeric data.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HexadTensorInput {
+pub struct OctadTensorInput {
     /// Flattened tensor data.
     pub data: Vec<f64>,
     /// Shape of the tensor (e.g. `[3, 224, 224]`).
@@ -217,7 +217,7 @@ pub struct HexadTensorInput {
 
 /// Semantic modality input: RDF-style triples and ontology references.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HexadSemanticInput {
+pub struct OctadSemanticInput {
     /// Semantic triples (subject, predicate, object).
     pub triples: Option<Vec<SemanticTriple>>,
     /// Ontology URI this entity conforms to.
@@ -239,7 +239,7 @@ pub struct SemanticTriple {
 
 /// Document modality input: unstructured / semi-structured content.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HexadDocumentInput {
+pub struct OctadDocumentInput {
     /// The document body (plain text, HTML, Markdown, etc.).
     pub content: String,
     /// MIME type of the content (e.g. "text/plain", "application/json").
@@ -252,7 +252,7 @@ pub struct HexadDocumentInput {
 
 /// Provenance modality input: lineage and audit trail events.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HexadProvenanceInput {
+pub struct OctadProvenanceInput {
     /// The type of provenance event (e.g. "creation", "transformation", "derivation").
     pub event_type: String,
     /// The agent (user, service, pipeline) that triggered the event.
@@ -267,7 +267,7 @@ pub struct HexadProvenanceInput {
 
 /// Spatial modality input: geospatial coordinates and geometries.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HexadSpatialInput {
+pub struct OctadSpatialInput {
     /// Latitude in decimal degrees (WGS 84).
     pub latitude: Option<f64>,
     /// Longitude in decimal degrees (WGS 84).
@@ -282,7 +282,7 @@ pub struct HexadSpatialInput {
 
 /// Temporal modality input: time-series events and temporal metadata.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HexadTemporalInput {
+pub struct OctadTemporalInput {
     /// The timestamp of the event.
     pub timestamp: DateTime<Utc>,
     /// Duration in milliseconds (for interval events).
@@ -299,11 +299,11 @@ pub struct HexadTemporalInput {
 // DriftScore
 // ---------------------------------------------------------------------------
 
-/// Drift score for a hexad entity, measuring how far its modality data has
+/// Drift score for a octad entity, measuring how far its modality data has
 /// diverged from its normalised baseline.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DriftScore {
-    /// The hexad entity identifier.
+    /// The octad entity identifier.
     pub entity_id: String,
     /// Aggregate drift score across all active modalities (0.0 = no drift).
     pub overall_score: f64,
@@ -319,12 +319,12 @@ pub struct DriftScore {
 // ProvenanceEvent
 // ---------------------------------------------------------------------------
 
-/// A single immutable event in a hexad's provenance chain.
+/// A single immutable event in a octad's provenance chain.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProvenanceEvent {
     /// Unique event identifier.
     pub id: Option<String>,
-    /// The hexad entity this event belongs to.
+    /// The octad entity this event belongs to.
     pub entity_id: String,
     /// Event type (e.g. "creation", "transformation", "derivation").
     pub event_type: String,
@@ -349,8 +349,8 @@ pub struct ProvenanceEvent {
 pub struct FederationResult {
     /// The peer store that produced this result.
     pub store_id: String,
-    /// The matched hexad entity.
-    pub entity: Hexad,
+    /// The matched octad entity.
+    pub entity: Octad,
     /// Relevance or similarity score (interpretation depends on query type).
     pub score: Option<f64>,
     /// Latency in milliseconds for this peer's response.

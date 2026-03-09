@@ -17,7 +17,7 @@ const VQL_KEYWORDS: &[&str] = &[
     "EXISTS", "CONTAINS", "SIMILAR", "TO", "TRAVERSE", "DEPTH", "THRESHOLD",
     "DRIFT", "CONSISTENCY", "AT", "TIME", "EXPLAIN", "INSERT", "UPDATE",
     "DELETE", "SET", "INTO", "VALUES", "CREATE", "DROP", "ALTER", "JOIN",
-    "ON", "WITH", "FEDERATION", "STORE", "HEXAD", "ALL", "ASC", "DESC",
+    "ON", "WITH", "FEDERATION", "STORE", "OCTAD", "ALL", "ASC", "DESC",
     "COUNT", "SUM", "AVG", "MIN", "MAX", "DISTINCT",
 ];
 
@@ -177,7 +177,7 @@ mod tests {
     #[test]
     fn test_highlight_returns_something() {
         let hl = VqlHighlighter;
-        let output = hl.highlight("SELECT FROM hexad", 0);
+        let output = hl.highlight("SELECT FROM octad", 0);
         // Just verify it does not panic and returns non-empty output.
         assert!(!output.is_empty());
     }

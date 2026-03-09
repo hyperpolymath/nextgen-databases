@@ -2,7 +2,7 @@
 
 defmodule VeriSim.EntityServer do
   @moduledoc """
-  GenServer representing a single Hexad entity.
+  GenServer representing a single Octad entity.
 
   Each entity has its own process for isolation and fault tolerance.
   The EntityServer coordinates operations across all 6 modalities.
@@ -135,7 +135,7 @@ defmodule VeriSim.EntityServer do
     Logger.info("Starting normalization for #{state.id}")
 
     # Snapshot current state via temporal store before normalization
-    RustClient.post("/hexads/#{state.id}/versions", %{
+    RustClient.post("/octads/#{state.id}/versions", %{
       version: state.version,
       modalities: state.modalities,
       drift_score: state.drift_score,

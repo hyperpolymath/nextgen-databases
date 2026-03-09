@@ -131,7 +131,7 @@ Client → Orchestrator → Remote Store → Remote Store → ... (N hops)  ✗�
 **Example Inconsistency Scenario:**
 [source,text]
 ----
-T=0:   Client writes Hexad update (Document + Vector)
+T=0:   Client writes Octad update (Document + Vector)
 T=1:   Local Vector modality updates immediately
 T=5:   Remote Document modality still processing (network delay)
 T=6:   Client queries: Vector reflects new data, Document shows old data
@@ -257,13 +257,13 @@ Hybrid Query (Local Vector + Remote Document):
 - **False Positives:** Network latency variance causes spurious drift alerts
 
 **Quantitative Impact:**
-- Drift checks every 60s × 1000 Hexads = **16.6 qps to remote stores** (just for monitoring)
-- At scale (100k Hexads), drift monitoring alone consumes **1.6k qps**
+- Drift checks every 60s × 1000 Octads = **16.6 qps to remote stores** (just for monitoring)
+- At scale (100k Octads), drift monitoring alone consumes **1.6k qps**
 
 **Mitigation:**
-- **Sampling:** Only check drift for **subset** of Hexads per interval (e.g., 1% sample)
+- **Sampling:** Only check drift for **subset** of Octads per interval (e.g., 1% sample)
 - **Push-Based Updates:** Remote stores **push** drift events to orchestrator (avoid polling)
-- **Bloom Filters:** Use probabilistic data structures to quickly identify unchanged Hexads
+- **Bloom Filters:** Use probabilistic data structures to quickly identify unchanged Octads
 
 === 2.3. Write Propagation Delay
 
@@ -272,7 +272,7 @@ Hybrid Query (Local Vector + Remote Document):
 **Example Timeline:**
 [source,text]
 ----
-T=0:   Client writes Hexad (updates Vector + Document)
+T=0:   Client writes Octad (updates Vector + Document)
 T=1:   Local Vector modality persists immediately
 T=50:  Network delay to remote Document store
 T=100: Remote Document store persists
@@ -281,7 +281,7 @@ T=200: Drift repair job enqueued (if policy requires sync)
 ----
 
 **Consequences:**
-- **Read-After-Write Inconsistency:** Client reads back Hexad immediately, sees old Document content
+- **Read-After-Write Inconsistency:** Client reads back Octad immediately, sees old Document content
 - **Cross-Modal Queries Fail:** Join between Vector (updated) and Document (stale) returns partial results
 - **Audit Log Ambiguity:** Temporal log shows write at T=0, but Document not updated until T=100
 
@@ -402,7 +402,7 @@ T=200: Drift repair job enqueued (if policy requires sync)
 **Policy Conflict Example:**
 [source,text]
 ----
-Hexad 550e8400-... access policy:
+Octad 550e8400-... access policy:
   Local Vector: "Allow all authenticated users"
   Remote Document: "Allow only .edu domains"
 
@@ -552,19 +552,19 @@ Risk: At 750 qps, network saturates → queries timeout
 **Monitoring Load:**
 [source,text]
 ----
-Scenario: 10,000 Hexads, drift check every 5 minutes
+Scenario: 10,000 Octads, drift check every 5 minutes
 
 Checks per hour: 10,000 × (60 / 5) = 120,000 checks/hour
 If each check = 1 HTTP request of 1 KB:
   Network: 120,000 × 1 KB = 120 MB/hour = 2.8 GB/day
 
-At scale (1M Hexads): 280 GB/day just for drift monitoring
+At scale (1M Octads): 280 GB/day just for drift monitoring
 ----
 
 **Consequence:** Drift monitoring becomes **major cost driver** (bandwidth, remote store load)
 
 **Mitigation:**
-- **Adaptive Sampling:** Only check drift for Hexads recently accessed (others assumed stable)
+- **Adaptive Sampling:** Only check drift for Octads recently accessed (others assumed stable)
 - **Event-Driven Updates:** Remote stores **push** change notifications instead of pull-based polling
 - **Batching:** Batch multiple drift checks into single HTTP request (reduce overhead)
 
@@ -587,7 +587,7 @@ At scale (1M Hexads): 280 GB/day just for drift monitoring
    - Remote store returns ack
    - Orchestrator confirms drift resolved
 4. If Option C:
-   - Orchestrator creates "drift alert" Hexad
+   - Orchestrator creates "drift alert" Octad
    - Sends notification to domain custodians
    - Waits for manual resolution
    - Custodian signs resolution decision
@@ -645,11 +645,11 @@ At scale (1M Hexads): 280 GB/day just for drift monitoring
 **Policy Layering:**
 [source,text]
 ----
-User Query: "Read Hexad 550e8400-..."
+User Query: "Read Octad 550e8400-..."
 
 Layer 1 (Orchestrator): Check global policy
   - Is user authenticated? ✓
-  - Does user have read permission for Hexad? ✓
+  - Does user have read permission for Octad? ✓
   - Forward to remote Document store
 
 Layer 2 (Remote Store): Check local policy

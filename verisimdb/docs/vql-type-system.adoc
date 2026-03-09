@@ -30,7 +30,7 @@ The VQL type language stem:[\tau] is defined by:
 \tau ::= &\ \text{UUID} \mid \text{String} \mid \text{Int} \mid \text{Float} \mid \text{Bool} \\
        | &\ \text{Vector}[n] \mid \text{Tensor}[d_1, \ldots, d_k] \\
        | &\ \text{Timestamp} \mid \text{RDFTriple} \\
-       | &\ \text{Hexad} \mid \text{HexadRef} \\
+       | &\ \text{Octad} \mid \text{OctadRef} \\
        | &\ \text{Modality} \mid \text{ModalitySet} \\
        | &\ \text{List}(\tau) \mid \text{Option}(\tau) \\
        | &\ \tau_1 \times \tau_2 \quad \text{(product)} \\
@@ -53,7 +53,7 @@ Represent pairs/tuples:
 \tau_1 \times \tau_2 = \{(v_1, v_2) \mid v_1 : \tau_1 \land v_2 : \tau_2\}
 ++++
 
-**Example:** `(UUID, Timestamp)` - a hexad ID paired with a timestamp
+**Example:** `(UUID, Timestamp)` - a octad ID paired with a timestamp
 
 ==== Function Types
 
@@ -62,7 +62,7 @@ Represent pairs/tuples:
 \tau_1 \to \tau_2 = \{f \mid \forall v : \tau_1. f(v) : \tau_2\}
 ++++
 
-**Example:** `Hexad → Bool` - predicate on hexads (used in WHERE clauses)
+**Example:** `Octad → Bool` - predicate on octads (used in WHERE clauses)
 
 ==== List Types
 
@@ -71,7 +71,7 @@ Represent pairs/tuples:
 \text{List}(\tau) = \{[], [v_1], [v_1, v_2], \ldots \mid v_i : \tau\}
 ++++
 
-**Example:** `List(Hexad)` - query results
+**Example:** `List(Octad)` - query results
 
 ==== Option Types
 
@@ -132,22 +132,22 @@ Each modality has an associated type:
 |Modality |Type Signature
 
 |`GRAPH`
-|stem:[\text{Hexad} \to \text{Set}(\text{RDFTriple})]
+|stem:[\text{Octad} \to \text{Set}(\text{RDFTriple})]
 
 |`VECTOR`
-|stem:[\Pi n : \text{Nat}. \text{Hexad} \to \text{Option}(\text{Vector}[n])]
+|stem:[\Pi n : \text{Nat}. \text{Octad} \to \text{Option}(\text{Vector}[n])]
 
 |`TENSOR`
-|stem:[\Pi d_1, \ldots, d_k : \text{Nat}. \text{Hexad} \to \text{Option}(\text{Tensor}[d_1, \ldots, d_k])]
+|stem:[\Pi d_1, \ldots, d_k : \text{Nat}. \text{Octad} \to \text{Option}(\text{Tensor}[d_1, \ldots, d_k])]
 
 |`SEMANTIC`
-|stem:[\text{Hexad} \to \text{Set}(\text{TypeAnnotation})]
+|stem:[\text{Octad} \to \text{Set}(\text{TypeAnnotation})]
 
 |`DOCUMENT`
-|stem:[\text{Hexad} \to \text{Option}(\text{String})]
+|stem:[\text{Octad} \to \text{Option}(\text{String})]
 
 |`TEMPORAL`
-|stem:[\text{Hexad} \to \text{List}(\text{Version})]
+|stem:[\text{Octad} \to \text{List}(\text{Version})]
 |===
 
 **Note:** Vector and tensor modalities have **dependent types** - the return type depends on the dimension parameters.
@@ -195,8 +195,8 @@ We use the following typing judgments:
 |stem:[\Gamma \vdash Q : \tau]
 |Query `Q` has type stem:[\tau] in context stem:[\Gamma]
 
-|stem:[\Gamma \vdash C : \text{Hexad} \to \text{Bool}]
-|Condition `C` is a predicate on hexads
+|stem:[\Gamma \vdash C : \text{Octad} \to \text{Bool}]
+|Condition `C` is a predicate on octads
 
 |stem:[\Gamma \vdash \tau : \text{Type}]
 |stem:[\tau] is a well-formed type
@@ -292,7 +292,7 @@ We use the following typing judgments:
 \frac{
   \Gamma \vdash \mathcal{M} : \text{ModalitySet} \quad
   \Gamma \vdash S : \text{Source} \quad
-  \Gamma \vdash C : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash C : \text{Octad} \to \text{Bool}
 }{
   \Gamma \vdash \texttt{SELECT } \mathcal{M} \texttt{ FROM } S \texttt{ WHERE } C : \text{QueryResult}[\mathcal{M}]
 } \text{(T-SlipstreamQuery)}
@@ -302,14 +302,14 @@ Where:
 
 [stem]
 ++++
-\text{QueryResult}[\mathcal{M}] = \text{List}(\text{Hexad}_\mathcal{M})
+\text{QueryResult}[\mathcal{M}] = \text{List}(\text{Octad}_\mathcal{M})
 ++++
 
 And:
 
 [stem]
 ++++
-\text{Hexad}_\mathcal{M} = \{h : \text{Hexad} \mid \forall m \in \mathcal{M}. m(h) \neq \text{None}\}
+\text{Octad}_\mathcal{M} = \{h : \text{Octad} \mid \forall m \in \mathcal{M}. m(h) \neq \text{None}\}
 ++++
 
 === Dependent-Type Query (With Proof)
@@ -319,7 +319,7 @@ And:
 \frac{
   \Gamma \vdash \mathcal{M} : \text{ModalitySet} \quad
   \Gamma \vdash S : \text{Source} \quad
-  \Gamma \vdash C : \text{Hexad} \to \text{Bool} \quad
+  \Gamma \vdash C : \text{Octad} \to \text{Bool} \quad
   \Gamma \vdash P : \text{ProofSpec}[\phi]
 }{
   \Gamma \vdash \texttt{SELECT } \mathcal{M} \texttt{ ... PROOF } P : \text{ProvedResult}[\mathcal{M}, \phi]
@@ -356,7 +356,7 @@ Where:
 
 === Source Typing
 
-==== Hexad Source
+==== Octad Source
 
 [stem]
 ++++
@@ -364,7 +364,7 @@ Where:
   \Gamma \vdash u : \text{UUID}
 }{
   \Gamma \vdash \texttt{HEXAD } u : \text{Source}
-} \text{(T-HexadSource)}
+} \text{(T-OctadSource)}
 ++++
 
 ==== Federation Source
@@ -401,7 +401,7 @@ Where:
 \frac{
   \Gamma \vdash p : \text{SPARQLPattern}
 }{
-  \Gamma \vdash p : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash p : \text{Octad} \to \text{Bool}
 } \text{(T-GraphCond)}
 ++++
 
@@ -413,7 +413,7 @@ Where:
   \Gamma \vdash v : \text{Vector}[n] \quad
   \Gamma \vdash t : \text{Float}
 }{
-  \Gamma \vdash \texttt{h.embedding SIMILAR TO } v \texttt{ WITHIN } t : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash \texttt{h.embedding SIMILAR TO } v \texttt{ WITHIN } t : \text{Octad} \to \text{Bool}
 } \text{(T-VectorSimilarity)}
 ++++
 
@@ -426,7 +426,7 @@ Where:
   k > 0 \quad
   \Gamma \vdash m : \text{MetricType}
 }{
-  \Gamma \vdash \texttt{h.embedding NEAREST } k \texttt{ USING } m : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash \texttt{h.embedding NEAREST } k \texttt{ USING } m : \text{Octad} \to \text{Bool}
 } \text{(T-VectorNearest)}
 ++++
 
@@ -435,11 +435,11 @@ Where:
 [stem]
 ++++
 \frac{
-  \Gamma \vdash \text{field} : \text{Hexad} \to \text{Tensor}[\ldots] \quad
+  \Gamma \vdash \text{field} : \text{Octad} \to \text{Tensor}[\ldots] \quad
   \Gamma \vdash \text{op} : \text{TensorOp} \quad
   \Gamma \vdash \text{literal} : \text{Tensor}[\ldots]
 }{
-  \Gamma \vdash \text{field op literal} : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash \text{field op literal} : \text{Octad} \to \text{Bool}
 } \text{(T-TensorCond)}
 ++++
 
@@ -451,7 +451,7 @@ Where:
   \Gamma \vdash c : \text{Contract} \quad
   \Gamma \vdash p : \text{Params}
 }{
-  \Gamma \vdash \texttt{SATISFIES } c(p) : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash \texttt{SATISFIES } c(p) : \text{Octad} \to \text{Bool}
 } \text{(T-SemanticCond)}
 ++++
 
@@ -462,7 +462,7 @@ Where:
 \frac{
   \Gamma \vdash t : \text{Timestamp}
 }{
-  \Gamma \vdash \texttt{AS OF } t : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash \texttt{AS OF } t : \text{Octad} \to \text{Bool}
 } \text{(T-TemporalAsOf)}
 ++++
 
@@ -473,10 +473,10 @@ Where:
 [stem]
 ++++
 \frac{
-  \Gamma \vdash C_1 : \text{Hexad} \to \text{Bool} \quad
-  \Gamma \vdash C_2 : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash C_1 : \text{Octad} \to \text{Bool} \quad
+  \Gamma \vdash C_2 : \text{Octad} \to \text{Bool}
 }{
-  \Gamma \vdash C_1 \texttt{ AND } C_2 : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash C_1 \texttt{ AND } C_2 : \text{Octad} \to \text{Bool}
 } \text{(T-And)}
 ++++
 
@@ -485,10 +485,10 @@ Where:
 [stem]
 ++++
 \frac{
-  \Gamma \vdash C_1 : \text{Hexad} \to \text{Bool} \quad
-  \Gamma \vdash C_2 : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash C_1 : \text{Octad} \to \text{Bool} \quad
+  \Gamma \vdash C_2 : \text{Octad} \to \text{Bool}
 }{
-  \Gamma \vdash C_1 \texttt{ OR } C_2 : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash C_1 \texttt{ OR } C_2 : \text{Octad} \to \text{Bool}
 } \text{(T-Or)}
 ++++
 
@@ -497,9 +497,9 @@ Where:
 [stem]
 ++++
 \frac{
-  \Gamma \vdash C : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash C : \text{Octad} \to \text{Bool}
 }{
-  \Gamma \vdash \texttt{NOT } C : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash \texttt{NOT } C : \text{Octad} \to \text{Bool}
 } \text{(T-Not)}
 ++++
 
@@ -634,11 +634,11 @@ stem:[\tau_1 \leq \tau_2] means "stem:[\tau_1] is a subtype of stem:[\tau_2]" (v
 \frac{
   \mathcal{M}_1 \subseteq \mathcal{M}_2
 }{
-  \text{Hexad}_{\mathcal{M}_2} \leq \text{Hexad}_{\mathcal{M}_1}
-} \text{(Sub-Hexad)}
+  \text{Octad}_{\mathcal{M}_2} \leq \text{Octad}_{\mathcal{M}_1}
+} \text{(Sub-Octad)}
 ++++
 
-**Intuition:** A hexad with more modalities can be used where fewer are required (contravariant).
+**Intuition:** A octad with more modalities can be used where fewer are required (contravariant).
 
 === Subsumption in Typing
 
@@ -751,10 +751,10 @@ check_slipstream_query Γ (SELECT M FROM S WHERE C) =
   let τ_M = check_modalities Γ M in
   let τ_S = check_source Γ S in
   let τ_C = check_condition Γ C in
-  if τ_C ≡ (Hexad → Bool) then
+  if τ_C ≡ (Octad → Bool) then
     QueryResult[M]
   else
-    TypeError "Condition must be predicate on Hexad"
+    TypeError "Condition must be predicate on Octad"
 ----
 
 ==== Dependent-Type Query
@@ -794,7 +794,7 @@ From conditions:
 WHERE h.embedding SIMILAR TO v WITHIN 0.8
 ----
 
-Inferred: `{h : Hexad | similarity(h.embedding, v) ≥ 0.8}`
+Inferred: `{h : Octad | similarity(h.embedding, v) ≥ 0.8}`
 
 == Type Safety Properties
 
@@ -832,8 +832,8 @@ If stem:[\Gamma \vdash Q : \tau] and stem:[Q \Rightarrow^* v], then stem:[\Gamma
 |Aspect |Slipstream Path |Dependent-Type Path
 
 |**Result Type**
-|stem:[\text{List}(\text{Hexad})]
-|stem:[\Sigma r : \text{List}(\text{Hexad}). \text{Proof}[\phi(r)]]
+|stem:[\text{List}(\text{Octad})]
+|stem:[\Sigma r : \text{List}(\text{Octad}). \text{Proof}[\phi(r)]]
 
 |**Guarantees**
 |Best-effort filtering
@@ -883,11 +883,11 @@ For runtime optimization, **dependent types can be erased** from slipstream quer
 
 === Row Polymorphism (Future)
 
-Support for flexible hexad projections:
+Support for flexible octad projections:
 
 [stem]
 ++++
-\text{Hexad}\{\text{graph} : \text{Graph}, \text{vector} : \text{Vector} \mid r\}
+\text{Octad}\{\text{graph} : \text{Graph}, \text{vector} : \text{Vector} \mid r\}
 ++++
 
 Where `r` is a row variable representing "possibly more modalities".
@@ -898,7 +898,7 @@ Track side effects in query execution:
 
 [stem]
 ++++
-\text{Query} : \text{HexadSet} \xrightarrow{\{\text{IO}, \text{Network}\}} \text{List}(\text{Hexad})
+\text{Query} : \text{OctadSet} \xrightarrow{\{\text{IO}, \text{Network}\}} \text{List}(\text{Octad})
 ++++
 
 Indicating the query performs IO and network operations.

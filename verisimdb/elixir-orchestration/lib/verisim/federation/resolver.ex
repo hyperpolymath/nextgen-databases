@@ -48,7 +48,7 @@ defmodule VeriSim.Federation.Resolver do
       register_peer("arango-prod", %{
         endpoint: "http://arango:8529",
         adapter_type: :arangodb,
-        adapter_config: %{database: "_system", collection: "hexads"},
+        adapter_config: %{database: "_system", collection: "octads"},
         modalities: [:graph, :document, :semantic]
       })
   """

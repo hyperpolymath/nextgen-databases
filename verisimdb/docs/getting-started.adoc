@@ -166,16 +166,16 @@ The `.gatekeeper.yaml` policy controls authentication, rate limits, and
 trust requirements. All `.ctp` bundles are cryptographically signed via
 cerro-torre (Ed25519) and verified before deployment.
 
-== Quick Start: Your First Hexad
+== Quick Start: Your First Octad
 
-A **hexad** (historical name; now an octad) is an entity with up to 8
+A **octad** (historical name; now an octad) is an entity with up to 8
 modality representations. Let's create one.
 
 === Step 1: Create an Entity
 
 [source,bash]
 ----
-curl -X POST http://localhost:8080/api/v1/hexads \
+curl -X POST http://localhost:8080/api/v1/octads \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Douglas Adams",
@@ -213,7 +213,7 @@ Response:
 
 [source,bash]
 ----
-curl http://localhost:8080/api/v1/hexads/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+curl http://localhost:8080/api/v1/octads/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
 ----
 
 === Step 3: Check Drift Status
@@ -252,7 +252,7 @@ updating the document:
 [source,bash]
 ----
 # Update ONLY the vector embedding (not the document text)
-curl -X PUT http://localhost:8080/api/v1/hexads/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d \
+curl -X PUT http://localhost:8080/api/v1/octads/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d \
   -H "Content-Type: application/json" \
   -d '{
     "embedding": [0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99]
@@ -507,10 +507,10 @@ repair strategy:
 | Method | Endpoint | Description
 
 | `GET` | `/api/v1/health` | Health check
-| `POST` | `/api/v1/hexads` | Create a new entity
-| `GET` | `/api/v1/hexads/:id` | Retrieve entity by ID
-| `PUT` | `/api/v1/hexads/:id` | Update entity
-| `DELETE` | `/api/v1/hexads/:id` | Delete entity
+| `POST` | `/api/v1/octads` | Create a new entity
+| `GET` | `/api/v1/octads/:id` | Retrieve entity by ID
+| `PUT` | `/api/v1/octads/:id` | Update entity
+| `DELETE` | `/api/v1/octads/:id` | Delete entity
 | `GET` | `/api/v1/search/text?q=...&limit=10` | Full-text search
 | `POST` | `/api/v1/search/vector` | Vector similarity search
 | `GET` | `/api/v1/search/related/:id` | Graph traversal

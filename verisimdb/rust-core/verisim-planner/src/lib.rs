@@ -34,8 +34,8 @@ pub use stats::{AdaptiveTuner, StatisticsCollector, StoreStatistics};
 
 /// The six modalities of VeriSimDB.
 ///
-/// Each modality represents a different representation/store for hexad entities.
-/// The planner defines its own canonical enum to avoid coupling with verisim-hexad
+/// Each modality represents a different representation/store for octad entities.
+/// The planner defines its own canonical enum to avoid coupling with verisim-octad
 /// or verisim-drift.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]

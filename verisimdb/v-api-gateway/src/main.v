@@ -99,12 +99,12 @@ fn (mut g Gateway) handle(req http.Request) http.Response {
 		return g.handle_health(headers)
 	}
 
-	// Hexad CRUD — proxy to Rust core
-	if url.starts_with('/api/v1/hexads') && req.method == .get {
+	// Octad CRUD — proxy to Rust core
+	if url.starts_with('/api/v1/octads') && req.method == .get {
 		return g.proxy_to_rust(url.replace('/api/v1', ''), headers)
 	}
-	if url == '/api/v1/hexads' && req.method == .post {
-		return g.proxy_post_to_rust('/hexads', req.data, headers)
+	if url == '/api/v1/octads' && req.method == .post {
+		return g.proxy_post_to_rust('/octads', req.data, headers)
 	}
 
 	// VQL execution — proxy to Rust core
@@ -294,17 +294,17 @@ fn (g Gateway) do_handle_graphql(data string, headers http.Header) http.Response
 		}
 	}
 
-	if query.contains('hexads') || query.contains('hexad') {
-		hexads_body := proxy_get('${g.config.rust_url}/hexads?limit=20&offset=0') or {
+	if query.contains('octads') || query.contains('octad') {
+		octads_body := proxy_get('${g.config.rust_url}/octads?limit=20&offset=0') or {
 			return http.Response{
 				status_code: 200
-				body:        '{"data":{"hexads":null},"errors":[{"message":"Hexads unavailable: ${err.msg()}"}]}'
+				body:        '{"data":{"octads":null},"errors":[{"message":"Octads unavailable: ${err.msg()}"}]}'
 				header:      headers
 			}
 		}
 		return http.Response{
 			status_code: 200
-			body:        '{"data":{"hexads":${hexads_body}}}'
+			body:        '{"data":{"octads":${octads_body}}}'
 			header:      headers
 		}
 	}
@@ -358,7 +358,7 @@ fn (g Gateway) do_handle_graphql(data string, headers http.Header) http.Response
 	// Unsupported query
 	return http.Response{
 		status_code: 200
-		body:        '{"errors":[{"message":"Unrecognised query. Supported: health, telemetry, hexads, driftScore, executeVql"}]}'
+		body:        '{"errors":[{"message":"Unrecognised query. Supported: health, telemetry, octads, driftScore, executeVql"}]}'
 		header:      headers
 	}
 }

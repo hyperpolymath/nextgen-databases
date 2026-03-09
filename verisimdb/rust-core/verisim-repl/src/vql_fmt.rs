@@ -16,7 +16,7 @@ const VQL_KEYWORDS: &[&str] = &[
     "EXISTS", "CONTAINS", "SIMILAR", "TO", "TRAVERSE", "DEPTH", "THRESHOLD",
     "DRIFT", "CONSISTENCY", "AT", "TIME", "EXPLAIN", "INSERT", "UPDATE",
     "DELETE", "SET", "INTO", "VALUES", "CREATE", "DROP", "ALTER", "JOIN",
-    "ON", "WITH", "FEDERATION", "STORE", "HEXAD", "ALL", "ASC", "DESC",
+    "ON", "WITH", "FEDERATION", "STORE", "OCTAD", "ALL", "ASC", "DESC",
     "COUNT", "SUM", "AVG", "MIN", "MAX", "DISTINCT", "ANALYZE",
 ];
 
@@ -303,18 +303,18 @@ mod tests {
 
     #[test]
     fn test_keyword_uppercasing() {
-        let input = "select graph from hexad where id = 'abc'";
+        let input = "select graph from octad where id = 'abc'";
         let output = format_vql(input);
         assert!(output.contains("SELECT"));
         assert!(output.contains("GRAPH"));
         assert!(output.contains("FROM"));
-        assert!(output.contains("HEXAD"));
+        assert!(output.contains("OCTAD"));
         assert!(output.contains("WHERE"));
     }
 
     #[test]
     fn test_modality_uppercasing() {
-        let input = "select vector, tensor from hexad";
+        let input = "select vector, tensor from octad";
         let output = format_vql(input);
         assert!(output.contains("VECTOR"));
         assert!(output.contains("TENSOR"));
@@ -322,14 +322,14 @@ mod tests {
 
     #[test]
     fn test_string_literals_preserved() {
-        let input = "select graph from hexad where name = 'hello world'";
+        let input = "select graph from octad where name = 'hello world'";
         let output = format_vql(input);
         assert!(output.contains("'hello world'"));
     }
 
     #[test]
     fn test_clause_newlines() {
-        let input = "SELECT GRAPH FROM HEXAD WHERE id = 'abc' LIMIT 10";
+        let input = "SELECT GRAPH FROM OCTAD WHERE id = 'abc' LIMIT 10";
         let output = format_vql(input);
         // FROM should be on a new line
         assert!(output.contains("\nFROM"));
@@ -341,7 +341,7 @@ mod tests {
 
     #[test]
     fn test_and_or_indentation() {
-        let input = "SELECT GRAPH FROM HEXAD WHERE a = 1 AND b = 2 OR c = 3";
+        let input = "SELECT GRAPH FROM OCTAD WHERE a = 1 AND b = 2 OR c = 3";
         let output = format_vql(input);
         assert!(output.contains("\n  AND"));
         assert!(output.contains("\n  OR"));
@@ -349,21 +349,21 @@ mod tests {
 
     #[test]
     fn test_compact_format() {
-        let input = "  select   graph   from   hexad  ";
+        let input = "  select   graph   from   octad  ";
         let output = format_vql_compact(input);
-        assert_eq!(output, "SELECT GRAPH FROM HEXAD");
+        assert_eq!(output, "SELECT GRAPH FROM OCTAD");
     }
 
     #[test]
     fn test_whitespace_normalization() {
-        let input = "SELECT    GRAPH    FROM     HEXAD";
+        let input = "SELECT    GRAPH    FROM     OCTAD";
         let compact = format_vql_compact(input);
-        assert_eq!(compact, "SELECT GRAPH FROM HEXAD");
+        assert_eq!(compact, "SELECT GRAPH FROM OCTAD");
     }
 
     #[test]
     fn test_number_preservation() {
-        let input = "select graph from hexad limit 42 offset 10";
+        let input = "select graph from octad limit 42 offset 10";
         let output = format_vql(input);
         assert!(output.contains("42"));
         assert!(output.contains("10"));
@@ -371,25 +371,25 @@ mod tests {
 
     #[test]
     fn test_mixed_case_keywords() {
-        let input = "Select Graph From Hexad Where Id = 'test'";
+        let input = "Select Graph From Octad Where Id = 'test'";
         let output = format_vql(input);
         assert!(output.contains("SELECT"));
         assert!(output.contains("GRAPH"));
         assert!(output.contains("FROM"));
-        assert!(output.contains("HEXAD"));
+        assert!(output.contains("OCTAD"));
         assert!(output.contains("WHERE"));
     }
 
     #[test]
     fn test_non_keyword_preserved() {
-        let input = "SELECT graph FROM hexad WHERE entity_name = 'test'";
+        let input = "SELECT graph FROM octad WHERE entity_name = 'test'";
         let output = format_vql(input);
         assert!(output.contains("entity_name"));
     }
 
     #[test]
     fn test_explain_select_same_line() {
-        let input = "explain select graph from hexad";
+        let input = "explain select graph from octad";
         let output = format_vql(input);
         // EXPLAIN and SELECT should stay on the same line
         let first_line = output.lines().next().unwrap();
@@ -416,7 +416,7 @@ mod tests {
 
     #[test]
     fn test_traverse_depth_formatting() {
-        let input = "select graph from hexad traverse relates_to depth 3";
+        let input = "select graph from octad traverse relates_to depth 3";
         let output = format_vql(input);
         assert!(output.contains("TRAVERSE"));
         assert!(output.contains("DEPTH"));
@@ -425,7 +425,7 @@ mod tests {
 
     #[test]
     fn test_proof_clause_formatting() {
-        let input = "select semantic from hexad proof existence threshold 0.95";
+        let input = "select semantic from octad proof existence threshold 0.95";
         let output = format_vql(input);
         assert!(output.contains("SEMANTIC"));
         assert!(output.contains("PROOF"));
@@ -435,14 +435,14 @@ mod tests {
 
     #[test]
     fn test_comma_spacing() {
-        let input = "select graph , vector , tensor from hexad";
+        let input = "select graph , vector , tensor from octad";
         let compact = format_vql_compact(input);
         assert!(compact.contains("GRAPH, VECTOR, TENSOR"));
     }
 
     #[test]
     fn test_federation_formatting() {
-        let input = "select graph from federation store 'remote-1' hexad";
+        let input = "select graph from federation store 'remote-1' octad";
         let output = format_vql(input);
         assert!(output.contains("FEDERATION"));
         assert!(output.contains("STORE"));
@@ -451,7 +451,7 @@ mod tests {
 
     #[test]
     fn test_roundtrip_idempotent() {
-        let input = "SELECT GRAPH\nFROM HEXAD\nWHERE id = 'abc'\nLIMIT 10";
+        let input = "SELECT GRAPH\nFROM OCTAD\nWHERE id = 'abc'\nLIMIT 10";
         let first = format_vql(input);
         let second = format_vql(&first);
         assert_eq!(first, second, "Formatting should be idempotent");

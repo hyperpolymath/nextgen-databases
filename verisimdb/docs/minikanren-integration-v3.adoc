@@ -40,7 +40,7 @@ toc::[]
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  Elixir Orchestration Layer                                 │
-│    ├── VeriSim.EntityServer (GenServer per Hexad)           │
+│    ├── VeriSim.EntityServer (GenServer per Octad)           │
 │    ├── VeriSim.DriftMonitor (drift detection coordinator)   │
 │    ├── VeriSim.QueryRouter (distributes queries)            │
 │    ├── VeriSim.AdaptiveLearner (v1: feedback loops)         │
@@ -75,7 +75,7 @@ toc::[]
 ;; Ask miniKanren: What plans satisfy this query?
 (run* (plan)
   (query-plano
-    '(FROM verisim:graph WHERE hexad.types INCLUDES "Paper")
+    '(FROM verisim:graph WHERE octad.types INCLUDES "Paper")
     plan))
 ```
 
@@ -145,17 +145,17 @@ toc::[]
 
 === 4. ZKP Contract Satisfaction
 
-**Problem:** Verify if a hexad satisfies contract constraints symbolically.
+**Problem:** Verify if a octad satisfies contract constraints symbolically.
 
 **miniKanren approach:**
 
 ```scheme
 ;; Relational specification of ZKP contracts
-(defrel (contract-satisfiedo hexad contract)
+(defrel (contract-satisfiedo octad contract)
   (fresh (contract-type constraints)
     (contract-typeo contract contract-type)
     (contract-constraintso contract constraints)
-    (all-constraints-satisfiedo hexad constraints)))
+    (all-constraints-satisfiedo octad constraints)))
 
 ;; Check satisfaction without executing ZKP
 (run* (result)
@@ -165,7 +165,7 @@ toc::[]
     result))
 ```
 
-**Output:** `(#f)` - hexad does NOT satisfy contract (missing citations)
+**Output:** `(#f)` - octad does NOT satisfy contract (missing citations)
 
 == Implementation Options (v3)
 

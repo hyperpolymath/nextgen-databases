@@ -3,7 +3,7 @@
 
 //! Drift detection and normalization operations.
 //!
-//! VeriSimDB continuously monitors how far each hexad's modality data has
+//! VeriSimDB continuously monitors how far each octad's modality data has
 //! diverged from its normalised baseline. When drift exceeds a configurable
 //! threshold the entity is flagged for re-normalisation. This module exposes
 //! drift score retrieval, system-wide status, and manual normalization triggers.
@@ -13,14 +13,14 @@ use crate::error::Result;
 use crate::types::DriftScore;
 
 impl VeriSimClient {
-    /// Retrieve the drift score for a single hexad entity.
+    /// Retrieve the drift score for a single octad entity.
     ///
     /// The score aggregates per-modality drift metrics into an overall value
     /// (0.0 = perfectly normalised, higher = more drift).
     ///
     /// # Arguments
     ///
-    /// * `id` — The hexad entity identifier.
+    /// * `id` — The octad entity identifier.
     ///
     /// # Errors
     ///
@@ -38,14 +38,14 @@ impl VeriSimClient {
         self.get("/api/v1/drift/status").await
     }
 
-    /// Trigger re-normalisation for a specific hexad entity.
+    /// Trigger re-normalisation for a specific octad entity.
     ///
     /// This enqueues the entity for the normaliser pipeline, which will
     /// recompute cross-modality consistency and update the baseline.
     ///
     /// # Arguments
     ///
-    /// * `id` — The hexad entity identifier.
+    /// * `id` — The octad entity identifier.
     pub async fn trigger_normalization(&self, id: &str) -> Result<()> {
         let path = format!("/api/v1/drift/{id}/normalize");
         let empty: serde_json::Value = serde_json::json!({});

@@ -6,7 +6,7 @@ defmodule VeriSim.Test.VQLTestHelpers do
 
   Provides:
   - VQLBridge startup and teardown
-  - Hexad fixtures for each modality combination
+  - Octad fixtures for each modality combination
   - AST assertion helpers
   - Query execution wrappers with Rust-core-unavailable handling
   - Cross-modal condition builders
@@ -151,13 +151,13 @@ defmodule VeriSim.Test.VQLTestHelpers do
     ~w(GRAPH VECTOR TENSOR SEMANTIC DOCUMENT TEMPORAL PROVENANCE SPATIAL)
   end
 
-  @doc "Build a SELECT query for a single modality from a hexad."
+  @doc "Build a SELECT query for a single modality from a octad."
   def single_modality_query(modality, entity_id \\ "test-entity-001") do
     mod_upper = modality |> to_string() |> String.upcase()
     "SELECT #{mod_upper}.* FROM HEXAD '#{entity_id}'"
   end
 
-  @doc "Build a SELECT query for multiple modalities from a hexad."
+  @doc "Build a SELECT query for multiple modalities from a octad."
   def multi_modality_query(modalities, entity_id \\ "test-entity-001") do
     projection = modalities
       |> Enum.map(fn m -> "#{m |> to_string() |> String.upcase()}.*" end)
@@ -165,7 +165,7 @@ defmodule VeriSim.Test.VQLTestHelpers do
     "SELECT #{projection} FROM HEXAD '#{entity_id}'"
   end
 
-  @doc "Build a SELECT * (all modalities) query from a hexad."
+  @doc "Build a SELECT * (all modalities) query from a octad."
   def all_modality_query(entity_id \\ "test-entity-001") do
     "SELECT * FROM HEXAD '#{entity_id}'"
   end
@@ -264,7 +264,7 @@ defmodule VeriSim.Test.VQLTestHelpers do
     source = ast[:source] || ast["source"]
 
     case {expected_type, source} do
-      {:hexad, {:hexad, _id}} -> :ok
+      {:octad, {:octad, _id}} -> :ok
       {:federation, {:federation, _, _}} -> :ok
       {:store, {:store, _id}} -> :ok
       _ ->

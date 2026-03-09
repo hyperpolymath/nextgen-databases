@@ -47,27 +47,27 @@ defmodule VeriSim.IntegrationTest do
       end
     end
 
-    test "create and get hexad" do
+    test "create and get octad" do
       input = %{
-        title: "Test Hexad",
-        body: "Integration test hexad",
+        title: "Test Octad",
+        body: "Integration test octad",
         embedding: List.duplicate(0.5, 384)
       }
 
-      case RustClient.create_hexad(input) do
+      case RustClient.create_octad(input) do
         {:ok, %{"id" => entity_id}} ->
           assert is_binary(entity_id)
 
-          case RustClient.get_hexad(entity_id) do
-            {:ok, hexad} ->
-              assert hexad["id"] == entity_id
-              assert hexad["document"]["title"] == "Test Hexad"
+          case RustClient.get_octad(entity_id) do
+            {:ok, octad} ->
+              assert octad["id"] == entity_id
+              assert octad["document"]["title"] == "Test Octad"
 
             {:error, :not_found} ->
-              flunk("Hexad should exist after creation")
+              flunk("Octad should exist after creation")
 
             {:error, reason} ->
-              flunk("Failed to get hexad: #{inspect(reason)}")
+              flunk("Failed to get octad: #{inspect(reason)}")
           end
 
         {:error, _reason} ->
@@ -189,7 +189,7 @@ defmodule VeriSim.IntegrationTest do
     test "generates explain plans" do
       query_ast = %{
         modalities: [:graph, :vector],
-        source: {:hexad, "test-id"},
+        source: {:octad, "test-id"},
         where: nil,
         proof: nil,
         limit: 10,
@@ -203,10 +203,10 @@ defmodule VeriSim.IntegrationTest do
       assert Map.has_key?(plan, :steps)
     end
 
-    test "executes hexad queries" do
+    test "executes octad queries" do
       query_ast = %{
         modalities: [:document],
-        source: {:hexad, "nonexistent-id"},
+        source: {:octad, "nonexistent-id"},
         where: nil,
         proof: nil,
         limit: 10,
@@ -215,7 +215,7 @@ defmodule VeriSim.IntegrationTest do
 
       result = VQLExecutor.execute(query_ast)
 
-      # Expect error for nonexistent hexad
+      # Expect error for nonexistent octad
       assert match?({:error, _}, result)
     end
   end
@@ -259,8 +259,8 @@ defmodule VeriSim.IntegrationTest do
   end
 
   describe "Full Stack Integration" do
-    test "create hexad via Rust, query via Elixir" do
-      # Create hexad via Rust client
+    test "create octad via Rust, query via Elixir" do
+      # Create octad via Rust client
       input = %{
         title: "Full Stack Test",
         body: "Testing end-to-end integration",
@@ -268,15 +268,15 @@ defmodule VeriSim.IntegrationTest do
         types: ["verisim:Document"]
       }
 
-      case RustClient.create_hexad(input) do
+      case RustClient.create_octad(input) do
         {:ok, %{"id" => entity_id}} ->
           # Query via Elixir QueryRouter
-          case RustClient.get_hexad(entity_id) do
-            {:ok, hexad} ->
-              assert hexad["document"]["title"] == "Full Stack Test"
+          case RustClient.get_octad(entity_id) do
+            {:ok, octad} ->
+              assert octad["document"]["title"] == "Full Stack Test"
 
             {:error, reason} ->
-              flunk("Failed to retrieve hexad: #{inspect(reason)}")
+              flunk("Failed to retrieve octad: #{inspect(reason)}")
           end
 
         {:error, _reason} ->
@@ -307,14 +307,14 @@ defmodule VeriSim.IntegrationTest do
     test "drift detection across stack" do
       entity_id = "drift-integration-#{:rand.uniform(10000)}"
 
-      # Create hexad with potential drift
+      # Create octad with potential drift
       input = %{
         title: "Drift Test",
         body: "Testing drift detection across stack",
         embedding: List.duplicate(0.8, 384)
       }
 
-      case RustClient.create_hexad(input) do
+      case RustClient.create_octad(input) do
         {:ok, %{"id" => ^entity_id}} ->
           # Check drift via Elixir
           case RustClient.get_drift_score(entity_id) do

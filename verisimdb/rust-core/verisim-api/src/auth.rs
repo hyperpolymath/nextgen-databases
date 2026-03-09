@@ -62,7 +62,7 @@ pub struct ClientIdentity {
 pub enum ClientRole {
     /// Read-only access to all endpoints.
     Reader,
-    /// Read and write access to hexad CRUD and queries.
+    /// Read and write access to octad CRUD and queries.
     Writer,
     /// Full access including admin operations (config, normalizer triggers).
     Admin,

@@ -30,7 +30,7 @@ defmodule VeriSim.Federation.Adapters.DuckDB do
       %{
         path: "/data/verisimdb.duckdb",   # Database file or :memory
         extensions: [:hnsw, :fts, :spatial],
-        table: "hexads"
+        table: "octads"
       }
 
   ## HTTP Endpoint
@@ -137,7 +137,7 @@ defmodule VeriSim.Federation.Adapters.DuckDB do
     |> Enum.map(fn row ->
       %{
         source_store: peer_info.store_id,
-        hexad_id: row["id"] || row["entity_id"] || row["_key"] || "unknown",
+        octad_id: row["id"] || row["entity_id"] || row["_key"] || "unknown",
         score: parse_score(row),
         drifted: false,
         data: row,
@@ -152,7 +152,7 @@ defmodule VeriSim.Federation.Adapters.DuckDB do
 
   defp build_sql(modalities, query_params, limit, peer_info) do
     config = peer_info.adapter_config
-    table = Map.get(config, :table, "hexads")
+    table = Map.get(config, :table, "octads")
 
     cond do
       :vector in modalities && Map.has_key?(query_params, :vector_query) ->

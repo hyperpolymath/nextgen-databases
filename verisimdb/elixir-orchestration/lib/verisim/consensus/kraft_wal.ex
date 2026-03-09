@@ -315,12 +315,12 @@ defmodule VeriSim.Consensus.KRaftWAL do
   defp serialize_command({:unregister_store, store_id}) do
     %{"type" => "unregister_store", "store_id" => store_id}
   end
-  defp serialize_command({:map_hexad, hexad_id, locations}) do
-    %{"type" => "map_hexad", "hexad_id" => hexad_id,
+  defp serialize_command({:map_octad, octad_id, locations}) do
+    %{"type" => "map_octad", "octad_id" => octad_id,
       "locations" => locations}
   end
-  defp serialize_command({:unmap_hexad, hexad_id}) do
-    %{"type" => "unmap_hexad", "hexad_id" => hexad_id}
+  defp serialize_command({:unmap_octad, octad_id}) do
+    %{"type" => "unmap_octad", "octad_id" => octad_id}
   end
   defp serialize_command({:update_trust, store_id, new_trust}) do
     %{"type" => "update_trust", "store_id" => store_id,
@@ -346,11 +346,11 @@ defmodule VeriSim.Consensus.KRaftWAL do
   defp deserialize_command(%{"type" => "unregister_store"} = cmd) do
     {:unregister_store, cmd["store_id"]}
   end
-  defp deserialize_command(%{"type" => "map_hexad"} = cmd) do
-    {:map_hexad, cmd["hexad_id"], cmd["locations"]}
+  defp deserialize_command(%{"type" => "map_octad"} = cmd) do
+    {:map_octad, cmd["octad_id"], cmd["locations"]}
   end
-  defp deserialize_command(%{"type" => "unmap_hexad"} = cmd) do
-    {:unmap_hexad, cmd["hexad_id"]}
+  defp deserialize_command(%{"type" => "unmap_octad"} = cmd) do
+    {:unmap_octad, cmd["octad_id"]}
   end
   defp deserialize_command(%{"type" => "update_trust"} = cmd) do
     {:update_trust, cmd["store_id"], cmd["new_trust"]}
@@ -369,7 +369,7 @@ defmodule VeriSim.Consensus.KRaftWAL do
       end),
       "mappings" => Map.new(registry[:mappings] || %{}, fn {k, v} ->
         {k, %{
-          "hexad_id" => v[:hexad_id] || k,
+          "octad_id" => v[:octad_id] || k,
           "locations" => v[:locations],
           "primary_store" => v[:primary_store]
         }}
@@ -392,7 +392,7 @@ defmodule VeriSim.Consensus.KRaftWAL do
       end),
       mappings: Map.new(map["mappings"] || %{}, fn {k, v} ->
         {k, %{
-          hexad_id: v["hexad_id"] || k,
+          octad_id: v["octad_id"] || k,
           locations: v["locations"],
           primary_store: v["primary_store"],
           created: nil,

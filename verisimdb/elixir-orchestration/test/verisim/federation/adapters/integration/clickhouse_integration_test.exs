@@ -7,9 +7,9 @@ defmodule VeriSim.Federation.Adapters.ClickHouseIntegrationTest do
   Runs against a real ClickHouse server from the test-infra container
   stack. The seed script `clickhouse-init.sql` pre-loads:
 
-  - `verisimdb.hexads` table: 3 rows (hexad-test-001, -002, -003) with
+  - `verisimdb.octads` table: 3 rows (octad-test-001, -002, -003) with
     title, content, entity_type, drift_status, spatial coordinates, tags
-  - `verisimdb.modalities` table: 11 rows (modality records per hexad)
+  - `verisimdb.modalities` table: 11 rows (modality records per octad)
   - `verisimdb.drift_scores` table: 5 rows (time-series drift measurements)
   - `verisimdb.provenance_events` table: 4 rows
   - 3 materialized views: mv_drift_status_counts, mv_modality_distribution,
@@ -47,11 +47,11 @@ defmodule VeriSim.Federation.Adapters.ClickHouseIntegrationTest do
     endpoint: @clickhouse_url,
     adapter_config: %{
       database: "verisimdb",
-      table: "hexads"
+      table: "octads"
     }
   }
 
-  @integration_prefix "hexad-integration"
+  @integration_prefix "octad-integration"
 
   # ---------------------------------------------------------------------------
   # Setup / Teardown
@@ -100,19 +100,19 @@ defmodule VeriSim.Federation.Adapters.ClickHouseIntegrationTest do
   # 2. Read / Query — Verify Seed Data
   # ---------------------------------------------------------------------------
 
-  describe "querying seeded hexads table" do
+  describe "querying seeded octads table" do
     test "SELECT * returns all 3 seeded rows", context do
       skip_if_unavailable(context)
 
       query_params = %{modalities: [], limit: 100}
       assert {:ok, results} = ClickHouse.query(@peer_info, query_params)
 
-      # The seed script inserts 3 hexad rows
+      # The seed script inserts 3 octad rows
       assert length(results) >= 3
 
       Enum.each(results, fn result ->
         assert result.source_store == "ch-integration"
-        assert is_binary(result.hexad_id)
+        assert is_binary(result.octad_id)
         assert is_number(result.score)
         assert result.drifted == false
         assert is_map(result.data)
@@ -125,8 +125,8 @@ defmodule VeriSim.Federation.Adapters.ClickHouseIntegrationTest do
       query_params = %{modalities: [], limit: 10}
       assert {:ok, results} = ClickHouse.query(@peer_info, query_params)
 
-      # Find hexad-test-001 in results
-      test_001 = Enum.find(results, fn r -> r.hexad_id == "hexad-test-001" end)
+      # Find octad-test-001 in results
+      test_001 = Enum.find(results, fn r -> r.octad_id == "octad-test-001" end)
 
       if test_001 do
         assert test_001.data["title"] == "Introduction to Cross-Modal Consistency"
@@ -151,7 +151,7 @@ defmodule VeriSim.Federation.Adapters.ClickHouseIntegrationTest do
       }
 
       assert {:ok, results} = ClickHouse.query(@peer_info, query_params)
-      # hexad-test-002 title contains "Drift", hexad-test-003 content mentions drift
+      # octad-test-002 title contains "Drift", octad-test-003 content mentions drift
       assert length(results) >= 1
     end
 
@@ -247,10 +247,10 @@ defmodule VeriSim.Federation.Adapters.ClickHouseIntegrationTest do
   # ---------------------------------------------------------------------------
 
   describe "spatial queries via ClickHouse geo functions" do
-    test "pointInPolygon query around London returns hexad-test-001", context do
+    test "pointInPolygon query around London returns octad-test-001", context do
       skip_if_unavailable(context)
 
-      # hexad-test-001 has lat=51.5074, lon=-0.1278 (London)
+      # octad-test-001 has lat=51.5074, lon=-0.1278 (London)
       query_params = %{
         modalities: [:spatial],
         spatial_bounds: %{
@@ -288,7 +288,7 @@ defmodule VeriSim.Federation.Adapters.ClickHouseIntegrationTest do
       [normalised] = ClickHouse.translate_results([raw_row], @peer_info)
 
       assert normalised.source_store == "ch-integration"
-      assert normalised.hexad_id == test_id
+      assert normalised.octad_id == test_id
       assert normalised.score == 0.73
       assert normalised.drifted == false
     end
@@ -316,7 +316,7 @@ defmodule VeriSim.Federation.Adapters.ClickHouseIntegrationTest do
       unreachable_peer = %{
         store_id: "ch-unreachable",
         endpoint: "http://localhost:59996",
-        adapter_config: %{database: "verisimdb", table: "hexads"}
+        adapter_config: %{database: "verisimdb", table: "octads"}
       }
 
       assert {:error, _reason} = ClickHouse.connect(unreachable_peer)

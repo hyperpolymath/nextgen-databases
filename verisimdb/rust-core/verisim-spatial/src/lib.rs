@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 //! VeriSim Spatial Modality
 //!
-//! Provides geospatial indexing and querying capabilities for hexad entities.
+//! Provides geospatial indexing and querying capabilities for octad entities.
 //! Supports WGS84 (EPSG:4326) coordinates by default, with configurable SRID
 //! for other coordinate reference systems.
 //!

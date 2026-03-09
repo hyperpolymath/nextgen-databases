@@ -13,7 +13,7 @@
 //! for arguments:
 //!
 //! ```json
-//! { "TAG": "Hexad", "_0": "some-uuid" }
+//! { "TAG": "Octad", "_0": "some-uuid" }
 //! ```
 //!
 //! This module defines serde-compatible Rust types that mirror this encoding and
@@ -97,7 +97,7 @@ impl<'de> Deserialize<'de> for VqlAst {
 pub struct VqlQuery {
     /// Requested modalities (`Graph`, `Vector`, ..., or `All`).
     pub modalities: Vec<VqlModality>,
-    /// Data source (Hexad, Federation, Store).
+    /// Data source (Octad, Federation, Store).
     pub source: VqlSource,
     /// Optional WHERE clause.
     #[serde(default, rename = "where")]
@@ -197,8 +197,8 @@ impl<'de> Deserialize<'de> for VqlModality {
 #[derive(Debug, Clone, Deserialize)]
 #[serde(tag = "TAG")]
 pub enum VqlSource {
-    /// Single hexad store. `_0` is an optional UUID filter.
-    Hexad {
+    /// Single octad store. `_0` is an optional UUID filter.
+    Octad {
         #[serde(rename = "_0")]
         uuid: Option<String>,
     },
@@ -838,7 +838,7 @@ fn vql_modality_to_planner(vm: &VqlModality) -> Result<Modality, PlannerError> {
 /// Map a VQL source to a planner `QuerySource`.
 fn map_source(src: &VqlSource) -> Result<QuerySource, PlannerError> {
     match src {
-        VqlSource::Hexad { .. } => Ok(QuerySource::Hexad),
+        VqlSource::Octad { .. } => Ok(QuerySource::Octad),
         VqlSource::Federation { nodes, .. } => Ok(QuerySource::Federation {
             nodes: nodes.clone(),
         }),
@@ -1125,12 +1125,12 @@ mod tests {
     }
 
     #[test]
-    fn test_simple_hexad_query() {
+    fn test_simple_octad_query() {
         let json = r#"{
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "Graph"}, {"TAG": "Document"}],
-                "source": {"TAG": "Hexad", "_0": "abc-123"},
+                "source": {"TAG": "Octad", "_0": "abc-123"},
                 "where": {
                     "TAG": "Simple",
                     "_0": {"TAG": "FulltextContains", "_0": "hello world"}
@@ -1146,10 +1146,10 @@ mod tests {
             }
         }"#;
 
-        let plan = parse_and_plan(json).expect("should parse simple hexad query");
+        let plan = parse_and_plan(json).expect("should parse simple octad query");
 
-        // Source should be Hexad.
-        assert!(matches!(plan.source, QuerySource::Hexad));
+        // Source should be Octad.
+        assert!(matches!(plan.source, QuerySource::Octad));
 
         // Two nodes: Document (priority 30) and Graph (priority 40).
         assert_eq!(plan.nodes.len(), 2);
@@ -1226,7 +1226,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "Document"}, {"TAG": "Graph"}],
-                "source": {"TAG": "Hexad", "_0": null},
+                "source": {"TAG": "Octad", "_0": null},
                 "where": {
                     "TAG": "Simple",
                     "_0": {
@@ -1265,7 +1265,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "Document"}],
-                "source": {"TAG": "Hexad", "_0": null},
+                "source": {"TAG": "Octad", "_0": null},
                 "where": null,
                 "projections": null,
                 "aggregates": [
@@ -1327,7 +1327,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "All"}],
-                "source": {"TAG": "Hexad", "_0": null},
+                "source": {"TAG": "Octad", "_0": null},
                 "where": null,
                 "projections": null,
                 "aggregates": null,
@@ -1384,7 +1384,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "Graph"}, {"TAG": "Vector"}],
-                "source": {"TAG": "Hexad", "_0": "some-uuid"},
+                "source": {"TAG": "Octad", "_0": "some-uuid"},
                 "where": {
                     "TAG": "And",
                     "_0": {
@@ -1455,7 +1455,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "Document"}, {"TAG": "Graph"}],
-                "source": {"TAG": "Hexad", "_0": null},
+                "source": {"TAG": "Octad", "_0": null},
                 "where": {
                     "TAG": "Or",
                     "_0": {
@@ -1528,7 +1528,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "Semantic"}, {"TAG": "Document"}],
-                "source": {"TAG": "Hexad", "_0": null},
+                "source": {"TAG": "Octad", "_0": null},
                 "where": null,
                 "projections": null,
                 "aggregates": null,
@@ -1573,7 +1573,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "Document"}],
-                "source": {"TAG": "Hexad", "_0": null},
+                "source": {"TAG": "Octad", "_0": null},
                 "where": {
                     "TAG": "Simple",
                     "_0": {
@@ -1615,7 +1615,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "Temporal"}],
-                "source": {"TAG": "Hexad", "_0": null},
+                "source": {"TAG": "Octad", "_0": null},
                 "where": {
                     "TAG": "Simple",
                     "_0": {
@@ -1656,7 +1656,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [],
-                "source": {"TAG": "Hexad", "_0": null},
+                "source": {"TAG": "Octad", "_0": null},
                 "where": null,
                 "projections": null,
                 "aggregates": null,
@@ -1682,7 +1682,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "Graph"}, {"TAG": "Vector"}],
-                "source": {"TAG": "Hexad", "_0": null},
+                "source": {"TAG": "Octad", "_0": null},
                 "where": {
                     "TAG": "Simple",
                     "_0": {
@@ -1720,7 +1720,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "Document"}],
-                "source": {"TAG": "Hexad", "_0": null},
+                "source": {"TAG": "Octad", "_0": null},
                 "where": {
                     "TAG": "Not",
                     "_0": {
@@ -1754,7 +1754,7 @@ mod tests {
             "TAG": "Query",
             "_0": {
                 "modalities": [{"TAG": "Graph"}, {"TAG": "All"}, {"TAG": "Graph"}],
-                "source": {"TAG": "Hexad", "_0": null},
+                "source": {"TAG": "Octad", "_0": null},
                 "where": null,
                 "projections": null,
                 "aggregates": null,

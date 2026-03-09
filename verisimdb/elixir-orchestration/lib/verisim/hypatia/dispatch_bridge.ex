@@ -2,7 +2,7 @@
 
 defmodule VeriSim.Hypatia.DispatchBridge do
   @moduledoc """
-  Bridge between VeriSimDB hexad data and Hypatia's dispatch pipeline.
+  Bridge between VeriSimDB octad data and Hypatia's dispatch pipeline.
 
   Reads dispatch manifests (JSONL files) from verisimdb-data/dispatch/,
   tracks execution status, and provides feedback to VeriSimDB for drift
@@ -226,16 +226,16 @@ defmodule VeriSim.Hypatia.DispatchBridge do
   end
 
   @doc """
-  Create a VeriSimDB hexad representing a dispatch batch summary.
+  Create a VeriSimDB octad representing a dispatch batch summary.
 
   Stores dispatch metadata as a trackable entity for temporal analysis.
   """
   def ingest_dispatch_summary(data_path) when is_binary(data_path) do
     summary = summarize(data_path)
-    hexad_id = "dispatch:summary:#{System.system_time(:second)}"
+    octad_id = "dispatch:summary:#{System.system_time(:second)}"
 
-    hexad_input = %{
-      hexad_id: hexad_id,
+    octad_input = %{
+      octad_id: octad_id,
       metadata: %{
         type: "dispatch_summary",
         timestamp: DateTime.utc_now() |> DateTime.to_iso8601()
@@ -268,9 +268,9 @@ defmodule VeriSim.Hypatia.DispatchBridge do
 
     # Also store the full summary in local ETS
     ensure_ets_table()
-    :ets.insert(:hypatia_dispatch_summaries, {hexad_id, hexad_input})
+    :ets.insert(:hypatia_dispatch_summaries, {octad_id, octad_input})
 
-    {:ok, hexad_id}
+    {:ok, octad_id}
   end
 
   # ---------------------------------------------------------------------------

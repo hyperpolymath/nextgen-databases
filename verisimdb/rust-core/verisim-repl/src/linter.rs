@@ -347,91 +347,91 @@ mod tests {
 
     #[test]
     fn test_clean_query_no_errors() {
-        let diagnostics = lint_query("SELECT GRAPH FROM HEXAD WHERE id = 'abc' LIMIT 10");
+        let diagnostics = lint_query("SELECT GRAPH FROM OCTAD WHERE id = 'abc' LIMIT 10");
         let errors: Vec<_> = diagnostics.iter().filter(|d| d.severity == Severity::Error).collect();
         assert!(errors.is_empty());
     }
 
     #[test]
     fn test_missing_limit() {
-        let diagnostics = lint_query("SELECT GRAPH FROM HEXAD");
+        let diagnostics = lint_query("SELECT GRAPH FROM OCTAD");
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::MissingLimit));
     }
 
     #[test]
     fn test_explain_exempt_from_limit() {
-        let diagnostics = lint_query("EXPLAIN SELECT GRAPH FROM HEXAD");
+        let diagnostics = lint_query("EXPLAIN SELECT GRAPH FROM OCTAD");
         assert!(!diagnostics.iter().any(|d| d.rule == LintRule::MissingLimit));
     }
 
     #[test]
     fn test_select_all_modalities() {
         let diagnostics = lint_query(
-            "SELECT GRAPH VECTOR TENSOR SEMANTIC DOCUMENT TEMPORAL PROVENANCE SPATIAL FROM HEXAD LIMIT 10"
+            "SELECT GRAPH VECTOR TENSOR SEMANTIC DOCUMENT TEMPORAL PROVENANCE SPATIAL FROM OCTAD LIMIT 10"
         );
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::SelectAllModalities));
     }
 
     #[test]
     fn test_semantic_without_proof() {
-        let diagnostics = lint_query("SELECT SEMANTIC FROM HEXAD LIMIT 10");
+        let diagnostics = lint_query("SELECT SEMANTIC FROM OCTAD LIMIT 10");
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::MissingProof));
     }
 
     #[test]
     fn test_semantic_with_proof_ok() {
-        let diagnostics = lint_query("SELECT SEMANTIC FROM HEXAD PROOF EXISTENCE LIMIT 10");
+        let diagnostics = lint_query("SELECT SEMANTIC FROM OCTAD PROOF EXISTENCE LIMIT 10");
         assert!(!diagnostics.iter().any(|d| d.rule == LintRule::MissingProof));
     }
 
     #[test]
     fn test_unbounded_traverse() {
-        let diagnostics = lint_query("SELECT GRAPH FROM HEXAD TRAVERSE relates_to LIMIT 10");
+        let diagnostics = lint_query("SELECT GRAPH FROM OCTAD TRAVERSE relates_to LIMIT 10");
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::UnboundedTraverse));
         assert!(diagnostics.iter().any(|d| d.severity == Severity::Error));
     }
 
     #[test]
     fn test_traverse_with_depth_ok() {
-        let diagnostics = lint_query("SELECT GRAPH FROM HEXAD TRAVERSE relates_to DEPTH 3 LIMIT 10");
+        let diagnostics = lint_query("SELECT GRAPH FROM OCTAD TRAVERSE relates_to DEPTH 3 LIMIT 10");
         assert!(!diagnostics.iter().any(|d| d.rule == LintRule::UnboundedTraverse));
     }
 
     #[test]
     fn test_drift_without_threshold() {
-        let diagnostics = lint_query("SELECT GRAPH FROM HEXAD WHERE DRIFT LIMIT 10");
+        let diagnostics = lint_query("SELECT GRAPH FROM OCTAD WHERE DRIFT LIMIT 10");
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::MissingThreshold));
     }
 
     #[test]
     fn test_order_without_limit() {
-        let diagnostics = lint_query("SELECT GRAPH FROM HEXAD ORDER BY name");
+        let diagnostics = lint_query("SELECT GRAPH FROM OCTAD ORDER BY name");
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::OrderByWithoutLimit));
     }
 
     #[test]
     fn test_dangerous_delete() {
-        let diagnostics = lint_query("DELETE FROM HEXAD");
+        let diagnostics = lint_query("DELETE FROM OCTAD");
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::DangerousWrite));
         assert!(diagnostics.iter().any(|d| d.severity == Severity::Error));
     }
 
     #[test]
     fn test_delete_with_where_ok() {
-        let diagnostics = lint_query("DELETE FROM HEXAD WHERE id = 'abc'");
+        let diagnostics = lint_query("DELETE FROM OCTAD WHERE id = 'abc'");
         assert!(!diagnostics.iter().any(|d| d.rule == LintRule::DangerousWrite));
     }
 
     #[test]
     fn test_unknown_proof_type() {
-        let diagnostics = lint_query("SELECT SEMANTIC FROM HEXAD PROOF FOOBAR LIMIT 10");
+        let diagnostics = lint_query("SELECT SEMANTIC FROM OCTAD PROOF FOOBAR LIMIT 10");
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::UnknownProofType));
     }
 
     #[test]
     fn test_known_proof_types_ok() {
         for proof_type in &["EXISTENCE", "CONSISTENCY", "INTEGRITY", "ZKP", "PLONK"] {
-            let q = format!("SELECT SEMANTIC FROM HEXAD PROOF {} LIMIT 10", proof_type);
+            let q = format!("SELECT SEMANTIC FROM OCTAD PROOF {} LIMIT 10", proof_type);
             let diagnostics = lint_query(&q);
             assert!(
                 !diagnostics.iter().any(|d| d.rule == LintRule::UnknownProofType),
@@ -443,44 +443,44 @@ mod tests {
 
     #[test]
     fn test_redundant_where() {
-        let diagnostics = lint_query("SELECT GRAPH FROM HEXAD WHERE 1=1 LIMIT 10");
+        let diagnostics = lint_query("SELECT GRAPH FROM OCTAD WHERE 1=1 LIMIT 10");
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::RedundantWhere));
     }
 
     #[test]
     fn test_multi_modality_hint() {
         let diagnostics = lint_query(
-            "SELECT GRAPH VECTOR TENSOR FROM HEXAD LIMIT 10"
+            "SELECT GRAPH VECTOR TENSOR FROM OCTAD LIMIT 10"
         );
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::MultiModalityNoExplain));
     }
 
     #[test]
     fn test_federation_without_store() {
-        let diagnostics = lint_query("SELECT GRAPH FROM FEDERATION HEXAD LIMIT 10");
+        let diagnostics = lint_query("SELECT GRAPH FROM FEDERATION OCTAD LIMIT 10");
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::FederationWithoutStore));
     }
 
     #[test]
     fn test_federation_with_store_ok() {
-        let diagnostics = lint_query("SELECT GRAPH FROM FEDERATION STORE 'remote-1' HEXAD LIMIT 10");
+        let diagnostics = lint_query("SELECT GRAPH FROM FEDERATION STORE 'remote-1' OCTAD LIMIT 10");
         assert!(!diagnostics.iter().any(|d| d.rule == LintRule::FederationWithoutStore));
     }
 
     #[test]
     fn test_has_errors_true() {
-        assert!(has_errors("DELETE FROM HEXAD"));
+        assert!(has_errors("DELETE FROM OCTAD"));
     }
 
     #[test]
     fn test_has_errors_false() {
-        assert!(!has_errors("SELECT GRAPH FROM HEXAD LIMIT 10"));
+        assert!(!has_errors("SELECT GRAPH FROM OCTAD LIMIT 10"));
     }
 
     #[test]
     fn test_diagnostics_sorted_by_severity() {
         let diagnostics = lint_query(
-            "DELETE FROM FEDERATION HEXAD"
+            "DELETE FROM FEDERATION OCTAD"
         );
         // Errors should come before warnings
         let severities: Vec<_> = diagnostics.iter().map(|d| d.severity).collect();
@@ -491,8 +491,8 @@ mod tests {
 
     #[test]
     fn test_format_diagnostics_output() {
-        let diagnostics = lint_query("DELETE FROM HEXAD");
-        let output = format_diagnostics("DELETE FROM HEXAD", &diagnostics);
+        let diagnostics = lint_query("DELETE FROM OCTAD");
+        let output = format_diagnostics("DELETE FROM OCTAD", &diagnostics);
         assert!(output.contains("VQL007"));
         assert!(output.contains("error"));
     }
@@ -505,13 +505,13 @@ mod tests {
 
     #[test]
     fn test_case_insensitive() {
-        let diagnostics = lint_query("select semantic from hexad limit 10");
+        let diagnostics = lint_query("select semantic from octad limit 10");
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::MissingProof));
     }
 
     #[test]
     fn test_update_without_where() {
-        let diagnostics = lint_query("UPDATE HEXAD SET name = 'test'");
+        let diagnostics = lint_query("UPDATE OCTAD SET name = 'test'");
         assert!(diagnostics.iter().any(|d| d.rule == LintRule::DangerousWrite));
     }
 }

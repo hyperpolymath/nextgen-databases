@@ -74,7 +74,7 @@ Single-node deployment with all 6 modalities local.
 
 ==== Use Cases
 
-* Small to medium deployments (<10M hexads)
+* Small to medium deployments (<10M octads)
 * Organizations with single-site requirements
 * Development and testing environments
 * Air-gapped environments
@@ -138,7 +138,7 @@ podman run -d \
 
 === Mode 2: Federated Coordinator
 
-Lightweight coordinator that maps hexad IDs to remote store locations.
+Lightweight coordinator that maps octad IDs to remote store locations.
 
 ==== Use Cases
 
@@ -369,10 +369,10 @@ curl -H "Authorization: Bearer $VERISIM_API_KEY" \
 ----
 # config/rbac.toml
 [roles.reader]
-permissions = ["hexad:read", "search:execute"]
+permissions = ["octad:read", "search:execute"]
 
 [roles.writer]
-permissions = ["hexad:read", "hexad:write", "search:execute"]
+permissions = ["octad:read", "octad:write", "search:execute"]
 
 [roles.admin]
 permissions = ["*"]
@@ -435,7 +435,7 @@ scrape_configs:
 |===
 |Metric |Description |Type
 
-|`verisim_hexads_total` |Total hexads in database |Counter
+|`verisim_octads_total` |Total octads in database |Counter
 |`verisim_queries_total` |Total queries executed |Counter
 |`verisim_query_duration_seconds` |Query latency histogram |Histogram
 |`verisim_drift_score` |Current drift score |Gauge
@@ -462,8 +462,8 @@ scrape_configs:
   "timestamp": "2026-02-04T20:00:00Z",
   "level": "INFO",
   "component": "verisim-api",
-  "message": "Hexad created",
-  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "message": "Octad created",
+  "octad_id": "550e8400-e29b-41d4-a716-446655440000",
   "modalities": ["document", "vector"],
   "duration_ms": 45
 }
@@ -601,11 +601,11 @@ VeriSimDB's temporal modality supports point-in-time recovery:
 
 [source,bash]
 ----
-# Restore hexad to specific timestamp
+# Restore octad to specific timestamp
 curl -X POST http://localhost:8080/api/v1/admin/restore \
   -H "Content-Type: application/json" \
   -d '{
-    "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+    "octad_id": "550e8400-e29b-41d4-a716-446655440000",
     "timestamp": "2026-02-04T12:00:00Z"
   }'
 ----
@@ -754,7 +754,7 @@ podman rename verisimdb-new verisimdb
 
 * Deploy multiple standalone instances
 * Use ReScript registry to coordinate
-* Distribute hexads across instances by hash
+* Distribute octads across instances by hash
 
 == Production Checklist
 

@@ -78,7 +78,7 @@ defmodule VeriSim.Federation.Adapter do
         adapter_type: :arangodb,
         adapter_config: %{
           database: "_system",
-          collection: "hexads",
+          collection: "octads",
           auth: {:basic, "root", "password"}
         },
         modalities: [:graph, :document, :semantic, :spatial]
@@ -90,7 +90,7 @@ defmodule VeriSim.Federation.Adapter do
 
       %{
         source_store: "peer-id",
-        hexad_id: "entity-id-or-equivalent",
+        octad_id: "entity-id-or-equivalent",
         score: 0.85,
         drifted: false,
         data: %{...},          # Raw data from the backend
@@ -153,7 +153,7 @@ defmodule VeriSim.Federation.Adapter do
   @typedoc "Normalised result from a federated query."
   @type federation_result :: %{
           source_store: String.t(),
-          hexad_id: String.t(),
+          octad_id: String.t(),
           score: float(),
           drifted: boolean(),
           data: map(),

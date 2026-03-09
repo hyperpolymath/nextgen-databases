@@ -162,7 +162,7 @@ defmodule VeriSim.Federation.Adapters.Redis do
 
       %{
         source_store: peer_info.store_id,
-        hexad_id: id,
+        octad_id: id,
         score: parse_score(row),
         drifted: false,
         data: data,
@@ -177,7 +177,7 @@ defmodule VeriSim.Federation.Adapters.Redis do
 
   defp build_commands(modalities, query_params, limit, peer_info) do
     config = peer_info.adapter_config
-    index_name = Map.get(config, :index_name, "hexad_idx")
+    index_name = Map.get(config, :index_name, "octad_idx")
 
     cond do
       :vector in modalities && Map.has_key?(query_params, :vector_query) ->
@@ -224,7 +224,7 @@ defmodule VeriSim.Federation.Adapters.Redis do
 
       :graph in modalities && Map.has_key?(query_params, :graph_pattern) ->
         # RedisGraph Cypher query
-        graph_key = Map.get(config, :graph_key, "hexad_graph")
+        graph_key = Map.get(config, :graph_key, "octad_graph")
         start_vertex = query_params.graph_pattern
 
         cypher = """
@@ -241,7 +241,7 @@ defmodule VeriSim.Federation.Adapters.Redis do
       :temporal in modalities && Map.has_key?(query_params, :temporal_range) ->
         # RedisTimeSeries range query
         range = query_params.temporal_range
-        ts_key = Map.get(config, :timeseries_key, "hexad_ts")
+        ts_key = Map.get(config, :timeseries_key, "octad_ts")
         start_ts = range[:start] || range["start"] || "-"
         end_ts = range[:end] || range["end"] || "+"
 
@@ -251,7 +251,7 @@ defmodule VeriSim.Federation.Adapters.Redis do
 
       :provenance in modalities ->
         # Redis Streams — XREVRANGE for latest events
-        stream_key = Map.get(config, :stream_key, "hexad_provenance")
+        stream_key = Map.get(config, :stream_key, "octad_provenance")
 
         %{
           "command" => ["XREVRANGE", stream_key, "+", "-", "COUNT", to_string(limit)]
@@ -260,7 +260,7 @@ defmodule VeriSim.Federation.Adapters.Redis do
       :semantic in modalities && Map.has_key?(query_params, :filters) ->
         # RedisJSON — JSON.GET with path filters
         filters = query_params.filters
-        json_key_pattern = Map.get(config, :json_key_pattern, "hexad:*")
+        json_key_pattern = Map.get(config, :json_key_pattern, "octad:*")
 
         # Use FT.SEARCH with JSON filter if RediSearch is available
         filter_clauses =
@@ -282,7 +282,7 @@ defmodule VeriSim.Federation.Adapters.Redis do
 
       true ->
         # Default: scan keys matching the collection pattern
-        key_pattern = Map.get(config, :key_pattern, "hexad:*")
+        key_pattern = Map.get(config, :key_pattern, "octad:*")
 
         %{
           "command" => ["SCAN", "0", "MATCH", key_pattern, "COUNT", to_string(limit)]

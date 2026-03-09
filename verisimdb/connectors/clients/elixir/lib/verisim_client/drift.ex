@@ -5,7 +5,7 @@ defmodule VeriSimClient.Drift do
   @moduledoc """
   Drift detection and normalization operations for VeriSimDB.
 
-  VeriSimDB continuously monitors how far each hexad's modality data has
+  VeriSimDB continuously monitors how far each octad's modality data has
   diverged from its normalised baseline. When drift exceeds a configurable
   threshold the entity is flagged for re-normalisation. This module exposes
   drift score retrieval, system-wide status, and manual normalization triggers.
@@ -23,7 +23,7 @@ defmodule VeriSimClient.Drift do
   alias VeriSimClient.Types
 
   @doc """
-  Retrieve the drift score for a single hexad entity.
+  Retrieve the drift score for a single octad entity.
 
   The score aggregates per-modality drift metrics into an overall value
   (0.0 = perfectly normalised, higher = more drift).
@@ -31,7 +31,7 @@ defmodule VeriSimClient.Drift do
   ## Parameters
 
     * `client` — A `VeriSimClient.t()` connection.
-    * `id`     — The hexad entity identifier.
+    * `id`     — The octad entity identifier.
   """
   @spec score(VeriSimClient.t(), String.t()) ::
           {:ok, Types.drift_score()} | {:error, term()}
@@ -55,7 +55,7 @@ defmodule VeriSimClient.Drift do
   end
 
   @doc """
-  Trigger re-normalisation for a specific hexad entity.
+  Trigger re-normalisation for a specific octad entity.
 
   This enqueues the entity for the normaliser pipeline, which will recompute
   cross-modality consistency and update the baseline.
@@ -63,7 +63,7 @@ defmodule VeriSimClient.Drift do
   ## Parameters
 
     * `client` — A `VeriSimClient.t()` connection.
-    * `id`     — The hexad entity identifier.
+    * `id`     — The octad entity identifier.
   """
   @spec normalize(VeriSimClient.t(), String.t()) :: :ok | {:error, term()}
   def normalize(%VeriSimClient{} = client, id) when is_binary(id) do

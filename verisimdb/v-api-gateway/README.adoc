@@ -17,7 +17,7 @@ https://github.com/hyperpolymath/developer-ecosystem[v-ecosystem]
 
 The gateway proxies to:
 
-* **Rust core** (port 8080) — data operations (hexads, search, drift, provenance)
+* **Rust core** (port 8080) — data operations (octads, search, drift, provenance)
 * **Elixir orchestration** (port 4080) — telemetry, status, consensus
 
 == Architecture
@@ -50,9 +50,9 @@ The gateway proxies to:
 | Method | Path | Description
 
 | GET | `/api/v1/health` | Combined health (gateway + Rust + Elixir)
-| GET | `/api/v1/hexads` | List hexad entities
-| GET | `/api/v1/hexads/:id` | Get single hexad
-| POST | `/api/v1/hexads` | Create hexad
+| GET | `/api/v1/octads` | List octad entities
+| GET | `/api/v1/octads/:id` | Get single octad
+| POST | `/api/v1/octads` | Create octad
 | POST | `/api/v1/vql/execute` | Execute VQL query
 | GET | `/api/v1/drift/entity/:id` | Get drift metrics
 | GET | `/api/v1/telemetry` | Product telemetry (from Elixir)
@@ -64,15 +64,15 @@ The gateway proxies to:
 [source,graphql]
 ----
 type Query {
-  hexad(id: ID!): Hexad
-  hexads(limit: Int, offset: Int): [Hexad!]!
+  octad(id: ID!): Octad
+  octads(limit: Int, offset: Int): [Octad!]!
   driftScore(entityId: ID!): DriftScore
   telemetry: TelemetryReport
   health: HealthStatus
 }
 
 type Mutation {
-  createHexad(input: HexadInput!): Hexad
+  createOctad(input: OctadInput!): Octad
   executeVql(query: String!): VqlResult
 }
 ----
@@ -88,7 +88,7 @@ Defined in `proto/verisimdb.proto`. Services:
 
 * `VeriSimService.Health` — health check
 * `VeriSimService.Query` — execute VQL
-* `VeriSimService.GetHexad` — fetch hexad
+* `VeriSimService.GetOctad` — fetch octad
 * `VeriSimService.GetDrift` — drift metrics
 
 ==== gRPC client examples (grpcurl)
@@ -99,12 +99,12 @@ Defined in `proto/verisimdb.proto`. Services:
 grpcurl -plaintext localhost:50051 verisimdb.VeriSimService/Health
 
 # Execute a VQL query
-grpcurl -plaintext -d '{"query": "SELECT * FROM hexads LIMIT 10"}' \
+grpcurl -plaintext -d '{"query": "SELECT * FROM octads LIMIT 10"}' \
   localhost:50051 verisimdb.VeriSimService/Query
 
-# Get a specific hexad
+# Get a specific octad
 grpcurl -plaintext -d '{"id": "entity-001"}' \
-  localhost:50051 verisimdb.VeriSimService/GetHexad
+  localhost:50051 verisimdb.VeriSimService/GetOctad
 
 # Get drift metrics for an entity
 grpcurl -plaintext -d '{"entity_id": "entity-001"}' \

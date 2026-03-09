@@ -3,7 +3,7 @@
 
 //! Provenance chain operations.
 //!
-//! Every hexad entity in VeriSimDB maintains an append-only provenance chain
+//! Every octad entity in VeriSimDB maintains an append-only provenance chain
 //! recording creation, transformation, derivation, and access events. This
 //! module provides methods to read, append to, and cryptographically verify
 //! provenance chains.
@@ -13,13 +13,13 @@ use crate::error::Result;
 use crate::types::ProvenanceEvent;
 
 impl VeriSimClient {
-    /// Retrieve the full provenance chain for a hexad entity.
+    /// Retrieve the full provenance chain for a octad entity.
     ///
     /// Events are returned in chronological order (oldest first).
     ///
     /// # Arguments
     ///
-    /// * `id` — The hexad entity identifier.
+    /// * `id` — The octad entity identifier.
     ///
     /// # Errors
     ///
@@ -29,7 +29,7 @@ impl VeriSimClient {
         self.get(&path).await
     }
 
-    /// Append a new event to a hexad's provenance chain.
+    /// Append a new event to a octad's provenance chain.
     ///
     /// The event is immutably recorded; its timestamp and identifier are
     /// assigned by the server. The returned [`ProvenanceEvent`] contains the
@@ -37,7 +37,7 @@ impl VeriSimClient {
     ///
     /// # Arguments
     ///
-    /// * `id`    — The hexad entity identifier.
+    /// * `id`    — The octad entity identifier.
     /// * `event` — The provenance event to record.
     pub async fn record_provenance(
         &self,
@@ -48,7 +48,7 @@ impl VeriSimClient {
         self.post(&path, event).await
     }
 
-    /// Verify the integrity of a hexad's provenance chain.
+    /// Verify the integrity of a octad's provenance chain.
     ///
     /// The server checks that the chain is contiguous, that no events have been
     /// tampered with, and that cryptographic hashes (if enabled) are consistent.
@@ -60,7 +60,7 @@ impl VeriSimClient {
     ///
     /// # Arguments
     ///
-    /// * `id` — The hexad entity identifier.
+    /// * `id` — The octad entity identifier.
     pub async fn verify_provenance(&self, id: &str) -> Result<serde_json::Value> {
         let path = format!("/api/v1/provenance/{id}/verify");
         self.get(&path).await

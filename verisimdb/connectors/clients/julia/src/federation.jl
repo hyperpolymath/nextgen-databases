@@ -4,7 +4,7 @@
 # VeriSimDB Julia Client — Federation operations.
 #
 # VeriSimDB supports federated operation where multiple instances form a cluster,
-# sharing and synchronising hexad data across peers. This file provides functions
+# sharing and synchronising octad data across peers. This file provides functions
 # to register and manage federation peers and to execute cross-node queries.
 
 """

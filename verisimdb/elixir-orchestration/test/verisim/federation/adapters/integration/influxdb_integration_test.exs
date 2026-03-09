@@ -11,8 +11,8 @@ defmodule VeriSim.Federation.Adapters.InfluxDBIntegrationTest do
   - Auth token: `verisim-test-token-do-not-use-in-production`
   - Buckets: `metrics` (auto-setup), `drift_scores` (30d retention),
     `federation_health` (7d retention)
-  - `drift_scores` bucket: 7 data points across 3 hexads
-    - Measurement: `drift` with tags `hexad_id`, `status`
+  - `drift_scores` bucket: 7 data points across 3 octads
+    - Measurement: `drift` with tags `octad_id`, `status`
     - Fields: `semantic_vector`, `graph_document`, `temporal`, `overall`
   - `metrics` bucket: ~20 query latency data points
     - Measurement: `query_latency` with tags `service`, `query_type`
@@ -62,7 +62,7 @@ defmodule VeriSim.Federation.Adapters.InfluxDBIntegrationTest do
     }
   }
 
-  @integration_prefix "hexad-integration"
+  @integration_prefix "octad-integration"
 
   # ---------------------------------------------------------------------------
   # Setup / Teardown
@@ -124,7 +124,7 @@ defmodule VeriSim.Federation.Adapters.InfluxDBIntegrationTest do
 
       Enum.each(results, fn result ->
         assert result.source_store == "influx-integration"
-        assert is_binary(result.hexad_id)
+        assert is_binary(result.octad_id)
         assert result.drifted == false
       end)
     end
@@ -177,7 +177,7 @@ defmodule VeriSim.Federation.Adapters.InfluxDBIntegrationTest do
   # ---------------------------------------------------------------------------
 
   describe "aggregation and tag-based filtering" do
-    test "filtering by hexad_id tag returns specific hexad drift scores", context do
+    test "filtering by octad_id tag returns specific octad drift scores", context do
       skip_if_unavailable(context)
 
       query_params = %{
@@ -186,7 +186,7 @@ defmodule VeriSim.Federation.Adapters.InfluxDBIntegrationTest do
           start: "-24h",
           end: "now()"
         },
-        filters: %{"hexad_id" => "hexad-test-001"},
+        filters: %{"octad_id" => "octad-test-001"},
         limit: 100
       }
 
@@ -194,7 +194,7 @@ defmodule VeriSim.Federation.Adapters.InfluxDBIntegrationTest do
       assert is_list(results)
     end
 
-    test "filtering by status=drifted returns only drifted hexads", context do
+    test "filtering by status=drifted returns only drifted octads", context do
       skip_if_unavailable(context)
 
       query_params = %{
@@ -281,8 +281,8 @@ defmodule VeriSim.Federation.Adapters.InfluxDBIntegrationTest do
         "_measurement" => "drift",
         "_time" => "2026-02-28T12:00:00Z",
         "_value" => 0.045,
-        "entity_id" => "hexad-test-001",
-        "hexad_id" => "hexad-test-001",
+        "entity_id" => "octad-test-001",
+        "octad_id" => "octad-test-001",
         "status" => "healthy"
       }
 
@@ -290,7 +290,7 @@ defmodule VeriSim.Federation.Adapters.InfluxDBIntegrationTest do
 
       assert normalised.source_store == "influx-integration"
       # InfluxDB adapter builds composite ID: measurement:entity_id:_time
-      assert normalised.hexad_id == "drift:hexad-test-001:2026-02-28T12:00:00Z"
+      assert normalised.octad_id == "drift:octad-test-001:2026-02-28T12:00:00Z"
       assert normalised.drifted == false
     end
   end
