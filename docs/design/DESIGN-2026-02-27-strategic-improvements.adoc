@@ -47,7 +47,7 @@ automatically.  This is genuinely novel.
   drift scores.
 
 | **Self-normalisation**
-| Real implementation.  Regeneration strategies inspect hexad data, select the
+| Real implementation.  Regeneration strategies inspect octad data, select the
   authoritative modality, and derive drifted modality content from it.
 
 | **HNSW vector search**
@@ -58,7 +58,7 @@ automatically.  This is genuinely novel.
 | Real implementation.  Inverted index, ranked results, phrase queries.
 
 | **Temporal versioning**
-| Real implementation.  Native version history per hexad, not audit table hacks.
+| Real implementation.  Native version history per octad, not audit table hacks.
 
 | **ETS caching**
 | Real implementation.  Read-through cache with TTL in the Elixir layer, write
@@ -101,7 +101,7 @@ automatically.  This is genuinely novel.
 | **Modality stores are wrappers**
 | LOW
 | The stores wrap Oxigraph, Tantivy, HNSW, ndarray, CBOR.  This is fine
-  architecturally -- the novel contribution is the hexad coordination and drift
+  architecturally -- the novel contribution is the octad coordination and drift
   layer, not the individual stores.  But it means the "8 modalities" pitch is
   weaker than it sounds; the real pitch is drift detection.  (The tensor
   modality is an exception — active research is uncovering novel applications
@@ -371,7 +371,7 @@ evolves to watch external databases (Layer 2 above), VerisimDB gets the
 ecosystem integration of Great Expectations with the cross-system consistency
 checking that none of them offer.
 
-== From Hexad to Octad: Two New Modalities
+== From Octad to Octad: Two New Modalities
 
 The current 6 modalities cover data representation well.  Two additions
 complete the model.
@@ -479,7 +479,7 @@ The provenance modality is structurally simpler than graph or vector:
 
 - Storage: append-only log per entity (similar to temporal, but tracking
   _origins_ not _versions_)
-- Query: `SELECT hexads WHERE provenance.origin = 'postgres'` or
+- Query: `SELECT octads WHERE provenance.origin = 'postgres'` or
   `WHERE provenance.chain CONTAINS 'spark-etl-step-3'`
 - Drift integration: when drift is detected, provenance can pinpoint
   _which transformation step_ introduced the inconsistency
@@ -542,7 +542,7 @@ extra steps.  This is the single highest-impact improvement.
    examples.  Every error case specified.
 
 2. **Cross-modal queries work end-to-end** -- a query like
-   `SELECT hexads WHERE drift_score > 0.3 AND modality.temporal.version > 5`
+   `SELECT octads WHERE drift_score > 0.3 AND modality.temporal.version > 5`
    must parse, plan, execute, and return correct results.
 
 3. **WHERE clause routing is correct** -- fulltext conditions go to Tantivy,
@@ -550,7 +550,7 @@ extra steps.  This is the single highest-impact improvement.
    conditions go to the drift engine.  The resolved issues (#12, #13) fixed
    the stubs; this is about ensuring coverage of all clause combinations.
 
-4. **Aggregates work** -- `COUNT`, `AVG`, `MIN`, `MAX`, `SUM` over hexad
+4. **Aggregates work** -- `COUNT`, `AVG`, `MIN`, `MAX`, `SUM` over octad
    fields.  `GROUP BY` modality or custom fields.
 
 5. **EXPLAIN is accurate** -- the resolved EXPLAIN (#18) produces real cost
@@ -624,7 +624,7 @@ data rot" is a value proposition.
    this document.  Be honest about where VerisimDB loses (maturity, query
    language, scale) and where it wins (drift, temporal, vector).
 
-4. **Tutorial** -- a 10-minute "store a hexad, search it, check its drift,
+4. **Tutorial** -- a 10-minute "store a octad, search it, check its drift,
    corrupt it, watch it heal" walkthrough.
 
 === Priority 5: Heterogeneous Federation (MEDIUM-HIGH)
@@ -639,7 +639,7 @@ peers via HTTP adapters.
 **What "done" means:**
 
 1. **Adapter interface** — a trait/behaviour that maps an external database's
-   API to VerisimDB's hexad model.  Each adapter knows how to read an entity
+   API to VerisimDB's octad model.  Each adapter knows how to read an entity
    from its source and extract modality-relevant data.
 
 2. **ArangoDB adapter** — the IDApTIK bridge (`ArangoClient`) is the first

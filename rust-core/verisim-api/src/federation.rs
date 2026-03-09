@@ -93,8 +93,8 @@ pub struct FederationQueryRequest {
 pub struct FederationResult {
     /// Which store provided this result.
     pub source_store: String,
-    /// Hexad ID.
-    pub hexad_id: String,
+    /// Octad ID.
+    pub octad_id: String,
     /// Relevance score.
     pub score: f64,
     /// Whether the source store has drift issues.
@@ -555,8 +555,8 @@ async fn query_single_peer(
             .await
             .map_err(|e| format!("Failed to parse response from {}: {}", store_id, e))?
     } else {
-        // No specific query — list hexads from the peer's /hexads endpoint
-        let url = format!("{}/hexads", endpoint);
+        // No specific query — list octads from the peer's /octads endpoint
+        let url = format!("{}/octads", endpoint);
         let resp = client
             .get(&url)
             .query(&[("limit", &limit.to_string())])
@@ -578,7 +578,7 @@ async fn query_single_peer(
         .into_iter()
         .map(|item| FederationResult {
             source_store: store_id.clone(),
-            hexad_id: item["id"].as_str().unwrap_or("unknown").to_string(),
+            octad_id: item["id"].as_str().unwrap_or("unknown").to_string(),
             score: item["score"].as_f64().unwrap_or(0.0),
             drifted: false,
             data: item,

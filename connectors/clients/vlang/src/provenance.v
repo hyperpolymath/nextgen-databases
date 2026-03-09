@@ -3,9 +3,9 @@
 //
 // VeriSimDB V Client — Provenance operations.
 //
-// Every hexad in VeriSimDB maintains an immutable provenance chain — a
+// Every octad in VeriSimDB maintains an immutable provenance chain — a
 // cryptographically linked sequence of events recording every mutation
-// (creation, update, merge, split, delete) applied to the hexad. This
+// (creation, update, merge, split, delete) applied to the octad. This
 // module provides functions to query provenance chains, record new
 // provenance events, and verify chain integrity.
 
@@ -21,59 +21,59 @@ pub:
 	details    map[string]string // arbitrary key-value metadata
 }
 
-// get_provenance_chain retrieves the complete provenance chain for a hexad.
+// get_provenance_chain retrieves the complete provenance chain for a octad.
 //
 // The provenance chain is returned in chronological order (oldest event first)
 // and includes the verification status of the chain.
 //
 // Parameters:
 //   c        — The authenticated Client.
-//   hexad_id — The unique identifier of the hexad.
+//   octad_id — The unique identifier of the octad.
 //
 // Returns:
 //   A ProvenanceChain containing all events and verification status, or an error.
-pub fn (c Client) get_provenance_chain(hexad_id string) !ProvenanceChain {
-	resp := c.do_get('/api/v1/hexads/${hexad_id}/provenance')!
+pub fn (c Client) get_provenance_chain(octad_id string) !ProvenanceChain {
+	resp := c.do_get('/api/v1/octads/${octad_id}/provenance')!
 	if resp.status_code != 200 {
 		return error(parse_error_response(resp.body).message)
 	}
 	return json.decode(ProvenanceChain, resp.body)
 }
 
-// record_provenance appends a new event to a hexad's provenance chain.
+// record_provenance appends a new event to a octad's provenance chain.
 //
 // The event is cryptographically linked to the previous event in the chain,
 // ensuring tamper-evidence. The server assigns the event ID and timestamp.
 //
 // Parameters:
 //   c        — The authenticated Client.
-//   hexad_id — The unique identifier of the hexad.
+//   octad_id — The unique identifier of the octad.
 //   input    — The event details to record.
 //
 // Returns:
 //   The newly created ProvenanceEvent with server-assigned fields, or an error.
-pub fn (c Client) record_provenance(hexad_id string, input ProvenanceEventInput) !ProvenanceEvent {
+pub fn (c Client) record_provenance(octad_id string, input ProvenanceEventInput) !ProvenanceEvent {
 	body := json.encode(input)
-	resp := c.do_post('/api/v1/hexads/${hexad_id}/provenance', body)!
+	resp := c.do_post('/api/v1/octads/${octad_id}/provenance', body)!
 	if resp.status_code != 201 {
 		return error(parse_error_response(resp.body).message)
 	}
 	return json.decode(ProvenanceEvent, resp.body)
 }
 
-// verify_provenance verifies the cryptographic integrity of a hexad's provenance chain.
+// verify_provenance verifies the cryptographic integrity of a octad's provenance chain.
 //
 // The server traverses the entire chain, checking each event's hash link to
 // its parent. Returns true if the chain is intact, false if tampering is detected.
 //
 // Parameters:
 //   c        — The authenticated Client.
-//   hexad_id — The unique identifier of the hexad.
+//   octad_id — The unique identifier of the octad.
 //
 // Returns:
 //   true if the provenance chain is verified intact, false otherwise, or an error.
-pub fn (c Client) verify_provenance(hexad_id string) !bool {
-	resp := c.do_post('/api/v1/hexads/${hexad_id}/provenance/verify', '{}')!
+pub fn (c Client) verify_provenance(octad_id string) !bool {
+	resp := c.do_post('/api/v1/octads/${octad_id}/provenance/verify', '{}')!
 	if resp.status_code != 200 {
 		return error(parse_error_response(resp.body).message)
 	}

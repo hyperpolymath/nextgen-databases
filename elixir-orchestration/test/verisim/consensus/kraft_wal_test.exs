@@ -196,23 +196,23 @@ defmodule VeriSim.Consensus.KRaftWALTest do
       assert hd(recovered.log).command == {:unregister_store, "store-1"}
     end
 
-    test "map_hexad", %{wal_path: wal_path} do
+    test "map_octad", %{wal_path: wal_path} do
       KRaftWAL.init(wal_path)
       locations = ["store-1", "store-2", "store-3"]
-      entry = %{term: 1, index: 1, command: {:map_hexad, "hex-1", locations}}
+      entry = %{term: 1, index: 1, command: {:map_octad, "hex-1", locations}}
       KRaftWAL.append_entry(wal_path, entry)
 
       {:ok, recovered} = KRaftWAL.recover(wal_path)
-      assert hd(recovered.log).command == {:map_hexad, "hex-1", locations}
+      assert hd(recovered.log).command == {:map_octad, "hex-1", locations}
     end
 
-    test "unmap_hexad", %{wal_path: wal_path} do
+    test "unmap_octad", %{wal_path: wal_path} do
       KRaftWAL.init(wal_path)
-      entry = %{term: 1, index: 1, command: {:unmap_hexad, "hex-1"}}
+      entry = %{term: 1, index: 1, command: {:unmap_octad, "hex-1"}}
       KRaftWAL.append_entry(wal_path, entry)
 
       {:ok, recovered} = KRaftWAL.recover(wal_path)
-      assert hd(recovered.log).command == {:unmap_hexad, "hex-1"}
+      assert hd(recovered.log).command == {:unmap_octad, "hex-1"}
     end
 
     test "update_trust", %{wal_path: wal_path} do
@@ -409,7 +409,7 @@ defmodule VeriSim.Consensus.KRaftWALTest do
       entries = [
         %{term: 1, index: 1, command: {:register_store, "s1", "http://a:8080", ["graph"]}},
         %{term: 1, index: 2, command: {:register_store, "s2", "http://b:8080", ["vector"]}},
-        %{term: 2, index: 3, command: {:map_hexad, "h1", ["s1", "s2"]}},
+        %{term: 2, index: 3, command: {:map_octad, "h1", ["s1", "s2"]}},
         %{term: 3, index: 4, command: :noop},
         %{term: 3, index: 5, command: {:update_trust, "s1", 0.9}}
       ]
@@ -434,7 +434,7 @@ defmodule VeriSim.Consensus.KRaftWALTest do
       assert Enum.at(commands, 1) ==
                {:register_store, "s2", "http://b:8080", ["vector"]}
 
-      assert Enum.at(commands, 2) == {:map_hexad, "h1", ["s1", "s2"]}
+      assert Enum.at(commands, 2) == {:map_octad, "h1", ["s1", "s2"]}
       assert Enum.at(commands, 3) == :noop
       assert Enum.at(commands, 4) == {:update_trust, "s1", 0.9}
     end
@@ -461,7 +461,7 @@ defmodule VeriSim.Consensus.KRaftWALTest do
         },
         mappings: %{
           "h1" => %{
-            hexad_id: "h1",
+            octad_id: "h1",
             locations: ["s1"],
             primary_store: "s1"
           }

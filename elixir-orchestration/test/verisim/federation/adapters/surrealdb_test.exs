@@ -36,11 +36,11 @@ defmodule VeriSim.Federation.Adapters.SurrealDBTest do
 
   describe "translate_results/2" do
     test "extracts SurrealDB record ID" do
-      raw = [%{"id" => "hexads:abc123", "title" => "Test", "score" => 0.88}]
+      raw = [%{"id" => "octads:abc123", "title" => "Test", "score" => 0.88}]
 
       [result] = SurrealDB.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "abc123"
+      assert result.octad_id == "abc123"
       assert result.score == 0.88
       assert result.source_store == "surreal-test"
     end

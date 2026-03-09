@@ -42,8 +42,8 @@ pub type VeriSimError {
   ServiceUnavailable(message: String)
 
   // --- Domain-specific errors ---
-  /// Hexad with given ID does not exist.
-  HexadNotFound(message: String)
+  /// Octad with given ID does not exist.
+  OctadNotFound(message: String)
   /// Requested modality is not enabled.
   ModalityUnavailable(message: String)
   /// Drift score computation failed.
@@ -80,7 +80,7 @@ pub fn message(err: VeriSimError) -> String {
     RateLimited(msg) -> "Rate limited: " <> msg
     InternalError(msg) -> "Internal server error: " <> msg
     ServiceUnavailable(msg) -> "Service unavailable: " <> msg
-    HexadNotFound(msg) -> "Hexad not found: " <> msg
+    OctadNotFound(msg) -> "Octad not found: " <> msg
     ModalityUnavailable(msg) -> "Modality unavailable: " <> msg
     DriftComputationError(msg) -> "Drift computation error: " <> msg
     ProvenanceInvalid(msg) -> "Provenance invalid: " <> msg
@@ -131,7 +131,7 @@ pub fn is_retryable(err: VeriSimError) -> Bool {
     NotFound(_) -> False
     Conflict(_) -> False
     ValidationFailed(_) -> False
-    HexadNotFound(_) -> False
+    OctadNotFound(_) -> False
     ModalityUnavailable(_) -> False
     DriftComputationError(_) -> False
     ProvenanceInvalid(_) -> False

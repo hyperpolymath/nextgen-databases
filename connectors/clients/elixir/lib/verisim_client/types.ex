@@ -41,7 +41,7 @@ defmodule VeriSimClient.Types do
   # ---------------------------------------------------------------------------
 
   @typedoc """
-  Boolean flags indicating which modalities are currently active for a hexad.
+  Boolean flags indicating which modalities are currently active for a octad.
   """
   @type modality_status :: %{
           graph: boolean(),
@@ -55,13 +55,13 @@ defmodule VeriSimClient.Types do
         }
 
   # ---------------------------------------------------------------------------
-  # HexadStatus (lightweight summary)
+  # OctadStatus (lightweight summary)
   # ---------------------------------------------------------------------------
 
   @typedoc """
-  Lightweight status summary for a hexad entity.
+  Lightweight status summary for a octad entity.
   """
-  @type hexad_status :: %{
+  @type octad_status :: %{
           id: String.t(),
           created_at: String.t(),
           modified_at: String.t(),
@@ -70,13 +70,13 @@ defmodule VeriSimClient.Types do
         }
 
   # ---------------------------------------------------------------------------
-  # Hexad (full entity)
+  # Octad (full entity)
   # ---------------------------------------------------------------------------
 
   @typedoc """
-  A complete hexad entity encompassing all eight modality payloads.
+  A complete octad entity encompassing all eight modality payloads.
   """
-  @type hexad :: %{
+  @type octad :: %{
           id: String.t(),
           name: String.t(),
           description: String.t() | nil,
@@ -96,25 +96,25 @@ defmodule VeriSimClient.Types do
         }
 
   # ---------------------------------------------------------------------------
-  # HexadInput (create / update payload)
+  # OctadInput (create / update payload)
   # ---------------------------------------------------------------------------
 
   @typedoc """
-  Input payload for creating or updating a hexad entity.
+  Input payload for creating or updating a octad entity.
   All fields are optional to support partial updates.
   """
-  @type hexad_input :: %{
+  @type octad_input :: %{
           optional(:name) => String.t(),
           optional(:description) => String.t(),
           optional(:metadata) => map(),
-          optional(:graph) => hexad_graph_input(),
-          optional(:vector) => hexad_vector_input(),
-          optional(:tensor) => hexad_tensor_input(),
-          optional(:semantic) => hexad_semantic_input(),
-          optional(:document) => hexad_document_input(),
-          optional(:temporal) => hexad_temporal_input(),
-          optional(:provenance) => hexad_provenance_input(),
-          optional(:spatial) => hexad_spatial_input()
+          optional(:graph) => octad_graph_input(),
+          optional(:vector) => octad_vector_input(),
+          optional(:tensor) => octad_tensor_input(),
+          optional(:semantic) => octad_semantic_input(),
+          optional(:document) => octad_document_input(),
+          optional(:temporal) => octad_temporal_input(),
+          optional(:provenance) => octad_provenance_input(),
+          optional(:spatial) => octad_spatial_input()
         }
 
   # ---------------------------------------------------------------------------
@@ -122,7 +122,7 @@ defmodule VeriSimClient.Types do
   # ---------------------------------------------------------------------------
 
   @typedoc "Graph modality input: nodes, edges, and properties."
-  @type hexad_graph_input :: %{
+  @type octad_graph_input :: %{
           optional(:nodes) => [String.t()],
           optional(:edges) => [graph_edge()],
           optional(:properties) => map()
@@ -137,21 +137,21 @@ defmodule VeriSimClient.Types do
         }
 
   @typedoc "Vector modality input: dense embeddings for similarity search."
-  @type hexad_vector_input :: %{
+  @type octad_vector_input :: %{
           embedding: [float()],
           optional(:dimensions) => non_neg_integer(),
           optional(:model) => String.t()
         }
 
   @typedoc "Tensor modality input: multi-dimensional numeric data."
-  @type hexad_tensor_input :: %{
+  @type octad_tensor_input :: %{
           data: [float()],
           shape: [non_neg_integer()],
           optional(:dtype) => String.t()
         }
 
   @typedoc "Semantic modality input: RDF-style triples and ontology references."
-  @type hexad_semantic_input :: %{
+  @type octad_semantic_input :: %{
           optional(:triples) => [semantic_triple()],
           optional(:ontology) => String.t(),
           optional(:annotations) => map()
@@ -165,7 +165,7 @@ defmodule VeriSimClient.Types do
         }
 
   @typedoc "Document modality input: unstructured / semi-structured content."
-  @type hexad_document_input :: %{
+  @type octad_document_input :: %{
           content: String.t(),
           optional(:content_type) => String.t(),
           optional(:language) => String.t(),
@@ -173,7 +173,7 @@ defmodule VeriSimClient.Types do
         }
 
   @typedoc "Temporal modality input: time-series events and temporal metadata."
-  @type hexad_temporal_input :: %{
+  @type octad_temporal_input :: %{
           timestamp: String.t(),
           optional(:duration_ms) => non_neg_integer(),
           optional(:recurrence) => String.t(),
@@ -182,7 +182,7 @@ defmodule VeriSimClient.Types do
         }
 
   @typedoc "Provenance modality input: lineage and audit trail events."
-  @type hexad_provenance_input :: %{
+  @type octad_provenance_input :: %{
           event_type: String.t(),
           agent: String.t(),
           optional(:description) => String.t(),
@@ -191,7 +191,7 @@ defmodule VeriSimClient.Types do
         }
 
   @typedoc "Spatial modality input: geospatial coordinates and geometries."
-  @type hexad_spatial_input :: %{
+  @type octad_spatial_input :: %{
           optional(:latitude) => float(),
           optional(:longitude) => float(),
           optional(:altitude) => float(),
@@ -204,7 +204,7 @@ defmodule VeriSimClient.Types do
   # ---------------------------------------------------------------------------
 
   @typedoc """
-  Drift score for a hexad entity, measuring divergence from normalised baseline.
+  Drift score for a octad entity, measuring divergence from normalised baseline.
   """
   @type drift_score :: %{
           entity_id: String.t(),
@@ -219,7 +219,7 @@ defmodule VeriSimClient.Types do
   # ---------------------------------------------------------------------------
 
   @typedoc """
-  A single immutable event in a hexad's provenance chain.
+  A single immutable event in a octad's provenance chain.
   """
   @type provenance_event :: %{
           optional(:id) => String.t(),
@@ -241,7 +241,7 @@ defmodule VeriSimClient.Types do
   """
   @type federation_result :: %{
           store_id: String.t(),
-          entity: hexad(),
+          entity: octad(),
           optional(:score) => float(),
           optional(:latency_ms) => non_neg_integer()
         }

@@ -20,7 +20,7 @@ VeriSimDB is a working system with real implementations in its core modality sto
 
 **Location:** `rust-core/verisim-normalizer/`
 
-**Resolved:** 2026-02-12. Regeneration strategies now inspect hexad data to select the authoritative modality and derive drifted modality content from it, rather than returning hardcoded placeholder strings. Each of the six modality strategies performs actual data transformation.
+**Resolved:** 2026-02-12. Regeneration strategies now inspect octad data to select the authoritative modality and derive drifted modality content from it, rather than returning hardcoded placeholder strings. Each of the six modality strategies performs actual data transformation.
 
 **Original issue:** Every regeneration strategy returned a hardcoded `[regenerated]` placeholder string instead of actually regenerating data.
 
@@ -86,9 +86,9 @@ Additionally:
 
 - `executeFederatedQuery`: HTTP fan-out to eligible peer stores with trust filtering, response mapping, and result aggregation with limit enforcement.
 - `achieveConsensus`: Quorum-based consensus with configurable mode (Strong/Quorum/Eventual), concurrent store fetch, agreement calculation.
-- `replicateHexad`: Fetches hexad from source store via HTTP, pushes to all target stores, reports per-target errors.
+- `replicateOctad`: Fetches octad from source store via HTTP, pushes to all target stores, reports per-target errors.
 - `checkReplicationStatus`: Examines mapping locations, checks store liveness against maxStoreDowntimeMs, detects trust divergence as data divergence proxy.
-- `detectByzantineFaults`: Computes median trust across stores for a hexad, flags stores deviating >0.3 from median.
+- `detectByzantineFaults`: Computes median trust across stores for a octad, flags stores deviating >0.3 from median.
 - `serializeRegistry`/`deserializeRegistry`: Full JSON serialization and deserialization of registry state (stores, mappings, config).
 
 Added `rescript.json` for build configuration.
@@ -131,11 +131,11 @@ Added `rescript.json` for build configuration.
 - **Tensor:** store_create_64x64, store_get, reduce_sum_axis0 (ndarray)
 - **Semantic:** register_type, get_type, proof_create_cbor, proof_verify (CBOR + ZKP verification)
 - **Temporal:** version_create, version_get_by_number, version_get_latest, history_10, history_100
-- **Hexad:** create_hexad, get_hexad (unified entity)
+- **Octad:** create_octad, get_octad (unified entity)
 - **Drift:** calculate_drift (semantic vector drift)
-- **Cross-modal:** vector_similarity_search, fulltext_search (1000 multi-modal hexads)
+- **Cross-modal:** vector_similarity_search, fulltext_search (1000 multi-modal octads)
 
-**Original issue:** Only document, vector, graph, hexad, drift, and cross-modal benchmarks existed. Tensor, semantic, and temporal stores had zero benchmarks.
+**Original issue:** Only document, vector, graph, octad, drift, and cross-modal benchmarks existed. Tensor, semantic, and temporal stores had zero benchmarks.
 
 === 12. Cross-Modal Drift/Consistency Were Stubs — ✅ RESOLVED
 
@@ -181,9 +181,9 @@ Added `rescript.json` for build configuration.
 
 **Location:** `elixir-orchestration/lib/verisim/rust_client.ex`
 
-**Resolved:** 2026-02-13. Added ETS-based read-through cache with configurable TTL (30s default for hexads, 10s for drift scores). Cache is invalidated on writes (update/delete). Provides `init_cache/0`, `clear_cache/0`, and `invalidate_cache/1` for cache management.
+**Resolved:** 2026-02-13. Added ETS-based read-through cache with configurable TTL (30s default for octads, 10s for drift scores). Cache is invalidated on writes (update/delete). Provides `init_cache/0`, `clear_cache/0`, and `invalidate_cache/1` for cache management.
 
-**Original issue:** Every RustClient call made a fresh HTTP request to the Rust core, with no caching. Repeated reads of the same hexad in a query pipeline (e.g., cross-modal evaluation fetching the same entity multiple times) each incurred full HTTP round-trip latency.
+**Original issue:** Every RustClient call made a fresh HTTP request to the Rust core, with no caching. Repeated reads of the same octad in a query pipeline (e.g., cross-modal evaluation fetching the same entity multiple times) each incurred full HTTP round-trip latency.
 
 === 18. EXPLAIN Returns Hardcoded Plan — ✅ RESOLVED
 
@@ -197,7 +197,7 @@ Added `rescript.json` for build configuration.
 
 **Location:** `elixir-orchestration/lib/verisim/query/vql_executor.ex`, `rust-core/verisim-api/src/federation.rs`
 
-**Resolved:** 2026-02-13. Added `GET /hexads` list endpoint with `?limit=N&offset=M` pagination to the Rust API. The `HexadStore` trait now includes a `list(limit, offset)` method. Federation `query_single_peer()` now falls back to the `/hexads` list endpoint when neither text_query nor vector_query is provided, so bare `SELECT * FROM FEDERATION /pattern/*` returns actual hexad data instead of empty results.
+**Resolved:** 2026-02-13. Added `GET /octads` list endpoint with `?limit=N&offset=M` pagination to the Rust API. The `OctadStore` trait now includes a `list(limit, offset)` method. Federation `query_single_peer()` now falls back to the `/octads` list endpoint when neither text_query nor vector_query is provided, so bare `SELECT * FROM FEDERATION /pattern/*` returns actual octad data instead of empty results.
 
 === 20. Custom Circuit Hardcoding — ✅ RESOLVED
 

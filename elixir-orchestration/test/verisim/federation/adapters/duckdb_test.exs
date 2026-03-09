@@ -15,7 +15,7 @@ defmodule VeriSim.Federation.Adapters.DuckDBTest do
   @peer_info %{
     store_id: "duckdb-test",
     endpoint: "http://duckdb:8080",
-    adapter_config: %{path: ":memory:", table: "hexads"}
+    adapter_config: %{path: ":memory:", table: "octads"}
   }
 
   describe "supported_modalities/1" do
@@ -46,7 +46,7 @@ defmodule VeriSim.Federation.Adapters.DuckDBTest do
 
       [result] = DuckDB.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "duck-001"
+      assert result.octad_id == "duck-001"
       assert result.score == 0.77
       assert result.source_store == "duckdb-test"
     end

@@ -55,11 +55,11 @@ pub struct DocumentStore {
 }
 
 impl DocumentStore {
-    pub fn create_document(&mut self, hexad_id: Uuid, title: &str, body: &str) -> Result<()>;
+    pub fn create_document(&mut self, octad_id: Uuid, title: &str, body: &str) -> Result<()>;
     pub fn search(&self, query: &str, limit: usize) -> Result<Vec<SearchResult>>;
-    pub fn get(&self, hexad_id: Uuid) -> Result<Option<Document>>;
-    pub fn update(&mut self, hexad_id: Uuid, title: &str, body: &str) -> Result<()>;
-    pub fn delete(&mut self, hexad_id: Uuid) -> Result<()>;
+    pub fn get(&self, octad_id: Uuid) -> Result<Option<Document>>;
+    pub fn update(&mut self, octad_id: Uuid, title: &str, body: &str) -> Result<()>;
+    pub fn delete(&mut self, octad_id: Uuid) -> Result<()>;
 }
 ```
 
@@ -86,10 +86,10 @@ pub struct TemporalStore {
 }
 
 impl TemporalStore {
-    pub fn record_version(&mut self, hexad_id: Uuid, timestamp: DateTime<Utc>, data: &[u8]) -> Result<()>;
-    pub fn get_at_time(&self, hexad_id: Uuid, timestamp: DateTime<Utc>) -> Result<Option<Vec<u8>>>;
-    pub fn get_history(&self, hexad_id: Uuid, start: DateTime<Utc>, end: DateTime<Utc>) -> Result<Vec<Version>>;
-    pub fn diff(&self, hexad_id: Uuid, t1: DateTime<Utc>, t2: DateTime<Utc>) -> Result<Diff>;
+    pub fn record_version(&mut self, octad_id: Uuid, timestamp: DateTime<Utc>, data: &[u8]) -> Result<()>;
+    pub fn get_at_time(&self, octad_id: Uuid, timestamp: DateTime<Utc>) -> Result<Option<Vec<u8>>>;
+    pub fn get_history(&self, octad_id: Uuid, start: DateTime<Utc>, end: DateTime<Utc>) -> Result<Vec<Version>>;
+    pub fn diff(&self, octad_id: Uuid, t1: DateTime<Utc>, t2: DateTime<Utc>) -> Result<Diff>;
 }
 ```
 
@@ -145,7 +145,7 @@ pub struct VectorStore {
 }
 
 impl VectorStore {
-    pub fn insert(&mut self, hexad_id: Uuid, embedding: &[f32]) -> Result<()>;
+    pub fn insert(&mut self, octad_id: Uuid, embedding: &[f32]) -> Result<()>;
     pub fn search_similar(&self, query: &[f32], k: usize, threshold: f32) -> Result<Vec<(Uuid, f32)>>;
     pub fn cosine_similarity(&self, v1: &[f32], v2: &[f32]) -> f32;
     pub fn euclidean_distance(&self, v1: &[f32], v2: &[f32]) -> f32;
@@ -172,10 +172,10 @@ pub struct SemanticStore {
 }
 
 impl SemanticStore {
-    pub fn add_type(&mut self, hexad_id: Uuid, type_uri: &str) -> Result<()>;
-    pub fn get_types(&self, hexad_id: Uuid) -> Result<Vec<String>>;
-    pub fn store_proof_blob(&mut self, hexad_id: Uuid, contract: &str, blob: &[u8]) -> Result<()>;
-    pub fn verify_proof(&self, hexad_id: Uuid, contract: &str) -> Result<bool>;
+    pub fn add_type(&mut self, octad_id: Uuid, type_uri: &str) -> Result<()>;
+    pub fn get_types(&self, octad_id: Uuid) -> Result<Vec<String>>;
+    pub fn store_proof_blob(&mut self, octad_id: Uuid, contract: &str, blob: &[u8]) -> Result<()>;
+    pub fn verify_proof(&self, octad_id: Uuid, contract: &str) -> Result<bool>;
 }
 ```
 
@@ -190,9 +190,9 @@ pub struct TensorStore {
 }
 
 impl TensorStore {
-    pub fn store(&mut self, hexad_id: Uuid, tensor: ArrayD<f64>) -> Result<()>;
-    pub fn get(&self, hexad_id: Uuid) -> Result<Option<ArrayD<f64>>>;
-    pub fn slice(&self, hexad_id: Uuid, indices: &[usize]) -> Result<ArrayD<f64>>;
+    pub fn store(&mut self, octad_id: Uuid, tensor: ArrayD<f64>) -> Result<()>;
+    pub fn get(&self, octad_id: Uuid) -> Result<Option<ArrayD<f64>>>;
+    pub fn slice(&self, octad_id: Uuid, indices: &[usize]) -> Result<ArrayD<f64>>;
 }
 ```
 
@@ -200,15 +200,15 @@ impl TensorStore {
 
 ---
 
-== Milestone V2: Hexad Entity Layer (Weeks 7-8)
+== Milestone V2: Octad Entity Layer (Weeks 7-8)
 
 **Goal**: Unified entity abstraction across modalities
 
 ```rust
-// verisim-hexad/src/lib.rs
+// verisim-octad/src/lib.rs
 use uuid::Uuid;
 
-pub struct Hexad {
+pub struct Octad {
     pub id: Uuid,
     pub document: Option<DocumentData>,
     pub graph: Option<GraphData>,
@@ -218,7 +218,7 @@ pub struct Hexad {
     pub tensor: Option<TensorData>,
 }
 
-pub struct HexadStore {
+pub struct OctadStore {
     document_store: DocumentStore,
     graph_store: GraphStore,
     vector_store: VectorStore,
@@ -227,10 +227,10 @@ pub struct HexadStore {
     tensor_store: TensorStore,
 }
 
-impl HexadStore {
-    pub fn create(&mut self, hexad: Hexad) -> Result<Uuid>;
-    pub fn get(&self, id: Uuid) -> Result<Option<Hexad>>;
-    pub fn update(&mut self, id: Uuid, hexad: Hexad) -> Result<()>;
+impl OctadStore {
+    pub fn create(&mut self, octad: Octad) -> Result<Uuid>;
+    pub fn get(&self, id: Uuid) -> Result<Option<Octad>>;
+    pub fn update(&mut self, id: Uuid, octad: Octad) -> Result<()>;
     pub fn query_cross_modal(&self, predicate: CrossModalPredicate) -> Result<Vec<Uuid>>;
 }
 ```
@@ -244,8 +244,8 @@ pub struct DriftDetector {
 }
 
 impl DriftDetector {
-    pub fn detect(&self, hexad_id: Uuid, modality1: Modality, modality2: Modality) -> Result<f32>;
-    pub fn repair(&mut self, hexad_id: Uuid, strategy: RepairStrategy) -> Result<()>;
+    pub fn detect(&self, octad_id: Uuid, modality1: Modality, modality2: Modality) -> Result<f32>;
+    pub fn repair(&mut self, octad_id: Uuid, strategy: RepairStrategy) -> Result<()>;
 }
 ```
 
@@ -264,7 +264,7 @@ impl DriftDetector {
 use rescript_parser::VQLParser; // ReScript → Rust FFI
 
 pub fn parse_vql(query: &str) -> Result<VQLAst>;
-pub fn execute_vql(ast: VQLAst, hexad_store: &HexadStore) -> Result<QueryResult>;
+pub fn execute_vql(ast: VQLAst, octad_store: &OctadStore) -> Result<QueryResult>;
 ```
 
 **Integration**:
@@ -327,8 +327,8 @@ use proptest::prelude::*;
 proptest! {
     #[test]
     fn insert_then_retrieve(title in "\\w{1,50}", body in "\\w{10,200}") {
-        let mut store = HexadStore::new()?;
-        let id = store.create(hexad_with_document(title, body))?;
+        let mut store = OctadStore::new()?;
+        let id = store.create(octad_with_document(title, body))?;
         let retrieved = store.get(id)?;
         assert!(retrieved.is_some());
     }
@@ -374,7 +374,7 @@ fn test_cross_modal_query() {
     store.add_vector(id, &[0.1, 0.2, 0.3])?;
 
     // Cross-modal query
-    let query = "SELECT * FROM hexads WHERE DOCUMENT MATCHES 'Test' AND VECTOR SIMILAR TO [0.1, 0.2, 0.3]";
+    let query = "SELECT * FROM octads WHERE DOCUMENT MATCHES 'Test' AND VECTOR SIMILAR TO [0.1, 0.2, 0.3]";
     let results = store.query(query)?;
 
     assert_eq!(results.len(), 1);
@@ -470,7 +470,7 @@ cargo fuzz run fuzz_vql -- -max_total_time=300
 - [ ] Completion: 20% → 40%
 
 ### Week 8
-- [ ] Hexad layer complete
+- [ ] Octad layer complete
 - [ ] Drift detection working
 - [ ] Completion: 40% → 55%
 
@@ -503,7 +503,7 @@ cargo fuzz run fuzz_vql -- -max_total_time=300
 
 ```sql
 -- VQL federating to FormBD (future feature)
-SELECT * FROM hexads@formbd_instance WHERE modality = 'document';
+SELECT * FROM octads@formbd_instance WHERE modality = 'document';
 ```
 
 But that's just treating FormBD like any other database endpoint (PostgreSQL, MongoDB, etc.).

@@ -191,7 +191,7 @@ mod tests {
 
     fn graph_vector_plan() -> LogicalPlan {
         LogicalPlan {
-            source: QuerySource::Hexad,
+            source: QuerySource::Octad,
             nodes: vec![
                 PlanNode {
                     modality: Modality::Graph,
@@ -217,7 +217,7 @@ mod tests {
     fn test_single_modality_sequential() {
         let planner = Planner::new(PlannerConfig::default());
         let plan = LogicalPlan {
-            source: QuerySource::Hexad,
+            source: QuerySource::Octad,
             nodes: vec![PlanNode {
                 modality: Modality::Document,
                 conditions: vec![ConditionKind::Fulltext {
@@ -256,7 +256,7 @@ mod tests {
     fn test_semantic_always_last() {
         let planner = Planner::new(PlannerConfig::default());
         let plan = LogicalPlan {
-            source: QuerySource::Hexad,
+            source: QuerySource::Octad,
             nodes: vec![
                 PlanNode {
                     modality: Modality::Semantic,
@@ -291,7 +291,7 @@ mod tests {
     fn test_temporal_always_first() {
         let planner = Planner::new(PlannerConfig::default());
         let plan = LogicalPlan {
-            source: QuerySource::Hexad,
+            source: QuerySource::Octad,
             nodes: vec![
                 PlanNode {
                     modality: Modality::Graph,
@@ -319,7 +319,7 @@ mod tests {
     fn test_empty_plan_error() {
         let planner = Planner::new(PlannerConfig::default());
         let plan = LogicalPlan {
-            source: QuerySource::Hexad,
+            source: QuerySource::Octad,
             nodes: vec![],
             post_processing: vec![],
         };

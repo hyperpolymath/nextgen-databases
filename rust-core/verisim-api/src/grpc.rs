@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 //! gRPC API for VeriSimDB.
 //!
-//! Exposes planner and hexad operations via gRPC on a separate port (50051).
+//! Exposes planner and octad operations via gRPC on a separate port (50051).
 
 use tonic::{Request, Response, Status};
 use tracing::error;
@@ -16,7 +16,7 @@ use crate::AppState;
 pub mod proto;
 
 use proto::veri_sim_planner_server::{VeriSimPlanner, VeriSimPlannerServer};
-use proto::veri_sim_hexad_server::{VeriSimHexad, VeriSimHexadServer};
+use proto::veri_sim_octad_server::{VeriSimOctad, VeriSimOctadServer};
 
 // ============================================================================
 // Planner gRPC Service
@@ -203,140 +203,140 @@ impl VeriSimPlanner for PlannerService {
 }
 
 // ============================================================================
-// Hexad gRPC Service
+// Octad gRPC Service
 // ============================================================================
 
-pub struct HexadService {
+pub struct OctadService {
     state: AppState,
 }
 
-impl HexadService {
+impl OctadService {
     pub fn new(state: AppState) -> Self {
         Self { state }
     }
 }
 
 #[tonic::async_trait]
-impl VeriSimHexad for HexadService {
+impl VeriSimOctad for OctadService {
     async fn create(
         &self,
-        request: Request<proto::HexadCreateRequest>,
-    ) -> Result<Response<proto::HexadResponse>, Status> {
+        request: Request<proto::OctadCreateRequest>,
+    ) -> Result<Response<proto::OctadResponse>, Status> {
         let req = request.into_inner();
-        let mut input = verisim_hexad::HexadInput::default();
+        let mut input = verisim_octad::OctadInput::default();
 
         if !req.title.is_empty() {
-            input.document = Some(verisim_hexad::HexadDocumentInput {
+            input.document = Some(verisim_octad::OctadDocumentInput {
                 title: req.title,
                 body: req.body,
                 fields: std::collections::HashMap::new(),
             });
         }
         if !req.embedding.is_empty() {
-            input.vector = Some(verisim_hexad::HexadVectorInput {
+            input.vector = Some(verisim_octad::OctadVectorInput {
                 embedding: req.embedding,
                 model: None,
             });
         }
         if !req.types.is_empty() {
-            input.semantic = Some(verisim_hexad::HexadSemanticInput {
+            input.semantic = Some(verisim_octad::OctadSemanticInput {
                 types: req.types,
                 properties: std::collections::HashMap::new(),
             });
         }
 
-        use verisim_hexad::HexadStore;
+        use verisim_octad::OctadStore;
         let h = self
             .state
-            .hexad_store
+            .octad_store
             .create(input)
             .await
             .map_err(|e| {
-                error!(error = %e, "gRPC hexad creation failed");
+                error!(error = %e, "gRPC octad creation failed");
                 Status::internal("Internal server error")
             })?;
 
-        Ok(Response::new(hexad_to_proto(&h)))
+        Ok(Response::new(octad_to_proto(&h)))
     }
 
     async fn get(
         &self,
-        request: Request<proto::HexadIdRequest>,
-    ) -> Result<Response<proto::HexadResponse>, Status> {
+        request: Request<proto::OctadIdRequest>,
+    ) -> Result<Response<proto::OctadResponse>, Status> {
         let id = request.into_inner().id;
-        let hexad_id = verisim_hexad::HexadId::new(&id);
+        let octad_id = verisim_octad::OctadId::new(&id);
 
-        use verisim_hexad::HexadStore;
+        use verisim_octad::OctadStore;
         let h = self
             .state
-            .hexad_store
-            .get(&hexad_id)
+            .octad_store
+            .get(&octad_id)
             .await
             .map_err(|e| {
-                error!(error = %e, "gRPC hexad get failed");
+                error!(error = %e, "gRPC octad get failed");
                 Status::internal("Internal server error")
             })?
-            .ok_or_else(|| Status::not_found(format!("Hexad {} not found", id)))?;
+            .ok_or_else(|| Status::not_found(format!("Octad {} not found", id)))?;
 
-        Ok(Response::new(hexad_to_proto(&h)))
+        Ok(Response::new(octad_to_proto(&h)))
     }
 
     async fn update(
         &self,
-        request: Request<proto::HexadUpdateRequest>,
-    ) -> Result<Response<proto::HexadResponse>, Status> {
+        request: Request<proto::OctadUpdateRequest>,
+    ) -> Result<Response<proto::OctadResponse>, Status> {
         let req = request.into_inner();
-        let hexad_id = verisim_hexad::HexadId::new(&req.id);
+        let octad_id = verisim_octad::OctadId::new(&req.id);
 
-        let mut input = verisim_hexad::HexadInput::default();
+        let mut input = verisim_octad::OctadInput::default();
         if !req.title.is_empty() {
-            input.document = Some(verisim_hexad::HexadDocumentInput {
+            input.document = Some(verisim_octad::OctadDocumentInput {
                 title: req.title,
                 body: req.body,
                 fields: std::collections::HashMap::new(),
             });
         }
         if !req.embedding.is_empty() {
-            input.vector = Some(verisim_hexad::HexadVectorInput {
+            input.vector = Some(verisim_octad::OctadVectorInput {
                 embedding: req.embedding,
                 model: None,
             });
         }
         if !req.types.is_empty() {
-            input.semantic = Some(verisim_hexad::HexadSemanticInput {
+            input.semantic = Some(verisim_octad::OctadSemanticInput {
                 types: req.types,
                 properties: std::collections::HashMap::new(),
             });
         }
 
-        use verisim_hexad::HexadStore;
+        use verisim_octad::OctadStore;
         let h = self
             .state
-            .hexad_store
-            .update(&hexad_id, input)
+            .octad_store
+            .update(&octad_id, input)
             .await
             .map_err(|e| {
-                error!(error = %e, "gRPC hexad update failed");
+                error!(error = %e, "gRPC octad update failed");
                 Status::internal("Internal server error")
             })?;
 
-        Ok(Response::new(hexad_to_proto(&h)))
+        Ok(Response::new(octad_to_proto(&h)))
     }
 
     async fn delete(
         &self,
-        request: Request<proto::HexadIdRequest>,
+        request: Request<proto::OctadIdRequest>,
     ) -> Result<Response<proto::Empty>, Status> {
         let id = request.into_inner().id;
-        let hexad_id = verisim_hexad::HexadId::new(&id);
+        let octad_id = verisim_octad::OctadId::new(&id);
 
-        use verisim_hexad::HexadStore;
+        use verisim_octad::OctadStore;
         self.state
-            .hexad_store
-            .delete(&hexad_id)
+            .octad_store
+            .delete(&octad_id)
             .await
             .map_err(|e| {
-                error!(error = %e, "gRPC hexad deletion failed");
+                error!(error = %e, "gRPC octad deletion failed");
                 Status::internal("Internal server error")
             })?;
 
@@ -350,10 +350,10 @@ impl VeriSimHexad for HexadService {
         let req = request.into_inner();
         let limit = if req.limit > 0 { req.limit as usize } else { 10 };
 
-        use verisim_hexad::HexadStore;
-        let hexads = self
+        use verisim_octad::OctadStore;
+        let octads = self
             .state
-            .hexad_store
+            .octad_store
             .search_text(&req.query, limit)
             .await
             .map_err(|e| {
@@ -361,7 +361,7 @@ impl VeriSimHexad for HexadService {
                 Status::internal("Internal server error")
             })?;
 
-        let results: Vec<proto::SearchResultMsg> = hexads
+        let results: Vec<proto::SearchResultMsg> = octads
             .iter()
             .enumerate()
             .map(|(i, h)| proto::SearchResultMsg {
@@ -385,10 +385,10 @@ impl VeriSimHexad for HexadService {
         let req = request.into_inner();
         let k = if req.k > 0 { req.k as usize } else { 10 };
 
-        use verisim_hexad::HexadStore;
-        let hexads = self
+        use verisim_octad::OctadStore;
+        let octads = self
             .state
-            .hexad_store
+            .octad_store
             .search_similar(&req.vector, k)
             .await
             .map_err(|e| {
@@ -396,7 +396,7 @@ impl VeriSimHexad for HexadService {
                 Status::internal("Internal server error")
             })?;
 
-        let results: Vec<proto::SearchResultMsg> = hexads
+        let results: Vec<proto::SearchResultMsg> = octads
             .iter()
             .enumerate()
             .map(|(i, h)| proto::SearchResultMsg {
@@ -418,8 +418,8 @@ impl VeriSimHexad for HexadService {
 // Helpers
 // ============================================================================
 
-fn hexad_to_proto(h: &verisim_hexad::Hexad) -> proto::HexadResponse {
-    proto::HexadResponse {
+fn octad_to_proto(h: &verisim_octad::Octad) -> proto::OctadResponse {
+    proto::OctadResponse {
         id: h.id.to_string(),
         created_at: h.status.created_at.to_rfc3339(),
         modified_at: h.status.modified_at.to_rfc3339(),
@@ -436,9 +436,9 @@ fn hexad_to_proto(h: &verisim_hexad::Hexad) -> proto::HexadResponse {
 /// Build gRPC server routes. Returns a tonic Router that can be served.
 pub fn build_grpc_router(state: AppState) -> tonic::transport::server::Router {
     let planner_svc = VeriSimPlannerServer::new(PlannerService::new(state.clone()));
-    let hexad_svc = VeriSimHexadServer::new(HexadService::new(state));
+    let octad_svc = VeriSimOctadServer::new(OctadService::new(state));
 
     tonic::transport::Server::builder()
         .add_service(planner_svc)
-        .add_service(hexad_svc)
+        .add_service(octad_svc)
 }

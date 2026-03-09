@@ -48,7 +48,7 @@ defmodule VeriSim.Query.VQLIntegrationTest do
         assert is_map(ast)
         expected_atom = @mod |> String.downcase() |> String.to_existing_atom()
         assert expected_atom in (ast[:modalities] || [])
-        H.assert_source(ast, :hexad)
+        H.assert_source(ast, :octad)
 
         # Execute: should not crash regardless of Rust core availability
         result = H.execute_safely(query)
@@ -160,7 +160,7 @@ defmodule VeriSim.Query.VQLIntegrationTest do
       assert ast[:TAG] == "Mutation"
       mutation = ast[:_0]
       assert mutation[:TAG] == "Update"
-      assert mutation[:hexadId] == "'entity-001'"
+      assert mutation[:octadId] == "'entity-001'"
     end
 
     test "DELETE HEXAD" do
@@ -174,7 +174,7 @@ defmodule VeriSim.Query.VQLIntegrationTest do
   end
 
   describe "mutation execution" do
-    test "INSERT routes to RustClient.create_hexad without crashing" do
+    test "INSERT routes to RustClient.create_octad without crashing" do
       query = "INSERT HEXAD WITH DOCUMENT(title = 'Test Insert', body = 'Body')"
       ast = H.parse_statement!(query)
 
@@ -183,7 +183,7 @@ defmodule VeriSim.Query.VQLIntegrationTest do
       assert elem(result, 0) in [:ok, :error, :unavailable]
     end
 
-    test "UPDATE routes to RustClient.update_hexad without crashing" do
+    test "UPDATE routes to RustClient.update_octad without crashing" do
       query = "UPDATE HEXAD 'entity-001' SET DOCUMENT.title = 'New Title'"
       ast = H.parse_statement!(query)
 
@@ -191,7 +191,7 @@ defmodule VeriSim.Query.VQLIntegrationTest do
       assert elem(result, 0) in [:ok, :error, :unavailable]
     end
 
-    test "DELETE routes to RustClient.delete_hexad without crashing" do
+    test "DELETE routes to RustClient.delete_octad without crashing" do
       query = "DELETE HEXAD 'entity-001'"
       ast = H.parse_statement!(query)
 

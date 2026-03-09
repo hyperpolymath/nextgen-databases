@@ -32,7 +32,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{debug, info, warn};
 
-use verisim_hexad::Hexad;
+use verisim_octad::Octad;
 
 use crate::NormalizerError;
 
@@ -81,63 +81,63 @@ impl Modality {
     /// ordering matters).
     pub const ALL: [Modality; 8] = Self::DEFAULT_AUTHORITY_ORDER;
 
-    /// Check whether this modality is populated on a given hexad.
-    pub fn is_present_on(self, hexad: &Hexad) -> bool {
+    /// Check whether this modality is populated on a given octad.
+    pub fn is_present_on(self, octad: &Octad) -> bool {
         match self {
-            Modality::Document => hexad.document.is_some(),
-            Modality::Semantic => hexad.semantic.is_some(),
-            Modality::Graph => hexad.graph_node.is_some(),
-            Modality::Vector => hexad.embedding.is_some(),
-            Modality::Tensor => hexad.tensor.is_some(),
-            Modality::Temporal => hexad.version_count > 0,
-            Modality::Provenance => hexad.provenance_chain_length > 0,
-            Modality::Spatial => hexad.spatial_data.is_some(),
+            Modality::Document => octad.document.is_some(),
+            Modality::Semantic => octad.semantic.is_some(),
+            Modality::Graph => octad.graph_node.is_some(),
+            Modality::Vector => octad.embedding.is_some(),
+            Modality::Tensor => octad.tensor.is_some(),
+            Modality::Temporal => octad.version_count > 0,
+            Modality::Provenance => octad.provenance_chain_length > 0,
+            Modality::Spatial => octad.spatial_data.is_some(),
         }
     }
 
-    /// Extract a textual summary of this modality's data from a hexad.
+    /// Extract a textual summary of this modality's data from a octad.
     ///
     /// Returns `None` if the modality is not populated.
-    pub fn summarize(self, hexad: &Hexad) -> Option<String> {
+    pub fn summarize(self, octad: &Octad) -> Option<String> {
         match self {
-            Modality::Document => hexad.document.as_ref().map(|d| {
+            Modality::Document => octad.document.as_ref().map(|d| {
                 format!(
                     "document(title='{}', body_len={})",
                     d.title,
                     d.body.len()
                 )
             }),
-            Modality::Semantic => hexad.semantic.as_ref().map(|s| {
+            Modality::Semantic => octad.semantic.as_ref().map(|s| {
                 format!(
                     "semantic(types={}, properties={})",
                     s.types.len(),
                     s.properties.len()
                 )
             }),
-            Modality::Graph => hexad.graph_node.as_ref().map(|g| {
+            Modality::Graph => octad.graph_node.as_ref().map(|g| {
                 format!("graph(iri='{}', local_name='{}')", g.iri, g.local_name)
             }),
-            Modality::Vector => hexad.embedding.as_ref().map(|e| {
+            Modality::Vector => octad.embedding.as_ref().map(|e| {
                 format!("vector(dim={})", e.vector.len())
             }),
-            Modality::Tensor => hexad.tensor.as_ref().map(|t| {
+            Modality::Tensor => octad.tensor.as_ref().map(|t| {
                 format!("tensor(shape={:?}, len={})", t.shape, t.data.len())
             }),
             Modality::Temporal => {
-                if hexad.version_count > 0 {
-                    Some(format!("temporal(versions={})", hexad.version_count))
+                if octad.version_count > 0 {
+                    Some(format!("temporal(versions={})", octad.version_count))
                 } else {
                     None
                 }
             }
             Modality::Provenance => {
-                if hexad.provenance_chain_length > 0 {
-                    Some(format!("provenance(chain_length={})", hexad.provenance_chain_length))
+                if octad.provenance_chain_length > 0 {
+                    Some(format!("provenance(chain_length={})", octad.provenance_chain_length))
                 } else {
                     None
                 }
             }
-            Modality::Spatial => hexad.spatial_data.as_ref().map(|s| {
+            Modality::Spatial => octad.spatial_data.as_ref().map(|s| {
                 format!(
                     "spatial(lat={}, lon={}, type={})",
                     s.coordinates.latitude,
@@ -274,7 +274,7 @@ impl RegenerationConfig {
 /// Record of a single regeneration action, for audit and observability.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NormalizationEvent {
-    /// ID of the hexad entity that was (or would be) repaired.
+    /// ID of the octad entity that was (or would be) repaired.
     pub entity_id: String,
 
     /// The modality that drifted and required regeneration.
@@ -460,7 +460,7 @@ pub trait ModalityRegenerator: Send + Sync {
     /// Returns a textual summary of what changed (for the audit log).
     async fn regenerate_from(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         source: Modality,
         target: Modality,
     ) -> Result<String, NormalizerError>;
@@ -470,7 +470,7 @@ pub trait ModalityRegenerator: Send + Sync {
     /// Returns a textual summary of what changed.
     async fn merge_into(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         sources: &[(Modality, f64)],
         target: Modality,
     ) -> Result<String, NormalizerError>;
@@ -480,7 +480,7 @@ pub trait ModalityRegenerator: Send + Sync {
     /// Returns the new score (0.0 = perfect, 1.0 = maximum drift).
     async fn measure_drift(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         modality: Modality,
     ) -> Result<f64, NormalizerError>;
 }
@@ -500,12 +500,12 @@ pub struct SummaryRegenerator;
 impl ModalityRegenerator for SummaryRegenerator {
     async fn regenerate_from(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         source: Modality,
         target: Modality,
     ) -> Result<String, NormalizerError> {
         let source_summary = source
-            .summarize(hexad)
+            .summarize(octad)
             .unwrap_or_else(|| format!("{} (empty)", source));
         Ok(format!(
             "Regenerated {} from {} [{}]",
@@ -515,7 +515,7 @@ impl ModalityRegenerator for SummaryRegenerator {
 
     async fn merge_into(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         sources: &[(Modality, f64)],
         target: Modality,
     ) -> Result<String, NormalizerError> {
@@ -523,7 +523,7 @@ impl ModalityRegenerator for SummaryRegenerator {
             .iter()
             .map(|(m, w)| {
                 let s = m
-                    .summarize(hexad)
+                    .summarize(octad)
                     .unwrap_or_else(|| format!("{} (empty)", m));
                 format!("{}(w={:.2}) [{}]", m, w, s)
             })
@@ -537,7 +537,7 @@ impl ModalityRegenerator for SummaryRegenerator {
 
     async fn measure_drift(
         &self,
-        _hexad: &Hexad,
+        _octad: &Octad,
         _modality: Modality,
     ) -> Result<f64, NormalizerError> {
         // After a summary-only "regeneration" the drift hasn't actually changed,
@@ -600,7 +600,7 @@ impl RegenerationEngine {
     ///
     /// # Arguments
     ///
-    /// * `hexad` -- the entity whose modality drifted.
+    /// * `octad` -- the entity whose modality drifted.
     /// * `drifted_modality` -- which modality has drifted.
     /// * `drift_score` -- the measured drift score (0.0 -- 1.0).
     ///
@@ -610,11 +610,11 @@ impl RegenerationEngine {
     /// human review, no action, or failure).
     pub async fn regenerate(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         drifted_modality: Modality,
         drift_score: f64,
     ) -> RegenerationResult {
-        let entity_id = hexad.id.to_string();
+        let entity_id = octad.id.to_string();
 
         // Step 1: check threshold
         if drift_score <= self.config.drift_threshold {
@@ -641,15 +641,15 @@ impl RegenerationEngine {
         // Step 4: execute strategy
         match strategy {
             RegenerationStrategy::FromAuthoritative => {
-                self.execute_from_authoritative(hexad, drifted_modality, drift_score)
+                self.execute_from_authoritative(octad, drifted_modality, drift_score)
                     .await
             }
             RegenerationStrategy::Merge => {
-                self.execute_merge(hexad, drifted_modality, drift_score)
+                self.execute_merge(octad, drifted_modality, drift_score)
                     .await
             }
             RegenerationStrategy::UserResolve => {
-                self.execute_user_resolve(hexad, drifted_modality, drift_score)
+                self.execute_user_resolve(octad, drifted_modality, drift_score)
                     .await
             }
         }
@@ -657,15 +657,15 @@ impl RegenerationEngine {
 
     // -- FromAuthoritative ---------------------------------------------------
 
-    /// Find the highest-authority modality that is present on the hexad and is
+    /// Find the highest-authority modality that is present on the octad and is
     /// *not* the drifted modality, then regenerate from it.
     async fn execute_from_authoritative(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         drifted_modality: Modality,
         drift_score: f64,
     ) -> RegenerationResult {
-        let entity_id = hexad.id.to_string();
+        let entity_id = octad.id.to_string();
 
         // Walk authority order to find the best source.
         let source = self
@@ -673,7 +673,7 @@ impl RegenerationEngine {
             .authority_order
             .iter()
             .copied()
-            .find(|m| *m != drifted_modality && m.is_present_on(hexad));
+            .find(|m| *m != drifted_modality && m.is_present_on(octad));
 
         let source = match source {
             Some(s) => s,
@@ -711,7 +711,7 @@ impl RegenerationEngine {
         // Call the pluggable regenerator.
         let regen_result = self
             .regenerator
-            .regenerate_from(hexad, source, drifted_modality)
+            .regenerate_from(octad, source, drifted_modality)
             .await;
 
         match regen_result {
@@ -721,7 +721,7 @@ impl RegenerationEngine {
                 // Step 5: validate
                 let post_score = self
                     .regenerator
-                    .measure_drift(hexad, drifted_modality)
+                    .measure_drift(octad, drifted_modality)
                     .await
                     .ok();
 
@@ -766,11 +766,11 @@ impl RegenerationEngine {
     /// merge into the drifted modality.
     async fn execute_merge(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         drifted_modality: Modality,
         drift_score: f64,
     ) -> RegenerationResult {
-        let entity_id = hexad.id.to_string();
+        let entity_id = octad.id.to_string();
 
         // Collect non-drifted, present modalities with their weights.
         let sources: Vec<(Modality, f64)> = self
@@ -778,7 +778,7 @@ impl RegenerationEngine {
             .authority_order
             .iter()
             .copied()
-            .filter(|m| *m != drifted_modality && m.is_present_on(hexad))
+            .filter(|m| *m != drifted_modality && m.is_present_on(octad))
             .map(|m| {
                 let weight = self.config.authority_weight(m);
                 (m, weight)
@@ -817,7 +817,7 @@ impl RegenerationEngine {
 
         let merge_result = self
             .regenerator
-            .merge_into(hexad, &sources, drifted_modality)
+            .merge_into(octad, &sources, drifted_modality)
             .await;
 
         match merge_result {
@@ -826,7 +826,7 @@ impl RegenerationEngine {
 
                 let post_score = self
                     .regenerator
-                    .measure_drift(hexad, drifted_modality)
+                    .measure_drift(octad, drifted_modality)
                     .await
                     .ok();
 
@@ -869,11 +869,11 @@ impl RegenerationEngine {
     /// Place the entity on the manual-resolution queue instead of auto-fixing.
     async fn execute_user_resolve(
         &self,
-        hexad: &Hexad,
+        octad: &Octad,
         drifted_modality: Modality,
         drift_score: f64,
     ) -> RegenerationResult {
-        let entity_id = hexad.id.to_string();
+        let entity_id = octad.id.to_string();
 
         let pending = PendingNormalization {
             entity_id: entity_id.clone(),
@@ -930,18 +930,18 @@ mod tests {
     use chrono::Utc;
     use verisim_document::Document;
     use verisim_graph::GraphNode;
-    use verisim_hexad::{HexadId, HexadStatus, ModalityStatus};
+    use verisim_octad::{OctadId, OctadStatus, ModalityStatus};
     use verisim_semantic::{Provenance, SemanticAnnotation};
     use verisim_vector::Embedding;
 
     // -- test helpers --------------------------------------------------------
 
-    /// Build a hexad with document, semantic, graph, and vector populated.
-    fn rich_hexad() -> Hexad {
-        Hexad {
-            id: HexadId::new("rich-1"),
-            status: HexadStatus {
-                id: HexadId::new("rich-1"),
+    /// Build a octad with document, semantic, graph, and vector populated.
+    fn rich_octad() -> Octad {
+        Octad {
+            id: OctadId::new("rich-1"),
+            status: OctadStatus {
+                id: OctadId::new("rich-1"),
                 created_at: Utc::now(),
                 modified_at: Utc::now(),
                 version: 1,
@@ -967,12 +967,12 @@ mod tests {
         }
     }
 
-    /// Build a hexad with only a document.
-    fn doc_only_hexad() -> Hexad {
-        Hexad {
-            id: HexadId::new("doc-1"),
-            status: HexadStatus {
-                id: HexadId::new("doc-1"),
+    /// Build a octad with only a document.
+    fn doc_only_octad() -> Octad {
+        Octad {
+            id: OctadId::new("doc-1"),
+            status: OctadStatus {
+                id: OctadId::new("doc-1"),
                 created_at: Utc::now(),
                 modified_at: Utc::now(),
                 version: 1,
@@ -989,12 +989,12 @@ mod tests {
         }
     }
 
-    /// Build a completely empty hexad.
-    fn empty_hexad() -> Hexad {
-        Hexad {
-            id: HexadId::new("empty-1"),
-            status: HexadStatus {
-                id: HexadId::new("empty-1"),
+    /// Build a completely empty octad.
+    fn empty_octad() -> Octad {
+        Octad {
+            id: OctadId::new("empty-1"),
+            status: OctadStatus {
+                id: OctadId::new("empty-1"),
                 created_at: Utc::now(),
                 modified_at: Utc::now(),
                 version: 1,
@@ -1078,8 +1078,8 @@ mod tests {
     // -- modality presence tests ---------------------------------------------
 
     #[test]
-    fn test_modality_is_present_on_rich_hexad() {
-        let h = rich_hexad();
+    fn test_modality_is_present_on_rich_octad() {
+        let h = rich_octad();
         assert!(Modality::Document.is_present_on(&h));
         assert!(Modality::Semantic.is_present_on(&h));
         assert!(Modality::Graph.is_present_on(&h));
@@ -1089,12 +1089,12 @@ mod tests {
     }
 
     #[test]
-    fn test_modality_is_present_on_empty_hexad() {
-        let h = empty_hexad();
+    fn test_modality_is_present_on_empty_octad() {
+        let h = empty_octad();
         for m in Modality::ALL {
             assert!(
                 !m.is_present_on(&h),
-                "{} should not be present on empty hexad",
+                "{} should not be present on empty octad",
                 m
             );
         }
@@ -1105,7 +1105,7 @@ mod tests {
     #[tokio::test]
     async fn test_from_authoritative_selects_correct_source() {
         let engine = RegenerationEngine::with_defaults();
-        let h = rich_hexad();
+        let h = rich_octad();
 
         // Vector drifted -- Document is highest authority and is present.
         let result = engine
@@ -1132,7 +1132,7 @@ mod tests {
     #[tokio::test]
     async fn test_from_authoritative_skips_drifted_modality() {
         let engine = RegenerationEngine::with_defaults();
-        let h = rich_hexad();
+        let h = rich_octad();
 
         // Document itself drifted -- next authority is Semantic.
         let result = engine
@@ -1155,7 +1155,7 @@ mod tests {
     #[tokio::test]
     async fn test_from_authoritative_fails_no_source() {
         let engine = RegenerationEngine::with_defaults();
-        let h = empty_hexad();
+        let h = empty_octad();
 
         let result = engine
             .regenerate(&h, Modality::Vector, 0.9)
@@ -1176,7 +1176,7 @@ mod tests {
     #[tokio::test]
     async fn test_from_authoritative_doc_only_regenerates_graph() {
         let engine = RegenerationEngine::with_defaults();
-        let h = doc_only_hexad();
+        let h = doc_only_octad();
 
         // Graph drifted, only Document is available.
         let result = engine
@@ -1200,7 +1200,7 @@ mod tests {
         config.default_strategy = RegenerationStrategy::Merge;
 
         let engine = RegenerationEngine::new(config);
-        let h = rich_hexad();
+        let h = rich_octad();
 
         let result = engine
             .regenerate(&h, Modality::Tensor, 0.5)
@@ -1224,7 +1224,7 @@ mod tests {
         config.default_strategy = RegenerationStrategy::Merge;
 
         let engine = RegenerationEngine::new(config);
-        let h = empty_hexad();
+        let h = empty_octad();
 
         let result = engine
             .regenerate(&h, Modality::Vector, 0.9)
@@ -1248,7 +1248,7 @@ mod tests {
             .insert(Modality::Tensor, RegenerationStrategy::UserResolve);
 
         let engine = RegenerationEngine::new(config);
-        let h = rich_hexad();
+        let h = rich_octad();
 
         assert!(engine.queue().is_empty().await);
 
@@ -1277,7 +1277,7 @@ mod tests {
         config.default_strategy = RegenerationStrategy::UserResolve;
 
         let engine = RegenerationEngine::new(config);
-        let h = rich_hexad();
+        let h = rich_octad();
 
         engine.regenerate(&h, Modality::Vector, 0.5).await;
         engine.regenerate(&h, Modality::Graph, 0.6).await;
@@ -1295,7 +1295,7 @@ mod tests {
         config.default_strategy = RegenerationStrategy::UserResolve;
 
         let engine = RegenerationEngine::new(config);
-        let h = rich_hexad();
+        let h = rich_octad();
 
         engine.regenerate(&h, Modality::Vector, 0.5).await;
         engine.regenerate(&h, Modality::Graph, 0.6).await;
@@ -1323,7 +1323,7 @@ mod tests {
             ..Default::default()
         };
         let engine = RegenerationEngine::new(config);
-        let h = rich_hexad();
+        let h = rich_octad();
 
         let result = engine
             .regenerate(&h, Modality::Vector, 0.3)
@@ -1341,7 +1341,7 @@ mod tests {
             ..Default::default()
         };
         let engine = RegenerationEngine::new(config);
-        let h = rich_hexad();
+        let h = rich_octad();
 
         let result = engine
             .regenerate(&h, Modality::Vector, 0.5)
@@ -1359,7 +1359,7 @@ mod tests {
             ..Default::default()
         };
         let engine = RegenerationEngine::new(config);
-        let h = rich_hexad();
+        let h = rich_octad();
 
         let result = engine
             .regenerate(&h, Modality::Vector, 0.51)
@@ -1375,7 +1375,7 @@ mod tests {
     #[tokio::test]
     async fn test_normalization_event_records_correctly() {
         let engine = RegenerationEngine::with_defaults();
-        let h = rich_hexad();
+        let h = rich_octad();
 
         assert!(engine.events().await.is_empty());
 
@@ -1399,7 +1399,7 @@ mod tests {
     #[tokio::test]
     async fn test_failed_regeneration_records_event() {
         let engine = RegenerationEngine::with_defaults();
-        let h = empty_hexad();
+        let h = empty_octad();
 
         engine
             .regenerate(&h, Modality::Vector, 0.9)
@@ -1413,7 +1413,7 @@ mod tests {
     #[tokio::test]
     async fn test_multiple_regenerations_accumulate_events() {
         let engine = RegenerationEngine::with_defaults();
-        let h = rich_hexad();
+        let h = rich_octad();
 
         engine.regenerate(&h, Modality::Vector, 0.5).await;
         engine.regenerate(&h, Modality::Graph, 0.6).await;
@@ -1444,7 +1444,7 @@ mod tests {
         };
 
         let engine = RegenerationEngine::new(config);
-        let h = rich_hexad(); // has temporal (version_count=3)
+        let h = rich_octad(); // has temporal (version_count=3)
 
         let result = engine
             .regenerate(&h, Modality::Document, 0.8)
@@ -1466,7 +1466,7 @@ mod tests {
 
     #[test]
     fn test_modality_summarize() {
-        let h = rich_hexad();
+        let h = rich_octad();
         let doc_summary = Modality::Document.summarize(&h);
         assert!(doc_summary.is_some());
         assert!(doc_summary.unwrap().contains("Rich Entity"));

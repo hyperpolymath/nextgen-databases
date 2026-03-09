@@ -84,7 +84,7 @@ VQL has the following base types:
     | Tensor[d₁, ..., dₙ]          -- n-dimensional tensor
     | Timestamp                     -- ISO 8601 datetime
     | RDFTriple                     -- (subject, predicate, object)
-    | HexadRef                      -- Reference to a Hexad
+    | OctadRef                      -- Reference to a Octad
     | Modality                      -- GRAPH | VECTOR | TENSOR | ...
     | Proof[φ]                      -- Proof of proposition φ
 ----
@@ -105,16 +105,16 @@ Each modality has an associated type projection:
 \end{aligned}
 ++++
 
-=== Hexad Type
+=== Octad Type
 
-A **Hexad** is a dependent product over modalities:
+A **Octad** is a dependent product over modalities:
 
 [stem]
 ++++
-\text{Hexad} = \{h : \text{UUID} \mid \exists m_1, \ldots, m_k \in \text{Modalities}. \text{Valid}(h, m_1) \land \cdots \land \text{Valid}(h, m_k)\}
+\text{Octad} = \{h : \text{UUID} \mid \exists m_1, \ldots, m_k \in \text{Modalities}. \text{Valid}(h, m_1) \land \cdots \land \text{Valid}(h, m_k)\}
 ++++
 
-Where stem:[\text{Valid}(h, m)] asserts that hexad `h` has a valid representation in modality `m`.
+Where stem:[\text{Valid}(h, m)] asserts that octad `h` has a valid representation in modality `m`.
 
 === Refinement Types for Queries
 
@@ -124,14 +124,14 @@ A query result has a refinement type that depends on the modalities selected:
 
 [stem]
 ++++
-\text{QueryResult}[\mathcal{M}] = \text{List}(\text{Hexad}_\mathcal{M})
+\text{QueryResult}[\mathcal{M}] = \text{List}(\text{Octad}_\mathcal{M})
 ++++
 
 Where stem:[\mathcal{M} \subseteq \{\text{GRAPH}, \text{VECTOR}, \ldots\}] and:
 
 [stem]
 ++++
-\text{Hexad}_\mathcal{M} = \{h : \text{Hexad} \mid \forall m \in \mathcal{M}. \text{Valid}(h, m)\}
+\text{Octad}_\mathcal{M} = \{h : \text{Octad} \mid \forall m \in \mathcal{M}. \text{Valid}(h, m)\}
 ++++
 
 ==== Dependent-Type Query Result
@@ -154,13 +154,13 @@ Where stem:[\phi] is the proposition specified by the `PROOF` clause.
 \frac{
   \Gamma \vdash \text{modalities} : \mathcal{M} \quad
   \Gamma \vdash \text{source} : \text{Source} \quad
-  \Gamma \vdash \text{condition} : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash \text{condition} : \text{Octad} \to \text{Bool}
 }{
   \Gamma \vdash \texttt{SELECT } \mathcal{M} \texttt{ FROM } \text{source} \texttt{ WHERE } \text{condition} : \text{QueryResult}[\mathcal{M}]
 }
 ++++
 
-**Interpretation:** A slipstream query returns a list of hexads with selected modalities, **without proof guarantees**.
+**Interpretation:** A slipstream query returns a list of octads with selected modalities, **without proof guarantees**.
 
 ==== T-ProvedQuery (Dependent-Type Path)
 
@@ -169,7 +169,7 @@ Where stem:[\phi] is the proposition specified by the `PROOF` clause.
 \frac{
   \Gamma \vdash \text{modalities} : \mathcal{M} \quad
   \Gamma \vdash \text{source} : \text{Source} \quad
-  \Gamma \vdash \text{condition} : \text{Hexad} \to \text{Bool} \quad
+  \Gamma \vdash \text{condition} : \text{Octad} \to \text{Bool} \quad
   \Gamma \vdash \text{proof-spec} : \text{ProofType} \times \text{Contract}
 }{
   \Gamma \vdash \texttt{SELECT } \mathcal{M} \texttt{ ... PROOF } \text{proof-spec} : \text{ProvedResult}[\mathcal{M}, \phi_{\text{proof-spec}}]
@@ -185,7 +185,7 @@ Where stem:[\phi] is the proposition specified by the `PROOF` clause.
 \frac{
   \Gamma \vdash \text{pattern} : \text{SPARQLPattern}
 }{
-  \Gamma \vdash \texttt{WHERE } \text{pattern} : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash \texttt{WHERE } \text{pattern} : \text{Octad} \to \text{Bool}
 }
 ++++
 
@@ -197,7 +197,7 @@ Where stem:[\phi] is the proposition specified by the `PROOF` clause.
   \Gamma \vdash v : \text{Vector}[n] \quad
   \Gamma \vdash \text{threshold} : \text{Float}
 }{
-  \Gamma \vdash \texttt{WHERE h.embedding SIMILAR TO } v \texttt{ WITHIN } \text{threshold} : \text{Hexad} \to \text{Bool}
+  \Gamma \vdash \texttt{WHERE h.embedding SIMILAR TO } v \texttt{ WITHIN } \text{threshold} : \text{Octad} \to \text{Bool}
 }
 ++++
 
@@ -229,14 +229,14 @@ Where stem:[\phi] is the proposition specified by the `PROOF` clause.
 
 We define two evaluation environments:
 
-1. **Store Environment** stem:[\Sigma]: Maps UUIDs to Hexad data
+1. **Store Environment** stem:[\Sigma]: Maps UUIDs to Octad data
 2. **Proof Environment** stem:[\Pi]: Maps contracts to proof functions
 
 [stem]
 ++++
 \begin{aligned}
-\Sigma &: \text{UUID} \rightharpoonup \text{HexadData} \\
-\Pi &: \text{Contract} \rightharpoonup (\text{HexadData} \to \text{Proof})
+\Sigma &: \text{UUID} \rightharpoonup \text{OctadData} \\
+\Pi &: \text{Contract} \rightharpoonup (\text{OctadData} \to \text{Proof})
 \end{aligned}
 ++++
 
@@ -256,7 +256,7 @@ We define two evaluation environments:
 ++++
 
 **Interpretation:**
-1. Retrieve candidate hexads from source
+1. Retrieve candidate octads from source
 2. Filter by condition
 3. Project to selected modalities
 4. **No proof generation**
@@ -266,10 +266,10 @@ We define two evaluation environments:
 [stem]
 ++++
 \frac{
-  \Sigma(h) = \text{hexad-data} \quad
+  \Sigma(h) = \text{octad-data} \quad
   \text{modality} \in \mathcal{M}
 }{
-  \text{project}_\mathcal{M}(h)[\text{modality}] = \text{extract}(\text{hexad-data}, \text{modality})
+  \text{project}_\mathcal{M}(h)[\text{modality}] = \text{extract}(\text{octad-data}, \text{modality})
 }
 ++++
 
@@ -381,7 +381,7 @@ For each proof type, we specify the **proposition** stem:[\phi] that must be pro
 \phi_{\text{EXISTENCE}}(h) \equiv \exists \text{data} \in \Sigma. \Sigma(h) = \text{data} \land \text{accessible}(h)
 ++++
 
-**Informal:** The hexad exists in at least one store and is accessible to the querier.
+**Informal:** The octad exists in at least one store and is accessible to the querier.
 
 ==== CITATION Contract
 
@@ -390,7 +390,7 @@ For each proof type, we specify the **proposition** stem:[\phi] that must be pro
 \phi_{\text{CITATION}}(h) \equiv \forall h' \in \text{citations}(h). \text{ValidCitation}(h, h') \land \phi_{\text{EXISTENCE}}(h')
 ++++
 
-**Informal:** All citations are valid and cited hexads exist.
+**Informal:** All citations are valid and cited octads exist.
 
 ==== ACCESS Contract
 
@@ -399,7 +399,7 @@ For each proof type, we specify the **proposition** stem:[\phi] that must be pro
 \phi_{\text{ACCESS}}(h, u) \equiv \text{hasPermission}(u, h, \text{READ})
 ++++
 
-**Informal:** User `u` has read permission for hexad `h`.
+**Informal:** User `u` has read permission for octad `h`.
 
 ==== INTEGRITY Contract
 
@@ -575,10 +575,10 @@ We can also give a **denotational semantics** by interpreting queries as functio
 
 [stem]
 ++++
-\llbracket \cdot \rrbracket : \text{Query} \to (\text{Store} \to \mathcal{P}(\text{Hexad}))
+\llbracket \cdot \rrbracket : \text{Query} \to (\text{Store} \to \mathcal{P}(\text{Octad}))
 ++++
 
-Where stem:[\mathcal{P}(\text{Hexad})] is the powerset of hexads.
+Where stem:[\mathcal{P}(\text{Octad})] is the powerset of octads.
 
 === Basic Queries
 
@@ -621,7 +621,7 @@ Future versions may support **refinement predicates** in query syntax:
 ----
 SELECT GRAPH, VECTOR
 FROM verisim:semantic
-WHERE hexad : {h : Hexad | citationCount(h) > 10}
+WHERE octad : {h : Octad | citationCount(h) > 10}
 LIMIT 100;
 ----
 
@@ -629,7 +629,7 @@ Formal type:
 
 [stem]
 ++++
-\{h : \text{Hexad} \mid \text{citationCount}(h) > 10\}
+\{h : \text{Octad} \mid \text{citationCount}(h) > 10\}
 ++++
 
 === Liquid Types
@@ -638,7 +638,7 @@ Integration with **liquid types** for automatic predicate inference:
 
 [stem]
 ++++
-\Gamma \vdash Q : \text{QueryResult}[\mathcal{M}]\{\nu : \text{List}(\text{Hexad}) \mid \phi(\nu)\}
+\Gamma \vdash Q : \text{QueryResult}[\mathcal{M}]\{\nu : \text{List}(\text{Octad}) \mid \phi(\nu)\}
 ++++
 
 Where stem:[\phi] is automatically inferred from the query structure.

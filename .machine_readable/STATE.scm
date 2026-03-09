@@ -84,7 +84,7 @@
        ✅ RustClient HTTP integration with ETS caching
        ✅ VQL Executor with cross-modal evaluation, REFLECT support
        ✅ Rust Modality Stores (100%): Document, Graph, Vector, Tensor, Semantic, Temporal, Provenance, Spatial
-       ✅ Octad entity management (8 modalities) + query-as-hexad homoiconicity
+       ✅ Octad entity management (8 modalities) + query-as-octad homoiconicity
        ✅ Drift detection with adaptive thresholds + normalization (5 strategies)
        ✅ HTTP API server (verisim-api) with TLS, IPv6, Prometheus metrics
        ✅ ZKP custom circuit registry, compiler, verification key management
@@ -111,10 +111,10 @@
        ✅ Heterogeneous federation adapters (ArangoDB, PostgreSQL, Elasticsearch)
        ✅ Federation adapter behaviour + registry (14 adapters, 36+ tests)
        ✅ Connector federation adapters: 10 adapters with real query builders + selur-compose test infrastructure (7 containerised databases, 105 integration tests)
-       ✅ Connector client SDKs: 6 SDKs complete (Rust, Elixir, V, ReScript, Julia, Gleam) — full feature parity across types, hexad, search, drift, provenance, vql, federation
+       ✅ Connector client SDKs: 6 SDKs complete (Rust, Elixir, V, ReScript, Julia, Gleam) — full feature parity across types, octad, search, drift, provenance, vql, federation
        ✅ selur-compose test stack: 7 databases (MongoDB, Redis Stack, Neo4j, ClickHouse, SurrealDB, InfluxDB, MinIO) on Chainguard wolfi-base
        ✅ k9-svc Hunt-level deployment component for test infrastructure (deploy.k9.ncl)
-       ✅ Seed scripts with consistent hexad test data across all 7 databases
+       ✅ Seed scripts with consistent octad test data across all 7 databases
        ✅ Getting-started guide and adoption strategy documentation
        ✅ Zero C/C++ deps in default build (clang, RocksDB, protoc all eliminated)
        ✅ redb persistent backends: verisim-storage (KV) and verisim-graph (triple store)
@@ -129,7 +129,7 @@
        ✅ KRaft node WAL integration (persist state/log, recover on restart, snapshot triggers)
        ✅ KRaft network transport abstraction (local GenServer + HTTP remote, async RPC)
        ✅ 56 consensus tests (WAL, recovery, transport, election, replication)
-       ✅ Hypatia ScanIngester (panic-attack → octad hexads, ETS fallback, file/dir ingestion)
+       ✅ Hypatia ScanIngester (panic-attack → octad octads, ETS fallback, file/dir ingestion)
        ✅ Hypatia PatternQuery (pipeline health, cross-repo patterns, severity dist, temporal trends)
        ✅ Hypatia DispatchBridge (JSONL dispatch reader, outcome tracking, drift feedback)
        ✅ 37 Hypatia tests (22 ingester + 8 pattern + 7 dispatch)
@@ -171,7 +171,7 @@
          Phase 4: Elixir stubs completed (QueryRouter semantic/temporal, Federation Resolver real repair, SchemaRegistry rejection, EntityServer snapshots, HealthChecker GenServer)
          Phase 5: Normalizer strategies (tensor regen, temporal repair, quality reconciliation), adaptive drift thresholds
          Phase 6: ZKP custom circuits (circuit registry, R1CS compiler, verification key management, VQL circuit DSL)
-         Phase 7: Homoiconicity (queries as hexads, REFLECT keyword, /queries API, self-optimization)")
+         Phase 7: Homoiconicity (queries as octads, REFLECT keyword, /queries API, self-optimization)")
     (blocked-on
       "- Hypatia fleet dispatch not yet live (JSONL logged, needs PAT for GraphQL execution)")))
 
@@ -209,7 +209,7 @@
        (status . "COMPLETED")
        (completion . 100)
        (items
-         "✅ verisim-hexad (core octad structure + query-as-hexad homoiconicity)
+         "✅ verisim-octad (core octad structure + query-as-octad homoiconicity)
           ✅ verisim-graph (Oxigraph integration)
           ✅ verisim-vector (HNSW implementation, 670 lines)
           ✅ verisim-tensor (ndarray storage)
@@ -287,7 +287,7 @@
        (status . "COMPLETED")
        (completion . 85)
        (items
-         "✅ QueryHexadBuilder (queries stored as hexads across all 6 modalities)
+         "✅ QueryOctadBuilder (queries stored as octads across all 6 modalities)
           ✅ /queries and /queries/similar API endpoints
           ✅ /queries/{id}/optimize self-modification endpoint
           ✅ VQL REFLECT keyword (meta-circular query source)
@@ -391,7 +391,7 @@
       (accomplishments
         "- Created connectors/test-infra/ with selur-compose stack (7 databases)
          - 5 custom Containerfiles (Redis Stack, Neo4j, ClickHouse, SurrealDB, InfluxDB) on wolfi-base
-         - 7 seed scripts with consistent hexad test data (hexad-test-001..003) across all databases
+         - 7 seed scripts with consistent octad test data (octad-test-001..003) across all databases
          - compose.toml, manifest.toml, .gatekeeper.yaml (permissive), ct-build.sh, vordr.toml
          - k9-svc Hunt-level deploy component (deploy.k9.ncl) + AI manifest (0-AI-MANIFEST.a2ml)
          - 7 integration test files (105 tests): MongoDB, Redis, Neo4j, ClickHouse, SurrealDB, InfluxDB, MinIO
@@ -402,7 +402,7 @@
         "- MinIO API port remapped to 9002 to avoid ClickHouse native TCP conflict on 9000
          - MongoDB uses replica set rs0 (required for change streams in drift monitor)
          - SurrealDB runs in memory mode (no persistence overhead during testing)
-         - Integration test data uses hexad-integration-* prefix (distinct from seed hexad-test-*)
+         - Integration test data uses octad-integration-* prefix (distinct from seed octad-test-*)
          - All custom Containerfiles use multi-stage builds from wolfi-base with non-root users"))
 
     (session
@@ -415,7 +415,7 @@
          - Updated adapter.ex registry: 4 → 14 adapters, modality mapping tables expanded
          - Updated mix.exs with optional deps (postgrex, redix, exqlite, bolt_sips)
          - 6 client SDK scaffolds: Rust, Elixir, V, ReScript, Julia, Gleam
-         - Each SDK: types, client, hexad CRUD, search, drift, provenance, VQL, federation, error modules
+         - Each SDK: types, client, octad CRUD, search, drift, provenance, VQL, federation, error modules
          - 10 adapter test stubs with modality and translate_results assertions
          - connectors/README.adoc with architecture diagram")
       (key-decisions
@@ -468,7 +468,7 @@
       (date . "2026-02-28e")
       (phase . "hypatia-pipeline-verisimdb-integration")
       (accomplishments
-        "- Created ScanIngester (scan_ingester.ex, ~280 lines) — panic-attack JSON → octad hexads
+        "- Created ScanIngester (scan_ingester.ex, ~280 lines) — panic-attack JSON → octad octads
          - Created PatternQuery (pattern_query.ex, ~220 lines) — cross-repo analytics over ingested scans
          - Created DispatchBridge (dispatch_bridge.ex, ~250 lines) — JSONL dispatch reader + drift feedback
          - 37 Hypatia tests (22 ingester + 8 pattern + 7 dispatch), all passing
@@ -575,7 +575,7 @@
         "- Implemented full octad evolution: 2 new modalities (Provenance + Spatial) across 9-layer stack
          - Created verisim-provenance crate: hash-chain lineage tracking, SHA-256 verification, InMemoryProvenanceStore
          - Created verisim-spatial crate: WGS84 coordinates, haversine distance, radius/bounds/nearest queries
-         - Extended verisim-hexad: 8-modality ModalityStatus, HexadProvenanceInput, HexadSpatialInput, HexadBuilder
+         - Extended verisim-octad: 8-modality ModalityStatus, OctadProvenanceInput, OctadSpatialInput, OctadBuilder
          - Extended verisim-api: 6 new endpoints (provenance chain/record/verify, spatial radius/bounds/nearest)
          - Extended verisim-drift: ProvenanceDrift + SpatialDrift types, provenance_drift() + spatial_drift() methods
          - Extended verisim-normalizer: 8 modalities in authority order (Provenance ranked 3rd)
@@ -590,7 +590,7 @@
       (key-decisions
         "- Spatial uses brute-force haversine (no rstar/geo-types deps) — production should use R-tree
          - Provenance ranked 3rd in normalizer authority order (Document > Semantic > Provenance)
-         - InMemoryHexadStore now generic over 8 type parameters (G, V, D, T, S, R, P, L)
+         - InMemoryOctadStore now generic over 8 type parameters (G, V, D, T, S, R, P, L)
          - VQL grammar v3.0: WITHIN RADIUS(), WITHIN BOUNDS(), NEAREST() spatial syntax
          - Provenance proof verification enhanced: calls /provenance/{id}/verify for chain integrity"))
 
@@ -614,7 +614,7 @@
         "- VQL-SPEC.adoc is the single normative reference; existing docs remain for deep dives
          - Followed grammar and implementation over vql-vs-vql-dt.adoc proof type names
          - Cross-modal conditions documented as post-fetch (not pushdown)
-         - Octad evolution noted but hexad model is current normative spec"))
+         - Octad evolution noted but octad model is current normative spec"))
 
     (session
       (date . "2026-02-27")
@@ -625,7 +625,7 @@
          - Full Virtuoso vs VerisimDB comparison table
          - Competitor analysis: Great Expectations, Monte Carlo, Soda, Atlan, Bigeye, Anomalo, Elementary, Datafold
          - Identified three-layer differentiator strategy: drift detection → federation → VQL-DT
-         - Architecture evolved from hexad (6) to octad (8): provenance (CRITICAL) + spatial (planned)
+         - Architecture evolved from octad (6) to octad (8): provenance (CRITICAL) + spatial (planned)
          - Tensor modality retained with active research into novel applications (details confidential)
          - Heterogeneous federation (non-VerisimDB peers) identified as enterprise value proposition
          - Cross-modal write atomicity identified as Priority 0 architectural concern
@@ -678,7 +678,7 @@
          - Phase 4: Elixir stubs (QueryRouter semantic/temporal, Federation Resolver repair, SchemaRegistry reject, EntityServer snapshots, HealthChecker)
          - Phase 5: Rust stubs (normalizer tensor/temporal/quality strategies, adaptive drift thresholds)
          - Phase 6: ZKP custom circuits (circuit registry, R1CS compiler, verification keys, VQL circuit DSL)
-         - Phase 7: Homoiconicity (queries as hexads, REFLECT keyword, /queries API, /queries/{id}/optimize)
+         - Phase 7: Homoiconicity (queries as octads, REFLECT keyword, /queries API, /queries/{id}/optimize)
          - 317 Rust tests pass (0 failures), Elixir compiles clean
          - Updated all documentation (STATE.scm, KNOWN-ISSUES.adoc, CHANGELOG.adoc)")
       (key-decisions

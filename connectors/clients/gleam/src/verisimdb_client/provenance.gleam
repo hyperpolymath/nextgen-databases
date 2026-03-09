@@ -4,7 +4,7 @@
 ////
 //// VeriSimDB Gleam Client — Provenance operations.
 ////
-//// Every hexad maintains an immutable provenance chain — a cryptographically
+//// Every octad maintains an immutable provenance chain — a cryptographically
 //// linked sequence of events recording every mutation applied to it. This
 //// module provides functions to query chains, record new events, and verify
 //// chain integrity.
@@ -17,21 +17,21 @@ import verisimdb_client/types.{
   type ProvenanceChain, type ProvenanceEvent, type ProvenanceEventInput,
 }
 
-/// Retrieve the complete provenance chain for a hexad.
+/// Retrieve the complete provenance chain for a octad.
 ///
 /// The chain is returned in chronological order (oldest first) and includes
 /// the verification status.
 ///
 /// Parameters:
 ///   client — The authenticated client.
-///   hexad_id — The unique identifier of the hexad.
+///   octad_id — The unique identifier of the octad.
 ///
 /// Returns the ProvenanceChain with all events, or an error.
 pub fn get_chain(
   client: Client,
-  hexad_id: String,
+  octad_id: String,
 ) -> Result(ProvenanceChain, VeriSimError) {
-  let path = "/api/v1/hexads/" <> hexad_id <> "/provenance"
+  let path = "/api/v1/octads/" <> octad_id <> "/provenance"
   case verisimdb_client.do_get(client, path) {
     Ok(resp) ->
       case resp.status {
@@ -42,23 +42,23 @@ pub fn get_chain(
   }
 }
 
-/// Record a new provenance event on a hexad's chain.
+/// Record a new provenance event on a octad's chain.
 ///
 /// The event is cryptographically linked to the previous event.
 /// The server assigns the event ID and timestamp.
 ///
 /// Parameters:
 ///   client — The authenticated client.
-///   hexad_id — The unique identifier of the hexad.
+///   octad_id — The unique identifier of the octad.
 ///   input — The event details to record.
 ///
 /// Returns the newly created ProvenanceEvent, or an error.
 pub fn record_event(
   client: Client,
-  hexad_id: String,
+  octad_id: String,
   input: ProvenanceEventInput,
 ) -> Result(ProvenanceEvent, VeriSimError) {
-  let path = "/api/v1/hexads/" <> hexad_id <> "/provenance"
+  let path = "/api/v1/octads/" <> octad_id <> "/provenance"
   let detail_pairs =
     input.details
     |> dict.to_list
@@ -79,19 +79,19 @@ pub fn record_event(
   }
 }
 
-/// Verify the cryptographic integrity of a hexad's provenance chain.
+/// Verify the cryptographic integrity of a octad's provenance chain.
 ///
 /// Returns Ok(True) if the chain is intact, Ok(False) if tampered,
 /// or an error on failure.
 ///
 /// Parameters:
 ///   client — The authenticated client.
-///   hexad_id — The unique identifier of the hexad.
+///   octad_id — The unique identifier of the octad.
 pub fn verify(
   client: Client,
-  hexad_id: String,
+  octad_id: String,
 ) -> Result(Bool, VeriSimError) {
-  let path = "/api/v1/hexads/" <> hexad_id <> "/provenance/verify"
+  let path = "/api/v1/octads/" <> octad_id <> "/provenance/verify"
   case verisimdb_client.do_post(client, path, "{}") {
     Ok(resp) ->
       case resp.status {

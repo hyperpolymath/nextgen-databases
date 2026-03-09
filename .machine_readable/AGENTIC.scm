@@ -111,18 +111,18 @@
         "- Monitor cache hit rate per query pattern
          - Adjust TTL dynamically (5 min → 1 hour if high hit rate)
          - Evict stale cache entries proactively
-         - Prefetch frequently accessed hexads
+         - Prefetch frequently accessed octads
          - Invalidate cache on drift detection")
       (decision-making
         (rules
           "IF cache_hit_rate > 90% THEN increase_ttl (1.5×)
            IF cache_hit_rate < 40% THEN decrease_ttl (0.7×)
-           IF drift_detected(hexad_id) THEN invalidate_cache(hexad_id)
-           IF query_frequency > 100/hour THEN prefetch_related_hexads")
+           IF drift_detected(octad_id) THEN invalidate_cache(octad_id)
+           IF query_frequency > 100/hour THEN prefetch_related_octads")
         (learning
           "- Observe: Cache hit rate, query patterns, drift frequency
            - Decide: Optimal TTL per query type, what to prefetch
-           - Act: Adjust TTL, prefetch hexads, evict stale entries
+           - Act: Adjust TTL, prefetch octads, evict stale entries
            - Measure: Cache hit rate, query latency, memory usage")
         (constraints
           "- Must not exceed memory budget (2 GB cache per store)
@@ -132,9 +132,9 @@
         (language . "Rust")
         (file . "src/verisim-cache/")
         (state
-          "- cache_entries: LRU cache (hexad_id → cached result + TTL)
+          "- cache_entries: LRU cache (octad_id → cached result + TTL)
            - ttl_policy: Map of query pattern to TTL
-           - prefetch_queue: Hexads to prefetch (priority queue)"))))
+           - prefetch_queue: Octads to prefetch (priority queue)"))))
 
 ;; ============================================================================
 ;; AGENT COORDINATION
@@ -147,7 +147,7 @@
         ((drift-detected
            (from . "drift-repair-agent")
            (to . "cache-manager-agent")
-           (payload . "{hexad_id, drift_type, severity}"))
+           (payload . "{octad_id, drift_type, severity}"))
 
          (query-slow
            (from . "query-optimizer-agent")
@@ -162,7 +162,7 @@
          (cache-invalidate
            (from . "drift-repair-agent")
            (to . "cache-manager-agent")
-           (payload . "{hexad_id, reason}")))))
+           (payload . "{octad_id, reason}")))))
 
     (conflict-resolution
       (scenario . "Drift repair agent wants to push, but network budget exceeded")

@@ -7,13 +7,13 @@ defmodule VeriSim.Federation.Adapters.Neo4jIntegrationTest do
   Runs against a real Neo4j 5.x instance from the test-infra container
   stack. The seed script `neo4j-init.cypher` pre-loads:
 
-  - 4 Hexad nodes (hexad-test-001 through -004) with labels, properties,
+  - 4 Octad nodes (octad-test-001 through -004) with labels, properties,
     and spatial coordinates
   - 6 relationships: RELATES_TO, CITES, PART_OF
   - 2 ProvenanceEvent nodes chained with FOLLOWED_BY and HAS_PROVENANCE
   - 3 OntologyType nodes with IS_TYPE and SUBCLASS_OF relationships
-  - Fulltext index `hexad_fulltext` on [title, content]
-  - Constraints: unique on Hexad.id, ProvenanceEvent.event_id
+  - Fulltext index `octad_fulltext` on [title, content]
+  - Constraints: unique on Octad.id, ProvenanceEvent.event_id
 
   ## Test Infrastructure
 
@@ -51,15 +51,15 @@ defmodule VeriSim.Federation.Adapters.Neo4jIntegrationTest do
     adapter_config: %{
       database: "neo4j",
       auth: {:basic, @neo4j_user, @neo4j_pass},
-      label: "Hexad",
+      label: "Octad",
       version: 5,
       relationship_type: "RELATES_TO",
-      fulltext_index: "hexad_fulltext",
+      fulltext_index: "octad_fulltext",
       max_depth: 3
     }
   }
 
-  @integration_prefix "hexad-integration"
+  @integration_prefix "octad-integration"
 
   # ---------------------------------------------------------------------------
   # Setup / Teardown
@@ -108,19 +108,19 @@ defmodule VeriSim.Federation.Adapters.Neo4jIntegrationTest do
   # 2. Read / Query — Verify Seed Data
   # ---------------------------------------------------------------------------
 
-  describe "querying seeded Hexad nodes" do
-    test "default MATCH query returns all 4 seeded Hexad nodes", context do
+  describe "querying seeded Octad nodes" do
+    test "default MATCH query returns all 4 seeded Octad nodes", context do
       skip_if_unavailable(context)
 
       query_params = %{modalities: [], limit: 100}
       assert {:ok, results} = Neo4j.query(@peer_info, query_params)
 
-      # The seed script creates 4 Hexad nodes
+      # The seed script creates 4 Octad nodes
       assert length(results) >= 4
 
       Enum.each(results, fn result ->
         assert result.source_store == "neo4j-integration"
-        assert is_binary(result.hexad_id) or result.hexad_id == "unknown"
+        assert is_binary(result.octad_id) or result.octad_id == "unknown"
         assert is_number(result.score)
         assert result.drifted == false
         assert is_map(result.data)
@@ -136,8 +136,8 @@ defmodule VeriSim.Federation.Adapters.Neo4jIntegrationTest do
     test "fulltext search for 'drift' returns matching nodes", context do
       skip_if_unavailable(context)
 
-      # hexad-test-002 has title "Drift Detection Algorithms"
-      # hexad-test-003 has content mentioning "drift"
+      # octad-test-002 has title "Drift Detection Algorithms"
+      # octad-test-003 has content mentioning "drift"
       query_params = %{
         modalities: [:document],
         text_query: "drift",
@@ -153,7 +153,7 @@ defmodule VeriSim.Federation.Adapters.Neo4jIntegrationTest do
       end)
     end
 
-    test "fulltext search for 'normalisation' returns hexad-test-003", context do
+    test "fulltext search for 'normalisation' returns octad-test-003", context do
       skip_if_unavailable(context)
 
       query_params = %{
@@ -172,22 +172,22 @@ defmodule VeriSim.Federation.Adapters.Neo4jIntegrationTest do
   # ---------------------------------------------------------------------------
 
   describe "graph relationship traversal" do
-    test "RELATES_TO traversal from hexad-test-001 finds connected nodes", context do
+    test "RELATES_TO traversal from octad-test-001 finds connected nodes", context do
       skip_if_unavailable(context)
 
       query_params = %{
         modalities: [:graph],
-        graph_pattern: "hexad-test-001",
+        graph_pattern: "octad-test-001",
         limit: 10
       }
 
       assert {:ok, results} = Neo4j.query(@peer_info, query_params)
-      # hexad-test-001 has RELATES_TO -> hexad-test-002 (bidirectional),
-      # CITES -> hexad-test-003, PART_OF -> hexad-test-004
+      # octad-test-001 has RELATES_TO -> octad-test-002 (bidirectional),
+      # CITES -> octad-test-003, PART_OF -> octad-test-004
       assert length(results) >= 1
     end
 
-    test "traversal from hexad-test-004 finds all PART_OF components", context do
+    test "traversal from octad-test-004 finds all PART_OF components", context do
       skip_if_unavailable(context)
 
       # Query with reversed relationship direction or multi-hop
@@ -198,7 +198,7 @@ defmodule VeriSim.Federation.Adapters.Neo4jIntegrationTest do
 
       query_params = %{
         modalities: [:graph],
-        graph_pattern: "hexad-test-001",
+        graph_pattern: "octad-test-001",
         limit: 10
       }
 
@@ -216,8 +216,8 @@ defmodule VeriSim.Federation.Adapters.Neo4jIntegrationTest do
       skip_if_unavailable(context)
 
       # Query ProvenanceEvent nodes via semantic filter on entity_type
-      # (Since Neo4j adapter uses Hexad label by default, we can filter
-      # by properties on Hexad nodes that link to provenance events)
+      # (Since Neo4j adapter uses Octad label by default, we can filter
+      # by properties on Octad nodes that link to provenance events)
       query_params = %{
         modalities: [:semantic],
         filters: %{"drift_status" => "healthy"},
@@ -225,7 +225,7 @@ defmodule VeriSim.Federation.Adapters.Neo4jIntegrationTest do
       }
 
       assert {:ok, results} = Neo4j.query(@peer_info, query_params)
-      # hexad-test-001, hexad-test-003, hexad-test-004 are 'healthy'
+      # octad-test-001, octad-test-003, octad-test-004 are 'healthy'
       assert length(results) >= 1
     end
   end
@@ -264,7 +264,7 @@ defmodule VeriSim.Federation.Adapters.Neo4jIntegrationTest do
   # ---------------------------------------------------------------------------
 
   describe "temporal queries with datetime" do
-    test "temporal range query filters Hexad nodes by created_at", context do
+    test "temporal range query filters Octad nodes by created_at", context do
       skip_if_unavailable(context)
 
       # All seed nodes were created relative to now() — query a wide range

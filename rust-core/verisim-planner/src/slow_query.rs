@@ -348,7 +348,7 @@ mod tests {
         let plan = make_plan(vec![(Modality::Vector, 30.0)]);
         let step_times = vec![(Modality::Vector, 30.0, 10)];
 
-        let was_slow = log.record(Some("SELECT VECTOR FROM HEXAD"), 30.0, &plan, &step_times);
+        let was_slow = log.record(Some("SELECT VECTOR FROM OCTAD"), 30.0, &plan, &step_times);
         assert!(!was_slow);
         assert_eq!(log.count(), 0);
     }
@@ -360,7 +360,7 @@ mod tests {
         let step_times = vec![(Modality::Semantic, 150.0, 5)];
 
         let was_slow =
-            log.record(Some("SELECT SEMANTIC FROM HEXAD"), 150.0, &plan, &step_times);
+            log.record(Some("SELECT SEMANTIC FROM OCTAD"), 150.0, &plan, &step_times);
         assert!(was_slow);
         assert_eq!(log.count(), 1);
 
@@ -380,7 +380,7 @@ mod tests {
         let plan = make_plan(vec![(Modality::Graph, 40.0)]);
         let step_times = vec![(Modality::Graph, 60.0, 20)];
 
-        let was_slow = log.record(Some("SELECT GRAPH FROM HEXAD"), 60.0, &plan, &step_times);
+        let was_slow = log.record(Some("SELECT GRAPH FROM OCTAD"), 60.0, &plan, &step_times);
         assert!(was_slow);
         assert_eq!(log.count(), 1);
     }
@@ -540,11 +540,11 @@ mod tests {
         let plan = make_plan(vec![(Modality::Temporal, 5.0)]);
         let step_times = vec![(Modality::Temporal, 20.0, 3)];
 
-        log.record(Some("SELECT TEMPORAL FROM HEXAD"), 20.0, &plan, &step_times);
+        log.record(Some("SELECT TEMPORAL FROM OCTAD"), 20.0, &plan, &step_times);
 
         let entries = log.recent(1);
         let json = serde_json::to_string(&entries[0]).unwrap();
         let parsed: SlowQueryEntry = serde_json::from_str(&json).unwrap();
-        assert_eq!(parsed.query_text, Some("SELECT TEMPORAL FROM HEXAD".to_string()));
+        assert_eq!(parsed.query_text, Some("SELECT TEMPORAL FROM OCTAD".to_string()));
     }
 }

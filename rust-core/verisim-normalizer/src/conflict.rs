@@ -139,7 +139,7 @@ pub struct Conflict {
     /// Unique identifier for this conflict instance.
     pub id: String,
 
-    /// The hexad entity on which the conflict was detected.
+    /// The octad entity on which the conflict was detected.
     pub entity_id: String,
 
     /// When the conflict was first detected.
@@ -331,7 +331,7 @@ impl ConflictResolver {
     ///
     /// # Arguments
     ///
-    /// * `entity_id` -- the hexad entity on which the conflict was detected.
+    /// * `entity_id` -- the octad entity on which the conflict was detected.
     /// * `modalities` -- the modalities whose data disagrees.
     /// * `drift_score` -- measured drift score (0.0 -- 1.0).
     /// * `description` -- human-readable description of the conflict.

@@ -85,7 +85,7 @@ defmodule VeriSim.IncompatibleGoals do
 
   defp is_high_risk?(query) do
     # Medical data, financial data, PII
-    has_sensitive_hexads?(query) or
+    has_sensitive_octads?(query) or
     has_cross_org_access?(query) or
     has_write_operations?(query)
   end
@@ -113,7 +113,7 @@ Raft quorum requires majority
 |**Drift Tolerance**
 Allow temporary inconsistency
 |**Referential Integrity**
-Citations must reference valid hexads
+Citations must reference valid octads
 |Broken citations during drift windows
 |===
 
@@ -149,7 +149,7 @@ defmodule VeriSim.CAP do
   defp requires_strong_consistency?(query) do
     # Writes, financial transactions, medical records
     query.mutation? or
-    query.hexads |> Enum.any?(&critical_data?/1)
+    query.octads |> Enum.any?(&critical_data?/1)
   end
 end
 ----
@@ -398,7 +398,7 @@ defmodule VeriSim.VerificationPolicy do
         query_id: query.id,
         user_id: context.user_id,
         reason: "User chose slipstream path despite dependent-type availability",
-        hexad_ids: extract_hexad_ids(query)
+        octad_ids: extract_octad_ids(query)
       })
     end
   end
@@ -1092,7 +1092,7 @@ Medical diagnosis data must be fresh to prevent harm:
 
 ## Decision
 
-Cache TTL for medical data (hexads tagged "medical:*") is **5 minutes**.
+Cache TTL for medical data (octads tagged "medical:*") is **5 minutes**.
 
 This is NOT negotiable. Do NOT increase this TTL without:
 1. New ADR with medical review board approval

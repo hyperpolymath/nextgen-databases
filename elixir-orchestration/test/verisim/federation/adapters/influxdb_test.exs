@@ -16,7 +16,7 @@ defmodule VeriSim.Federation.Adapters.InfluxDBTest do
   @peer_info %{
     store_id: "influx-test",
     endpoint: "http://influxdb:8086",
-    adapter_config: %{org: "verisim", bucket: "hexads", token: "test-token"}
+    adapter_config: %{org: "verisim", bucket: "octads", token: "test-token"}
   }
 
   describe "supported_modalities/1" do
@@ -39,7 +39,7 @@ defmodule VeriSim.Federation.Adapters.InfluxDBTest do
     test "normalises InfluxDB time-series records" do
       raw = [
         %{
-          "_measurement" => "hexad_events",
+          "_measurement" => "octad_events",
           "_time" => "2026-02-28T12:00:00Z",
           "_value" => 42.5,
           "entity_id" => "influx-001"
@@ -48,7 +48,7 @@ defmodule VeriSim.Federation.Adapters.InfluxDBTest do
 
       [result] = InfluxDB.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "hexad_events:influx-001:2026-02-28T12:00:00Z"
+      assert result.octad_id == "octad_events:influx-001:2026-02-28T12:00:00Z"
       assert result.source_store == "influx-test"
     end
 

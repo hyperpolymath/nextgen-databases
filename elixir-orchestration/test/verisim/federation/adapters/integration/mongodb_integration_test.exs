@@ -5,7 +5,7 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
   Integration tests for the MongoDB federation adapter.
 
   Runs against a real MongoDB 7+ replica set (rs0) from the test-infra
-  container stack. The seed script `mongodb-init.js` pre-loads 3 hexad
+  container stack. The seed script `mongodb-init.js` pre-loads 3 octad
   documents, 2 drift score documents, and 2 provenance events into the
   `verisimdb` database.
 
@@ -19,7 +19,7 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
 
   ## Seed Data Summary
 
-  - `hexads` collection: 3 documents (hexad-test-001, -002, -003)
+  - `octads` collection: 3 documents (octad-test-001, -002, -003)
     - Each has modalities array with document, vector, spatial, temporal,
       graph, provenance, and semantic sub-documents
     - Indexes: unique on `id`, text on `modalities.data.content`/`title`,
@@ -51,15 +51,15 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
     endpoint: @mongodb_url,
     adapter_config: %{
       database: "verisimdb",
-      collection: "hexads",
+      collection: "octads",
       replica_set: "rs0",
       geo_index: true,
       data_source: "Cluster0"
     }
   }
 
-  # Prefix for integration test data — avoids collision with seed data (hexad-test-*)
-  @integration_prefix "hexad-integration"
+  # Prefix for integration test data — avoids collision with seed data (octad-test-*)
+  @integration_prefix "octad-integration"
 
   # ---------------------------------------------------------------------------
   # Setup / Teardown
@@ -111,20 +111,20 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
   # 2. Read / Query — Verify Seed Data
   # ---------------------------------------------------------------------------
 
-  describe "querying seeded hexads collection" do
+  describe "querying seeded octads collection" do
     test "default query returns all 3 seeded documents", context do
       skip_if_unavailable(context)
 
       query_params = %{modalities: [], limit: 100}
       assert {:ok, results} = MongoDB.query(@peer_info, query_params)
 
-      # The seed script inserts 3 hexad documents
+      # The seed script inserts 3 octad documents
       assert length(results) >= 3
 
       # All results should be normalised with the correct source_store
       Enum.each(results, fn result ->
         assert result.source_store == "mongo-integration"
-        assert is_binary(result.hexad_id)
+        assert is_binary(result.octad_id)
         assert is_float(result.score) or is_integer(result.score)
         assert result.drifted == false
         assert is_map(result.data)
@@ -132,10 +132,10 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
       end)
     end
 
-    test "text search across document modality returns matching hexads", context do
+    test "text search across document modality returns matching octads", context do
       skip_if_unavailable(context)
 
-      # Seed document hexad-test-001 contains "cross-modal consistency"
+      # Seed document octad-test-001 contains "cross-modal consistency"
       query_params = %{
         modalities: [:document],
         text_query: "consistency modality",
@@ -167,14 +167,14 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
       }
 
       assert {:ok, results} = MongoDB.query(@peer_info, query_params)
-      # Should find at least some of the 3 seeded hexads created within 1 day
+      # Should find at least some of the 3 seeded octads created within 1 day
       assert length(results) >= 1
     end
 
     test "semantic (metadata) filter query returns matching documents", context do
       skip_if_unavailable(context)
 
-      # Hexad-test-001 has modality type "document" with specific content
+      # Octad-test-001 has modality type "document" with specific content
       query_params = %{
         modalities: [:semantic],
         filters: %{"type" => "document"},
@@ -191,10 +191,10 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
   # ---------------------------------------------------------------------------
 
   describe "geospatial queries (2dsphere)" do
-    test "geoWithin query on London coordinates returns hexad-test-001", context do
+    test "geoWithin query on London coordinates returns octad-test-001", context do
       skip_if_unavailable(context)
 
-      # hexad-test-001 is located at [-0.1278, 51.5074] (London)
+      # octad-test-001 is located at [-0.1278, 51.5074] (London)
       # Query a bounding box around London
       query_params = %{
         modalities: [:spatial],
@@ -208,14 +208,14 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
       }
 
       assert {:ok, results} = MongoDB.query(@peer_info, query_params)
-      # Should find at least hexad-test-001 which has London coordinates
+      # Should find at least octad-test-001 which has London coordinates
       assert length(results) >= 1
     end
 
     test "geoWithin query on empty region returns no results", context do
       skip_if_unavailable(context)
 
-      # Query an area in the middle of the ocean where no hexads exist
+      # Query an area in the middle of the ocean where no octads exist
       query_params = %{
         modalities: [:spatial],
         spatial_bounds: %{
@@ -237,7 +237,7 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
   # ---------------------------------------------------------------------------
 
   describe "write and read-back cycle" do
-    test "inserting a new hexad document and querying it back", context do
+    test "inserting a new octad document and querying it back", context do
       skip_if_unavailable(context)
 
       test_id = "#{@integration_prefix}-write-#{System.unique_integer([:positive])}"
@@ -260,7 +260,7 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
       [normalised] = MongoDB.translate_results([raw_doc], @peer_info)
 
       assert normalised.source_store == "mongo-integration"
-      assert normalised.hexad_id == test_id
+      assert normalised.octad_id == test_id
       assert normalised.score == 0.77
       assert normalised.drifted == false
       assert normalised.data["title"] == "Integration Test Document"
@@ -275,10 +275,10 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
     test "graph traversal query with $graphLookup returns results", context do
       skip_if_unavailable(context)
 
-      # hexad-test-001 has a relates_to relationship to hexad-test-002
+      # octad-test-001 has a relates_to relationship to octad-test-002
       query_params = %{
         modalities: [:graph],
-        graph_pattern: "hexad-test-001",
+        graph_pattern: "octad-test-001",
         limit: 10
       }
 
@@ -370,15 +370,15 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
 
       [result] = MongoDB.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "507f1f77bcf86cd799439011"
+      assert result.octad_id == "507f1f77bcf86cd799439011"
       assert result.score == 0.93
     end
 
     test "normalises a document with nested modalities array" do
       raw = [
         %{
-          "_id" => "hexad-test-001",
-          "id" => "hexad-test-001",
+          "_id" => "octad-test-001",
+          "id" => "octad-test-001",
           "modalities" => [
             %{"type" => "document", "data" => %{"title" => "Test"}},
             %{"type" => "vector", "data" => %{"embedding" => [0.1, 0.2]}}
@@ -387,7 +387,7 @@ defmodule VeriSim.Federation.Adapters.MongoDBIntegrationTest do
       ]
 
       [result] = MongoDB.translate_results(raw, @peer_info)
-      assert result.hexad_id == "hexad-test-001"
+      assert result.octad_id == "octad-test-001"
       assert is_list(result.data["modalities"])
     end
   end

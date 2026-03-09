@@ -11,7 +11,7 @@
 //!
 //! ```rust,no_run
 //! use verisimdb_client::client::VeriSimClient;
-//! use verisimdb_client::types::HexadInput;
+//! use verisimdb_client::types::OctadInput;
 //!
 //! #[tokio::main]
 //! async fn main() -> verisimdb_client::error::Result<()> {
@@ -25,8 +25,8 @@
 //! ## Modules
 //!
 //! - [`client`] — Connection configuration, authentication, and HTTP transport.
-//! - [`types`] — Data types mirroring the VeriSimDB JSON Schema (Hexad, Modality, etc.).
-//! - [`hexad`] — CRUD operations for hexad entities.
+//! - [`types`] — Data types mirroring the VeriSimDB JSON Schema (Octad, Modality, etc.).
+//! - [`octad`] — CRUD operations for octad entities.
 //! - [`search`] — Text, vector, graph-relational, and spatial search operations.
 //! - [`drift`] — Drift score retrieval and normalization triggers.
 //! - [`provenance`] — Immutable provenance chain management.
@@ -36,7 +36,7 @@
 
 pub mod client;
 pub mod types;
-pub mod hexad;
+pub mod octad;
 pub mod search;
 pub mod drift;
 pub mod provenance;

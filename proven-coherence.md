@@ -30,7 +30,7 @@ const App = () => {
       contract: "CitationContract",
       breach: "Invariant 'claim_validity' failed.",
       cause: "Reference 0x990F... has status 'retracted'.",
-      implication: "Approving this update will logically invalidate the authority of the parent Hexad.",
+      implication: "Approving this update will logically invalidate the authority of the parent Octad.",
       timestamp: "12 mins ago"
     },
     {

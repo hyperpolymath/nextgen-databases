@@ -8,13 +8,13 @@ defmodule VeriSim.Federation.Adapters.SurrealDBIntegrationTest do
   stack. The seed script `surrealdb-init.surql` pre-loads:
 
   - Namespace `verisimdb`, database `test`
-  - `hexads` table: 4 schemafull records (test001-test004) with title,
+  - `octads` table: 4 schemafull records (test001-test004) with title,
     content, entity_type, drift_status, drift_score, tags, timestamps
   - Edge tables: `relates_to` (2), `cites` (1), `part_of` (3), `derived_from` (1)
   - `modalities` table: 5 records
   - `drift_scores` table: 2 records
   - `provenance_events` table: 2 records
-  - Fulltext index `idx_hexads_fulltext` with BM25 scoring
+  - Fulltext index `idx_octads_fulltext` with BM25 scoring
   - Field-level indexes on entity_type, drift_status, created_at
 
   ## Test Infrastructure
@@ -51,7 +51,7 @@ defmodule VeriSim.Federation.Adapters.SurrealDBIntegrationTest do
     adapter_config: %{
       namespace: "verisimdb",
       database: "test",
-      table: "hexads",
+      table: "octads",
       auth: {:basic, "root", "root"},
       edge_table: "relates_to",
       search_fields: ["title", "content"],
@@ -59,7 +59,7 @@ defmodule VeriSim.Federation.Adapters.SurrealDBIntegrationTest do
     }
   }
 
-  @integration_prefix "hexad-integration"
+  @integration_prefix "octad-integration"
 
   # ---------------------------------------------------------------------------
   # Setup / Teardown
@@ -108,19 +108,19 @@ defmodule VeriSim.Federation.Adapters.SurrealDBIntegrationTest do
   # 2. Read / Query — Verify Seed Data
   # ---------------------------------------------------------------------------
 
-  describe "querying seeded hexads table" do
+  describe "querying seeded octads table" do
     test "SELECT * returns all 4 seeded records", context do
       skip_if_unavailable(context)
 
       query_params = %{modalities: [], limit: 100}
       assert {:ok, results} = SurrealDB.query(@peer_info, query_params)
 
-      # The seed script creates 4 hexad records
+      # The seed script creates 4 octad records
       assert length(results) >= 4
 
       Enum.each(results, fn result ->
         assert result.source_store == "surreal-integration"
-        assert is_binary(result.hexad_id)
+        assert is_binary(result.octad_id)
         assert is_number(result.score)
         assert result.drifted == false
         assert is_map(result.data)
@@ -133,8 +133,8 @@ defmodule VeriSim.Federation.Adapters.SurrealDBIntegrationTest do
       query_params = %{modalities: [], limit: 10}
       assert {:ok, results} = SurrealDB.query(@peer_info, query_params)
 
-      # SurrealDB IDs are "hexads:test001" — adapter should extract "test001"
-      ids = Enum.map(results, & &1.hexad_id)
+      # SurrealDB IDs are "octads:test001" — adapter should extract "test001"
+      ids = Enum.map(results, & &1.octad_id)
 
       # At least one of the seeded IDs should be present (without table prefix)
       assert Enum.any?(ids, fn id ->
@@ -148,7 +148,7 @@ defmodule VeriSim.Federation.Adapters.SurrealDBIntegrationTest do
   # ---------------------------------------------------------------------------
 
   describe "graph edge traversal" do
-    test "relates_to traversal from test001 finds connected hexads", context do
+    test "relates_to traversal from test001 finds connected octads", context do
       skip_if_unavailable(context)
 
       query_params = %{
@@ -215,11 +215,11 @@ defmodule VeriSim.Federation.Adapters.SurrealDBIntegrationTest do
       }
 
       assert {:ok, results} = SurrealDB.query(@peer_info, query_params)
-      # hexad test001 title contains "Consistency"
+      # octad test001 title contains "Consistency"
       assert length(results) >= 1
     end
 
-    test "text search for 'federation' returns hexad test004", context do
+    test "text search for 'federation' returns octad test004", context do
       skip_if_unavailable(context)
 
       query_params = %{
@@ -270,7 +270,7 @@ defmodule VeriSim.Federation.Adapters.SurrealDBIntegrationTest do
 
       # Simulate SurrealDB response format
       raw_record = %{
-        "id" => "hexads:#{test_id}",
+        "id" => "octads:#{test_id}",
         "title" => "Integration Test Record",
         "entity_type" => "TestArticle",
         "drift_status" => "healthy",
@@ -280,8 +280,8 @@ defmodule VeriSim.Federation.Adapters.SurrealDBIntegrationTest do
       [normalised] = SurrealDB.translate_results([raw_record], @peer_info)
 
       assert normalised.source_store == "surreal-integration"
-      # The adapter strips the "hexads:" table prefix from the ID
-      assert normalised.hexad_id == test_id
+      # The adapter strips the "octads:" table prefix from the ID
+      assert normalised.octad_id == test_id
       assert normalised.score == 0.82
       assert normalised.drifted == false
     end

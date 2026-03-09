@@ -5,7 +5,7 @@
 //// VeriSimDB Gleam Client — Federation operations.
 ////
 //// VeriSimDB supports federated operation where multiple instances form a
-//// cluster, sharing and synchronising hexad data across peers. This module
+//// cluster, sharing and synchronising octad data across peers. This module
 //// provides functions to register and manage peers and to execute cross-node
 //// queries.
 

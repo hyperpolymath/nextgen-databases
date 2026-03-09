@@ -61,7 +61,7 @@ defmodule VeriSim.Query.VQLTypeChecker do
   }
 
   @proof_witness_fields %{
-    existence: ["hexad_id", "timestamp", "modality_count"],
+    existence: ["octad_id", "timestamp", "modality_count"],
     integrity: ["content_hash", "merkle_root", "schema_version"],
     consistency: ["modality_a", "modality_b", "drift_score", "threshold"],
     provenance: ["chain_hash", "chain_length", "origin", "actor_trail"],

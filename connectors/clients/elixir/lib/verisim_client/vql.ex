@@ -14,10 +14,10 @@ defmodule VeriSimClient.Vql do
 
       {:ok, client} = VeriSimClient.new("http://localhost:8080")
 
-      {:ok, result} = VeriSimClient.Vql.execute(client, "SELECT * FROM hexads WHERE drift > 0.5")
+      {:ok, result} = VeriSimClient.Vql.execute(client, "SELECT * FROM octads WHERE drift > 0.5")
       IO.puts("Rows returned: \#{result["row_count"]}")
 
-      {:ok, plan} = VeriSimClient.Vql.explain(client, "SELECT * FROM hexads WHERE drift > 0.5")
+      {:ok, plan} = VeriSimClient.Vql.explain(client, "SELECT * FROM octads WHERE drift > 0.5")
   """
 
   alias VeriSimClient.Types

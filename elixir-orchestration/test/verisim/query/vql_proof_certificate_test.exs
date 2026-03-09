@@ -26,7 +26,7 @@ defmodule VeriSim.Query.VQLProofCertificateTest do
       proofType: "EXISTENCE",
       contract: "entity-001",
       contractName: "entity-001",
-      witness_fields: ["hexad_id", "timestamp", "modality_count"],
+      witness_fields: ["octad_id", "timestamp", "modality_count"],
       circuit: "existence-proof-v1",
       estimated_time_ms: 50,
       required_modalities: []
@@ -35,7 +35,7 @@ defmodule VeriSim.Query.VQLProofCertificateTest do
 
   defp existence_witness do
     %{
-      "hexad_id" => "entity-001",
+      "octad_id" => "entity-001",
       "timestamp" => "2026-02-28T12:00:00Z",
       "modality_count" => 8
     }
@@ -110,7 +110,7 @@ defmodule VeriSim.Query.VQLProofCertificateTest do
     test "tampered witness causes hash mismatch" do
       {:ok, cert} = VQLProofCertificate.generate_certificate(existence_obligation(), existence_witness())
 
-      tampered = %{cert | witness: %{"hexad_id" => "evil-entity"}}
+      tampered = %{cert | witness: %{"octad_id" => "evil-entity"}}
       assert {:error, :invalid_hash} = VQLProofCertificate.verify_certificate(tampered)
     end
 

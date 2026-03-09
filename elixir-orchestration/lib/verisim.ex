@@ -20,7 +20,7 @@ defmodule VeriSim do
   ├─────────────────────────────────────────────────────────────┤
   │  Rust Core (verisim-api)                                    │
   │    ├── 6 modality stores                                    │
-  │    ├── Hexad management                                     │
+  │    ├── Octad management                                     │
   │    └── Normalizer                                           │
   └─────────────────────────────────────────────────────────────┘
   ```

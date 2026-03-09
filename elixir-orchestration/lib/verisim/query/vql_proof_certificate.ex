@@ -26,13 +26,13 @@ defmodule VeriSim.Query.VQLProofCertificate do
 
   Certificates contain only proof metadata (types, hashes, timestamps) — never
   query content, entity data, or PII. The witness fields are structural (e.g.,
-  `hexad_id`, `drift_score`, `chain_length`) not content-bearing.
+  `octad_id`, `drift_score`, `chain_length`) not content-bearing.
 
   ## Usage
 
       # After type checking succeeds and proof is verified:
-      obligation = %{type: :existence, witness_fields: ["hexad_id", "timestamp", "modality_count"], ...}
-      witness = %{"hexad_id" => "entity-001", "timestamp" => "2026-02-28T12:00:00Z", "modality_count" => 8}
+      obligation = %{type: :existence, witness_fields: ["octad_id", "timestamp", "modality_count"], ...}
+      witness = %{"octad_id" => "entity-001", "timestamp" => "2026-02-28T12:00:00Z", "modality_count" => 8}
 
       {:ok, cert} = VQLProofCertificate.generate_certificate(obligation, witness)
       :ok = VQLProofCertificate.verify_certificate(cert)

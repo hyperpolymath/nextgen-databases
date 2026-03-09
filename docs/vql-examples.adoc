@@ -11,7 +11,7 @@ This document provides **63 comprehensive examples** of VQL queries and mutation
 
 == Basic Queries
 
-=== Example 1: Simple Hexad Retrieval
+=== Example 1: Simple Octad Retrieval
 
 **Slipstream** (no proof):
 [source,vql]
@@ -643,7 +643,7 @@ VERSION 1.0;
 
 SELECT GRAPH, DOCUMENT
 FROM verisim:semantic
-WHERE hexad.types INCLUDES "https://schema.org/Person"
+WHERE octad.types INCLUDES "https://schema.org/Person"
 LIMIT 10;
 ----
 
@@ -654,7 +654,7 @@ VERSION 0.9;  -- Deprecated syntax accepted
 
 FROM verisim:semantic
 SELECT GRAPH, DOCUMENT
-WHERE hexad.types INCLUDES "https://schema.org/Person"
+WHERE octad.types INCLUDES "https://schema.org/Person"
 LIMIT 10;
 ----
 
@@ -668,7 +668,7 @@ VERSION 1.0;
 SELECT *
 FROM FEDERATION /universities/*
 WITH DRIFT LATEST  -- Use latest schema version
-WHERE hexad.types INCLUDES "Paper"
+WHERE octad.types INCLUDES "Paper"
 LIMIT 100;
 ----
 
@@ -681,7 +681,7 @@ LIMIT 100;
 ----
 SELECT DRIFT
 FROM verisim:all_modalities
-WHERE hexad.id = @hexad_id;
+WHERE octad.id = @octad_id;
 
 -- Returns: {
 --   "drifts": [
@@ -697,7 +697,7 @@ WHERE hexad.id = @hexad_id;
 ----
 DRIFT REPAIR
 FROM verisim:graph
-WHERE hexad.id = @id
+WHERE octad.id = @id
 USING STRATEGY latest_wins;
 ----
 
@@ -708,7 +708,7 @@ USING STRATEGY latest_wins;
 ----
 DRIFT REPAIR
 FROM verisim:federation /universities/*
-WHERE hexad.id = @id
+WHERE octad.id = @id
 USING STRATEGY quorum;
 ----
 
@@ -720,7 +720,7 @@ USING STRATEGY quorum;
 SELECT GRAPH, DOCUMENT
 FROM FEDERATION /universities/*
 WITH DRIFT TOLERATE  -- Return data despite drift
-WHERE hexad.types INCLUDES "Paper"
+WHERE octad.types INCLUDES "Paper"
 LIMIT 100;
 ----
 
@@ -732,7 +732,7 @@ LIMIT 100;
 SELECT GRAPH, DOCUMENT
 FROM FEDERATION /universities/*
 WITH DRIFT REPAIR  -- Auto-repair detected drift
-WHERE hexad.types INCLUDES "Paper"
+WHERE octad.types INCLUDES "Paper"
 LIMIT 100;
 ----
 
@@ -778,7 +778,7 @@ LIMIT 100
 
 === Example 45: COUNT(*), SUM, AVG — Aggregate Functions
 
-**Count all matching hexads:**
+**Count all matching octads:**
 [source,vql]
 ----
 SELECT COUNT(*)
@@ -911,7 +911,7 @@ WHERE DOCUMENT.severity > GRAPH.centrality
 ----
 
 Evaluates after both modalities are fetched, comparing the document severity
-field against the graph centrality field on the same hexad.
+field against the graph centrality field on the same octad.
 
 === Example 53: Drift Between Modalities
 
@@ -924,7 +924,7 @@ WHERE DRIFT(VECTOR, DOCUMENT) > 0.3
 LIMIT 50
 ----
 
-Returns hexads where the vector embedding has drifted more than 0.3 from the
+Returns octads where the vector embedding has drifted more than 0.3 from the
 document representation. Useful for identifying stale embeddings.
 
 === Example 54: Consistency Check
@@ -953,8 +953,8 @@ WHERE VECTOR EXISTS
 LIMIT 100
 ----
 
-Returns hexads that have vector embeddings but lack tensor data. Useful for
-identifying hexads that need tensor representations generated.
+Returns octads that have vector embeddings but lack tensor data. Useful for
+identifying octads that need tensor representations generated.
 
 === Example 56: Combined Cross-Modal and Standard Conditions
 
@@ -973,11 +973,11 @@ LIMIT 50
 
 Pushdown conditions (FULLTEXT CONTAINS) are sent to individual stores,
 while cross-modal conditions (DRIFT, EXISTS) are evaluated post-fetch
-on full hexad data.
+on full octad data.
 
 == Write Path: INSERT / UPDATE / DELETE (v2.0)
 
-=== Example 57: Insert a New Hexad
+=== Example 57: Insert a New Octad
 
 **Insert with document and vector data:**
 [source,vql]
@@ -987,8 +987,8 @@ INSERT HEXAD WITH
   VECTOR([0.12, 0.45, 0.78, 0.23, 0.91])
 ----
 
-Creates a new hexad with document and vector modalities populated.
-The hexad ID is auto-generated and returned in the result.
+Creates a new octad with document and vector modalities populated.
+The octad ID is auto-generated and returned in the result.
 
 === Example 58: Insert with Graph Relationship
 
@@ -1001,8 +1001,8 @@ INSERT HEXAD WITH
   GRAPH(CITES, 550e8400-e29b-41d4-a716-446655440000)
 ----
 
-Creates a hexad with document content, embedding, and a graph edge
-(CITES relationship to an existing hexad).
+Creates a octad with document content, embedding, and a graph edge
+(CITES relationship to an existing octad).
 
 === Example 59: Verified Insert with Proof
 
@@ -1019,7 +1019,7 @@ PROOF INTEGRITY(WriteContract) AND PROVENANCE(AuditTrailContract)
 The ZKP proofs are generated for the write operation itself, ensuring the
 insert is verified and auditable.
 
-=== Example 60: Update Hexad Fields
+=== Example 60: Update Octad Fields
 
 **Update specific fields:**
 [source,vql]
@@ -1044,7 +1044,7 @@ PROOF ACCESS(EditAccessContract) AND PROVENANCE(RetractionContract)
 The update requires proof of edit access and creates a provenance record
 of the retraction in the audit trail.
 
-=== Example 62: Delete a Hexad
+=== Example 62: Delete a Octad
 
 **Simple deletion:**
 [source,vql]
@@ -1052,7 +1052,7 @@ of the retraction in the audit trail.
 DELETE HEXAD 550e8400-e29b-41d4-a716-446655440000
 ----
 
-Removes the hexad and all its modality data. This operation is logged
+Removes the octad and all its modality data. This operation is logged
 in verisim-temporal for auditability.
 
 === Example 63: Verified Delete with Proof

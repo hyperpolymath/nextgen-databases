@@ -66,7 +66,7 @@ VeriSimDB's error handling provides **comprehensive, actionable feedback** acros
 
 [source,vql]
 ----
-SELECT GRAPH, VECTRO FROM hexad abc-123
+SELECT GRAPH, VECTRO FROM octad abc-123
                 ^^^^^^
                 typo here
 ----
@@ -92,7 +92,7 @@ ParseError({
     start: {line: 1, column: 14, offset: 14},
     end_: {line: 1, column: 20, offset: 20}
   },
-  source: "SELECT GRAPH, VECTRO FROM hexad abc-123",
+  source: "SELECT GRAPH, VECTRO FROM octad abc-123",
   hint: Some("Did you mean 'VECTOR'?")
 })
 ----
@@ -116,7 +116,7 @@ ParseError({
 |Valid: STRICT, REPAIR, TOLERATE, LATEST
 
 |**Unterminated String**
-|`SELECT GRAPH FROM hexad "abc-123`
+|`SELECT GRAPH FROM octad "abc-123`
 |Missing closing quote
 
 |**Invalid Proof Type**
@@ -139,7 +139,7 @@ ParseError({
 
 [source,vql]
 ----
-SELECT SEMANTIC FROM hexad abc-123
+SELECT SEMANTIC FROM octad abc-123
   PROOF ACCESS(EthicsApprovalContract)
 ----
 
@@ -147,7 +147,7 @@ SELECT SEMANTIC FROM hexad abc-123
 
 [source,text]
 ----
-Type Error [hexad: abc-123, modality: SEMANTIC]: Contract 'EthicsApprovalContract' violated: ethics approval expired on 2025-11-01
+Type Error [octad: abc-123, modality: SEMANTIC]: Contract 'EthicsApprovalContract' violated: ethics approval expired on 2025-11-01
   Context: Query requires valid ethics approval for medical data access
 ----
 
@@ -160,7 +160,7 @@ TypeError({
     contract: "EthicsApprovalContract",
     reason: "ethics approval expired on 2025-11-01"
   }),
-  hexad_id: Some("abc-123"),
+  octad_id: Some("abc-123"),
   modality: Some("SEMANTIC"),
   context: "Query requires valid ethics approval for medical data access"
 })
@@ -254,7 +254,7 @@ end
 |⚠️ Sometimes
 |Clear cache, wait for resources, fail if persistent
 
-|**InvalidHexadId**
+|**InvalidOctadId**
 |❌ No
 |Fail immediately, client error
 
@@ -625,7 +625,7 @@ defmodule VeriSim.ErrorLogger do
       error_message: VQLError.format(error),
       query_id: context.query_id,
       user_id: context.user_id,
-      hexad_ids: context.hexad_ids,
+      octad_ids: context.octad_ids,
       recoverable: VQLError.is_recoverable?(error),
       recovery_attempted: context.recovery_attempted,
       recovery_successful: context.recovery_successful
@@ -679,7 +679,7 @@ ORDER BY COUNT(*) DESC
         "start": 14,
         "end": 20
       },
-      "query": "SELECT GRAPH, VECTRO FROM hexad abc-123"
+      "query": "SELECT GRAPH, VECTRO FROM octad abc-123"
     }
   },
   "request_id": "req_abc123",
@@ -698,7 +698,7 @@ ORDER BY COUNT(*) DESC
 {:error, {:store_unavailable, "milvus-1"}}
 
 # Non-recoverable error
-{:error, {:permission_denied, "User cannot access hexad abc-123"}}
+{:error, {:permission_denied, "User cannot access octad abc-123"}}
 
 # Partial success
 {:partial, results, failed_stores}
@@ -762,7 +762,7 @@ Logger.error("Query execution failed",
   error: inspect(error),
   query_id: query.id,
   user_id: query.user_id,
-  hexad_ids: query.hexad_ids,
+  octad_ids: query.octad_ids,
   duration_ms: duration,
   retry_count: retry_count
 )
@@ -890,7 +890,7 @@ SET VERBOSITY VERBOSE;
 
 SELECT GRAPH, DOCUMENT
 FROM verisim:semantic
-WHERE hexad.types INCLUDES "Paper"
+WHERE octad.types INCLUDES "Paper"
 LIMIT 10;
 ----
 
@@ -945,21 +945,21 @@ Query returned 10 results in 234ms
     condition: Some(Condition::Includes(...))
   }
 [TYPE] Checking modalities: GRAPH, DOCUMENT
-[TYPE] Hexad type: {h : Hexad | Graph(h) ≠ None ∧ Document(h) ≠ None}
-[TYPE] Condition type: Hexad → Bool
+[TYPE] Octad type: {h : Octad | Graph(h) ≠ None ∧ Document(h) ≠ None}
+[TYPE] Condition type: Octad → Bool
 [TYPE] Query type: QueryResult[{GRAPH, DOCUMENT}]
 [EXEC] HTTP GET https://university-archive.edu/verisim/query
-[EXEC] Response: 200 OK, 3 hexads
+[EXEC] Response: 200 OK, 3 octads
 [EXEC] HTTP GET https://research-lab.org/verisim/query
-[EXEC] Response: 200 OK, 5 hexads
+[EXEC] Response: 200 OK, 5 octads
 [EXEC] HTTP GET https://corporate-db.com/verisim/query
 [EXEC] Response: 504 Gateway Timeout (retry 1/3)
-[EXEC] Response: 200 OK, 2 hexads
+[EXEC] Response: 200 OK, 2 octads
 [DRIFT] Store 1 title: "ML Paper"
 [DRIFT] Store 2 title: "Machine Learning Paper"
 [DRIFT] Store 3 title: "Machine Learning Paper"
 [DRIFT] Quorum result: "Machine Learning Paper" (2/3)
-[RESULT] Merged 10 hexads with drift repair
+[RESULT] Merged 10 octads with drift repair
 [TIMING] Total: 1.2s (Parse: 5ms, Type: 12ms, Execute: 1183ms)
 ----
 
@@ -1020,7 +1020,7 @@ SELECT * FROM HEXAD abc-123;
 ----
 SELECT GRAPH, DOCUMENT
 FROM FEDERATION /universities/*
-WHERE hexad.types INCLUDES "Paper";
+WHERE octad.types INCLUDES "Paper";
 ----
 
 [source,text]
@@ -1106,8 +1106,8 @@ VQL error handling will integrate with **miniKanren** (link:minikanren-integrati
 ;; Example: Learn that missing modality causes errors
 (run 1 (pattern)
   (error-patterno
-    '((query "SELECT FROM hexad abc" . error)
-      (query "SELECT GRAPH FROM hexad abc" . ok)
+    '((query "SELECT FROM octad abc" . error)
+      (query "SELECT GRAPH FROM octad abc" . ok)
       (query "SELECT FROM store xyz" . error))
     pattern))
 ;; Output: (pattern (missing-modality-in-select))
@@ -1139,9 +1139,9 @@ VQL error handling will integrate with **miniKanren** (link:minikanren-integrati
 ;; Query: What fix for this error?
 (run* (fixed)
   (fix-suggestiono
-    "SELECT GRPH FROM hexad abc"  ;; Typo: GRPH
+    "SELECT GRPH FROM octad abc"  ;; Typo: GRPH
     fixed))
-;; Output: ("SELECT GRAPH FROM hexad abc")
+;; Output: ("SELECT GRAPH FROM octad abc")
 ----
 
 === Use Case 3: Strategy Optimization (v3)

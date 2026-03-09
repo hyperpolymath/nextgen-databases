@@ -40,7 +40,7 @@ rate_limits:
 
   # Write operations: 100 req/s (protects modality stores)
   writes:
-    paths: ["/api/v1/hexads"]
+    paths: ["/api/v1/octads"]
     methods: ["POST", "PUT", "DELETE"]
     requests_per_second: 100
     burst: 200
@@ -79,7 +79,7 @@ validation:
   # Maximum vector dimension (prevents OOM from oversized embeddings)
   max_vector_dimension: 4096
 
-  # Maximum hexad limit per list/search query
+  # Maximum octad limit per list/search query
   max_result_limit: 1000
 
 # CORS policy (delegated from Rust core)
@@ -95,6 +95,6 @@ logging:
   level: "info"
   # Log all write operations for audit trail
   audit_paths:
-    - "/api/v1/hexads"
+    - "/api/v1/octads"
     - "/api/v1/federation/*"
     - "/api/v1/normalizer/trigger/*"

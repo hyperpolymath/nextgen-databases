@@ -93,10 +93,10 @@ Result: All three queries degrade due to resource contention
 
 === 2.2. Write Amplification
 
-**Problem:** A single Hexad update can trigger writes across **all six modalities**.
+**Problem:** A single Octad update can trigger writes across **all six modalities**.
 
 **Example:**
-1. User updates Hexad `550e8400-...` with new document text
+1. User updates Octad `550e8400-...` with new document text
 2. **Document modality**: Tantivy reindexes (writes segments)
 3. **Vector modality**: Recomputes embedding, updates HNSW index (rebuilds layers)
 4. **Temporal modality**: Appends new Merkle-tree node (writes snapshot)
@@ -113,7 +113,7 @@ Result: All three queries degrade due to resource contention
 **Mitigation:**
 - **Lazy Updates:** Only write to modalities that actually changed
 - **Batching:** Buffer updates in memory, flush every N seconds
-- **Write Coalescing:** Merge multiple updates to same Hexad before persisting
+- **Write Coalescing:** Merge multiple updates to same Octad before persisting
 
 === 2.3. Query Routing Overhead
 
@@ -130,7 +130,7 @@ Result: All three queries degrade due to resource contention
 - Orchestrator CPU at 100% (single core)
 
 **Mitigation:**
-- **Pooling:** Use `poolboy` to spawn N parallel routers (shard by Hexad UUID)
+- **Pooling:** Use `poolboy` to spawn N parallel routers (shard by Octad UUID)
 - **Direct Dispatch:** For hot paths, bypass GenServer and call Rust NIFs directly
 - **Load Balancing:** Use `pg` (process groups) to distribute across BEAM scheduler cores
 
@@ -239,7 +239,7 @@ tokio = { version = "1.40", features = ["rt-multi-thread", "io-util"] }
 
 **Scaling Options (All Suboptimal):**
 - **Vertical Scaling:** Buy bigger machine → diminishing returns, CapEx explosion
-- **Manual Sharding:** Split Hexads across multiple standalone nodes → lose single-system image
+- **Manual Sharding:** Split Octads across multiple standalone nodes → lose single-system image
 - **Migrate to Hybrid/Federated:** Requires architectural overhaul
 
 **Constraint:** Standalone architecture fundamentally incompatible with horizontal scaling.
@@ -278,7 +278,7 @@ tokio = { version = "1.40", features = ["rt-multi-thread", "io-util"] }
 
 **Mitigation:**
 - **Pooling:** Use `poolboy` to spawn N parallel `EntityServer` processes
-- **Sharding:** Shard Hexads by UUID across multiple orchestrator nodes (requires migration to distributed Elixir)
+- **Sharding:** Shard Octads by UUID across multiple orchestrator nodes (requires migration to distributed Elixir)
 - **Async Writes:** Use `GenServer.cast` for non-critical writes (lose ordering guarantees)
 
 == 5. Security Challenges
@@ -292,7 +292,7 @@ tokio = { version = "1.40", features = ["rt-multi-thread", "io-util"] }
 2. **Elixir VM Exploit:** Remote code execution in Erlang VM → full database compromise
 3. **Rust NIF Bug:** Buffer overflow in modality crate → arbitrary code execution with DB privileges
 
-**Blast Radius:** 100% of data (all modalities, all Hexads)
+**Blast Radius:** 100% of data (all modalities, all Octads)
 
 **Mitigation:**
 - **Defense in Depth:**

@@ -10,9 +10,9 @@
 
 VQL (VeriSim Query Language) is the query language for VeriSimDB, a 6-core multimodal database. While VQL borrows familiar keywords from SQL (`SELECT`, `FROM`, `WHERE`, `LIMIT`, `OFFSET`), it serves a fundamentally different purpose.
 
-VQL is **read-only**. It does not support `INSERT`, `UPDATE`, or `DELETE` statements. All mutations go through the Hexad API (Rust core or Elixir orchestration layer). This is a deliberate design choice: VeriSimDB treats writes as coordinated multi-modal operations that must maintain consistency across all six modality stores (Graph, Vector, Tensor, Semantic, Document, Temporal). A simple `INSERT` statement cannot express the cross-modal invariants that a Hexad write requires.
+VQL is **read-only**. It does not support `INSERT`, `UPDATE`, or `DELETE` statements. All mutations go through the Octad API (Rust core or Elixir orchestration layer). This is a deliberate design choice: VeriSimDB treats writes as coordinated multi-modal operations that must maintain consistency across all six modality stores (Graph, Vector, Tensor, Semantic, Document, Temporal). A simple `INSERT` statement cannot express the cross-modal invariants that a Octad write requires.
 
-VQL is **multimodal**. Where SQL selects columns from relational tables, VQL selects _modalities_ from _hexad stores_ or _federations_. A single VQL query can retrieve graph edges, vector embeddings, tensor slices, semantic annotations, document text, and temporal versions in one pass.
+VQL is **multimodal**. Where SQL selects columns from relational tables, VQL selects _modalities_ from _octad stores_ or _federations_. A single VQL query can retrieve graph edges, vector embeddings, tensor slices, semantic annotations, document text, and temporal versions in one pass.
 
 VQL is **federation-aware**. Queries can target a local `STORE`, a specific `HEXAD` entity, or a `FEDERATION` of distributed VeriSimDB instances, with configurable drift policies governing cross-instance consistency.
 
@@ -27,7 +27,7 @@ VQL is **federation-aware**. Queries can target a local `STORE`, a specific `HEX
 |`SELECT` with _column names_ or `*` for all columns.
 
 |**Data Source**
-|`FROM STORE <name>`, `FROM HEXAD <uuid>`, or `FROM FEDERATION <name>`. A STORE is a collection of hexad entities. A HEXAD is a single entity addressed by UUID. A FEDERATION spans multiple VeriSimDB instances.
+|`FROM STORE <name>`, `FROM HEXAD <uuid>`, or `FROM FEDERATION <name>`. A STORE is a collection of octad entities. A HEXAD is a single entity addressed by UUID. A FEDERATION spans multiple VeriSimDB instances.
 |`FROM <table>` or `FROM <table> AS <alias>`. Tables are flat relational structures.
 
 |**Filtering**
@@ -35,11 +35,11 @@ VQL is **federation-aware**. Queries can target a local `STORE`, a specific `HEX
 |`WHERE` supports standard comparison operators, `LIKE`, `IN`, `BETWEEN`, `IS NULL`, boolean combinators (`AND`, `OR`, `NOT`), and subqueries.
 
 |**Joins**
-|**No JOINs.** Graph modality replaces relational joins entirely. Relationships are first-class: `(h)-[:CITES]->(target)` traverses edges without explicit join syntax. Cross-modal correlation is implicit within a hexad.
+|**No JOINs.** Graph modality replaces relational joins entirely. Relationships are first-class: `(h)-[:CITES]->(target)` traverses edges without explicit join syntax. Cross-modal correlation is implicit within a octad.
 |`JOIN`, `LEFT JOIN`, `RIGHT JOIN`, `FULL OUTER JOIN`, `CROSS JOIN` with `ON` conditions.
 
 |**Mutations**
-|**None.** VQL is strictly read-only. All writes go through the Hexad API: `POST /api/hexads` (create), `PUT /api/hexads/:id` (update), `DELETE /api/hexads/:id` (delete). This ensures cross-modal consistency.
+|**None.** VQL is strictly read-only. All writes go through the Octad API: `POST /api/octads` (create), `PUT /api/octads/:id` (update), `DELETE /api/octads/:id` (delete). This ensures cross-modal consistency.
 |`INSERT INTO`, `UPDATE ... SET`, `DELETE FROM`, `MERGE`, `TRUNCATE`.
 
 |**Verification**
@@ -72,7 +72,7 @@ VQL is intentionally minimal. The following SQL features have no VQL equivalent:
 |Not supported. Queries are flat. Compose results in application code or use the Elixir query router for multi-step workflows.
 
 |`DISTINCT`
-|Not supported. Hexad entities are inherently unique (UUID-addressed), so deduplication is rarely needed.
+|Not supported. Octad entities are inherently unique (UUID-addressed), so deduplication is rarely needed.
 
 |`HAVING`
 |Not supported (requires `GROUP BY`).
@@ -108,7 +108,7 @@ VQL is intentionally minimal. The following SQL features have no VQL equivalent:
 |Drift policies
 |`DRIFT POLICY <name>` attaches consistency enforcement rules to federated queries. Drift detection and repair are first-class query concerns.
 
-|Hexad entity addressing
+|Octad entity addressing
 |`FROM HEXAD <uuid>` addresses a single cross-modal entity by its UUID. All six modalities are accessible through one query against one identifier.
 
 |Graph traversal syntax
@@ -140,7 +140,7 @@ SELECT *
 FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
 ----
 
-The VQL version returns all six modalities for that hexad. The SQL version returns only the columns in the `entities` table.
+The VQL version returns all six modalities for that octad. The SQL version returns only the columns in the `entities` table.
 
 === Finding Related Entities
 
@@ -214,7 +214,7 @@ FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
 PROOF INTEGRITY(DataIntegrityContract)
 ----
 
-This returns the hexad data _plus_ a cryptographic proof certificate asserting data integrity. SQL has no mechanism for this.
+This returns the octad data _plus_ a cryptographic proof certificate asserting data integrity. SQL has no mechanism for this.
 
 == Summary
 

@@ -10,7 +10,7 @@ toc::[]
 
 == Overview
 
-**Drift** occurs when the same Hexad exists in multiple modality stores with inconsistent representations. VeriSimDB provides:
+**Drift** occurs when the same Octad exists in multiple modality stores with inconsistent representations. VeriSimDB provides:
 
 1. **Drift Detection** - Automatic monitoring across modalities
 2. **Drift Repair** - Reconciliation strategies to restore consistency
@@ -21,12 +21,12 @@ toc::[]
 
 === Cross-Modal Drift
 
-**Definition:** Representations of the same Hexad differ across modalities.
+**Definition:** Representations of the same Octad differ across modalities.
 
 **Example:**
 
 ```
-Hexad: 550e8400-e29b-41d4-a716-446655440000
+Octad: 550e8400-e29b-41d4-a716-446655440000
 
 verisim:graph    → title: "Machine Learning Paper"
 verisim:document → title: "ML Paper"  ❌ DRIFT
@@ -46,9 +46,9 @@ verisim:vector   → embedding: [0.1, 0.2, ...]  ✓ OK
 **Example:**
 
 ```
-t0: hexad.title = "Draft Paper"
-t1: hexad.title = "Published Paper"  (document updated)
-t1: hexad.graph still has "Draft Paper"  ❌ DRIFT
+t0: octad.title = "Draft Paper"
+t1: octad.title = "Published Paper"  (document updated)
+t1: octad.graph still has "Draft Paper"  ❌ DRIFT
 ```
 
 **Causes:**
@@ -59,12 +59,12 @@ t1: hexad.graph still has "Draft Paper"  ❌ DRIFT
 
 === Federation Drift
 
-**Definition:** Same Hexad stored at multiple organizations with divergent state.
+**Definition:** Same Octad stored at multiple organizations with divergent state.
 
 **Example:**
 
 ```
-Hexad: 550e8400-e29b-41d4-a716-446655440000
+Octad: 550e8400-e29b-41d4-a716-446655440000
 
 University A: retraction_status = "active"
 University B: retraction_status = "retracted"  ❌ DRIFT
@@ -103,28 +103,28 @@ verisim:graph    → types: ["https://schema.org/Paper"]  ❌ DRIFT
 # lib/verisim/drift_monitor.ex
 defmodule VeriSim.DriftMonitor do
   @doc """
-  Check all hexads for cross-modal drift.
+  Check all octads for cross-modal drift.
   """
   def detect_all_drift do
-    hexad_ids = list_all_hexad_ids()
+    octad_ids = list_all_octad_ids()
 
-    hexad_ids
+    octad_ids
     |> Stream.chunk_every(100)
     |> Enum.each(fn chunk ->
       chunk
-      |> Task.async_stream(&detect_hexad_drift/1, max_concurrency: 10)
+      |> Task.async_stream(&detect_octad_drift/1, max_concurrency: 10)
       |> Stream.filter(fn {:ok, result} -> result.has_drift end)
       |> Enum.each(&log_drift/1)
     end)
   end
 
-  defp detect_hexad_drift(hexad_id) do
+  defp detect_octad_drift(octad_id) do
     # Fetch from all modalities
-    graph_rep = VeriSim.Graph.get(hexad_id)
-    vector_rep = VeriSim.Vector.get(hexad_id)
-    document_rep = VeriSim.Document.get(hexad_id)
-    semantic_rep = VeriSim.Semantic.get(hexad_id)
-    temporal_rep = VeriSim.Temporal.get(hexad_id)
+    graph_rep = VeriSim.Graph.get(octad_id)
+    vector_rep = VeriSim.Vector.get(octad_id)
+    document_rep = VeriSim.Document.get(octad_id)
+    semantic_rep = VeriSim.Semantic.get(octad_id)
+    temporal_rep = VeriSim.Temporal.get(octad_id)
 
     # Check for inconsistencies
     drifts = []
@@ -141,7 +141,7 @@ defmodule VeriSim.DriftMonitor do
       drifts
     end
 
-    %{hexad_id: hexad_id, has_drift: length(drifts) > 0, drifts: drifts}
+    %{octad_id: octad_id, has_drift: length(drifts) > 0, drifts: drifts}
   end
 end
 ```
@@ -153,14 +153,14 @@ end
 ```vql
 DRIFT DETECT
 FROM verisim:graph
-WHERE hexad.id = @id;
+WHERE octad.id = @id;
 ```
 
 **Response:**
 
 ```json
 {
-  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "octad_id": "550e8400-e29b-41d4-a716-446655440000",
   "has_drift": true,
   "drifts": [
     {
@@ -182,7 +182,7 @@ WHERE hexad.id = @id;
 ```vql
 DRIFT DETECT
 FROM verisim:graph
-WHERE hexad.types INCLUDES "https://schema.org/Paper"
+WHERE octad.types INCLUDES "https://schema.org/Paper"
 LIMIT 100;
 ```
 
@@ -197,7 +197,7 @@ Most recent update across all modalities becomes canonical.
 ```vql
 DRIFT REPAIR
 FROM verisim:graph
-WHERE hexad.id = @id
+WHERE octad.id = @id
 USING STRATEGY latest_wins;
 ```
 
@@ -206,9 +206,9 @@ USING STRATEGY latest_wins;
 ```rust
 // rust-core/verisim-drift/src/repair.rs
 
-pub fn repair_latest_wins(hexad_id: &Uuid) -> Result<RepairResult, Error> {
+pub fn repair_latest_wins(octad_id: &Uuid) -> Result<RepairResult, Error> {
     // Fetch from all modalities with timestamps
-    let reps = fetch_all_representations(hexad_id)?;
+    let reps = fetch_all_representations(octad_id)?;
 
     // Find representation with latest updated_at
     let latest = reps.iter()
@@ -223,7 +223,7 @@ pub fn repair_latest_wins(hexad_id: &Uuid) -> Result<RepairResult, Error> {
     }
 
     Ok(RepairResult {
-        hexad_id: *hexad_id,
+        octad_id: *octad_id,
         canonical_source: latest.modality.clone(),
         repaired_modalities: reps.len() - 1,
     })
@@ -237,15 +237,15 @@ Value that appears in majority of modalities wins.
 ```vql
 DRIFT REPAIR
 FROM verisim:graph
-WHERE hexad.id = @id
+WHERE octad.id = @id
 USING STRATEGY quorum;
 ```
 
 **Implementation:**
 
 ```rust
-pub fn repair_quorum(hexad_id: &Uuid) -> Result<RepairResult, Error> {
-    let reps = fetch_all_representations(hexad_id)?;
+pub fn repair_quorum(octad_id: &Uuid) -> Result<RepairResult, Error> {
+    let reps = fetch_all_representations(octad_id)?;
 
     // Group by value, count occurrences
     let mut value_counts: HashMap<String, usize> = HashMap::new();
@@ -262,7 +262,7 @@ pub fn repair_quorum(hexad_id: &Uuid) -> Result<RepairResult, Error> {
     // Propagate canonical value
     for rep in &reps {
         if &rep.title != canonical_value {
-            update_representation(&rep.modality, hexad_id, canonical_value)?;
+            update_representation(&rep.modality, octad_id, canonical_value)?;
         }
     }
 
@@ -277,7 +277,7 @@ Present conflict to user for manual decision.
 ```vql
 DRIFT REPAIR
 FROM verisim:graph
-WHERE hexad.id = @id
+WHERE octad.id = @id
 USING STRATEGY manual;
 ```
 
@@ -285,7 +285,7 @@ USING STRATEGY manual;
 
 ```json
 {
-  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "octad_id": "550e8400-e29b-41d4-a716-446655440000",
   "conflicts": [
     {
       "field": "title",
@@ -325,7 +325,7 @@ Combine values intelligently (domain-specific).
 ```vql
 DRIFT REPAIR
 FROM verisim:graph
-WHERE hexad.id = @id
+WHERE octad.id = @id
 USING STRATEGY merge;
 ```
 
@@ -345,7 +345,7 @@ merged:   tags = ["machine-learning", "neural-networks", "deep-learning"]
 ```elixir
 # config.exs
 config :verisim,
-  drift_tolerance: 0.05,  # 5% of hexads can have drift
+  drift_tolerance: 0.05,  # 5% of octads can have drift
   auto_repair: true,
   repair_strategy: :latest_wins
 ```
@@ -355,7 +355,7 @@ config :verisim,
 ```
 1. Drift detection runs every 5 minutes
 2. If drift_rate > threshold → trigger repair
-3. Apply repair_strategy to all drifted hexads
+3. Apply repair_strategy to all drifted octads
 4. Log repair actions to verisim-temporal
 5. Verify repair success (re-check drift)
 ```
@@ -367,14 +367,14 @@ config :verisim,
 ```vql
 DRIFT VERIFY
 FROM verisim:graph
-WHERE hexad.id = @id;
+WHERE octad.id = @id;
 ```
 
 **Response:**
 
 ```json
 {
-  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "octad_id": "550e8400-e29b-41d4-a716-446655440000",
   "is_consistent": true,
   "checked_modalities": ["graph", "vector", "document", "semantic", "temporal"],
   "last_repair": "2025-01-15T10:30:00Z",
@@ -391,13 +391,13 @@ WHERE hexad.id = @id;
 ```vql
 FROM verisim:graph
 WITH DRIFT TOLERANCE 0.1  -- Allow 10% drift
-WHERE hexad.types INCLUDES "https://schema.org/Paper"
+WHERE octad.types INCLUDES "https://schema.org/Paper"
 LIMIT 100;
 ```
 
 **Behavior:**
 
-- Query returns results even if some hexads have drift
+- Query returns results even if some octads have drift
 - Drift warnings included in response metadata
 - Faster than strict consistency checks
 
@@ -423,7 +423,7 @@ LIMIT 100;
 ```vql
 FROM verisim:graph
 WITH DRIFT TOLERANCE 0.0  -- No drift allowed
-WHERE hexad.types INCLUDES "https://schema.org/Paper"
+WHERE octad.types INCLUDES "https://schema.org/Paper"
 LIMIT 100;
 ```
 
@@ -440,12 +440,12 @@ LIMIT 100;
 ```vql
 -- Query BEFORE repair (as of specific time)
 FROM verisim:temporal
-WHERE hexad.id = @id
+WHERE octad.id = @id
 AS OF TIMESTAMP '2025-01-15T09:00:00Z';
 
 -- Query AFTER repair (latest)
 FROM verisim:graph
-WHERE hexad.id = @id;
+WHERE octad.id = @id;
 ```
 
 **Use case:** Audit trail, rollback analysis, drift impact assessment
@@ -456,7 +456,7 @@ WHERE hexad.id = @id;
 
 ```vql
 FROM verisim:federation
-WHERE hexad.types INCLUDES "https://schema.org/Paper"
+WHERE octad.types INCLUDES "https://schema.org/Paper"
 WITH DRIFT TOLERANCE 0.2  -- Tolerate 20% drift across federation
 MIN QUORUM 3;  -- At least 3 stores must respond
 ```
@@ -536,14 +536,14 @@ pub fn classify_drift_severity(drift: &Drift) -> DriftSeverity {
 
 === Cross-Organization Drift
 
-**Challenge:** Universities A and B have divergent state for the same Hexad.
+**Challenge:** Universities A and B have divergent state for the same Octad.
 
 **Detection:**
 
 ```vql
 DRIFT DETECT FEDERATION
 FROM verisim:federation
-WHERE hexad.id = @id
+WHERE octad.id = @id
 STORES [@university_a, @university_b];
 ```
 
@@ -551,7 +551,7 @@ STORES [@university_a, @university_b];
 
 ```json
 {
-  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "octad_id": "550e8400-e29b-41d4-a716-446655440000",
   "federation_drift": true,
   "stores": {
     "university_a": {
@@ -593,7 +593,7 @@ Action: Exclude Store E from quorum, investigate tampering
 
 ```vql
 FROM verisim:federation
-WHERE hexad.id = @id
+WHERE octad.id = @id
 WITH BYZANTINE TOLERANCE 1  -- Tolerate 1 faulty node
 MIN QUORUM 3;
 ```
@@ -612,7 +612,7 @@ MIN QUORUM 3;
 ```vql
 DRIFT REPAIR FEDERATION
 FROM verisim:federation
-WHERE hexad.id = @id
+WHERE octad.id = @id
 USING STRATEGY consensus
 COORDINATOR @university_a;
 ```
@@ -621,12 +621,12 @@ COORDINATOR @university_a;
 
 === Query Drift History
 
-**View all drift events for a Hexad:**
+**View all drift events for a Octad:**
 
 ```vql
 DRIFT HISTORY
 FROM verisim:temporal
-WHERE hexad.id = @id
+WHERE octad.id = @id
 ORDER BY detected_at DESC
 LIMIT 10;
 ```
@@ -635,7 +635,7 @@ LIMIT 10;
 
 ```json
 {
-  "hexad_id": "550e8400-e29b-41d4-a716-446655440000",
+  "octad_id": "550e8400-e29b-41d4-a716-446655440000",
   "drift_events": [
     {
       "detected_at": "2025-01-15T10:30:00Z",
@@ -672,8 +672,8 @@ WHERE period = 'last_24_hours';
 ```json
 {
   "period": "2025-01-14T10:00:00Z to 2025-01-15T10:00:00Z",
-  "total_hexads": 100000,
-  "drifted_hexads": 850,
+  "total_octads": 100000,
+  "drifted_octads": 850,
   "drift_rate": 0.0085,
   "drift_rate_threshold": 0.05,
   "status": "healthy",
@@ -703,17 +703,17 @@ WHERE period = 'last_24_hours';
 Write to all modalities in a transaction:
 
 ```rust
-pub fn create_hexad_atomic(hexad: &Hexad) -> Result<Uuid, Error> {
+pub fn create_octad_atomic(octad: &Octad) -> Result<Uuid, Error> {
     let tx = begin_transaction()?;
 
-    tx.write_graph(&hexad)?;
-    tx.write_vector(&hexad)?;
-    tx.write_document(&hexad)?;
-    tx.write_semantic(&hexad)?;
-    tx.write_temporal(&hexad)?;
+    tx.write_graph(&octad)?;
+    tx.write_vector(&octad)?;
+    tx.write_document(&octad)?;
+    tx.write_semantic(&octad)?;
+    tx.write_temporal(&octad)?;
 
     tx.commit()?;
-    Ok(hexad.id)
+    Ok(octad.id)
 }
 ```
 
@@ -722,14 +722,14 @@ pub fn create_hexad_atomic(hexad: &Hexad) -> Result<Uuid, Error> {
 Invalidate caches immediately after writes:
 
 ```elixir
-def update_hexad(hexad) do
+def update_octad(octad) do
   # Update all modalities
-  VeriSim.Graph.update(hexad)
-  VeriSim.Vector.update(hexad)
-  VeriSim.Document.update(hexad)
+  VeriSim.Graph.update(octad)
+  VeriSim.Vector.update(octad)
+  VeriSim.Document.update(octad)
 
   # Invalidate all caches
-  VeriSim.QueryCache.invalidate(hexad.id)
+  VeriSim.QueryCache.invalidate(octad.id)
 end
 ```
 
@@ -739,7 +739,7 @@ Use version vectors to track causality:
 
 ```json
 {
-  "hexad_id": "550e8400-...",
+  "octad_id": "550e8400-...",
   "version_vector": {
     "graph": 5,
     "vector": 5,
@@ -772,11 +772,11 @@ end
 Check for drift immediately after writes:
 
 ```rust
-pub fn update_hexad_with_verification(hexad: &Hexad) -> Result<(), Error> {
-    write_all_modalities(hexad)?;
+pub fn update_octad_with_verification(octad: &Octad) -> Result<(), Error> {
+    write_all_modalities(octad)?;
 
     // Immediate drift check
-    let drift = detect_drift(&hexad.id)?;
+    let drift = detect_drift(&octad.id)?;
 
     if drift.has_drift {
         return Err(Error::DriftDetectedAfterWrite(drift));
@@ -793,13 +793,13 @@ pub fn update_hexad_with_verification(hexad: &Hexad) -> Result<(), Error> {
 Don't repair everything at once (avoid system overload):
 
 ```elixir
-def repair_drifted_hexads_gradually do
-  drifted = list_drifted_hexads(limit: 100)
+def repair_drifted_octads_gradually do
+  drifted = list_drifted_octads(limit: 100)
 
   drifted
   |> Enum.chunk_every(10)
   |> Enum.each(fn chunk ->
-    Enum.each(chunk, &repair_hexad/1)
+    Enum.each(chunk, &repair_octad/1)
     Process.sleep(1000)  # Rate limit
   end)
 end

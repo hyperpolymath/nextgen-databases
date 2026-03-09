@@ -46,8 +46,8 @@ using VeriSimDBClient
         @test ms.graph == false
         @test ms.vector == false
 
-        # HexadInput keyword constructor
-        hi = HexadInput(modalities=[Graph, Vector])
+        # OctadInput keyword constructor
+        hi = OctadInput(modalities=[Graph, Vector])
         @test length(hi.modalities) == 2
         @test hi.graph_data === nothing
         @test hi.metadata == Dict{String,String}()
@@ -63,8 +63,8 @@ using VeriSimDBClient
         @test pr.metadata == Dict{String,String}()
 
         # FederatedQueryRequest keyword constructor
-        fqr = FederatedQueryRequest("FIND hexads"; timeout=5000)
-        @test fqr.query == "FIND hexads"
+        fqr = FederatedQueryRequest("FIND octads"; timeout=5000)
+        @test fqr.query == "FIND octads"
         @test fqr.timeout == 5000
         @test fqr.peer_ids == String[]
     end

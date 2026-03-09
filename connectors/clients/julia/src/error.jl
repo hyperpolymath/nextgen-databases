@@ -79,13 +79,13 @@ end
 # Domain-specific errors
 # ---------------------------------------------------------------------------
 
-"""Hexad with given ID does not exist."""
-struct HexadNotFoundError <: VeriSimError
-    hexad_id::String
+"""Octad with given ID does not exist."""
+struct OctadNotFoundError <: VeriSimError
+    octad_id::String
     message::String
 end
 
-"""Requested modality is not enabled on the hexad."""
+"""Requested modality is not enabled on the octad."""
 struct ModalityUnavailableError <: VeriSimError
     modality::String
     message::String
@@ -98,7 +98,7 @@ end
 
 """Provenance chain integrity failure."""
 struct ProvenanceInvalidError <: VeriSimError
-    hexad_id::String
+    octad_id::String
     message::String
 end
 

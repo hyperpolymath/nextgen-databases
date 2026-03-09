@@ -8,9 +8,9 @@ defmodule VeriSim.Federation.Adapters.RedisIntegrationTest do
   stack. Redis Stack bundles RediSearch, RedisJSON, RedisTimeSeries, and
   RedisGraph modules. The seed script `redis-init.sh` pre-loads:
 
-  - 3 hexad JSON documents (hexad:test-001, hexad:test-002, hexad:test-003)
+  - 3 octad JSON documents (octad:test-001, octad:test-002, octad:test-003)
   - 2 drift score documents (drift:test-001, drift:test-002)
-  - 2 RediSearch indexes (idx:hexads, idx:drift)
+  - 2 RediSearch indexes (idx:octads, idx:drift)
   - 3 RedisTimeSeries keys with sample data points
 
   ## Test Infrastructure
@@ -46,13 +46,13 @@ defmodule VeriSim.Federation.Adapters.RedisIntegrationTest do
     adapter_config: %{
       database: 0,
       modules: [:redisearch, :redisgraph, :redisjson, :redistimeseries],
-      index_name: "idx:hexads",
-      json_key_pattern: "hexad:*"
+      index_name: "idx:octads",
+      json_key_pattern: "octad:*"
     }
   }
 
   # Prefix for integration test data
-  @integration_prefix "hexad-integration"
+  @integration_prefix "octad-integration"
 
   # ---------------------------------------------------------------------------
   # Setup / Teardown
@@ -101,8 +101,8 @@ defmodule VeriSim.Federation.Adapters.RedisIntegrationTest do
   # 2. RediSearch Full-Text Search (FT.SEARCH)
   # ---------------------------------------------------------------------------
 
-  describe "FT.SEARCH on idx:hexads index" do
-    test "searching for 'consistency' returns matching hexads", context do
+  describe "FT.SEARCH on idx:octads index" do
+    test "searching for 'consistency' returns matching octads", context do
       skip_if_unavailable(context)
 
       query_params = %{
@@ -117,7 +117,7 @@ defmodule VeriSim.Federation.Adapters.RedisIntegrationTest do
       # All results should be properly normalised
       Enum.each(results, fn result ->
         assert result.source_store == "redis-integration"
-        assert is_binary(result.hexad_id)
+        assert is_binary(result.octad_id)
         assert is_number(result.score)
       end)
     end
@@ -132,7 +132,7 @@ defmodule VeriSim.Federation.Adapters.RedisIntegrationTest do
       }
 
       assert {:ok, results} = Redis.query(@peer_info, query_params)
-      # Seed loads 3 hexad documents into the index
+      # Seed loads 3 octad documents into the index
       assert length(results) >= 3
     end
   end
@@ -148,7 +148,7 @@ defmodule VeriSim.Federation.Adapters.RedisIntegrationTest do
       # Simulate a JSON document as returned by the Redis HTTP bridge
       raw = [
         %{
-          "id" => "hexad:test-001",
+          "id" => "octad:test-001",
           "score" => 0.85,
           "payload" => %{
             "title" => "Introduction to Cross-Modal Consistency",
@@ -160,7 +160,7 @@ defmodule VeriSim.Federation.Adapters.RedisIntegrationTest do
       [result] = Redis.translate_results(raw, @peer_info)
 
       assert result.source_store == "redis-integration"
-      assert result.hexad_id == "hexad:test-001"
+      assert result.octad_id == "octad:test-001"
       assert result.score == 0.85
       assert result.drifted == false
     end
@@ -211,7 +211,7 @@ defmodule VeriSim.Federation.Adapters.RedisIntegrationTest do
         "id" => test_id,
         "score" => 0.62,
         "payload" => %{
-          "title" => "Integration test hexad",
+          "title" => "Integration test octad",
           "content" => "Written by RedisIntegrationTest"
         }
       }
@@ -219,7 +219,7 @@ defmodule VeriSim.Federation.Adapters.RedisIntegrationTest do
       [normalised] = Redis.translate_results([raw_doc], @peer_info)
 
       assert normalised.source_store == "redis-integration"
-      assert normalised.hexad_id == test_id
+      assert normalised.octad_id == test_id
       assert normalised.score == 0.62
       assert normalised.drifted == false
     end
@@ -237,7 +237,7 @@ defmodule VeriSim.Federation.Adapters.RedisIntegrationTest do
         @peer_info
         | adapter_config:
             Map.merge(@peer_info.adapter_config, %{
-              stream_key: "hexad_provenance"
+              stream_key: "octad_provenance"
             })
       }
 

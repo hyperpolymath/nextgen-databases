@@ -30,7 +30,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorage do
       %{
         host: "minio.internal",
         port: 9000,
-        bucket: "verisimdb-hexads",
+        bucket: "verisimdb-octads",
         region: "us-east-1",
         access_key: "minioadmin",
         secret_key: "minioadmin",
@@ -41,7 +41,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorage do
       %{
         host: "s3.amazonaws.com",
         port: 443,
-        bucket: "verisimdb-hexads",
+        bucket: "verisimdb-octads",
         region: "eu-west-1",
         access_key: "AKIA...",
         secret_key: "...",
@@ -118,7 +118,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorage do
   @impl true
   def health_check(peer_info) do
     config = peer_info.adapter_config
-    bucket = Map.get(config, :bucket, "verisimdb-hexads")
+    bucket = Map.get(config, :bucket, "verisimdb-octads")
     start = System.monotonic_time(:millisecond)
 
     # Health check: HEAD bucket to verify it exists and is accessible
@@ -165,7 +165,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorage do
     |> Enum.map(fn obj ->
       %{
         source_store: peer_info.store_id,
-        hexad_id: extract_object_id(obj),
+        octad_id: extract_object_id(obj),
         score: parse_score(obj),
         drifted: false,
         data: obj,
@@ -180,7 +180,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorage do
 
   defp execute_s3_query(peer_info, modalities, query_params, limit, timeout) do
     config = peer_info.adapter_config
-    bucket = Map.get(config, :bucket, "verisimdb-hexads")
+    bucket = Map.get(config, :bucket, "verisimdb-octads")
 
     cond do
       :temporal in modalities && Map.has_key?(query_params, :temporal_range) ->
@@ -419,7 +419,7 @@ defmodule VeriSim.Federation.Adapters.ObjectStorage do
 
     # Strip common prefixes and extensions to get a clean ID
     key
-    |> String.replace(~r/^(hexads|entities|objects)\//, "")
+    |> String.replace(~r/^(octads|entities|objects)\//, "")
     |> String.replace(~r/\.(json|cbor|bin)$/, "")
   end
 

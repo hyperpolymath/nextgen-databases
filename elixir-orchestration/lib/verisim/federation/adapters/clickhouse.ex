@@ -30,7 +30,7 @@ defmodule VeriSim.Federation.Adapters.ClickHouse do
         host: "clickhouse.internal",
         port: 8123,
         database: "verisimdb",
-        table: "hexads",
+        table: "octads",
         auth: {:basic, "default", "password"}
       }
 
@@ -134,7 +134,7 @@ defmodule VeriSim.Federation.Adapters.ClickHouse do
     |> Enum.map(fn row ->
       %{
         source_store: peer_info.store_id,
-        hexad_id: row["id"] || row["entity_id"] || row["_key"] || "unknown",
+        octad_id: row["id"] || row["entity_id"] || row["_key"] || "unknown",
         score: parse_score(row),
         drifted: false,
         data: row,
@@ -150,7 +150,7 @@ defmodule VeriSim.Federation.Adapters.ClickHouse do
   defp build_sql(modalities, query_params, limit, peer_info) do
     config = peer_info.adapter_config
     db = Map.get(config, :database, "verisimdb")
-    table = Map.get(config, :table, "hexads")
+    table = Map.get(config, :table, "octads")
     qualified_table = "#{db}.#{table}"
 
     cond do

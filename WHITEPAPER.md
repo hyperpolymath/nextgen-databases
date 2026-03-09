@@ -70,7 +70,7 @@ Traditional federated systems (e.g., IPFS, Solid, Dat) solve *some* of these iss
 2. **Open Science & FAIR data** – funding agencies now require data provenance and versioning across institutional boundaries.  
 3. **Decentralized Web (Web3)** – community governance models rely on verifiable, tamper‑evident data exchanges.  
 
-These trends converge on a single requirement: **a universal, address‑able namespace that can host heterogeneous knowledge units (Hexads) while allowing controlled drift and auditable trust boundaries.**  
+These trends converge on a single requirement: **a universal, address‑able namespace that can host heterogeneous knowledge units (Octads) while allowing controlled drift and auditable trust boundaries.**  
 
 ---
 
@@ -80,7 +80,7 @@ The VeriSimDB **core** is deliberately *tiny*: it only provides *namespace resol
 
 ### 2.1. ReScript Registry – The Global Namespace (Memory #1)  
 
-- **Function**: Maps each **Hexad UUID** (128‑bit) to a *store identifier* and a *metadata bundle* (modality list, access policy hash).  
+- **Function**: Maps each **Octad UUID** (128‑bit) to a *store identifier* and a *metadata bundle* (modality list, access policy hash).  
 - **Implementation**: Pure ReScript, compiled to a tiny JavaScript module that runs inside a **WASM sandbox**.  
 - **Why ReScript?**  
   - Strong static typing eliminates runtime reinterpretation bugs.  
@@ -90,7 +90,7 @@ The VeriSimDB **core** is deliberately *tiny*: it only provides *namespace resol
 ```rescript
 // registry.res
 type storeId = string;
-type hexadId = string;
+type octadId = string;
 
 type storeMeta = {
   endpoint: string,
@@ -98,7 +98,7 @@ type storeMeta = {
   policyHash: string,
 };
 
-var registry: map<hexadId, storeMeta> = /* empty */;
+var registry: map<octadId, storeMeta> = /* empty */;
 ```
 
 The registry is **stateless** – all mutations are persisted as *signed append‑only events* (see §5).
@@ -119,12 +119,12 @@ The registry is **stateless** – all mutations are persisted as *signed append�
 
 | Modality | Crate | Core API | Performance Note |
 |----------|-------|----------|-------------------|
-| Graph    | `verisim-graph-rs` | `load_graph(hexad_id) -> Oxigraph` | Zero‑copy `Arc` over MMAP files |
+| Graph    | `verisim-graph-rs` | `load_graph(octad_id) -> Oxigraph` | Zero‑copy `Arc` over MMAP files |
 | Vector   | `verisim-vector-rs` | `search(embedding) -> nearest` | HNSW built on `hnsw-sys` (sub‑ms latency) |
-| Tensor   | `verisim-tensor-rs` | `load_tensor(hexad_id) -> ndarray::Array` | Integrates with `burn` for on‑the‑fly inference |
+| Tensor   | `verisim-tensor-rs` | `load_tensor(octad_id) -> ndarray::Array` | Integrates with `burn` for on‑the‑fly inference |
 | Document | `verisim-doc-rs` | `fulltext_search(query) -> tantivy::Result` | Uses Tantivy’s inverted index, store‑level compression |
 | Semantic | `verisim-semantic-rs` | `type_proof(cbor_blob) -> enum` | CBOR schema validation via `cbor-rs` |
-| Temporal | `verisim-temporal-rs` | `versions(hexad_id) -> tree` | Merkle‑tree snapshots for deterministic replay |
+| Temporal | `verisim-temporal-rs` | `versions(octad_id) -> tree` | Merkle‑tree snapshots for deterministic replay |
 
 All crates expose a **C‑ABI** friendly entry point (`#[no_mangle] pub extern "C"`), enabling direct calls from the Elixir orchestrator without marshalling overhead.
 
@@ -136,7 +136,7 @@ All crates expose a **C‑ABI** friendly entry point (`#[no_mangle] pub extern "
   - **Interacts** with the ReScript registry to resolve UUID → store mapping.  
   - **Enforces** access signatures (see §5).  
 - **Benefits**:  
-  - Language‑agnostic: any client can issue a simple JSON‑RPC call (`/hexad/:id`).  
+  - Language‑agnostic: any client can issue a simple JSON‑RPC call (`/octad/:id`).  
   - No direct filesystem access; all I/O is mediated by the core’s policy engine.  
 
 ### 2.5. Zero‑Trust Signing – sactify‑php (Memory #2)  
@@ -163,16 +163,16 @@ All crates expose a **C‑ABI** friendly entry point (`#[no_mangle] pub extern "
 2. **Commit** – The manifest is signed with the store’s private key and posted to `/registry` (the ReScript core).  
 3. **Acknowledge** – Elixir orchestrator adds the entry to the registry and dispatches a **registration event** to downstream modules.  
 
-### 3.2. Hexad Lifecycle  
+### 3.2. Octad Lifecycle  
 
 | Phase | Actor | Action | Core Interaction |
 |-------|-------|--------|------------------|
-| **Store creation** | Store | Emits a *Hexad* (UUID + payload + modality tags) | Registry entry created; metadata attached |
-| **Fetch** | Client | Requests `GET /hexad/:id` | WASM proxy resolves UUID → store, forwards request |
-| **Sync** | Orchestrator | Pulls updates from all stores that host the Hexad | GenStage pipelines perform *diff* ingestion |
+| **Store creation** | Store | Emits a *Octad* (UUID + payload + modality tags) | Registry entry created; metadata attached |
+| **Fetch** | Client | Requests `GET /octad/:id` | WASM proxy resolves UUID → store, forwards request |
+| **Sync** | Orchestrator | Pulls updates from all stores that host the Octad | GenStage pipelines perform *diff* ingestion |
 | **Drift repair** | Orchestrator/Store | Detects change; decides to *auto‑repair* or *prompt user* | Repair job scheduled; signed by policy holder |
 
-Stores effectively behave as *virtual memory pages*: a Hexad’s vector modality may reside on Store A, while its document modality resides on Store B. The core never copies data; it merely **routes** the request and enforces policy.
+Stores effectively behave as *virtual memory pages*: a Octad’s vector modality may reside on Store A, while its document modality resides on Store B. The core never copies data; it merely **routes** the request and enforces policy.
 
 ---
 
@@ -190,7 +190,7 @@ Knowledge is *inherently dynamic*. VeriSimDB embraces this through a **drift tax
 | Document content | TF‑IDF cosine (section level) | Pre‑trained classifier for “retraction” vs “Revision” |
 | Temporal versions | Version‑tree depth increase | Formal rule: `max_depth ≤ 3` per policy |
 
-Statistical drift is **sampled** every *N* minutes (configurable). If the sample exceeds a *soft* threshold, the system **marks** the Hexad as *potentially drifted* but does **not** automatically repair.
+Statistical drift is **sampled** every *N* minutes (configurable). If the sample exceeds a *soft* threshold, the system **marks** the Octad as *potentially drifted* but does **not** automatically repair.
 
 ### 4.2. Repair Policies  
 
@@ -215,9 +215,9 @@ Repair actions are **policy‑driven** (encoded in CBOR Semantic proofs). The co
 
 ### 5.2. Signature Flow (Figure 1 – omitted)  
 
-1. **Client** creates payload: `{action: "read", hexad_id: "0x12AB…"}`
+1. **Client** creates payload: `{action: "read", octad_id: "0x12AB…"}`
 2. **Client** signs payload → `sig = sactify-php sign(payload, priv_key)`
-3. **Client** POSTs `{payload, sig}` to `/hexad/:id` (WASM proxy)
+3. **Client** POSTs `{payload, sig}` to `/octad/:id` (WASM proxy)
 4. **Proxy** resolves UUID → `store_id`
 5. **Proxy** verifies `sig` against the public key associated with the caller’s DID (Decentralized Identifier stored in registry)
 6. **Proxy** forwards request to the identified store only if verification succeeds.
@@ -242,7 +242,7 @@ VeriSimDB treats *every* data type as a **first‑class modality**. Below is the
 
 Adding a **new modality** (e.g., *audio* or *geospatial*) requires only:
 
-1. A Rust crate exposing `load_<modality>(hexad_id)`.  
+1. A Rust crate exposing `load_<modality>(octad_id)`.  
 2. An entry in the *modality registry* (a static map inside the core).  
 3. Optional *validation* logic (e.g., schema checks).  
 
@@ -257,8 +257,8 @@ Because all modality bundles are **self‑describing** (CBOR carries type metada
 - **Participants**: University data repositories, pre‑print servers (arXiv, bioRxiv), clinical trial registries.  
 - **Workflow**:  
   1. Each repo registers its endpoint.  
-  2. When a paper is uploaded, a Hexad is minted containing *citation graph*, *embedding vector*, and *document* modalities.  
-  3. The core synchronizes the Hexad across all repositories.  
+  2. When a paper is uploaded, a Octad is minted containing *citation graph*, *embedding vector*, and *document* modalities.  
+  3. The core synchronizes the Octad across all repositories.  
   4. Retraction events trigger *drift detection* and optional *manual review*.  
 - **Benefit**: Researchers can query a *global citation graph* without harvesting each repository individually, while preserving institutional data sovereignty.
 
@@ -279,13 +279,13 @@ Because all modality bundles are **self‑describing** (CBOR carries type metada
   - Vector modality stores embeddings from transformer models.  
   - Graph modality holds relational facts.  
   - Tensor modality persists latent state tensors of live models.  
-- **Outcome**: A single Hexad can be traversed from *semantic proof* → *graph* → *vector* → *tensor* without moving data, enabling **reason‑driven retrieval** and **runtime grounding** of AI predictions.
+- **Outcome**: A single Octad can be traversed from *semantic proof* → *graph* → *vector* → *tensor* without moving data, enabling **reason‑driven retrieval** and **runtime grounding** of AI predictions.
 
 ### 7.4. Healthcare & Personal Data  
 
 - **Participants**: Hospitals, patient‑generated health apps, public health agencies.  
 - **Privacy Model**:  
-  - Each patient owns a *personal namespace* of Hexads.  
+  - Each patient owns a *personal namespace* of Octads.  
   - Access requires **patient‑signed policy**; policy hash is stored in the registry.  
   - Drift detection respects *clinical relevance thresholds* (e.g., only version changes for lab results > 10% shift trigger review).  
 - **Result**: A **patient‑centric knowledge graph** that can be securely shared across institutions while respecting consent and regulatory constraints.
@@ -295,7 +295,7 @@ Because all modality bundles are **self‑describing** (CBOR carries type metada
 - **Participants**: DAO‑governed knowledge bases, decentralized social platforms.  
 - **Mechanics**:  
   - Governance tokens are mapped to *signature authorities*.  
-  - Proposals to alter a Hexad must carry a quorum of signatures.  
+  - Proposals to alter a Octad must carry a quorum of signatures.  
   - The immutable temporal log provides a *public audit trail* for governance disputes.  
 - **Impact**: Knowledge ownership becomes **token‑backed yet ethically governed**, aligning with Web3 principles of transparency and accountability.
 
@@ -323,7 +323,7 @@ Because all modality bundles are **self‑describing** (CBOR carries type metada
 | **1. ReScript Registry** | 1 wk | `registry.res` compiled to WASM; API spec | You |
 | **2. Elixir Orchestrator** | 2 wks | Registration, sync pipelines, drift detection stub | You |
 | **3. Rust Modality Crates** | 3 wks | `verisim-graph-rs`, `verisim-vector-rs`, … with test suites | You |
-| **4. WASM Proxy** | 1 wk | `/hexad/:id` endpoint, signature verification hook | You |
+| **4. WASM Proxy** | 1 wk | `/octad/:id` endpoint, signature verification hook | You |
 | **5. sactify‑php Integration** | 1 wk | Signature verification service (deployed as side‑car) | You |
 | **6. Pilot Stores** | 2 wks | 3 test stores (e.g., GitHub repo, local Oxigraph instance, mock paper DB) | You + collaborators |
 | **7. Drift Engine** | 1 wk | Full statistical + proven‑library rule engine | You |
@@ -341,7 +341,7 @@ Because all modality bundles are **self‑describing** (CBOR carries type metada
 
 2. **Bias Detection** – Statistical drift signals can expose systematic biases (e.g., a dominant narrative gaining disproportionate representation). The system can surface these signals to domain experts, facilitating **bias remediation** rather than concealment.  
 
-3. **Agency & Ownership** – Each Hexad is *individually owned* (via its UUID) yet *participates* in a global namespace. This balances **individual sovereignty** with **collective epistemic infrastructure**—a model resonant with contemporary debates on data‑property rights.  
+3. **Agency & Ownership** – Each Octad is *individually owned* (via its UUID) yet *participates* in a global namespace. This balances **individual sovereignty** with **collective epistemic infrastructure**—a model resonant with contemporary debates on data‑property rights.  
 
 4. **Governance Transparency** – Immutable temporal logs provide an auditable *public ledger of epistemic decisions*. This satisfies the demands of **participatory governance** in open‑science consortia and DAO communities.  
 

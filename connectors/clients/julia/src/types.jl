@@ -7,7 +7,7 @@
 # and the VeriSimDB server. Types are Julia structs with JSON3.StructTypes
 # registration for automatic serialization/deserialization.
 #
-# The central entity in VeriSimDB is the Hexad — a six-faceted data object that
+# The central entity in VeriSimDB is the Octad — a six-faceted data object that
 # unifies graph, vector, tensor, semantic, document, temporal, provenance, and
 # spatial modalities into a single addressable record.
 
@@ -21,8 +21,8 @@ using Dates
 """
     Modality
 
-Enumeration of the eight data modalities supported by VeriSimDB hexads.
-A single hexad can participate in multiple modalities simultaneously.
+Enumeration of the eight data modalities supported by VeriSimDB octads.
+A single octad can participate in multiple modalities simultaneously.
 """
 @enum Modality begin
     Graph
@@ -38,7 +38,7 @@ end
 """
     ModalityStatus
 
-Indicates which modalities are active on a given hexad.
+Indicates which modalities are active on a given octad.
 Each field is a Bool; true means the modality is enabled.
 """
 struct ModalityStatus
@@ -58,15 +58,15 @@ ModalityStatus() = ModalityStatus(false, false, false, false, false, false, fals
 JSON3.StructTypes.StructType(::Type{ModalityStatus}) = JSON3.StructTypes.Struct()
 
 # ---------------------------------------------------------------------------
-# Hexad status
+# Octad status
 # ---------------------------------------------------------------------------
 
 """
-    HexadStatus
+    OctadStatus
 
-Lifecycle state of a hexad: active, archived, draft, or deleted.
+Lifecycle state of a octad: active, archived, draft, or deleted.
 """
-@enum HexadStatus begin
+@enum OctadStatus begin
     Active
     Archived
     Draft
@@ -80,7 +80,7 @@ end
 """
     GraphEdge
 
-A directed relationship between two hexads in the graph modality.
+A directed relationship between two octads in the graph modality.
 """
 struct GraphEdge
     source::String
@@ -95,7 +95,7 @@ JSON3.StructTypes.StructType(::Type{GraphEdge}) = JSON3.StructTypes.Struct()
 """
     GraphData
 
-Graph-modality data for a hexad: edges and node properties.
+Graph-modality data for a octad: edges and node properties.
 """
 struct GraphData
     edges::Vector{GraphEdge}
@@ -178,19 +178,19 @@ end
 JSON3.StructTypes.StructType(::Type{SpatialData}) = JSON3.StructTypes.Struct()
 
 # ---------------------------------------------------------------------------
-# Hexad (core entity)
+# Octad (core entity)
 # ---------------------------------------------------------------------------
 
 """
-    Hexad
+    Octad
 
 The core entity in VeriSimDB — a multi-modal data object unifying graph,
 vector, tensor, semantic, document, temporal, provenance, and spatial modalities
 into a single addressable record.
 """
-struct Hexad
+struct Octad
     id::String
-    status::HexadStatus
+    status::OctadStatus
     modalities::ModalityStatus
     created_at::String              # ISO 8601 timestamp
     updated_at::String              # ISO 8601 timestamp
@@ -202,19 +202,19 @@ struct Hexad
     spatial_data::Union{SpatialData,Nothing}
 end
 
-JSON3.StructTypes.StructType(::Type{Hexad}) = JSON3.StructTypes.Struct()
+JSON3.StructTypes.StructType(::Type{Octad}) = JSON3.StructTypes.Struct()
 
 # ---------------------------------------------------------------------------
-# Hexad input (for create/update)
+# Octad input (for create/update)
 # ---------------------------------------------------------------------------
 
 """
-    HexadInput
+    OctadInput
 
-Input structure for creating or updating a hexad. Optional fields use
+Input structure for creating or updating a octad. Optional fields use
 `Union{T, Nothing}` (Julia's equivalent of Option/Maybe).
 """
-struct HexadInput
+struct OctadInput
     graph_data::Union{GraphData,Nothing}
     vector_data::Union{VectorData,Nothing}
     tensor_data::Union{TensorData,Nothing}
@@ -225,7 +225,7 @@ struct HexadInput
 end
 
 # Convenience constructor with keyword arguments.
-function HexadInput(;
+function OctadInput(;
     graph_data::Union{GraphData,Nothing}=nothing,
     vector_data::Union{VectorData,Nothing}=nothing,
     tensor_data::Union{TensorData,Nothing}=nothing,
@@ -234,10 +234,10 @@ function HexadInput(;
     metadata::Dict{String,String}=Dict{String,String}(),
     modalities::Vector{Modality}=Modality[]
 )
-    HexadInput(graph_data, vector_data, tensor_data, content, spatial_data, metadata, modalities)
+    OctadInput(graph_data, vector_data, tensor_data, content, spatial_data, metadata, modalities)
 end
 
-JSON3.StructTypes.StructType(::Type{HexadInput}) = JSON3.StructTypes.Struct()
+JSON3.StructTypes.StructType(::Type{OctadInput}) = JSON3.StructTypes.Struct()
 
 # ---------------------------------------------------------------------------
 # Drift types
@@ -246,12 +246,12 @@ JSON3.StructTypes.StructType(::Type{HexadInput}) = JSON3.StructTypes.Struct()
 """
     DriftScore
 
-Drift measurement for a hexad. The `score` field ranges from 0.0 (no drift,
+Drift measurement for a octad. The `score` field ranges from 0.0 (no drift,
 fully aligned with baseline) to 1.0 (maximum drift, completely diverged).
 The `components` dictionary breaks down the score by modality.
 """
 struct DriftScore
-    hexad_id::String
+    octad_id::String
     score::Float64
     components::Dict{String,Float64}
     measured_at::String   # ISO 8601
@@ -276,11 +276,11 @@ end
 """
     DriftStatusReport
 
-Classified drift status for a hexad, combining the numeric score with
+Classified drift status for a octad, combining the numeric score with
 a human-readable level and message.
 """
 struct DriftStatusReport
-    hexad_id::String
+    octad_id::String
     level::DriftLevel
     score::DriftScore
     message::String
@@ -295,12 +295,12 @@ JSON3.StructTypes.StructType(::Type{DriftStatusReport}) = JSON3.StructTypes.Stru
 """
     ProvenanceEvent
 
-A single event in a hexad's provenance chain. Each event is cryptographically
+A single event in a octad's provenance chain. Each event is cryptographically
 linked to its parent, forming an immutable audit trail.
 """
 struct ProvenanceEvent
     event_id::String
-    hexad_id::String
+    octad_id::String
     event_type::String     # e.g. "created", "updated", "merged", "split"
     actor::String
     timestamp::String      # ISO 8601
@@ -313,10 +313,10 @@ JSON3.StructTypes.StructType(::Type{ProvenanceEvent}) = JSON3.StructTypes.Struct
 """
     ProvenanceChain
 
-Complete provenance history for a hexad, including verification status.
+Complete provenance history for a octad, including verification status.
 """
 struct ProvenanceChain
-    hexad_id::String
+    octad_id::String
     events::Vector{ProvenanceEvent}
     verified::Bool
 end
@@ -343,10 +343,10 @@ JSON3.StructTypes.StructType(::Type{ProvenanceEventInput}) = JSON3.StructTypes.S
 """
     PaginatedResponse
 
-Paginated response wrapping a list of hexads with page metadata.
+Paginated response wrapping a list of octads with page metadata.
 """
 struct PaginatedResponse
-    items::Vector{Hexad}
+    items::Vector{Octad}
     total::Int
     page::Int
     per_page::Int
@@ -362,10 +362,10 @@ JSON3.StructTypes.StructType(::Type{PaginatedResponse}) = JSON3.StructTypes.Stru
 """
     SearchResult
 
-A search result pairing a hexad with a relevance score (0.0 to 1.0).
+A search result pairing a octad with a relevance score (0.0 to 1.0).
 """
 struct SearchResult
-    hexad::Hexad
+    octad::Octad
     score::Float64
 end
 

@@ -134,7 +134,7 @@ defmodule VeriSim.QueryRouter do
         time -> [at: to_string(time)]
       end
 
-    RustClient.get("/hexads/#{entity_id}/versions", query_params)
+    RustClient.get("/octads/#{entity_id}/versions", query_params)
   end
 
   defp execute_query(:multi, params, opts) do

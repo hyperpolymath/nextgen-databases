@@ -39,7 +39,7 @@ defmodule VeriSim.Federation.Adapters.Neo4jTest do
       raw = [
         %{
           "id" => "neo4j-001",
-          "labels" => ["Hexad"],
+          "labels" => ["Octad"],
           "properties" => %{"title" => "Graph entity"},
           "score" => 0.92
         }
@@ -47,7 +47,7 @@ defmodule VeriSim.Federation.Adapters.Neo4jTest do
 
       [result] = Neo4j.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "neo4j-001"
+      assert result.octad_id == "neo4j-001"
       assert result.score == 0.92
       assert result.source_store == "neo4j-test"
     end

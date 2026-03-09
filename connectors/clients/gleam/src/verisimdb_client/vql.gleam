@@ -17,7 +17,7 @@ import verisimdb_client/types.{type VqlExplanation, type VqlResult}
 /// Execute a VQL query and return the result set.
 ///
 /// VQL queries can combine modalities — for example:
-///   FIND hexads WHERE vector_similar($embedding, 0.8)
+///   FIND octads WHERE vector_similar($embedding, 0.8)
 ///     AND spatial_within(51.5, -0.1, 10km)
 ///     AND graph_connected("category:science", depth: 2)
 ///

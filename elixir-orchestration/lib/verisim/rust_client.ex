@@ -16,7 +16,7 @@ defmodule VeriSim.RustClient do
   @cache_ttl_ms 30_000  # 30 seconds default TTL
 
   # ---------------------------------------------------------------------------
-  # ETS Cache — transparent read-through caching for hexad lookups and searches
+  # ETS Cache — transparent read-through caching for octad lookups and searches
   # ---------------------------------------------------------------------------
 
   @doc """
@@ -100,13 +100,13 @@ defmodule VeriSim.RustClient do
     end
   end
 
-  # Hexad Operations
+  # Octad Operations
 
   @doc """
-  Create a new hexad entity.
+  Create a new octad entity.
   """
-  def create_hexad(input) do
-    case post("/hexads", input) do
+  def create_octad(input) do
+    case post("/octads", input) do
       {:ok, %{status: 200, body: body}} -> {:ok, body}
       {:ok, %{status: 201, body: body}} -> {:ok, body}
       {:ok, %{status: status, body: body}} -> {:error, {status, body}}
@@ -115,15 +115,15 @@ defmodule VeriSim.RustClient do
   end
 
   @doc """
-  Get a hexad by ID.
+  Get a octad by ID.
   """
-  def get_hexad(entity_id) do
-    cache_key = {:hexad, entity_id}
+  def get_octad(entity_id) do
+    cache_key = {:octad, entity_id}
 
     case cache_get(cache_key) do
       {:hit, cached} -> {:ok, cached}
       :miss ->
-        case get("/hexads/#{entity_id}") do
+        case get("/octads/#{entity_id}") do
           {:ok, %{status: 200, body: body}} ->
             cache_put(cache_key, body)
             {:ok, body}
@@ -135,12 +135,12 @@ defmodule VeriSim.RustClient do
   end
 
   @doc """
-  Update a hexad.
+  Update a octad.
   """
-  def update_hexad(entity_id, changes) do
-    case put("/hexads/#{entity_id}", changes) do
+  def update_octad(entity_id, changes) do
+    case put("/octads/#{entity_id}", changes) do
       {:ok, %{status: 200, body: body}} ->
-        invalidate_cache({:hexad, entity_id})
+        invalidate_cache({:octad, entity_id})
         invalidate_cache({:drift, entity_id})
         {:ok, body}
       {:ok, %{status: 404}} -> {:error, :not_found}
@@ -150,16 +150,16 @@ defmodule VeriSim.RustClient do
   end
 
   @doc """
-  Delete a hexad.
+  Delete a octad.
   """
-  def delete_hexad(entity_id) do
-    case delete("/hexads/#{entity_id}") do
+  def delete_octad(entity_id) do
+    case delete("/octads/#{entity_id}") do
       {:ok, %{status: 204}} ->
-        invalidate_cache({:hexad, entity_id})
+        invalidate_cache({:octad, entity_id})
         invalidate_cache({:drift, entity_id})
         :ok
       {:ok, %{status: 200}} ->
-        invalidate_cache({:hexad, entity_id})
+        invalidate_cache({:octad, entity_id})
         invalidate_cache({:drift, entity_id})
         :ok
       {:ok, %{status: 404}} -> {:error, :not_found}
@@ -171,7 +171,7 @@ defmodule VeriSim.RustClient do
   # Search Operations
 
   @doc """
-  Search for hexads by text.
+  Search for octads by text.
   """
   def search_text(query, limit \\ 10) do
     case get("/search/text", q: query, limit: limit) do
@@ -182,7 +182,7 @@ defmodule VeriSim.RustClient do
   end
 
   @doc """
-  Search for hexads by vector similarity.
+  Search for octads by vector similarity.
   """
   def search_vector(vector, k \\ 10) do
     case post("/search/vector", %{vector: vector, k: k}) do
@@ -193,7 +193,7 @@ defmodule VeriSim.RustClient do
   end
 
   @doc """
-  Get related hexads (graph query).
+  Get related octads (graph query).
   """
   def get_related(entity_id) do
     case get("/search/related/#{entity_id}") do

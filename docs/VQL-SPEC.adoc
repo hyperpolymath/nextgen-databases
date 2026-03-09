@@ -97,7 +97,7 @@ VQL operates in two execution modes, determined by the presence or absence of a 
 | ZKP witness generation per proof obligation
 
 | Result type
-| `List(Hexad_M)` — bare results
+| `List(Octad_M)` — bare results
 | `Sigma(QueryResult, Proof)` — results bundled with proof certificate
 
 | Latency
@@ -350,7 +350,7 @@ Comments are stripped during lexing and have no semantic effect.
 
 The fundamental unit of data in VeriSimDB is the **octad** — a single entity that exists simultaneously across up to eight modalities. Each octad is identified by a UUID and contains zero or more modality slots populated with data.
 
-NOTE: The name "hexad" persists in some API surfaces and code for backward compatibility. The data model is octad (8 modalities).
+NOTE: The name "octad" persists in some API surfaces and code for backward compatibility. The data model is octad (8 modalities).
 
 .Octad structure
 ----
@@ -493,7 +493,7 @@ The full VQL type language stem:[\tau] is defined by:
 \tau ::= &\ \text{UUID} \mid \text{String} \mid \text{Int} \mid \text{Float} \mid \text{Bool} \\
        | &\ \text{Vector}[n] \mid \text{Tensor}[d_1, \ldots, d_k] \\
        | &\ \text{Timestamp} \\
-       | &\ \text{Hexad} \mid \text{HexadRef} \\
+       | &\ \text{Octad} \mid \text{OctadRef} \\
        | &\ \text{Modality} \mid \text{ModalitySet} \\
        | &\ \text{List}(\tau) \mid \text{Option}(\tau) \\
        | &\ \tau_1 \times \tau_2 \quad \text{(product)} \\
@@ -521,7 +521,7 @@ type rec vqlType =
   | Primitive(primitiveType)
   | ArrayType(vqlType)
   | ModalityType(modalityType)
-  | HexadType(array<modalityType>)
+  | OctadType(array<modalityType>)
   | QueryResultType(queryResultInfo)
   | ProofType(proofKind, string)
   | ProvedResultType(queryResultInfo, proofKind, string)
@@ -543,7 +543,7 @@ stem:[\Pi x : \tau_1. \tau_2(x)] — The codomain type depends on the argument v
 
 [stem]
 ++++
-\text{VECTOR} : \Pi n : \text{Nat}. \text{Hexad} \to \text{Option}(\text{Vector}[n])
+\text{VECTOR} : \Pi n : \text{Nat}. \text{Octad} \to \text{Option}(\text{Vector}[n])
 ++++
 
 ==== Sigma Types (Dependent Pairs)
@@ -566,7 +566,7 @@ The result is bundled with a proof that the result satisfies the stated property
 | Proof Kind | Verifies | Cost
 
 | `EXISTENCE`
-| Hexad exists and is accessible in the store
+| Octad exists and is accessible in the store
 | Low
 
 | `CITATION`
@@ -631,7 +631,7 @@ The `synthesizeQuery` function in `VQLBidir.res` walks the query AST through nin
 .Core typing rules
 [stem]
 ++++
-\frac{\Gamma \vdash q : \text{Query}[M] \quad \text{no PROOF clause}}{\Gamma \vdash q \Rightarrow \text{List}(\text{Hexad}_M)} \quad \text{(T-SlipstreamQuery)}
+\frac{\Gamma \vdash q : \text{Query}[M] \quad \text{no PROOF clause}}{\Gamma \vdash q \Rightarrow \text{List}(\text{Octad}_M)} \quad \text{(T-SlipstreamQuery)}
 ++++
 
 [stem]
@@ -649,7 +649,7 @@ Refinement types stem:[\{x : \tau \mid \phi(x)\}] constrain values beyond their 
 WHERE FIELD severity > 3
 ----
 
-This produces a refined query result type: stem:[\{h : \text{Hexad} \mid h.\text{severity} > 3\}].
+This produces a refined query result type: stem:[\{h : \text{Octad} \mid h.\text{severity} > 3\}].
 
 `[.partial]` Refinement types are implicit in condition checking. Explicit refinement type syntax is planned.
 
@@ -668,7 +668,7 @@ The VQL type system satisfies three key properties (proven in `vql-type-system.a
 
 == Query Statements
 
-A query statement retrieves hexad data and optionally verifies it:
+A query statement retrieves octad data and optionally verifies it:
 
 .Grammar
 ----
@@ -735,7 +735,7 @@ Five aggregate functions are supported:
 | Function | Syntax | Return Type
 
 | `COUNT(*)`
-| Count all matching hexads
+| Count all matching octads
 | `Int`
 
 | `COUNT(M.field)`
@@ -781,19 +781,19 @@ The FROM clause specifies the data source.
 .Grammar
 ----
 from_clause = 'FROM' , source_spec ;
-source_spec = hexad_source | federation_source | store_source ;
+source_spec = octad_source | federation_source | store_source ;
 ----
 
 ==== HEXAD Source
 
-Query a specific hexad by UUID:
+Query a specific octad by UUID:
 
 [source,vql]
 ----
 FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
 ----
 
-Type: stem:[\text{Hexad}(\text{UUID})]
+Type: stem:[\text{Octad}(\text{UUID})]
 
 ==== FEDERATION Source
 
@@ -873,7 +873,7 @@ Useful for lowest-latency queries when you know which store has your data.
 
 === WHERE Clause
 
-The WHERE clause filters hexads based on conditions.
+The WHERE clause filters octads based on conditions.
 
 .Grammar
 ----
@@ -1110,7 +1110,7 @@ cross_modal_condition = cross_modal_field_compare
 
 ===== Field Comparison Across Modalities
 
-Compare field values from different modalities on the same hexad:
+Compare field values from different modalities on the same octad:
 
 ----
 cross_modal_field_compare = field_ref , comparison_op , field_ref ;
@@ -1142,7 +1142,7 @@ drift_condition = 'DRIFT' , '(' , modality , ',' , modality , ')' , comparison_o
 WHERE DRIFT(VECTOR, DOCUMENT) > 0.3
 ----
 
-Returns hexads where the drift score between the two modalities exceeds the threshold. The drift score is computed as a normalised distance metric (0.0 = perfectly consistent, 1.0 = maximally divergent).
+Returns octads where the drift score between the two modalities exceeds the threshold. The drift score is computed as a normalised distance metric (0.0 = perfectly consistent, 1.0 = maximally divergent).
 
 `DriftRequiresNumeric` error if either modality lacks a numeric/vector representation.
 
@@ -1165,7 +1165,7 @@ WHERE CONSISTENT(VECTOR, SEMANTIC) USING COSINE
 
 ===== Modality Existence
 
-Filter hexads based on which modalities are populated:
+Filter octads based on which modalities are populated:
 
 ----
 exists_condition = modality_name , 'EXISTS' ;
@@ -1174,7 +1174,7 @@ not_exists_condition = modality_name , 'NOT' , 'EXISTS' ;
 
 [source,vql]
 ----
--- Hexads with vectors but without tensors
+-- Octads with vectors but without tensors
 WHERE VECTOR EXISTS
   AND TENSOR NOT EXISTS
 ----
@@ -1326,7 +1326,7 @@ mutation = insert_mutation | update_mutation | delete_mutation ;
 
 === INSERT HEXAD
 
-Create a new hexad with modality data.
+Create a new octad with modality data.
 
 .Grammar
 ----
@@ -1349,7 +1349,7 @@ Each modality data type has its own syntax:
 | `VECTOR([float, ...])`
 
 | `GRAPH`
-| `GRAPH(edge_type, target_hexad_id)`
+| `GRAPH(edge_type, target_octad_id)`
 
 | `TENSOR`
 | `TENSOR([array_literal])`
@@ -1383,13 +1383,13 @@ INSERT HEXAD WITH
 PROOF INTEGRITY(WriteContract) AND PROVENANCE(AuditTrailContract)
 ----
 
-The hexad ID is **auto-generated** and returned in the result. Drift detection fires after insert to validate cross-modal consistency.
+The octad ID is **auto-generated** and returned in the result. Drift detection fires after insert to validate cross-modal consistency.
 
 `[.implemented]` INSERT parsing and execution via Elixir executor.
 
 === UPDATE HEXAD
 
-Modify fields of an existing hexad.
+Modify fields of an existing octad.
 
 .Grammar
 ----
@@ -1413,13 +1413,13 @@ PROOF ACCESS(EditAccessContract)
   AND PROVENANCE(RetractionContract)
 ----
 
-`UpdateNotFound` error if the hexad UUID does not exist. Drift detection fires after update.
+`UpdateNotFound` error if the octad UUID does not exist. Drift detection fires after update.
 
 `[.implemented]` UPDATE parsing and execution.
 
 === DELETE HEXAD
 
-Remove a hexad and all its modality data.
+Remove a octad and all its modality data.
 
 .Grammar
 ----
@@ -1529,7 +1529,7 @@ The proof system is the core differentiator between VQL and traditional query la
 | Type | Contract | Formal Proposition
 
 | `EXISTENCE`
-| Hexad exists and is accessible
+| Octad exists and is accessible
 | stem:[\exists h \in S : h.\text{id} = \text{uuid} \land \text{accessible}(h)]
 
 | `CITATION`
@@ -1655,7 +1655,7 @@ The executor separates conditions into two categories:
 
 === Cross-Modal Joins
 
-VQL does not have explicit JOIN syntax. Instead, cross-modal querying is implicit — every hexad is already the join of all its modalities. When you write:
+VQL does not have explicit JOIN syntax. Instead, cross-modal querying is implicit — every octad is already the join of all its modalities. When you write:
 
 [source,vql]
 ----
@@ -1671,8 +1671,8 @@ The executor:
 1. Routes graph condition to Oxigraph
 2. Routes vector condition to HNSW
 3. Routes document condition to Tantivy
-4. Intersects results by hexad ID
-5. Returns the unified hexad with all three modalities populated
+4. Intersects results by octad ID
+5. Returns the unified octad with all three modalities populated
 
 === EXPLAIN Plans
 
@@ -1701,7 +1701,7 @@ Steps:
      Pushed predicates: SIMILAR TO [0.1, 0.2, 0.3]
   3. [GRAPH] Graph retrieval
      Estimated cost: 150ms | Selectivity: 1.0
-  4. [INTERSECT] Cross-modal join by hexad ID
+  4. [INTERSECT] Cross-modal join by octad ID
      Estimated cost: 10ms
   5. [LIMIT] Cap results at 50
      Estimated cost: 1ms
@@ -2039,9 +2039,9 @@ temporal_projection = '(', version_spec, ')' ;
 
 (* 3. FROM CLAUSE *)
 from_clause = 'FROM', source_spec ;
-source_spec = hexad_source | federation_source | store_source ;
+source_spec = octad_source | federation_source | store_source ;
 
-hexad_source = 'HEXAD', uuid ;
+octad_source = 'HEXAD', uuid ;
 
 federation_source = 'FEDERATION', node_pattern, [drift_policy] ;
 node_pattern = glob_pattern | node_list ;
@@ -2519,13 +2519,13 @@ Complete alphabetical list of all 70 reserved keywords. Keywords are case-insens
 | CONSISTENT() metric not applicable to modality pair
 
 | `InsertConflict`
-| INSERT hexad already exists
+| INSERT octad already exists
 
 | `UpdateNotFound`
-| UPDATE hexad does not exist
+| UPDATE octad does not exist
 
 | `DeleteNotFound`
-| DELETE hexad does not exist
+| DELETE octad does not exist
 
 | `ConstraintViolation`
 | Write violates field constraints
@@ -2558,8 +2558,8 @@ Complete alphabetical list of all 70 reserved keywords. Keywords are case-insens
 | `ResourceExhausted`
 | System resource limit reached (memory, connections, etc.)
 
-| `InvalidHexadId`
-| Hexad UUID is malformed or syntactically invalid
+| `InvalidOctadId`
+| Octad UUID is malformed or syntactically invalid
 
 | `NetworkError`
 | Network error connecting to a store or federation endpoint

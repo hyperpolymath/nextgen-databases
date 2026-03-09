@@ -80,45 +80,45 @@ defmodule VeriSim.Transport do
   end
 
   @doc """
-  Create a new hexad entity.
+  Create a new octad entity.
   """
-  def create_hexad(input) do
+  def create_octad(input) do
     if use_nif?() do
       json = Jason.encode!(input)
-      case NifBridge.create_hexad(json) do
+      case NifBridge.create_octad(json) do
         result when is_binary(result) -> {:ok, Jason.decode!(result)}
         {:error, reason} -> {:error, reason}
       end
     else
-      RustClient.create_hexad(input)
+      RustClient.create_octad(input)
     end
   end
 
   @doc """
-  Get a hexad by ID.
+  Get a octad by ID.
   """
-  def get_hexad(entity_id) do
+  def get_octad(entity_id) do
     if use_nif?() do
-      case NifBridge.get_hexad(entity_id) do
+      case NifBridge.get_octad(entity_id) do
         result when is_binary(result) -> {:ok, Jason.decode!(result)}
         {:error, reason} -> {:error, reason}
       end
     else
-      RustClient.get_hexad(entity_id)
+      RustClient.get_octad(entity_id)
     end
   end
 
   @doc """
-  Delete a hexad entity.
+  Delete a octad entity.
   """
-  def delete_hexad(entity_id) do
+  def delete_octad(entity_id) do
     if use_nif?() do
-      case NifBridge.delete_hexad(entity_id) do
+      case NifBridge.delete_octad(entity_id) do
         result when is_binary(result) -> :ok
         {:error, reason} -> {:error, reason}
       end
     else
-      RustClient.delete_hexad(entity_id)
+      RustClient.delete_octad(entity_id)
     end
   end
 
@@ -152,16 +152,16 @@ defmodule VeriSim.Transport do
   end
 
   @doc """
-  Paginated listing of hexad entities.
+  Paginated listing of octad entities.
   """
-  def list_hexads(limit \\ 50, offset \\ 0) do
+  def list_octads(limit \\ 50, offset \\ 0) do
     if use_nif?() do
-      case NifBridge.list_hexads(limit, offset) do
+      case NifBridge.list_octads(limit, offset) do
         result when is_binary(result) -> {:ok, Jason.decode!(result)}
         {:error, reason} -> {:error, reason}
       end
     else
-      RustClient.list_hexads(limit, offset)
+      RustClient.list_octads(limit, offset)
     end
   end
 

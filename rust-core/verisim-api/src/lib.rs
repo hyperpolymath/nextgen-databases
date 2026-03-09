@@ -39,11 +39,11 @@ use verisim_planner::{
     PhysicalPlan, PlanCache, Planner, PlannerConfig, PreparedId, PreparedStatement,
     Profiler, SlowQueryLog, SlowQuerySummary, StatisticsCollector,
 };
-use verisim_hexad::{
-    BoundingBox, Coordinates, HexadConfig, HexadDocumentInput, HexadGraphInput,
-    HexadId, HexadInput, HexadProvenanceInput, HexadSemanticInput, HexadSnapshot,
-    HexadSpatialInput, HexadStore, HexadTensorInput, HexadVectorInput,
-    InMemoryHexadStore, ProvenanceStore, SpatialStore,
+use verisim_octad::{
+    BoundingBox, Coordinates, OctadConfig, OctadDocumentInput, OctadGraphInput,
+    OctadId, OctadInput, OctadProvenanceInput, OctadSemanticInput, OctadSnapshot,
+    OctadSpatialInput, OctadStore, OctadTensorInput, OctadVectorInput,
+    InMemoryOctadStore, ProvenanceStore, SpatialStore,
 };
 use verisim_provenance::InMemoryProvenanceStore;
 use verisim_spatial::InMemorySpatialStore;
@@ -55,32 +55,32 @@ use verisim_temporal::InMemoryVersionStore;
 use verisim_tensor::InMemoryTensorStore;
 use verisim_vector::{DistanceMetric, BruteForceVectorStore};
 
-/// Type alias for our concrete HexadStore implementation (octad: 8 modality stores).
+/// Type alias for our concrete OctadStore implementation (octad: 8 modality stores).
 ///
 /// When the `persistent` feature is enabled, the graph store uses redb (pure Rust,
 /// ACID, single-file B-tree) and the document store uses file-backed Tantivy.
 /// WAL is enabled for crash recovery. Requires `VERISIM_PERSISTENCE_DIR` at runtime.
 #[cfg(not(feature = "persistent"))]
-pub type ConcreteHexadStore = InMemoryHexadStore<
+pub type ConcreteOctadStore = InMemoryOctadStore<
     SimpleGraphStore,
     BruteForceVectorStore,
     TantivyDocumentStore,
     InMemoryTensorStore,
     InMemorySemanticStore,
-    InMemoryVersionStore<HexadSnapshot>,
+    InMemoryVersionStore<OctadSnapshot>,
     InMemoryProvenanceStore,
     InMemorySpatialStore,
 >;
 
 /// Persistent variant: redb graph store, file-backed Tantivy, WAL enabled.
 #[cfg(feature = "persistent")]
-pub type ConcreteHexadStore = InMemoryHexadStore<
+pub type ConcreteOctadStore = InMemoryOctadStore<
     RedbGraphStore,
     BruteForceVectorStore,
     TantivyDocumentStore,
     InMemoryTensorStore,
     InMemorySemanticStore,
-    InMemoryVersionStore<HexadSnapshot>,
+    InMemoryVersionStore<OctadSnapshot>,
     InMemoryProvenanceStore,
     InMemorySpatialStore,
 >;
@@ -171,17 +171,17 @@ fn validate_limit(limit: usize) -> usize {
     limit.min(MAX_RESULT_LIMIT)
 }
 
-/// Validate a hexad ID: max 128 chars, alphanumeric + dash + underscore only.
-fn validate_hexad_id(id: &str) -> Result<(), ApiError> {
+/// Validate a octad ID: max 128 chars, alphanumeric + dash + underscore only.
+fn validate_octad_id(id: &str) -> Result<(), ApiError> {
     if id.is_empty() {
-        return Err(ApiError::BadRequest("Hexad ID must not be empty".to_string()));
+        return Err(ApiError::BadRequest("Octad ID must not be empty".to_string()));
     }
     if id.len() > 128 {
-        return Err(ApiError::BadRequest("Hexad ID must be at most 128 characters".to_string()));
+        return Err(ApiError::BadRequest("Octad ID must be at most 128 characters".to_string()));
     }
     if !id.chars().all(|c| c.is_alphanumeric() || c == '-' || c == '_') {
         return Err(ApiError::BadRequest(
-            "Hexad ID must contain only alphanumeric characters, dashes, and underscores".to_string(),
+            "Octad ID must contain only alphanumeric characters, dashes, and underscores".to_string(),
         ));
     }
     Ok(())
@@ -207,9 +207,9 @@ pub struct HealthResponse {
     pub degraded_reason: Option<String>,
 }
 
-/// Hexad create/update request
+/// Octad create/update request
 #[derive(Debug, Serialize, Deserialize)]
-pub struct HexadRequest {
+pub struct OctadRequest {
     /// Document title
     pub title: Option<String>,
     /// Document body
@@ -260,19 +260,19 @@ pub struct SpatialRequest {
     pub properties: Option<std::collections::HashMap<String, String>>,
 }
 
-impl HexadRequest {
-    /// Convert to HexadInput
-    fn to_hexad_input(&self) -> HexadInput {
-        let mut input = HexadInput::default();
+impl OctadRequest {
+    /// Convert to OctadInput
+    fn to_octad_input(&self) -> OctadInput {
+        let mut input = OctadInput::default();
 
         if let (Some(title), Some(body)) = (&self.title, &self.body) {
-            input.document = Some(HexadDocumentInput {
+            input.document = Some(OctadDocumentInput {
                 title: title.clone(),
                 body: body.clone(),
                 fields: std::collections::HashMap::new(),
             });
         } else if let Some(title) = &self.title {
-            input.document = Some(HexadDocumentInput {
+            input.document = Some(OctadDocumentInput {
                 title: title.clone(),
                 body: String::new(),
                 fields: std::collections::HashMap::new(),
@@ -280,34 +280,34 @@ impl HexadRequest {
         }
 
         if let Some(embedding) = &self.embedding {
-            input.vector = Some(HexadVectorInput {
+            input.vector = Some(OctadVectorInput {
                 embedding: embedding.clone(),
                 model: None,
             });
         }
 
         if let Some(types) = &self.types {
-            input.semantic = Some(HexadSemanticInput {
+            input.semantic = Some(OctadSemanticInput {
                 types: types.clone(),
                 properties: std::collections::HashMap::new(),
             });
         }
 
         if let Some(relationships) = &self.relationships {
-            input.graph = Some(HexadGraphInput {
+            input.graph = Some(OctadGraphInput {
                 relationships: relationships.clone(),
             });
         }
 
         if let Some(tensor) = &self.tensor {
-            input.tensor = Some(HexadTensorInput {
+            input.tensor = Some(OctadTensorInput {
                 shape: tensor.shape.clone(),
                 data: tensor.data.clone(),
             });
         }
 
         if let Some(provenance) = &self.provenance {
-            input.provenance = Some(HexadProvenanceInput {
+            input.provenance = Some(OctadProvenanceInput {
                 event_type: provenance.event_type.clone(),
                 actor: provenance.actor.clone(),
                 source: provenance.source.clone(),
@@ -316,7 +316,7 @@ impl HexadRequest {
         }
 
         if let Some(spatial) = &self.spatial {
-            input.spatial = Some(HexadSpatialInput {
+            input.spatial = Some(OctadSpatialInput {
                 latitude: spatial.latitude,
                 longitude: spatial.longitude,
                 altitude: spatial.altitude,
@@ -341,11 +341,11 @@ pub struct TensorRequest {
     pub data: Vec<f64>,
 }
 
-/// Hexad response
+/// Octad response
 #[derive(Debug, Serialize, Deserialize)]
-pub struct HexadResponse {
+pub struct OctadResponse {
     pub id: String,
-    pub status: HexadStatusResponse,
+    pub status: OctadStatusResponse,
     pub has_graph: bool,
     pub has_vector: bool,
     pub has_tensor: bool,
@@ -359,17 +359,17 @@ pub struct HexadResponse {
 
 /// Status response
 #[derive(Debug, Serialize, Deserialize)]
-pub struct HexadStatusResponse {
+pub struct OctadStatusResponse {
     pub created_at: String,
     pub modified_at: String,
     pub version: u64,
 }
 
-impl From<&verisim_hexad::Hexad> for HexadResponse {
-    fn from(h: &verisim_hexad::Hexad) -> Self {
+impl From<&verisim_octad::Octad> for OctadResponse {
+    fn from(h: &verisim_octad::Octad) -> Self {
         Self {
             id: h.id.to_string(),
-            status: HexadStatusResponse {
+            status: OctadStatusResponse {
                 created_at: h.status.created_at.to_rfc3339(),
                 modified_at: h.status.modified_at.to_rfc3339(),
                 version: h.status.version,
@@ -448,7 +448,7 @@ impl DriftStatusResponse {
 #[derive(Clone)]
 pub struct AppState {
     pub start_time: std::time::Instant,
-    pub hexad_store: Arc<ConcreteHexadStore>,
+    pub octad_store: Arc<ConcreteOctadStore>,
     pub drift_detector: Arc<DriftDetector>,
     pub normalizer: Arc<Normalizer>,
     pub planner: Arc<Mutex<Planner>>,
@@ -468,7 +468,7 @@ impl AppState {
     /// to determine where to store data on disk. Defaults to `/var/lib/verisimdb`
     /// if the variable is unset.
     pub async fn new_async(config: ApiConfig) -> Result<Self, ApiError> {
-        let hexad_config = HexadConfig {
+        let octad_config = OctadConfig {
             vector_dimension: config.vector_dimension,
             ..Default::default()
         };
@@ -522,8 +522,8 @@ impl AppState {
         let provenance = Arc::new(InMemoryProvenanceStore::new());
         let spatial = Arc::new(InMemorySpatialStore::new());
 
-        let hexad_store_inner = InMemoryHexadStore::new(
-            hexad_config,
+        let octad_store_inner = InMemoryOctadStore::new(
+            octad_config,
             graph,
             vector,
             document,
@@ -536,14 +536,14 @@ impl AppState {
 
         // Enable WAL for crash recovery when persistent.
         #[cfg(feature = "persistent")]
-        let hexad_store_inner = hexad_store_inner
+        let octad_store_inner = octad_store_inner
             .with_wal(
                 format!("{}/wal", persist_dir),
-                verisim_hexad::SyncMode::Fsync,
+                verisim_octad::SyncMode::Fsync,
             )
             .map_err(|e| ApiError::Internal(format!("WAL init: {e}")))?;
 
-        let hexad_store = Arc::new(hexad_store_inner);
+        let octad_store = Arc::new(octad_store_inner);
 
         let drift_detector = Arc::new(DriftDetector::new(DriftThresholds::default()));
         let normalizer = Arc::new(create_default_normalizer(drift_detector.clone()).await);
@@ -566,7 +566,7 @@ impl AppState {
 
         Ok(Self {
             start_time: std::time::Instant::now(),
-            hexad_store,
+            octad_store,
             drift_detector,
             normalizer,
             planner,
@@ -591,11 +591,11 @@ pub fn build_router(state: AppState) -> Router {
         .route("/health", get(health_handler))
         .route("/ready", get(ready_handler))
         .route("/metrics", get(metrics_handler))
-        // Hexad CRUD
-        .route("/hexads", get(list_hexads_handler).post(create_hexad_handler))
-        .route("/hexads/{id}", get(get_hexad_handler))
-        .route("/hexads/{id}", put(update_hexad_handler))
-        .route("/hexads/{id}", delete(delete_hexad_handler))
+        // Octad CRUD
+        .route("/octads", get(list_octads_handler).post(create_octad_handler))
+        .route("/octads/{id}", get(get_octad_handler))
+        .route("/octads/{id}", put(update_octad_handler))
+        .route("/octads/{id}", delete(delete_octad_handler))
         // Search endpoints
         .route("/search/text", get(text_search_handler))
         .route("/search/vector", post(vector_search_handler))
@@ -605,7 +605,7 @@ pub fn build_router(state: AppState) -> Router {
         .route("/drift/entity/{id}", get(entity_drift_handler))
         .route("/normalizer/status", get(normalizer_status_handler))
         .route("/normalizer/trigger/{id}", post(trigger_normalization_handler))
-        // Meta-query store (homoiconicity: queries as hexads)
+        // Meta-query store (homoiconicity: queries as octads)
         .route("/queries", post(store_query_handler))
         .route("/queries/similar", post(similar_queries_handler))
         .route("/queries/{id}/optimize", put(optimize_query_handler))
@@ -770,11 +770,11 @@ async fn metrics_handler(
     ))
 }
 
-/// Readiness check handler — checks hexad store accessibility and drift detector health
+/// Readiness check handler — checks octad store accessibility and drift detector health
 #[instrument(skip(state))]
 async fn ready_handler(State(state): State<AppState>) -> StatusCode {
-    // Check hexad store is accessible (try a list with limit 0)
-    if state.hexad_store.list(1, 0).await.is_err() {
+    // Check octad store is accessible (try a list with limit 0)
+    if state.octad_store.list(1, 0).await.is_err() {
         return StatusCode::SERVICE_UNAVAILABLE;
     }
 
@@ -786,102 +786,102 @@ async fn ready_handler(State(state): State<AppState>) -> StatusCode {
     StatusCode::OK
 }
 
-/// List hexads handler with pagination
+/// List octads handler with pagination
 #[instrument(skip(state))]
-async fn list_hexads_handler(
+async fn list_octads_handler(
     State(state): State<AppState>,
     Query(params): Query<ListQuery>,
-) -> Result<Json<Vec<HexadResponse>>, ApiError> {
+) -> Result<Json<Vec<OctadResponse>>, ApiError> {
     let limit = validate_limit(params.limit.unwrap_or(100));
     let offset = params.offset.unwrap_or(0);
 
-    let hexads = state
-        .hexad_store
+    let octads = state
+        .octad_store
         .list(limit, offset)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-    let responses: Vec<HexadResponse> = hexads.iter().map(HexadResponse::from).collect();
+    let responses: Vec<OctadResponse> = octads.iter().map(OctadResponse::from).collect();
     Ok(Json(responses))
 }
 
-/// Create hexad handler
+/// Create octad handler
 #[instrument(skip(state, request))]
-async fn create_hexad_handler(
+async fn create_octad_handler(
     State(state): State<AppState>,
-    Json(request): Json<HexadRequest>,
-) -> Result<(StatusCode, Json<HexadResponse>), ApiError> {
-    let input = request.to_hexad_input();
+    Json(request): Json<OctadRequest>,
+) -> Result<(StatusCode, Json<OctadResponse>), ApiError> {
+    let input = request.to_octad_input();
 
-    let hexad = state
-        .hexad_store
+    let octad = state
+        .octad_store
         .create(input)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-    Ok((StatusCode::CREATED, Json(HexadResponse::from(&hexad))))
+    Ok((StatusCode::CREATED, Json(OctadResponse::from(&octad))))
 }
 
-/// Get hexad handler
+/// Get octad handler
 #[instrument(skip(state))]
-async fn get_hexad_handler(
+async fn get_octad_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
-) -> Result<Json<HexadResponse>, ApiError> {
-    validate_hexad_id(&id)?;
-    let hexad_id = HexadId::new(&id);
+) -> Result<Json<OctadResponse>, ApiError> {
+    validate_octad_id(&id)?;
+    let octad_id = OctadId::new(&id);
 
-    let hexad = state
-        .hexad_store
-        .get(&hexad_id)
+    let octad = state
+        .octad_store
+        .get(&octad_id)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?
-        .ok_or_else(|| ApiError::NotFound(format!("Hexad {} not found", id)))?;
+        .ok_or_else(|| ApiError::NotFound(format!("Octad {} not found", id)))?;
 
-    Ok(Json(HexadResponse::from(&hexad)))
+    Ok(Json(OctadResponse::from(&octad)))
 }
 
-/// Update hexad handler
+/// Update octad handler
 #[instrument(skip(state, request))]
-async fn update_hexad_handler(
+async fn update_octad_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    Json(request): Json<HexadRequest>,
-) -> Result<Json<HexadResponse>, ApiError> {
-    validate_hexad_id(&id)?;
-    let hexad_id = HexadId::new(&id);
-    let input = request.to_hexad_input();
+    Json(request): Json<OctadRequest>,
+) -> Result<Json<OctadResponse>, ApiError> {
+    validate_octad_id(&id)?;
+    let octad_id = OctadId::new(&id);
+    let input = request.to_octad_input();
 
-    let hexad = state
-        .hexad_store
-        .update(&hexad_id, input)
+    let octad = state
+        .octad_store
+        .update(&octad_id, input)
         .await
         .map_err(|e| match e {
-            verisim_hexad::HexadError::NotFound(_) => {
-                ApiError::NotFound(format!("Hexad {} not found", id))
+            verisim_octad::OctadError::NotFound(_) => {
+                ApiError::NotFound(format!("Octad {} not found", id))
             }
             _ => ApiError::Internal(e.to_string()),
         })?;
 
-    Ok(Json(HexadResponse::from(&hexad)))
+    Ok(Json(OctadResponse::from(&octad)))
 }
 
-/// Delete hexad handler
+/// Delete octad handler
 #[instrument(skip(state))]
-async fn delete_hexad_handler(
+async fn delete_octad_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<StatusCode, ApiError> {
-    validate_hexad_id(&id)?;
-    let hexad_id = HexadId::new(&id);
+    validate_octad_id(&id)?;
+    let octad_id = OctadId::new(&id);
 
     state
-        .hexad_store
-        .delete(&hexad_id)
+        .octad_store
+        .delete(&octad_id)
         .await
         .map_err(|e| match e {
-            verisim_hexad::HexadError::NotFound(_) => {
-                ApiError::NotFound(format!("Hexad {} not found", id))
+            verisim_octad::OctadError::NotFound(_) => {
+                ApiError::NotFound(format!("Octad {} not found", id))
             }
             _ => ApiError::Internal(e.to_string()),
         })?;
@@ -901,13 +901,13 @@ async fn text_search_handler(
     };
     let limit = validate_limit(query.limit.unwrap_or(10));
 
-    let hexads = state
-        .hexad_store
+    let octads = state
+        .octad_store
         .search_text(&q, limit)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-    let results: Vec<SearchResultResponse> = hexads
+    let results: Vec<SearchResultResponse> = octads
         .iter()
         .enumerate()
         .map(|(i, h)| SearchResultResponse {
@@ -937,13 +937,13 @@ async fn vector_search_handler(
     }
     validate_vector(&request.vector)?;
 
-    let hexads = state
-        .hexad_store
+    let octads = state
+        .octad_store
         .search_similar(&request.vector, k)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-    let results: Vec<SearchResultResponse> = hexads
+    let results: Vec<SearchResultResponse> = octads
         .iter()
         .enumerate()
         .map(|(i, h)| SearchResultResponse {
@@ -962,18 +962,18 @@ async fn related_search_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
     Query(query): Query<RelatedQuery>,
-) -> Result<Json<Vec<HexadResponse>>, ApiError> {
-    validate_hexad_id(&id)?;
-    let hexad_id = HexadId::new(&id);
+) -> Result<Json<Vec<OctadResponse>>, ApiError> {
+    validate_octad_id(&id)?;
+    let octad_id = OctadId::new(&id);
     let predicate = query.predicate.unwrap_or_else(|| "related".to_string());
 
-    let hexads = state
-        .hexad_store
-        .query_related(&hexad_id, &predicate)
+    let octads = state
+        .octad_store
+        .query_related(&octad_id, &predicate)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-    let responses: Vec<HexadResponse> = hexads.iter().map(HexadResponse::from).collect();
+    let responses: Vec<OctadResponse> = octads.iter().map(OctadResponse::from).collect();
 
     Ok(Json(responses))
 }
@@ -1015,16 +1015,16 @@ async fn entity_drift_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<EntityDriftResponse>, ApiError> {
-    validate_hexad_id(&id)?;
-    let hexad_id = HexadId::new(&id);
+    validate_octad_id(&id)?;
+    let octad_id = OctadId::new(&id);
 
-    // Verify hexad exists
-    let _hexad = state
-        .hexad_store
-        .get(&hexad_id)
+    // Verify octad exists
+    let _octad = state
+        .octad_store
+        .get(&octad_id)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?
-        .ok_or_else(|| ApiError::NotFound(format!("Hexad {} not found", id)))?;
+        .ok_or_else(|| ApiError::NotFound(format!("Octad {} not found", id)))?;
 
     // Get aggregate health from drift detector
     let all_metrics = state.drift_detector.all_metrics()
@@ -1066,20 +1066,20 @@ async fn trigger_normalization_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<StatusCode, ApiError> {
-    validate_hexad_id(&id)?;
-    let hexad_id = HexadId::new(&id);
+    validate_octad_id(&id)?;
+    let octad_id = OctadId::new(&id);
 
-    // Check if hexad exists
-    let _hexad = state
-        .hexad_store
-        .get(&hexad_id)
+    // Check if octad exists
+    let _octad = state
+        .octad_store
+        .get(&octad_id)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?
-        .ok_or_else(|| ApiError::NotFound(format!("Hexad {} not found", id)))?;
+        .ok_or_else(|| ApiError::NotFound(format!("Octad {} not found", id)))?;
 
     // In a full implementation, this would trigger actual normalization
-    // For now, we just verify the hexad exists and return accepted
-    info!(id = %id, "Normalization triggered for hexad");
+    // For now, we just verify the octad exists and return accepted
+    info!(id = %id, "Normalization triggered for octad");
 
     Ok(StatusCode::ACCEPTED)
 }
@@ -1156,15 +1156,15 @@ pub struct StoreQueryRequest {
     pub proof_obligations: Option<Vec<String>>,
 }
 
-/// Store a VQL query as a hexad (homoiconicity)
+/// Store a VQL query as a octad (homoiconicity)
 #[instrument(skip(state, request))]
 async fn store_query_handler(
     State(state): State<AppState>,
     Json(request): Json<StoreQueryRequest>,
-) -> Result<(StatusCode, Json<HexadResponse>), ApiError> {
-    use verisim_hexad::QueryHexadBuilder;
+) -> Result<(StatusCode, Json<OctadResponse>), ApiError> {
+    use verisim_octad::QueryOctadBuilder;
 
-    let mut builder = QueryHexadBuilder::new(&request.query);
+    let mut builder = QueryOctadBuilder::new(&request.query);
 
     if let Some(embedding) = request.embedding {
         validate_vector(&embedding)?;
@@ -1183,15 +1183,15 @@ async fn store_query_handler(
 
     let (_query_id, input) = builder.build();
 
-    let hexad = state
-        .hexad_store
+    let octad = state
+        .octad_store
         .create(input)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-    info!(hexad_id = %hexad.id, "Stored query as hexad");
+    info!(octad_id = %octad.id, "Stored query as octad");
 
-    Ok((StatusCode::CREATED, Json(HexadResponse::from(&hexad))))
+    Ok((StatusCode::CREATED, Json(OctadResponse::from(&octad))))
 }
 
 /// Find similar past queries by vector similarity
@@ -1211,15 +1211,15 @@ async fn similar_queries_handler(
     }
     validate_vector(&request.vector)?;
 
-    // Search for similar hexads (which includes query-hexads)
-    let hexads = state
-        .hexad_store
+    // Search for similar octads (which includes query-octads)
+    let octads = state
+        .octad_store
         .search_similar(&request.vector, k)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-    // Filter to only query hexads (those with "vql_query" type in document fields)
-    let results: Vec<SearchResultResponse> = hexads
+    // Filter to only query octads (those with "vql_query" type in document fields)
+    let results: Vec<SearchResultResponse> = octads
         .iter()
         .filter(|h| {
             h.document
@@ -1246,17 +1246,17 @@ async fn optimize_query_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
     body: Option<Json<LogicalPlan>>,
-) -> Result<Json<HexadResponse>, ApiError> {
-    validate_hexad_id(&id)?;
-    let hexad_id = HexadId::new(&id);
+) -> Result<Json<OctadResponse>, ApiError> {
+    validate_octad_id(&id)?;
+    let octad_id = OctadId::new(&id);
 
-    // Get the existing query hexad
-    let hexad = state
-        .hexad_store
-        .get(&hexad_id)
+    // Get the existing query octad
+    let octad = state
+        .octad_store
+        .get(&octad_id)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?
-        .ok_or_else(|| ApiError::NotFound(format!("Query hexad {} not found", id)))?;
+        .ok_or_else(|| ApiError::NotFound(format!("Query octad {} not found", id)))?;
 
     // Compute cost vector from the planner
     let cost_vector = if let Some(Json(logical_plan)) = body {
@@ -1278,16 +1278,16 @@ async fn optimize_query_handler(
     } else {
         // No plan provided — use existing tensor data scaled by a learning factor,
         // or default to [1.0] if no tensor exists
-        hexad
+        octad
             .tensor
             .as_ref()
             .map(|t| t.data.iter().map(|v| v * 0.95).collect())
             .unwrap_or_else(|| vec![1.0])
     };
 
-    // Update the hexad with new tensor data (cost vector)
-    let mut update_input = HexadInput::default();
-    update_input.tensor = Some(HexadTensorInput {
+    // Update the octad with new tensor data (cost vector)
+    let mut update_input = OctadInput::default();
+    update_input.tensor = Some(OctadTensorInput {
         shape: vec![1, cost_vector.len()],
         data: cost_vector,
     });
@@ -1296,14 +1296,14 @@ async fn optimize_query_handler(
         .insert("optimized_at".to_string(), chrono::Utc::now().to_rfc3339());
 
     let updated = state
-        .hexad_store
-        .update(&hexad_id, update_input)
+        .octad_store
+        .update(&octad_id, update_input)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-    info!(hexad_id = %id, "Optimized query hexad with new cost vector");
+    info!(octad_id = %id, "Optimized query octad with new cost vector");
 
-    Ok(Json(HexadResponse::from(&updated)))
+    Ok(Json(OctadResponse::from(&updated)))
 }
 
 // --- EXPLAIN ANALYZE Handler ---
@@ -1478,7 +1478,7 @@ async fn transaction_commit_handler(
             _ => ApiError::BadRequest(e.to_string()),
         })?;
 
-    // In a full implementation, ops would be applied to the hexad store here
+    // In a full implementation, ops would be applied to the octad store here
     let status = state.transaction_manager
         .status(&txn_id)
         .await
@@ -1764,13 +1764,13 @@ async fn provenance_get_chain_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<ProvenanceChainResponse>, ApiError> {
-    validate_hexad_id(&id)?;
+    validate_octad_id(&id)?;
 
     // Check entity exists
-    let hexad_id = HexadId::new(&id);
+    let octad_id = OctadId::new(&id);
     let exists = state
-        .hexad_store
-        .status(&hexad_id)
+        .octad_store
+        .status(&octad_id)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
     if exists.is_none() {
@@ -1778,14 +1778,14 @@ async fn provenance_get_chain_handler(
     }
 
     let chain = state
-        .hexad_store
+        .octad_store
         .provenance_store()
         .get_chain(&id)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
     let chain_valid = state
-        .hexad_store
+        .octad_store
         .provenance_store()
         .verify_chain(&id)
         .await
@@ -1819,11 +1819,11 @@ async fn provenance_record_handler(
     Path(id): Path<String>,
     Json(body): Json<ProvenanceRequest>,
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    validate_hexad_id(&id)?;
+    validate_octad_id(&id)?;
 
-    let hexad_id = HexadId::new(&id);
-    let input = HexadInput {
-        provenance: Some(HexadProvenanceInput {
+    let octad_id = OctadId::new(&id);
+    let input = OctadInput {
+        provenance: Some(OctadProvenanceInput {
             event_type: body.event_type,
             actor: body.actor,
             source: body.source,
@@ -1832,15 +1832,15 @@ async fn provenance_record_handler(
         ..Default::default()
     };
 
-    let hexad = state
-        .hexad_store
-        .update(&hexad_id, input)
+    let octad = state
+        .octad_store
+        .update(&octad_id, input)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
     Ok(Json(serde_json::json!({
         "entity_id": id,
-        "chain_length": hexad.provenance_chain_length,
+        "chain_length": octad.provenance_chain_length,
         "recorded": true,
     })))
 }
@@ -1851,12 +1851,12 @@ async fn provenance_verify_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<serde_json::Value>, ApiError> {
-    validate_hexad_id(&id)?;
+    validate_octad_id(&id)?;
 
-    let hexad_id = HexadId::new(&id);
+    let octad_id = OctadId::new(&id);
     let status = state
-        .hexad_store
-        .status(&hexad_id)
+        .octad_store
+        .status(&octad_id)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?
         .ok_or_else(|| ApiError::NotFound(format!("Entity {} not found", id)))?;
@@ -1930,7 +1930,7 @@ async fn spatial_radius_search_handler(
     };
 
     let results = state
-        .hexad_store
+        .octad_store
         .spatial_store()
         .search_radius(&center, body.radius_km, limit)
         .await
@@ -1971,7 +1971,7 @@ async fn spatial_bounds_search_handler(
     };
 
     let results = state
-        .hexad_store
+        .octad_store
         .spatial_store()
         .search_within(&bounds, limit)
         .await
@@ -2009,7 +2009,7 @@ async fn spatial_nearest_handler(
     };
 
     let results = state
-        .hexad_store
+        .octad_store
         .spatial_store()
         .nearest(&point, k)
         .await
@@ -2096,12 +2096,12 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_create_and_get_hexad() {
+    async fn test_create_and_get_octad() {
         let state = create_test_state().await;
         let app = build_router(state);
 
-        // Create a hexad
-        let create_request = HexadRequest {
+        // Create a octad
+        let create_request = OctadRequest {
             title: Some("Test Document".to_string()),
             body: Some("Test body content".to_string()),
             embedding: Some(vec![0.1, 0.2, 0.3]),
@@ -2118,7 +2118,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method("POST")
-                    .uri("/hexads")
+                    .uri("/octads")
                     .header("content-type", "application/json")
                     .body(Body::from(serde_json::to_string(&create_request).unwrap()))
                     .unwrap(),
@@ -2132,13 +2132,13 @@ mod tests {
         let body = axum::body::to_bytes(response.into_body(), 1024 * 1024)
             .await
             .unwrap();
-        let created: HexadResponse = serde_json::from_slice(&body).unwrap();
+        let created: OctadResponse = serde_json::from_slice(&body).unwrap();
 
-        // Get the hexad
+        // Get the octad
         let response = app
             .oneshot(
                 Request::builder()
-                    .uri(format!("/hexads/{}", created.id))
+                    .uri(format!("/octads/{}", created.id))
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -2153,8 +2153,8 @@ mod tests {
         let state = create_test_state().await;
         let app = build_router(state);
 
-        // Create a hexad
-        let create_request = HexadRequest {
+        // Create a octad
+        let create_request = OctadRequest {
             title: Some("Rust Programming".to_string()),
             body: Some("Rust is a systems programming language".to_string()),
             embedding: Some(vec![0.1, 0.2, 0.3]),
@@ -2171,7 +2171,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method("POST")
-                    .uri("/hexads")
+                    .uri("/octads")
                     .header("content-type", "application/json")
                     .body(Body::from(serde_json::to_string(&create_request).unwrap()))
                     .unwrap(),

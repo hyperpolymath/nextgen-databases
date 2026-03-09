@@ -169,7 +169,7 @@ defmodule VeriSim.Federation.AdapterTest do
       [result] = VeriSimDB.translate_results(raw, @peer_info)
 
       assert result.source_store == "test-peer"
-      assert result.hexad_id == "abc-123"
+      assert result.octad_id == "abc-123"
       assert result.score == 0.95
       assert result.drifted == false
       assert result.data == hd(raw)
@@ -180,26 +180,26 @@ defmodule VeriSim.Federation.AdapterTest do
 
       [result] = VeriSimDB.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "unknown"
+      assert result.octad_id == "unknown"
       assert result.score == 0.0
     end
 
     test "ArangoDB extracts _key from ArangoDB documents" do
-      raw = [%{"_key" => "doc-456", "_id" => "hexads/doc-456", "_score" => 1.5}]
+      raw = [%{"_key" => "doc-456", "_id" => "octads/doc-456", "_score" => 1.5}]
 
       [result] = ArangoDB.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "doc-456"
+      assert result.octad_id == "doc-456"
       assert result.score == 1.5
       assert result.source_store == "test-peer"
     end
 
     test "ArangoDB falls back to _id when _key missing" do
-      raw = [%{"_id" => "hexads/fallback-789"}]
+      raw = [%{"_id" => "octads/fallback-789"}]
 
       [result] = ArangoDB.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "hexads/fallback-789"
+      assert result.octad_id == "octads/fallback-789"
     end
 
     test "PostgreSQL normalises row results" do
@@ -207,7 +207,7 @@ defmodule VeriSim.Federation.AdapterTest do
 
       [result] = PostgreSQL.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "pg-001"
+      assert result.octad_id == "pg-001"
       assert result.score == 0.88
     end
 
@@ -216,7 +216,7 @@ defmodule VeriSim.Federation.AdapterTest do
 
       [result] = PostgreSQL.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "pg-alt"
+      assert result.octad_id == "pg-alt"
     end
 
     test "Elasticsearch extracts from _source and _id" do
@@ -230,7 +230,7 @@ defmodule VeriSim.Federation.AdapterTest do
 
       [result] = Elasticsearch.translate_results(raw, @peer_info)
 
-      assert result.hexad_id == "es-doc-1"
+      assert result.octad_id == "es-doc-1"
       assert result.score == 2.3
       assert result.data == %{"title" => "ES document", "body" => "Content"}
     end
@@ -299,7 +299,7 @@ defmodule VeriSim.Federation.AdapterTest do
           adapter_type: :postgresql,
           adapter_config: %{
             database: "verisimdb",
-            table: "hexads",
+            table: "octads",
             extensions: [:pgvector, :postgis]
           },
           modalities: ["document", "vector", "spatial", "tensor"]
@@ -321,7 +321,7 @@ defmodule VeriSim.Federation.AdapterTest do
         Resolver.register_peer("es-1", %{
           endpoint: "http://elastic:9200",
           adapter_type: :elasticsearch,
-          adapter_config: %{index: "hexads", version: 8},
+          adapter_config: %{index: "octads", version: 8},
           modalities: ["document", "vector"]
         })
 

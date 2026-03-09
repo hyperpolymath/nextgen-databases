@@ -22,7 +22,7 @@ Both modes use the same parser and produce the same AST. They diverge at the que
 
 Use Slipstream for:
 
-* **Analytics and exploration** -- Browsing data, running ad-hoc queries during development, investigating hexad contents.
+* **Analytics and exploration** -- Browsing data, running ad-hoc queries during development, investigating octad contents.
 * **Non-critical reads** -- Queries where correctness matters but formal verification is overkill (e.g., populating a dashboard).
 * **Performance-sensitive workloads** -- When latency budgets are tight and the cost of proof generation is unacceptable.
 * **Development and debugging** -- Iterating on query structure before adding verification.
@@ -60,7 +60,7 @@ VQL-DT supports six proof types, each verifying a different property of the quer
 
 === EXISTENCE
 
-**What it verifies:** The requested hexad entity actually exists in the target store and has data in the requested modalities. The proof certificate attests that the entity was present at query time.
+**What it verifies:** The requested octad entity actually exists in the target store and has data in the requested modalities. The proof certificate attests that the entity was present at query time.
 
 **Use case:** Confirming that a referenced entity has not been deleted or that a federated peer genuinely holds the claimed data.
 
@@ -86,7 +86,7 @@ PROOF INTEGRITY(DataIntegrityContract)
 
 === CONSISTENCY
 
-**What it verifies:** All six modalities of the hexad are mutually consistent. The graph edges match the document content, the vector embedding reflects the semantic annotations, and the temporal history is coherent. The proof certificate attests that no drift has been detected across modalities.
+**What it verifies:** All six modalities of the octad are mutually consistent. The graph edges match the document content, the vector embedding reflects the semantic annotations, and the temporal history is coherent. The proof certificate attests that no drift has been detected across modalities.
 
 **Use case:** Before making decisions based on cross-modal data (e.g., using both the graph structure and the vector embedding), verify that the modalities agree.
 

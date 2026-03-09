@@ -12,7 +12,7 @@ This document details the **technical challenges** unique to federated deploymen
 
 === 1.1. KRaft Metadata Consensus Overhead
 
-**Problem:** Every registry update (Hexad registration, policy change) requires **Raft quorum consensus**.
+**Problem:** Every registry update (Octad registration, policy change) requires **Raft quorum consensus**.
 
 **Raft Requirements:**
 - **Minimum Nodes:** 3 (tolerates 1 failure)
@@ -147,7 +147,7 @@ Result: 800ms write unavailability
 **Signature Overhead:**
 [source,text]
 ----
-Operation: Query Hexad across 3 federated stores
+Operation: Query Octad across 3 federated stores
 
 1. Orchestrator sends query to Store A, B, C (parallel)
 2. Each store:
@@ -190,7 +190,7 @@ Total overhead: 30ms signature verification (vs 0ms standalone)
 |Attack |Example |Impact
 
 |**Data Tampering**
-|Store A returns modified Hexad content
+|Store A returns modified Octad content
 |Clients receive incorrect data
 
 |**Policy Violation**
@@ -239,7 +239,7 @@ Federated: 50-100 boundaries (orchestrator → N remote stores)
 ----
 
 **Security Implications:**
-1. **Compromise Surface:** Any one store compromise exposes its hosted Hexads
+1. **Compromise Surface:** Any one store compromise exposes its hosted Octads
 2. **Policy Inconsistency:** 100 stores = 100 different security policies to audit
 3. **Credential Management:** Must manage 100 pairs of TLS certificates
 4. **Audit Complexity:** Must correlate logs across 100 independent systems
@@ -248,11 +248,11 @@ Federated: 50-100 boundaries (orchestrator → N remote stores)
 [source,text]
 ----
 Attacker compromises University B's federated store:
-  - Gains access to all Hexads hosted by University B
+  - Gains access to all Octads hosted by University B
   - Can serve malicious data to orchestrator
   - Can exfiltrate query patterns (who queries what)
 
-Impact: Partial breach (only University B's Hexads), but:
+Impact: Partial breach (only University B's Octads), but:
   - Orchestrator cannot detect tampering without cross-validation
   - Clients unaware they received compromised data
 ----
@@ -362,10 +362,10 @@ User Experience: Slow and unreliable
 **Drift Detection Protocol:**
 [source,text]
 ----
-1. Orchestrator queries all stores hosting Hexad 550e8400-...
-   - Store A (Graph): GET /hexad/550e8400/graph/metadata
-   - Store B (Vector): GET /hexad/550e8400/vector/metadata
-   - Store C (Document): GET /hexad/550e8400/document/metadata
+1. Orchestrator queries all stores hosting Octad 550e8400-...
+   - Store A (Graph): GET /octad/550e8400/graph/metadata
+   - Store B (Vector): GET /octad/550e8400/vector/metadata
+   - Store C (Document): GET /octad/550e8400/document/metadata
 
 2. Compare metadata (timestamps, hashes, version numbers)
 
@@ -540,7 +540,7 @@ With N modalities: latency scales with max(Store1, Store2, ..., StoreN)
 **Write Propagation Flow:**
 [source,text]
 ----
-T=0:   Client writes Hexad update to orchestrator
+T=0:   Client writes Octad update to orchestrator
 T=1:   Orchestrator commits to KRaft metadata log (quorum: 100ms)
 T=101: Orchestrator dispatches writes to federated stores:
        - Store A (Graph): 50ms to reach, 10ms to persist
@@ -644,7 +644,7 @@ Monthly bandwidth:
 **Example:**
 [source,text]
 ----
-Proposal: Add "license" field to Hexad metadata
+Proposal: Add "license" field to Octad metadata
 
 Timeline:
   - T=0:   Proposal submitted
@@ -784,7 +784,7 @@ Result: Federated ecosystem at risk
 **Compliance Conflict:**
 [source,text]
 ----
-Scenario: EU user queries Hexad hosted across:
+Scenario: EU user queries Octad hosted across:
   - Store A (Germany): Subject to GDPR
   - Store B (US): Subject to CLOUD Act
   - Store C (China): Subject to Data Security Law
@@ -802,12 +802,12 @@ VeriSimDB must:
 ----
 
 **Consequences:**
-- **Compliance Overhead:** Must track **data residency** for every Hexad
+- **Compliance Overhead:** Must track **data residency** for every Octad
 - **Partial Results:** May need to exclude stores for legal reasons
 - **Audit Complexity:** Must prove compliance to regulators in multiple jurisdictions
 
 **Mitigation:**
-- **Data Tagging:** Tag Hexads with **jurisdiction metadata** (e.g., "EU-only", "US-only")
+- **Data Tagging:** Tag Octads with **jurisdiction metadata** (e.g., "EU-only", "US-only")
 - **Query Planning:** Route queries only to **legally compliant stores**
 - **Encryption:** Use **homomorphic encryption** to process data without exposing plaintext (but: performance cost)
 - **Legal Counsel:** Consult lawyers specializing in cross-border data flows
@@ -819,15 +819,15 @@ VeriSimDB must:
 **RTBF Challenge:**
 [source,text]
 ----
-User requests deletion of Hexad 550e8400-...
+User requests deletion of Octad 550e8400-...
 
 VeriSimDB must:
-  1. Identify all stores hosting any modality of Hexad
+  1. Identify all stores hosting any modality of Octad
      - Registry lookup: Stores [A, B, C, D, E]
   2. Send deletion request to each store
   3. Wait for confirmation (stores may take days to comply)
   4. Verify deletion (how to prove data gone?)
-  5. Update registry to mark Hexad deleted
+  5. Update registry to mark Octad deleted
 
 Complications:
   - Store B is offline (maintenance window)
@@ -842,8 +842,8 @@ Result: Incomplete deletion → GDPR violation
 
 **Mitigation:**
 - **Deletion SLA:** Pre-negotiate **deletion timelines** with all stores (e.g., 30 days)
-- **Immutable Flag:** Mark Hexad as "deleted" in registry immediately, lazy-delete from stores
-- **Cryptographic Deletion:** Encrypt Hexads with **per-Hexad keys**, delete keys instead of data
+- **Immutable Flag:** Mark Octad as "deleted" in registry immediately, lazy-delete from stores
+- **Cryptographic Deletion:** Encrypt Octads with **per-Octad keys**, delete keys instead of data
 - **Backup Coordination:** Require stores to certify backups also purged
 
 === 6.3. Sovereignty vs Availability Tradeoff
@@ -853,7 +853,7 @@ Result: Incomplete deletion → GDPR violation
 **Example:**
 [source,text]
 ----
-Scenario: French research paper (Hexad X) hosted only on French stores
+Scenario: French research paper (Octad X) hosted only on French stores
 
 Global query from US user:
   - Option 1: Query French stores (slow, 150ms latency due to geography)

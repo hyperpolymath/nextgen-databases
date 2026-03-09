@@ -2,9 +2,9 @@
 
 = VeriSimDB: ReScript Registry Type Definitions
 
-These definitions form the backbone of the "Tiny Core". They ensure that every Hexad resolved by the WASM proxy is type-safe and consistent with the KRaft controller's state.
+These definitions form the backbone of the "Tiny Core". They ensure that every Octad resolved by the WASM proxy is type-safe and consistent with the KRaft controller's state.
 
-== 1. Core Hexad Types
+== 1. Core Octad Types
 
 [source,rescript]
 ----
@@ -25,7 +25,7 @@ type storeMeta = {
   policyHash: string,
 }
 
-type hexad = {
+type octad = {
   id: uuid,
   owner: did,
   modalities: Belt.Map.String.t<storeMeta>,
@@ -47,7 +47,7 @@ type logEntry = {
   term: term,
   index: index,
   command:
-    | RegisterHexad(hexad)
+    | RegisterOctad(octad)
     | UpdatePolicy(uuid, string)
     | RevokeStore(string)
 }
@@ -55,7 +55,7 @@ type logEntry = {
 type registryState = {
   lastIncludedIndex: index,
   lastIncludedTerm: term,
-  hexads: Belt.Map.String.t<hexad>,
+  octads: Belt.Map.String.t<octad>,
 }
 ----
 
@@ -65,7 +65,7 @@ This is the primary function invoked by the WASM proxy during a lookup.
 
 [source,rescript]
 ----
-let resolveHexad = (registry: registryState, id: uuid): option<hexad> => {
-  Belt.Map.String.get(registry.hexads, id)
+let resolveOctad = (registry: registryState, id: uuid): option<octad> => {
+  Belt.Map.String.get(registry.octads, id)
 }
 ----

@@ -37,7 +37,7 @@ pub enum VectorError {
 /// A vector embedding with metadata
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Embedding {
-    /// Unique identifier (matches Hexad entity ID)
+    /// Unique identifier (matches Octad entity ID)
     pub id: String,
     /// The embedding vector
     pub vector: Vec<f32>,

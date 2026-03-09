@@ -13,7 +13,7 @@ base_iri = "https://verisim.db/self"
 [storage]
 # Flat-file JSON storage (committed to git)
 backend = "flat-json"
-hexad_dir = ".verisimdb/hexads"
+octad_dir = ".verisimdb/octads"
 index_file = ".verisimdb/index.json"
 
 [ingest]
@@ -21,7 +21,7 @@ index_file = ".verisimdb/index.json"
 sources = ["git-log", "known-issues", "panic-attack-scans", "benchmarks"]
 
 [ingest.git-log]
-# Map git commits to hexads
+# Map git commits to octads
 # Document: commit message + diff stats
 # Graph: file dependencies (which files changed together)
 # Vector: embedding of commit message (placeholder until model integrated)
@@ -31,7 +31,7 @@ sources = ["git-log", "known-issues", "panic-attack-scans", "benchmarks"]
 enabled = true
 
 [ingest.known-issues]
-# Parse KNOWN-ISSUES.adoc entries into hexads
+# Parse KNOWN-ISSUES.adoc entries into octads
 enabled = true
 
 [ingest.panic-attack]
@@ -48,6 +48,6 @@ enabled = false
 vector_dimension = 64  # Small dimension for commit embeddings (hash-based)
 
 [display]
-# How to present hexads in CLI/TUI
+# How to present octads in CLI/TUI
 date_format = "%Y-%m-%d %H:%M"
 max_title_length = 80

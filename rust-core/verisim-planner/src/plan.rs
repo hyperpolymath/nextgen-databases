@@ -10,8 +10,8 @@ use crate::Modality;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum QuerySource {
-    /// Query a single hexad store.
-    Hexad,
+    /// Query a single octad store.
+    Octad,
     /// Federated query across multiple nodes.
     Federation { nodes: Vec<String> },
     /// Direct store access for a specific modality.
@@ -124,7 +124,7 @@ mod tests {
 
     fn sample_logical_plan() -> LogicalPlan {
         LogicalPlan {
-            source: QuerySource::Hexad,
+            source: QuerySource::Octad,
             nodes: vec![
                 PlanNode {
                     modality: Modality::Graph,
@@ -191,9 +191,9 @@ mod tests {
 
     #[test]
     fn test_query_source_variants() {
-        let hexad = QuerySource::Hexad;
-        let json = serde_json::to_string(&hexad).unwrap();
-        assert!(json.contains("hexad"));
+        let octad = QuerySource::Octad;
+        let json = serde_json::to_string(&octad).unwrap();
+        assert!(json.contains("octad"));
 
         let fed = QuerySource::Federation {
             nodes: vec!["node1".to_string()],

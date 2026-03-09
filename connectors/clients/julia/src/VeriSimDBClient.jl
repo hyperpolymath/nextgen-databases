@@ -4,13 +4,13 @@
 # VeriSimDB Julia Client — Main module.
 #
 # This is the top-level module for the VeriSimDB Julia client SDK. It aggregates
-# all submodules (types, error, client, hexad, search, drift, provenance, vql,
+# all submodules (types, error, client, octad, search, drift, provenance, vql,
 # federation) and re-exports the public API.
 #
 # Usage:
 #   using VeriSimDBClient
 #   client = Client("http://localhost:8080")
-#   hexad = create_hexad(client, HexadInput(modalities=[Graph, Vector]))
+#   octad = create_octad(client, OctadInput(modalities=[Graph, Vector]))
 
 module VeriSimDBClient
 
@@ -26,7 +26,7 @@ using Dates
 include("types.jl")
 include("error.jl")
 include("client.jl")
-include("hexad.jl")
+include("octad.jl")
 include("search.jl")
 include("drift.jl")
 include("provenance.jl")
@@ -39,7 +39,7 @@ include("federation.jl")
 export Client, health
 
 # Types
-export Hexad, HexadInput, Modality, ModalityStatus, HexadStatus
+export Octad, OctadInput, Modality, ModalityStatus, OctadStatus
 export GraphData, GraphEdge, VectorData, TensorData, DocumentContent, SpatialData
 export DriftScore, DriftLevel, DriftStatusReport
 export ProvenanceEvent, ProvenanceChain, ProvenanceEventInput
@@ -47,8 +47,8 @@ export PaginatedResponse, SearchResult
 export VqlResult, VqlExplanation
 export FederationPeer
 
-# Hexad CRUD
-export create_hexad, get_hexad, update_hexad, delete_hexad, list_hexads
+# Octad CRUD
+export create_octad, get_octad, update_octad, delete_octad, list_octads
 
 # Search
 export search_text, search_vector, search_spatial_radius, search_spatial_bounds

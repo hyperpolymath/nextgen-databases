@@ -148,7 +148,7 @@ impl ProofCost {
     /// Get the cost for a proof type by name.
     ///
     /// Proof types from VQLProofObligation.res:
-    /// - Existence: trivial check (hexad exists)
+    /// - Existence: trivial check (octad exists)
     /// - Citation: contract lookup in registry
     /// - Access: semantic store rights check
     /// - Integrity: CBOR proof blob + Merkle verification

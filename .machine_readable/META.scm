@@ -123,15 +123,15 @@
         (neutral . "PSK is simple; future: upgrade to mTLS or signed tokens")))
 
     (adr-011
-      (title . "Homoiconicity: Queries as Hexads")
+      (title . "Homoiconicity: Queries as Octads")
       (status . "accepted")
       (date . "2026-02-13")
-      (context . "VQL queries are structured data. Storing them as hexads enables meta-circular operations: query the query store, optimize stored queries, track query lineage.")
-      (decision . "VQL queries are stored as hexads with all 6 modalities populated. REFLECT keyword queries the query store itself. /queries/{id}/optimize enables self-modification.")
+      (context . "VQL queries are structured data. Storing them as octads enables meta-circular operations: query the query store, optimize stored queries, track query lineage.")
+      (decision . "VQL queries are stored as octads with all 6 modalities populated. REFLECT keyword queries the query store itself. /queries/{id}/optimize enables self-modification.")
       (consequences
         (positive . "Meta-circular: system can reason about its own queries. Similarity search over past queries. Self-optimization.")
-        (negative . "Storage overhead for query hexads. Risk of infinite recursion with REFLECT queries.")
-        (neutral . "REFLECT queries are themselves stored as hexads, enabling arbitrary meta-levels")))
+        (negative . "Storage overhead for query octads. Risk of infinite recursion with REFLECT queries.")
+        (neutral . "REFLECT queries are themselves stored as octads, enabling arbitrary meta-levels")))
 
     (adr-012
       (title . "R1CS Constraint System for Custom ZKP Circuits")
@@ -145,14 +145,14 @@
         (neutral . "Can add Plonk support later as alternative backend")))
 
     (adr-013
-      (title . "Octad Architecture: 8 Modalities (Hexad → Octad Evolution)")
+      (title . "Octad Architecture: 8 Modalities (Octad → Octad Evolution)")
       (status . "accepted")
       (date . "2026-02-27")
-      (context . "The original hexad (6 modalities) covered data representation but lacked origin tracking and geospatial awareness. Temporal tracks versions (what changed); provenance tracks origins (where it came from). Spatial captures physical location and proximity.")
-      (decision . "Evolve from hexad (6) to octad (8). Add provenance/lineage as 7th modality (CRITICAL) and spatial/geospatial as 8th modality. Tensor modality retained — active research is exploring novel applications with significant future potential beyond traditional numeric storage. All existing modalities unchanged.")
+      (context . "The original octad (6 modalities) covered data representation but lacked origin tracking and geospatial awareness. Temporal tracks versions (what changed); provenance tracks origins (where it came from). Spatial captures physical location and proximity.")
+      (decision . "Evolve from octad (6) to octad (8). Add provenance/lineage as 7th modality (CRITICAL) and spatial/geospatial as 8th modality. Tensor modality retained — active research is exploring novel applications with significant future potential beyond traditional numeric storage. All existing modalities unchanged.")
       (consequences
         (positive . "Provenance enables GDPR compliance, audit trails, cross-system lineage, drift causality explanation. Spatial enables IoT, logistics, fleet management consistency. Tensor research opens future possibilities.")
-        (negative . "Structural change across codebase. All modality iteration must account for 8 stores. Naming evolution (hexad → octad) throughout documentation.")
+        (negative . "Structural change across codebase. All modality iteration must account for 8 stores. Naming evolution (octad → octad) throughout documentation.")
         (neutral . "Provenance is append-only (simpler than graph or vector). Spatial uses mature Rust crates (geo, rstar). Tensor research is ongoing and confidential.")))
 
     (adr-014
@@ -160,7 +160,7 @@
       (status . "proposed")
       (date . "2026-02-27")
       (context . "Current federation is peer-to-peer between VerisimDB instances. Enterprise value requires watching non-VerisimDB databases (ArangoDB, PostgreSQL, Elasticsearch) for cross-system entity consistency. IDApTIK database bridge is the first working example.")
-      (decision . "Extend federation with adapter interface for external databases. Each adapter maps an external database's API to VerisimDB's hexad model. Drift detection operates across adapters.")
+      (decision . "Extend federation with adapter interface for external databases. Each adapter maps an external database's API to VerisimDB's octad model. Drift detection operates across adapters.")
       (consequences
         (positive . "Enterprise adoption without requiring data migration. VerisimDB becomes consistency layer over existing stack. Unique positioning vs data quality tools.")
         (negative . "Each adapter is maintenance burden. External database schema changes can break adapters.")
@@ -210,7 +210,7 @@
          (elixir . "mix format with default settings")
          (rust . "rustfmt with edition 2024")))
       (naming-conventions
-        "- Types: PascalCase (e.g., QueryResult, HexadRef)
+        "- Types: PascalCase (e.g., QueryResult, OctadRef)
          - Functions: snake_case (e.g., detect_drift, parse_query)
          - Constants: SCREAMING_SNAKE_CASE (e.g., MAX_RETRIES)
          - Modules: PascalCase (e.g., DriftMonitor, VQLParser)")
@@ -325,7 +325,7 @@
       (problem . "Single-language systems lack best tool for each job.")
       (solution
         "- ReScript: Type-safe registry, compiles to WASM (portable, sandboxed)
-         - Elixir/OTP: Fault-tolerant coordination, GenServers for hexads
+         - Elixir/OTP: Fault-tolerant coordination, GenServers for octads
          - Rust: Performance-critical stores, zero-cost abstractions")
       (benefit . "Each language solves problem it's best at. ReScript for logic, Elixir for supervision, Rust for speed."))
 
@@ -383,7 +383,7 @@
 
     (observability
       (logging
-        "- Elixir: Logger with metadata (query_id, hexad_id)
+        "- Elixir: Logger with metadata (query_id, octad_id)
          - Rust: tracing crate with spans
          - Structured logs (JSON) for parsing")
       (metrics

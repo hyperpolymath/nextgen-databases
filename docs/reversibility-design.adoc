@@ -19,8 +19,8 @@ State A → [Operation O] → State B → [Inverse O⁻¹] → State A
 ----
 
 **Examples:**
-- `INSERT hexad X` → `DELETE hexad X`
-- `UPDATE hexad X field=Y` → `UPDATE hexad X field=<old_value>`
+- `INSERT octad X` → `DELETE octad X`
+- `UPDATE octad X field=Y` → `UPDATE octad X field=<old_value>`
 - `QUERY returns 100 results` → `RESTORE query state (cached)`
 
 == Why Reversibility Matters
@@ -28,7 +28,7 @@ State A → [Operation O] → State B → [Inverse O⁻¹] → State A
 === Use Cases
 
 1. **Undo Accidental Changes**
-   - User deletes important hexad → Undo
+   - User deletes important octad → Undo
    - Drift repair applies wrong fix → Undo
 
 2. **Time-Travel Queries**
@@ -79,9 +79,9 @@ The registry doesn't delete entries - it appends new versions:
 
 [source,text]
 ----
-Log Entry 1: REGISTER hexad abc-123 → store-1
-Log Entry 2: UPDATE hexad abc-123 → store-2 (moved)
-Log Entry 3: DELETE hexad abc-123 (tombstone)
+Log Entry 1: REGISTER octad abc-123 → store-1
+Log Entry 2: UPDATE octad abc-123 → store-2 (moved)
+Log Entry 3: DELETE octad abc-123 (tombstone)
 
 To revert to Entry 2:
   - Replay log up to Entry 2
@@ -187,19 +187,19 @@ impl ModalitySnapshot {
 [source,rust]
 ----
 // Use persistent data structures (like Git)
-pub struct CowHexad {
+pub struct CowOctad {
     id: Uuid,
-    versions: BTreeMap<Timestamp, Arc<HexadState>>,
+    versions: BTreeMap<Timestamp, Arc<OctadState>>,
 }
 
-impl CowHexad {
-    pub fn update(&mut self, new_state: HexadState) {
+impl CowOctad {
+    pub fn update(&mut self, new_state: OctadState) {
         // Share unchanged data, clone only modified parts
         let new_version = Arc::new(new_state);
         self.versions.insert(Utc::now(), new_version);
     }
 
-    pub fn revert_to(&self, timestamp: Timestamp) -> Option<Arc<HexadState>> {
+    pub fn revert_to(&self, timestamp: Timestamp) -> Option<Arc<OctadState>> {
         self.versions.range(..=timestamp).next_back().map(|(_, state)| state.clone())
     }
 }
@@ -214,27 +214,27 @@ impl CowHexad {
 [source,rust]
 ----
 // Store operations, not states
-pub enum HexadEvent {
-    Created { id: Uuid, data: HexadData },
+pub enum OctadEvent {
+    Created { id: Uuid, data: OctadData },
     Updated { id: Uuid, field: String, old: Value, new: Value },
     Deleted { id: Uuid },
 }
 
 pub struct EventLog {
-    events: Vec<HexadEvent>,
+    events: Vec<OctadEvent>,
 }
 
 impl EventLog {
-    pub fn reconstruct_at(&self, timestamp: i64) -> HexadState {
+    pub fn reconstruct_at(&self, timestamp: i64) -> OctadState {
         self.events
             .iter()
             .take_while(|e| e.timestamp <= timestamp)
-            .fold(HexadState::default(), |state, event| {
+            .fold(OctadState::default(), |state, event| {
                 state.apply(event)
             })
     }
 
-    pub fn revert(&self, steps: usize) -> HexadState {
+    pub fn revert(&self, steps: usize) -> OctadState {
         // Replay all events except last N
         self.reconstruct_from_events(&self.events[..self.events.len() - steps])
     }
@@ -350,12 +350,12 @@ LIMIT 100
 [source,elixir]
 ----
 defmodule VeriSim.DriftMonitor do
-  def repair_with_validation(hexad_id, repair_policy) do
+  def repair_with_validation(octad_id, repair_policy) do
     # Create reversible checkpoint
-    checkpoint = Reversibility.create_checkpoint(hexad_id)
+    checkpoint = Reversibility.create_checkpoint(octad_id)
 
     # Apply repair
-    case apply_repair(hexad_id, repair_policy) do
+    case apply_repair(octad_id, repair_policy) do
       {:ok, new_state} ->
         # Validate repair
         if validate_consistency(new_state) do

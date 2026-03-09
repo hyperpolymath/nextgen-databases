@@ -118,7 +118,7 @@ pub fn (c Client) health() !bool {
 // do_get sends an authenticated GET request to the given path.
 //
 // Parameters:
-//   path — The API path (appended to base_url), e.g. "/hexads".
+//   path — The API path (appended to base_url), e.g. "/octads".
 //
 // Returns:
 //   The HTTP response, or an error if the request fails.

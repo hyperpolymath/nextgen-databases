@@ -30,7 +30,7 @@ defmodule VeriSim.Federation.Adapters.VectorDB do
       %{
         host: "qdrant.internal",
         port: 6333,
-        collection: "hexads",
+        collection: "octads",
         backend: :qdrant,
         auth: {:api_key, "your-api-key"}
       }
@@ -39,7 +39,7 @@ defmodule VeriSim.Federation.Adapters.VectorDB do
       %{
         host: "milvus.internal",
         port: 19530,
-        collection: "hexads",
+        collection: "octads",
         backend: :milvus,
         auth: {:bearer, "token"}
       }
@@ -48,7 +48,7 @@ defmodule VeriSim.Federation.Adapters.VectorDB do
       %{
         host: "weaviate.internal",
         port: 8080,
-        collection: "Hexad",
+        collection: "Octad",
         backend: :weaviate,
         auth: {:api_key, "your-api-key"}
       }
@@ -158,7 +158,7 @@ defmodule VeriSim.Federation.Adapters.VectorDB do
 
       %{
         source_store: peer_info.store_id,
-        hexad_id: id,
+        octad_id: id,
         score: score,
         drifted: false,
         data: data,
@@ -193,7 +193,7 @@ defmodule VeriSim.Federation.Adapters.VectorDB do
 
   defp query_qdrant(peer_info, modalities, query_params, limit, timeout) do
     config = peer_info.adapter_config
-    collection = Map.get(config, :collection, "hexads")
+    collection = Map.get(config, :collection, "octads")
     headers = auth_headers(config)
 
     cond do
@@ -351,7 +351,7 @@ defmodule VeriSim.Federation.Adapters.VectorDB do
 
   defp query_milvus(peer_info, modalities, query_params, limit, timeout) do
     config = peer_info.adapter_config
-    collection = Map.get(config, :collection, "hexads")
+    collection = Map.get(config, :collection, "octads")
     headers = auth_headers(config) ++ [{"Content-Type", "application/json"}]
 
     cond do
@@ -452,7 +452,7 @@ defmodule VeriSim.Federation.Adapters.VectorDB do
 
   defp query_weaviate(peer_info, modalities, query_params, limit, timeout) do
     config = peer_info.adapter_config
-    collection = Map.get(config, :collection, "Hexad")
+    collection = Map.get(config, :collection, "Octad")
     headers = auth_headers(config) ++ [{"Content-Type", "application/json"}]
 
     cond do

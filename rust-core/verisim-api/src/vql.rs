@@ -5,21 +5,21 @@
 //! routes to the appropriate store operations.
 //!
 //! This is a lightweight server-side VQL parser that handles the core
-//! query operations directly against the hexad store. It bridges the gap
+//! query operations directly against the octad store. It bridges the gap
 //! between the REPL client (which sends raw VQL text) and the REST API
 //! (which expects structured JSON requests).
 //!
 //! ## Supported VQL Statements
 //!
-//! - `SELECT [modalities] FROM hexads [WHERE id = '...'] [LIMIT n]`
+//! - `SELECT [modalities] FROM octads [WHERE id = '...'] [LIMIT n]`
 //! - `SEARCH TEXT '<query>' [LIMIT n]`
 //! - `SEARCH VECTOR [v1, v2, ...] [LIMIT n]`
 //! - `SEARCH RELATED '<id>' [BY '<predicate>']`
-//! - `INSERT INTO hexads (fields...) VALUES (values...)`
-//! - `DELETE FROM hexads WHERE id = '<id>'`
+//! - `INSERT INTO octads (fields...) VALUES (values...)`
+//! - `DELETE FROM octads WHERE id = '<id>'`
 //! - `SHOW STATUS` / `SHOW DRIFT` / `SHOW NORMALIZER`
-//! - `SHOW HEXADS [LIMIT n]`
-//! - `COUNT hexads`
+//! - `SHOW OCTADS [LIMIT n]`
+//! - `COUNT octads`
 //! - `EXPLAIN <query>`
 
 use axum::{extract::State, Json};
@@ -27,9 +27,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tracing::{info, instrument};
 
-use verisim_hexad::{HexadId, HexadInput, HexadDocumentInput, HexadStore};
+use verisim_octad::{OctadId, OctadInput, OctadDocumentInput, OctadStore};
 
-use crate::{ApiError, AppState, HexadResponse};
+use crate::{ApiError, AppState, OctadResponse};
 
 /// VQL execute request — wraps a raw VQL query string.
 #[derive(Debug, Deserialize)]
@@ -57,7 +57,7 @@ pub struct VqlExecuteResponse {
 /// Execute a VQL query string against the database.
 ///
 /// Parses the query, determines the operation, executes it against the
-/// hexad store, and returns structured results.
+/// octad store, and returns structured results.
 #[instrument(skip(state, request), fields(query = %request.query))]
 pub async fn vql_execute_handler(
     State(state): State<AppState>,
@@ -167,9 +167,9 @@ fn parse_limit(tokens: &[String]) -> (usize, usize) {
 /// Execute a SELECT query.
 ///
 /// Supported forms:
-/// - `SELECT * FROM hexads` — list all hexads
-/// - `SELECT * FROM hexads WHERE id = '<id>'` — get one hexad
-/// - `SELECT * FROM hexads LIMIT n` — list with limit
+/// - `SELECT * FROM octads` — list all octads
+/// - `SELECT * FROM octads WHERE id = '<id>'` — get one octad
+/// - `SELECT * FROM octads LIMIT n` — list with limit
 async fn execute_select(
     state: &AppState,
     tokens: &[String],
@@ -181,16 +181,16 @@ async fn execute_select(
     let where_id = find_where_id(tokens);
 
     if let Some(id) = where_id {
-        // Single hexad lookup
-        let hexad_id = HexadId::new(id);
-        let hexad = state
-            .hexad_store
-            .get(&hexad_id)
+        // Single octad lookup
+        let octad_id = OctadId::new(id);
+        let octad = state
+            .octad_store
+            .get(&octad_id)
             .await
             .map_err(|e| ApiError::Internal(e.to_string()))?
-            .ok_or_else(|| ApiError::NotFound(format!("Hexad '{}' not found", id)))?;
+            .ok_or_else(|| ApiError::NotFound(format!("Octad '{}' not found", id)))?;
 
-        let response = HexadResponse::from(&hexad);
+        let response = OctadResponse::from(&octad);
         Ok(VqlExecuteResponse {
             success: true,
             statement_type: "SELECT".to_string(),
@@ -200,14 +200,14 @@ async fn execute_select(
             message: None,
         })
     } else {
-        // List hexads
-        let hexads = state
-            .hexad_store
+        // List octads
+        let octads = state
+            .octad_store
             .list(limit, 0)
             .await
             .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-        let responses: Vec<HexadResponse> = hexads.iter().map(HexadResponse::from).collect();
+        let responses: Vec<OctadResponse> = octads.iter().map(OctadResponse::from).collect();
         let count = responses.len();
 
         Ok(VqlExecuteResponse {
@@ -263,13 +263,13 @@ async fn execute_search(
             let query_text = unquote(&tokens[2]);
             let (limit, _) = parse_limit(tokens);
 
-            let hexads = state
-                .hexad_store
+            let octads = state
+                .octad_store
                 .search_text(query_text, limit)
                 .await
                 .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-            let results: Vec<Value> = hexads
+            let results: Vec<Value> = octads
                 .iter()
                 .enumerate()
                 .map(|(i, h)| {
@@ -308,13 +308,13 @@ async fn execute_search(
                 )));
             }
 
-            let hexads = state
-                .hexad_store
+            let octads = state
+                .octad_store
                 .search_similar(&vector, limit)
                 .await
                 .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-            let results: Vec<Value> = hexads
+            let results: Vec<Value> = octads
                 .iter()
                 .enumerate()
                 .map(|(i, h)| {
@@ -342,7 +342,7 @@ async fn execute_search(
                 ));
             }
             let id = unquote(&tokens[2]);
-            let hexad_id = HexadId::new(id);
+            let octad_id = OctadId::new(id);
 
             let predicate = tokens
                 .iter()
@@ -351,13 +351,13 @@ async fn execute_search(
                 .map(|t| unquote(t))
                 .unwrap_or("related");
 
-            let hexads = state
-                .hexad_store
-                .query_related(&hexad_id, predicate)
+            let octads = state
+                .octad_store
+                .query_related(&octad_id, predicate)
                 .await
                 .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-            let responses: Vec<HexadResponse> = hexads.iter().map(HexadResponse::from).collect();
+            let responses: Vec<OctadResponse> = octads.iter().map(OctadResponse::from).collect();
             let count = responses.len();
 
             Ok(VqlExecuteResponse {
@@ -400,7 +400,7 @@ fn parse_vector(s: &str) -> Result<Vec<f32>, ApiError> {
 /// Execute an INSERT statement.
 ///
 /// Supported form:
-/// `INSERT INTO hexads (title, body) VALUES ('<title>', '<body>')`
+/// `INSERT INTO octads (title, body) VALUES ('<title>', '<body>')`
 ///
 /// Also accepts simplified form:
 /// `INSERT '<title>' '<body>'`
@@ -411,14 +411,14 @@ async fn execute_insert(
     let upper = raw.to_uppercase();
 
     let (title, body) = if upper.starts_with("INSERT INTO") {
-        // Parse: INSERT INTO hexads (title, body) VALUES ('...', '...')
+        // Parse: INSERT INTO octads (title, body) VALUES ('...', '...')
         parse_insert_values(raw)?
     } else {
         // Simplified: INSERT '<title>' '<body>'
         let tokens = tokenize(raw);
         if tokens.len() < 3 {
             return Err(ApiError::BadRequest(
-                "INSERT requires: INSERT INTO hexads (title, body) VALUES ('<title>', '<body>')".to_string(),
+                "INSERT requires: INSERT INTO octads (title, body) VALUES ('<title>', '<body>')".to_string(),
             ));
         }
         (
@@ -427,20 +427,20 @@ async fn execute_insert(
         )
     };
 
-    let mut input = HexadInput::default();
-    input.document = Some(HexadDocumentInput {
+    let mut input = OctadInput::default();
+    input.document = Some(OctadDocumentInput {
         title: title.clone(),
         body,
         fields: std::collections::HashMap::new(),
     });
 
-    let hexad = state
-        .hexad_store
+    let octad = state
+        .octad_store
         .create(input)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-    let response = HexadResponse::from(&hexad);
+    let response = OctadResponse::from(&octad);
 
     Ok(VqlExecuteResponse {
         success: true,
@@ -448,7 +448,7 @@ async fn execute_insert(
         row_count: 1,
         data: serde_json::to_value(vec![&response])
             .map_err(|e| ApiError::Serialization(e.to_string()))?,
-        message: Some(format!("Inserted hexad '{}'", response.id)),
+        message: Some(format!("Inserted octad '{}'", response.id)),
     })
 }
 
@@ -486,26 +486,26 @@ fn parse_insert_values(raw: &str) -> Result<(String, String), ApiError> {
 /// Execute a DELETE statement.
 ///
 /// Supported form:
-/// `DELETE FROM hexads WHERE id = '<id>'`
+/// `DELETE FROM octads WHERE id = '<id>'`
 async fn execute_delete(
     state: &AppState,
     tokens: &[String],
 ) -> Result<VqlExecuteResponse, ApiError> {
     let id = find_where_id(tokens).ok_or_else(|| {
         ApiError::BadRequest(
-            "DELETE requires: DELETE FROM hexads WHERE id = '<id>'".to_string(),
+            "DELETE requires: DELETE FROM octads WHERE id = '<id>'".to_string(),
         )
     })?;
 
-    let hexad_id = HexadId::new(id);
+    let octad_id = OctadId::new(id);
 
     state
-        .hexad_store
-        .delete(&hexad_id)
+        .octad_store
+        .delete(&octad_id)
         .await
         .map_err(|e| match e {
-            verisim_hexad::HexadError::NotFound(_) => {
-                ApiError::NotFound(format!("Hexad '{}' not found", id))
+            verisim_octad::OctadError::NotFound(_) => {
+                ApiError::NotFound(format!("Octad '{}' not found", id))
             }
             _ => ApiError::Internal(e.to_string()),
         })?;
@@ -515,7 +515,7 @@ async fn execute_delete(
         statement_type: "DELETE".to_string(),
         row_count: 1,
         data: json!(null),
-        message: Some(format!("Deleted hexad '{}'", id)),
+        message: Some(format!("Deleted octad '{}'", id)),
     })
 }
 
@@ -529,14 +529,14 @@ async fn execute_delete(
 /// - `SHOW STATUS` — server health
 /// - `SHOW DRIFT` — drift metrics
 /// - `SHOW NORMALIZER` — normalizer status
-/// - `SHOW HEXADS [LIMIT n]` — list hexads (alias for SELECT)
+/// - `SHOW OCTADS [LIMIT n]` — list octads (alias for SELECT)
 async fn execute_show(
     state: &AppState,
     tokens: &[String],
 ) -> Result<VqlExecuteResponse, ApiError> {
     if tokens.len() < 2 {
         return Err(ApiError::BadRequest(
-            "SHOW requires: SHOW STATUS | SHOW DRIFT | SHOW NORMALIZER | SHOW HEXADS".to_string(),
+            "SHOW requires: SHOW STATUS | SHOW DRIFT | SHOW NORMALIZER | SHOW OCTADS".to_string(),
         ));
     }
 
@@ -612,20 +612,20 @@ async fn execute_show(
                 message: None,
             })
         }
-        "HEXADS" => {
+        "OCTADS" => {
             let (limit, _) = parse_limit(tokens);
-            let hexads = state
-                .hexad_store
+            let octads = state
+                .octad_store
                 .list(limit, 0)
                 .await
                 .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-            let responses: Vec<HexadResponse> = hexads.iter().map(HexadResponse::from).collect();
+            let responses: Vec<OctadResponse> = octads.iter().map(OctadResponse::from).collect();
             let count = responses.len();
 
             Ok(VqlExecuteResponse {
                 success: true,
-                statement_type: "SHOW HEXADS".to_string(),
+                statement_type: "SHOW OCTADS".to_string(),
                 row_count: count,
                 data: serde_json::to_value(responses)
                     .map_err(|e| ApiError::Serialization(e.to_string()))?,
@@ -633,7 +633,7 @@ async fn execute_show(
             })
         }
         other => Err(ApiError::BadRequest(format!(
-            "Unknown SHOW target: '{}'. Use STATUS, DRIFT, NORMALIZER, or HEXADS.",
+            "Unknown SHOW target: '{}'. Use STATUS, DRIFT, NORMALIZER, or OCTADS.",
             other
         ))),
     }
@@ -646,19 +646,19 @@ async fn execute_show(
 /// Execute a COUNT query.
 ///
 /// Supported form:
-/// - `COUNT hexads` — return total hexad count
+/// - `COUNT octads` — return total octad count
 async fn execute_count(
     state: &AppState,
     _tokens: &[String],
 ) -> Result<VqlExecuteResponse, ApiError> {
     // List with a large limit to count (in a real DB this would be a COUNT query).
-    let hexads = state
-        .hexad_store
+    let octads = state
+        .octad_store
         .list(1000, 0)
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-    let count = hexads.len();
+    let count = octads.len();
 
     Ok(VqlExecuteResponse {
         success: true,
@@ -702,7 +702,7 @@ async fn execute_explain(
             if where_id.is_some() {
                 json!({
                     "operation": "Point Lookup",
-                    "target": "hexad_store",
+                    "target": "octad_store",
                     "method": "get_by_id",
                     "cost": "O(1)",
                     "estimated_rows": 1,
@@ -710,7 +710,7 @@ async fn execute_explain(
             } else {
                 json!({
                     "operation": "Sequential Scan",
-                    "target": "hexad_store",
+                    "target": "octad_store",
                     "method": "list",
                     "limit": limit,
                     "cost": "O(n)",
@@ -780,8 +780,8 @@ mod tests {
 
     #[test]
     fn test_tokenize_simple() {
-        let tokens = tokenize("SELECT * FROM hexads");
-        assert_eq!(tokens, vec!["SELECT", "*", "FROM", "hexads"]);
+        let tokens = tokenize("SELECT * FROM octads");
+        assert_eq!(tokens, vec!["SELECT", "*", "FROM", "octads"]);
     }
 
     #[test]
@@ -799,7 +799,7 @@ mod tests {
 
     #[test]
     fn test_parse_limit() {
-        let tokens: Vec<String> = vec!["SELECT", "*", "FROM", "hexads", "LIMIT", "50"]
+        let tokens: Vec<String> = vec!["SELECT", "*", "FROM", "octads", "LIMIT", "50"]
             .into_iter()
             .map(String::from)
             .collect();
@@ -810,7 +810,7 @@ mod tests {
 
     #[test]
     fn test_parse_limit_default() {
-        let tokens: Vec<String> = vec!["SELECT", "*", "FROM", "hexads"]
+        let tokens: Vec<String> = vec!["SELECT", "*", "FROM", "octads"]
             .into_iter()
             .map(String::from)
             .collect();
@@ -821,7 +821,7 @@ mod tests {
 
     #[test]
     fn test_find_where_id() {
-        let tokens: Vec<String> = vec!["SELECT", "*", "FROM", "hexads", "WHERE", "id", "=", "'abc-123'"]
+        let tokens: Vec<String> = vec!["SELECT", "*", "FROM", "octads", "WHERE", "id", "=", "'abc-123'"]
             .into_iter()
             .map(String::from)
             .collect();

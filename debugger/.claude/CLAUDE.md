@@ -51,7 +51,7 @@ Build the TUI skeleton with these panels:
 ```
 ┌──────────────────────────────────┬──────────────────────────────────┐
 │  Entity Inspector                │  Drift Heatmap                   │
-│  ├── hexad_id                    │  ┌────────────────────────────┐  │
+│  ├── octad_id                    │  ┌────────────────────────────┐  │
 │  ├── graph: [edges]              │  │ ■■■■■■■■ entity-001  0.02  │  │
 │  ├── vector: [dims]              │  │ ■■■■■■■□ entity-002  0.15  │  │
 │  ├── tensor: [shape]             │  │ ■■■□□□□□ entity-003  0.67  │  │
@@ -62,8 +62,8 @@ Build the TUI skeleton with these panels:
 │  └── spatial: [coords]           │                                  │
 ├──────────────────────────────────┼──────────────────────────────────┤
 │  VQL Trace                       │  Proof Verifier                  │
-│  > SELECT * FROM hexads          │  PROOF EXISTENCE(entity-001)     │
-│    1. Parse: 2ms                 │    ✅ hexad_id: found            │
+│  > SELECT * FROM octads          │  PROOF EXISTENCE(entity-001)     │
+│    1. Parse: 2ms                 │    ✅ octad_id: found            │
 │    2. Type-check: 15ms           │    ✅ modality_count: 8          │
 │    3. Route → graph,vector: 8ms  │    ✅ certificate: SHA-256 ok    │
 │    4. Execute graph: 12ms        │                                  │

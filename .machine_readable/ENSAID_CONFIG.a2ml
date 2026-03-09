@@ -1,0 +1,154 @@
+; SPDX-License-Identifier: PMPL-1.0-or-later
+; Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+;
+; ENSAID_CONFIG.a2ml — PanLL configuration for VeriSimDB.
+; VeriSimDB is a formally verified database with Idris2 ABI, Zig FFI,
+; V-lang API gateway, VQL query language, and a registry subsystem.
+; This is a key dogfooding project for the full ABI→FFI→Adapter stack.
+
+; ─────────────────────────────────────────────────────────────────────
+; [ensaid] — eNSAID environment identity
+; ─────────────────────────────────────────────────────────────────────
+[ensaid]
+version = "1.0"
+name = "verisimdb-dev"
+description = "Formally verified database development environment"
+humidity = "dry"
+; Humidity: "dry" = symbolic-heavy. VeriSimDB is a formally verified system —
+; proofs and type checking dominate. Neural assists with query optimisation
+; and test generation, but never overrides the formal guarantees.
+
+; ─────────────────────────────────────────────────────────────────────
+; [workspace] — file watching, language detection, build integration
+; ─────────────────────────────────────────────────────────────────────
+[workspace]
+root = "."
+watch_extensions = [".idr", ".zig", ".v", ".vql", ".gleam", ".toml"]
+; .idr = ABI definitions, .zig = FFI bridge, .v = API gateway,
+; .vql = VeriSimDB Query Language, .gleam = REPL/tooling
+ignore_patterns = ["build/", ".git/", "zig-cache/", "zig-out/", "_build/"]
+editor = "vscodium"
+build_command = "just build"
+test_command = "just test"
+language_id = "idris2"
+; Primary specification language. Implementation spans Zig + V + Gleam.
+
+; ─────────────────────────────────────────────────────────────────────
+; [preferences] — developer preferences and UI settings
+; ─────────────────────────────────────────────────────────────────────
+[preferences]
+theme = "dark"
+font_size = 14
+show_line_numbers = true
+auto_save = true
+auto_format_on_save = true
+tab_size = 2
+panel_layout = "three-column"
+
+; ─────────────────────────────────────────────────────────────────────
+; [panels] — which PanLL panels are enabled for this project
+; ─────────────────────────────────────────────────────────────────────
+[panels]
+enabled = [
+  "valence-shell",       ; Terminal + command execution
+  "editor-bridge",       ; Editor integration
+  "build-dashboard",     ; Multi-language build status (Idris2 + Zig + V)
+  "boj",                 ; BoJ dashboard — VeriSimDB is a BoJ consumer
+  "database",            ; Database inspection — dogfooding VeriSimDB itself
+  "vm-inspector",        ; Query engine / VQL inspection
+  "security",            ; Security scanning (Hypatia)
+  "reposystem",          ; Repository management
+  "panic-attack",        ; Error analysis
+  "tsdm",                ; Type System Design Mode — ABI type exploration
+  "migration",           ; Schema migration tracking
+]
+
+disabled = [
+  "network",             ; Network handled by V-lang adapter
+  "container",           ; Container builds handled externally
+  "fleet",               ; Single-repo work
+]
+
+; ─────────────────────────────────────────────────────────────────────
+; [workflows] — project-specific workflow definitions
+; ─────────────────────────────────────────────────────────────────────
+[workflows]
+
+[workflows.zig-on-abi-change]
+trigger = "file_save"
+match = "src/abi/*.idr"
+action = "run_command"
+command = "cd ffi/zig && zig build test"
+description = "Rebuild and test Zig FFI when Idris2 ABI definitions change"
+
+[workflows.adapter-on-ffi-change]
+trigger = "file_save"
+match = "ffi/zig/src/*.zig"
+action = "run_command"
+command = "cd v-api-gateway && v build ."
+description = "Rebuild V-lang API gateway when Zig FFI changes"
+
+[workflows.vql-test-on-save]
+trigger = "file_save"
+match = "src/vql/*.idr"
+action = "run_command"
+command = "idris2 --check src/vql/Parser.idr"
+description = "Verify VQL parser when query language definitions change"
+
+[workflows.registry-test]
+trigger = "file_save"
+match = "src/registry/*.idr"
+action = "run_command"
+command = "idris2 --check src/registry/Registry.idr"
+description = "Verify registry types when registry definitions change"
+
+[workflows.debugger-rebuild]
+trigger = "file_save"
+match = "debugger/src/**"
+action = "run_command"
+command = "cd debugger && just build"
+description = "Rebuild debugger when debugger source changes"
+
+; ─────────────────────────────────────────────────────────────────────
+; [clades] — panel clade taxonomy for this project
+; ─────────────────────────────────────────────────────────────────────
+[clades]
+active = ["builder", "database", "terminal", "scanner", "viewer", "bridge"]
+; Database development uses builder (multi-lang compilation), database
+; (dogfooding VeriSimDB), terminal (VQL REPL), scanner (security),
+; viewer (query plans), bridge (editor integration).
+
+; ─────────────────────────────────────────────────────────────────────
+; [portfolios] — named panel/workflow presets
+; ─────────────────────────────────────────────────────────────────────
+[portfolios]
+
+[portfolios.abi-focus]
+description = "Formal ABI development — Idris2 type definitions"
+panels = ["editor-bridge", "tsdm", "build-dashboard"]
+layout = "three-column"
+focus = "tsdm"
+
+[portfolios.ffi-testing]
+description = "FFI bridge testing — Zig implementation"
+panels = ["valence-shell", "build-dashboard", "panic-attack"]
+layout = "three-column"
+focus = "build-dashboard"
+
+[portfolios.query-dev]
+description = "VQL query language development"
+panels = ["editor-bridge", "vm-inspector", "database"]
+layout = "three-column"
+focus = "vm-inspector"
+
+[portfolios.full-stack]
+description = "Full VeriSimDB development view"
+panels = ["valence-shell", "editor-bridge", "build-dashboard", "boj", "database", "tsdm"]
+layout = "three-column"
+focus = "build-dashboard"
+
+[portfolios.integration]
+description = "End-to-end integration testing"
+panels = ["valence-shell", "database", "panic-attack", "security"]
+layout = "two-column"
+focus = "valence-shell"

@@ -280,10 +280,10 @@ WHERE VERSION v3-final
 [source,elixir]
 ----
 # Create checkpoint before risky operation
-checkpoint = VeriSim.Reversibility.create_checkpoint(hexad_id)
+checkpoint = VeriSim.Reversibility.create_checkpoint(octad_id)
 
 # Try operation
-case apply_operation(hexad_id) do
+case apply_operation(octad_id) do
   {:ok, result} ->
     # Success → commit
     VeriSim.Reversibility.commit_checkpoint(checkpoint)
@@ -320,10 +320,10 @@ end
 [source,elixir]
 ----
 defmodule VeriSim.DriftMonitor do
-  def repair_with_validation(hexad_id, policy) do
-    checkpoint = Reversibility.create_checkpoint(hexad_id)
+  def repair_with_validation(octad_id, policy) do
+    checkpoint = Reversibility.create_checkpoint(octad_id)
 
-    case apply_repair(hexad_id, policy) do
+    case apply_repair(octad_id, policy) do
       {:ok, new_state} ->
         if validate_consistency(new_state) do
           Reversibility.commit_checkpoint(checkpoint)

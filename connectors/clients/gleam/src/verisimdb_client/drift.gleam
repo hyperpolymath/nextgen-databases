@@ -4,7 +4,7 @@
 ////
 //// VeriSimDB Gleam Client — Drift detection operations.
 ////
-//// Drift measures how much a hexad's embeddings, relationships, or content
+//// Drift measures how much a octad's embeddings, relationships, or content
 //// have diverged from a baseline state (0.0 = no drift, 1.0 = maximum drift).
 //// This module provides functions to query drift scores, check classified
 //// status, and trigger re-normalisation.
@@ -13,21 +13,21 @@ import verisimdb_client.{type Client}
 import verisimdb_client/error.{type VeriSimError}
 import verisimdb_client/types.{type DriftScore, type DriftStatusReport}
 
-/// Retrieve the current drift score for a specific hexad.
+/// Retrieve the current drift score for a specific octad.
 ///
 /// The drift score is a floating-point value between 0.0 (no drift — fully
 /// aligned with baseline) and 1.0 (maximum drift — completely diverged).
 ///
 /// Parameters:
 ///   client — The authenticated client.
-///   hexad_id — The unique identifier of the hexad.
+///   octad_id — The unique identifier of the octad.
 ///
 /// Returns a DriftScore with component breakdown, or an error.
 pub fn get_score(
   client: Client,
-  hexad_id: String,
+  octad_id: String,
 ) -> Result(DriftScore, VeriSimError) {
-  let path = "/api/v1/hexads/" <> hexad_id <> "/drift"
+  let path = "/api/v1/octads/" <> octad_id <> "/drift"
   case verisimdb_client.do_get(client, path) {
     Ok(resp) ->
       case resp.status {
@@ -38,21 +38,21 @@ pub fn get_score(
   }
 }
 
-/// Retrieve a classified drift status report for a hexad.
+/// Retrieve a classified drift status report for a octad.
 ///
 /// The report includes the drift level (Stable, Low, Moderate, High, Critical),
 /// the underlying score, and a human-readable explanation.
 ///
 /// Parameters:
 ///   client — The authenticated client.
-///   hexad_id — The unique identifier of the hexad.
+///   octad_id — The unique identifier of the octad.
 ///
 /// Returns a DriftStatusReport, or an error.
 pub fn status(
   client: Client,
-  hexad_id: String,
+  octad_id: String,
 ) -> Result(DriftStatusReport, VeriSimError) {
-  let path = "/api/v1/hexads/" <> hexad_id <> "/drift/status"
+  let path = "/api/v1/octads/" <> octad_id <> "/drift/status"
   case verisimdb_client.do_get(client, path) {
     Ok(resp) ->
       case resp.status {
@@ -63,21 +63,21 @@ pub fn status(
   }
 }
 
-/// Trigger re-normalisation of a drifted hexad.
+/// Trigger re-normalisation of a drifted octad.
 ///
-/// Normalisation recomputes the hexad's embeddings and relationship weights
+/// Normalisation recomputes the octad's embeddings and relationship weights
 /// against the current baseline, effectively resetting the drift score.
 ///
 /// Parameters:
 ///   client — The authenticated client.
-///   hexad_id — The unique identifier of the hexad.
+///   octad_id — The unique identifier of the octad.
 ///
 /// Returns the updated DriftScore after normalisation, or an error.
 pub fn normalize(
   client: Client,
-  hexad_id: String,
+  octad_id: String,
 ) -> Result(DriftScore, VeriSimError) {
-  let path = "/api/v1/hexads/" <> hexad_id <> "/drift/normalize"
+  let path = "/api/v1/octads/" <> octad_id <> "/drift/normalize"
   case verisimdb_client.do_post(client, path, "{}") {
     Ok(resp) ->
       case resp.status {

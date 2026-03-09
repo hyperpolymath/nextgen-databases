@@ -113,7 +113,7 @@ pub struct StatsResponse {
     pub stores: ::prost::alloc::vec::Vec<StoreStatsMsg>,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct HexadCreateRequest {
+pub struct OctadCreateRequest {
     #[prost(string, tag = "1")]
     pub title: ::prost::alloc::string::String,
     #[prost(string, tag = "2")]
@@ -124,12 +124,12 @@ pub struct HexadCreateRequest {
     pub types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 #[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
-pub struct HexadIdRequest {
+pub struct OctadIdRequest {
     #[prost(string, tag = "1")]
     pub id: ::prost::alloc::string::String,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct HexadUpdateRequest {
+pub struct OctadUpdateRequest {
     #[prost(string, tag = "1")]
     pub id: ::prost::alloc::string::String,
     #[prost(string, tag = "2")]
@@ -142,7 +142,7 @@ pub struct HexadUpdateRequest {
     pub types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 #[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
-pub struct HexadResponse {
+pub struct OctadResponse {
     #[prost(string, tag = "1")]
     pub id: ::prost::alloc::string::String,
     #[prost(string, tag = "2")]
@@ -793,7 +793,7 @@ pub mod veri_sim_planner_server {
     }
 }
 /// Generated client implementations.
-pub mod veri_sim_hexad_client {
+pub mod veri_sim_octad_client {
     #![allow(
         unused_variables,
         dead_code,
@@ -804,10 +804,10 @@ pub mod veri_sim_hexad_client {
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
-    pub struct VeriSimHexadClient<T> {
+    pub struct VeriSimOctadClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl VeriSimHexadClient<tonic::transport::Channel> {
+    impl VeriSimOctadClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -818,7 +818,7 @@ pub mod veri_sim_hexad_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> VeriSimHexadClient<T>
+    impl<T> VeriSimOctadClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::Body>,
         T::Error: Into<StdError>,
@@ -836,7 +836,7 @@ pub mod veri_sim_hexad_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> VeriSimHexadClient<InterceptedService<T, F>>
+        ) -> VeriSimOctadClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -850,7 +850,7 @@ pub mod veri_sim_hexad_client {
                 http::Request<tonic::body::Body>,
             >>::Error: Into<StdError> + std::marker::Send + std::marker::Sync,
         {
-            VeriSimHexadClient::new(InterceptedService::new(inner, interceptor))
+            VeriSimOctadClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -883,11 +883,11 @@ pub mod veri_sim_hexad_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        /// Create a new hexad.
+        /// Create a new octad.
         pub async fn create(
             &mut self,
-            request: impl tonic::IntoRequest<super::HexadCreateRequest>,
-        ) -> std::result::Result<tonic::Response<super::HexadResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::OctadCreateRequest>,
+        ) -> std::result::Result<tonic::Response<super::OctadResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -898,18 +898,18 @@ pub mod veri_sim_hexad_client {
                 })?;
             let codec = tonic_prost::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/verisim.VeriSimHexad/Create",
+                "/verisim.VeriSimOctad/Create",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("verisim.VeriSimHexad", "Create"));
+                .insert(GrpcMethod::new("verisim.VeriSimOctad", "Create"));
             self.inner.unary(req, path, codec).await
         }
-        /// Get a hexad by ID.
+        /// Get a octad by ID.
         pub async fn get(
             &mut self,
-            request: impl tonic::IntoRequest<super::HexadIdRequest>,
-        ) -> std::result::Result<tonic::Response<super::HexadResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::OctadIdRequest>,
+        ) -> std::result::Result<tonic::Response<super::OctadResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -919,16 +919,16 @@ pub mod veri_sim_hexad_client {
                     )
                 })?;
             let codec = tonic_prost::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static("/verisim.VeriSimHexad/Get");
+            let path = http::uri::PathAndQuery::from_static("/verisim.VeriSimOctad/Get");
             let mut req = request.into_request();
-            req.extensions_mut().insert(GrpcMethod::new("verisim.VeriSimHexad", "Get"));
+            req.extensions_mut().insert(GrpcMethod::new("verisim.VeriSimOctad", "Get"));
             self.inner.unary(req, path, codec).await
         }
-        /// Update an existing hexad.
+        /// Update an existing octad.
         pub async fn update(
             &mut self,
-            request: impl tonic::IntoRequest<super::HexadUpdateRequest>,
-        ) -> std::result::Result<tonic::Response<super::HexadResponse>, tonic::Status> {
+            request: impl tonic::IntoRequest<super::OctadUpdateRequest>,
+        ) -> std::result::Result<tonic::Response<super::OctadResponse>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -939,17 +939,17 @@ pub mod veri_sim_hexad_client {
                 })?;
             let codec = tonic_prost::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/verisim.VeriSimHexad/Update",
+                "/verisim.VeriSimOctad/Update",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("verisim.VeriSimHexad", "Update"));
+                .insert(GrpcMethod::new("verisim.VeriSimOctad", "Update"));
             self.inner.unary(req, path, codec).await
         }
-        /// Delete a hexad.
+        /// Delete a octad.
         pub async fn delete(
             &mut self,
-            request: impl tonic::IntoRequest<super::HexadIdRequest>,
+            request: impl tonic::IntoRequest<super::OctadIdRequest>,
         ) -> std::result::Result<tonic::Response<super::Empty>, tonic::Status> {
             self.inner
                 .ready()
@@ -961,11 +961,11 @@ pub mod veri_sim_hexad_client {
                 })?;
             let codec = tonic_prost::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/verisim.VeriSimHexad/Delete",
+                "/verisim.VeriSimOctad/Delete",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("verisim.VeriSimHexad", "Delete"));
+                .insert(GrpcMethod::new("verisim.VeriSimOctad", "Delete"));
             self.inner.unary(req, path, codec).await
         }
         /// Full-text search.
@@ -983,11 +983,11 @@ pub mod veri_sim_hexad_client {
                 })?;
             let codec = tonic_prost::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/verisim.VeriSimHexad/SearchText",
+                "/verisim.VeriSimOctad/SearchText",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("verisim.VeriSimHexad", "SearchText"));
+                .insert(GrpcMethod::new("verisim.VeriSimOctad", "SearchText"));
             self.inner.unary(req, path, codec).await
         }
         /// Vector similarity search.
@@ -1005,17 +1005,17 @@ pub mod veri_sim_hexad_client {
                 })?;
             let codec = tonic_prost::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/verisim.VeriSimHexad/SearchVector",
+                "/verisim.VeriSimOctad/SearchVector",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("verisim.VeriSimHexad", "SearchVector"));
+                .insert(GrpcMethod::new("verisim.VeriSimOctad", "SearchVector"));
             self.inner.unary(req, path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod veri_sim_hexad_server {
+pub mod veri_sim_octad_server {
     #![allow(
         unused_variables,
         dead_code,
@@ -1024,28 +1024,28 @@ pub mod veri_sim_hexad_server {
         clippy::let_unit_value,
     )]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with VeriSimHexadServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with VeriSimOctadServer.
     #[async_trait]
-    pub trait VeriSimHexad: std::marker::Send + std::marker::Sync + 'static {
-        /// Create a new hexad.
+    pub trait VeriSimOctad: std::marker::Send + std::marker::Sync + 'static {
+        /// Create a new octad.
         async fn create(
             &self,
-            request: tonic::Request<super::HexadCreateRequest>,
-        ) -> std::result::Result<tonic::Response<super::HexadResponse>, tonic::Status>;
-        /// Get a hexad by ID.
+            request: tonic::Request<super::OctadCreateRequest>,
+        ) -> std::result::Result<tonic::Response<super::OctadResponse>, tonic::Status>;
+        /// Get a octad by ID.
         async fn get(
             &self,
-            request: tonic::Request<super::HexadIdRequest>,
-        ) -> std::result::Result<tonic::Response<super::HexadResponse>, tonic::Status>;
-        /// Update an existing hexad.
+            request: tonic::Request<super::OctadIdRequest>,
+        ) -> std::result::Result<tonic::Response<super::OctadResponse>, tonic::Status>;
+        /// Update an existing octad.
         async fn update(
             &self,
-            request: tonic::Request<super::HexadUpdateRequest>,
-        ) -> std::result::Result<tonic::Response<super::HexadResponse>, tonic::Status>;
-        /// Delete a hexad.
+            request: tonic::Request<super::OctadUpdateRequest>,
+        ) -> std::result::Result<tonic::Response<super::OctadResponse>, tonic::Status>;
+        /// Delete a octad.
         async fn delete(
             &self,
-            request: tonic::Request<super::HexadIdRequest>,
+            request: tonic::Request<super::OctadIdRequest>,
         ) -> std::result::Result<tonic::Response<super::Empty>, tonic::Status>;
         /// Full-text search.
         async fn search_text(
@@ -1059,14 +1059,14 @@ pub mod veri_sim_hexad_server {
         ) -> std::result::Result<tonic::Response<super::SearchResponse>, tonic::Status>;
     }
     #[derive(Debug)]
-    pub struct VeriSimHexadServer<T> {
+    pub struct VeriSimOctadServer<T> {
         inner: Arc<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
         max_decoding_message_size: Option<usize>,
         max_encoding_message_size: Option<usize>,
     }
-    impl<T> VeriSimHexadServer<T> {
+    impl<T> VeriSimOctadServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -1117,9 +1117,9 @@ pub mod veri_sim_hexad_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for VeriSimHexadServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for VeriSimOctadServer<T>
     where
-        T: VeriSimHexad,
+        T: VeriSimOctad,
         B: Body + std::marker::Send + 'static,
         B::Error: Into<StdError> + std::marker::Send + 'static,
     {
@@ -1134,25 +1134,25 @@ pub mod veri_sim_hexad_server {
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             match req.uri().path() {
-                "/verisim.VeriSimHexad/Create" => {
+                "/verisim.VeriSimOctad/Create" => {
                     #[allow(non_camel_case_types)]
-                    struct CreateSvc<T: VeriSimHexad>(pub Arc<T>);
+                    struct CreateSvc<T: VeriSimOctad>(pub Arc<T>);
                     impl<
-                        T: VeriSimHexad,
-                    > tonic::server::UnaryService<super::HexadCreateRequest>
+                        T: VeriSimOctad,
+                    > tonic::server::UnaryService<super::OctadCreateRequest>
                     for CreateSvc<T> {
-                        type Response = super::HexadResponse;
+                        type Response = super::OctadResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::HexadCreateRequest>,
+                            request: tonic::Request<super::OctadCreateRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as VeriSimHexad>::create(&inner, request).await
+                                <T as VeriSimOctad>::create(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -1179,24 +1179,24 @@ pub mod veri_sim_hexad_server {
                     };
                     Box::pin(fut)
                 }
-                "/verisim.VeriSimHexad/Get" => {
+                "/verisim.VeriSimOctad/Get" => {
                     #[allow(non_camel_case_types)]
-                    struct GetSvc<T: VeriSimHexad>(pub Arc<T>);
+                    struct GetSvc<T: VeriSimOctad>(pub Arc<T>);
                     impl<
-                        T: VeriSimHexad,
-                    > tonic::server::UnaryService<super::HexadIdRequest> for GetSvc<T> {
-                        type Response = super::HexadResponse;
+                        T: VeriSimOctad,
+                    > tonic::server::UnaryService<super::OctadIdRequest> for GetSvc<T> {
+                        type Response = super::OctadResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::HexadIdRequest>,
+                            request: tonic::Request<super::OctadIdRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as VeriSimHexad>::get(&inner, request).await
+                                <T as VeriSimOctad>::get(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -1223,25 +1223,25 @@ pub mod veri_sim_hexad_server {
                     };
                     Box::pin(fut)
                 }
-                "/verisim.VeriSimHexad/Update" => {
+                "/verisim.VeriSimOctad/Update" => {
                     #[allow(non_camel_case_types)]
-                    struct UpdateSvc<T: VeriSimHexad>(pub Arc<T>);
+                    struct UpdateSvc<T: VeriSimOctad>(pub Arc<T>);
                     impl<
-                        T: VeriSimHexad,
-                    > tonic::server::UnaryService<super::HexadUpdateRequest>
+                        T: VeriSimOctad,
+                    > tonic::server::UnaryService<super::OctadUpdateRequest>
                     for UpdateSvc<T> {
-                        type Response = super::HexadResponse;
+                        type Response = super::OctadResponse;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::HexadUpdateRequest>,
+                            request: tonic::Request<super::OctadUpdateRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as VeriSimHexad>::update(&inner, request).await
+                                <T as VeriSimOctad>::update(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -1268,12 +1268,12 @@ pub mod veri_sim_hexad_server {
                     };
                     Box::pin(fut)
                 }
-                "/verisim.VeriSimHexad/Delete" => {
+                "/verisim.VeriSimOctad/Delete" => {
                     #[allow(non_camel_case_types)]
-                    struct DeleteSvc<T: VeriSimHexad>(pub Arc<T>);
+                    struct DeleteSvc<T: VeriSimOctad>(pub Arc<T>);
                     impl<
-                        T: VeriSimHexad,
-                    > tonic::server::UnaryService<super::HexadIdRequest>
+                        T: VeriSimOctad,
+                    > tonic::server::UnaryService<super::OctadIdRequest>
                     for DeleteSvc<T> {
                         type Response = super::Empty;
                         type Future = BoxFuture<
@@ -1282,11 +1282,11 @@ pub mod veri_sim_hexad_server {
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::HexadIdRequest>,
+                            request: tonic::Request<super::OctadIdRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as VeriSimHexad>::delete(&inner, request).await
+                                <T as VeriSimOctad>::delete(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -1313,11 +1313,11 @@ pub mod veri_sim_hexad_server {
                     };
                     Box::pin(fut)
                 }
-                "/verisim.VeriSimHexad/SearchText" => {
+                "/verisim.VeriSimOctad/SearchText" => {
                     #[allow(non_camel_case_types)]
-                    struct SearchTextSvc<T: VeriSimHexad>(pub Arc<T>);
+                    struct SearchTextSvc<T: VeriSimOctad>(pub Arc<T>);
                     impl<
-                        T: VeriSimHexad,
+                        T: VeriSimOctad,
                     > tonic::server::UnaryService<super::TextSearchRequest>
                     for SearchTextSvc<T> {
                         type Response = super::SearchResponse;
@@ -1331,7 +1331,7 @@ pub mod veri_sim_hexad_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as VeriSimHexad>::search_text(&inner, request).await
+                                <T as VeriSimOctad>::search_text(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -1358,11 +1358,11 @@ pub mod veri_sim_hexad_server {
                     };
                     Box::pin(fut)
                 }
-                "/verisim.VeriSimHexad/SearchVector" => {
+                "/verisim.VeriSimOctad/SearchVector" => {
                     #[allow(non_camel_case_types)]
-                    struct SearchVectorSvc<T: VeriSimHexad>(pub Arc<T>);
+                    struct SearchVectorSvc<T: VeriSimOctad>(pub Arc<T>);
                     impl<
-                        T: VeriSimHexad,
+                        T: VeriSimOctad,
                     > tonic::server::UnaryService<super::VectorSearchRequest>
                     for SearchVectorSvc<T> {
                         type Response = super::SearchResponse;
@@ -1376,7 +1376,7 @@ pub mod veri_sim_hexad_server {
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as VeriSimHexad>::search_vector(&inner, request).await
+                                <T as VeriSimOctad>::search_vector(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -1425,7 +1425,7 @@ pub mod veri_sim_hexad_server {
             }
         }
     }
-    impl<T> Clone for VeriSimHexadServer<T> {
+    impl<T> Clone for VeriSimOctadServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -1438,8 +1438,8 @@ pub mod veri_sim_hexad_server {
         }
     }
     /// Generated gRPC service name
-    pub const SERVICE_NAME: &str = "verisim.VeriSimHexad";
-    impl<T> tonic::server::NamedService for VeriSimHexadServer<T> {
+    pub const SERVICE_NAME: &str = "verisim.VeriSimOctad";
+    impl<T> tonic::server::NamedService for VeriSimOctadServer<T> {
         const NAME: &'static str = SERVICE_NAME;
     }
 }

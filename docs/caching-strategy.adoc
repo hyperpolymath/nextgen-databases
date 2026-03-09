@@ -41,7 +41,7 @@ VeriSimDB implements a **multi-layer, drift-aware caching system** that dramatic
 |On registry update
 
 |**Temporal Versions**
-|Historical hexad states
+|Historical octad states
 |Infinite
 |Never (immutable)
 
@@ -152,11 +152,11 @@ Different modalities have different caching needs:
 
 [source,elixir]
 ----
-# 1. Drift detected for specific hexad
+# 1. Drift detected for specific octad
 defmodule VeriSim.DriftMonitor do
-  def handle_drift_detected(hexad_id, _details) do
-    # Invalidate all cached queries for this hexad
-    VeriSim.QueryRouter.Cached.invalidate_on_drift(hexad_id)
+  def handle_drift_detected(octad_id, _details) do
+    # Invalidate all cached queries for this octad
+    VeriSim.QueryRouter.Cached.invalidate_on_drift(octad_id)
   end
 end
 
@@ -180,14 +180,14 @@ Every cache entry has tags for fine-grained invalidation:
 # Cache entry with tags
 QueryCache.put(key, result,
   tags: [
-    "hexad:abc-123",
+    "octad:abc-123",
     "modality:GRAPH",
     "federation:/universities/*"
   ]
 )
 
-# Invalidate all queries for hexad
-QueryCache.invalidate_by_tag("hexad:abc-123")
+# Invalidate all queries for octad
+QueryCache.invalidate_by_tag("octad:abc-123")
 
 # Invalidate all graph queries
 QueryCache.invalidate_by_tag("modality:GRAPH")
@@ -445,7 +445,7 @@ ZKP generation: 300-1000ms
 [info] Cache hit (l1): 1.2ms for query:result:abc123def
 [info] Cache miss: 0.8ms for query:plan:balanced:xyz789
 [info] Evicted 1000 LRU cache entries (memory limit reached)
-[info] Invalidated 234 cache entries with tag: hexad:abc-123
+[info] Invalidated 234 cache entries with tag: octad:abc-123
 [info] Cache warming complete: 50 queries pre-loaded
 ----
 

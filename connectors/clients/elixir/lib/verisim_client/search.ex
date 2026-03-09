@@ -3,7 +3,7 @@
 
 defmodule VeriSimClient.Search do
   @moduledoc """
-  Search operations across VeriSimDB's multi-modal hexad entities.
+  Search operations across VeriSimDB's multi-modal octad entities.
 
   Supports full-text search, vector similarity (k-NN), graph-relational
   traversal, and geospatial queries (radius, bounding box, nearest-neighbour).
@@ -28,7 +28,7 @@ defmodule VeriSimClient.Search do
   alias VeriSimClient.Types
 
   @doc """
-  Full-text search across hexad names, descriptions, and document content.
+  Full-text search across octad names, descriptions, and document content.
 
   ## Parameters
 
@@ -37,7 +37,7 @@ defmodule VeriSimClient.Search do
     * `opts`   — Keyword list with optional `:limit` (default 20).
   """
   @spec text(VeriSimClient.t(), String.t(), keyword()) ::
-          {:ok, [Types.hexad()]} | {:error, term()}
+          {:ok, [Types.octad()]} | {:error, term()}
   def text(%VeriSimClient{} = client, query, opts \\ []) when is_binary(query) do
     limit = Keyword.get(opts, :limit, 20)
     encoded_query = URI.encode_www_form(query)
@@ -47,7 +47,7 @@ defmodule VeriSimClient.Search do
   @doc """
   Vector similarity search (k-nearest neighbours).
 
-  Finds the `k` hexads whose stored vector embeddings are closest to the
+  Finds the `k` octads whose stored vector embeddings are closest to the
   provided vector (cosine similarity by default).
 
   ## Parameters
@@ -57,7 +57,7 @@ defmodule VeriSimClient.Search do
     * `opts`   — Keyword list with optional `:k` (default 10).
   """
   @spec vector(VeriSimClient.t(), [float()], keyword()) ::
-          {:ok, [Types.hexad()]} | {:error, term()}
+          {:ok, [Types.octad()]} | {:error, term()}
   def vector(%VeriSimClient{} = client, vector, opts \\ []) when is_list(vector) do
     k = Keyword.get(opts, :k, 10)
     body = %{vector: vector, k: k}
@@ -65,24 +65,24 @@ defmodule VeriSimClient.Search do
   end
 
   @doc """
-  Find hexads related to the given entity via graph edges.
+  Find octads related to the given entity via graph edges.
 
   Traverses one hop of the graph modality and returns all directly connected
-  hexads.
+  octads.
 
   ## Parameters
 
     * `client` — A `VeriSimClient.t()` connection.
-    * `id`     — The hexad identifier to find relations for.
+    * `id`     — The octad identifier to find relations for.
   """
   @spec related(VeriSimClient.t(), String.t()) ::
-          {:ok, [Types.hexad()]} | {:error, term()}
+          {:ok, [Types.octad()]} | {:error, term()}
   def related(%VeriSimClient{} = client, id) when is_binary(id) do
     VeriSimClient.do_get(client, "/api/v1/search/related/#{id}")
   end
 
   @doc """
-  Spatial search: find hexads within a given radius of a point.
+  Spatial search: find octads within a given radius of a point.
 
   ## Parameters
 
@@ -93,7 +93,7 @@ defmodule VeriSimClient.Search do
     * `opts`      — Keyword list with optional `:limit` (default 20).
   """
   @spec spatial_radius(VeriSimClient.t(), float(), float(), float(), keyword()) ::
-          {:ok, [Types.hexad()]} | {:error, term()}
+          {:ok, [Types.octad()]} | {:error, term()}
   def spatial_radius(%VeriSimClient{} = client, lat, lon, radius_km, opts \\ [])
       when is_number(lat) and is_number(lon) and is_number(radius_km) do
     limit = Keyword.get(opts, :limit, 20)
@@ -109,7 +109,7 @@ defmodule VeriSimClient.Search do
   end
 
   @doc """
-  Spatial search: find hexads within a rectangular bounding box.
+  Spatial search: find octads within a rectangular bounding box.
 
   ## Parameters
 
@@ -121,7 +121,7 @@ defmodule VeriSimClient.Search do
     * `opts`    — Keyword list with optional `:limit` (default 20).
   """
   @spec spatial_bounds(VeriSimClient.t(), float(), float(), float(), float(), keyword()) ::
-          {:ok, [Types.hexad()]} | {:error, term()}
+          {:ok, [Types.octad()]} | {:error, term()}
   def spatial_bounds(%VeriSimClient{} = client, min_lat, min_lon, max_lat, max_lon, opts \\ [])
       when is_number(min_lat) and is_number(min_lon) and
              is_number(max_lat) and is_number(max_lon) do
@@ -139,7 +139,7 @@ defmodule VeriSimClient.Search do
   end
 
   @doc """
-  Spatial search: find the `k` nearest hexads to a given point.
+  Spatial search: find the `k` nearest octads to a given point.
 
   ## Parameters
 
@@ -149,7 +149,7 @@ defmodule VeriSimClient.Search do
     * `opts`   — Keyword list with optional `:k` (default 10).
   """
   @spec nearest(VeriSimClient.t(), float(), float(), keyword()) ::
-          {:ok, [Types.hexad()]} | {:error, term()}
+          {:ok, [Types.octad()]} | {:error, term()}
   def nearest(%VeriSimClient{} = client, lat, lon, opts \\ [])
       when is_number(lat) and is_number(lon) do
     k = Keyword.get(opts, :k, 10)

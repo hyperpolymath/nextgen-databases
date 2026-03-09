@@ -5,7 +5,7 @@ defmodule VeriSimClient.Provenance do
   @moduledoc """
   Provenance chain operations for VeriSimDB.
 
-  Every hexad entity in VeriSimDB maintains an append-only provenance chain
+  Every octad entity in VeriSimDB maintains an append-only provenance chain
   recording creation, transformation, derivation, and access events. This
   module provides methods to read, append to, and cryptographically verify
   provenance chains.
@@ -29,14 +29,14 @@ defmodule VeriSimClient.Provenance do
   alias VeriSimClient.Types
 
   @doc """
-  Retrieve the full provenance chain for a hexad entity.
+  Retrieve the full provenance chain for a octad entity.
 
   Events are returned in chronological order (oldest first).
 
   ## Parameters
 
     * `client` — A `VeriSimClient.t()` connection.
-    * `id`     — The hexad entity identifier.
+    * `id`     — The octad entity identifier.
   """
   @spec chain(VeriSimClient.t(), String.t()) ::
           {:ok, [Types.provenance_event()]} | {:error, term()}
@@ -45,7 +45,7 @@ defmodule VeriSimClient.Provenance do
   end
 
   @doc """
-  Append a new event to a hexad's provenance chain.
+  Append a new event to a octad's provenance chain.
 
   The event is immutably recorded; its timestamp and identifier are assigned
   by the server. The returned map contains the server-assigned fields.
@@ -53,7 +53,7 @@ defmodule VeriSimClient.Provenance do
   ## Parameters
 
     * `client` — A `VeriSimClient.t()` connection.
-    * `id`     — The hexad entity identifier.
+    * `id`     — The octad entity identifier.
     * `event`  — A `provenance_event()` map describing what happened.
   """
   @spec record(VeriSimClient.t(), String.t(), Types.provenance_event()) ::
@@ -64,7 +64,7 @@ defmodule VeriSimClient.Provenance do
   end
 
   @doc """
-  Verify the integrity of a hexad's provenance chain.
+  Verify the integrity of a octad's provenance chain.
 
   The server checks that the chain is contiguous, that no events have been
   tampered with, and that cryptographic hashes (if enabled) are consistent.
@@ -75,7 +75,7 @@ defmodule VeriSimClient.Provenance do
   ## Parameters
 
     * `client` — A `VeriSimClient.t()` connection.
-    * `id`     — The hexad entity identifier.
+    * `id`     — The octad entity identifier.
   """
   @spec verify(VeriSimClient.t(), String.t()) :: {:ok, map()} | {:error, term()}
   def verify(%VeriSimClient{} = client, id) when is_binary(id) do

@@ -25,7 +25,7 @@ defmodule VeriSim.Federation.Adapters.Elasticsearch do
   ## Configuration
 
       %{
-        index: "hexads",              # Default index name
+        index: "octads",              # Default index name
         auth: {:basic, "elastic", "password"},
         version: 8                     # ES major version (7 or 8)
       }
@@ -134,7 +134,7 @@ defmodule VeriSim.Federation.Adapters.Elasticsearch do
 
       %{
         source_store: peer_info.store_id,
-        hexad_id: id,
+        octad_id: id,
         score: if(is_number(score), do: score, else: 0.0),
         drifted: false,
         data: source,
@@ -279,7 +279,7 @@ defmodule VeriSim.Federation.Adapters.Elasticsearch do
 
   defp execute_search(peer_info, dsl, timeout) do
     config = peer_info.adapter_config
-    index = Map.get(config, :index, "hexads")
+    index = Map.get(config, :index, "octads")
     url = "#{peer_info.endpoint}/#{index}/_search"
     headers = auth_headers(config) ++ [{"Content-Type", "application/json"}]
 

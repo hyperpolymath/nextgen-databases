@@ -90,7 +90,7 @@ pub enum GraphObject {
 
 /// Graph store trait for cross-modal consistency.
 ///
-/// All graph backends implement this trait, allowing the hexad store to be
+/// All graph backends implement this trait, allowing the octad store to be
 /// generic over the concrete backend.
 #[async_trait]
 pub trait GraphStore: Send + Sync {

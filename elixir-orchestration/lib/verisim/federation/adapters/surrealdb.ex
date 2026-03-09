@@ -130,7 +130,7 @@ defmodule VeriSim.Federation.Adapters.SurrealDB do
     |> Enum.map(fn record ->
       %{
         source_store: peer_info.store_id,
-        hexad_id: extract_id(record),
+        octad_id: extract_id(record),
         score: parse_score(record),
         drifted: false,
         data: record,
@@ -145,7 +145,7 @@ defmodule VeriSim.Federation.Adapters.SurrealDB do
 
   defp build_surreal_ql(modalities, query_params, limit, peer_info) do
     config = peer_info.adapter_config
-    table = Map.get(config, :table, "hexads")
+    table = Map.get(config, :table, "octads")
 
     cond do
       :graph in modalities && Map.has_key?(query_params, :graph_pattern) ->

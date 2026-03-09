@@ -7,7 +7,7 @@
 //! It produces structured reports in JSON/SARIF format.
 //!
 //! This bridge consumes sanctify reports, converts security issues into
-//! VeriSimDB semantic annotations, and binds security contracts to hexads.
+//! VeriSimDB semantic annotations, and binds security contracts to octads.
 //!
 //! # Architecture
 //!
@@ -18,7 +18,7 @@
 //!                                   │ SanctifyContract    │
 //!                                   │  - parse_report     │
 //!                                   │  - validate         │
-//!                                   │  - bind_to_hexad    │
+//!                                   │  - bind_to_octad    │
 //!                                   └────────────────────┘
 //! ```
 
@@ -146,7 +146,7 @@ impl IssueSummary {
     }
 }
 
-/// A verifiable security contract binding sanctify findings to a hexad.
+/// A verifiable security contract binding sanctify findings to a octad.
 ///
 /// Represents a commitment that a particular codebase or entity has been
 /// analysed and the results are stored in the semantic modality.
@@ -154,8 +154,8 @@ impl IssueSummary {
 pub struct SanctifyContract {
     /// Unique contract identifier
     pub contract_id: String,
-    /// Hexad ID this contract is bound to
-    pub hexad_id: String,
+    /// Octad ID this contract is bound to
+    pub octad_id: String,
     /// The sanctify report backing this contract
     pub report: SanctifyReport,
     /// Whether all critical issues have been resolved
@@ -175,15 +175,15 @@ pub fn parse_sanctify_report(bytes: &[u8]) -> Result<SanctifyReport, SemanticErr
 /// Validate a sanctify contract's structural integrity.
 ///
 /// Checks:
-/// - Contract has a non-empty ID and hexad_id
+/// - Contract has a non-empty ID and octad_id
 /// - Summary counts match the actual issue counts
 /// - Resolution flags are consistent with issue counts
 pub fn validate_contract(contract: &SanctifyContract) -> Result<bool, SemanticError> {
     if contract.contract_id.is_empty() {
         return Err(SemanticError::ConstraintViolation("Contract ID must not be empty".to_string()));
     }
-    if contract.hexad_id.is_empty() {
-        return Err(SemanticError::ConstraintViolation("Hexad ID must not be empty".to_string()));
+    if contract.octad_id.is_empty() {
+        return Err(SemanticError::ConstraintViolation("Octad ID must not be empty".to_string()));
     }
 
     // Verify summary is consistent
@@ -213,9 +213,9 @@ pub fn contract_to_proof_blob(contract: &SanctifyContract) -> Result<ProofBlob, 
         .map_err(|e| SemanticError::SerializationError(e.to_string()))?;
 
     let claim = format!(
-        "security-audit:{} hexad:{} issues:{}",
+        "security-audit:{} octad:{} issues:{}",
         contract.contract_id,
-        contract.hexad_id,
+        contract.octad_id,
         contract.report.summary.total()
     );
 
@@ -227,10 +227,10 @@ pub fn contract_to_proof_blob(contract: &SanctifyContract) -> Result<ProofBlob, 
     })
 }
 
-/// Create a SanctifyContract from a report and hexad binding.
-pub fn bind_contract_to_hexad(
+/// Create a SanctifyContract from a report and octad binding.
+pub fn bind_contract_to_octad(
     contract_id: String,
-    hexad_id: String,
+    octad_id: String,
     report: SanctifyReport,
 ) -> SanctifyContract {
     let all_critical_resolved = report.summary.critical == 0;
@@ -238,7 +238,7 @@ pub fn bind_contract_to_hexad(
 
     SanctifyContract {
         contract_id,
-        hexad_id,
+        octad_id,
         report,
         all_critical_resolved,
         all_high_resolved,
@@ -318,9 +318,9 @@ mod tests {
     #[test]
     fn test_bind_contract() {
         let report = sample_report();
-        let contract = bind_contract_to_hexad(
+        let contract = bind_contract_to_octad(
             "audit-001".to_string(),
-            "hexad-abc".to_string(),
+            "octad-abc".to_string(),
             report,
         );
         assert!(!contract.all_critical_resolved); // Has 1 critical
@@ -331,9 +331,9 @@ mod tests {
     #[test]
     fn test_validate_contract() {
         let report = sample_report();
-        let contract = bind_contract_to_hexad(
+        let contract = bind_contract_to_octad(
             "audit-001".to_string(),
-            "hexad-abc".to_string(),
+            "octad-abc".to_string(),
             report,
         );
         // Valid contract (resolution flags match issue counts)
@@ -345,7 +345,7 @@ mod tests {
         let report = sample_report();
         let contract = SanctifyContract {
             contract_id: "".to_string(),
-            hexad_id: "hexad-abc".to_string(),
+            octad_id: "octad-abc".to_string(),
             report,
             all_critical_resolved: false,
             all_high_resolved: false,
@@ -359,7 +359,7 @@ mod tests {
         let report = sample_report();
         let contract = SanctifyContract {
             contract_id: "audit-002".to_string(),
-            hexad_id: "hexad-abc".to_string(),
+            octad_id: "octad-abc".to_string(),
             report,
             all_critical_resolved: true, // Claims resolved but has 1 critical
             all_high_resolved: false,
@@ -372,14 +372,14 @@ mod tests {
     #[test]
     fn test_contract_to_proof_blob() {
         let report = sample_report();
-        let contract = bind_contract_to_hexad(
+        let contract = bind_contract_to_octad(
             "audit-003".to_string(),
-            "hexad-xyz".to_string(),
+            "octad-xyz".to_string(),
             report,
         );
         let blob = contract_to_proof_blob(&contract).unwrap();
         assert!(blob.claim.contains("security-audit:audit-003"));
-        assert!(blob.claim.contains("hexad:hexad-xyz"));
+        assert!(blob.claim.contains("octad:octad-xyz"));
         assert!(!blob.data.is_empty());
     }
 
@@ -401,9 +401,9 @@ mod tests {
             issues: vec![],
             summary: IssueSummary::default(),
         };
-        let contract = bind_contract_to_hexad(
+        let contract = bind_contract_to_octad(
             "clean-001".to_string(),
-            "hexad-clean".to_string(),
+            "octad-clean".to_string(),
             report,
         );
         assert!(contract.all_critical_resolved);

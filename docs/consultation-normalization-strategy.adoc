@@ -35,13 +35,13 @@ VeriSimDB's multimodal federation creates **five distinct levels of normalizatio
 |**Strong** - should not occur
 
 |**L1** |Cross-modality +
-(across modalities in hexad)
+(across modalities in octad)
 |Title mismatch: graph says "ML Paper" vs document says "Machine Learning Paper"
 |**Eventually consistent** - cosmetic
 
-|**L2** |Cross-hexad +
-(between related hexads)
-|Author hexad links to paper hexad that doesn't exist yet
+|**L2** |Cross-octad +
+(between related octads)
+|Author octad links to paper octad that doesn't exist yet
 |**Eventually consistent** - temporal ordering
 
 |**L3** |Cross-store +
@@ -69,9 +69,9 @@ VeriSimDB's multimodal federation creates **five distinct levels of normalizatio
 2. **Too much pull**: Stale data, compliance violations (GDPR right-to-forget not propagated), users see inconsistent results
 3. **No strategy**: Drift accumulates until system unusable
 
-**Scale**: At 100 federated stores with 1M hexads each:
+**Scale**: At 100 federated stores with 1M octads each:
 - Push strategy: ~100 billion messages/day (if 1% daily drift)
-- Pull strategy: ~1 billion query-time repairs/day (if 10 queries/hexad/day)
+- Pull strategy: ~1 billion query-time repairs/day (if 10 queries/octad/day)
 
 This is not a theoretical problem—it's the **make-or-break architectural decision** for federation scalability.
 
@@ -124,10 +124,10 @@ defmodule VeriSim.DriftMonitor do
 
     case severity do
       :critical ->
-        # Push immediately to all affected hexads
-        affected_hexads = find_affected_hexads(drift_details)
-        Enum.each(affected_hexads, fn hexad_id ->
-          VeriSim.Hexad.repair(hexad_id, drift_details)
+        # Push immediately to all affected octads
+        affected_octads = find_affected_octads(drift_details)
+        Enum.each(affected_octads, fn octad_id ->
+          VeriSim.Octad.repair(octad_id, drift_details)
         end)
 
         # Broadcast to federation if cross-store impact
@@ -172,7 +172,7 @@ From Kafka's migration to KRaft (similar problem domain):
 - **Failure mode**: Controller node failure causes 5-10 second unavailability
 
 **Extrapolated to VeriSimDB**:
-- At 100 federated stores, 1% daily drift rate (1M hexads):
+- At 100 federated stores, 1% daily drift rate (1M octads):
   - **10,000 drift events/day**
   - **1,000,000 repair messages/day** (100× amplification)
   - **~12 messages/second** sustained load
@@ -214,7 +214,7 @@ From Kafka's migration to KRaft (similar problem domain):
 -- User's query
 SELECT GRAPH, DOCUMENT
 FROM verisim:semantic
-WHERE hexad.types INCLUDES "Paper"
+WHERE octad.types INCLUDES "Paper"
 LIMIT 100;
 
 -- VeriSimDB internally detects: graph title ≠ document title
@@ -226,7 +226,7 @@ LIMIT 100;
 **Rust store pseudo-code**:
 
 ```rust
-impl HexadStore {
+impl OctadStore {
     pub async fn query_with_repair(
         &self,
         query: &VQLQuery,
@@ -282,7 +282,7 @@ From DNS caching (similar problem domain):
 - **Repair latency**: First query pays full cost, subsequent queries ~1ms (cached)
 
 **Extrapolated to VeriSimDB**:
-- At 100 federated stores, 1% daily drift rate (1M hexads), 10 queries/hexad/day:
+- At 100 federated stores, 1% daily drift rate (1M octads), 10 queries/octad/day:
   - **100,000 drift instances/day**
   - **1,000,000 query-time repairs/day** (if 10 queries hit each drift)
   - **Cache hit rate**: 90% (if TTL = 1 hour, query distribution even)
@@ -491,11 +491,11 @@ pub struct FederationQuorum {
 impl FederationQuorum {
     pub async fn repair_with_quorum(
         &self,
-        hexad_id: HexadId,
+        octad_id: OctadId,
         field: &str,
     ) -> Result<String, QuorumError> {
         // Query all stores in parallel
-        let responses = self.query_all_stores(hexad_id, field).await?;
+        let responses = self.query_all_stores(octad_id, field).await?;
 
         // Count responses
         let mut counts: HashMap<String, usize> = HashMap::new();
@@ -515,7 +515,7 @@ impl FederationQuorum {
 
         // No quorum reached
         Err(QuorumError::NoConsensus {
-            hexad_id,
+            octad_id,
             field: field.to_string(),
             responses,
         })
@@ -530,7 +530,7 @@ impl FederationQuorum {
 ```elixir
 defmodule VeriSim.Federation.RepairMessage do
   defstruct [
-    :hexad_id,
+    :octad_id,
     :drift_type,
     :repair_action,
     :timestamp,
@@ -565,7 +565,7 @@ end
 
 Variables:
 - `N` = number of federated stores
-- `H` = number of hexads
+- `H` = number of octads
 - `D` = daily drift rate (as fraction, e.g., 0.01 = 1%)
 - `M` = message size (bytes)
 
@@ -577,7 +577,7 @@ Bytes_per_day = Messages_per_day × M
 
 **Example (conservative)**:
 - N = 100 stores
-- H = 1,000,000 hexads
+- H = 1,000,000 octads
 - D = 0.01 (1% daily drift)
 - M = 1024 bytes (1 KB message)
 
@@ -599,7 +599,7 @@ Network_cost = $0.01/GB × 1 GB × 100 stores = $1/day
 === 4.2 Pull Strategy Cost Model
 
 Variables:
-- `Q` = queries per hexad per day
+- `Q` = queries per octad per day
 - `L_repair` = repair latency (ms)
 - `L_cache` = cache hit latency (ms)
 - `C` = cache hit rate (as fraction, e.g., 0.9 = 90%)
@@ -614,9 +614,9 @@ Latency_cost = Cache_misses × L_repair + Cache_hits × L_cache
 ```
 
 **Example (conservative)**:
-- H = 1,000,000 hexads
+- H = 1,000,000 octads
 - D = 0.01 (1% daily drift)
-- Q = 10 queries/hexad/day
+- Q = 10 queries/octad/day
 - L_repair = 100 ms
 - L_cache = 1 ms
 - C = 0.9 (90% cache hit)
@@ -724,7 +724,7 @@ Pull_latency = 9,500 × 100ms + 85,500 × 1ms = 1,035,500 ms = ~17 minutes
 |Push: retractions, integrity violations +
 Pull: title mismatches, derived data
 
-|**L2** (Cross-hexad)
+|**L2** (Cross-octad)
 |PULL
 |Validate at query time, cache results
 
@@ -794,7 +794,7 @@ Pull: schema version, optimization
 %DriftEvent{
   type: :retraction,
   severity: :critical,
-  hexad_id: "hexad:550e8400-e29b-41d4-a716-446655440000",
+  octad_id: "octad:550e8400-e29b-41d4-a716-446655440000",
   field: "semantic.status",
   old_value: "published",
   new_value: "retracted",
@@ -804,7 +804,7 @@ Pull: schema version, optimization
 }
 
 # Push to all stores that cite this paper
-# Push to all hexads that reference this paper
+# Push to all octads that reference this paper
 # Log in immutable temporal store
 ```
 
@@ -813,7 +813,7 @@ Pull: schema version, optimization
 %DriftEvent{
   type: :integrity_violation,
   severity: :critical,
-  hexad_id: "hexad:6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+  octad_id: "octad:6ba7b810-9dad-11d1-80b4-00c04fd430c8",
   field: "document.content_hash",
   old_value: "sha256:abc123...",
   new_value: "sha256:def456...",
@@ -823,7 +823,7 @@ Pull: schema version, optimization
 }
 
 # Push to all federation members
-# Quarantine hexad until resolved
+# Quarantine octad until resolved
 ```
 
 === A.2 Optimization Drift (Pull on Query)
@@ -833,7 +833,7 @@ Pull: schema version, optimization
 %DriftEvent{
   type: :title_mismatch,
   severity: :low,
-  hexad_id: "hexad:7c9e6679-7425-40de-944b-e07fc1f90ae7",
+  octad_id: "octad:7c9e6679-7425-40de-944b-e07fc1f90ae7",
   field: "graph.title vs document.title",
   old_value: "ML Paper",
   new_value: "Machine Learning Paper",
@@ -843,7 +843,7 @@ Pull: schema version, optimization
 }
 
 # Don't push (cosmetic difference)
-# Repair when user queries this hexad
+# Repair when user queries this octad
 # Cache repaired result for 1 hour
 ```
 
@@ -852,7 +852,7 @@ Pull: schema version, optimization
 %DriftEvent{
   type: :derived_stale,
   severity: :low,
-  hexad_id: "hexad:8d8a8b4c-5d3e-4f5a-9b6c-7e8f9a0b1c2d",
+  octad_id: "octad:8d8a8b4c-5d3e-4f5a-9b6c-7e8f9a0b1c2d",
   field: "semantic.citation_count",
   old_value: 42,
   new_value: 45,
@@ -861,7 +861,7 @@ Pull: schema version, optimization
   action: :pull_on_query
 }
 
-# Don't push (expensive to recompute for all hexads)
+# Don't push (expensive to recompute for all octads)
 # Recompute when user queries citation count
 # Cache for 1 day (citations change slowly)
 ```
@@ -873,7 +873,7 @@ Pull: schema version, optimization
 === B.1 Successful Quorum (3/5 agreement)
 
 ```
-Store responses for hexad:550e8400, field "title":
+Store responses for octad:550e8400, field "title":
 
 Store A: "Machine Learning Paper" (200ms latency)
 Store B: "Machine Learning Paper" (150ms latency)
@@ -894,7 +894,7 @@ Action: Repair local store to quorum value
 === B.2 Failed Quorum (no majority)
 
 ```
-Store responses for hexad:6ba7b810, field "status":
+Store responses for octad:6ba7b810, field "status":
 
 Store A: "published" (200ms latency)
 Store B: "retracted" (150ms latency)

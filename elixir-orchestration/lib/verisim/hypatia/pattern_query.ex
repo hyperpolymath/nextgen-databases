@@ -145,7 +145,7 @@ defmodule VeriSim.Hypatia.PatternQuery do
     end)
     |> Enum.map(fn scan ->
       %{
-        hexad_id: scan[:hexad_id],
+        octad_id: scan[:octad_id],
         timestamp: get_in(scan, [:metadata, :scan_timestamp]),
         weak_point_count: get_in(scan, [:metadata, :weak_point_count]) || 0,
         severity_counts: get_in(scan, [:metadata, :severity_counts]) || %{}

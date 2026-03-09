@@ -15,7 +15,7 @@ defmodule VeriSim.Federation.Adapters.MongoDBTest do
   @peer_info %{
     store_id: "mongo-test",
     endpoint: "http://mongo:27017",
-    adapter_config: %{database: "verisimdb", collection: "hexads"}
+    adapter_config: %{database: "verisimdb", collection: "octads"}
   }
 
   # ---------------------------------------------------------------------------
@@ -58,7 +58,7 @@ defmodule VeriSim.Federation.Adapters.MongoDBTest do
       [result] = MongoDB.translate_results(raw, @peer_info)
 
       assert result.source_store == "mongo-test"
-      assert result.hexad_id == "64a1b2c3d4e5f67890abcdef"
+      assert result.octad_id == "64a1b2c3d4e5f67890abcdef"
       assert result.score == 0.9
       assert result.drifted == false
     end
@@ -67,7 +67,7 @@ defmodule VeriSim.Federation.Adapters.MongoDBTest do
       raw = [%{"title" => "No ID"}]
 
       [result] = MongoDB.translate_results(raw, @peer_info)
-      assert result.hexad_id == "unknown"
+      assert result.octad_id == "unknown"
     end
 
     test "handles empty result list" do

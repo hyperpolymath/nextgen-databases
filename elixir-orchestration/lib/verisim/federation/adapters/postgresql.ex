@@ -30,7 +30,7 @@ defmodule VeriSim.Federation.Adapters.PostgreSQL do
         port: 5432,
         database: "verisimdb",
         schema: "public",
-        table: "hexads",
+        table: "octads",
         auth: {:basic, "verisim", "password"},
         extensions: [:pgvector, :postgis]  # Optional: declares installed extensions
       }
@@ -147,7 +147,7 @@ defmodule VeriSim.Federation.Adapters.PostgreSQL do
     |> Enum.map(fn row ->
       %{
         source_store: peer_info.store_id,
-        hexad_id: row["id"] || row["entity_id"] || row["_key"] || "unknown",
+        octad_id: row["id"] || row["entity_id"] || row["_key"] || "unknown",
         score: parse_score(row),
         drifted: false,
         data: row,
@@ -163,7 +163,7 @@ defmodule VeriSim.Federation.Adapters.PostgreSQL do
   defp build_sql(modalities, query_params, limit, peer_info) do
     config = peer_info.adapter_config
     schema = Map.get(config, :schema, "public")
-    table = Map.get(config, :table, "hexads")
+    table = Map.get(config, :table, "octads")
     qualified_table = "#{schema}.#{table}"
 
     cond do

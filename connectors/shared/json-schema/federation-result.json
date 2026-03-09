@@ -3,17 +3,17 @@
   "$id": "https://verisim.db/schema/federation-result.json",
   "$comment": "SPDX-License-Identifier: PMPL-1.0-or-later",
   "title": "FederationResult",
-  "description": "A normalised result from a federated query. Each result represents a single hexad entity returned by a specific peer store in the federation mesh, along with its relevance score, drift status, and response timing.",
+  "description": "A normalised result from a federated query. Each result represents a single octad entity returned by a specific peer store in the federation mesh, along with its relevance score, drift status, and response timing.",
   "type": "object",
-  "required": ["source_store", "hexad_id", "score", "drifted", "data", "response_time_ms"],
+  "required": ["source_store", "octad_id", "score", "drifted", "data", "response_time_ms"],
   "properties": {
     "source_store": {
       "type": "string",
       "description": "Identifier of the peer store that provided this result (e.g. 'store-1', '/universities/oxford')."
     },
-    "hexad_id": {
+    "octad_id": {
       "type": "string",
-      "description": "Hexad entity identifier within the source store."
+      "description": "Octad entity identifier within the source store."
     },
     "score": {
       "type": "number",

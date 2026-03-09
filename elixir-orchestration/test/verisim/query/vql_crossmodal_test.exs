@@ -7,7 +7,7 @@ defmodule VeriSim.Query.VQLCrossModalTest do
   Exercises the condition classification and cross-modal evaluation logic in
   `VQLExecutor`. Cross-modal conditions are NOT pushed down to individual
   modality stores — they are evaluated post-fetch by comparing data across
-  two or more modalities on the same hexad.
+  two or more modalities on the same octad.
 
   ## Cross-modal condition types tested
 
@@ -58,7 +58,7 @@ defmodule VeriSim.Query.VQLCrossModalTest do
       assert raw =~ "GRAPH.importance"
     end
 
-    test "CrossModalFieldCompare AST node evaluates correctly on mock hexad" do
+    test "CrossModalFieldCompare AST node evaluates correctly on mock octad" do
       # Build a cross-modal condition AST node and verify its structure
       condition = H.cross_modal_compare("document", "severity", ">", "graph", "importance")
 

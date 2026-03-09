@@ -43,7 +43,7 @@ verisimdb/
 │   ├── verisim-semantic/     # Semantic modality (CBOR proofs)
 │   ├── verisim-document/     # Document modality (Tantivy)
 │   ├── verisim-temporal/     # Temporal modality (versioning)
-│   ├── verisim-hexad/        # Unified 6-modal entity
+│   ├── verisim-octad/        # Unified 6-modal entity
 │   ├── verisim-drift/        # Drift detection
 │   ├── verisim-normalizer/   # Self-normalization
 │   ├── verisim-planner/      # Cost-based query planner

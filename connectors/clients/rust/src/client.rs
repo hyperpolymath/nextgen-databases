@@ -5,7 +5,7 @@
 //!
 //! [`VeriSimClient`] is the primary entry point for all SDK operations. It owns
 //! the base URL, HTTP client, authentication credentials, and timeout settings.
-//! Domain-specific methods (hexad CRUD, search, drift, etc.) are defined as
+//! Domain-specific methods (octad CRUD, search, drift, etc.) are defined as
 //! `impl VeriSimClient` blocks in their respective modules.
 
 use std::time::Duration;
@@ -47,7 +47,7 @@ pub enum Auth {
 /// The main VeriSimDB client.
 ///
 /// Holds connection parameters and provides low-level HTTP helpers that the
-/// higher-level module methods (`hexad`, `search`, `drift`, etc.) delegate to.
+/// higher-level module methods (`octad`, `search`, `drift`, etc.) delegate to.
 ///
 /// # Examples
 ///

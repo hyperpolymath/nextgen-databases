@@ -2,7 +2,7 @@
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)
 #
 # OpenAPI 3.1 specification for the VeriSimDB REST API.
-# Covers all hexad CRUD operations, search endpoints, drift monitoring,
+# Covers all octad CRUD operations, search endpoints, drift monitoring,
 # provenance chain management, spatial queries, normalisation triggers,
 # and VQL query execution.
 
@@ -14,7 +14,7 @@ info:
   description: |
     VeriSimDB (Veridical Simulacrum Database) REST API.
 
-    Each entity (hexad) exists simultaneously across 8 modalities -- the
+    Each entity (octad) exists simultaneously across 8 modalities -- the
     octad: Graph, Vector, Tensor, Semantic, Document, Temporal, Provenance,
     and Spatial.  This API provides unified CRUD, search, drift detection,
     normalisation, and provenance management for all modalities.
@@ -32,8 +32,8 @@ servers:
 tags:
   - name: health
     description: Health check and readiness probes
-  - name: hexads
-    description: Hexad entity CRUD operations
+  - name: octads
+    description: Octad entity CRUD operations
   - name: search
     description: Text, vector, and relationship search
   - name: spatial
@@ -90,31 +90,31 @@ paths:
                 $ref: "../json-schema/error.json"
 
   # ---------------------------------------------------------------------------
-  # Hexad CRUD
+  # Octad CRUD
   # ---------------------------------------------------------------------------
-  /api/v1/hexads:
+  /api/v1/octads:
     post:
-      operationId: createHexad
-      summary: Create a new hexad entity
+      operationId: createOctad
+      summary: Create a new octad entity
       description: |
-        Creates a new hexad with the provided modality data.  A UUID is
+        Creates a new octad with the provided modality data.  A UUID is
         generated automatically.  Only the modalities included in the
         request body are populated; omitted modalities remain empty.
         A provenance "created" event is recorded automatically.
-      tags: [hexads]
+      tags: [octads]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "../json-schema/hexad-input.json"
+              $ref: "../json-schema/octad-input.json"
       responses:
         "201":
-          description: Hexad created successfully.
+          description: Octad created successfully.
           content:
             application/json:
               schema:
-                $ref: "../json-schema/hexad.json"
+                $ref: "../json-schema/octad.json"
         "400":
           description: Validation error (e.g. tensor shape mismatch, invalid coordinates).
           content:
@@ -129,12 +129,12 @@ paths:
                 $ref: "../json-schema/error.json"
 
     get:
-      operationId: listHexads
-      summary: List hexad entities (paginated)
+      operationId: listOctads
+      summary: List octad entities (paginated)
       description: |
-        Returns a paginated list of hexad entities.  Results are ordered
+        Returns a paginated list of octad entities.  Results are ordered
         by creation time (newest first).
-      tags: [hexads]
+      tags: [octads]
       parameters:
         - name: limit
           in: query
@@ -153,13 +153,13 @@ paths:
             default: 0
       responses:
         "200":
-          description: List of hexad entities.
+          description: List of octad entities.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "../json-schema/hexad.json"
+                  $ref: "../json-schema/octad.json"
         "500":
           description: Internal server error.
           content:
@@ -167,30 +167,30 @@ paths:
               schema:
                 $ref: "../json-schema/error.json"
 
-  /api/v1/hexads/{id}:
+  /api/v1/octads/{id}:
     parameters:
       - name: id
         in: path
         required: true
-        description: Hexad entity UUID.
+        description: Octad entity UUID.
         schema:
           type: string
 
     get:
-      operationId: getHexad
-      summary: Get a hexad entity by ID
+      operationId: getOctad
+      summary: Get a octad entity by ID
       description: |
-        Returns the full hexad entity including all populated modality
+        Returns the full octad entity including all populated modality
         data, status, version count, provenance chain length, and
         spatial data.
-      tags: [hexads]
+      tags: [octads]
       responses:
         "200":
-          description: Hexad entity found.
+          description: Octad entity found.
           content:
             application/json:
               schema:
-                $ref: "../json-schema/hexad.json"
+                $ref: "../json-schema/octad.json"
         "404":
           description: Entity not found.
           content:
@@ -205,27 +205,27 @@ paths:
                 $ref: "../json-schema/error.json"
 
     put:
-      operationId: updateHexad
-      summary: Update an existing hexad entity
+      operationId: updateOctad
+      summary: Update an existing octad entity
       description: |
-        Updates the specified modalities of an existing hexad.  Only
+        Updates the specified modalities of an existing octad.  Only
         the modalities included in the request body are modified;
         omitted modalities are left unchanged.  A new temporal version
         is created, and a provenance "modified" event is recorded.
-      tags: [hexads]
+      tags: [octads]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "../json-schema/hexad-input.json"
+              $ref: "../json-schema/octad-input.json"
       responses:
         "200":
-          description: Hexad updated successfully.
+          description: Octad updated successfully.
           content:
             application/json:
               schema:
-                $ref: "../json-schema/hexad.json"
+                $ref: "../json-schema/octad.json"
         "400":
           description: Validation error.
           content:
@@ -246,12 +246,12 @@ paths:
                 $ref: "../json-schema/error.json"
 
     delete:
-      operationId: deleteHexad
-      summary: Delete a hexad entity
+      operationId: deleteOctad
+      summary: Delete a octad entity
       description: |
-        Deletes the hexad and all its modality data.  A provenance
+        Deletes the octad and all its modality data.  A provenance
         "deleted" event is recorded before the entity is removed.
-      tags: [hexads]
+      tags: [octads]
       responses:
         "204":
           description: Entity deleted successfully (no content).
@@ -274,10 +274,10 @@ paths:
   /api/v1/search/text:
     get:
       operationId: searchText
-      summary: Full-text search across hexad documents
+      summary: Full-text search across octad documents
       description: |
         Searches the document modality using the Tantivy full-text
-        engine.  Returns hexads whose title or body match the query,
+        engine.  Returns octads whose title or body match the query,
         ranked by BM25 relevance.
       tags: [search]
       parameters:
@@ -303,7 +303,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "../json-schema/hexad.json"
+                  $ref: "../json-schema/octad.json"
         "400":
           description: Missing or invalid query parameter.
           content:
@@ -323,7 +323,7 @@ paths:
       summary: Vector similarity search
       description: |
         Searches the vector modality using HNSW approximate nearest
-        neighbour search.  Returns the k most similar hexads ranked
+        neighbour search.  Returns the k most similar octads ranked
         by cosine similarity.
       tags: [search]
       requestBody:
@@ -352,7 +352,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "../json-schema/hexad.json"
+                  $ref: "../json-schema/octad.json"
         "400":
           description: Invalid vector dimension or missing parameters.
           content:
@@ -372,13 +372,13 @@ paths:
       summary: Find related entities via graph traversal
       description: |
         Traverses the graph modality to find entities related to the
-        given hexad.  Returns entities connected by outgoing edges.
+        given octad.  Returns entities connected by outgoing edges.
       tags: [search]
       parameters:
         - name: id
           in: path
           required: true
-          description: Source hexad entity UUID.
+          description: Source octad entity UUID.
           schema:
             type: string
         - name: predicate
@@ -394,7 +394,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "../json-schema/hexad.json"
+                  $ref: "../json-schema/octad.json"
         "404":
           description: Source entity not found.
           content:
@@ -416,7 +416,7 @@ paths:
       operationId: spatialSearchRadius
       summary: Search entities within a radius
       description: |
-        Finds hexad entities within a given radius (km) of a centre
+        Finds octad entities within a given radius (km) of a centre
         point.  Results are sorted by distance ascending.
       tags: [spatial]
       requestBody:
@@ -482,7 +482,7 @@ paths:
       operationId: spatialSearchBounds
       summary: Search entities within a bounding box
       description: |
-        Finds hexad entities within a geographic bounding box defined
+        Finds octad entities within a geographic bounding box defined
         by south-west and north-east corners (WGS84).
       tags: [spatial]
       requestBody:
@@ -554,7 +554,7 @@ paths:
       operationId: spatialSearchNearest
       summary: Find k nearest entities to a point
       description: |
-        Finds the k nearest hexad entities to a given geographic point
+        Finds the k nearest octad entities to a given geographic point
         using the Haversine formula for distance computation.
       tags: [spatial]
       requestBody:
@@ -618,7 +618,7 @@ paths:
       operationId: getDriftScore
       summary: Get drift score for an entity
       description: |
-        Returns the current drift measurement for a specific hexad
+        Returns the current drift measurement for a specific octad
         entity, including per-modality scores and whether normalisation
         is needed.
       tags: [drift]
@@ -626,7 +626,7 @@ paths:
         - name: id
           in: path
           required: true
-          description: Hexad entity UUID.
+          description: Octad entity UUID.
           schema:
             type: string
       responses:
@@ -698,7 +698,7 @@ paths:
       summary: Trigger normalisation for an entity
       description: |
         Manually triggers the self-normalisation process for a specific
-        hexad entity.  The normaliser identifies the most authoritative
+        octad entity.  The normaliser identifies the most authoritative
         modality and regenerates drifted modalities from it, validating
         consistency and updating all modalities atomically.
       tags: [normalizer]
@@ -706,7 +706,7 @@ paths:
         - name: id
           in: path
           required: true
-          description: Hexad entity UUID to normalise.
+          description: Octad entity UUID to normalise.
           schema:
             type: string
       responses:
@@ -797,7 +797,7 @@ paths:
       operationId: getProvenanceChain
       summary: Get provenance chain for an entity
       description: |
-        Returns the full provenance chain for a hexad entity -- an
+        Returns the full provenance chain for a octad entity -- an
         ordered list of provenance events linked by SHA-256 hashes.
         Records are returned oldest-first.
       tags: [provenance]
@@ -805,7 +805,7 @@ paths:
         - name: id
           in: path
           required: true
-          description: Hexad entity UUID.
+          description: Octad entity UUID.
           schema:
             type: string
       responses:
@@ -852,7 +852,7 @@ paths:
         - name: id
           in: path
           required: true
-          description: Hexad entity UUID.
+          description: Octad entity UUID.
           schema:
             type: string
       requestBody:
@@ -910,7 +910,7 @@ paths:
         - name: id
           in: path
           required: true
-          description: Hexad entity UUID.
+          description: Octad entity UUID.
           schema:
             type: string
       responses:
@@ -993,8 +993,8 @@ paths:
                   results:
                     type: array
                     items:
-                      $ref: "../json-schema/hexad.json"
-                    description: Matching hexad entities.
+                      $ref: "../json-schema/octad.json"
+                    description: Matching octad entities.
                   execution_time_ms:
                     type: integer
                     description: Time taken to execute the query.

@@ -12,7 +12,7 @@ defmodule VeriSim.Federation.Adapters.VeriSimDB do
   - `:graph` → `GET /search/related/:id` (graph traversal)
   - `:document` / `:text` → `GET /search/text` (Tantivy full-text)
   - `:spatial` → `POST /spatial/search/radius` (PostGIS-backed)
-  - default → `GET /hexads` (paginated listing)
+  - default → `GET /octads` (paginated listing)
 
   ## Capabilities
 
@@ -119,7 +119,7 @@ defmodule VeriSim.Federation.Adapters.VeriSimDB do
     |> Enum.map(fn item ->
       %{
         source_store: peer_info.store_id,
-        hexad_id: item["id"] || item["entity_id"] || "unknown",
+        octad_id: item["id"] || item["entity_id"] || "unknown",
         score: item["score"] || 0.0,
         drifted: item["drifted"] || false,
         data: item,
@@ -200,7 +200,7 @@ defmodule VeriSim.Federation.Adapters.VeriSimDB do
 
       true ->
         # Default: paginated listing
-        url = "#{endpoint}/hexads"
+        url = "#{endpoint}/octads"
 
         case Req.get(url, params: [limit: limit], headers: headers, receive_timeout: timeout) do
           {:ok, %Req.Response{status: status, body: body}} when status in 200..299 ->
@@ -218,7 +218,7 @@ defmodule VeriSim.Federation.Adapters.VeriSimDB do
   defp extract_results(body) when is_list(body), do: body
 
   defp extract_results(%{"results" => results}) when is_list(results), do: results
-  defp extract_results(%{"hexads" => hexads}) when is_list(hexads), do: hexads
+  defp extract_results(%{"octads" => octads}) when is_list(octads), do: octads
   defp extract_results(body) when is_map(body), do: [body]
   defp extract_results(_), do: []
 
