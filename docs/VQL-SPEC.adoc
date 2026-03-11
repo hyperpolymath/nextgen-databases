@@ -2787,3 +2787,227 @@ For transparency, these inconsistencies exist between the pre-v2.0 documents:
 3. **`vql-vs-sql.adoc`** describes VQL as "read-only" which is no longer accurate after v2.0 mutations.
 
 This specification resolves all three inconsistencies in favour of the implemented grammar and source code.
+
+// ============================================================================
+// APPENDIX E: VQL-dt++ EXTENSIONS (TYPELL INTEGRATION)
+// ============================================================================
+
+[appendix]
+== VQL-dt++ Extensions (Typell Integration)
+
+VQL-dt++ extends VQL v3.0 with six optional clauses that provide maximal type-theoretic strictness. These extensions are consumed by the **Typell verification kernel** (the formal verification substrate for PanLL) and are specified normatively in the grammar delta file:
+
+* link:../../typeql-experimental/docs/vql-dtpp-grammar.ebnf[`vql-dtpp-grammar.ebnf`] — EBNF grammar delta (199 lines)
+
+All six clauses are optional and composable in any combination. They append after the standard query structure with no keyword conflicts against VQL v3.0's 60+ reserved keywords.
+
+=== VQL-dt vs VQL-dt++ Feature Comparison
+
+[cols="2,1,1,2"]
+|===
+| Feature | VQL-dt | VQL-dt++ | Typell Kernel Mapping
+
+| Dependent types (Pi, Sigma)
+| ✅
+| ✅
+| Bidirectional type checker
+
+| Proof obligations (EXISTENCE, INTEGRITY, etc.)
+| ✅
+| ✅
+| Proof engine (auto-gen + Echidna dispatch)
+
+| ZKP witness generation
+| ✅
+| ✅
+| Proof certificates
+
+| **Linear types** (resource counting)
+| ❌
+| ✅ `CONSUME AFTER n USE`
+| Linear resource tracker
+
+| **Session types** (protocol state machines)
+| ❌
+| ✅ `WITH SESSION protocol`
+| Session protocol manager
+
+| **Effect systems** (side-effect tracking)
+| Partial
+| ✅ `EFFECTS { Read, Write, ... }`
+| Compositional effect inference
+
+| **Modal types** (world-indexed scoping)
+| ❌
+| ✅ `IN TRANSACTION state`
+| Modal scope checker
+
+| **Proof-carrying code** (theorem attachment)
+| Partial (pre-conditions)
+| ✅ `PROOF ATTACHED theorem`
+| Cryptographic PCC certificates
+
+| **QTT** (bounded resource quantities)
+| ❌
+| ✅ `USAGE LIMIT n`
+| Quantitative type theory tracker
+|===
+
+=== Individual Feature Syntax Examples
+
+Each dt++ clause is shown in isolation to demonstrate independent usage.
+
+==== Linear Types — CONSUME AFTER
+
+Resources used a bounded number of times. Prevents duplicate reads and data leaks.
+
+[source,sql]
+----
+-- Single-use query result (exactly-once consumption)
+SELECT GRAPH.*, DOCUMENT.* FROM HEXAD 'entity-001'
+  PROOF EXISTENCE(entity-001)
+  CONSUME AFTER 1 USE;
+
+-- Federation result consumed at most 3 times (e.g., retry budget)
+SELECT * FROM FEDERATION '/universities/*'
+  WITH DRIFT STRICT
+  CONSUME AFTER 3 USE;
+----
+
+Idris2 ABI mapping: `(1 conn : Connection)` for single-use, `(n conn : BoundedConn n)` for multi-use.
+
+==== Session Types — WITH SESSION
+
+Protocol safety. Connections follow a state machine: Fresh → Authenticated → InTransaction → Committed → Closed.
+
+[source,sql]
+----
+-- Read-only session: can query but not mutate
+SELECT GRAPH FROM HEXAD 'entity-001'
+  WITH SESSION ReadOnlyProtocol;
+
+-- Mutation session: allows INSERT/UPDATE/DELETE
+INSERT HEXAD WITH DOCUMENT(title = 'New Entry')
+  WITH SESSION MutationProtocol;
+
+-- Streaming session: maintains cursor across result batches
+SELECT * FROM FEDERATION '/sensors/*'
+  WITH SESSION StreamProtocol;
+----
+
+Built-in protocols: `ReadOnlyProtocol`, `MutationProtocol`, `StreamProtocol`, `BatchProtocol`. Custom protocols extensible via schema.
+
+==== Effect Systems — EFFECTS
+
+Explicit declaration of side effects. The type checker verifies actual operations are a subset of declared effects.
+
+[source,sql]
+----
+-- Pure read: no writes, no audit trail
+SELECT GRAPH FROM HEXAD 'entity-001'
+  EFFECTS { Read };
+
+-- Mutation with audit: declares write and audit effects
+INSERT HEXAD WITH DOCUMENT(title = 'Audited Entry')
+  PROOF INTEGRITY(schema-v2)
+  EFFECTS { Read, Write, Audit };
+
+-- Federation with transformation: cross-node data reshaping
+SELECT VECTOR FROM FEDERATION '/cluster/*'
+  EFFECTS { Read, Federate, Transform };
+----
+
+Available effects: `Read`, `Write`, `Cite`, `Audit`, `Transform`, `Federate` (extensible via `identifier`).
+
+==== Modal Types — IN TRANSACTION
+
+Data scoping via world-indexed types. Data in one scope cannot leak to another without explicit marshalling.
+
+[source,sql]
+----
+-- Only visible within committed transactions
+SELECT GRAPH FROM HEXAD 'entity-001'
+  IN TRANSACTION Committed;
+
+-- Read snapshot isolation: sees consistent view at query time
+SELECT * FROM FEDERATION '/analytics/*'
+  IN TRANSACTION ReadSnapshot;
+
+-- Active transaction: data may change before commit
+UPDATE HEXAD 'entity-001' SET DOCUMENT.status = 'reviewed'
+  IN TRANSACTION Active;
+----
+
+Transaction states: `Fresh`, `Active`, `Committed`, `RolledBack`, `ReadSnapshot` (extensible).
+
+==== Proof-Carrying Code — PROOF ATTACHED
+
+Attaches post-condition theorems to query results as sigma pairs. Different from `PROOF` (which verifies pre-conditions).
+
+[source,sql]
+----
+-- Attach integrity theorem to result
+SELECT GRAPH FROM HEXAD 'entity-001'
+  PROOF EXISTENCE(entity-001)
+  PROOF ATTACHED IntegrityTheorem;
+
+-- Attach freshness guarantee to federation result
+SELECT * FROM FEDERATION '/realtime/*'
+  WITH DRIFT STRICT
+  PROOF ATTACHED FreshnessGuarantee;
+
+-- Attach custom theorem with parameters
+SELECT DOCUMENT FROM HEXAD 'entity-001'
+  PROOF ATTACHED CrossModalConsistency(tolerance = 0.01);
+----
+
+Idris2 ABI mapping: `ProvedResult : (result : QueryResult) -> (prf : Theorem) -> Type`.
+
+==== Quantitative Type Theory — USAGE LIMIT
+
+Bounded resource consumption across the query plan (connections, API calls, memory). Different from `LIMIT` (which caps result rows).
+
+[source,sql]
+----
+-- Cap at 100 resource operations (connections, store reads, etc.)
+SELECT GRAPH FROM HEXAD 'entity-001'
+  USAGE LIMIT 100;
+
+-- Federation with bounded resource budget
+SELECT * FROM FEDERATION '/global/*'
+  WITH DRIFT TOLERATE
+  USAGE LIMIT 1000;
+----
+
+Idris2 ABI mapping: `BoundedResource : (n : Nat) -> Type`. Generalises linear types from exact-1 to at-most-n.
+
+==== Combined: Maximal Strictness
+
+All six clauses composed together (see also link:../../typell/docs/design/DESIGN-2026-03-01-typell-vision.md[Typell Vision Document]):
+
+[source,sql]
+----
+SELECT GRAPH.*, DOCUMENT.* FROM HEXAD 'entity-001'
+  PROOF EXISTENCE(entity-001)
+  CONSUME AFTER 1 USE
+  WITH SESSION ReadOnlyProtocol
+  EFFECTS { Read }
+  IN TRANSACTION Committed
+  PROOF ATTACHED IntegrityTheorem
+  USAGE LIMIT 100;
+----
+
+=== Typell Integration
+
+VQL-dt++ queries are verified by the Typell kernel via JSON-RPC:
+
+[source]
+----
+typell.check(query, "vql-dt++") → TypeResult
+----
+
+The kernel returns: types, proof obligations, linear tracking, session protocol compliance, effect analysis, modal scope verification, and proof certificates. See the link:../../typell/docs/design/DESIGN-2026-03-01-typell-vision.md[Typell Vision Document] for the full verification protocol specification.
+
+=== Status
+
+`[.planned]` All six VQL-dt++ clauses. Grammar formally specified. Implementation pending Typell kernel (Phase 3+).
