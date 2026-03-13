@@ -103,37 +103,46 @@ def test_execution_safety : IO Unit := do
   execute stmt
   IO.println "✓ Execution succeeded (type safety guaranteed)"
 
--- Theorem: Type-safe queries can't produce runtime type errors
-theorem typeSafeQueriesPreserveInvariants (stmt : InsertStmt schema) :
-  ∀ i, i < stmt.values.length →
-    let ⟨t, v⟩ := stmt.values.get! i
-    -- Value v satisfies all constraints of type t
-    match t with
-    | .boundedNat min max =>
-        match v with
-        | .boundedNat _ _ bn => min ≤ bn.val ∧ bn.val ≤ max
-        | _ => False
-    | .nonEmptyString =>
-        match v with
-        | .nonEmptyString nes => nes.val.length > 0
-        | _ => False
-    | _ => True
+-- Helper: states the invariant for a single sigma-typed value pair.
+-- When the type tag is .boundedNat or .nonEmptyString, the TypedValue
+-- dependent index guarantees the corresponding constructor was used,
+-- so the carried proofs are available.
+private def valueInvariant (pair : Σ t : TypeExpr, TypedValue t) : Prop :=
+  match pair with
+  | ⟨.boundedNat min max, .boundedNat _ _ bn⟩ => min ≤ bn.val ∧ bn.val ≤ max
+  | ⟨.nonEmptyString, .nonEmptyString nes⟩ => nes.val.length > 0
+  | _ => True
+
+-- Helper lemma: every well-typed sigma pair satisfies the invariant.
+-- This is provable because TypedValue is indexed by TypeExpr, so the
+-- dependent pattern match is exhaustive and the proofs are carried
+-- in the BoundedNat/NonEmptyString structures.
+private theorem valueInvariant_holds (pair : Σ t : TypeExpr, TypedValue t)
+    : valueInvariant pair := by
+  obtain ⟨t, v⟩ := pair
+  match t, v with
+  | .nat, .nat _ => trivial
+  | .int, .int _ => trivial
+  | .string, .string _ => trivial
+  | .bool, .bool _ => trivial
+  | .float, .float _ => trivial
+  | .boundedNat min max, .boundedNat _ _ bn =>
+      exact ⟨bn.min_le, bn.le_max⟩
+  | .nonEmptyString, .nonEmptyString nes =>
+      exact nes.nonempty
+  | .promptScores, .promptScores _ => trivial
+
+-- Theorem: Type-safe queries can't produce runtime type errors.
+-- Uses List.get with a Fin index (not get!) to preserve the dependent
+-- relationship between the type tag and the value, enabling Lean to see
+-- that TypedValue (.boundedNat min max) can only be .boundedNat and
+-- TypedValue .nonEmptyString can only be .nonEmptyString.
+theorem typeSafeQueriesPreserveInvariants {schema : Schema} (stmt : InsertStmt schema) :
+  ∀ (i : Fin stmt.values.length),
+    valueInvariant (stmt.values.get i)
   := by
-  intro i hi
-  -- The proof proceeds by case analysis on the type tag and value.
-  -- For each branch, the dependent type constraints on TypedValue
-  -- already carry the proofs we need (BoundedNat carries min_le/le_max,
-  -- NonEmptyString carries nonempty).
-  --
-  -- Note: This theorem operates over arbitrary InsertStmt values where the
-  -- values list contains sigma types (Σ t : TypeExpr, TypedValue t). The
-  -- `get!` returns a default when out of bounds, and the `let` destructuring
-  -- loses the dependent index relationship between t and v. A fully rigorous
-  -- proof requires either:
-  --   (a) Rewriting to use `get` with the bounds proof `hi`, or
-  --   (b) Auxiliary lemmas about TypedValue index injectivity.
-  -- For now, we use sorry with a clear explanation of what's needed.
-  sorry -- TODO: requires rewriting to use List.get (not get!) to preserve the dependent index constraint between t and v, enabling Lean to see that TypedValue (.boundedNat min max) can only be .boundedNat and TypedValue .nonEmptyString can only be .nonEmptyString
+  intro i
+  exact valueInvariant_holds (stmt.values.get i)
 
 -- Run all tests
 def main : IO Unit := do
