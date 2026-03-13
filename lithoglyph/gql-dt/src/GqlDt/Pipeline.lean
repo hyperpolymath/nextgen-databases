@@ -16,7 +16,7 @@ namespace GqlDt.Pipeline
 -- Mark entire namespace as noncomputable due to axiomatized parser functions
 noncomputable section
 
-open Lexer Parser TypeChecker TypeInference IR Serialization AST
+open Lexer Parser TypeChecker TypeInference IR Serialization Serialization.Types AST
 
 /-!
 # GQL-DT/GQL Complete Parsing Pipeline
@@ -104,7 +104,7 @@ def tokenizeSource (source : String) : Except String (List Token) :=
   tokenize source
 
 /-- Stage 2: Parse tokens to AST -/
-noncomputable def parseTokens (tokens : List Token) (config : PipelineConfig) : Except String (List Statement) := do
+noncomputable def parseTokens (tokens : List Token) (_config : PipelineConfig) : Except String (List Statement) := do
   let initialState : ParserState := {
     tokens := tokens,
     position := 0
@@ -124,21 +124,33 @@ def typeCheckAST (stmt : Statement) (config : PipelineConfig) : Except String St
       -- TODO: Verify proofs
       .ok stmt
 
+/-- Convert parser-level ParsedSelect to IR.Select Unit -/
+def parsedSelectToIR (ps : ParsedSelect) (permissions : PermissionMetadata) : IR :=
+  .select {
+    selectList := ps.selectList,
+    from_ := ps.from_,
+    where_ := ps.where_,
+    orderBy := ps.orderBy,
+    limit := ps.limit,
+    returning := none,
+    permissions := permissions
+  }
+
 /-- Stage 4: Generate IR from AST -/
-def generateIRFromAST (stmt : Statement) (config : PipelineConfig) : Except String IR := do
+def generateIRFromAST (stmt : Statement) (config : PipelineConfig) : Except String IR :=
   match stmt with
-  | .insertGQL inferred =>
+  | .insertGQL _inferred =>
       -- TODO: Convert InferredInsert to IR.Insert (needs schema lookup)
       .error "InferredInsert → IR conversion not yet implemented"
-  | .insertGQLdt inferred =>
+  | .insertGQLdt _inferred =>
       -- TODO: Convert InferredInsert to IR.Insert (needs schema lookup)
       .error "InferredInsert → IR conversion not yet implemented"
   | .select selectStmt =>
-      .ok (generateIR_Select selectStmt config.permissions)
-  | .update updateStmt =>
+      .ok (parsedSelectToIR selectStmt config.permissions)
+  | .update _updateStmt =>
       -- TODO: Generate IR.Update (needs schema lookup)
       .error "UPDATE → IR conversion not yet implemented"
-  | .delete deleteStmt =>
+  | .delete _deleteStmt =>
       -- TODO: Generate IR.Delete (needs schema lookup)
       .error "DELETE → IR conversion not yet implemented"
 
@@ -155,34 +167,37 @@ noncomputable def serializeIRToBytes (ir : IR) (config : PipelineConfig) : ByteA
 -- ============================================================================
 
 /-- Run complete pipeline: Source → IR -/
-noncomputable def runPipeline (source : String) (config : PipelineConfig) : Except String IR := do
+noncomputable def runPipeline (source : String) (config : PipelineConfig) : Except String IR :=
   -- Stage 1: Tokenize
-  let tokens ← tokenizeSource source
-
+  match tokenizeSource source with
+  | .error msg => .error msg
+  | .ok tokens =>
   -- Stage 2: Parse
-  let stmts ← parseTokens tokens config
-
+  match parseTokens tokens config with
+  | .error msg => .error msg
+  | .ok stmts =>
   -- Get first statement (TODO: Handle multiple statements)
-  let stmt ← match stmts.head? with
-    | some s => .ok s
-    | none => .error "No statements parsed"
-
+  match stmts.head? with
+  | none => .error "No statements parsed"
+  | some stmt =>
   -- Stage 3: Type check
-  let checkedStmt ← typeCheckAST stmt config
-
+  match typeCheckAST stmt config with
+  | .error msg => .error msg
+  | .ok checkedStmt =>
   -- Stage 4: Generate IR
-  let ir ← generateIRFromAST checkedStmt config
-
+  match generateIRFromAST checkedStmt config with
+  | .error msg => .error msg
+  | .ok ir =>
   -- Stage 5: Validate permissions
-  validateIRPermissions ir config
-
-  -- Return validated IR
-  .ok ir
+  match validateIRPermissions ir config with
+  | .error msg => .error msg
+  | .ok () => .ok ir
 
 /-- Run pipeline and serialize to bytes -/
-noncomputable def runPipelineAndSerialize (source : String) (config : PipelineConfig) : Except String ByteArray := do
-  let ir ← runPipeline source config
-  .ok (serializeIRToBytes ir config)
+noncomputable def runPipelineAndSerialize (source : String) (config : PipelineConfig) : Except String ByteArray :=
+  match runPipeline source config with
+  | .error msg => .error msg
+  | .ok ir => .ok (serializeIRToBytes ir config)
 
 -- ============================================================================
 -- Convenience Functions

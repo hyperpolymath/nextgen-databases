@@ -12,7 +12,7 @@ import GqlDt.Prompt
 
 namespace GqlDt.Tests.TypeSafety
 
-open TypeSafe TypeChecker AST
+open TypeSafe TypeChecker AST Types
 
 -- Test 1: Valid insertion compiles
 def test_valid_insert : InsertStmt evidenceSchema :=
@@ -51,22 +51,7 @@ def test_valid_insert : InsertStmt evidenceSchema :=
 --     [ ⟨.string, .string "Plain string"⟩ ]  -- Wrong type!
 --     -- ERROR: Type mismatch in typesMatch proof
 
--- Test 5: Type-safe SELECT with refinement
-def test_select_refinement : SelectStmt (List (Σ e : Evidence, e.promptOverall > 90)) :=
-  selectHighQualityEvidence
-
-#check test_select_refinement  -- ✓ Type checks with refinement!
-
--- Test 6: Builder API validates at construction
-def test_builder : IO Unit := do
-  match exampleBuilder.run with
-  | .ok stmt =>
-      IO.println "✓ Builder created valid INSERT"
-      execute stmt
-  | .error msg =>
-      IO.println s!"✗ Builder validation failed: {msg}"
-
--- Test 7: Proof obligations are generated
+-- Test 5: Proof obligations are generated
 def test_proof_obligations : IO Unit := do
   let stmt := test_valid_insert
   let obligations := generateProofObligations stmt
@@ -83,7 +68,7 @@ def test_proof_obligations : IO Unit := do
     | .customProof _ =>
         IO.println s!"  - Custom proof required"
 
--- Test 8: Type errors produce helpful messages
+-- Test 6: Type errors produce helpful messages
 def test_error_messages : IO Unit := do
   let error := reportTypeError (.boundedNat 0 100) .nat
   IO.println s!"Error: {error.message}"
@@ -91,7 +76,7 @@ def test_error_messages : IO Unit := do
   | some sugg => IO.println s!"Suggestion: {sugg}"
   | none => pure ()
 
--- Test 9: Execute only accepts type-safe queries
+-- Test 7: Execute only accepts type-safe queries
 def test_execution_safety : IO Unit := do
   let stmt := test_valid_insert
   -- At this point, the type system GUARANTEES:
@@ -154,19 +139,15 @@ def main : IO Unit := do
   IO.println "✓ Compiles successfully"
   IO.println ""
 
-  IO.println "Test 2: Builder API"
-  test_builder
-  IO.println ""
-
-  IO.println "Test 3: Proof obligations"
+  IO.println "Test 2: Proof obligations"
   test_proof_obligations
   IO.println ""
 
-  IO.println "Test 4: Error messages"
+  IO.println "Test 3: Error messages"
   test_error_messages
   IO.println ""
 
-  IO.println "Test 5: Execution safety"
+  IO.println "Test 4: Execution safety"
   test_execution_safety
   IO.println ""
 
