@@ -80,8 +80,8 @@ pub fn setActiveMigrations(count: u64) void {
 }
 
 pub fn getPrometheus(alloc: std.mem.Allocator) ![]const u8 {
-    var buffer = std.ArrayList(u8).init(alloc);
-    const writer = buffer.writer();
+    var buffer: std.ArrayList(u8) = .empty;
+    const writer = buffer.writer(alloc);
 
     const uptime = std.time.timestamp() - start_time;
 
@@ -157,7 +157,7 @@ pub fn getPrometheus(alloc: std.mem.Allocator) ![]const u8 {
         uptime,
     });
 
-    return buffer.toOwnedSlice();
+    return buffer.toOwnedSlice(alloc);
 }
 
 test "metrics increment" {

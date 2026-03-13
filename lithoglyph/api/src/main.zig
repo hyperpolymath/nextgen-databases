@@ -105,7 +105,7 @@ fn handleRequest(
     const start_time = std.time.nanoTimestamp();
     defer {
         const elapsed = std.time.nanoTimestamp() - start_time;
-        metrics.recordLatency(elapsed);
+        metrics.recordLatency(@intCast(elapsed));
     }
 
     metrics.incrementRequests();

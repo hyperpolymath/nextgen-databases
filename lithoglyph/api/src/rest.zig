@@ -68,8 +68,9 @@ fn handleQuery(
     }
 
     // Read request body
-    var body_reader = try request.reader();
-    const body = try body_reader.readAllAlloc(allocator, 10 * 1024 * 1024);
+    var read_buf: [65536]u8 = undefined;
+    const body_reader = try request.readerExpectContinue(&read_buf);
+    const body = try body_reader.adaptToOldInterface().readAllAlloc(allocator, 10 * 1024 * 1024);
     defer allocator.free(body);
 
     // Parse JSON request
@@ -141,9 +142,9 @@ fn handleQuery(
     defer result.deinit(allocator);
 
     // Build response JSON
-    var response_buffer = std.ArrayList(u8).init(allocator);
-    defer response_buffer.deinit();
-    const writer = response_buffer.writer();
+    var response_buffer: std.ArrayList(u8) = .empty;
+    defer response_buffer.deinit(allocator);
+    const writer = response_buffer.writer(allocator);
 
     try writer.print(
         \\{{"rows":{s},"rowCount":{d},"journalSeq":0,
@@ -225,9 +226,9 @@ fn handleListCollections(allocator: std.mem.Allocator, request: *std.http.Server
     defer allocator.free(collections);
 
     // Build response JSON
-    var response_buffer = std.ArrayList(u8).init(allocator);
-    defer response_buffer.deinit();
-    const writer = response_buffer.writer();
+    var response_buffer: std.ArrayList(u8) = .empty;
+    defer response_buffer.deinit(allocator);
+    const writer = response_buffer.writer(allocator);
 
     try writer.writeAll("{\"collections\":[");
     for (collections, 0..) |col, i| {
@@ -252,9 +253,9 @@ fn handleGetCollection(allocator: std.mem.Allocator, request: *std.http.Server.R
 
     if (collection) |col| {
         // Build response JSON
-        var response_buffer = std.ArrayList(u8).init(allocator);
-        defer response_buffer.deinit();
-        const writer = response_buffer.writer();
+        var response_buffer: std.ArrayList(u8) = .empty;
+        defer response_buffer.deinit(allocator);
+        const writer = response_buffer.writer(allocator);
 
         try writer.print(
             \\{{"name":"{s}","type":"document","schema":{{"fields":[],"constraints":[]}},"documentCount":{d},"normalForm":"unknown"}}
@@ -268,8 +269,9 @@ fn handleGetCollection(allocator: std.mem.Allocator, request: *std.http.Server.R
 
 fn handleCreateCollection(allocator: std.mem.Allocator, request: *std.http.Server.Request) !void {
     // Read request body
-    var body_reader = try request.reader();
-    const body = try body_reader.readAllAlloc(allocator, 1024 * 1024);
+    var read_buf: [65536]u8 = undefined;
+    const body_reader = try request.readerExpectContinue(&read_buf);
+    const body = try body_reader.adaptToOldInterface().readAllAlloc(allocator, 1024 * 1024);
     defer allocator.free(body);
 
     // Parse JSON request
@@ -284,12 +286,9 @@ fn handleCreateCollection(allocator: std.mem.Allocator, request: *std.http.Serve
     bridge.createCollection(req.name, req.schema orelse "{}") catch |err| {
         log.err("Failed to create collection: {}", .{err});
 
-        const error_response = switch (err) {
+        const error_response: []const u8 = switch (err) {
             error.NotImplemented =>
                 \\{"error":"not_implemented","message":"Collection creation not yet implemented"}
-            ,
-            else =>
-                \\{"error":"internal_error","message":"Failed to create collection"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);
@@ -297,9 +296,9 @@ fn handleCreateCollection(allocator: std.mem.Allocator, request: *std.http.Serve
     };
 
     // Build response JSON
-    var response_buffer = std.ArrayList(u8).init(allocator);
-    defer response_buffer.deinit();
-    const writer = response_buffer.writer();
+    var response_buffer: std.ArrayList(u8) = .empty;
+    defer response_buffer.deinit(allocator);
+    const writer = response_buffer.writer(allocator);
 
     try writer.print(
         \\{{"name":"{s}","type":"document","documentCount":0,"normalForm":"unknown"}}
@@ -317,15 +316,9 @@ fn handleDropCollection(request: *std.http.Server.Request, name: []const u8) !vo
     bridge.dropCollection(name) catch |err| {
         log.err("Failed to drop collection {s}: {}", .{ name, err });
 
-        const error_response = switch (err) {
+        const error_response: []const u8 = switch (err) {
             error.NotImplemented =>
                 \\{"error":"LITH_ERR_NOT_IMPLEMENTED","message":"Collection drop not yet implemented in bridge"}
-            ,
-            error.NotInitialized =>
-                \\{"error":"LITH_ERR_INTERNAL","message":"Database not initialized"}
-            ,
-            else =>
-                \\{"error":"LITH_ERR_INTERNAL","message":"Failed to drop collection"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);
@@ -389,9 +382,9 @@ fn handleJournal(
     defer allocator.free(entries);
 
     // Build response JSON
-    var response_buffer = std.ArrayList(u8).init(allocator);
-    defer response_buffer.deinit();
-    const writer = response_buffer.writer();
+    var response_buffer: std.ArrayList(u8) = .empty;
+    defer response_buffer.deinit(allocator);
+    const writer = response_buffer.writer(allocator);
 
     try writer.writeAll("{\"entries\":[");
     for (entries, 0..) |entry, i| {
@@ -447,8 +440,9 @@ fn handleNormalize(
 
 fn handleDiscover(allocator: std.mem.Allocator, request: *std.http.Server.Request) !void {
     // Read request body to get collection name and optional sample_size
-    var body_reader = try request.reader();
-    const body = try body_reader.readAllAlloc(allocator, 1024 * 1024);
+    var read_buf: [65536]u8 = undefined;
+    const body_reader = try request.readerExpectContinue(&read_buf);
+    const body = try body_reader.adaptToOldInterface().readAllAlloc(allocator, 1024 * 1024);
     defer allocator.free(body);
 
     const parsed = json.parseFromSlice(DiscoverRequest, allocator, body, .{}) catch {
@@ -463,15 +457,9 @@ fn handleDiscover(allocator: std.mem.Allocator, request: *std.http.Server.Reques
     const deps = bridge.discoverDependencies(req.collection, sample_size) catch |err| {
         log.err("Failed to discover dependencies for {s}: {}", .{ req.collection, err });
 
-        const error_response = switch (err) {
+        const error_response: []const u8 = switch (err) {
             error.NotImplemented =>
                 \\{"error":"LITH_ERR_NOT_IMPLEMENTED","message":"Dependency discovery not yet implemented in bridge"}
-            ,
-            error.NotInitialized =>
-                \\{"error":"LITH_ERR_INTERNAL","message":"Database not initialized"}
-            ,
-            else =>
-                \\{"error":"LITH_ERR_INTERNAL","message":"Failed to discover functional dependencies"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);
@@ -480,9 +468,9 @@ fn handleDiscover(allocator: std.mem.Allocator, request: *std.http.Server.Reques
     defer allocator.free(deps);
 
     // Build response JSON
-    var response_buffer = std.ArrayList(u8).init(allocator);
-    defer response_buffer.deinit();
-    const writer = response_buffer.writer();
+    var response_buffer: std.ArrayList(u8) = .empty;
+    defer response_buffer.deinit(allocator);
+    const writer = response_buffer.writer(allocator);
 
     try writer.print("{{\"collection\":\"{s}\",\"functionalDependencies\":[", .{req.collection});
     for (deps, 0..) |dep, i| {
@@ -513,8 +501,9 @@ const DiscoverRequest = struct {
 
 fn handleAnalyze(allocator: std.mem.Allocator, request: *std.http.Server.Request) !void {
     // Read request body to get collection name
-    var body_reader = try request.reader();
-    const body = try body_reader.readAllAlloc(allocator, 1024 * 1024);
+    var read_buf: [65536]u8 = undefined;
+    const body_reader = try request.readerExpectContinue(&read_buf);
+    const body = try body_reader.adaptToOldInterface().readAllAlloc(allocator, 1024 * 1024);
     defer allocator.free(body);
 
     const parsed = json.parseFromSlice(AnalyzeRequest, allocator, body, .{}) catch {
@@ -528,15 +517,9 @@ fn handleAnalyze(allocator: std.mem.Allocator, request: *std.http.Server.Request
     const analysis = bridge.analyzeNormalForm(req.collection) catch |err| {
         log.err("Failed to analyze normal form for {s}: {}", .{ req.collection, err });
 
-        const error_response = switch (err) {
+        const error_response: []const u8 = switch (err) {
             error.NotImplemented =>
                 \\{"error":"LITH_ERR_NOT_IMPLEMENTED","message":"Normal form analysis not yet implemented in bridge"}
-            ,
-            error.NotInitialized =>
-                \\{"error":"LITH_ERR_INTERNAL","message":"Database not initialized"}
-            ,
-            else =>
-                \\{"error":"LITH_ERR_INTERNAL","message":"Failed to analyze normal form"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);
@@ -544,9 +527,9 @@ fn handleAnalyze(allocator: std.mem.Allocator, request: *std.http.Server.Request
     };
 
     // Build response JSON
-    var response_buffer = std.ArrayList(u8).init(allocator);
-    defer response_buffer.deinit();
-    const writer = response_buffer.writer();
+    var response_buffer: std.ArrayList(u8) = .empty;
+    defer response_buffer.deinit(allocator);
+    const writer = response_buffer.writer(allocator);
 
     try writer.print("{{\"collection\":\"{s}\",\"currentForm\":\"{s}\",\"violations\":[", .{
         req.collection,
@@ -612,8 +595,9 @@ const MigrationAdvanceRequest = struct {
 
 fn handleMigrationStart(allocator: std.mem.Allocator, request: *std.http.Server.Request) !void {
     // Read request body
-    var body_reader = try request.reader();
-    const body = try body_reader.readAllAlloc(allocator, 1024 * 1024);
+    var read_buf: [65536]u8 = undefined;
+    const body_reader = try request.readerExpectContinue(&read_buf);
+    const body = try body_reader.adaptToOldInterface().readAllAlloc(allocator, 1024 * 1024);
     defer allocator.free(body);
 
     const parsed = json.parseFromSlice(MigrationStartRequest, allocator, body, .{}) catch {
@@ -628,15 +612,9 @@ fn handleMigrationStart(allocator: std.mem.Allocator, request: *std.http.Server.
     const migration = bridge.startMigration(req.collection, target_schema) catch |err| {
         log.err("Failed to start migration for {s}: {}", .{ req.collection, err });
 
-        const error_response = switch (err) {
+        const error_response: []const u8 = switch (err) {
             error.NotImplemented =>
                 \\{"error":"LITH_ERR_NOT_IMPLEMENTED","message":"Migration not yet implemented in bridge"}
-            ,
-            error.NotInitialized =>
-                \\{"error":"LITH_ERR_INTERNAL","message":"Database not initialized"}
-            ,
-            else =>
-                \\{"error":"LITH_ERR_INTERNAL","message":"Failed to start migration"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);
@@ -644,9 +622,9 @@ fn handleMigrationStart(allocator: std.mem.Allocator, request: *std.http.Server.
     };
 
     // Build response JSON
-    var response_buffer = std.ArrayList(u8).init(allocator);
-    defer response_buffer.deinit();
-    const writer = response_buffer.writer();
+    var response_buffer: std.ArrayList(u8) = .empty;
+    defer response_buffer.deinit(allocator);
+    const writer = response_buffer.writer(allocator);
 
     const phase_str = switch (migration.state) {
         .announced => "announce",
@@ -665,8 +643,9 @@ fn handleMigrationStart(allocator: std.mem.Allocator, request: *std.http.Server.
 
 fn handleMigrationAdvance(allocator: std.mem.Allocator, request: *std.http.Server.Request, action: bridge.MigrationAction) !void {
     // Read request body
-    var body_reader = try request.reader();
-    const body = try body_reader.readAllAlloc(allocator, 1024 * 1024);
+    var read_buf: [65536]u8 = undefined;
+    const body_reader = try request.readerExpectContinue(&read_buf);
+    const body = try body_reader.adaptToOldInterface().readAllAlloc(allocator, 1024 * 1024);
     defer allocator.free(body);
 
     const parsed = json.parseFromSlice(MigrationAdvanceRequest, allocator, body, .{}) catch {
@@ -680,15 +659,9 @@ fn handleMigrationAdvance(allocator: std.mem.Allocator, request: *std.http.Serve
     bridge.advanceMigration(req.id, action) catch |err| {
         log.err("Failed to advance migration {s}: {}", .{ req.id, err });
 
-        const error_response = switch (err) {
+        const error_response: []const u8 = switch (err) {
             error.NotImplemented =>
                 \\{"error":"LITH_ERR_NOT_IMPLEMENTED","message":"Migration advancement not yet implemented in bridge"}
-            ,
-            error.NotInitialized =>
-                \\{"error":"LITH_ERR_INTERNAL","message":"Database not initialized"}
-            ,
-            else =>
-                \\{"error":"LITH_ERR_INTERNAL","message":"Failed to advance migration"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);
@@ -704,9 +677,9 @@ fn handleMigrationAdvance(allocator: std.mem.Allocator, request: *std.http.Serve
             .commit => "complete",
             .abort => "aborted",
         };
-        var response_buffer = std.ArrayList(u8).init(allocator);
-        defer response_buffer.deinit();
-        try response_buffer.writer().print(
+        var response_buffer: std.ArrayList(u8) = .empty;
+        defer response_buffer.deinit(allocator);
+        try response_buffer.writer(allocator).print(
             \\{{"id":"{s}","phase":"{s}","narrative":"Migration phase advanced"}}
         , .{ req.id, phase_str });
         try sendJson(request, .ok, response_buffer.items);
@@ -714,9 +687,9 @@ fn handleMigrationAdvance(allocator: std.mem.Allocator, request: *std.http.Serve
     };
 
     if (migration) |mig| {
-        var response_buffer = std.ArrayList(u8).init(allocator);
-        defer response_buffer.deinit();
-        const writer = response_buffer.writer();
+        var response_buffer: std.ArrayList(u8) = .empty;
+        defer response_buffer.deinit(allocator);
+        const writer = response_buffer.writer(allocator);
 
         const phase_str = switch (mig.state) {
             .announced => "announce",
@@ -744,9 +717,9 @@ fn handleHealth(allocator: std.mem.Allocator, request: *std.http.Server.Request)
     const health = bridge.getHealth();
 
     // Build response JSON
-    var response_buffer = std.ArrayList(u8).init(allocator);
-    defer response_buffer.deinit();
-    const writer = response_buffer.writer();
+    var response_buffer: std.ArrayList(u8) = .empty;
+    defer response_buffer.deinit(allocator);
+    const writer = response_buffer.writer(allocator);
 
     try writer.print(
         \\{{"status":"{s}","version":"{s}","uptime":{d},"checks":{{"database":"{s}","journal":"{s}"}}}}

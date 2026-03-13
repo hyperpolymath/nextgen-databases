@@ -46,8 +46,9 @@ fn routeGrpcMethod(allocator: std.mem.Allocator, request: *std.http.Server.Reque
     log.info("gRPC method: {s}", .{method});
 
     // Read request body (gRPC frame)
-    var body_reader = try request.reader();
-    const body = try body_reader.readAllAlloc(allocator, 10 * 1024 * 1024);
+    var read_buf: [65536]u8 = undefined;
+    const body_reader = try request.readerExpectContinue(&read_buf);
+    const body = try body_reader.adaptToOldInterface().readAllAlloc(allocator, 10 * 1024 * 1024);
     defer allocator.free(body);
 
     // Parse gRPC frame: 1 byte compression + 4 bytes length + message
@@ -99,23 +100,24 @@ fn routeGrpcMethod(allocator: std.mem.Allocator, request: *std.http.Server.Reque
 // =============================================================================
 
 const ProtobufEncoder = struct {
-    buffer: std.ArrayList(u8),
+    buffer: std.ArrayList(u8) = .empty,
+    allocator: std.mem.Allocator,
 
     fn init(allocator: std.mem.Allocator) ProtobufEncoder {
-        return .{ .buffer = std.ArrayList(u8).init(allocator) };
+        return .{ .allocator = allocator };
     }
 
     fn deinit(self: *ProtobufEncoder) void {
-        self.buffer.deinit();
+        self.buffer.deinit(self.allocator);
     }
 
     fn writeVarint(self: *ProtobufEncoder, value: u64) !void {
         var v = value;
         while (v >= 0x80) {
-            try self.buffer.append(@as(u8, @truncate(v)) | 0x80);
+            try self.buffer.append(self.allocator, @as(u8, @truncate(v)) | 0x80);
             v >>= 7;
         }
-        try self.buffer.append(@as(u8, @truncate(v)));
+        try self.buffer.append(self.allocator, @as(u8, @truncate(v)));
     }
 
     fn writeTag(self: *ProtobufEncoder, field: u32, wire_type: u3) !void {
@@ -125,7 +127,7 @@ const ProtobufEncoder = struct {
     fn writeString(self: *ProtobufEncoder, field: u32, value: []const u8) !void {
         try self.writeTag(field, 2); // Length-delimited
         try self.writeVarint(value.len);
-        try self.buffer.appendSlice(value);
+        try self.buffer.appendSlice(self.allocator, value);
     }
 
     fn writeInt64(self: *ProtobufEncoder, field: u32, value: i64) !void {
@@ -156,13 +158,13 @@ const ProtobufEncoder = struct {
     fn writeBytes(self: *ProtobufEncoder, field: u32, value: []const u8) !void {
         try self.writeTag(field, 2); // Length-delimited
         try self.writeVarint(value.len);
-        try self.buffer.appendSlice(value);
+        try self.buffer.appendSlice(self.allocator, value);
     }
 
     fn writeMessage(self: *ProtobufEncoder, field: u32, msg: []const u8) !void {
         try self.writeTag(field, 2); // Length-delimited
         try self.writeVarint(msg.len);
-        try self.buffer.appendSlice(msg);
+        try self.buffer.appendSlice(self.allocator, msg);
     }
 
     fn finish(self: *ProtobufEncoder) []const u8 {
@@ -356,9 +358,8 @@ fn handleCreateCollection(allocator: std.mem.Allocator, request: *std.http.Serve
 
     bridge.createCollection(name, schema) catch |err| {
         log.err("CreateCollection failed: {}", .{err});
-        const msg = switch (err) {
+        const msg: []const u8 = switch (err) {
             error.NotImplemented => "Collection creation not yet implemented",
-            else => "Failed to create collection",
         };
         try sendGrpcError(allocator, request, 12, msg);
         return;
@@ -433,15 +434,11 @@ fn handleDiscoverDependencies(allocator: std.mem.Allocator, request: *std.http.S
 
     const deps = bridge.discoverDependencies(collection, sample_size) catch |err| {
         log.err("DiscoverDependencies failed for {s}: {}", .{ collection, err });
-        const msg = switch (err) {
+        const msg: []const u8 = switch (err) {
             error.NotImplemented => "Dependency discovery not yet implemented in bridge",
-            error.NotInitialized => "Database not initialized",
-            else => "Failed to discover dependencies",
         };
-        // gRPC status 12 = UNIMPLEMENTED for NotImplemented, 13 = INTERNAL otherwise
         const code: u8 = switch (err) {
             error.NotImplemented => 12,
-            else => 13,
         };
         try sendGrpcError(allocator, request, code, msg);
         return;
@@ -466,7 +463,7 @@ fn handleDiscoverDependencies(allocator: std.mem.Allocator, request: *std.http.S
         // Encode confidence as fixed32 (IEEE 754 float)
         try dep_encoder.writeTag(3, 5); // wire type 5 = 32-bit
         const conf_bits: u32 = @bitCast(dep.confidence);
-        try dep_encoder.buffer.appendSlice(&std.mem.toBytes(conf_bits));
+        try dep_encoder.buffer.appendSlice(dep_encoder.allocator, &std.mem.toBytes(conf_bits));
         try encoder.writeMessage(2, dep_encoder.finish());
     }
 
@@ -493,14 +490,11 @@ fn handleAnalyzeNormalForm(allocator: std.mem.Allocator, request: *std.http.Serv
 
     const analysis = bridge.analyzeNormalForm(collection) catch |err| {
         log.err("AnalyzeNormalForm failed for {s}: {}", .{ collection, err });
-        const msg = switch (err) {
+        const msg: []const u8 = switch (err) {
             error.NotImplemented => "Normal form analysis not yet implemented in bridge",
-            error.NotInitialized => "Database not initialized",
-            else => "Failed to analyze normal form",
         };
         const code: u8 = switch (err) {
             error.NotImplemented => 12,
-            else => 13,
         };
         try sendGrpcError(allocator, request, code, msg);
         return;
@@ -566,14 +560,11 @@ fn handleStartMigration(allocator: std.mem.Allocator, request: *std.http.Server.
 
     const migration = bridge.startMigration(collection, target_schema) catch |err| {
         log.err("StartMigration failed for {s}: {}", .{ collection, err });
-        const msg = switch (err) {
+        const msg: []const u8 = switch (err) {
             error.NotImplemented => "Migration not yet implemented in bridge",
-            error.NotInitialized => "Database not initialized",
-            else => "Failed to start migration",
         };
         const code: u8 = switch (err) {
             error.NotImplemented => 12,
-            else => 13,
         };
         try sendGrpcError(allocator, request, code, msg);
         return;

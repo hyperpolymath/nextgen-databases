@@ -22,9 +22,9 @@ pub fn build(b: *std.Build) void {
     // Link libc for networking
     exe.linkLibC();
 
-    // Link bridge library (from core-zig)
-    exe.addLibraryPath(b.path("../core-zig"));
-    exe.linkSystemLibrary("bridge");
+    // Link bridge library (from core-zig build output)
+    exe.addLibraryPath(b.path("../core-zig/zig-out/lib"));
+    exe.linkSystemLibrary("lith_bridge");
 
     b.installArtifact(exe);
 

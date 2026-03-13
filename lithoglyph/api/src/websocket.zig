@@ -187,9 +187,9 @@ pub fn createSubscriptionMessage(
     id: ?[]const u8,
     payload: ?[]const u8,
 ) ![]const u8 {
-    var buffer = std.ArrayList(u8).init(allocator);
-    errdefer buffer.deinit();
-    const writer = buffer.writer();
+    var buffer: std.ArrayList(u8) = .empty;
+    errdefer buffer.deinit(allocator);
+    const writer = buffer.writer(allocator);
 
     try writer.writeAll("{\"type\":\"");
     try writer.writeAll(msg_type);
@@ -208,7 +208,7 @@ pub fn createSubscriptionMessage(
 
     try writer.writeAll("}");
 
-    return try buffer.toOwnedSlice();
+    return try buffer.toOwnedSlice(allocator);
 }
 
 /// Parse a GraphQL subscription message
@@ -252,9 +252,9 @@ pub fn createJournalNotification(
     sub_id: []const u8,
     entry: bridge.JournalEntry,
 ) ![]const u8 {
-    var payload = std.ArrayList(u8).init(allocator);
-    defer payload.deinit();
-    const writer = payload.writer();
+    var payload: std.ArrayList(u8) = .empty;
+    defer payload.deinit(allocator);
+    const writer = payload.writer(allocator);
 
     try writer.print(
         \\{{"data":{{"journalStream":{{"seq":{d},"timestamp":"{s}","operation":"{s}"

@@ -71,8 +71,9 @@ fn handleGraphiQL(request: *std.http.Server.Request) !void {
 
 fn handleGraphQLQuery(allocator: std.mem.Allocator, request: *std.http.Server.Request) !void {
     // Read request body
-    var body_reader = try request.reader();
-    const body = try body_reader.readAllAlloc(allocator, 10 * 1024 * 1024);
+    var read_buf: [65536]u8 = undefined;
+    const body_reader = try request.readerExpectContinue(&read_buf);
+    const body = try body_reader.adaptToOldInterface().readAllAlloc(allocator, 10 * 1024 * 1024);
     defer allocator.free(body);
 
     // Parse GraphQL request
@@ -164,9 +165,9 @@ fn executeQueryOperation(allocator: std.mem.Allocator, query: []const u8) ![]con
         );
     } else if (std.mem.indexOf(u8, query, "health") != null) {
         const health = bridge.getHealth();
-        var response_buffer = std.ArrayList(u8).init(allocator);
-        errdefer response_buffer.deinit();
-        const writer = response_buffer.writer();
+        var response_buffer: std.ArrayList(u8) = .empty;
+        errdefer response_buffer.deinit(allocator);
+        const writer = response_buffer.writer(allocator);
 
         try writer.print(
             \\{{"data":{{"health":{{"status":"{s}","version":"{s}","uptimeSeconds":{d}}}}}}}
@@ -176,7 +177,7 @@ fn executeQueryOperation(allocator: std.mem.Allocator, query: []const u8) ![]con
             health.uptime_seconds,
         });
 
-        return try response_buffer.toOwnedSlice();
+        return try response_buffer.toOwnedSlice(allocator);
     } else if (std.mem.indexOf(u8, query, "query(") != null or
         std.mem.indexOf(u8, query, "query (") != null)
     {

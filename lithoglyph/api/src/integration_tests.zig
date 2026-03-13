@@ -290,8 +290,8 @@ test "Bridge client CBOR encoding produces valid output" {
     const allocator = createTestAllocator();
 
     // Test CBOR map encoding
-    var cbor = std.ArrayList(u8).init(allocator);
-    defer cbor.deinit();
+    var cbor: std.ArrayList(u8) = .empty;
+    defer cbor.deinit(allocator);
 
     // Write a simple CBOR map: {1: "test"}
     try cbor.append(0xA1); // Map with 1 item
