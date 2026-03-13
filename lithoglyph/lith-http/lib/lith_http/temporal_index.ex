@@ -20,6 +20,10 @@ defmodule LithHttp.TemporalIndex do
 
   @table_prefix :temporal_index_
 
+  # Maximum number of temporal indexes to prevent atom table exhaustion.
+  # Each index creates one atom for the ETS named table.
+  @max_indexes 10_000
+
   # Client API
 
   def start_link(_opts) do
@@ -211,10 +215,6 @@ defmodule LithHttp.TemporalIndex do
         end
     end
   end
-
-  # Maximum number of temporal indexes to prevent atom table exhaustion.
-  # Each index creates one atom for the ETS named table.
-  @max_indexes 10_000
 
   # Private functions
 
