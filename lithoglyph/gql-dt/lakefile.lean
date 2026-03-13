@@ -6,7 +6,7 @@
 import Lake
 open Lake DSL
 
-package fqldt where
+package gqldt where
   leanOptions := #[
     ⟨`pp.unicode.fun, true⟩,  -- Use unicode λ in pretty printing
     ⟨`autoImplicit, false⟩    -- Require explicit type annotations
@@ -18,9 +18,9 @@ require mathlib from git
 
 -- Main library
 @[default_target]
-lean_lib FbqlDt where
+lean_lib GqlDt where
   srcDir := "src"
-  roots := #[`FbqlDt]
+  roots := #[`GqlDt]
 
 -- FFI Test executable (requires Zig library to be built first)
 -- Build Zig lib: cd bridge && zig build
@@ -30,7 +30,7 @@ lean_exe ffi_test where
   -- Link against the Zig FFI bridge library
   moreLinkArgs := #[
     "-Lbridge/zig-out/lib",
-    "-lfdb_bridge"
+    "-llith_bridge"
   ]
 
 -- Parser test executable
@@ -39,11 +39,11 @@ lean_exe parser_test where
   root := `ParserTest
 
 -- GQLdt CLI/REPL (with FFI persistence backend)
-lean_exe fqldt where
+lean_exe gqldt where
   srcDir := "src"
   root := `Main
   -- Link against the Zig FFI bridge library for persistence
   moreLinkArgs := #[
     "-Lbridge/zig-out/lib",
-    "-lfdb_bridge"
+    "-llith_bridge"
   ]

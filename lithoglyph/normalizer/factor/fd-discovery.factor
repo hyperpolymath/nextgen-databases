@@ -296,7 +296,7 @@ TUPLE: nf-violation
         >>violations ;
 
 ! ============================================================
-! FQL Integration: DISCOVER DEPENDENCIES
+! GQL Integration: DISCOVER DEPENDENCIES
 ! ============================================================
 
 TUPLE: discover-stmt

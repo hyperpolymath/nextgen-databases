@@ -6,7 +6,7 @@
 !
 ! These tests verify that data flows correctly across component boundaries.
 
-USING: accessors arrays assocs fdql fd-discovery io kernel math
+USING: accessors arrays assocs gql fd-discovery io kernel math
 namespaces sequences strings tools.test vectors ;
 
 IN: seam-tests
@@ -21,7 +21,7 @@ IN: seam-tests
 : setup-test-collection ( -- )
     reset-test-state
     ! Create a test collection with sample data
-    "CREATE COLLECTION test_users" run-fdql drop
+    "CREATE COLLECTION test_users" run-gql drop
     ! Insert test documents
     V{
         H{ { "id" "u1" } { "name" "Alice" } { "dept" "Engineering" } { "salary" "100000" } }
@@ -38,34 +38,34 @@ IN: seam-tests
 ! Test that parsed AST can be planned
 
 { t } [
-    "SELECT * FROM users" parse-fdql
-    fdql-select?
+    "SELECT * FROM users" parse-gql
+    gql-select?
 ] unit-test
 
 { t } [
-    "SELECT * FROM users" parse-fdql plan-query
+    "SELECT * FROM users" parse-gql plan-query
     query-plan?
 ] unit-test
 
 { t } [
-    "SELECT name, dept FROM users WHERE dept = Engineering" parse-fdql plan-query
+    "SELECT name, dept FROM users WHERE dept = Engineering" parse-gql plan-query
     steps>> length 2 >=  ! At least project + scan
 ] unit-test
 
 { t } [
-    "INSERT INTO users { name: Test }" parse-fdql plan-query
+    "INSERT INTO users { name: Test }" parse-gql plan-query
     steps>> first type>> "insert" =
 ] unit-test
 
 ! Test EXPLAIN produces plan
 
 { "ok" } [
-    "EXPLAIN SELECT * FROM users" parse-fdql execute-fdql
+    "EXPLAIN SELECT * FROM users" parse-gql execute-gql
     "status" swap at
 ] unit-test
 
 { t } [
-    "EXPLAIN SELECT * FROM users" parse-fdql execute-fdql
+    "EXPLAIN SELECT * FROM users" parse-gql execute-gql
     "plan" swap at
     "steps" swap at
     array?
@@ -79,19 +79,19 @@ IN: seam-tests
 
 { "ok" } [
     setup-test-collection
-    "SELECT * FROM test_users" run-fdql
+    "SELECT * FROM test_users" run-gql
     "status" swap at
 ] unit-test
 
 { 5 } [
     setup-test-collection
-    "SELECT * FROM test_users" run-fdql
+    "SELECT * FROM test_users" run-gql
     "count" swap at
 ] unit-test
 
 { t } [
     setup-test-collection
-    "SELECT * FROM test_users WHERE dept = Engineering" run-fdql
+    "SELECT * FROM test_users WHERE dept = Engineering" run-gql
     "count" swap at 3 =
 ] unit-test
 
@@ -99,8 +99,8 @@ IN: seam-tests
 
 { t } [
     setup-test-collection
-    "INSERT INTO test_users { name: Frank, dept: HR }" run-fdql drop
-    "SELECT * FROM test_users WHERE dept = HR" run-fdql
+    "INSERT INTO test_users { name: Frank, dept: HR }" run-gql drop
+    "SELECT * FROM test_users WHERE dept = HR" run-gql
     "count" swap at 1 =
 ] unit-test
 
@@ -108,8 +108,8 @@ IN: seam-tests
 
 { t } [
     setup-test-collection
-    "UPDATE test_users SET salary = 120000 WHERE name = Alice" run-fdql drop
-    "SELECT salary FROM test_users WHERE name = Alice" run-fdql
+    "UPDATE test_users SET salary = 120000 WHERE name = Alice" run-gql drop
+    "SELECT salary FROM test_users WHERE name = Alice" run-gql
     "rows" swap at first "salary" swap at "120000" =
 ] unit-test
 
@@ -117,8 +117,8 @@ IN: seam-tests
 
 { t } [
     setup-test-collection
-    "DELETE FROM test_users WHERE dept = Sales" run-fdql drop
-    "SELECT * FROM test_users" run-fdql
+    "DELETE FROM test_users WHERE dept = Sales" run-gql drop
+    "SELECT * FROM test_users" run-gql
     "count" swap at 3 =  ! 5 - 2 Sales employees = 3
 ] unit-test
 
@@ -167,7 +167,7 @@ IN: seam-tests
     reset-test-state
 
     ! Step 1: Create collection
-    "CREATE COLLECTION orders" run-fdql
+    "CREATE COLLECTION orders" run-gql
     "status" swap at "ok" = not [ f ] [
 
         ! Step 2: Insert data with clear FD pattern
@@ -179,7 +179,7 @@ IN: seam-tests
         } "orders" set-collection
 
         ! Step 3: Query and verify
-        "SELECT * FROM orders" run-fdql
+        "SELECT * FROM orders" run-gql
         "count" swap at 4 = not [ f ] [
 
             ! Step 4: Run FD discovery
@@ -209,13 +209,13 @@ IN: seam-tests
 
 { t } [
     setup-test-collection
-    "EXPLAIN ANALYZE SELECT * FROM test_users" run-fdql
+    "EXPLAIN ANALYZE SELECT * FROM test_users" run-gql
     "execution_time_ms" swap key?
 ] unit-test
 
 { t } [
     setup-test-collection
-    "EXPLAIN ANALYZE SELECT * FROM test_users" run-fdql
+    "EXPLAIN ANALYZE SELECT * FROM test_users" run-gql
     "actual_result" swap at
     "count" swap at 5 =
 ] unit-test
@@ -224,7 +224,7 @@ IN: seam-tests
 
 { t } [
     setup-test-collection
-    "EXPLAIN VERBOSE SELECT * FROM test_users WHERE dept = Engineering" run-fdql
+    "EXPLAIN VERBOSE SELECT * FROM test_users WHERE dept = Engineering" run-gql
     "verbose_plan" swap at
     "Seq Scan" swap subseq?
 ] unit-test
@@ -237,14 +237,14 @@ IN: seam-tests
 
 { t } [
     setup-test-collection
-    "INTROSPECT COLLECTIONS" run-fdql
+    "INTROSPECT COLLECTIONS" run-gql
     "collections" swap at
     "test_users" swap member?
 ] unit-test
 
 { "ok" } [
     setup-test-collection
-    "INTROSPECT SCHEMA" run-fdql
+    "INTROSPECT SCHEMA" run-gql
     "status" swap at
 ] unit-test
 
@@ -255,21 +255,21 @@ IN: seam-tests
 ! Test that parser errors don't crash planner
 
 { t } [
-    [ "SELECTT * FROM users" parse-fdql ] [ fdql-parse-error? ] recover
+    [ "SELECTT * FROM users" parse-gql ] [ gql-parse-error? ] recover
 ] unit-test
 
 ! Test that missing collection returns error gracefully
 
 { "ok" } [
     reset-test-state
-    "SELECT * FROM nonexistent" run-fdql
+    "SELECT * FROM nonexistent" run-gql
     "status" swap at
     ! Should still return ok, just with empty results
 ] unit-test
 
 { 0 } [
     reset-test-state
-    "SELECT * FROM nonexistent" run-fdql
+    "SELECT * FROM nonexistent" run-gql
     "count" swap at
 ] unit-test
 
@@ -291,13 +291,13 @@ IN: seam-tests
 
 { t } [
     1000 create-large-dataset
-    "SELECT * FROM large_users" run-fdql
+    "SELECT * FROM large_users" run-gql
     "count" swap at 1000 =
 ] unit-test
 
 { t } [
     1000 create-large-dataset
-    "SELECT * FROM large_users WHERE dept = Eng" run-fdql
+    "SELECT * FROM large_users WHERE dept = Eng" run-gql
     "count" swap at 500 =
 ] unit-test
 

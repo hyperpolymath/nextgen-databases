@@ -34,8 +34,8 @@ let defaultConfig: propertyConfig = {
   verbose: false,
 }
 
-/** FDQL statement types for generation */
-type fdqlStatementType =
+/** GQL statement types for generation */
+type gqlStatementType =
   | Select
   | Insert
   | Update
@@ -46,7 +46,7 @@ type fdqlStatementType =
   | Introspect
 
 /** All statement types */
-let allStatementTypes: array<fdqlStatementType> = [
+let allStatementTypes: array<gqlStatementType> = [
   Select,
   Insert,
   Update,
@@ -58,7 +58,7 @@ let allStatementTypes: array<fdqlStatementType> = [
 ]
 
 /** Statement type to string */
-let statementTypeToString = (st: fdqlStatementType): string =>
+let statementTypeToString = (st: gqlStatementType): string =>
   switch st {
   | Select => "SELECT"
   | Insert => "INSERT"
@@ -109,7 +109,7 @@ type rec valueType =
   | NullVal
   | ArrayVal(array<valueType>)
 
-/** Value to FDQL string */
+/** Value to GQL string */
 let rec valueToString = (v: valueType): string =>
   switch v {
   | StringVal(s) => `"${s}"`

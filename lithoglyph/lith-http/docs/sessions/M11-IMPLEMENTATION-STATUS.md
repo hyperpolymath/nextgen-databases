@@ -73,7 +73,7 @@ M10 PoC Stubs (returns dummy data)
 - `lib/lith_http/lith.ex` - High-level Lithoglyph client API
 - `lib/lith_http_web/controllers/api_controller.ex` - HTTP API controller
 - `lib/lith_http_web/router.ex` - API routes
-- `native_rust/` - Rustler NIF source (copied from formbd-beam)
+- `native_rust/` - Rustler NIF source (copied from lith-beam)
 - `priv/native/lith_nif.so` - Compiled NIF library
 
 ### Testing
@@ -150,12 +150,12 @@ curl -X POST http://localhost:4000/api/v1/transactions/txn_xyz789/commit
 
 ## Next Steps (Remaining M11 Work)
 
-### FormBD-Geo Endpoints (2-3 hours)
+### Lith-Geo Endpoints (2-3 hours)
 - [ ] `POST /api/v1/geo/insert` - Insert geospatial features
 - [ ] `GET /api/v1/geo/query` - Query by bounding box
 - [ ] `GET /api/v1/geo/features/:id/provenance` - Feature history
 
-### FormBD-Analytics Endpoints (2-3 hours)
+### Lith-Analytics Endpoints (2-3 hours)
 - [ ] `POST /api/v1/analytics/timeseries` - Insert time-series data
 - [ ] `GET /api/v1/analytics/timeseries` - Query with aggregation
 - [ ] `GET /api/v1/analytics/timeseries/:id/provenance` - Series history
@@ -231,7 +231,7 @@ All core Lithoglyph operations are accessible via HTTP with proper:
 - WebSocket subscriptions
 - Production hardening
 
-**Next session:** Implement FormBD-Geo and FormBD-Analytics endpoints.
+**Next session:** Implement Lith-Geo and Lith-Analytics endpoints.
 
 ---
 

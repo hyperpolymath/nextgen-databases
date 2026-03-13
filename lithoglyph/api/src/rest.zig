@@ -81,7 +81,7 @@ fn handleQuery(
 
     const req = parsed.value;
 
-    log.info("Executing GQL: {s}", .{req.fdql});
+    log.info("Executing GQL: {s}", .{req.ldql});
 
     // EXPLAIN mode - return query plan without execution
     if (req.explain) {
@@ -114,7 +114,7 @@ fn handleQuery(
         .rationale = p.rationale,
     } else null;
 
-    var result = bridge.executeQuery(req.fdql, prov) catch |err| {
+    var result = bridge.executeQuery(req.ldql, prov) catch |err| {
         log.err("Query execution failed: {}", .{err});
 
         // Return error response
@@ -164,7 +164,7 @@ fn handleQuery(
 }
 
 const QueryRequest = struct {
-    fdql: []const u8,
+    ldql: []const u8,
     provenance: ?Provenance = null,
     explain: bool = false,
     analyze: bool = false,
@@ -319,13 +319,13 @@ fn handleDropCollection(request: *std.http.Server.Request, name: []const u8) !vo
 
         const error_response = switch (err) {
             error.NotImplemented =>
-                \\{"error":"FDB_ERR_NOT_IMPLEMENTED","message":"Collection drop not yet implemented in bridge"}
+                \\{"error":"LITH_ERR_NOT_IMPLEMENTED","message":"Collection drop not yet implemented in bridge"}
             ,
             error.NotInitialized =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Database not initialized"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Database not initialized"}
             ,
             else =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Failed to drop collection"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Failed to drop collection"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);
@@ -374,13 +374,13 @@ fn handleJournal(
 
         const error_response = switch (err) {
             error.NotInitialized =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Database not initialized"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Database not initialized"}
             ,
             error.JournalRenderFailed =>
-                \\{"error":"FDB_ERR_IO_ERROR","message":"Failed to render journal entries"}
+                \\{"error":"LITH_ERR_IO_ERROR","message":"Failed to render journal entries"}
             ,
             else =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Internal server error"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Internal server error"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);
@@ -465,13 +465,13 @@ fn handleDiscover(allocator: std.mem.Allocator, request: *std.http.Server.Reques
 
         const error_response = switch (err) {
             error.NotImplemented =>
-                \\{"error":"FDB_ERR_NOT_IMPLEMENTED","message":"Dependency discovery not yet implemented in bridge"}
+                \\{"error":"LITH_ERR_NOT_IMPLEMENTED","message":"Dependency discovery not yet implemented in bridge"}
             ,
             error.NotInitialized =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Database not initialized"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Database not initialized"}
             ,
             else =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Failed to discover functional dependencies"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Failed to discover functional dependencies"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);
@@ -530,13 +530,13 @@ fn handleAnalyze(allocator: std.mem.Allocator, request: *std.http.Server.Request
 
         const error_response = switch (err) {
             error.NotImplemented =>
-                \\{"error":"FDB_ERR_NOT_IMPLEMENTED","message":"Normal form analysis not yet implemented in bridge"}
+                \\{"error":"LITH_ERR_NOT_IMPLEMENTED","message":"Normal form analysis not yet implemented in bridge"}
             ,
             error.NotInitialized =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Database not initialized"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Database not initialized"}
             ,
             else =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Failed to analyze normal form"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Failed to analyze normal form"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);
@@ -630,13 +630,13 @@ fn handleMigrationStart(allocator: std.mem.Allocator, request: *std.http.Server.
 
         const error_response = switch (err) {
             error.NotImplemented =>
-                \\{"error":"FDB_ERR_NOT_IMPLEMENTED","message":"Migration not yet implemented in bridge"}
+                \\{"error":"LITH_ERR_NOT_IMPLEMENTED","message":"Migration not yet implemented in bridge"}
             ,
             error.NotInitialized =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Database not initialized"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Database not initialized"}
             ,
             else =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Failed to start migration"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Failed to start migration"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);
@@ -682,13 +682,13 @@ fn handleMigrationAdvance(allocator: std.mem.Allocator, request: *std.http.Serve
 
         const error_response = switch (err) {
             error.NotImplemented =>
-                \\{"error":"FDB_ERR_NOT_IMPLEMENTED","message":"Migration advancement not yet implemented in bridge"}
+                \\{"error":"LITH_ERR_NOT_IMPLEMENTED","message":"Migration advancement not yet implemented in bridge"}
             ,
             error.NotInitialized =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Database not initialized"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Database not initialized"}
             ,
             else =>
-                \\{"error":"FDB_ERR_INTERNAL","message":"Failed to advance migration"}
+                \\{"error":"LITH_ERR_INTERNAL","message":"Failed to advance migration"}
             ,
         };
         try sendJson(request, .internal_server_error, error_response);

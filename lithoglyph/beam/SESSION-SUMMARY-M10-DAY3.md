@@ -130,7 +130,7 @@ fn handle_erlang_result(result: dynamic.Dynamic)
 - `server/src/router.gleam` (updated) - Added error cases
 - `server/src/formbase_server.gleam` (updated) - Added error cases
 - `server/test_lith_nif.erl` (created) - Erlang test script
-- `server/FORMBD-INTEGRATION.md` (updated) - Integration status
+- `server/LITH-INTEGRATION.md` (updated) - Integration status
 
 ## Test Results
 
@@ -227,7 +227,7 @@ Defining security requirements now (M10) prevents costly retrofits in M12+.
 | lithoglyph-analytics | Spec only | ⏳ (needs M11 HTTP API) |
 | lithoglyph-debugger | Not started | ⏳ |
 | lithoglyph-studio | Not started | ⏳ |
-| gql-dt | Complete | ✅ (FBQL parser) |
+| gql-dt | Complete | ✅ (GQL parser) |
 
 ## Time Investment
 

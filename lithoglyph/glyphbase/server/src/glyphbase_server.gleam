@@ -92,8 +92,10 @@ fn format_error(error: client.LithError) -> String {
     client.NotFound(entity, id) -> entity <> " not found: " <> id
     client.PermissionDenied(action) -> "Permission denied: " <> action
     client.NifNotLoaded -> "NIF not loaded"
+    client.NifError(reason) -> "NIF error: " <> reason
     client.ParseFailed -> "CBOR parse failed"
     client.InvalidHandle -> "Invalid handle"
+    client.PathTraversal(path) -> "Path traversal rejected: " <> path
   }
 }
 

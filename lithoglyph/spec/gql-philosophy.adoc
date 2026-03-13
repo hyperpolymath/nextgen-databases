@@ -138,7 +138,7 @@ GQL Flow:
 
 You cannot insert data without saying who added it and why.
 
-[source,fql]
+[source,gql]
 ----
 -- This will NOT compile in GQL:
 INSERT INTO evidence (name, type)
@@ -169,7 +169,7 @@ structure InsertOp where
 
 Every mutating operation must have a defined inverse, or be explicitly marked as irreversible with a story explaining why.
 
-[source,fql]
+[source,gql]
 ----
 -- Regular insert (reversible)
 INSERT INTO evidence (name) VALUES ('Report')
@@ -213,7 +213,7 @@ GQL constraint failure:
 
 GQL's EXPLAIN goes beyond query plans to include reasoning:
 
-[source,fql]
+[source,gql]
 ----
 EXPLAIN
 SELECT * FROM evidence
@@ -248,7 +248,7 @@ INDEX USAGE:
 
 Query results can optionally include provenance metadata:
 
-[source,fql]
+[source,gql]
 ----
 SELECT name, source_url, prompt_score
 FROM evidence
@@ -283,7 +283,7 @@ Returns:
 
 Schema changes are not silent infrastructure updates—they are recorded narrative events:
 
-[source,fql]
+[source,gql]
 ----
 ALTER COLLECTION evidence
 ADD COLUMN confidence : BoundedNat 0 100
@@ -404,6 +404,6 @@ GQL optimizes for:
 
 * link:../README.adoc[README] - Lithoglyph overview
 * link:../ARCHITECTURE.adoc[ARCHITECTURE] - System architecture
-* link:fql-dependent-types.md[GQL Dependent Types] - Compile-time verification
+* link:gql-dependent-types.md[GQL Dependent Types] - Compile-time verification
 * link:self-normalizing.adoc[Self-Normalizing] - Schema evolution
 * link:cloud-storage.adoc[Cloud Storage] - Sync safety guarantees

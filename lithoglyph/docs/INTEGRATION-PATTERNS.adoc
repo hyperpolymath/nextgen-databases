@@ -14,7 +14,7 @@ Comprehensive guide to integrating Lith with message queues, search engines, ana
 ====
 **Status: Documentation Complete, Adapters Planned**
 
-This document provides complete integration patterns. Native adapters are planned for Milestone M11. Currently, integrations use the documented patterns with FQL API or HTTP REST interface.
+This document provides complete integration patterns. Native adapters are planned for Milestone M11. Currently, integrations use the documented patterns with GQL API or HTTP REST interface.
 ====
 
 == Integration Philosophy
@@ -92,7 +92,7 @@ auto_commit = false
 # Commit after Lith journal write confirmed
 commit_strategy = "after_journal"
 
-# Message to FQL mapping
+# Message to GQL mapping
 [integrations.kafka.inbound.mapping]
 topic = "events"
 collection = "events"
@@ -444,20 +444,20 @@ setInterval(syncToElasticsearch, 5000);
 [source,toml]
 ----
 [integrations.elasticsearch.search]
-# Enable search through FQL
+# Enable search through GQL
 enabled = true
 
-# FQL SEARCH operator uses Elasticsearch
+# GQL SEARCH operator uses Elasticsearch
 search_operator = "elasticsearch"
 
 # Fallback to Lith scan if ES unavailable
 fallback_to_scan = true
 ----
 
-.Using Elasticsearch Search in FQL
-[source,fql]
+.Using Elasticsearch Search in GQL
+[source,gql]
 ----
--- FQL with Elasticsearch search
+-- GQL with Elasticsearch search
 SELECT * FROM evidence
 WHERE SEARCH("leaked memo corruption")
   AND score > 70
@@ -659,7 +659,7 @@ import pyarrow.flight as flight
 # Connect to Lith Arrow Flight endpoint
 client = flight.connect("grpc://lith:8815")
 
-# Execute FQL query and get Arrow table
+# Execute GQL query and get Arrow table
 info = client.get_flight_info(
     flight.FlightDescriptor.for_command(
         b"SELECT * FROM evidence WHERE score > 80"
@@ -800,15 +800,15 @@ base_uri = "https://lith.example.org/"
 
 # Vocabulary prefixes
 [integrations.rdf.prefixes]
-fdb = "https://lith.example.org/ontology#"
+lith = "https://lith.example.org/ontology#"
 dc = "http://purl.org/dc/elements/1.1/"
 prov = "http://www.w3.org/ns/prov#"
 schema = "https://schema.org/"
 
 # Collection to RDF class mapping
 [integrations.rdf.classes]
-evidence = "fdb:Evidence"
-sources = "fdb:Source"
+evidence = "lith:Evidence"
+sources = "lith:Source"
 people = "schema:Person"
 
 # Property mappings
@@ -816,7 +816,7 @@ people = "schema:Person"
 title = "dc:title"
 content = "dc:description"
 source = "dc:source"
-score = "fdb:promptScore"
+score = "lith:promptScore"
 created_at = "dc:date"
 _provenance.actor = "prov:wasAttributedTo"
 ----
@@ -839,16 +839,16 @@ timeout_seconds = 30
 .SPARQL Queries
 [source,sparql]
 ----
-PREFIX fdb: <https://lith.example.org/ontology#>
+PREFIX lith: <https://lith.example.org/ontology#>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 
 # Find all evidence by a specific actor
 SELECT ?evidence ?title ?score
 WHERE {
-    ?evidence a fdb:Evidence ;
+    ?evidence a lith:Evidence ;
               dc:title ?title ;
-              fdb:promptScore ?score ;
+              lith:promptScore ?score ;
               prov:wasAttributedTo ?actor .
     FILTER (?actor = "user:alice")
     FILTER (?score > 70)
@@ -858,7 +858,7 @@ ORDER BY DESC(?score)
 # Count evidence by source
 SELECT ?source (COUNT(?evidence) as ?count)
 WHERE {
-    ?evidence a fdb:Evidence ;
+    ?evidence a lith:Evidence ;
               dc:source ?source .
 }
 GROUP BY ?source
@@ -1344,9 +1344,9 @@ async def sync_vectors():
         """, [max_seq])
 ----
 
-=== Semantic Search in FQL
+=== Semantic Search in GQL
 
-[source,fql]
+[source,gql]
 ----
 -- Semantic search using vector similarity
 SELECT * FROM evidence
@@ -1433,7 +1433,7 @@ async function classifyDocument(documentKey) {
 
 === Human-in-the-Loop Patterns
 
-[source,fql]
+[source,gql]
 ----
 -- Find AI-generated content pending review
 SELECT * FROM evidence

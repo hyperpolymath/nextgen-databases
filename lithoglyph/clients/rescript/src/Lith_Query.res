@@ -39,7 +39,7 @@ type rec filterExpr =
   | Or(filterExpr, filterExpr)
   | Not(filterExpr)
 
-let rec filterToFdql = filter =>
+let rec filterToGql = filter =>
   switch filter {
   | Field(name, op, value) => {
       let valueStr = switch value {
@@ -51,9 +51,9 @@ let rec filterToFdql = filter =>
       }
       `${name} ${compareOpToString(op)} ${valueStr}`
     }
-  | And(a, b) => `(${filterToFdql(a)} AND ${filterToFdql(b)})`
-  | Or(a, b) => `(${filterToFdql(a)} OR ${filterToFdql(b)})`
-  | Not(f) => `NOT (${filterToFdql(f)})`
+  | And(a, b) => `(${filterToGql(a)} AND ${filterToGql(b)})`
+  | Or(a, b) => `(${filterToGql(a)} OR ${filterToGql(b)})`
+  | Not(f) => `NOT (${filterToGql(f)})`
   }
 
 // =============================================================================
@@ -133,8 +133,8 @@ let withProvenance = (builder, prov) => {
   builder
 }
 
-/** Build the FDQL query string */
-let toFdql = builder => {
+/** Build the GQL query string */
+let toGql = builder => {
   let collection = switch builder.collection {
   | Some(c) => c
   | None => panic("Collection is required")
@@ -148,7 +148,7 @@ let toFdql = builder => {
   let mut query = `SELECT ${fieldsStr} FROM ${collection}`
 
   switch builder.filter {
-  | Some(filter) => query = query ++ ` WHERE ${filterToFdql(filter)}`
+  | Some(filter) => query = query ++ ` WHERE ${filterToGql(filter)}`
   | None => ()
   }
 
@@ -211,7 +211,7 @@ let insertWithProvenance = (builder, prov) => {
   builder
 }
 
-let insertToFdql = builder => {
+let insertToGql = builder => {
   let collection = switch builder.collection {
   | Some(c) => c
   | None => panic("Collection is required")
@@ -272,7 +272,7 @@ let updateWithProvenance = (builder, prov) => {
   builder
 }
 
-let updateToFdql = builder => {
+let updateToGql = builder => {
   let collection = switch builder.collection {
   | Some(c) => c
   | None => panic("Collection is required")
@@ -299,7 +299,7 @@ let updateToFdql = builder => {
   let mut query = `UPDATE ${collection} SET ${setsClauses}`
 
   switch builder.filter {
-  | Some(filter) => query = query ++ ` WHERE ${filterToFdql(filter)}`
+  | Some(filter) => query = query ++ ` WHERE ${filterToGql(filter)}`
   | None => ()
   }
 
@@ -344,7 +344,7 @@ let deleteWithProvenance = (builder, prov) => {
   builder
 }
 
-let deleteToFdql = builder => {
+let deleteToGql = builder => {
   let collection = switch builder.collection {
   | Some(c) => c
   | None => panic("Collection is required")
@@ -353,7 +353,7 @@ let deleteToFdql = builder => {
   let mut query = `DELETE FROM ${collection}`
 
   switch builder.filter {
-  | Some(filter) => query = query ++ ` WHERE ${filterToFdql(filter)}`
+  | Some(filter) => query = query ++ ` WHERE ${filterToGql(filter)}`
   | None => ()
   }
 

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # SPDX-FileCopyrightText: 2026 hyperpolymath
 #
-# Build FBQLdt container using svalinn/vordr/cerro-torre/selur
+# Build GQLdt container using svalinn/vordr/cerro-torre/selur
 
 set -euo pipefail
 
@@ -11,7 +11,7 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
 cd "$REPO_ROOT"
 
-echo "=== FBQLdt Container Build (Chainguard-based) ==="
+echo "=== GQLdt Container Build (Chainguard-based) ==="
 echo ""
 
 # Detect container builder
@@ -30,7 +30,7 @@ else
 fi
 
 # Image tags
-IMAGE_NAME="fbqldt"
+IMAGE_NAME="gqldt"
 IMAGE_TAG="${IMAGE_TAG:-dev}"
 FULL_IMAGE="${IMAGE_NAME}:${IMAGE_TAG}"
 

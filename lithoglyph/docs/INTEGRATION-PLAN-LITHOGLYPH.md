@@ -25,7 +25,7 @@ Raw Documents (200K+ files)
 |---|------|----------|--------|-------|
 | L1 | Zig 0.15.2 HTTP API migration (83 call sites) | Critical | Medium | **COMPLETE** — Reader/Writer pattern applied |
 | L2 | Lith → Lithoglyph rename (Google trademark) | Critical | Small | **COMPLETE** — formdb-http/ → lith-http/ |
-| L3 | Evidence collection schema for bofig | High | Small | **COMPLETE** — 5 collections + 5 FQL test vectors |
+| L3 | Evidence collection schema for bofig | High | Small | **COMPLETE** — 5 collections + 5 GQL test vectors |
 | L4 | Financial transaction collection | High | Small | source, destination, amount, date, instrument, intermediary |
 | L5 | Entity collection + co-reference resolution | High | Medium | Person/org/location entities with alias tracking |
 | L6 | Ingest bridge: Docudactyl Cap'n Proto → GQL INSERT | High | Medium | Batch import with auto-PROMPT scoring from extraction metadata |

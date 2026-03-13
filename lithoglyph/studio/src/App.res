@@ -26,8 +26,8 @@ let checkServiceStatus = async (): option<ServiceStatus.t> => {
   }
 }
 
-// Generate FBQLdt from collection definition
-let generateFbqldt = async (collection: Collection.t): result<string, string> => {
+// Generate GQLdt from collection definition
+let generateGqldt = async (collection: Collection.t): result<string, string> => {
   try {
     let payload = {
       "name": collection.name,
@@ -46,17 +46,17 @@ let generateFbqldt = async (collection: Collection.t): result<string, string> =>
         }
       }),
     }
-    let result = await Tauri.invoke("generate_fbqldt", {"collection": payload})
+    let result = await Tauri.invoke("generate_gqldt", {"collection": payload})
     Ok(result)
   } catch {
   | JsExn(e) => Error(JsExn.message(e)->Option.getOr("Unknown error"))
   }
 }
 
-// Validate FBQLdt code
-let validateFbqldt = async (code: string): result<validationResult, string> => {
+// Validate GQLdt code
+let validateGqldt = async (code: string): result<validationResult, string> => {
   try {
-    let result = await Tauri.invoke("validate_fbqldt", {"code": code})
+    let result = await Tauri.invoke("validate_gqldt", {"code": code})
     Ok(result)
   } catch {
   | JsExn(e) => Error(JsExn.message(e)->Option.getOr("Unknown error"))
@@ -243,10 +243,10 @@ let make = () => {
     if currentCollection.name != "" && Array.length(currentCollection.fields) > 0 {
       setValidationState(_ => Types.Validating)
 
-      let _ = generateFbqldt(currentCollection)->Promise.then(result => {
+      let _ = generateGqldt(currentCollection)->Promise.then(result => {
         switch result {
         | Ok(code) =>
-          validateFbqldt(code)->Promise.then(validResult => {
+          validateGqldt(code)->Promise.then(validResult => {
             switch validResult {
             | Ok(r) =>
               if r.valid {
@@ -298,7 +298,7 @@ let make = () => {
             onAddField={handleAddField}
             onRemoveField={handleRemoveField}
           />
-          <FbqldtPreview
+          <GqldtPreview
             collection={currentCollection}
             validationState
             onCreateCollection={handleCreateCollection}

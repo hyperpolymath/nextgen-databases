@@ -62,7 +62,7 @@ Lith's audit-first design provides unique observability advantages:
 
 Lith provides observability features that other databases require external tools for:
 
-[source,fql]
+[source,gql]
 ----
 -- Query audit history (built-in)
 SELECT * FROM _journal
@@ -125,7 +125,7 @@ Lith uses structured JSON logging for machine-parseable output:
   "timestamp": "2026-01-12T10:30:45.123456Z",
   "level": "INFO",
   "component": "Form.Runtime",
-  "node_id": "fdb-prod-01",
+  "node_id": "lith-prod-01",
   "request_id": "req_abc123def456",
   "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
   "span_id": "00f067aa0ba902b7",
@@ -146,7 +146,7 @@ Lith uses structured JSON logging for machine-parseable output:
   "timestamp": "2026-01-12T10:31:00.000000Z",
   "level": "ERROR",
   "component": "Form.Constraints",
-  "node_id": "fdb-prod-01",
+  "node_id": "lith-prod-01",
   "request_id": "req_def789ghi012",
   "message": "Constraint violation",
   "operation": "INSERT",
@@ -171,7 +171,7 @@ Lith uses structured JSON logging for machine-parseable output:
   "timestamp": "2026-01-12T10:32:15.789012Z",
   "level": "INFO",
   "component": "Form.Journal",
-  "node_id": "fdb-prod-01",
+  "node_id": "lith-prod-01",
   "message": "Journal entry written",
   "sequence": 100542,
   "operation": "UPDATE",
@@ -330,7 +330,7 @@ default_api_key = "${DATADOG_API_KEY}"
 labels:
   - service: lith
   - environment: production
-  - node_id: fdb-prod-01
+  - node_id: lith-prod-01
   - component: Form.Runtime
   - level: info
   - operation: SELECT
@@ -744,7 +744,7 @@ deployment.environment = "production"
 ----
 Trace: lith.query
 ├── lith.query.parse        (1ms)
-│   └── Parse FQL query string
+│   └── Parse GQL query string
 ├── lith.query.plan         (2ms)
 │   └── Generate query execution plan
 ├── lith.query.validate     (1ms)
@@ -769,13 +769,13 @@ Trace: lith.query
 | Always "lith"
 
 | `db.operation`
-| FQL operation (SELECT, INSERT, UPDATE, DELETE)
+| GQL operation (SELECT, INSERT, UPDATE, DELETE)
 
 | `db.collection`
 | Target collection name
 
 | `db.statement`
-| Sanitized FQL query (parameters removed)
+| Sanitized GQL query (parameters removed)
 
 | `lith.sequence`
 | Journal sequence number (for mutations)
@@ -915,7 +915,7 @@ spec:
           image: lith:0.0.2
           ports:
             - containerPort: 8765
-              name: fql
+              name: gql
             - containerPort: 9090
               name: metrics
           livenessProbe:
@@ -1273,7 +1273,7 @@ pitr = """
 
 ==== Investigating Slow Queries
 
-[source,fql]
+[source,gql]
 ----
 -- 1. Check current slow queries
 SELECT * FROM _slow_query_log
@@ -1395,7 +1395,7 @@ systemctl start lith
 
 === Capacity Planning
 
-[source,fql]
+[source,gql]
 ----
 -- Storage growth analysis
 SELECT

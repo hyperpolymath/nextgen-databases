@@ -103,7 +103,7 @@ Lith's security model follows these core principles:
 | Rate limiting, anomaly detection, query auditing
 
 | **Injection Attacks**
-| FQL injection, parameter tampering
+| GQL injection, parameter tampering
 | Parameterized queries, input validation
 
 | **Man-in-the-Middle**
@@ -165,7 +165,7 @@ Authentication verifies the identity of actors (users, services, agents) before 
 
 Lith uses a unified actor model for all authentication:
 
-[source,fql]
+[source,gql]
 ----
 -- Every operation requires an actor
 INSERT INTO evidence {
@@ -238,7 +238,7 @@ lith auth create-key \
   --expires "2025-12-31"
 
 # Output:
-# API Key: fdb_sk_live_abc123...xyz789
+# API Key: lith_sk_live_abc123...xyz789
 # Key ID: key_01234567
 # WARNING: This key will only be shown once. Store it securely.
 
@@ -254,11 +254,11 @@ lith auth revoke-key key_01234567 --reason "Rotation"
 [source,bash]
 ----
 # HTTP header (preferred)
-curl -H "X-Lith-API-Key: fdb_sk_live_abc123...xyz789" \
+curl -H "X-Lith-API-Key: lith_sk_live_abc123...xyz789" \
   https://lith.example.com/v1/query
 
-# In FQL session
-lith shell --api-key "fdb_sk_live_abc123...xyz789"
+# In GQL session
+lith shell --api-key "lith_sk_live_abc123...xyz789"
 ----
 
 ==== Key Scopes
@@ -559,7 +559,7 @@ Predefined roles simplify permission management.
 
 ==== Custom Roles
 
-[source,fql]
+[source,gql]
 ----
 -- Create a custom role
 CREATE ROLE evidence_reviewer WITH {
@@ -664,7 +664,7 @@ policies:
 
 === Collection-Level Permissions
 
-[source,fql]
+[source,gql]
 ----
 -- Set collection permissions
 ALTER COLLECTION evidence SET PERMISSIONS {
@@ -683,7 +683,7 @@ WITH PROVENANCE {
 
 Filter documents based on actor attributes.
 
-[source,fql]
+[source,gql]
 ----
 -- Create a row-level security policy
 CREATE POLICY department_isolation ON evidence
@@ -853,7 +853,7 @@ Block Payload (4032 bytes):
 
 Encrypt sensitive fields while keeping others queryable.
 
-[source,fql]
+[source,gql]
 ----
 -- Define encrypted fields in schema
 ALTER COLLECTION users ADD SCHEMA {
@@ -924,7 +924,7 @@ lith admin key-status
 
 Mask sensitive data for non-privileged users.
 
-[source,fql]
+[source,gql]
 ----
 -- Create masking policy
 CREATE MASKING POLICY email_mask ON users.email
@@ -1351,9 +1351,9 @@ securityContext:
 
 === Query Injection Prevention
 
-Lith uses parameterized queries to prevent FQL injection:
+Lith uses parameterized queries to prevent GQL injection:
 
-[source,fql]
+[source,gql]
 ----
 -- WRONG: String interpolation (vulnerable)
 -- SELECT * FROM users WHERE name = '{user_input}'
@@ -1393,7 +1393,7 @@ Lith's provenance system supports GDPR requirements:
 | Provenance `rationale` field documents processing purpose
 |===
 
-[source,fql]
+[source,gql]
 ----
 -- GDPR data export
 SELECT * FROM users WHERE id = "user_123"
@@ -1483,7 +1483,7 @@ lith admin security-check
 
 ==== Detection
 
-[source,fql]
+[source,gql]
 ----
 -- Query for suspicious activity
 SELECT * FROM $journal

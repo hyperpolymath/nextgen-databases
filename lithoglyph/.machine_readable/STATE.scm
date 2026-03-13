@@ -22,18 +22,18 @@
       (storage-layer "Forth" "Lith.Blocks + Lith.Model (17 passing tests)")
       (bridge-layer "Zig" "Lith.Bridge - C ABI, 19 functions, WAL commit, all tests pass")
       (abi-layer "Idris2" "Dependent-type ABI proofs, zero believe_me, compiles clean")
-      (runtime-layer "Factor" "Lith.Runtime - FQL parser/planner/executor")
+      (runtime-layer "Factor" "Lith.Runtime - GQL parser/planner/executor")
       (normalizer-layer "Factor + Lean 4" "Lith.Normalizer - FD discovery with 52 proofs")
       (beam-layer "Zig + Rust" "BEAM NIFs for Elixir/Erlang integration, both build clean")
       (control-plane "Elixir/OTP" "Lith.ControlPlane - clustering, supervision (planned)")
-      (query-language "FBQLdt" "github.com/hyperpolymath/fbql-dt - dependently-typed")
+      (query-language "GQLdt" "github.com/hyperpolymath/gql-dt - dependently-typed")
       (config "Nickel")
       (containers "Podman + selur-compose")))
 
   (current-position
-    (phase "abi-hardened")
-    (overall-completion 75)
-    (note "Core phases 1-4 complete. ABI formally verified. BEAM NIFs compile. L1 (Zig HTTP migration) COMPLETE. L2 (Lith rename) COMPLETE. L3 (Evidence collection schema) COMPLETE. formdb-http/ renamed to lith-http/. All FORMDB_*/FormBD env vars and code references renamed to LITH_*/Lith.")
+    (phase "ip-rename-complete")
+    (overall-completion 80)
+    (note "Core phases 1-4 complete. ABI formally verified. BEAM NIFs compile. L1 (Zig HTTP migration) COMPLETE. L2 (Lith rename) COMPLETE. L3 (Evidence collection schema) COMPLETE. IP rename: fdb_*→lith_*, FQL/FBQL/FDQL→GQL, FormBD/FormDB→Lith/Lithoglyph — all complete. Glyphbase NIF wired to core-zig via Zig module import (19 bridge functions, 9.3MB .so). All builds pass.")
     (components
       (lith-blocks
         (status complete)
@@ -47,9 +47,9 @@
       (lith-bridge
         (status complete)
         (completion 100)
-        (version "v0.0.7")
+        (version "v0.0.8")
         (build-status "BUILD + TEST PASS (Zig 0.15.2)")
-        (description "C ABI bridge with persistent BlockStorage, WAL commit, 6-phase sync")
+        (description "C ABI bridge with persistent BlockStorage, WAL commit, 6-phase sync. IP rename complete: fdb_*→lith_*, FQL→GQL, FormBD→Lith.")
         (files
           "core-zig/src/bridge.zig"
           "core-zig/src/blocks.zig"
@@ -60,7 +60,8 @@
           "Block allocator with compaction"
           "Schema and constraint introspection"
           "Proof verifier registration"
-          "All unsafe casts annotated with // SAFETY:"))
+          "All unsafe casts annotated with // SAFETY:"
+          "IP rename: all fdb_* symbols → lith_*, FQL/FBQL/FDQL → GQL (Glyph Query Language)"))
       (idris2-abi
         (status complete)
         (completion 100)
@@ -78,7 +79,7 @@
           "ABI compatibility proofs (cross-platform, version stability)"
           "Storage efficiency proofs (>98% payload ratio)"
           "18 FFI declarations matching core-zig bridge"
-          "Inline validation (path, FQL query, JSON) pending Proven integration"))
+          "Inline validation (path, GQL query, JSON) pending Proven integration"))
       (ffi-delegation
         (status complete)
         (completion 100)
@@ -98,10 +99,10 @@
         (status complete)
         (completion 100)
         (version "v0.0.4")
-        (description "FQL parser, planner, executor in Factor with FFI to Zig bridge")
+        (description "GQL parser, planner, executor in Factor with FFI to Zig bridge")
         (files
           "core-factor/gql/storage-backend.factor"
-          "core-factor/fbql/fbql.factor"))
+          "core-factor/gql/gql.factor"))
       (lean-proofs
         (status complete)
         (completion 100)
@@ -111,12 +112,21 @@
       (beam-nif-zig
         (status complete)
         (completion 100)
-        (version "v0.0.7")
+        (version "v0.0.8")
         (build-status "BUILD PASS (0 errors)")
         (description "Zig NIF for BEAM with real FFI calls to core-zig bridge")
         (files
           "beam/native/src/lith_nif.zig"
           "beam/native/src/beam.zig"))
+      (glyphbase-nif
+        (status in-progress)
+        (completion 60)
+        (version "v0.0.8")
+        (build-status "BUILD PASS — NIF links to core-zig (9.3MB .so)")
+        (description "Glyphbase Zig NIF wired to core-zig via module import. All 19 bridge functions available. Type mismatch resolved: NIF uses real LgBlob/LgStatus from core-zig.")
+        (files
+          "glyphbase/native/src/glyphbase_nif.zig")
+        (notes "UI layer still uses demo data. NIF build and linkage complete, real data flow pending."))
       (beam-nif-rust
         (status complete)
         (completion 100)
@@ -142,7 +152,7 @@
         (status complete)
         (completion 100)
         (version "v0.0.8")
-        (description "L3: Evidence collection schema for bofig — 5 collections defined in glyphbase/examples/bofig-evidence.json + 5 FQL test vectors")
+        (description "L3: Evidence collection schema for bofig — 5 collections defined in glyphbase/examples/bofig-evidence.json + 5 GQL test vectors")
         (collections "bofig_evidence" "bofig_claims" "bofig_relationships" "bofig_entities" "bofig_financial_transactions"))
       (production-infra
         (status complete)
@@ -218,7 +228,7 @@
         (status complete)
         (version "v0.0.3"))
       (milestone-8
-        (name "Lith.Runtime (FQL Engine)")
+        (name "Lith.Runtime (GQL Engine)")
         (status complete)
         (version "v0.0.4"))
       (milestone-9
@@ -277,10 +287,10 @@
       (issue
         (id "NAMING-001")
         (title "Lith → Lith/Litho rename (IP claim)")
-        (description "Google owns 'Lith' trademark. Rename from Form*/FormBD/FormDB to Lith/Lithoglyph in progress. formdb-http/ renamed to lith-http/ (2026-03-13). All FORMDB_*/FormBD env vars and code refs renamed to LITH_*/Lith (2026-03-13).")
+        (description "Google owns 'Lith' trademark. Rename from Form*/FormBD/FormDB to Lith/Lithoglyph LARGELY COMPLETE. fdb_*→lith_* symbol rename done. FQL/FBQL/FDQL→GQL (Glyph Query Language) done. FormBD/FormDB→Lith/Lithoglyph done. Remaining: full Lith→Litho rename at M14.5.")
         (milestone "M14.5")
         (target-version "v0.8.0")
-        (partial-progress "formdb-http/ → lith-http/ directory rename complete; all env vars FORMDB_* → LITH_*; all FormBD/FormDB code comments → Lith/Lithoglyph; lith-http/ internal files excluded from this pass")))
+        (partial-progress "fdb_*→lith_* complete; FQL/FBQL/FDQL→GQL complete; FormBD/FormDB→Lith/Lithoglyph complete; formdb-http/→lith-http/ complete; remaining: Lith→Litho final rename deferred to M14.5")))
     (high
       (issue
         (id "API-001")
@@ -291,9 +301,9 @@
         (notes "All 83 call sites migrated to Reader/Writer pattern. L1 COMPLETE."))
       (issue
         (id "INTEGRATION-001")
-        (title "FBQLdt integration")
-        (description "Lithoglyph needs to integrate with fbql-dt for dependently-typed queries")
-        (dependency "github.com/hyperpolymath/fbql-dt M7 (Idris2 ABI) + M8 (Zig FFI)")))
+        (title "GQLdt integration")
+        (description "Lithoglyph needs to integrate with gql-dt for dependently-typed queries")
+        (dependency "github.com/hyperpolymath/gql-dt M7 (Idris2 ABI) + M8 (Zig FFI)")))
     (medium
       (issue
         (id "PROVEN-001")
@@ -314,11 +324,24 @@
   (session-history
     (snapshot
       (date "2026-03-13")
+      (session-id "ip-rename-and-glyphbase-nif-linkage")
+      (accomplishments
+        "IP rename complete: fdb_*→lith_* across all Zig/C/Idris2/Factor symbols"
+        "Query language rename: FQL/FBQL/FDQL→GQL (Glyph Query Language)"
+        "Project name rename: FormBD/FormDB→Lith/Lithoglyph in all code and docs"
+        "Glyphbase NIF wired to core-zig via Zig module import — all 19 bridge functions linked"
+        "NIF builds to 9.3MB .so with real core-zig integration"
+        "Type mismatch resolved: NIF now uses real LgBlob/LgStatus from core-zig instead of local stubs"
+        "All builds pass: core-zig, ffi/zig, glyphbase NIF, Idris2 ABI"
+        "Zero believe_me maintained throughout"
+        "Updated overall completion from 75% to 80%"))
+    (snapshot
+      (date "2026-03-13")
       (session-id "seams-sealing-pipeline-integration")
       (accomplishments
         "L1 (Zig HTTP migration): marked COMPLETE"
         "L2 (Lith rename): formdb-http/ → lith-http/ directory rename + all FORMDB_*/FormBD/FormDB env vars and code refs renamed to LITH_*/Lith across entire repo (excl. lith-http/)"
-        "L3 (Evidence collection schema): marked COMPLETE — 5 collections + 5 FQL test vectors"
+        "L3 (Evidence collection schema): marked COMPLETE — 5 collections + 5 GQL test vectors"
         "Updated overall completion from 70% to 75%"
         "Integration plan docs created: docs/INTEGRATION-PLAN-LITHOGLYPH.md, docs/EPSTEIN-INGEST-TESTS.md"
         "Cross-repo seams sealed with Bofig and Docudactyl"))

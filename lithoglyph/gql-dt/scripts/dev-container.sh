@@ -11,7 +11,7 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
 cd "$REPO_ROOT"
 
-echo "=== FBQLdt Development Container ==="
+echo "=== GQLdt Development Container ==="
 echo ""
 
 # Check if Docker or Podman is available
@@ -32,14 +32,14 @@ echo ""
 
 # Build image
 echo "Building image..."
-$CONTAINER_CMD build -t fbqldt:dev .
+$CONTAINER_CMD build -t gqldt:dev .
 
 # Run container
 echo ""
 echo "Starting development container..."
 $CONTAINER_CMD run -it --rm \
     -v "$REPO_ROOT:/workspace" \
-    fbqldt:dev
+    gqldt:dev
 
 echo ""
 echo "Container exited"

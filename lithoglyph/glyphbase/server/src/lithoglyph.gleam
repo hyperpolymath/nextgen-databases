@@ -1,191 +1,90 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// SPDX-FileCopyrightText: 2025 Jonathan D.A. Jewell (@hyperpolymath)
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (@hyperpolymath)
 //
-// lith.gleam - Gleam wrapper for Lith NIF
+// lithoglyph.gleam - Public API for Lithoglyph database
 //
-// This provides type-safe Gleam functions that call the Erlang NIF
+// This module re-exports the client API for convenient access.
+// The real NIF FFI layer is in lithoglyph/nif_ffi.gleam,
+// and the typed client wrapper is in lithoglyph/client.gleam.
 
-import gleam/dynamic.{type Dynamic}
-import gleam/json
-import gleam/option.{type Option, None, Some}
-import gleam/list
-
-/// Opaque handle to a Lith database
-pub opaque type Db {
-  Db(resource: Dynamic)
+import gleam/option.{type Option}
+import lithoglyph/client.{
+  type Connection, type LithError, type LithResult, type Transaction,
+  type TransactionMode, ReadOnly, ReadWrite,
 }
 
-/// Opaque handle to a transaction
-pub opaque type Transaction {
-  Transaction(resource: Dynamic)
+/// Re-export core types
+pub type Db =
+  Connection
+
+pub type Txn =
+  Transaction
+
+pub type Mode =
+  TransactionMode
+
+/// Re-export error type
+pub type Error =
+  LithError
+
+/// Get Lithoglyph version tuple
+pub fn version() -> #(Int, Int, Int) {
+  client.version()
 }
 
-/// Opaque handle to a query cursor
-pub opaque type Cursor {
-  Cursor(resource: Dynamic)
+/// Open a connection to a Lithoglyph database
+pub fn open(path: String) -> LithResult(Connection) {
+  client.connect(path)
 }
 
-/// Lith status/error codes
-pub type FdbError {
-  InvalidArg
-  NotFound
-  PermissionDenied
-  AlreadyExists
-  ConstraintViolation
-  TypeMismatch
-  OutOfMemory
-  IoError
-  Corruption
-  Conflict
-  InternalError
+/// Close a connection
+pub fn close(conn: Connection) -> LithResult(Nil) {
+  client.disconnect(conn)
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// NIF Function Declarations
-////////////////////////////////////////////////////////////////////////////////
-
-/// Initialize Lith (must be called once at startup)
-@external(erlang, "lith_nif", "init")
-fn nif_init() -> Result(Nil, FdbError)
-
-/// Open an existing database
-@external(erlang, "lith_nif", "open")
-fn nif_open(path: String) -> Result(Dynamic, FdbError)
-
-/// Create a new database
-@external(erlang, "lith_nif", "create")
-fn nif_create(path: String, block_count: Int) -> Result(Dynamic, FdbError)
-
-/// Begin a transaction
-@external(erlang, "lith_nif", "txn_begin")
-fn nif_txn_begin(db: Dynamic) -> Result(Dynamic, FdbError)
-
-/// Commit a transaction
-@external(erlang, "lith_nif", "txn_commit")
-fn nif_txn_commit(txn: Dynamic) -> Result(Nil, FdbError)
-
-/// Execute an FQL query with provenance
-@external(erlang, "lith_nif", "query_execute")
-fn nif_query_execute(
-  db: Dynamic,
-  query: String,
-  provenance: String,
-) -> Result(Dynamic, FdbError)
-
-/// Fetch next result from cursor
-@external(erlang, "lith_nif", "cursor_next")
-fn nif_cursor_next(cursor: Dynamic) -> Result(String, FdbError)
-
-////////////////////////////////////////////////////////////////////////////////
-// Public API
-////////////////////////////////////////////////////////////////////////////////
-
-/// Initialize Lith library
-pub fn init() -> Result(Nil, FdbError) {
-  nif_init()
+/// Begin a read-only transaction
+pub fn begin_read(conn: Connection) -> LithResult(Transaction) {
+  client.begin_transaction(conn, ReadOnly)
 }
 
-/// Open an existing Lith database
-pub fn open(path: String) -> Result(Db, FdbError) {
-  case nif_open(path) {
-    Ok(resource) -> Ok(Db(resource))
-    Error(e) -> Error(e)
-  }
-}
-
-/// Create a new Lith database
-///
-/// block_count: Initial number of 4KiB blocks to allocate
-pub fn create(path: String, block_count: Int) -> Result(Db, FdbError) {
-  case nif_create(path, block_count) {
-    Ok(resource) -> Ok(Db(resource))
-    Error(e) -> Error(e)
-  }
-}
-
-/// Begin a new ACID transaction
-pub fn begin_transaction(db: Db) -> Result(Transaction, FdbError) {
-  let Db(db_resource) = db
-  case nif_txn_begin(db_resource) {
-    Ok(resource) -> Ok(Transaction(resource))
-    Error(e) -> Error(e)
-  }
+/// Begin a read-write transaction
+pub fn begin_write(conn: Connection) -> LithResult(Transaction) {
+  client.begin_transaction(conn, ReadWrite)
 }
 
 /// Commit a transaction
-pub fn commit_transaction(txn: Transaction) -> Result(Nil, FdbError) {
-  let Transaction(txn_resource) = txn
-  nif_txn_commit(txn_resource)
+pub fn commit(txn: Transaction) -> LithResult(Nil) {
+  client.commit(txn)
 }
 
-/// Execute an FQL query
-///
-/// Example provenance JSON:
-/// ```json
-/// {
-///   "actor": "user@example.com",
-///   "rationale": "Monthly report generation",
-///   "timestamp": 1706745600000
-/// }
-/// ```
-pub fn execute_query(
-  db: Db,
-  query: String,
-  actor: String,
-  rationale: String,
-) -> Result(Cursor, FdbError) {
-  let Db(db_resource) = db
-
-  // Build provenance JSON
-  let provenance = json.object([
-    #("actor", json.string(actor)),
-    #("rationale", json.string(rationale)),
-    #("timestamp", json.int(timestamp_now())),
-  ])
-  |> json.to_string
-
-  case nif_query_execute(db_resource, query, provenance) {
-    Ok(resource) -> Ok(Cursor(resource))
-    Error(e) -> Error(e)
-  }
+/// Abort a transaction
+pub fn abort(txn: Transaction) -> LithResult(Nil) {
+  client.abort(txn)
 }
 
-/// Fetch the next result from a cursor
-///
-/// Returns Ok(Some(json_doc)) if a row was fetched,
-/// Ok(None) if the cursor is exhausted,
-/// Error(e) on error
-pub fn cursor_next(cursor: Cursor) -> Result(Option(String), FdbError) {
-  let Cursor(cursor_resource) = cursor
-  case nif_cursor_next(cursor_resource) {
-    Ok(json_doc) -> Ok(Some(json_doc))
-    Error(NotFound) -> Ok(None)  // Cursor exhausted
-    Error(e) -> Error(e)
-  }
+/// Apply a CBOR-encoded operation within a transaction
+pub fn apply(
+  txn: Transaction,
+  operation: BitArray,
+) -> LithResult(#(BitArray, Option(BitArray))) {
+  client.apply_operation(txn, operation)
 }
 
-/// Collect all results from a cursor into a list
-pub fn cursor_to_list(cursor: Cursor) -> Result(List(String), FdbError) {
-  cursor_to_list_helper(cursor, [])
+/// Get database schema (CBOR-encoded)
+pub fn schema(conn: Connection) -> LithResult(BitArray) {
+  client.get_schema(conn)
 }
 
-fn cursor_to_list_helper(
-  cursor: Cursor,
-  acc: List(String),
-) -> Result(List(String), FdbError) {
-  case cursor_next(cursor) {
-    Ok(Some(doc)) -> cursor_to_list_helper(cursor, [doc, ..acc])
-    Ok(None) -> Ok(list.reverse(acc))
-    Error(e) -> Error(e)
-  }
+/// Get journal entries since a sequence number (CBOR-encoded)
+pub fn journal(conn: Connection, since: Int) -> LithResult(BitArray) {
+  client.get_journal(conn, since)
 }
 
-/// Get current timestamp in milliseconds
-@external(erlang, "erlang", "system_time")
-fn erlang_system_time_native() -> Int
-
-fn timestamp_now() -> Int {
-  // Get native time and convert to milliseconds
-  // Native time is typically nanoseconds on modern systems
-  erlang_system_time_native() / 1_000_000
+/// Execute an operation in a transaction with automatic commit/abort
+pub fn with_transaction(
+  conn: Connection,
+  mode: TransactionMode,
+  operation: fn(Transaction) -> LithResult(a),
+) -> LithResult(a) {
+  client.with_transaction(conn, mode, operation)
 }

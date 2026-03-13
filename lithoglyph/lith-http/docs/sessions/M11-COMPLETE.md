@@ -8,8 +8,8 @@
 
 M11 HTTP API is **100% COMPLETE** with all specified endpoints operational:
 - ✅ Core API (9 endpoints)
-- ✅ FormBD-Geo API (3 endpoints)
-- ✅ FormBD-Analytics API (3 endpoints)
+- ✅ Lith-Geo API (3 endpoints)
+- ✅ Lith-Analytics API (3 endpoints)
 
 **Total: 15 HTTP endpoints, all working**
 
@@ -29,7 +29,7 @@ M11 HTTP API is **100% COMPLETE** with all specified endpoints operational:
 | `/api/v1/databases/:db_id/schema` | GET | ✅ | Get database schema |
 | `/api/v1/databases/:db_id/journal` | GET | ✅ | Get journal entries |
 
-### FormBD-Geo API (3 endpoints)
+### Lith-Geo API (3 endpoints)
 
 | Endpoint | Method | Status | Description |
 |----------|--------|--------|-------------|
@@ -37,7 +37,7 @@ M11 HTTP API is **100% COMPLETE** with all specified endpoints operational:
 | `/api/v1/geo/query` | GET | ✅ | Query features by bbox or geometry |
 | `/api/v1/geo/features/:feature_id/provenance` | GET | ✅ | Get feature provenance history |
 
-### FormBD-Analytics API (3 endpoints)
+### Lith-Analytics API (3 endpoints)
 
 | Endpoint | Method | Status | Description |
 |----------|--------|--------|-------------|
@@ -69,7 +69,7 @@ M11 HTTP API is **100% COMPLETE** with all specified endpoints operational:
 
 ### Module Tests (Elixir)
 ```
-=== FormBD-Geo and Analytics Test ===
+=== Lith-Geo and Analytics Test ===
 Test 1: Connect to database... ✓
 Test 2: Validate Point geometry... ✓
 Test 3: Validate LineString geometry... ✓
@@ -108,7 +108,7 @@ mix run test_geo_analytics.exs
 
 ## API Examples
 
-### FormBD-Geo: Insert Feature
+### Lith-Geo: Insert Feature
 ```bash
 curl -X POST http://localhost:4000/api/v1/geo/insert \
   -H "Content-Type: application/json" \
@@ -135,7 +135,7 @@ curl -X POST http://localhost:4000/api/v1/geo/insert \
 # }
 ```
 
-### FormBD-Geo: Query by Bounding Box
+### Lith-Geo: Query by Bounding Box
 ```bash
 curl "http://localhost:4000/api/v1/geo/query?database_id=db_abc123&bbox=-123,37,-122,38&limit=10"
 
@@ -147,7 +147,7 @@ curl "http://localhost:4000/api/v1/geo/query?database_id=db_abc123&bbox=-123,37,
 # }
 ```
 
-### FormBD-Geo: Get Provenance
+### Lith-Geo: Get Provenance
 ```bash
 curl "http://localhost:4000/api/v1/geo/features/feat_c7b59cba21ecd4e2/provenance?database_id=db_abc123"
 
@@ -165,7 +165,7 @@ curl "http://localhost:4000/api/v1/geo/features/feat_c7b59cba21ecd4e2/provenance
 # }
 ```
 
-### FormBD-Analytics: Insert Time-Series
+### Lith-Analytics: Insert Time-Series
 ```bash
 curl -X POST http://localhost:4000/api/v1/analytics/timeseries \
   -H "Content-Type: application/json" \
@@ -191,7 +191,7 @@ curl -X POST http://localhost:4000/api/v1/analytics/timeseries \
 # }
 ```
 
-### FormBD-Analytics: Query with Aggregation
+### Lith-Analytics: Query with Aggregation
 ```bash
 curl "http://localhost:4000/api/v1/analytics/timeseries?database_id=db_abc123&series_id=sensor_temp_01&start=2026-02-04T12:00:00Z&end=2026-02-04T13:00:00Z&aggregation=avg&interval=5m"
 
@@ -206,7 +206,7 @@ curl "http://localhost:4000/api/v1/analytics/timeseries?database_id=db_abc123&se
 # }
 ```
 
-### FormBD-Analytics: Get Provenance Summary
+### Lith-Analytics: Get Provenance Summary
 ```bash
 curl "http://localhost:4000/api/v1/analytics/timeseries/sensor_temp_01/provenance?database_id=db_abc123"
 
@@ -226,7 +226,7 @@ curl "http://localhost:4000/api/v1/analytics/timeseries/sensor_temp_01/provenanc
 
 ## Features Implemented
 
-### FormBD-Geo Features
+### Lith-Geo Features
 
 #### Geometry Support
 - ✅ Point
@@ -247,7 +247,7 @@ curl "http://localhost:4000/api/v1/analytics/timeseries/sensor_temp_01/provenanc
 - ✅ Provenance chain retrieval
 - ✅ Source and confidence metadata
 
-### FormBD-Analytics Features
+### Lith-Analytics Features
 
 #### Time-Series Operations
 - ✅ Insert data points with timestamp
@@ -347,15 +347,15 @@ Current implementation returns dummy data for M10 testing:
 ## Milestone Status
 
 ### M10: Lithoglyph Core ✅
-- FormBD C ABI
+- Lith C ABI
 - Rustler NIF
 - Gleam client
 - M10 PoC stubs
 
 ### M11: HTTP API ✅ COMPLETE
 - Core API (9 endpoints) ✅
-- FormBD-Geo (3 endpoints) ✅
-- FormBD-Analytics (3 endpoints) ✅
+- Lith-Geo (3 endpoints) ✅
+- Lith-Analytics (3 endpoints) ✅
 - Documentation ✅
 - Tests ✅
 

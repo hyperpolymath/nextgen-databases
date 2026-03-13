@@ -23,7 +23,7 @@ Comprehensive seam analysis identified **76 critical issues** across M6 Parser i
 **Problem:** `IR.lean` ↔ `Serialization.lean` circular import causing compilation failure.
 
 **Solution:**
-Created new module `src/FbqlDt/Serialization/Types.lean` with shared types:
+Created new module `src/GqlDt/Serialization/Types.lean` with shared types:
 - `JsonValue` - JSON in-memory representation
 - `CBORValue`, `CBORMajorType` - CBOR types (RFC 8949)
 - `SerializationFormat` - Format selection enum
@@ -32,10 +32,10 @@ Created new module `src/FbqlDt/Serialization/Types.lean` with shared types:
 **Changed Tags:** Updated from 1000-1004 → 55800-55804 (vendor-specific range)
 
 **Files Modified:**
-- ✅ `src/FbqlDt/Serialization/Types.lean` - CREATED
-- ✅ `src/FbqlDt/Serialization.lean` - Import from Types, removed duplicates
-- ✅ `src/FbqlDt/IR.lean` - Import Serialization.Types instead of Serialization
-- ✅ `src/FbqlDt.lean` - Export Serialization.Types
+- ✅ `src/GqlDt/Serialization/Types.lean` - CREATED
+- ✅ `src/GqlDt/Serialization.lean` - Import from Types, removed duplicates
+- ✅ `src/GqlDt/IR.lean` - Import Serialization.Types instead of Serialization
+- ✅ `src/GqlDt.lean` - Export Serialization.Types
 
 **Impact:** Circular dependency broken, clean module separation.
 
@@ -43,34 +43,34 @@ Created new module `src/FbqlDt/Serialization/Types.lean` with shared types:
 
 ### 1.2 Inconsistent Import Paths ✅ FIXED
 
-**Problem:** 17 files used `import FqlDt.*` instead of `import FbqlDt.*`.
+**Problem:** 17 files used `import GqlDt.*` instead of `import GqlDt.*`.
 
 **Solution:** Global find-and-replace across all `.lean` files.
 
 **Files Fixed (17 total):**
 ```
-src/FbqlDt/Prompt/PromptDimension.lean
-src/FbqlDt/Prompt/PromptScores.lean
-src/FbqlDt/Provenance/ActorId.lean
-src/FbqlDt/Provenance/Rationale.lean
-src/FbqlDt/Provenance/Tracked.lean
-src/FbqlDt/Types.lean
-src/FbqlDt/Prompt.lean
-src/FbqlDt/Provenance.lean
-src/FbqlDt/FFI.lean
-src/FbqlDt/Query/AST.lean
-src/FbqlDt/Query/Parser.lean
-src/FbqlDt/Query/Schema.lean
-src/FbqlDt/Query/TypeCheck.lean
-src/FbqlDt/Query/Store.lean
-src/FbqlDt/Query/Eval.lean
-src/FbqlDt/Query.lean
+src/GqlDt/Prompt/PromptDimension.lean
+src/GqlDt/Prompt/PromptScores.lean
+src/GqlDt/Provenance/ActorId.lean
+src/GqlDt/Provenance/Rationale.lean
+src/GqlDt/Provenance/Tracked.lean
+src/GqlDt/Types.lean
+src/GqlDt/Prompt.lean
+src/GqlDt/Provenance.lean
+src/GqlDt/FFI.lean
+src/GqlDt/Query/AST.lean
+src/GqlDt/Query/Parser.lean
+src/GqlDt/Query/Schema.lean
+src/GqlDt/Query/TypeCheck.lean
+src/GqlDt/Query/Store.lean
+src/GqlDt/Query/Eval.lean
+src/GqlDt/Query.lean
 src/Main.lean
 ```
 
 **Command Used:**
 ```bash
-sed -i 's/import FqlDt\./import FbqlDt./g' <files>
+sed -i 's/import GqlDt\./import GqlDt./g' <files>
 ```
 
 **Impact:** All imports now use correct namespace prefix.
@@ -113,8 +113,8 @@ sed -i 's/import FqlDt\./import FbqlDt./g' <files>
 - `WhereClause`, `OrderByClause` are shared AST types needed by Parser
 
 **Files Modified:**
-- ✅ `src/FbqlDt/AST.lean` - Added 3 type definitions
-- ✅ `src/FbqlDt/TypeInference.lean` - Removed InferredType (now imported from AST)
+- ✅ `src/GqlDt/AST.lean` - Added 3 type definitions
+- ✅ `src/GqlDt/TypeInference.lean` - Removed InferredType (now imported from AST)
 
 **Impact:** All types properly defined before use, no forward references.
 
@@ -128,11 +128,11 @@ sed -i 's/import FqlDt\./import FbqlDt./g' <files>
 
 **Imports Added:**
 ```lean
-import FbqlDt.Types
-import FbqlDt.Types.NonEmptyString
-import FbqlDt.Types.BoundedNat
-import FbqlDt.Types.Confidence
-import FbqlDt.Provenance
+import GqlDt.Types
+import GqlDt.Types.NonEmptyString
+import GqlDt.Types.BoundedNat
+import GqlDt.Types.Confidence
+import GqlDt.Provenance
 ```
 
 **Namespace Updated:**
@@ -225,7 +225,7 @@ def fail {α : Type} (msg : String) : Parser α :=
 
 ## Files Created
 
-1. `src/FbqlDt/Serialization/Types.lean` - Shared serialization types (118 lines)
+1. `src/GqlDt/Serialization/Types.lean` - Shared serialization types (118 lines)
 2. `docs/SEAM-ANALYSIS-2026-02-01.md` - This document
 
 ---
@@ -234,13 +234,13 @@ def fail {α : Type} (msg : String) : Parser α :=
 
 | File | Changes | Lines |
 |------|---------|-------|
-| `src/FbqlDt/Serialization.lean` | Import Types, remove duplicates | -50 |
-| `src/FbqlDt/IR.lean` | Import Serialization.Types | +1, -1 |
-| `src/FbqlDt/AST.lean` | Add InferredType, WhereClause, OrderByClause | +35 |
-| `src/FbqlDt/TypeInference.lean` | Remove InferredType | -8 |
-| `src/FbqlDt/Parser.lean` | Add imports, fix error handling, remove duplicates | +9, -15 |
-| `src/FbqlDt.lean` | Export Serialization.Types | +1 |
-| **17 Query/Prompt/Provenance files** | Fix FqlDt → FbqlDt imports | ~17 changes |
+| `src/GqlDt/Serialization.lean` | Import Types, remove duplicates | -50 |
+| `src/GqlDt/IR.lean` | Import Serialization.Types | +1, -1 |
+| `src/GqlDt/AST.lean` | Add InferredType, WhereClause, OrderByClause | +35 |
+| `src/GqlDt/TypeInference.lean` | Remove InferredType | -8 |
+| `src/GqlDt/Parser.lean` | Add imports, fix error handling, remove duplicates | +9, -15 |
+| `src/GqlDt.lean` | Export Serialization.Types | +1 |
+| **17 Query/Prompt/Provenance files** | Fix GqlDt → GqlDt imports | ~17 changes |
 
 **Total Files Modified:** 24
 **Total Lines Changed:** ~100
@@ -312,7 +312,7 @@ lake build
 
 **If Build Fails:**
 1. Check error message for module import issues
-2. Verify all FqlDt → FbqlDt replacements
+2. Verify all GqlDt → GqlDt replacements
 3. Check for remaining `throw` statements
 4. Verify Serialization.Types is exported
 

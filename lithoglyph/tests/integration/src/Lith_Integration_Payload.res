@@ -60,7 +60,7 @@ let test_afterChangeCreate = async (): testResult => {
     {
       "method": "POST",
       "headers": Js.Dict.fromArray([("Content-Type", "application/json")]),
-      "body": `{"fdql": "INSERT INTO posts ${Js.Json.stringify(doc)}"}`,
+      "body": `{"gql": "INSERT INTO posts ${Js.Json.stringify(doc)}"}`,
     },
   )
 
@@ -84,7 +84,7 @@ let test_afterChangeUpdate = async (): testResult => {
     {
       "method": "POST",
       "headers": Js.Dict.fromArray([("Content-Type", "application/json")]),
-      "body": `{"fdql": "UPDATE posts SET {\\"title\\": \\"Updated\\"} WHERE id = \\"doc-123\\""}`,
+      "body": `{"gql": "UPDATE posts SET {\\"title\\": \\"Updated\\"} WHERE id = \\"doc-123\\""}`,
     },
   )
 
@@ -108,7 +108,7 @@ let test_afterDelete = async (): testResult => {
     {
       "method": "POST",
       "headers": Js.Dict.fromArray([("Content-Type", "application/json")]),
-      "body": `{"fdql": "DELETE FROM posts WHERE id = \\"doc-123\\""}`,
+      "body": `{"gql": "DELETE FROM posts WHERE id = \\"doc-123\\""}`,
     },
   )
 

@@ -4,7 +4,7 @@
 ;
 ; This file is distributed to all Lith ecosystem repos:
 ; - lith (core database)
-; - fdql-dt (dependently-typed query language)
+; - gql-dt (dependently-typed query language)
 ; - lith-studio (GUI)
 ; - lith-debugger (recovery tool)
 
@@ -26,7 +26,7 @@
         (completion 70)
         (role "Core database engine")
         (tech "Forth + Factor + Zig"))
-      (fdql-dt
+      (gql-dt
         (version "0.2.0")
         (completion 65)
         (role "Dependently-typed query language")
@@ -45,9 +45,9 @@
     (architecture
       "┌─────────────────────────────────────────────────────────────┐"
       "│  Lith Studio (GUI)                                        │"
-      "│    ↓ generates FBQLdt code                                   │"
+      "│    ↓ generates GQLdt code                                   │"
       "├─────────────────────────────────────────────────────────────┤"
-      "│  FBQLdt (Lean 4)                                             │"
+      "│  GQLdt (Lean 4)                                             │"
       "│    ↓ compiles to proof blobs                                │"
       "├─────────────────────────────────────────────────────────────┤"
       "│  Form.Bridge (Zig ABI)                                      │"
@@ -58,7 +58,7 @@
       "├─────────────────────────────────────────────────────────────┤"
       "│  Lith Debugger (alongside)                                │"
       "│    ↓ proves recovery safe                                   │"
-      "│  Lith + FBQLdt                                             │"
+      "│  Lith + GQLdt                                             │"
       "└─────────────────────────────────────────────────────────────┘"))
 
   ;; ============================================================================
@@ -67,19 +67,19 @@
   (critical-path
     (phase (id "P1") (name "Core Integration")
       (duration "weeks 1-6")
-      (focus "Lith + FBQLdt integration")
+      (focus "Lith + GQLdt integration")
 
       (lith-tasks
         (task "Complete M11: HTTP API Server" priority: critical status: in-progress)
         (task "Expose Form.Bridge FFI for proof verification" priority: high status: pending)
         (task "Add CBOR proof blob acceptance in query path" priority: high status: pending))
 
-      (fdql-dt-tasks
+      (gql-dt-tasks
         (task "M5: Zig FFI bridge to Form.Bridge" priority: critical status: not-started)
-        (task "M6: FBQL parser (integrate with Lith's EBNF)" priority: high status: not-started)
+        (task "M6: GQL parser (integrate with Lith's EBNF)" priority: high status: not-started)
         (task "Proof blob serialization (CBOR RFC 8949)" priority: high status: pending))
 
-      (checkpoint "FBQLdt can compile a query → proof blob → Lith accepts and executes"))
+      (checkpoint "GQLdt can compile a query → proof blob → Lith accepts and executes"))
 
     (phase (id "P2") (name "User-Facing Tools")
       (duration "weeks 7-10")
@@ -87,7 +87,7 @@
 
       (studio-tasks
         (task "Verify ReScript/Tauri build pipeline" priority: critical status: pending)
-        (task "Wire ReScript UI to FBQLdt code generation" priority: high status: pending)
+        (task "Wire ReScript UI to GQLdt code generation" priority: high status: pending)
         (task "Connect to Lith HTTP API" priority: high status: blocked)
         (task "Test schema creation → query → results flow" priority: medium status: pending))
 
@@ -121,16 +121,16 @@
       (blocks "Studio M2" "Debugger Lith adapter")
       (priority critical))
 
-    (fdql-dt-m5
-      (name "FBQLdt Zig FFI Bridge")
+    (gql-dt-m5
+      (name "GQLdt Zig FFI Bridge")
       (blocks "Studio M3" "Real type checking")
       (depends-on "Lith Form.Bridge")
       (priority critical))
 
-    (fdql-dt-m6
-      (name "FBQLdt FBQL Parser")
-      (blocks "Full FBQLdt compilation")
-      (depends-on "fdql-dt-m5")
+    (gql-dt-m6
+      (name "GQLdt GQL Parser")
+      (blocks "Full GQLdt compilation")
+      (depends-on "gql-dt-m5")
       (priority high))
 
     (studio-m1
@@ -148,18 +148,18 @@
   ;; ============================================================================
   (decisions-needed
     (decision (id "DECISION-002")
-      (title "FBQLdt parser approach")
-      (repo "fdql-dt")
+      (title "GQLdt parser approach")
+      (repo "gql-dt")
       (options
         "Hand-rolled parser (simple, no deps)"
         "Lean 4 Parsec (built-in)"
-        "Integrate with Lith's Factor-based FDQL parser")
+        "Integrate with Lith's Factor-based GQL parser")
       (recommendation "Integrate - reuse Lith's EBNF grammar via FFI")
       (impact "Affects M6 implementation"))
 
     (decision (id "DECISION-003")
-      (title "Lith integration strategy for FBQLdt")
-      (repo "fdql-dt")
+      (title "Lith integration strategy for GQLdt")
+      (repo "gql-dt")
       (options
         "Mock Forth core for MVP"
         "Real Form.Bridge integration")
@@ -196,7 +196,7 @@
   (success-metrics
     (mvp-criteria
       "User can create a schema in Studio with visual builder"
-      "Schema generates valid FBQLdt with type checking"
+      "Schema generates valid GQLdt with type checking"
       "User can insert data with provenance tracking"
       "User can query data and see results"
       "Debugger can analyze schema and propose fixes"

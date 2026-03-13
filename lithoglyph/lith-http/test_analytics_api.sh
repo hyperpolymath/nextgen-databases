@@ -1,13 +1,13 @@
 #!/bin/bash
 # SPDX-License-Identifier: PMPL-1.0-or-later
-# FormBD-Analytics HTTP API Test Script
+# Lith-Analytics HTTP API Test Script
 
 set -e
 
 BASE_URL="http://localhost:4000/api/v1"
 
 echo ""
-echo "=== FormBD-Analytics HTTP API Test ==="
+echo "=== Lith-Analytics HTTP API Test ==="
 echo ""
 
 # Test 1: Create database

@@ -35,7 +35,7 @@ module Filter = {
     | EndsWith => "ENDS WITH"
     }
 
-  let operatorToFql = op =>
+  let operatorToGql = op =>
     switch op {
     | Equals => "="
     | NotEquals => "<>"
@@ -81,8 +81,8 @@ module Query = {
   }
 }
 
-// Generate FQL from query
-let generateFql = (query: Query.t): string => {
+// Generate GQL from query
+let generateGql = (query: Query.t): string => {
   if query.collection == "" {
     "-- Select a collection to build query"
   } else {
@@ -101,7 +101,7 @@ let generateFql = (query: Query.t): string => {
       let conditions =
         query.filters
         ->Array.map(f => {
-          let op = Filter.operatorToFql(f.operator)
+          let op = Filter.operatorToGql(f.operator)
           let value = switch f.operator {
           | Filter.Contains => `'%${f.value}%'`
           | Filter.StartsWith => `'${f.value}%'`
@@ -331,7 +331,7 @@ let make = (~collections: array<Collection.t>) => {
     }, 500)
   }
 
-  let fql = generateFql(query)
+  let gql = generateGql(query)
 
   <section className="query-builder">
     <h2> {React.string("Query Builder")} </h2>
@@ -398,8 +398,8 @@ let make = (~collections: array<Collection.t>) => {
       </div>
 
       <div className="query-preview">
-        <h3> {React.string("Generated FQL")} </h3>
-        <pre className="code-block"> {React.string(fql)} </pre>
+        <h3> {React.string("Generated GQL")} </h3>
+        <pre className="code-block"> {React.string(gql)} </pre>
       </div>
 
       <div className="actions-bar">

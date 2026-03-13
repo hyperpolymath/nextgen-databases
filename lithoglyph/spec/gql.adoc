@@ -169,7 +169,7 @@ digit           = [0-9] ;
 
 === Example 1: Insert Document
 
-[source,fql]
+[source,gql]
 ----
 INSERT INTO evidence {
   "claim": "UK inflation reached 10.1% in July 2022",
@@ -200,7 +200,7 @@ WITH PROVENANCE {
 
 === Example 2: Select with Filter
 
-[source,fql]
+[source,gql]
 ----
 SELECT claim, source, prompt_score
 FROM evidence
@@ -231,7 +231,7 @@ LIMIT 10;
 
 === Example 3: Select with Provenance
 
-[source,fql]
+[source,gql]
 ----
 SELECT * FROM evidence
 WHERE claim LIKE "%inflation%"
@@ -263,7 +263,7 @@ WITH PROVENANCE;
 
 === Example 4: Insert Edge
 
-[source,fql]
+[source,gql]
 ----
 INSERT INTO supports {
   "_from": "evidence/doc_a1b2c3d4",
@@ -291,7 +291,7 @@ WITH PROVENANCE {
 
 === Example 5: Edge Traversal
 
-[source,fql]
+[source,gql]
 ----
 SELECT * FROM claims
 WHERE _id = "claims/claim_xyz"
@@ -330,7 +330,7 @@ TRAVERSE supports INBOUND DEPTH 2;
 
 === Example 6: Create Collection with Schema
 
-[source,fql]
+[source,gql]
 ----
 CREATE COLLECTION sources (
   name STRING NOT NULL,
@@ -358,7 +358,7 @@ CREATE COLLECTION sources (
 
 === Example 7: Update with Provenance
 
-[source,fql]
+[source,gql]
 ----
 UPDATE evidence
 SET prompt_score = 98, verified = true
@@ -389,7 +389,7 @@ WITH PROVENANCE {
 
 === Example 8: Explain Query
 
-[source,fql]
+[source,gql]
 ----
 EXPLAIN SELECT * FROM evidence
 WHERE prompt_score >= 80 AND source = "ONS";
@@ -425,7 +425,7 @@ WHERE prompt_score >= 80 AND source = "ONS";
 
 === Example 9: Introspect Schema
 
-[source,fql]
+[source,gql]
 ----
 INTROSPECT SCHEMA evidence;
 ----
@@ -458,7 +458,7 @@ INTROSPECT SCHEMA evidence;
 
 === Example 10: Introspect Journal
 
-[source,fql]
+[source,gql]
 ----
 INTROSPECT JOURNAL SINCE 1000;
 ----
@@ -628,7 +628,7 @@ TRAVERSE TRUE UNIQUE UPDATE WHERE WITH
 
 GQL supports single-line and multi-line comments:
 
-[source,fql]
+[source,gql]
 ----
 -- This is a single-line comment
 
@@ -650,18 +650,18 @@ SELECT * FROM evidence; -- Inline comment
 
 == Test Vectors
 
-Golden test vectors in `test-vectors/fql/`:
+Golden test vectors in `test-vectors/gql/`:
 
-* `parse_insert.fql` + `parse_insert.ast` - Insert parsing
-* `parse_select.fql` + `parse_select.ast` - Select parsing
-* `parse_edge.fql` + `parse_edge.ast` - Edge traversal parsing
-* `execute_insert.fql` + `execute_insert.result` - Insert execution
-* `execute_select.fql` + `execute_select.result` - Select execution
-* `error_constraint.fql` + `error_constraint.result` - Constraint error
+* `parse_insert.gql` + `parse_insert.ast` - Insert parsing
+* `parse_select.gql` + `parse_select.ast` - Select parsing
+* `parse_edge.gql` + `parse_edge.ast` - Edge traversal parsing
+* `execute_insert.gql` + `execute_insert.result` - Insert execution
+* `execute_select.gql` + `execute_select.result` - Select execution
+* `error_constraint.gql` + `error_constraint.result` - Constraint error
 
 == References
 
 * link:blocks.adoc[Block Storage Format]
 * link:journal.adoc[Journal Format]
 * link:encoding.adoc[Blob Encoding]
-* link:fql-philosophy.adoc[GQL Philosophy]
+* link:gql-philosophy.adoc[GQL Philosophy]

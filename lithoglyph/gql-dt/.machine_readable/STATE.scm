@@ -42,31 +42,31 @@
           "lakefile.lean"
           "lean-toolchain"
           "lake-manifest.json"
-          "src/FqlDt.lean"))
+          "src/GqlDt.lean"))
       (refinement-types
         (status complete)
         (completion 100)
         (files
-          "src/FqlDt/Types.lean"
-          "src/FqlDt/Types/BoundedNat.lean"
-          "src/FqlDt/Types/BoundedInt.lean"
-          "src/FqlDt/Types/NonEmptyString.lean"
-          "src/FqlDt/Types/Confidence.lean"))
+          "src/GqlDt/Types.lean"
+          "src/GqlDt/Types/BoundedNat.lean"
+          "src/GqlDt/Types/BoundedInt.lean"
+          "src/GqlDt/Types/NonEmptyString.lean"
+          "src/GqlDt/Types/Confidence.lean"))
       (prompt-scores
         (status complete)
         (completion 100)
         (files
-          "src/FqlDt/Prompt.lean"
-          "src/FqlDt/Prompt/PromptDimension.lean"
-          "src/FqlDt/Prompt/PromptScores.lean"))
+          "src/GqlDt/Prompt.lean"
+          "src/GqlDt/Prompt/PromptDimension.lean"
+          "src/GqlDt/Prompt/PromptScores.lean"))
       (provenance-tracking
         (status complete)
         (completion 100)
         (files
-          "src/FqlDt/Provenance.lean"
-          "src/FqlDt/Provenance/ActorId.lean"
-          "src/FqlDt/Provenance/Rationale.lean"
-          "src/FqlDt/Provenance/Tracked.lean"))
+          "src/GqlDt/Provenance.lean"
+          "src/GqlDt/Provenance/ActorId.lean"
+          "src/GqlDt/Provenance/Rationale.lean"
+          "src/GqlDt/Provenance/Tracked.lean"))
       (zig-ffi-bridge
         (status stub)
         (completion 10)
@@ -78,12 +78,12 @@
         (status partial)
         (completion 60)
         (files
-          "src/FbqlDt/Lexer.lean"
-          "src/FbqlDt/Parser.lean"
-          "src/FbqlDt/TypeInference.lean"
-          "src/FbqlDt/IR.lean"
-          "src/FbqlDt/Serialization.lean"
-          "src/FbqlDt/Pipeline.lean")
+          "src/GqlDt/Lexer.lean"
+          "src/GqlDt/Parser.lean"
+          "src/GqlDt/TypeInference.lean"
+          "src/GqlDt/IR.lean"
+          "src/GqlDt/Serialization.lean"
+          "src/GqlDt/Pipeline.lean")
         (notes "HONEST AUDIT 2026-03-13: Lexer real, parser partial. Serialization broken by AST refactoring (8+ sorry). IR has major stubs. 37 sorry instances across module."))
       (lsp-server
         (status complete)
@@ -126,7 +126,7 @@
         (items
           (item "Create lakefile.lean with Mathlib4 dependency" status: complete)
           (item "Add lean-toolchain file (leanprover/lean4:v4.15.0)" status: complete)
-          (item "Create FqlDt/ source directory structure" status: complete)
+          (item "Create GqlDt/ source directory structure" status: complete)
           (item "Update Dockerfile for Lean 4 + elan" status: pending)
           (item "Verify lake build succeeds" status: complete)))
 
@@ -136,10 +136,10 @@
         (completed-date "2026-01-12")
         (depends-on milestone-1)
         (items
-          (item "FqlDt/Types/BoundedNat.lean - BoundedNat min max structure" status: complete)
-          (item "FqlDt/Types/BoundedInt.lean - BoundedInt min max structure" status: complete)
-          (item "FqlDt/Types/NonEmptyString.lean - String with length > 0 proof" status: complete)
-          (item "FqlDt/Types/Confidence.lean - Float 0.0 1.0 with runtime validation" status: complete)
+          (item "GqlDt/Types/BoundedNat.lean - BoundedNat min max structure" status: complete)
+          (item "GqlDt/Types/BoundedInt.lean - BoundedInt min max structure" status: complete)
+          (item "GqlDt/Types/NonEmptyString.lean - String with length > 0 proof" status: complete)
+          (item "GqlDt/Types/Confidence.lean - Float 0.0 1.0 with runtime validation" status: complete)
           (item "Prove basic theorems (bounds preserved under arithmetic)" status: complete)))
 
       (milestone-3
@@ -148,8 +148,8 @@
         (completed-date "2026-01-12")
         (depends-on milestone-2)
         (items
-          (item "FqlDt/Prompt/PromptDimension.lean - BoundedNat 0 100 alias" status: complete)
-          (item "FqlDt/Prompt/PromptScores.lean - 6 dimensions struct" status: complete)
+          (item "GqlDt/Prompt/PromptDimension.lean - BoundedNat 0 100 alias" status: complete)
+          (item "GqlDt/Prompt/PromptScores.lean - 6 dimensions struct" status: complete)
           (item "Auto-computed overall field with correctness proof" status: complete)
           (item "Smart constructor PromptScores.create" status: complete)
           (item "Theorem: overall_in_bounds" status: complete)))
@@ -160,9 +160,9 @@
         (completed-date "2026-01-12")
         (depends-on milestone-2)
         (items
-          (item "FqlDt/Provenance/ActorId.lean - NonEmptyString wrapper" status: complete)
-          (item "FqlDt/Provenance/Rationale.lean - NonEmptyString wrapper" status: complete)
-          (item "FqlDt/Provenance/Tracked.lean - Timestamp + Tracked alpha structure" status: complete)
+          (item "GqlDt/Provenance/ActorId.lean - NonEmptyString wrapper" status: complete)
+          (item "GqlDt/Provenance/Rationale.lean - NonEmptyString wrapper" status: complete)
+          (item "GqlDt/Provenance/Tracked.lean - Timestamp + Tracked alpha structure" status: complete)
           (item "Theorem: tracked_has_provenance" status: complete)
           (item "TrackedList with all_have_provenance theorem" status: complete)))
 
@@ -198,11 +198,11 @@
           "spec/GQL-DT-Lexical.md - Tokenization rules"
           "spec/GQL-DT-Railroad-Diagrams.md - Visual syntax")
         (implementation-files
-          "src/FbqlDt/Lexer.lean - Hand-rolled lexer (540+ lines, no Parsec dependency)"
-          "src/FbqlDt/Parser.lean - Parser combinators with error handling"
-          "src/FbqlDt/AST.lean - Type-safe AST with dependent types (BUILDS SUCCESSFULLY)"
-          "src/FbqlDt/TypeInference.lean - Inferred types before schema lookup"
-          "src/FbqlDt/Pipeline.lean - Full compilation pipeline"))
+          "src/GqlDt/Lexer.lean - Hand-rolled lexer (540+ lines, no Parsec dependency)"
+          "src/GqlDt/Parser.lean - Parser combinators with error handling"
+          "src/GqlDt/AST.lean - Type-safe AST with dependent types (BUILDS SUCCESSFULLY)"
+          "src/GqlDt/TypeInference.lean - Inferred types before schema lookup"
+          "src/GqlDt/Pipeline.lean - Full compilation pipeline"))
 
       (milestone-7
         (name "Production Tooling & Deployment")
@@ -215,7 +215,7 @@
           (item "Debugger with proof visualization" status: complete)
           (item "Svalinn/Vordr verified container stack" status: complete)
           (item "Post-quantum crypto configuration (Dilithium5, Kyber-1024)" status: complete)
-          (item "Complete rebrand: Lith→Lithoglyph, FBQL→GQL" status: complete))
+          (item "Complete rebrand: Lith→Lithoglyph, GQL→GQL" status: complete))
         (files
           "cli/lsp-server.ts - Language Server Protocol (180 LOC)"
           "cli/debugger.ts - Proof obligation debugger"
@@ -265,10 +265,10 @@
     (integration-points
       (lithoglyph-fundep "Lithoglyph's FunDep.lean uses String-based attrs - upgrade to schema-bound")
       (lithoglyph-normalizer "Lithoglyph's fd-discovery.factor aligns with DFD algorithm spec")
-      (lithoglyph-bridge "bridge.zig exports fdb_verify_proof compatible with spec"))
-    (when-fdql-dt-implements
-      "Lithoglyph should import fdql-dt types for FunDep, NormalForm predicates"
-      "Proofs.lean should use fdql-dt's LosslessTransform theorem"))
+      (lithoglyph-bridge "bridge.zig exports lith_verify_proof compatible with spec"))
+    (when-gql-dt-implements
+      "Lithoglyph should import gql-dt types for FunDep, NormalForm predicates"
+      "Proofs.lean should use gql-dt's LosslessTransform theorem"))
 
   (critical-next-actions
     (immediate
@@ -276,7 +276,7 @@
       (action "Add CI workflow for lake build"))
     (this-week
       (action "Start Milestone 5: Zig FFI Bridge")
-      (action "Create bridge/fdb_types.zig"))
+      (action "Create bridge/lith_types.zig"))
     (this-month
       (action "Complete Milestone 5 (Zig FFI)")
       (action "Begin Milestone 6 (GQL Parser)")))
@@ -327,7 +327,7 @@
       (date "2026-02-01")
       (session-id "formal-specification-completion")
       (accomplishments
-        "Fixed naming inconsistencies: fdql → gql in STATE.scm, ECOSYSTEM.scm"
+        "Fixed naming inconsistencies: gql → gql in STATE.scm, ECOSYSTEM.scm"
         "Created formal EBNF grammar: spec/GQL-DT-Grammar.ebnf (800+ lines)"
         "Created lexical specification: spec/GQL-DT-Lexical.md (700+ lines)"
         "Documented operator precedence table (11 levels)"
@@ -347,16 +347,16 @@
       (date "2026-02-01")
       (session-id "type-safety-enforcement")
       (accomplishments
-        "Created type-safe AST with dependent types: src/FbqlDt/AST.lean"
+        "Created type-safe AST with dependent types: src/GqlDt/AST.lean"
         "Type-indexed TypedValue ensures compile-time type correctness"
         "InsertStmt includes typesMatch proof obligation"
-        "Created smart constructors: src/FbqlDt/TypeSafe.lean"
+        "Created smart constructors: src/GqlDt/TypeSafe.lean"
         "mkInsert requires proof that values match column types"
         "Builder API with validation for ergonomic query construction"
-        "Created type checker: src/FbqlDt/TypeChecker.lean"
+        "Created type checker: src/GqlDt/TypeChecker.lean"
         "checkInsert, checkSelect with proof obligation generation"
         "reportTypeError with helpful suggestions"
-        "Created type safety examples: src/FbqlDt/TypeSafeQueries.lean"
+        "Created type safety examples: src/GqlDt/TypeSafeQueries.lean"
         "Demonstrated compile-time rejection of invalid queries"
         "Created comprehensive documentation: docs/TYPE-SAFETY-ENFORCEMENT.md"
         "Documented four-layer defense: UI, type inference, proofs, database"
@@ -396,17 +396,17 @@
         "Haskell bindings: GADTs for type-level safety"
         "Deno bindings: dlopen FFI, TypeScript types"
         "Priority: ReScript > Rust > Julia/Deno > Gleam/Elixir > Haskell"
-        "Created IR data structures: src/FbqlDt/IR.lean (M6 STARTED)"
+        "Created IR data structures: src/GqlDt/IR.lean (M6 STARTED)"
         "IR preserves dependent types, proofs (CBOR), permissions"
         "IR supports: INSERT, SELECT, UPDATE, DELETE, NORMALIZE"
         "Permission validation in IR: isTypeAllowed, validatePermissions"
         "IR optimization: constant folding, proof caching (placeholders)"
         "IR → SQL lowering for compatibility (loses type info - warning added)"
-        "Created type inference engine: src/FbqlDt/TypeInference.lean"
+        "Created type inference engine: src/GqlDt/TypeInference.lean"
         "Type inference for GQL: infer from literals, schema-guided"
         "Auto-proof generation: decide, omega, simp tactics"
         "Runtime validation fallback when proofs fail"
-        "Created serialization: src/FbqlDt/Serialization.lean"
+        "Created serialization: src/GqlDt/Serialization.lean"
         "Serialization formats: JSON, CBOR (RFC 8949), Binary, SQL"
         "JSON: web APIs, ReScript integration, debugging"
         "CBOR: proof blobs, IR transport, semantic tags"
@@ -417,7 +417,7 @@
         "VERIFIED: All 5 language design requirements COMPLETE"
         "Type System ✓, Grammar ✓, Type Safety ✓, Serialization ✓, ReScript ✓")
       (next-steps
-        "Implement actual parser (text → AST): src/FbqlDt/Parser.lean"
+        "Implement actual parser (text → AST): src/GqlDt/Parser.lean"
         "Implement AST → IR generation (complete stubs in IR.lean)"
         "Implement CBOR encoding/decoding (complete stubs in Serialization.lean)"
         "Coordinate with Lithoglyph team on native IR execution"
@@ -431,12 +431,12 @@
       (session-id "m6-parser-implementation")
       (accomplishments
         "MILESTONE 6: GQL-DT/GQL Parser - SUBSTANTIALLY COMPLETE"
-        "Created lexer: src/FbqlDt/Lexer.lean (tokenization complete)"
+        "Created lexer: src/GqlDt/Lexer.lean (tokenization complete)"
         "Tokenizes 80+ keywords: SQL, type, proof, Lithoglyph keywords"
         "Operators with precedence, literals (nat, int, float, string, bool)"
         "Identifier parsing with keyword lookup (case-sensitive type keywords)"
         "Comment skipping: single-line (--) and multi-line (/* */)"
-        "Created parser: src/FbqlDt/Parser.lean (parser combinators complete)"
+        "Created parser: src/GqlDt/Parser.lean (parser combinators complete)"
         "Basic combinators: peek, advance, expect, optional, many, sepBy"
         "Expression parsing: literals, type expressions (including BoundedNat min max)"
         "INSERT parsing: both GQL (inferred) and GQL-DT (explicit types)"
@@ -447,9 +447,9 @@
         "ORDER BY clause: multiple columns with direction (ASC/DESC)"
         "LIMIT clause: natural number literal"
         "Statement-level parsing with discriminated union (insertGQL, insertGQL-DT, select, update, delete)"
-        "Created pipeline: src/FbqlDt/Pipeline.lean (end-to-end orchestration)"
+        "Created pipeline: src/GqlDt/Pipeline.lean (end-to-end orchestration)"
         "6-stage pipeline: tokenize → parse → type check → generate IR → validate permissions → serialize"
-        "Pipeline configuration: ParsingMode (fbqld, gql), ValidationLevel, SerializationFormat"
+        "Pipeline configuration: ParsingMode (gqld, gql), ValidationLevel, SerializationFormat"
         "Convenience functions: parseGQL (user tier), parseGQL-DT (admin tier), parseAndExecute"
         "Error reporting with context: PipelineError with line, column, source"
         "Examples and tests: exampleParseGQL, exampleParseGQL-DT, exampleParseSelect"
@@ -475,7 +475,7 @@
         "Completed proof serialization: serializeProof with CBOR metadata"
         "generateIR_Insert: extracts proof metadata from typed values (BoundedNat, NonEmptyString, Confidence, PromptScores)"
         "Proof blobs: type, data, verified flag (compile-time checked, serialized for audit)"
-        "Updated src/FbqlDt.lean: imports all M6 modules (Lexer, Parser, TypeInference, IR, Serialization, Pipeline)"
+        "Updated src/GqlDt.lean: imports all M6 modules (Lexer, Parser, TypeInference, IR, Serialization, Pipeline)"
         "UPDATED: overall-completion 75% (M1-M5 complete, M6 substantially done)")
       (next-steps
         "Complete JSON parsing: bytesToJson (currently stub)"
@@ -502,9 +502,9 @@
         "Comprehensive seam analysis: 76 issues identified across 9 categories"
         "Fixed 33 compilation-blocking issues in Phase 1"
         "BUILD STATUS: 34/35 modules compiling (97% build success)"
-        "NAMESPACE CONSISTENCY: Global FqlDt → FbqlDt replacement across entire codebase (24 files)"
+        "NAMESPACE CONSISTENCY: Global GqlDt → GqlDt replacement across entire codebase (24 files)"
         "Fixed import statements, namespace declarations, open directives, end statements"
-        "CIRCULAR DEPENDENCY RESOLUTION: Created src/FbqlDt/Serialization/Types.lean"
+        "CIRCULAR DEPENDENCY RESOLUTION: Created src/GqlDt/Serialization/Types.lean"
         "Extracted shared types: CBORValue, JsonValue, CBORMajorType, SerializationFormat"
         "Updated CBOR semantic tags to vendor-specific range (55800-55804) to avoid IANA collisions"
         "Both IR.lean and Serialization.lean now import from Types module (cycle broken)"
@@ -550,7 +550,7 @@
       (date "2026-02-01")
       (session-id "ast-lean-complete-fix")
       (accomplishments
-        "AST.lean FIXED: Module now builds successfully (24/35 → FbqlDt.AST ✓)"
+        "AST.lean FIXED: Module now builds successfully (24/35 → GqlDt.AST ✓)"
         "CRITICAL BLOCKER RESOLVED: AST-001 nested inductive type error fixed"
         "Removed .tracked variant from TypeExpr (no longer a type constructor)"
         "Created TrackedValue wrapper structure (separates provenance from type system)"
@@ -588,8 +588,8 @@
         "TypeSafe.lean broken by AST refactoring (TS-001)"
         "Missing imports, references to removed Evidence type, keyword conflicts")
       (build-status
-        "24 modules build successfully (including FbqlDt.AST)"
-        "2 modules failing: FbqlDt.TypeSafe, FbqlDt.Serialization"
+        "24 modules build successfully (including GqlDt.AST)"
+        "2 modules failing: GqlDt.TypeSafe, GqlDt.Serialization"
         "9 dependent modules not building due to failures")
       (next-steps
         "Fix Serialization.lean: Update to new AST structure"
@@ -611,7 +611,7 @@
       (accomplishments
         "MILESTONE 7 COMPLETE: Production Tooling & Deployment - 100%"
         "OVERALL COMPLETION: 94% → 100% (PRODUCTION READY)"
-        "COMPREHENSIVE REBRAND: Lith→Lithoglyph, FBQL→GQL, FBQLdt→GQL-DT (708 lines, 26 files)"
+        "COMPREHENSIVE REBRAND: Lith→Lithoglyph, GQL→GQL, GQLdt→GQL-DT (708 lines, 26 files)"
         "Fixed Lean identifier issues: GQL-DT→GQLdt in code (hyphens invalid in Lean)"
         "Renamed 4 spec files to GQL naming"
         "Updated all 38 Lean source files with new branding"
@@ -665,7 +665,7 @@
         "Coordinate with Lithoglyph team on native IR execution")
       (notes
         "All 7 milestones complete (M1: Setup, M2: Types, M3: PROMPT, M4: Provenance, M5: Zig FFI, M6: Parser, M7: Tooling)"
-        "Rebranding was critical: old Lith/FBQL naming replaced throughout"
+        "Rebranding was critical: old Lith/GQL naming replaced throughout"
         "Zig FFI bridge provides C ABI compatibility for all language bindings"
         "LSP + VS Code extension enables IDE integration"
         "Debugger visualizes proof obligations at runtime"

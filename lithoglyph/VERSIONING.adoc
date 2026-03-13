@@ -100,7 +100,7 @@ Each Lith component is assigned a stability tier that defines its compatibility 
 
 **Post-1.0 Stable Components:**
 
-* FQL core query syntax
+* GQL core query syntax
 * Core data types (STRING, INTEGER, FLOAT, BOOLEAN, TIMESTAMP, JSON, PROMPT_SCORE)
 * Provenance model (actor, rationale, timestamp)
 * Document and edge CRUD operations
@@ -126,7 +126,7 @@ Each Lith component is assigned a stability tier that defines its compatibility 
 
 **Provisional Components (stabilizing):**
 
-* FQL advanced syntax (TRAVERSE depth options, complex WHERE clauses)
+* GQL advanced syntax (TRAVERSE depth options, complex WHERE clauses)
 * Constraint definition syntax
 * Schema evolution operations
 * HTTP API endpoints
@@ -188,12 +188,12 @@ Each Lith component is assigned a stability tier that defines its compatibility 
 |===
 | Component | Tier | Status | Notes
 
-| FQL Core Syntax
+| GQL Core Syntax
 | Provisional
 | Stabilizing
 | Grammar mostly stable, minor changes expected
 
-| FQL Advanced Syntax
+| GQL Advanced Syntax
 | Experimental
 | Active development
 | TRAVERSE, complex predicates evolving
@@ -250,11 +250,11 @@ Each Lith component is assigned a stability tier that defines its compatibility 
 |===
 | Component | Target Tier | Criteria for Stability
 
-| FQL Core Syntax
+| GQL Core Syntax
 | Stable
 | Grammar frozen, 100% backwards compatible
 
-| FQL Advanced Syntax
+| GQL Advanced Syntax
 | Provisional
 | Core features stable, extensions provisional
 
@@ -324,7 +324,7 @@ Journals written by any Lith version can be replayed by any later version. This 
 
 Each collection tracks its schema version:
 
-[source,fql]
+[source,gql]
 ----
 INTROSPECT SCHEMA evidence;
 
@@ -341,14 +341,14 @@ INTROSPECT SCHEMA evidence;
 
 == API Versioning
 
-=== FQL Versioning
+=== GQL Versioning
 
-FQL syntax is versioned at the dialect level:
+GQL syntax is versioned at the dialect level:
 
-[source,fql]
+[source,gql]
 ----
--- Explicitly request FQL v1 syntax
-#fql-version 1
+-- Explicitly request GQL v1 syntax
+#gql-version 1
 
 SELECT * FROM evidence;
 ----
@@ -461,18 +461,18 @@ lith doctor --verify mydb/
 
 === Query Migration
 
-For FQL syntax changes:
+For GQL syntax changes:
 
 [source,bash]
 ----
 # Check queries for deprecated syntax
-lith lint --queries queries/*.fql
+lith lint --queries queries/*.gql
 
 # Auto-fix where possible
-lith lint --fix --queries queries/*.fql
+lith lint --fix --queries queries/*.gql
 
 # Generate migration report
-lith lint --report queries/*.fql > migration-report.md
+lith lint --report queries/*.gql > migration-report.md
 ----
 
 === Zero-Downtime Migration
@@ -555,9 +555,9 @@ Queries written for older versions continue to work:
 |===
 | Query Version | Runtime Version | Guaranteed
 
-| FQL v1 | Lith 1.x | Yes
-| FQL v1 | Lith 2.x | Yes (with version directive)
-| FQL v1 | Lith 3.x | Yes (with version directive)
+| GQL v1 | Lith 1.x | Yes
+| GQL v1 | Lith 2.x | Yes (with version directive)
+| GQL v1 | Lith 3.x | Yes (with version directive)
 |===
 
 === Journal Replay Guarantee
@@ -590,11 +590,11 @@ Queries written for older versions continue to work:
 
 | 0.1.0
 | PoC Complete
-| Single-node CRUD, journal, basic FQL
+| Single-node CRUD, journal, basic GQL
 
 | 0.5.0
 | Alpha
-| Full FQL, constraints, edges
+| Full GQL, constraints, edges
 
 | 1.0.0
 | Stable
@@ -605,13 +605,13 @@ Queries written for older versions continue to work:
 
 === Runtime Version
 
-[source,fql]
+[source,gql]
 ----
 INTROSPECT VERSION;
 
 {
   "lith": "0.0.1",
-  "fql": "1",
+  "gql": "1",
   "block_format": 1,
   "journal_format": 1,
   "zig_abi": "0.1.0"
@@ -620,7 +620,7 @@ INTROSPECT VERSION;
 
 === Database Version
 
-[source,fql]
+[source,gql]
 ----
 INTROSPECT DATABASE;
 

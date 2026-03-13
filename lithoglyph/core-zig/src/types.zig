@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// Form.Bridge - Type Definitions
+// Lith.Bridge - Type Definitions
 //
 // Part of Lithoglyph: Stone-carved data for the ages.
 // LgBlob = Lithoglyph Blob (abbreviated for C compatibility)
@@ -54,7 +54,7 @@ pub const LgBlob = extern struct {
 // Status Codes
 // ============================================================
 
-pub const FdbStatus = enum(i32) {
+pub const LithStatus = enum(i32) {
     ok = 0,
 
     // Database errors (1xxx)
@@ -88,11 +88,11 @@ pub const FdbStatus = enum(i32) {
     err_invalid_argument = 9003,
     err_not_implemented = 9004,
 
-    pub fn isOk(self: FdbStatus) bool {
+    pub fn isOk(self: LithStatus) bool {
         return self == .ok;
     }
 
-    pub fn isError(self: FdbStatus) bool {
+    pub fn isError(self: LithStatus) bool {
         return @intFromEnum(self) > 0;
     }
 };
@@ -101,7 +101,7 @@ pub const FdbStatus = enum(i32) {
 // Transaction Mode
 // ============================================================
 
-pub const FdbTxnMode = enum(u8) {
+pub const LithTxnMode = enum(u8) {
     read_only = 0,
     read_write = 1,
 };
@@ -110,7 +110,7 @@ pub const FdbTxnMode = enum(u8) {
 // Operation Types
 // ============================================================
 
-pub const FdbOpType = enum(u16) {
+pub const LithOpType = enum(u16) {
     // Document operations
     doc_insert = 0x0001,
     doc_update = 0x0002,
@@ -148,7 +148,7 @@ pub const FdbOpType = enum(u16) {
 // Block Types
 // ============================================================
 
-pub const FdbBlockType = enum(u16) {
+pub const LithBlockType = enum(u16) {
     free = 0x0000,
     superblock = 0x0001,
     collection_meta = 0x0010,
@@ -187,7 +187,7 @@ pub const CborTag = enum(u64) {
 // Render Options
 // ============================================================
 
-pub const FdbRenderOpts = extern struct {
+pub const LithRenderOpts = extern struct {
     include_provenance: bool = true,
     include_timestamps: bool = true,
     pretty_print: bool = false,
@@ -199,14 +199,14 @@ pub const FdbRenderOpts = extern struct {
 // Result Structure
 // ============================================================
 
-pub const FdbResult = extern struct {
+pub const LithResult = extern struct {
     result_blob: LgBlob,
     provenance_blob: LgBlob,
-    status: FdbStatus,
+    status: LithStatus,
     _padding: [4]u8 = [_]u8{0} ** 4,
     err_blob: LgBlob,
 
-    pub fn ok(result: LgBlob) FdbResult {
+    pub fn ok(result: LgBlob) LithResult {
         return .{
             .result_blob = result,
             .provenance_blob = LgBlob.empty(),
@@ -215,7 +215,7 @@ pub const FdbResult = extern struct {
         };
     }
 
-    pub fn okWithProvenance(result: LgBlob, provenance: LgBlob) FdbResult {
+    pub fn okWithProvenance(result: LgBlob, provenance: LgBlob) LithResult {
         return .{
             .result_blob = result,
             .provenance_blob = provenance,
@@ -224,7 +224,7 @@ pub const FdbResult = extern struct {
         };
     }
 
-    pub fn err(status: FdbStatus, err_blob: LgBlob) FdbResult {
+    pub fn err(status: LithStatus, err_blob: LgBlob) LithResult {
         return .{
             .result_blob = LgBlob.empty(),
             .provenance_blob = LgBlob.empty(),
@@ -256,9 +256,9 @@ test "LgBlob fromSlice" {
     }
 }
 
-test "FdbStatus" {
-    try std.testing.expect(FdbStatus.ok.isOk());
-    try std.testing.expect(!FdbStatus.ok.isError());
-    try std.testing.expect(!FdbStatus.err_doc_not_found.isOk());
-    try std.testing.expect(FdbStatus.err_doc_not_found.isError());
+test "LithStatus" {
+    try std.testing.expect(LithStatus.ok.isOk());
+    try std.testing.expect(!LithStatus.ok.isError());
+    try std.testing.expect(!LithStatus.err_doc_not_found.isOk());
+    try std.testing.expect(LithStatus.err_doc_not_found.isError());
 }

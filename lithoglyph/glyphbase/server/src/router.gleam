@@ -554,10 +554,19 @@ fn error_response(error: client.LithError) -> Response {
     client.NotFound(entity, id) -> entity <> " not found: " <> id
     client.PermissionDenied(action) -> "Permission denied: " <> action
     client.NifNotLoaded -> "Database NIF not loaded"
+    client.NifError(reason) -> "NIF error: " <> reason
     client.ParseFailed -> "Failed to parse CBOR data"
     client.InvalidHandle -> "Invalid database or transaction handle"
+    client.PathTraversal(path) -> "Path traversal rejected: " <> path
   }
-  json_response(json.object([#("error", json.string(message))]), 500)
+  let status = case error {
+    client.PathTraversal(_) -> 400
+    client.NotFound(_, _) -> 404
+    client.PermissionDenied(_) -> 403
+    client.ValidationError(_) -> 400
+    _ -> 500
+  }
+  json_response(json.object([#("error", json.string(message))]), status)
 }
 
 fn get_query_int(req: Request, key: String) -> Option(Int) {

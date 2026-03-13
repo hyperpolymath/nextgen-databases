@@ -23,14 +23,14 @@
 
   (related-projects
     ;; Core ecosystem - Sibling projects
-    (fbql-dt
+    (gql-dt
       (relationship "sibling-language")
-      (repo "github.com/hyperpolymath/fbql-dt")
+      (repo "github.com/hyperpolymath/gql-dt")
       (status "implementation-in-progress")
       (completion 75)
-      (description "FBQLdt: Dependently-Typed Lith Query Language. Lean 4 implementation
+      (description "GQLdt: Dependently-Typed Lith Query Language. Lean 4 implementation
                     with compile-time type checking, refinement types, and proof-carrying
-                    migrations. Two-tier design: FBQLdt (admin) and FBQL (user-friendly).")
+                    migrations. Two-tier design: GQLdt (admin) and GQL (user-friendly).")
       (tech-stack "Lean 4 + Idris2 ABI + Zig FFI + ReScript bindings")
       (integration-points
         (type-system "BoundedNat, BoundedInt, NonEmptyString, Confidence, PromptScores")
@@ -39,9 +39,9 @@
         (parser "Complete parser for INSERT/SELECT/UPDATE/DELETE with type inference")
         (permissions "Two-tier permission system with TypeWhitelist"))
       (alignment-status
-        (fundep-types "Lith should adopt schema-bound FunDep S type from fbql-dt")
-        (proofs "Waiting for fbql-dt M7 (Idris2 ABI) + M8 (Zig FFI)")
-        (bindings "Waiting for fbql-dt M9 (ReScript bindings)")
+        (fundep-types "Lith should adopt schema-bound FunDep S type from gql-dt")
+        (proofs "Waiting for gql-dt M7 (Idris2 ABI) + M8 (Zig FFI)")
+        (bindings "Waiting for gql-dt M9 (ReScript bindings)")
         (ffi "Compatible - both use CBOR-encoded proof blobs via Zig FFI")))
 
     (formbase
@@ -61,7 +61,7 @@
       (repo "github.com/hyperpolymath/lithoglyph-studio")
       (status "planned")
       (description "Zero-friction admin GUI for Lith. Visual schema designer,
-                    FQL query builder, provenance explorer, journal viewer, and
+                    GQL query builder, provenance explorer, journal viewer, and
                     normalization proof visualizer."))
 
     (lithoglyph-debugger
@@ -69,12 +69,12 @@
       (repo "github.com/hyperpolymath/lithoglyph-debugger")
       (status "scaffolding-complete")
       (completion 35)
-      (description "Proof-carrying debugger. Step through FQL queries, inspect
+      (description "Proof-carrying debugger. Step through GQL queries, inspect
                     constraint violations, visualize normalization proofs, and
                     explore journal replay scenarios.")
       (alignment-status
         (journal-types "Need Migration/NormalizationStep entry types from Lith")
-        (provenance "Need Confidence + ProofBlob types from fbql-dt")
+        (provenance "Need Confidence + ProofBlob types from gql-dt")
         (proofs "LosslessProof stubs need real Lean 4 implementations")))
 
     (lithoglyph-analytics
@@ -154,16 +154,16 @@
 
   (what-this-is
     "A database engine that treats data history as sacred"
-    "A query language (FBQL/FBQLdt) designed for provenance and narrative"
+    "A query language (GQL/GQLdt) designed for provenance and narrative"
     "A storage format (blocks + journal) optimized for auditability"
     "A philosophy: databases should explain themselves"
     "An ecosystem of tools for narrative-first data management"
     "Layered architecture: Forth (storage) + Zig (FFI) + Factor (runtime) + Elixir (clustering)"
-    "Integration with formal methods: Lean 4 via fbql-dt for proof-carrying migrations"
+    "Integration with formal methods: Lean 4 via gql-dt for proof-carrying migrations"
     "Open source under PMPL-1.0-or-later (Palimpsest License)")
 
   (what-this-is-not
-    "Not a drop-in SQL replacement (FBQL is intentionally different)"
+    "Not a drop-in SQL replacement (GQL is intentionally different)"
     "Not optimized for OLAP workloads (narrative overhead, use lithoglyph-analytics for that)"
     "Not a distributed database yet (single-node PoC complete, clustering in M14)"
     "Not a real-time streaming platform (use CDC integration for streaming)"

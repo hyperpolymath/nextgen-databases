@@ -104,10 +104,10 @@ let request = async (client, ~method, ~path, ~body=?) => {
 // Query Operations
 // =============================================================================
 
-/** Execute an FDQL query */
-let query = async (client, ~fdql, ~provenance=?, ~explain=?) => {
+/** Execute an GQL query */
+let query = async (client, ~gql, ~provenance=?, ~explain=?) => {
   let body: JSON.t = JSON.Encode.object([
-    ("fdql", JSON.Encode.string(fdql)),
+    ("gql", JSON.Encode.string(gql)),
     ...switch provenance {
     | Some(p) => [
         (
@@ -154,9 +154,9 @@ let query = async (client, ~fdql, ~provenance=?, ~explain=?) => {
 
 /** Execute a query using the query builder */
 let queryWith = async (client, builder) => {
-  let fdql = builder->toFdql
+  let gql = builder->toGql
   let provenance = builder.provenance
-  await query(client, ~fdql, ~provenance?)
+  await query(client, ~gql, ~provenance?)
 }
 
 // =============================================================================

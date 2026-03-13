@@ -10,36 +10,36 @@
 -- 2. Build Lean with link: lake build (configure moreLinkArgs in lakefile)
 -- 3. Run: .lake/build/bin/ffi_test
 
-import FqlDt.FFI.Bridge
-import FqlDt.Types.BoundedNat
-import FqlDt.Prompt.PromptScores
+import GqlDt.FFI.Bridge
+import GqlDt.Types.BoundedNat
+import GqlDt.Prompt.PromptScores
 
-open FqlDt.FFI
-open FqlDt.Types
-open FqlDt.Prompt
+open GqlDt.FFI
+open GqlDt.Types
+open GqlDt.Prompt
 
-/-- Test FdbStatus conversion -/
-def testFdbStatus : IO Unit := do
-  IO.println "Testing FdbStatus..."
+/-- Test LithStatus conversion -/
+def testLithStatus : IO Unit := do
+  IO.println "Testing LithStatus..."
 
   -- Test fromInt conversions
-  let s0 := FdbStatus.fromInt 0
-  let s1 := FdbStatus.fromInt (-1)
-  let s99 := FdbStatus.fromInt (-99)
+  let s0 := LithStatus.fromInt 0
+  let s1 := LithStatus.fromInt (-1)
+  let s99 := LithStatus.fromInt (-99)
 
   IO.println s!"  fromInt 0 = {repr s0} (expected ok)"
   IO.println s!"  fromInt -1 = {repr s1} (expected invalidProof)"
   IO.println s!"  fromInt -99 = {repr s99} (expected genericError)"
 
   -- Test isOk
-  IO.println s!"  ok.isOk = {FdbStatus.ok.isOk} (expected true)"
-  IO.println s!"  invalidProof.isOk = {FdbStatus.invalidProof.isOk} (expected false)"
+  IO.println s!"  ok.isOk = {LithStatus.ok.isOk} (expected true)"
+  IO.println s!"  invalidProof.isOk = {LithStatus.invalidProof.isOk} (expected false)"
 
   -- Test message
-  IO.println s!"  ok.message = \"{FdbStatus.ok.message}\""
-  IO.println s!"  invalidActor.message = \"{FdbStatus.invalidActor.message}\""
+  IO.println s!"  ok.message = \"{LithStatus.ok.message}\""
+  IO.println s!"  invalidActor.message = \"{LithStatus.invalidActor.message}\""
 
-  IO.println "✓ FdbStatus tests passed"
+  IO.println "✓ LithStatus tests passed"
 
 /-- Test PromptScoresFFI -/
 def testPromptScoresFFI : IO Unit := do
@@ -120,11 +120,11 @@ def testIntegration : IO Unit := do
 /-- Main test runner -/
 def main : IO Unit := do
   IO.println "═══════════════════════════════════════════════"
-  IO.println "  FqlDt FFI Integration Tests"
+  IO.println "  GqlDt FFI Integration Tests"
   IO.println "═══════════════════════════════════════════════"
   IO.println ""
 
-  testFdbStatus
+  testLithStatus
   IO.println ""
 
   testPromptScoresFFI

@@ -38,7 +38,7 @@
       (role . "Autonomous normalization and functional dependency discovery")
       (capabilities
         "- Run Lean 4 normalization proofs on schema changes
-         - Discover functional dependencies via Factor FQL runtime
+         - Discover functional dependencies via Factor GQL runtime
          - Suggest schema improvements based on FD analysis
          - Verify normalization forms (1NF through BCNF)")
       (decision-making

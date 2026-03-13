@@ -12,7 +12,7 @@ open Lith_Fuzz_Mutators
 /** Fuzz target function type */
 type fuzzTarget = string => fuzzInputResult
 
-/** Seed corpus - valid FDQL statements */
+/** Seed corpus - valid GQL statements */
 let seedCorpus: array<string> = [
   "SELECT * FROM users",
   "SELECT id, name FROM posts WHERE status = \"published\"",

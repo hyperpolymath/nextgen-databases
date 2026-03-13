@@ -9,7 +9,7 @@ Multi-language stack in dependency order:
 2. **Zig** (core-zig/) — C ABI bridge with WAL, 19 functions, block allocator
 3. **Zig** (ffi/zig/) — Delegation layer that forwards to core-zig
 4. **Idris2** (src/Lith/) — Dependent-type ABI proofs, memory layout verification
-5. **Factor** (core-factor/) — FQL runtime: parser, planner, executor
+5. **Factor** (core-factor/) — GQL runtime: parser, planner, executor
 6. **Lean 4** (normalizer/) — Normalization proofs, FD discovery (52 proofs)
 7. **Lean 4** (gql-dt/) — Dependently-typed Glyph Query Language
 8. **Zig + Rust** (beam/) — BEAM NIFs for Elixir/Erlang integration
@@ -27,7 +27,7 @@ svalinn (TLS) → lith-http (Elixir :4000) → BEAM NIFs → core-zig (C ABI) �
                               Idris2 ABI proofs (src/Lith/) verify bridge contracts
                               Lean 4 normalizer verifies schema correctness
                               GQL-DT (Lean 4) verifies query correctness
-                              Factor FQL plans and executes queries
+                              Factor GQL plans and executes queries
 ```
 
 ## Critical Invariants
@@ -61,7 +61,7 @@ svalinn (TLS) → lith-http (Elixir :4000) → BEAM NIFs → core-zig (C ABI) �
 - **Zig** — Bridge, BEAM NIF, API layer
 - **Idris2** — ABI proofs (dependent types)
 - **Lean 4** — Normalization proofs, GQL-DT
-- **Factor** — FQL runtime (concatenative)
+- **Factor** — GQL runtime (concatenative)
 - **Elixir** — OTP control plane, HTTP API
 - **Rust** — BEAM NIF (Rustler), studio backend
 - **ReScript** — Client libraries (if needed)
@@ -128,7 +128,7 @@ just build-all # everything in dependency order
 | ffi/zig | PASS | PASS | Delegates to core-zig |
 | Idris2 ABI | PASS | N/A | 3 files type-check clean, 0 believe_me |
 | Lean 4 normalizer | PASS | 52 PASS | FD discovery proofs |
-| core-factor | PASS | N/A | FQL parser/planner/executor |
+| core-factor | PASS | N/A | GQL parser/planner/executor |
 | BEAM NIF (Zig) | PASS | N/A | Real FFI calls |
 | BEAM NIF (Rust) | PASS | N/A | Rustler 0.35, 0 warnings |
 | lith-http | PASS | PASS | M15 complete |

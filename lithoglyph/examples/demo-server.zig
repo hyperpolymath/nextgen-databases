@@ -39,8 +39,8 @@ const LgResult = extern struct {
 };
 
 // External FFI functions (from libbridge.so)
-extern fn fdb_version() c_int;
-extern fn fdb_db_open(
+extern fn lith_version() c_int;
+extern fn lith_db_open(
     path: [*]const u8,
     path_len: usize,
     opts: ?[*]const u8,
@@ -48,21 +48,21 @@ extern fn fdb_db_open(
     out_db: *?*anyopaque,
     out_err: *LgBlob,
 ) LgStatus;
-extern fn fdb_db_close(db: ?*anyopaque) void;
-extern fn fdb_txn_begin(
+extern fn lith_db_close(db: ?*anyopaque) void;
+extern fn lith_txn_begin(
     db: ?*anyopaque,
     read_only: bool,
     out_txn: *?*anyopaque,
     out_err: *LgBlob,
 ) LgStatus;
-extern fn fdb_txn_commit(txn: ?*anyopaque, out_err: *LgBlob) LgStatus;
-extern fn fdb_apply(txn: ?*anyopaque, op: [*]const u8, op_len: usize) LgResult;
-extern fn fdb_introspect_schema(
+extern fn lith_txn_commit(txn: ?*anyopaque, out_err: *LgBlob) LgStatus;
+extern fn lith_apply(txn: ?*anyopaque, op: [*]const u8, op_len: usize) LgResult;
+extern fn lith_introspect_schema(
     db: ?*anyopaque,
     out_schema: *LgBlob,
     out_err: *LgBlob,
 ) LgStatus;
-extern fn fdb_blob_free(blob: *LgBlob) void;
+extern fn lith_blob_free(blob: *LgBlob) void;
 
 // Global state
 var db: ?*anyopaque = null;
@@ -76,13 +76,13 @@ pub fn main() !void {
     std.debug.print("===========================================\n", .{});
     std.debug.print("Lithoglyph Phase 4 Demo Server\n", .{});
     std.debug.print("===========================================\n", .{});
-    std.debug.print("Bridge version: {d}\n", .{fdb_version()});
+    std.debug.print("Bridge version: {d}\n", .{lith_version()});
 
     // Open database
     const db_path = "demo.lgh";
     var err_blob = LgBlob.empty();
 
-    const status = fdb_db_open(
+    const status = lith_db_open(
         db_path.ptr,
         db_path.len,
         null,
@@ -103,7 +103,7 @@ pub fn main() !void {
 
     defer {
         if (db) |d| {
-            fdb_db_close(d);
+            lith_db_close(d);
             std.debug.print("\nDatabase closed\n", .{});
         }
     }
@@ -176,7 +176,7 @@ fn handleHealth(stream: std.net.Stream) !void {
 
 fn handleVersion(stream: std.net.Stream) !void {
     var buf: [256]u8 = undefined;
-    const version = fdb_version();
+    const version = lith_version();
     const json = try std.fmt.bufPrint(&buf,
         \\HTTP/1.1 200 OK
         \\Content-Type: application/json
@@ -194,7 +194,7 @@ fn handleInsert(allocator: std.mem.Allocator, stream: std.net.Stream, request: [
     var txn: ?*anyopaque = null;
     var err_blob = LgBlob.empty();
 
-    var status = fdb_txn_begin(db, false, &txn, &err_blob);
+    var status = lith_txn_begin(db, false, &txn, &err_blob);
     if (status != .ok) {
         const error_response =
             \\HTTP/1.1 500 Internal Server Error
@@ -212,7 +212,7 @@ fn handleInsert(allocator: std.mem.Allocator, stream: std.net.Stream, request: [
     const op = "{\"op\":\"insert\",\"collection\":\"demo\",\"doc\":{\"name\":\"test\"}}";
 
     // Apply operation
-    const result = fdb_apply(txn, op.ptr, op.len);
+    const result = lith_apply(txn, op.ptr, op.len);
 
     if (result.status != .ok) {
         const error_response =
@@ -227,7 +227,7 @@ fn handleInsert(allocator: std.mem.Allocator, stream: std.net.Stream, request: [
     }
 
     // Commit
-    status = fdb_txn_commit(txn, &err_blob);
+    status = lith_txn_commit(txn, &err_blob);
     if (status != .ok) {
         const error_response =
             \\HTTP/1.1 500 Internal Server Error
@@ -254,7 +254,7 @@ fn handleSchema(stream: std.net.Stream) !void {
     var schema_blob = LgBlob.empty();
     var err_blob = LgBlob.empty();
 
-    const status = fdb_introspect_schema(db, &schema_blob, &err_blob);
+    const status = lith_introspect_schema(db, &schema_blob, &err_blob);
 
     if (status != .ok) {
         const error_response =
@@ -268,7 +268,7 @@ fn handleSchema(stream: std.net.Stream) !void {
         return;
     }
 
-    defer fdb_blob_free(&schema_blob);
+    defer lith_blob_free(&schema_blob);
 
     const schema_data = schema_blob.toSlice() orelse "{}";
 

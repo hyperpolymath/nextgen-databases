@@ -1,5 +1,5 @@
 {
-  "description": "Test vectors for Lithoglyph WAL journal entries. Journal entry layout defined in spec/journal.adoc: 48-byte header (sequence(8) + timestamp(8) + op_type(2) + flags(2) + forward_len(4) + inverse_len(4) + provenance_len(4) + affected_block(8) + checksum(4) + entry_len(4)) followed by variable-length forward, inverse, and provenance payloads. All payloads are CBOR-encoded. Journal header magic: 0x4644424A ('FDBJ'). All multi-byte fields are little-endian.",
+  "description": "Test vectors for Lithoglyph WAL journal entries. Journal entry layout defined in spec/journal.adoc: 48-byte header (sequence(8) + timestamp(8) + op_type(2) + flags(2) + forward_len(4) + inverse_len(4) + provenance_len(4) + affected_block(8) + checksum(4) + entry_len(4)) followed by variable-length forward, inverse, and provenance payloads. All payloads are CBOR-encoded. Journal header magic: 0x4644424A (legacy 'FDBJ', retained for format compatibility). All multi-byte fields are little-endian.",
   "constants": {
     "JOURNAL_MAGIC": "0x4644424A",
     "ENTRY_HEADER_SIZE": 48,
@@ -369,7 +369,7 @@
       "name": "valid_journal_header",
       "description": "Journal file header occupying the first block (4096 bytes). Contains database metadata for the journal.",
       "input_fields": {
-        "magic": "0x4644424A (FDBJ)",
+        "magic": "0x4644424A (legacy FDBJ)",
         "format_version": 1,
         "database_uuid": "550e8400-e29b-41d4-a716-446655440000",
         "head_sequence": 1300,

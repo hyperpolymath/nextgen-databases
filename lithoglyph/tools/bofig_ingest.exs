@@ -32,7 +32,7 @@ defmodule BofigIngest do
 
   Reads JSON evidence files (converted from Cap'n Proto StageResults by the
   Zig lith_adapter), deduplicates by SHA-256 hash, and POSTs to Lithoglyph's
-  FDQL query endpoint with provenance metadata.
+  GQL query endpoint with provenance metadata.
   """
 
   require Logger
@@ -167,10 +167,10 @@ defmodule BofigIngest do
   defp check_dedup(nil, _config), do: :new
 
   defp check_dedup(sha256, config) do
-    query = "SELECT sha256_hash FROM bofig_evidence WHERE sha256_hash = '#{escape_fdql(sha256)}' LIMIT 1"
+    query = "SELECT sha256_hash FROM bofig_evidence WHERE sha256_hash = '#{escape_gql(sha256)}' LIMIT 1"
 
     body = %{
-      "fdql" => query
+      "gql" => query
     }
 
     case Req.post("#{config.url}/query",
@@ -196,9 +196,9 @@ defmodule BofigIngest do
 
   defp insert_record(record, config) do
     json_str = Jason.encode!(record)
-    run_id = escape_fdql(config.run_id)
+    run_id = escape_gql(config.run_id)
 
-    fdql = """
+    gql = """
     INSERT INTO bofig_evidence #{json_str}
     WITH PROVENANCE {
       actor: "docudactyl-pipeline",
@@ -207,7 +207,7 @@ defmodule BofigIngest do
     """
 
     body = %{
-      "fdql" => fdql,
+      "gql" => gql,
       "provenance" => %{
         "actor" => "docudactyl-pipeline",
         "rationale" => "Batch extraction run #{config.run_id}"
@@ -233,14 +233,14 @@ defmodule BofigIngest do
 
   # ── Helpers ──────────────────────────────────────────────────────────
 
-  defp escape_fdql(str) when is_binary(str) do
+  defp escape_gql(str) when is_binary(str) do
     str
     |> String.replace("\\", "\\\\")
     |> String.replace("'", "\\'")
     |> String.replace("\"", "\\\"")
   end
 
-  defp escape_fdql(_), do: ""
+  defp escape_gql(_), do: ""
 
   # ── Argument Parsing ─────────────────────────────────────────────────
 

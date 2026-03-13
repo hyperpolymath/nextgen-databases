@@ -24,7 +24,7 @@ Lith is structured as a stack of layers, each with a specific responsibility and
 │  └── Port communication with core                           │
 ├─────────────────────────────────────────────────────────────┤
 │  Form.Runtime (Factor)                                      │
-│  ├── FQL parser                                             │
+│  ├── GQL parser                                             │
 │  ├── Query planner                                          │
 │  ├── Executor                                               │
 │  └── Introspection surfaces                                 │
@@ -126,19 +126,19 @@ Stable ABI boundary between core and runtimes. Written entirely in Zig with no C
 [source,zig]
 ----
 /// All functions return status + optional error blob
-pub const FdbStatus = struct {
+pub const LithStatus = struct {
     code: i32,
     error_blob: ?[*]const u8,
     error_len: usize,
 };
 
 /// Handles are opaque pointers
-pub const FdbDb = opaque {};
-pub const FdbTxn = opaque {};
-pub const FdbCursor = opaque {};
+pub const LithDb = opaque {};
+pub const LithTxn = opaque {};
+pub const LithCursor = opaque {};
 
 /// Example: Open database
-pub export fn fdb_open(path: [*:0]const u8, path_len: usize) callconv(.C) FdbStatus {
+pub export fn lith_open(path: [*:0]const u8, path_len: usize) callconv(.C) LithStatus {
     // Zig provides C-compatible calling convention for FFI
     // without requiring C headers or toolchain
 }
@@ -153,25 +153,25 @@ Form.Bridge supports bidirectional communication—runtimes can call into the co
 [source,zig]
 ----
 /// Forward direction: Runtime → Core
-/// Used by FQL (Factor), FQLdt (Lean 4), Elixir control plane
-pub export fn fdb_insert(
-    db: *FdbDb,
+/// Used by GQL (Factor), FQLdt (Lean 4), Elixir control plane
+pub export fn lith_insert(
+    db: *LithDb,
     collection: [*:0]const u8,
     document: [*]const u8,
     doc_len: usize,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 
 /// Reverse direction: Core → Runtime
 /// For constraint checking, proof verification, provenance callbacks
-pub export fn fdb_register_constraint_checker(
-    db: *FdbDb,
+pub export fn lith_register_constraint_checker(
+    db: *LithDb,
     checker: *const fn (doc: [*]const u8, len: usize) callconv(.C) bool,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 
-pub export fn fdb_register_proof_verifier(
-    db: *FdbDb,
+pub export fn lith_register_proof_verifier(
+    db: *LithDb,
     verifier: *const fn (proof: [*]const u8, len: usize) callconv(.C) bool,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 ----
 
 This enables:
@@ -182,21 +182,21 @@ This enables:
 
 === Form.Runtime (Query Layer)
 
-FQL parser, planner, and executor.
+GQL parser, planner, and executor.
 
 ==== Responsibilities
 
-* **Parser**: FQL syntax → AST
+* **Parser**: GQL syntax → AST
 * **Planner**: AST → execution plan
 * **Executor**: Plan → results
 * **Introspection**: Schema and constraint queries
 
-==== FQL Design
+==== GQL Design
 
-FQL is not SQL. Key differences:
+GQL is not SQL. Key differences:
 
 |===
-| SQL | FQL
+| SQL | GQL
 
 | `SELECT * FROM t` | `SELECT FROM collection`
 | Implicit joins | Explicit edge traversal
@@ -242,7 +242,7 @@ Cross-layer invariants verified at stage freezes:
 
 === M↔R (Model ↔ Runtime)
 
-* Constraints enforced identically via FQL or direct API
+* Constraints enforced identically via GQL or direct API
 * Introspection returns reason graphs + provenance
 
 === B↔R (Blocks ↔ Runtime)

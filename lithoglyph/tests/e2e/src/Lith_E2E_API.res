@@ -31,7 +31,7 @@ let test_createCollection = async (env: testEnvironment): e2eResult => {
   try {
     let client = makeHttpClient(env)
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`CREATE COLLECTION ${collectionName}`)),
+      ("gql", Js.Json.string(`CREATE COLLECTION ${collectionName}`)),
     ]))
     let response = await client.post("/v1/query", body)
 
@@ -50,7 +50,7 @@ let test_insertDocument = async (env: testEnvironment): e2eResult => {
   try {
     let client = makeHttpClient(env)
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`INSERT INTO ${collectionName} {"title": "Test Article", "status": "draft"}`)),
+      ("gql", Js.Json.string(`INSERT INTO ${collectionName} {"title": "Test Article", "status": "draft"}`)),
     ]))
     let response = await client.post("/v1/query", body)
 
@@ -69,7 +69,7 @@ let test_selectDocuments = async (env: testEnvironment): e2eResult => {
   try {
     let client = makeHttpClient(env)
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`SELECT * FROM ${collectionName}`)),
+      ("gql", Js.Json.string(`SELECT * FROM ${collectionName}`)),
     ]))
     let response = await client.post("/v1/query", body)
 
@@ -88,7 +88,7 @@ let test_updateDocument = async (env: testEnvironment): e2eResult => {
   try {
     let client = makeHttpClient(env)
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`UPDATE ${collectionName} SET {"status": "published"} WHERE status = "draft"`)),
+      ("gql", Js.Json.string(`UPDATE ${collectionName} SET {"status": "published"} WHERE status = "draft"`)),
     ]))
     let response = await client.post("/v1/query", body)
 
@@ -107,7 +107,7 @@ let test_deleteDocument = async (env: testEnvironment): e2eResult => {
   try {
     let client = makeHttpClient(env)
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`DELETE FROM ${collectionName} WHERE status = "published"`)),
+      ("gql", Js.Json.string(`DELETE FROM ${collectionName} WHERE status = "published"`)),
     ]))
     let response = await client.post("/v1/query", body)
 
@@ -126,7 +126,7 @@ let test_queryWithWhere = async (env: testEnvironment): e2eResult => {
   try {
     let client = makeHttpClient(env)
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`SELECT title, status FROM ${collectionName} WHERE status = "draft" LIMIT 10`)),
+      ("gql", Js.Json.string(`SELECT title, status FROM ${collectionName} WHERE status = "draft" LIMIT 10`)),
     ]))
     let response = await client.post("/v1/query", body)
 
@@ -145,7 +145,7 @@ let test_explainQuery = async (env: testEnvironment): e2eResult => {
   try {
     let client = makeHttpClient(env)
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`EXPLAIN SELECT * FROM ${collectionName}`)),
+      ("gql", Js.Json.string(`EXPLAIN SELECT * FROM ${collectionName}`)),
     ]))
     let response = await client.post("/v1/query", body)
 
@@ -164,7 +164,7 @@ let test_introspectSchema = async (env: testEnvironment): e2eResult => {
   try {
     let client = makeHttpClient(env)
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`INTROSPECT SCHEMA ${collectionName}`)),
+      ("gql", Js.Json.string(`INTROSPECT SCHEMA ${collectionName}`)),
     ]))
     let response = await client.post("/v1/query", body)
 
@@ -183,7 +183,7 @@ let test_dropCollection = async (env: testEnvironment): e2eResult => {
   try {
     let client = makeHttpClient(env)
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`DROP COLLECTION ${collectionName}`)),
+      ("gql", Js.Json.string(`DROP COLLECTION ${collectionName}`)),
     ]))
     let response = await client.post("/v1/query", body)
 

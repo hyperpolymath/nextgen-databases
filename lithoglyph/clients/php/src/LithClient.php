@@ -108,11 +108,11 @@ final class LithClient
     // =========================================================================
 
     /**
-     * Execute an FDQL query
+     * Execute an GQL query
      */
-    public function query(string $fdql, ?Provenance $provenance = null, bool $explain = false): QueryResult
+    public function query(string $gql, ?Provenance $provenance = null, bool $explain = false): QueryResult
     {
-        $body = ['fdql' => $fdql];
+        $body = ['gql' => $gql];
         if ($provenance !== null) {
             $body['provenance'] = $provenance->toArray();
         }
@@ -129,7 +129,7 @@ final class LithClient
      */
     public function queryWith(QueryBuilder $builder): QueryResult
     {
-        return $this->query($builder->toFdql(), $builder->getProvenance());
+        return $this->query($builder->toGql(), $builder->getProvenance());
     }
 
     /**
@@ -169,7 +169,7 @@ final class LithClient
      */
     public function insertWith(InsertBuilder $builder): QueryResult
     {
-        return $this->query($builder->toFdql(), $builder->getProvenance());
+        return $this->query($builder->toGql(), $builder->getProvenance());
     }
 
     /**
@@ -177,7 +177,7 @@ final class LithClient
      */
     public function updateWith(UpdateBuilder $builder): QueryResult
     {
-        return $this->query($builder->toFdql(), $builder->getProvenance());
+        return $this->query($builder->toGql(), $builder->getProvenance());
     }
 
     /**
@@ -185,7 +185,7 @@ final class LithClient
      */
     public function deleteWith(DeleteBuilder $builder): QueryResult
     {
-        return $this->query($builder->toFdql(), $builder->getProvenance());
+        return $this->query($builder->toGql(), $builder->getProvenance());
     }
 
     // =========================================================================

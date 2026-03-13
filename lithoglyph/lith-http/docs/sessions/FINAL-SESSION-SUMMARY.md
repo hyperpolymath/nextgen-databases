@@ -7,15 +7,15 @@
 ## Major Milestones Achieved
 
 ### 🎯 M10 Day 3: Core Infrastructure (7 hours)
-1. ✅ FormBD-BEAM Rustler NIF migration
+1. ✅ Lith-BEAM Rustler NIF migration
 2. ✅ FormBase Gleam integration
 3. ✅ M11 HTTP API specification
 4. ✅ Security requirements documentation
 
 ### 🎯 M11: HTTP API Implementation (5 hours)
 5. ✅ Core API (9 endpoints)
-6. ✅ FormBD-Geo API (3 endpoints)
-7. ✅ FormBD-Analytics API (3 endpoints)
+6. ✅ Lith-Geo API (3 endpoints)
+7. ✅ Lith-Analytics API (3 endpoints)
 
 ## Complete Endpoint Inventory
 
@@ -30,12 +30,12 @@
 - GET /api/v1/databases/:db_id/schema
 - GET /api/v1/databases/:db_id/journal
 
-### FormBD-Geo API: 3 Endpoints ✅
+### Lith-Geo API: 3 Endpoints ✅
 - POST /api/v1/geo/insert (Point, LineString, Polygon)
 - GET /api/v1/geo/query (bbox or geometry)
 - GET /api/v1/geo/features/:feature_id/provenance
 
-### FormBD-Analytics API: 3 Endpoints ✅
+### Lith-Analytics API: 3 Endpoints ✅
 - POST /api/v1/analytics/timeseries
 - GET /api/v1/analytics/timeseries (with aggregations)
 - GET /api/v1/analytics/timeseries/:series_id/provenance
@@ -67,7 +67,7 @@
 
 ## File Inventory
 
-### FormBD-BEAM Repository
+### Lith-BEAM Repository
 - `native_rust/src/lib.rs` - Rustler NIF
 - `native_rust/Cargo.toml` - Rust dependencies
 - `src/lith_nif.erl` - Erlang NIF wrapper
@@ -83,7 +83,7 @@
 - `server/src/lith/nif_ffi.gleam` - FFI declarations
 - `server/src/lith/client.gleam` - High-level client
 - `server/test_lith_nif.erl` - Integration tests
-- `FORMBD-INTEGRATION.md` - Integration status
+- `LITH-INTEGRATION.md` - Integration status
 
 ### Lithoglyph-HTTP Repository (NEW)
 - `lib/lith_nif.ex` - Elixir NIF wrapper
@@ -107,7 +107,7 @@
 
 ## Test Results Summary
 
-### FormBD-BEAM NIF Tests: 8/8 ✅
+### Lith-BEAM NIF Tests: 8/8 ✅
 - Version
 - Database open/close
 - Transaction begin/commit/abort
@@ -201,7 +201,7 @@ M10 PoC Stubs
 
 | Time | Activity | Duration |
 |------|----------|----------|
-| 14:00-16:00 | FormBD-BEAM Rustler migration | 2h |
+| 14:00-16:00 | Lith-BEAM Rustler migration | 2h |
 | 16:00-19:00 | FormBase Gleam integration | 3h |
 | 19:00-21:00 | M11 API specification | 2h |
 | 21:00-21:30 | Security requirements | 0.5h |
@@ -289,15 +289,15 @@ curl -X POST http://localhost:4000/api/v1/analytics/timeseries \
 
 | Repository | Status | Ready for M12 |
 |------------|--------|---------------|
-| **formbd** (core-forth) | ✅ Complete | ✅ C ABI built |
-| **formbd-beam** | ✅ Complete | ✅ Rustler NIF |
+| **lith** (core-forth) | ✅ Complete | ✅ C ABI built |
+| **lith-beam** | ✅ Complete | ✅ Rustler NIF |
 | **formbase** | ✅ Complete | ✅ Gleam client |
 | **lith_http** | ✅ Complete | ✅ HTTP API |
-| formbd-geo | Spec only | ⏳ Needs HTTP API |
-| formbd-analytics | Spec only | ⏳ Needs HTTP API |
-| formbd-debugger | Not started | ⏳ |
-| formbd-studio | Not started | ⏳ |
-| fbql-dt | ✅ Complete | ✅ FBQL parser |
+| lith-geo | Spec only | ⏳ Needs HTTP API |
+| lith-analytics | Spec only | ⏳ Needs HTTP API |
+| lith-debugger | Not started | ⏳ |
+| lith-studio | Not started | ⏳ |
+| gql-dt | ✅ Complete | ✅ GQL parser |
 
 ## Lessons Learned
 

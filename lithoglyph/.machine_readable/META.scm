@@ -51,12 +51,12 @@
 
     (adr-004
       (id "ADR-004")
-      (title "FQL Over SQL")
+      (title "GQL Over SQL")
       (status "accepted")
       (date "2026-01-03")
       (context "SQL is ubiquitous but designed for relational model only.
                 Lith is multi-model (document, graph, relational).")
-      (decision "Design FQL (Lith Query Language) with native support for
+      (decision "Design GQL (Lith Query Language) with native support for
                  documents, edges, provenance, and narrative constraints.")
       (consequences
         "No SQL compatibility layer (explicit non-goal)"
@@ -86,13 +86,13 @@
       (date "2026-01-11")
       (context "Schema migrations are error-prone. Type systems can catch errors
                 at compile time but most don't encode database constraints.")
-      (decision "FQLdt (FQL with Dependent Types) uses Lean 4 to encode constraints
+      (decision "FQLdt (GQL with Dependent Types) uses Lean 4 to encode constraints
                  as types. Schema evolution carries proofs of correctness.")
       (consequences
         "Compile-time query verification"
         "Proof-carrying migrations"
         "Requires Lean 4 for full verification"
-        "Optional - base FQL works without proofs"))
+        "Optional - base GQL works without proofs"))
 
     (adr-007
       (id "ADR-007")

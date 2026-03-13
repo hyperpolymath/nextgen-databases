@@ -6,7 +6,7 @@ Comprehensive testing framework for Lith including property-based tests, fuzz te
 
 | Category | Directory | Purpose |
 |----------|-----------|---------|
-| Property | `tests/property/` | Property-based tests for FDQL |
+| Property | `tests/property/` | Property-based tests for GQL |
 | Fuzz | `tests/fuzz/` | Fuzz testing for parser robustness |
 | Integration | `tests/integration/` | CMS plugin integration tests |
 | E2E | `tests/e2e/` | End-to-end API and sync tests |
@@ -48,7 +48,7 @@ Property-based tests verify invariants that should hold for all inputs.
 
 ### Features
 
-- Random FDQL statement generation
+- Random GQL statement generation
 - Structural property verification
 - Configurable iteration count
 - Seed-based reproducibility
@@ -102,7 +102,7 @@ deno task fuzz:long     # Long run (100K iterations)
 | ByteReplace | Replace random bytes |
 | TokenSplice | Splice tokens from corpus |
 | Arithmetic | Add/subtract from bytes |
-| Dictionary | Insert FDQL keywords |
+| Dictionary | Insert GQL keywords |
 
 ## Integration Tests
 
@@ -319,7 +319,7 @@ tests/
 │       ├── Lith_Property_Types.res
 │       ├── Lith_Property_Generators.res
 │       ├── Lith_Property_Runner.res
-│       └── Lith_Property_FDQL.res
+│       └── Lith_Property_GQL.res
 ├── fuzz/                  # Fuzz testing
 │   ├── rescript.json
 │   ├── deno.json
@@ -327,7 +327,7 @@ tests/
 │       ├── Lith_Fuzz_Types.res
 │       ├── Lith_Fuzz_Mutators.res
 │       ├── Lith_Fuzz_Runner.res
-│       └── Lith_Fuzz_FDQL.res
+│       └── Lith_Fuzz_GQL.res
 ├── integration/           # Integration tests
 │   ├── rescript.json
 │   ├── deno.json

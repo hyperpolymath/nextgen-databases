@@ -68,7 +68,7 @@ foreach ($result->rows as $row) {
 }
 ```
 
-### Raw FDQL
+### Raw GQL
 
 ```php
 $result = $lith->query(

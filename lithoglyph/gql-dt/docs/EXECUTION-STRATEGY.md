@@ -515,7 +515,7 @@ fn insert(db: *Database, stmt: IR.InsertStmt) !void {
 ---
 
 **Next Steps:**
-1. Design IR data structures (src/FbqlDt/IR.lean)
+1. Design IR data structures (src/GqlDt/IR.lean)
 2. Implement AST → IR generation
 3. Design CBOR proof blob format
 4. Coordinate with Lithoglyph team on native IR execution

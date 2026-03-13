@@ -13,10 +13,10 @@ echo ""
 echo "Building ReScript..."
 deno task build 2>&1
 
-# Run the FDQL property tests
+# Run the GQL property tests
 echo ""
-echo "Running FDQL property tests (12 predicates)..."
-deno run --allow-read --allow-env src/Lith_Property_FDQL.res.js
+echo "Running GQL property tests (12 predicates)..."
+deno run --allow-read --allow-env src/Lith_Property_GQL.res.js
 
 echo ""
 echo "=== Property tests complete ==="

@@ -17,13 +17,13 @@ pub const BlobEncoding = enum(u8) {
 // Blob Structure
 // ============================================================
 
-pub const FdbBlob = extern struct {
+pub const LithBlob = extern struct {
     data: ?[*]const u8,
     len: usize,
     encoding: BlobEncoding,
     _padding: [7]u8 = [_]u8{0} ** 7,
 
-    pub fn empty() FdbBlob {
+    pub fn empty() LithBlob {
         return .{
             .data = null,
             .len = 0,
@@ -31,7 +31,7 @@ pub const FdbBlob = extern struct {
         };
     }
 
-    pub fn fromSlice(slice: []const u8) FdbBlob {
+    pub fn fromSlice(slice: []const u8) LithBlob {
         return .{
             .data = slice.ptr,
             .len = slice.len,
@@ -39,7 +39,7 @@ pub const FdbBlob = extern struct {
         };
     }
 
-    pub fn toSlice(self: FdbBlob) ?[]const u8 {
+    pub fn toSlice(self: LithBlob) ?[]const u8 {
         if (self.data) |ptr| {
             return ptr[0..self.len];
         }
@@ -51,7 +51,7 @@ pub const FdbBlob = extern struct {
 // Status Codes
 // ============================================================
 
-pub const FdbStatus = enum(i32) {
+pub const LithStatus = enum(i32) {
     ok = 0,
 
     // Database errors (1xxx)
@@ -85,11 +85,11 @@ pub const FdbStatus = enum(i32) {
     err_invalid_argument = 9003,
     err_not_implemented = 9004,
 
-    pub fn isOk(self: FdbStatus) bool {
+    pub fn isOk(self: LithStatus) bool {
         return self == .ok;
     }
 
-    pub fn isError(self: FdbStatus) bool {
+    pub fn isError(self: LithStatus) bool {
         return @intFromEnum(self) > 0;
     }
 };
@@ -98,7 +98,7 @@ pub const FdbStatus = enum(i32) {
 // Transaction Mode
 // ============================================================
 
-pub const FdbTxnMode = enum(u8) {
+pub const LithTxnMode = enum(u8) {
     read_only = 0,
     read_write = 1,
 };
@@ -107,7 +107,7 @@ pub const FdbTxnMode = enum(u8) {
 // Operation Types
 // ============================================================
 
-pub const FdbOpType = enum(u16) {
+pub const LithOpType = enum(u16) {
     // Document operations
     doc_insert = 0x0001,
     doc_update = 0x0002,
@@ -145,7 +145,7 @@ pub const FdbOpType = enum(u16) {
 // Block Types
 // ============================================================
 
-pub const FdbBlockType = enum(u16) {
+pub const LithBlockType = enum(u16) {
     free = 0x0000,
     superblock = 0x0001,
     collection_meta = 0x0010,
@@ -184,7 +184,7 @@ pub const CborTag = enum(u64) {
 // Render Options
 // ============================================================
 
-pub const FdbRenderOpts = extern struct {
+pub const LithRenderOpts = extern struct {
     include_provenance: bool = true,
     include_timestamps: bool = true,
     pretty_print: bool = false,
@@ -196,35 +196,35 @@ pub const FdbRenderOpts = extern struct {
 // Result Structure
 // ============================================================
 
-pub const FdbResult = extern struct {
-    result_blob: FdbBlob,
-    provenance_blob: FdbBlob,
-    status: FdbStatus,
+pub const LithResult = extern struct {
+    result_blob: LithBlob,
+    provenance_blob: LithBlob,
+    status: LithStatus,
     _padding: [4]u8 = [_]u8{0} ** 4,
-    err_blob: FdbBlob,
+    err_blob: LithBlob,
 
-    pub fn ok(result: FdbBlob) FdbResult {
+    pub fn ok(result: LithBlob) LithResult {
         return .{
             .result_blob = result,
-            .provenance_blob = FdbBlob.empty(),
+            .provenance_blob = LithBlob.empty(),
             .status = .ok,
-            .err_blob = FdbBlob.empty(),
+            .err_blob = LithBlob.empty(),
         };
     }
 
-    pub fn okWithProvenance(result: FdbBlob, provenance: FdbBlob) FdbResult {
+    pub fn okWithProvenance(result: LithBlob, provenance: LithBlob) LithResult {
         return .{
             .result_blob = result,
             .provenance_blob = provenance,
             .status = .ok,
-            .err_blob = FdbBlob.empty(),
+            .err_blob = LithBlob.empty(),
         };
     }
 
-    pub fn err(status: FdbStatus, err_blob: FdbBlob) FdbResult {
+    pub fn err(status: LithStatus, err_blob: LithBlob) LithResult {
         return .{
-            .result_blob = FdbBlob.empty(),
-            .provenance_blob = FdbBlob.empty(),
+            .result_blob = LithBlob.empty(),
+            .provenance_blob = LithBlob.empty(),
             .status = status,
             .err_blob = err_blob,
         };
@@ -235,15 +235,15 @@ pub const FdbResult = extern struct {
 // Tests
 // ============================================================
 
-test "FdbBlob empty" {
-    const blob = FdbBlob.empty();
+test "LithBlob empty" {
+    const blob = LithBlob.empty();
     try std.testing.expectEqual(@as(?[*]const u8, null), blob.data);
     try std.testing.expectEqual(@as(usize, 0), blob.len);
 }
 
-test "FdbBlob fromSlice" {
+test "LithBlob fromSlice" {
     const data = "test data";
-    const blob = FdbBlob.fromSlice(data);
+    const blob = LithBlob.fromSlice(data);
     try std.testing.expectEqual(@as(usize, 9), blob.len);
 
     if (blob.toSlice()) |slice| {
@@ -253,9 +253,9 @@ test "FdbBlob fromSlice" {
     }
 }
 
-test "FdbStatus" {
-    try std.testing.expect(FdbStatus.ok.isOk());
-    try std.testing.expect(!FdbStatus.ok.isError());
-    try std.testing.expect(!FdbStatus.err_doc_not_found.isOk());
-    try std.testing.expect(FdbStatus.err_doc_not_found.isError());
+test "LithStatus" {
+    try std.testing.expect(LithStatus.ok.isOk());
+    try std.testing.expect(!LithStatus.ok.isError());
+    try std.testing.expect(!LithStatus.err_doc_not_found.isOk());
+    try std.testing.expect(LithStatus.err_doc_not_found.isError());
 }

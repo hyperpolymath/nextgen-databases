@@ -10,19 +10,19 @@ const config = @import("config.zig");
 const log = std.log.scoped(.bridge_client);
 
 // FFI type definitions (matching bridge.zig)
-pub const FdbBlob = extern struct {
+pub const LithBlob = extern struct {
     ptr: ?[*]const u8,
     len: usize,
 
-    pub fn empty() FdbBlob {
+    pub fn empty() LithBlob {
         return .{ .ptr = null, .len = 0 };
     }
 
-    pub fn fromSlice(data: []const u8) FdbBlob {
+    pub fn fromSlice(data: []const u8) LithBlob {
         return .{ .ptr = data.ptr, .len = data.len };
     }
 
-    pub fn toSlice(self: FdbBlob) ?[]const u8 {
+    pub fn toSlice(self: LithBlob) ?[]const u8 {
         if (self.ptr) |p| {
             return p[0..self.len];
         }
@@ -30,7 +30,7 @@ pub const FdbBlob = extern struct {
     }
 };
 
-pub const FdbStatus = enum(i32) {
+pub const LithStatus = enum(i32) {
     ok = 0,
     err_invalid_argument = -1,
     err_not_found = -2,
@@ -43,115 +43,115 @@ pub const FdbStatus = enum(i32) {
     err_not_implemented = -100,
 };
 
-pub const FdbResult = extern struct {
-    result: FdbBlob,
-    provenance: FdbBlob,
-    status: FdbStatus,
-    error_blob: FdbBlob,
+pub const LithResult = extern struct {
+    result: LithBlob,
+    provenance: LithBlob,
+    status: LithStatus,
+    error_blob: LithBlob,
 };
 
-pub const FdbTxnMode = enum(u8) {
+pub const LithTxnMode = enum(u8) {
     read_only = 0,
     read_write = 1,
 };
 
-pub const FdbRenderOpts = extern struct {
+pub const LithRenderOpts = extern struct {
     include_provenance: bool = true,
     canonical: bool = true,
     pretty: bool = false,
 };
 
 // Opaque handles
-pub const FdbDb = opaque {};
-pub const FdbTxn = opaque {};
+pub const LithDb = opaque {};
+pub const LithTxn = opaque {};
 
 // External bridge functions (linked from core-zig)
-extern fn fdb_db_open(
+extern fn lith_db_open(
     path_ptr: [*]const u8,
     path_len: usize,
     opts_ptr: ?[*]const u8,
     opts_len: usize,
-    out_db: *?*FdbDb,
-    out_err: *FdbBlob,
-) FdbStatus;
+    out_db: *?*LithDb,
+    out_err: *LithBlob,
+) LithStatus;
 
-extern fn fdb_db_close(db: ?*FdbDb) FdbStatus;
+extern fn lith_db_close(db: ?*LithDb) LithStatus;
 
-extern fn fdb_txn_begin(
-    db: ?*FdbDb,
-    mode: FdbTxnMode,
-    out_txn: *?*FdbTxn,
-    out_err: *FdbBlob,
-) FdbStatus;
+extern fn lith_txn_begin(
+    db: ?*LithDb,
+    mode: LithTxnMode,
+    out_txn: *?*LithTxn,
+    out_err: *LithBlob,
+) LithStatus;
 
-extern fn fdb_txn_commit(txn: ?*FdbTxn, out_err: *FdbBlob) FdbStatus;
-extern fn fdb_txn_abort(txn: ?*FdbTxn) FdbStatus;
+extern fn lith_txn_commit(txn: ?*LithTxn, out_err: *LithBlob) LithStatus;
+extern fn lith_txn_abort(txn: ?*LithTxn) LithStatus;
 
-extern fn fdb_apply(
-    txn: ?*FdbTxn,
+extern fn lith_apply(
+    txn: ?*LithTxn,
     op_ptr: [*]const u8,
     op_len: usize,
-) FdbResult;
+) LithResult;
 
-extern fn fdb_introspect_schema(
-    db: ?*FdbDb,
-    out_schema: *FdbBlob,
-    out_err: *FdbBlob,
-) FdbStatus;
+extern fn lith_introspect_schema(
+    db: ?*LithDb,
+    out_schema: *LithBlob,
+    out_err: *LithBlob,
+) LithStatus;
 
-extern fn fdb_introspect_constraints(
-    db: ?*FdbDb,
-    out_constraints: *FdbBlob,
-    out_err: *FdbBlob,
-) FdbStatus;
+extern fn lith_introspect_constraints(
+    db: ?*LithDb,
+    out_constraints: *LithBlob,
+    out_err: *LithBlob,
+) LithStatus;
 
-extern fn fdb_render_journal(
-    db: ?*FdbDb,
+extern fn lith_render_journal(
+    db: ?*LithDb,
     since: u64,
-    opts: FdbRenderOpts,
-    out_text: *FdbBlob,
-    out_err: *FdbBlob,
-) FdbStatus;
+    opts: LithRenderOpts,
+    out_text: *LithBlob,
+    out_err: *LithBlob,
+) LithStatus;
 
-extern fn fdb_render_block(
-    db: ?*FdbDb,
+extern fn lith_render_block(
+    db: ?*LithDb,
     block_id: u64,
-    opts: FdbRenderOpts,
-    out_text: *FdbBlob,
-    out_err: *FdbBlob,
-) FdbStatus;
+    opts: LithRenderOpts,
+    out_text: *LithBlob,
+    out_err: *LithBlob,
+) LithStatus;
 
-extern fn fdb_proof_verify(
+extern fn lith_proof_verify(
     proof_ptr: [*]const u8,
     proof_len: usize,
     out_valid: *bool,
-    out_err: *FdbBlob,
-) FdbStatus;
+    out_err: *LithBlob,
+) LithStatus;
 
-extern fn fdb_proof_init_builtins() FdbStatus;
-extern fn fdb_blob_free(blob: *FdbBlob) void;
-extern fn fdb_version() u32;
+extern fn lith_proof_init_builtins() LithStatus;
+extern fn lith_blob_free(blob: *LithBlob) void;
+extern fn lith_version() u32;
 
 // =============================================================================
 // Bridge Client
 // =============================================================================
 
 var allocator: std.mem.Allocator = undefined;
-var db_handle: ?*FdbDb = null;
+var db_handle: ?*LithDb = null;
 var is_initialized: bool = false;
 
 pub fn init(alloc: std.mem.Allocator, cfg: *const config.Config) !void {
     allocator = alloc;
 
     // Initialize built-in proof verifiers
-    const verifier_status = fdb_proof_init_builtins();
+    const verifier_status = lith_proof_init_builtins();
     if (verifier_status != .ok) {
         log.warn("Failed to initialize proof verifiers: {}", .{verifier_status});
     }
 
     // Open database
-    var err_blob: FdbBlob = FdbBlob.empty();
-    const status = fdb_db_open(
+    var err_blob: LithBlob = LithBlob.empty();
+    const status = lith_db_open(
         cfg.db_path.ptr,
         cfg.db_path.len,
         null,
@@ -163,7 +163,7 @@ pub fn init(alloc: std.mem.Allocator, cfg: *const config.Config) !void {
     if (status != .ok) {
         if (err_blob.toSlice()) |err_data| {
             log.err("Failed to open database: {s}", .{err_data});
-            fdb_blob_free(&err_blob);
+            lith_blob_free(&err_blob);
         }
         return error.DatabaseOpenFailed;
     }
@@ -174,7 +174,7 @@ pub fn init(alloc: std.mem.Allocator, cfg: *const config.Config) !void {
 
 pub fn deinit() void {
     if (db_handle) |db| {
-        _ = fdb_db_close(db);
+        _ = lith_db_close(db);
         db_handle = null;
     }
     is_initialized = false;
@@ -201,37 +201,37 @@ pub const QueryResult = struct {
     }
 };
 
-pub fn executeQuery(fdql: []const u8, provenance: ?QueryProvenance) !QueryResult {
+pub fn executeQuery(gql: []const u8, provenance: ?QueryProvenance) !QueryResult {
     if (!is_initialized) {
         return error.NotInitialized;
     }
 
     // Begin transaction
-    var txn: ?*FdbTxn = null;
-    var txn_err: FdbBlob = FdbBlob.empty();
+    var txn: ?*LithTxn = null;
+    var txn_err: LithBlob = LithBlob.empty();
 
-    const txn_status = fdb_txn_begin(db_handle, .read_write, &txn, &txn_err);
+    const txn_status = lith_txn_begin(db_handle, .read_write, &txn, &txn_err);
     if (txn_status != .ok) {
         if (txn_err.toSlice()) |err| {
             log.err("Transaction begin failed: {s}", .{err});
-            fdb_blob_free(&txn_err);
+            lith_blob_free(&txn_err);
         }
         return error.TransactionFailed;
     }
     defer {
         if (txn != null) {
-            _ = fdb_txn_abort(txn);
+            _ = lith_txn_abort(txn);
         }
     }
 
     // Encode operation as CBOR (simplified - just wrap GQL string)
     var op_buffer: [4096]u8 = undefined;
-    const op_len = encodeFdqlOperation(&op_buffer, fdql, provenance) catch {
+    const op_len = encodeLithqlOperation(&op_buffer, gql, provenance) catch {
         return error.EncodingFailed;
     };
 
     // Execute operation
-    const result = fdb_apply(txn, &op_buffer, op_len);
+    const result = lith_apply(txn, &op_buffer, op_len);
 
     if (result.status != .ok) {
         if (result.error_blob.toSlice()) |err| {
@@ -241,14 +241,14 @@ pub fn executeQuery(fdql: []const u8, provenance: ?QueryProvenance) !QueryResult
     }
 
     // Commit transaction
-    var commit_err: FdbBlob = FdbBlob.empty();
-    const commit_status = fdb_txn_commit(txn, &commit_err);
+    var commit_err: LithBlob = LithBlob.empty();
+    const commit_status = lith_txn_commit(txn, &commit_err);
     txn = null; // Mark as consumed
 
     if (commit_status != .ok) {
         if (commit_err.toSlice()) |err| {
             log.err("Commit failed: {s}", .{err});
-            fdb_blob_free(&commit_err);
+            lith_blob_free(&commit_err);
         }
         return error.CommitFailed;
     }
@@ -287,18 +287,18 @@ pub fn listCollections() ![]CollectionInfo {
         return error.NotInitialized;
     }
 
-    var schema_blob: FdbBlob = FdbBlob.empty();
-    var err_blob: FdbBlob = FdbBlob.empty();
+    var schema_blob: LithBlob = LithBlob.empty();
+    var err_blob: LithBlob = LithBlob.empty();
 
-    const status = fdb_introspect_schema(db_handle, &schema_blob, &err_blob);
+    const status = lith_introspect_schema(db_handle, &schema_blob, &err_blob);
     if (status != .ok) {
         if (err_blob.toSlice()) |err| {
             log.err("Schema introspection failed: {s}", .{err});
-            fdb_blob_free(&err_blob);
+            lith_blob_free(&err_blob);
         }
         return error.IntrospectionFailed;
     }
-    defer fdb_blob_free(&schema_blob);
+    defer lith_blob_free(&schema_blob);
 
     // Parse CBOR schema response (placeholder - return empty list)
     const collections = try allocator.alloc(CollectionInfo, 0);
@@ -349,24 +349,24 @@ pub fn getJournal(since: u64, limit: u32) ![]JournalEntry {
         return error.NotInitialized;
     }
 
-    var journal_blob: FdbBlob = FdbBlob.empty();
-    var err_blob: FdbBlob = FdbBlob.empty();
+    var journal_blob: LithBlob = LithBlob.empty();
+    var err_blob: LithBlob = LithBlob.empty();
 
-    const opts = FdbRenderOpts{
+    const opts = LithRenderOpts{
         .include_provenance = true,
         .canonical = true,
         .pretty = false,
     };
 
-    const status = fdb_render_journal(db_handle, since, opts, &journal_blob, &err_blob);
+    const status = lith_render_journal(db_handle, since, opts, &journal_blob, &err_blob);
     if (status != .ok) {
         if (err_blob.toSlice()) |err| {
             log.err("Journal render failed: {s}", .{err});
-            fdb_blob_free(&err_blob);
+            lith_blob_free(&err_blob);
         }
         return error.JournalRenderFailed;
     }
-    defer fdb_blob_free(&journal_blob);
+    defer lith_blob_free(&journal_blob);
 
     // Parse CBOR journal response (placeholder - return empty list)
     _ = limit;
@@ -458,7 +458,7 @@ pub const HealthStatus = struct {
 };
 
 pub fn getHealth() HealthStatus {
-    const version_num = fdb_version();
+    const version_num = lith_version();
     const major = version_num / 10000;
     const minor = (version_num % 10000) / 100;
     const patch = version_num % 100;
@@ -479,7 +479,7 @@ pub fn getHealth() HealthStatus {
 // CBOR Encoding/Decoding Helpers
 // =============================================================================
 
-fn encodeFdqlOperation(buffer: []u8, fdql: []const u8, prov: ?QueryProvenance) !usize {
+fn encodeLithqlOperation(buffer: []u8, gql: []const u8, prov: ?QueryProvenance) !usize {
     // Simplified CBOR encoding for GQL operation
     // In production, would use proper CBOR encoder
 
@@ -505,31 +505,31 @@ fn encodeFdqlOperation(buffer: []u8, fdql: []const u8, prov: ?QueryProvenance) !
     @memcpy(buffer[offset .. offset + 5], "query");
     offset += 5;
 
-    // Key: "fdql"
+    // Key: "gql"
     buffer[offset] = 0x64; // text of 4 bytes
     offset += 1;
-    @memcpy(buffer[offset .. offset + 4], "fdql");
+    @memcpy(buffer[offset .. offset + 4], "gql");
     offset += 4;
 
-    // Value: fdql string
-    if (fdql.len < 24) {
-        buffer[offset] = @as(u8, 0x60) + @as(u8, @intCast(fdql.len));
+    // Value: gql string
+    if (gql.len < 24) {
+        buffer[offset] = @as(u8, 0x60) + @as(u8, @intCast(gql.len));
         offset += 1;
-    } else if (fdql.len < 256) {
+    } else if (gql.len < 256) {
         buffer[offset] = 0x78; // text with 1-byte length
         offset += 1;
-        buffer[offset] = @intCast(fdql.len);
+        buffer[offset] = @intCast(gql.len);
         offset += 1;
     } else {
         buffer[offset] = 0x79; // text with 2-byte length
         offset += 1;
-        buffer[offset] = @intCast(fdql.len >> 8);
+        buffer[offset] = @intCast(gql.len >> 8);
         offset += 1;
-        buffer[offset] = @intCast(fdql.len & 0xFF);
+        buffer[offset] = @intCast(gql.len & 0xFF);
         offset += 1;
     }
-    @memcpy(buffer[offset .. offset + fdql.len], fdql);
-    offset += fdql.len;
+    @memcpy(buffer[offset .. offset + gql.len], gql);
+    offset += gql.len;
 
     // Optional provenance
     if (has_prov) {

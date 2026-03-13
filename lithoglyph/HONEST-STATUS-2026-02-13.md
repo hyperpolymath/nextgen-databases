@@ -46,7 +46,7 @@ Two major work phases completed today:
 | Idris2 ABI (src/Lith/) | PASS | N/A | All 3 files type-check clean |
 | beam/native (Zig NIF) | PASS | N/A | Real FFI calls to core-zig |
 | beam/native_rust (Rust NIF) | PASS (0 warnings) | N/A | Rustler 0.35 NIF |
-| core-factor (GQL runtime) | PASS | N/A | FQL parser, planner, executor |
+| core-factor (GQL runtime) | PASS | N/A | GQL parser, planner, executor |
 
 ---
 
@@ -78,8 +78,8 @@ This is a satellite component, not core infrastructure.
 - `LithLayout` → `LithLayout`
 - `LithForeign` → `LithForeign`
 - `LithBridge` → `LithBridge`
-- `FDQL` → `LDQL` or `LithQL`
-- `fdb_*` C symbols → `lg_*` or `lith_*`
+- `GQL` → `LDQL` or `LithQL`
+- `lith_*` C symbols → `lg_*` or `lith_*`
 - Module directory `src/Lith/` → `src/LithBD/` or `src/Litho/`
 - Factor vocabulary `storage-backend` references
 - `generated/abi/bridge.h` type prefixes

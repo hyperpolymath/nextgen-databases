@@ -231,26 +231,26 @@ const ProtobufDecoder = struct {
 // =============================================================================
 
 fn handleQuery(allocator: std.mem.Allocator, request: *std.http.Server.Request, msg_data: []const u8) !void {
-    // Parse QueryRequest: fdql (1), explain (2), analyze (3), verbose (4), provenance (5)
+    // Parse QueryRequest: gql (1), explain (2), analyze (3), verbose (4), provenance (5)
     var decoder = ProtobufDecoder.init(msg_data);
-    var fdql: []const u8 = "";
+    var gql: []const u8 = "";
     var explain = false;
 
     while (decoder.hasMore()) {
         const tag = try decoder.readTag();
         switch (tag.field) {
-            1 => fdql = try decoder.readString(), // fdql
+            1 => gql = try decoder.readString(), // gql
             2 => explain = (try decoder.readVarint()) != 0, // explain
             else => try decoder.skipField(tag.wire_type),
         }
     }
 
-    if (fdql.len == 0) {
-        try sendGrpcError(allocator, request, 3, "Missing fdql field");
+    if (gql.len == 0) {
+        try sendGrpcError(allocator, request, 3, "Missing gql field");
         return;
     }
 
-    log.info("gRPC Query: {s}", .{fdql});
+    log.info("gRPC Query: {s}", .{gql});
 
     // Execute via bridge
     if (explain) {
@@ -268,7 +268,7 @@ fn handleQuery(allocator: std.mem.Allocator, request: *std.http.Server.Request, 
         return;
     }
 
-    var result = bridge.executeQuery(fdql, null) catch |err| {
+    var result = bridge.executeQuery(gql, null) catch |err| {
         log.err("Query failed: {}", .{err});
         try sendGrpcError(allocator, request, 13, "Query execution failed");
         return;

@@ -22,33 +22,33 @@ extern "C" {
 #endif
 
 /* ============================================================
- * Status Codes (Lith.LithBridge.FdbStatus)
+ * Status Codes (Lith.LithBridge.LithStatus)
  *
  * Unified superset of core-zig LgStatus (0-7) and
  * ffi/zig Status (0-11). Values 0-7 are implemented;
  * values 8-11 are reserved for future use.
  * ============================================================ */
 typedef enum {
-    FDB_OK                      = 0,
-    FDB_ERR_INTERNAL            = 1,
-    FDB_ERR_NOT_FOUND           = 2,
-    FDB_ERR_INVALID_ARGUMENT    = 3,
-    FDB_ERR_OUT_OF_MEMORY       = 4,
-    FDB_ERR_NOT_IMPLEMENTED     = 5,
-    FDB_ERR_TXN_NOT_ACTIVE      = 6,
-    FDB_ERR_TXN_ALREADY_COMMITTED = 7,
+    LITH_OK                      = 0,
+    LITH_ERR_INTERNAL            = 1,
+    LITH_ERR_NOT_FOUND           = 2,
+    LITH_ERR_INVALID_ARGUMENT    = 3,
+    LITH_ERR_OUT_OF_MEMORY       = 4,
+    LITH_ERR_NOT_IMPLEMENTED     = 5,
+    LITH_ERR_TXN_NOT_ACTIVE      = 6,
+    LITH_ERR_TXN_ALREADY_COMMITTED = 7,
     /* Reserved (ffi/zig extended codes) */
-    FDB_ERR_IO_ERROR            = 8,
-    FDB_ERR_CORRUPTION          = 9,
-    FDB_ERR_CONFLICT            = 10,
-    FDB_ERR_ALREADY_EXISTS      = 11,
-} FdbStatus;
+    LITH_ERR_IO_ERROR            = 8,
+    LITH_ERR_CORRUPTION          = 9,
+    LITH_ERR_CONFLICT            = 10,
+    LITH_ERR_ALREADY_EXISTS      = 11,
+} LithStatus;
 
 /* ============================================================
  * Opaque Handles
  * ============================================================ */
-typedef struct FdbDb  FdbDb;
-typedef struct FdbTxn FdbTxn;
+typedef struct LithDb  LithDb;
+typedef struct LithTxn LithTxn;
 
 /* ============================================================
  * Blob Types (Lith.LithBridge + core-zig)
@@ -64,7 +64,7 @@ typedef struct {
 typedef struct {
     LgBlob  data;
     LgBlob  provenance;
-    int     status;       /* FdbStatus */
+    int     status;       /* LithStatus */
     LgBlob  error_blob;
 } LgResult;
 
@@ -81,7 +81,7 @@ typedef struct {
 } LgRenderOpts;
 
 /** Proof verifier callback type */
-typedef FdbStatus (*LgProofVerifier)(
+typedef LithStatus (*LgProofVerifier)(
     const uint8_t* proof_ptr,
     size_t         proof_len,
     void*          context
@@ -118,21 +118,21 @@ typedef FdbStatus (*LgProofVerifier)(
  * @param opts_len  Length of options (0 if opts_ptr is NULL)
  * @param out_db    Output: database handle
  * @param out_err   Output: error blob (empty on success)
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_db_open(
+LithStatus lith_db_open(
     const uint8_t* path_ptr, size_t path_len,
     const uint8_t* opts_ptr, size_t opts_len,
-    FdbDb** out_db, LgBlob* out_err
+    LithDb** out_db, LgBlob* out_err
 );
 
 /**
  * Close a Lith database and release resources.
  *
  * @param db  Database handle (may be NULL — returns INVALID_ARGUMENT)
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_db_close(FdbDb* db);
+LithStatus lith_db_close(LithDb* db);
 
 /* --- Transaction Management --- */
 
@@ -143,11 +143,11 @@ FdbStatus fdb_db_close(FdbDb* db);
  * @param mode     Transaction mode (read-only or read-write)
  * @param out_txn  Output: transaction handle
  * @param out_err  Output: error blob
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_txn_begin(
-    FdbDb* db, LgTxnMode mode,
-    FdbTxn** out_txn, LgBlob* out_err
+LithStatus lith_txn_begin(
+    LithDb* db, LgTxnMode mode,
+    LithTxn** out_txn, LgBlob* out_err
 );
 
 /**
@@ -155,17 +155,17 @@ FdbStatus fdb_txn_begin(
  *
  * @param txn      Transaction handle
  * @param out_err  Output: error blob
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_txn_commit(FdbTxn* txn, LgBlob* out_err);
+LithStatus lith_txn_commit(LithTxn* txn, LgBlob* out_err);
 
 /**
  * Abort a transaction, discarding all buffered operations.
  *
  * @param txn  Transaction handle
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_txn_abort(FdbTxn* txn);
+LithStatus lith_txn_abort(LithTxn* txn);
 
 /* --- Operations (buffered until commit) --- */
 
@@ -178,7 +178,7 @@ FdbStatus fdb_txn_abort(FdbTxn* txn);
  * @param op_len  Length of operation data
  * @return LgResult with block_id in data blob on success
  */
-LgResult fdb_apply(FdbTxn* txn, const uint8_t* op_ptr, size_t op_len);
+LgResult lith_apply(LithTxn* txn, const uint8_t* op_ptr, size_t op_len);
 
 /**
  * Update an existing block within a transaction.
@@ -188,10 +188,10 @@ LgResult fdb_apply(FdbTxn* txn, const uint8_t* op_ptr, size_t op_len);
  * @param data_ptr  New data
  * @param data_len  Length of new data
  * @param out_err   Output: error blob
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_update_block(
-    FdbTxn* txn, uint64_t block_id,
+LithStatus lith_update_block(
+    LithTxn* txn, uint64_t block_id,
     const uint8_t* data_ptr, size_t data_len,
     LgBlob* out_err
 );
@@ -202,9 +202,9 @@ FdbStatus fdb_update_block(
  * @param txn       Transaction handle
  * @param block_id  Block ID to delete
  * @param out_err   Output: error blob
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_delete_block(FdbTxn* txn, uint64_t block_id, LgBlob* out_err);
+LithStatus lith_delete_block(LithTxn* txn, uint64_t block_id, LgBlob* out_err);
 
 /* --- Query --- */
 
@@ -216,10 +216,10 @@ FdbStatus fdb_delete_block(FdbTxn* txn, uint64_t block_id, LgBlob* out_err);
  * @param block_type  Block type filter (e.g. LG_BLOCK_TYPE_DOCUMENT)
  * @param out_data    Output: JSON array blob
  * @param out_err     Output: error blob
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_read_blocks(
-    FdbDb* db, uint16_t block_type,
+LithStatus lith_read_blocks(
+    LithDb* db, uint16_t block_type,
     LgBlob* out_data, LgBlob* out_err
 );
 
@@ -233,10 +233,10 @@ FdbStatus fdb_read_blocks(
  * @param opts      Render options
  * @param out_text  Output: text blob
  * @param out_err   Output: error blob
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_render_block(
-    FdbDb* db, uint64_t block_id,
+LithStatus lith_render_block(
+    LithDb* db, uint64_t block_id,
     LgRenderOpts opts,
     LgBlob* out_text, LgBlob* out_err
 );
@@ -249,10 +249,10 @@ FdbStatus fdb_render_block(
  * @param opts      Render options
  * @param out_text  Output: text blob
  * @param out_err   Output: error blob
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_render_journal(
-    FdbDb* db, uint64_t since,
+LithStatus lith_render_journal(
+    LithDb* db, uint64_t since,
     LgRenderOpts opts,
     LgBlob* out_text, LgBlob* out_err
 );
@@ -263,10 +263,10 @@ FdbStatus fdb_render_journal(
  * @param db          Database handle
  * @param out_schema  Output: schema blob
  * @param out_err     Output: error blob
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_introspect_schema(
-    FdbDb* db, LgBlob* out_schema, LgBlob* out_err
+LithStatus lith_introspect_schema(
+    LithDb* db, LgBlob* out_schema, LgBlob* out_err
 );
 
 /**
@@ -275,10 +275,10 @@ FdbStatus fdb_introspect_schema(
  * @param db               Database handle
  * @param out_constraints  Output: constraints blob
  * @param out_err          Output: error blob
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_introspect_constraints(
-    FdbDb* db, LgBlob* out_constraints, LgBlob* out_err
+LithStatus lith_introspect_constraints(
+    LithDb* db, LgBlob* out_constraints, LgBlob* out_err
 );
 
 /* --- Proof Verification --- */
@@ -290,9 +290,9 @@ FdbStatus fdb_introspect_constraints(
  * @param type_len  Length of type identifier
  * @param callback  Verification callback function
  * @param context   Optional context passed to callback (may be NULL)
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_proof_register_verifier(
+LithStatus lith_proof_register_verifier(
     const uint8_t* type_ptr, size_t type_len,
     LgProofVerifier callback, void* context
 );
@@ -302,9 +302,9 @@ FdbStatus fdb_proof_register_verifier(
  *
  * @param type_ptr  Proof type identifier
  * @param type_len  Length of type identifier
- * @return FdbStatus (NOT_FOUND if not registered)
+ * @return LithStatus (NOT_FOUND if not registered)
  */
-FdbStatus fdb_proof_unregister_verifier(
+LithStatus lith_proof_unregister_verifier(
     const uint8_t* type_ptr, size_t type_len
 );
 
@@ -316,9 +316,9 @@ FdbStatus fdb_proof_unregister_verifier(
  * @param proof_len  Length of proof
  * @param out_valid  Output: true if proof is valid
  * @param out_err    Output: error blob
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_proof_verify(
+LithStatus lith_proof_verify(
     const uint8_t* proof_ptr, size_t proof_len,
     bool* out_valid, LgBlob* out_err
 );
@@ -326,9 +326,9 @@ FdbStatus fdb_proof_verify(
 /**
  * Initialize built-in proof verifiers (fd-holds, normalization, denormalization).
  *
- * @return FdbStatus
+ * @return LithStatus
  */
-FdbStatus fdb_proof_init_builtins(void);
+LithStatus lith_proof_init_builtins(void);
 
 /* --- Utilities --- */
 
@@ -337,7 +337,7 @@ FdbStatus fdb_proof_init_builtins(void);
  *
  * @param blob  Blob to free (ptr set to NULL after free)
  */
-void fdb_blob_free(LgBlob* blob);
+void lith_blob_free(LgBlob* blob);
 
 /**
  * Get Lith version as encoded integer.
@@ -346,7 +346,7 @@ void fdb_blob_free(LgBlob* blob);
  *
  * @return Version number
  */
-uint32_t fdb_version(void);
+uint32_t lith_version(void);
 
 /* ============================================================
  * Planned Functions (not yet implemented in core-zig)
@@ -356,27 +356,27 @@ uint32_t fdb_version(void);
  * implementations land.
  * ============================================================ */
 
-/* FdbStatus fdb_init(void); */
-/* void      fdb_cleanup(void); */
-/* FdbStatus fdb_create(const char* path, size_t path_len, uint64_t block_count, FdbDb** out_db); */
-/* FdbStatus fdb_collection_create(FdbDb* db, const char* name, size_t name_len, const char* schema_json, size_t schema_len); */
-/* FdbStatus fdb_collection_drop(FdbDb* db, const char* name, size_t name_len); */
-/* FdbStatus fdb_collection_schema(FdbDb* db, const char* name, void** schema_out); */
-/* FdbStatus fdb_query_execute(FdbDb* db, const char* query, size_t query_len, const char* provenance, size_t prov_len, void** cursor_out); */
-/* FdbStatus fdb_query_explain(FdbDb* db, const char* query, size_t query_len, void* buf, size_t buf_len, size_t* written); */
-/* FdbStatus fdb_cursor_next(void* cursor, void* buf, size_t buf_len, size_t* written); */
-/* void      fdb_cursor_close(void* cursor); */
-/* FdbStatus fdb_journal_get(FdbDb* db, void** journal_out); */
-/* FdbStatus fdb_journal_read(void* journal, uint64_t start_seq, uint64_t count, void* buf, size_t buf_len, size_t* written); */
-/* FdbStatus fdb_journal_replay(FdbDb* db, uint64_t from_seq); */
-/* FdbStatus fdb_normalize_discover(FdbDb* db, const char* collection, void* buf, size_t buf_len, size_t* written); */
-/* FdbStatus fdb_normalize_analyze(FdbDb* db, const char* collection, void* nf_out); */
-/* FdbStatus fdb_migrate_start(FdbDb* db, const char* collection, uint8_t target_nf, void* proof, size_t proof_len, void** migration_out); */
-/* FdbStatus fdb_migrate_commit(void* migration, uint8_t phase); */
-/* FdbStatus fdb_serialize_cbor(const char* json, size_t json_len, void* buf, size_t buf_len, size_t* written); */
-/* FdbStatus fdb_deserialize_cbor(void* cbor, size_t cbor_len, void* buf, size_t buf_len, size_t* written); */
-/* FdbStatus fdb_verify_checksums(FdbDb* db, void* corrupted_out, size_t buf_len, size_t* count_out); */
-/* FdbStatus fdb_repair(FdbDb* db, void* report_buf, size_t buf_len, size_t* written); */
+/* LithStatus lith_init(void); */
+/* void      lith_cleanup(void); */
+/* LithStatus lith_create(const char* path, size_t path_len, uint64_t block_count, LithDb** out_db); */
+/* LithStatus lith_collection_create(LithDb* db, const char* name, size_t name_len, const char* schema_json, size_t schema_len); */
+/* LithStatus lith_collection_drop(LithDb* db, const char* name, size_t name_len); */
+/* LithStatus lith_collection_schema(LithDb* db, const char* name, void** schema_out); */
+/* LithStatus lith_query_execute(LithDb* db, const char* query, size_t query_len, const char* provenance, size_t prov_len, void** cursor_out); */
+/* LithStatus lith_query_explain(LithDb* db, const char* query, size_t query_len, void* buf, size_t buf_len, size_t* written); */
+/* LithStatus lith_cursor_next(void* cursor, void* buf, size_t buf_len, size_t* written); */
+/* void      lith_cursor_close(void* cursor); */
+/* LithStatus lith_journal_get(LithDb* db, void** journal_out); */
+/* LithStatus lith_journal_read(void* journal, uint64_t start_seq, uint64_t count, void* buf, size_t buf_len, size_t* written); */
+/* LithStatus lith_journal_replay(LithDb* db, uint64_t from_seq); */
+/* LithStatus lith_normalize_discover(LithDb* db, const char* collection, void* buf, size_t buf_len, size_t* written); */
+/* LithStatus lith_normalize_analyze(LithDb* db, const char* collection, void* nf_out); */
+/* LithStatus lith_migrate_start(LithDb* db, const char* collection, uint8_t target_nf, void* proof, size_t proof_len, void** migration_out); */
+/* LithStatus lith_migrate_commit(void* migration, uint8_t phase); */
+/* LithStatus lith_serialize_cbor(const char* json, size_t json_len, void* buf, size_t buf_len, size_t* written); */
+/* LithStatus lith_deserialize_cbor(void* cbor, size_t cbor_len, void* buf, size_t buf_len, size_t* written); */
+/* LithStatus lith_verify_checksums(LithDb* db, void* corrupted_out, size_t buf_len, size_t* count_out); */
+/* LithStatus lith_repair(LithDb* db, void* report_buf, size_t buf_len, size_t* written); */
 
 #ifdef __cplusplus
 }

@@ -116,7 +116,7 @@ pub const Encoder = struct {
     }
 
     // Encode Lith-specific tag
-    pub fn encodeFdbTag(self: *Encoder, tag: types.CborTag) !void {
+    pub fn encodeLithTag(self: *Encoder, tag: types.CborTag) !void {
         try self.encodeTag(@intFromEnum(tag));
     }
 
@@ -389,12 +389,12 @@ pub fn encodeProvenance(
     var encoder = Encoder.init(allocator);
     errdefer encoder.deinit();
 
-    try encoder.encodeFdbTag(.provenance);
+    try encoder.encodeLithTag(.provenance);
     try encoder.beginMap(3);
 
     // actor
     try encoder.encodeText("actor");
-    try encoder.encodeFdbTag(.actor);
+    try encoder.encodeLithTag(.actor);
     try encoder.beginMap(2);
     try encoder.encodeText("id");
     try encoder.encodeText(actor_id);

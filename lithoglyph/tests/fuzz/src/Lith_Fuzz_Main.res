@@ -4,7 +4,7 @@
  * Lith Fuzz Test Entry Point
  *
  * Imports and runs all 4 fuzz targets:
- *   1. FDQL Parser
+ *   1. GQL Parser
  *   2. Deep Nesting
  *   3. Unicode Handling
  *   4. Long Input
@@ -15,7 +15,7 @@
  */
 
 open Lith_Fuzz_Types
-open Lith_Fuzz_FDQL
+open Lith_Fuzz_GQL
 open Lith_Fuzz_Runner
 
 /** Parse --iterations from command-line args */
@@ -57,7 +57,7 @@ let main = () => {
     verbose: true,
   }
 
-  let results = runFDQLFuzz(~config)
+  let results = runGQLFuzz(~config)
 
   Js.Console.log("\n======================================")
   Js.Console.log("Summary")

@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
-# FormBD-Geo and FormBD-Analytics Test Script
+# Lith-Geo and Lith-Analytics Test Script
 
 # Start the application
 {:ok, _} = Application.ensure_all_started(:lith_http)
 
 alias LithHttp.{Lithoglyph, Geo, Analytics}
 
-IO.puts("\n=== FormBD-Geo and Analytics Test ===\n")
+IO.puts("\n=== Lith-Geo and Analytics Test ===\n")
 
 # ============================================================
-# FormBD-Geo Tests
+# Lith-Geo Tests
 # ============================================================
 
 IO.puts("=== Geo Tests ===\n")
@@ -62,7 +62,7 @@ IO.puts("Test 7: Get feature provenance...")
 IO.puts("  ✓ Provenance chain length: #{length(provenance.provenance_chain)}\n")
 
 # ============================================================
-# FormBD-Analytics Tests
+# Lith-Analytics Tests
 # ============================================================
 
 IO.puts("=== Analytics Tests ===\n")

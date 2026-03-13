@@ -58,13 +58,16 @@
     │  ┌──────────────┐  ┌──────────────┐                     │
     │  │  Factor      │  │  Glyphbase   │                     │
     │  │  core-factor/│  │  glyphbase/  │                     │
-    │  │  FQL runtime │  │  graph store │                     │
+    │  │  GQL runtime │  │  graph store │                     │
     │  └──────────────┘  └──────────────┘                     │
     └─────────────────────────────────────────────────────────┘
 
     Data flow:
-    mutation → core-forth blocks → core-zig bridge → BEAM NIF → lith-http API
-    query   → GQL-DT (Lean verify) → Factor FQL → core-zig → core-forth → result
+    mutation → core-forth blocks → core-zig bridge (lith_*) → BEAM NIF → lith-http API
+    query   → GQL-DT (Lean verify) → Factor GQL → core-zig → core-forth → result
+    glyphbase NIF → core-zig bridge (19 functions, LgBlob/LgStatus types) → core-forth
+
+    Naming: fdb_* → lith_*, FQL/FBQL/FDQL → GQL (Glyph Query Language), FormBD → Lithoglyph
 ```
 
 ## Completion Dashboard
@@ -76,18 +79,19 @@
 | ffi/zig (delegation)   | `██████████` 100%            | Complete       |
 | Idris2 ABI (proofs)    | `██████████` 100%            | Complete       |
 | Lean 4 normalizer      | `██████████` 100%            | Complete       |
-| core-factor (FQL)      | `██████████` 100%            | Complete       |
+| core-factor (GQL)      | `██████████` 100%            | Complete       |
 | BEAM NIF (Zig)         | `████████░░` 80%             | Builds         |
 | BEAM NIF (Rust)        | `████████░░` 80%             | Builds         |
+| glyphbase NIF          | `██████░░░░` 60%             | Linked to core |
 | lith-http (Elixir)     | `█████████░` 90%             | M15 complete   |
 | gql-dt (Lean 4)        | `████████░░` 80%             | Needs audit    |
 | glyphbase              | `████████░░` 80%             | Needs audit    |
-| api (Zig HTTP)         | `███░░░░░░░` 30%             | BROKEN         |
+| api (Zig HTTP)         | `██████████` 100%            | L1 complete    |
 | studio (Tauri)         | `██░░░░░░░░` 20%             | Mock data      |
 | Containerfile          | `██████████` 100%            | Complete       |
 | selur-compose          | `██████████` 100%            | Complete       |
-| IP rename              | `░░░░░░░░░░` 0%              | Not started    |
-| **Overall**            | `███████░░░` **75%**         |                |
+| IP rename              | `████████░░` 80%             | fdb→lith done  |
+| **Overall**            | `████████░░` **80%**         |                |
 
 ## Key Dependencies
 
@@ -98,7 +102,7 @@ lithoglyph
 ├── idris2 (dependent-type ABI proofs)
 ├── lean 4 v4.15.0 (normalization, GQL-DT)
 ├── mathlib v4.15.0 (GQL-DT proofs)
-├── factor (FQL runtime — parser, planner, executor)
+├── factor (GQL runtime — parser, planner, executor)
 ├── rustler 0.35 (Rust BEAM NIF)
 ├── elixir 1.18 / OTP 27 (lith-http, control plane)
 ├── phoenix (HTTP API framework)

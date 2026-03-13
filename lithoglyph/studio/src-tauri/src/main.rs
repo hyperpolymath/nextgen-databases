@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-//! Lith Studio - Zero-friction interface for Lith with FBQLdt
+//! Lith Studio - Zero-friction interface for Lith with GQLdt
 //!
 //! This is the Tauri backend that bridges the ReScript UI to Lith.
 
@@ -226,10 +226,10 @@ pub struct SuggestedFix {
 // Tauri Commands - Schema
 // ============================================================================
 
-/// Generate FBQLdt code from a visual collection definition
+/// Generate GQLdt code from a visual collection definition
 #[tauri::command]
 fn generate_gqldt(collection: CollectionDef) -> Result<String, String> {
-    let mut fql = format!(
+    let mut gql = format!(
         "CREATE COLLECTION {} (\n  id : UUID",
         collection.name
     );
@@ -255,15 +255,15 @@ fn generate_gqldt(collection: CollectionDef) -> Result<String, String> {
             _ => "String".to_string(),
         };
 
-        fql.push_str(&format!(",\n  {} : {}", field.name, type_str));
+        gql.push_str(&format!(",\n  {} : {}", field.name, type_str));
     }
 
-    fql.push_str("\n) WITH DEPENDENT_TYPES, PROVENANCE_TRACKING;");
+    gql.push_str("\n) WITH DEPENDENT_TYPES, PROVENANCE_TRACKING;");
 
-    Ok(fql)
+    Ok(gql)
 }
 
-/// Validate FBQLdt code using Lean 4 type checker
+/// Validate GQLdt code using Lean 4 type checker
 #[tauri::command]
 fn validate_gqldt(code: String) -> Result<ValidationResult, String> {
     // TODO: Call Lean 4 via subprocess or FFI
@@ -401,16 +401,16 @@ fn check_service_status() -> ServiceStatus {
     // Check Lith availability
     let lithoglyph = check_lithoglyph_status();
 
-    // Check FBQLdt availability
+    // Check GQLdt availability
     let gqldt = check_gqldt_status();
 
     // Determine which features are available
     let features = FeatureAvailability {
-        // Schema builder works offline (generates FBQLdt code locally)
+        // Schema builder works offline (generates GQLdt code locally)
         schema_builder: true,
-        // FBQLdt code generation works offline
+        // GQLdt code generation works offline
         gqldt_generation: true,
-        // Validation requires FBQLdt/Lean 4
+        // Validation requires GQLdt/Lean 4
         gqldt_validation: gqldt.available,
         // Query execution requires Lith
         query_execution: lithoglyph.available,
@@ -418,7 +418,7 @@ fn check_service_status() -> ServiceStatus {
         data_entry: lithoglyph.available,
         // Normalization requires Lith
         normalization: lithoglyph.available,
-        // Proof assistant requires FBQLdt
+        // Proof assistant requires GQLdt
         proof_assistant: gqldt.available,
     };
 
@@ -447,18 +447,18 @@ fn check_lithoglyph_status() -> ServiceInfo {
     }
 }
 
-/// Check FBQLdt/Lean 4 availability
+/// Check GQLdt/Lean 4 availability
 fn check_gqldt_status() -> ServiceInfo {
-    // TODO: Check for Lean 4 binary and FBQLdt package
+    // TODO: Check for Lean 4 binary and GQLdt package
     // For now, return unavailable with informative message
     ServiceInfo {
-        name: "FBQLdt (Lean 4)".to_string(),
+        name: "GQLdt (Lean 4)".to_string(),
         available: false,
         version: None,
-        message: "FBQLdt type checker not yet integrated. \
+        message: "GQLdt type checker not yet integrated. \
                   Type validation and proof generation will be enabled \
-                  when FBQLdt M5 (Zig FFI) is released.".to_string(),
-        blocking_milestone: Some("FBQLdt M5".to_string()),
+                  when GQLdt M5 (Zig FFI) is released.".to_string(),
+        blocking_milestone: Some("GQLdt M5".to_string()),
     }
 }
 

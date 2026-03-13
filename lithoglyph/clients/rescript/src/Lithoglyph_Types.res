@@ -29,7 +29,7 @@ type timing = {
   totalMs: float,
 }
 
-/** Query result from FDQL execution */
+/** Query result from GQL execution */
 type queryResult = {
   rows: array<row>,
   rowCount: int,

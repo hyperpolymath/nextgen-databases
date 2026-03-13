@@ -22,10 +22,10 @@ const beam = @import("beam.zig");
 // ============================================================
 
 /// Opaque database handle from the core bridge
-const FdbDb = opaque {};
+const LithDb = opaque {};
 
 /// Opaque transaction handle from the core bridge
-const FdbTxn = opaque {};
+const LithTxn = opaque {};
 
 /// Owned byte buffer passed across the FFI boundary
 const LgBlob = extern struct {
@@ -37,7 +37,7 @@ const LgBlob = extern struct {
 const LgResult = extern struct {
     data: LgBlob,
     provenance: LgBlob,
-    status: c_int, // FdbStatus
+    status: c_int, // LithStatus
     error_blob: LgBlob,
 };
 
@@ -53,8 +53,8 @@ const LgRenderOpts = extern struct {
     include_metadata: bool,
 };
 
-/// FdbStatus codes (must match bridge.h FdbStatus enum)
-const FdbStatus = enum(c_int) {
+/// LithStatus codes (must match bridge.h LithStatus enum)
+const LithStatus = enum(c_int) {
     ok = 0,
     err_internal = 1,
     err_not_found = 2,
@@ -71,53 +71,53 @@ const FdbStatus = enum(c_int) {
 
 // --- Extern C ABI bridge functions ---
 
-extern fn fdb_db_open(
+extern fn lith_db_open(
     path_ptr: [*]const u8,
     path_len: usize,
     opts_ptr: ?[*]const u8,
     opts_len: usize,
-    out_db: *?*FdbDb,
+    out_db: *?*LithDb,
     out_err: *LgBlob,
 ) callconv(.c) c_int;
 
-extern fn fdb_db_close(db: *FdbDb) callconv(.c) c_int;
+extern fn lith_db_close(db: *LithDb) callconv(.c) c_int;
 
-extern fn fdb_txn_begin(
-    db: *FdbDb,
+extern fn lith_txn_begin(
+    db: *LithDb,
     mode: LgTxnMode,
-    out_txn: *?*FdbTxn,
+    out_txn: *?*LithTxn,
     out_err: *LgBlob,
 ) callconv(.c) c_int;
 
-extern fn fdb_txn_commit(txn: *FdbTxn, out_err: *LgBlob) callconv(.c) c_int;
+extern fn lith_txn_commit(txn: *LithTxn, out_err: *LgBlob) callconv(.c) c_int;
 
-extern fn fdb_txn_abort(txn: *FdbTxn) callconv(.c) c_int;
+extern fn lith_txn_abort(txn: *LithTxn) callconv(.c) c_int;
 
-extern fn fdb_apply(
-    txn: *FdbTxn,
+extern fn lith_apply(
+    txn: *LithTxn,
     op_ptr: [*]const u8,
     op_len: usize,
 ) callconv(.c) LgResult;
 
-extern fn fdb_introspect_schema(
-    db: *FdbDb,
+extern fn lith_introspect_schema(
+    db: *LithDb,
     out_schema: *LgBlob,
     out_err: *LgBlob,
 ) callconv(.c) c_int;
 
-extern fn fdb_render_journal(
-    db: *FdbDb,
+extern fn lith_render_journal(
+    db: *LithDb,
     since: u64,
     opts: LgRenderOpts,
     out_text: *LgBlob,
     out_err: *LgBlob,
 ) callconv(.c) c_int;
 
-extern fn fdb_blob_free(blob: *LgBlob) callconv(.c) void;
+extern fn lith_blob_free(blob: *LgBlob) callconv(.c) void;
 
-extern fn fdb_version() callconv(.c) u32;
+extern fn lith_version() callconv(.c) u32;
 
-/// Convert an FdbStatus integer to an atom name for BEAM error tuples.
+/// Convert an LithStatus integer to an atom name for BEAM error tuples.
 /// Returns a descriptive atom string for each known status code.
 fn status_to_atom(status: c_int) [*:0]const u8 {
     return switch (status) {
@@ -145,17 +145,17 @@ const allocator = gpa.allocator();
 var db_handle_type: ?*beam.resource_type = undefined;
 var txn_handle_type: ?*beam.resource_type = undefined;
 
-// Database handle wrapper — holds an opaque FdbDb pointer from the core bridge.
+// Database handle wrapper — holds an opaque LithDb pointer from the core bridge.
 const DbHandle = struct {
-    fdb: *FdbDb,
+    lith: *LithDb,
     path: []const u8,
 
-    /// Open a database via the core bridge C ABI (fdb_db_open).
+    /// Open a database via the core bridge C ABI (lith_db_open).
     fn create(path: []const u8) !*DbHandle {
-        var out_db: ?*FdbDb = null;
+        var out_db: ?*LithDb = null;
         var out_err: LgBlob = .{ .ptr = null, .len = 0 };
 
-        const status = fdb_db_open(
+        const status = lith_db_open(
             path.ptr,
             path.len,
             null, // no options
@@ -165,32 +165,32 @@ const DbHandle = struct {
         );
 
         // Free error blob regardless of outcome
-        if (out_err.ptr != null) fdb_blob_free(&out_err);
+        if (out_err.ptr != null) lith_blob_free(&out_err);
 
-        if (status != @intFromEnum(FdbStatus.ok) or out_db == null) {
+        if (status != @intFromEnum(LithStatus.ok) or out_db == null) {
             return error.InitFailed;
         }
 
         const db = try allocator.create(DbHandle);
         db.* = .{
-            .fdb = out_db.?,
+            .lith = out_db.?,
             .path = try allocator.dupe(u8, path),
         };
 
         return db;
     }
 
-    /// Close the database via the core bridge C ABI (fdb_db_close) and free memory.
+    /// Close the database via the core bridge C ABI (lith_db_close) and free memory.
     fn destroy(self: *DbHandle) void {
-        _ = fdb_db_close(self.fdb);
+        _ = lith_db_close(self.lith);
         allocator.free(self.path);
         allocator.destroy(self);
     }
 };
 
-// Transaction handle wrapper — holds an opaque FdbTxn pointer from the core bridge.
+// Transaction handle wrapper — holds an opaque LithTxn pointer from the core bridge.
 const TxnHandle = struct {
-    fdb_txn: *FdbTxn,
+    lith_txn: *LithTxn,
     db: *DbHandle,
     mode: TransactionMode,
 
@@ -219,7 +219,7 @@ export fn version(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.
     _ = argc;
     _ = argv;
 
-    const ver = fdb_version();
+    const ver = lith_version();
     const major: c_int = @intCast(ver / 10000);
     const minor: c_int = @intCast((ver % 10000) / 100);
     const patch: c_int = @intCast(ver % 100);
@@ -333,31 +333,31 @@ export fn txn_begin(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) bea
     else
         return beam.make_badarg(env);
 
-    // Begin transaction via the core bridge C ABI (fdb_txn_begin)
-    var out_txn: ?*FdbTxn = null;
+    // Begin transaction via the core bridge C ABI (lith_txn_begin)
+    var out_txn: ?*LithTxn = null;
     var out_err: LgBlob = .{ .ptr = null, .len = 0 };
 
-    const status = fdb_txn_begin(
-        db.fdb,
+    const status = lith_txn_begin(
+        db.lith,
         mode.to_lg_mode(),
         &out_txn,
         &out_err,
     );
 
     // Free error blob regardless of outcome
-    if (out_err.ptr != null) fdb_blob_free(&out_err);
+    if (out_err.ptr != null) lith_blob_free(&out_err);
 
-    if (status != @intFromEnum(FdbStatus.ok) or out_txn == null) {
+    if (status != @intFromEnum(LithStatus.ok) or out_txn == null) {
         return beam.make_tuple2(env,
             beam.make_atom(env, "error"),
             beam.make_atom(env, status_to_atom(status)),
         );
     }
 
-    // Create transaction handle wrapping the bridge FdbTxn
+    // Create transaction handle wrapping the bridge LithTxn
     const txn = allocator.create(TxnHandle) catch {
         // Abort the bridge transaction to avoid leaking it
-        _ = fdb_txn_abort(out_txn.?);
+        _ = lith_txn_abort(out_txn.?);
         return beam.make_tuple2(env,
             beam.make_atom(env, "error"),
             beam.make_atom(env, "alloc_failed"),
@@ -365,14 +365,14 @@ export fn txn_begin(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) bea
     };
 
     txn.* = .{
-        .fdb_txn = out_txn.?,
+        .lith_txn = out_txn.?,
         .db = db,
         .mode = mode,
     };
 
     // Create resource
     const txn_res = beam.alloc_resource(env, txn, txn_handle_type) catch {
-        _ = fdb_txn_abort(out_txn.?);
+        _ = lith_txn_abort(out_txn.?);
         allocator.destroy(txn);
         return beam.make_tuple2(env,
             beam.make_atom(env, "error"),
@@ -408,18 +408,18 @@ export fn txn_commit(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) be
     // Alignment is met because TxnHandle was heap-allocated by allocator.create().
     const txn: *TxnHandle = @ptrCast(@alignCast(txn_ptr));
 
-    // Commit the transaction via the core bridge C ABI (fdb_txn_commit).
+    // Commit the transaction via the core bridge C ABI (lith_txn_commit).
     // This executes the 6-phase WAL: journal -> sync -> blocks -> deletes -> superblock -> sync.
     var out_err: LgBlob = .{ .ptr = null, .len = 0 };
-    const status = fdb_txn_commit(txn.fdb_txn, &out_err);
+    const status = lith_txn_commit(txn.lith_txn, &out_err);
 
     // Free error blob regardless of outcome
-    if (out_err.ptr != null) fdb_blob_free(&out_err);
+    if (out_err.ptr != null) lith_blob_free(&out_err);
 
     // Clean up the Zig-side wrapper regardless of commit outcome
     allocator.destroy(txn);
 
-    if (status != @intFromEnum(FdbStatus.ok)) {
+    if (status != @intFromEnum(LithStatus.ok)) {
         return beam.make_tuple2(env,
             beam.make_atom(env, "error"),
             beam.make_atom(env, status_to_atom(status)),
@@ -448,13 +448,13 @@ export fn txn_abort(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) bea
     // Alignment is met because TxnHandle was heap-allocated by allocator.create().
     const txn: *TxnHandle = @ptrCast(@alignCast(txn_ptr));
 
-    // Abort the transaction via the core bridge C ABI (fdb_txn_abort).
-    const status = fdb_txn_abort(txn.fdb_txn);
+    // Abort the transaction via the core bridge C ABI (lith_txn_abort).
+    const status = lith_txn_abort(txn.lith_txn);
 
     // Clean up the Zig-side wrapper regardless of abort outcome
     allocator.destroy(txn);
 
-    if (status != @intFromEnum(FdbStatus.ok)) {
+    if (status != @intFromEnum(LithStatus.ok)) {
         return beam.make_tuple2(env,
             beam.make_atom(env, "error"),
             beam.make_atom(env, status_to_atom(status)),
@@ -502,16 +502,16 @@ export fn apply(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.te
 
     const cbor_data = cbor_bin.data[0..cbor_bin.size];
 
-    // Apply the operation via the core bridge C ABI (fdb_apply).
+    // Apply the operation via the core bridge C ABI (lith_apply).
     // The bridge parses the CBOR/JSON payload, validates it, and buffers the write.
-    const result: LgResult = fdb_apply(txn.fdb_txn, cbor_data.ptr, cbor_data.len);
+    const result: LgResult = lith_apply(txn.lith_txn, cbor_data.ptr, cbor_data.len);
 
-    if (result.status != @intFromEnum(FdbStatus.ok)) {
+    if (result.status != @intFromEnum(LithStatus.ok)) {
         // Free any blobs the bridge may have allocated
         var err_blob = result.error_blob;
-        if (err_blob.ptr != null) fdb_blob_free(&err_blob);
+        if (err_blob.ptr != null) lith_blob_free(&err_blob);
         var data_blob = result.data;
-        if (data_blob.ptr != null) fdb_blob_free(&data_blob);
+        if (data_blob.ptr != null) lith_blob_free(&data_blob);
 
         return beam.make_tuple2(env,
             beam.make_atom(env, "error"),
@@ -523,14 +523,14 @@ export fn apply(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.te
     const result_bin = blk: {
         if (result.data.ptr != null and result.data.len > 0) {
             // SAFETY: result.data.ptr is non-null and result.data.len > 0 (checked above).
-            // The bridge guarantees the pointer is valid until fdb_blob_free() is called.
+            // The bridge guarantees the pointer is valid until lith_blob_free() is called.
             // We copy the data into a BEAM binary before freeing, so no use-after-free.
             const data_slice = result.data.ptr.?[0..result.data.len];
             break :blk beam.make_binary(env, data_slice) catch {
                 var data_blob = result.data;
-                fdb_blob_free(&data_blob);
+                lith_blob_free(&data_blob);
                 var prov_blob = result.provenance;
-                if (prov_blob.ptr != null) fdb_blob_free(&prov_blob);
+                if (prov_blob.ptr != null) lith_blob_free(&prov_blob);
                 return beam.make_tuple2(env,
                     beam.make_atom(env, "error"),
                     beam.make_atom(env, "result_alloc_failed"),
@@ -553,14 +553,14 @@ export fn apply(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.te
 
     if (has_provenance) {
         // SAFETY: result.provenance.ptr is non-null and result.provenance.len > 0 (checked above).
-        // The bridge guarantees the pointer is valid until fdb_blob_free() is called.
+        // The bridge guarantees the pointer is valid until lith_blob_free() is called.
         // We copy the data into a BEAM binary before freeing.
         const prov_slice = result.provenance.ptr.?[0..result.provenance.len];
         const prov_bin = beam.make_binary(env, prov_slice) catch {
             var data_blob = result.data;
-            if (data_blob.ptr != null) fdb_blob_free(&data_blob);
+            if (data_blob.ptr != null) lith_blob_free(&data_blob);
             var prov_blob = result.provenance;
-            fdb_blob_free(&prov_blob);
+            lith_blob_free(&prov_blob);
             return beam.make_tuple2(env,
                 beam.make_atom(env, "error"),
                 beam.make_atom(env, "result_alloc_failed"),
@@ -569,9 +569,9 @@ export fn apply(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.te
 
         // Free bridge blobs now that data is copied into BEAM binaries
         var data_blob = result.data;
-        if (data_blob.ptr != null) fdb_blob_free(&data_blob);
+        if (data_blob.ptr != null) lith_blob_free(&data_blob);
         var prov_blob = result.provenance;
-        fdb_blob_free(&prov_blob);
+        lith_blob_free(&prov_blob);
 
         return beam.make_tuple3(env,
             beam.make_atom(env, "ok"),
@@ -582,7 +582,7 @@ export fn apply(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.te
 
     // Free bridge data blob (no provenance to free)
     var data_blob = result.data;
-    if (data_blob.ptr != null) fdb_blob_free(&data_blob);
+    if (data_blob.ptr != null) lith_blob_free(&data_blob);
 
     return beam.make_tuple2(env,
         beam.make_atom(env, "ok"),
@@ -590,7 +590,7 @@ export fn apply(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.te
     );
 }
 
-/// Get database schema via the core bridge (fdb_introspect_schema).
+/// Get database schema via the core bridge (lith_introspect_schema).
 /// Parameters: DbRef
 /// Returns: {ok, SchemaJson} | {error, Reason}
 export fn schema(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.term {
@@ -616,13 +616,13 @@ export fn schema(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.t
     var out_schema: LgBlob = .{ .ptr = null, .len = 0 };
     var out_err: LgBlob = .{ .ptr = null, .len = 0 };
 
-    const status = fdb_introspect_schema(db.fdb, &out_schema, &out_err);
+    const status = lith_introspect_schema(db.lith, &out_schema, &out_err);
 
     // Free error blob regardless of outcome
-    if (out_err.ptr != null) fdb_blob_free(&out_err);
+    if (out_err.ptr != null) lith_blob_free(&out_err);
 
-    if (status != @intFromEnum(FdbStatus.ok)) {
-        if (out_schema.ptr != null) fdb_blob_free(&out_schema);
+    if (status != @intFromEnum(LithStatus.ok)) {
+        if (out_schema.ptr != null) lith_blob_free(&out_schema);
         return beam.make_tuple2(env,
             beam.make_atom(env, "error"),
             beam.make_atom(env, status_to_atom(status)),
@@ -633,10 +633,10 @@ export fn schema(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.t
     const schema_bin = blk: {
         if (out_schema.ptr != null and out_schema.len > 0) {
             // SAFETY: out_schema.ptr is non-null and out_schema.len > 0 (checked above).
-            // The bridge guarantees the pointer is valid until fdb_blob_free() is called.
+            // The bridge guarantees the pointer is valid until lith_blob_free() is called.
             const schema_slice = out_schema.ptr.?[0..out_schema.len];
             break :blk beam.make_binary(env, schema_slice) catch {
-                fdb_blob_free(&out_schema);
+                lith_blob_free(&out_schema);
                 return beam.make_tuple2(env,
                     beam.make_atom(env, "error"),
                     beam.make_atom(env, "alloc_failed"),
@@ -655,7 +655,7 @@ export fn schema(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.t
     };
 
     // Free the bridge blob now that data is copied
-    if (out_schema.ptr != null) fdb_blob_free(&out_schema);
+    if (out_schema.ptr != null) lith_blob_free(&out_schema);
 
     return beam.make_tuple2(env,
         beam.make_atom(env, "ok"),
@@ -663,7 +663,7 @@ export fn schema(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.t
     );
 }
 
-/// Get journal entries since a sequence number via the core bridge (fdb_render_journal).
+/// Get journal entries since a sequence number via the core bridge (lith_render_journal).
 /// Parameters: DbRef, Since (integer)
 /// Returns: {ok, JournalJson} | {error, Reason}
 export fn journal(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.term {
@@ -706,13 +706,13 @@ export fn journal(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.
     var out_text: LgBlob = .{ .ptr = null, .len = 0 };
     var out_err: LgBlob = .{ .ptr = null, .len = 0 };
 
-    const status = fdb_render_journal(db.fdb, since, opts, &out_text, &out_err);
+    const status = lith_render_journal(db.lith, since, opts, &out_text, &out_err);
 
     // Free error blob regardless of outcome
-    if (out_err.ptr != null) fdb_blob_free(&out_err);
+    if (out_err.ptr != null) lith_blob_free(&out_err);
 
-    if (status != @intFromEnum(FdbStatus.ok)) {
-        if (out_text.ptr != null) fdb_blob_free(&out_text);
+    if (status != @intFromEnum(LithStatus.ok)) {
+        if (out_text.ptr != null) lith_blob_free(&out_text);
         return beam.make_tuple2(env,
             beam.make_atom(env, "error"),
             beam.make_atom(env, status_to_atom(status)),
@@ -723,10 +723,10 @@ export fn journal(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.
     const journal_bin = blk: {
         if (out_text.ptr != null and out_text.len > 0) {
             // SAFETY: out_text.ptr is non-null and out_text.len > 0 (checked above).
-            // The bridge guarantees the pointer is valid until fdb_blob_free() is called.
+            // The bridge guarantees the pointer is valid until lith_blob_free() is called.
             const text_slice = out_text.ptr.?[0..out_text.len];
             break :blk beam.make_binary(env, text_slice) catch {
-                fdb_blob_free(&out_text);
+                lith_blob_free(&out_text);
                 return beam.make_tuple2(env,
                     beam.make_atom(env, "error"),
                     beam.make_atom(env, "alloc_failed"),
@@ -745,7 +745,7 @@ export fn journal(env: ?*beam.env, argc: c_int, argv: [*c]const beam.term) beam.
     };
 
     // Free the bridge blob now that data is copied
-    if (out_text.ptr != null) fdb_blob_free(&out_text);
+    if (out_text.ptr != null) lith_blob_free(&out_text);
 
     return beam.make_tuple2(env,
         beam.make_atom(env, "ok"),

@@ -60,11 +60,11 @@
             - Stack-based computation model"))
 
        (factor-runtime
-         (description . "FQL parser, planner, and executor")
+         (description . "GQL parser, planner, and executor")
          (role . "Symbolic query planning and execution")
          (implementation . "core-factor/")
          (capabilities
-           "- FQL parsing (concatenative query language)
+           "- GQL parsing (concatenative query language)
             - Query plan generation
             - Plan execution against core-zig bridge"))))
 
@@ -93,7 +93,7 @@
          (example
            "1. Lean 4 normalizer proves schema is in BCNF
             2. This proof constrains query planner: certain join orders are provably optimal
-            3. Factor FQL executor uses constrained plan
+            3. Factor GQL executor uses constrained plan
             4. Result: faster queries with correctness guarantee")
          (status . "partially implemented — Lean proofs exist, planner not yet constrained"))
 

@@ -44,7 +44,7 @@ module Tauri = {
   external invoke: (string, 'a) => promise<'b> = "invoke"
 }
 
-// Validation state for FBQLdt preview
+// Validation state for GQLdt preview
 type validationState =
   | NotValidated
   | Validating
@@ -63,8 +63,8 @@ module ServiceStatus = {
 
   type featureAvailability = {
     schema_builder: bool,
-    fbqldt_generation: bool,
-    fbqldt_validation: bool,
+    gqldt_generation: bool,
+    gqldt_validation: bool,
     query_execution: bool,
     data_entry: bool,
     normalization: bool,
@@ -73,7 +73,7 @@ module ServiceStatus = {
 
   type t = {
     lith: serviceInfo,
-    fbqldt: serviceInfo,
+    gqldt: serviceInfo,
     overall_ready: bool,
     features: featureAvailability,
   }

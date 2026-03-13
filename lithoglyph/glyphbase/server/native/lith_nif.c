@@ -12,17 +12,17 @@
 // Forward declarations for Lith FFI functions
 // These will be linked from liblith.so
 
-extern int32_t fdb_init(void);
-extern void fdb_cleanup(void);
-extern int32_t fdb_open(const char* path, uint64_t path_len, void** db_out);
-extern int32_t fdb_close(void* db);
-extern int32_t fdb_create(const char* path, uint64_t path_len, uint64_t block_count, void** db_out);
+extern int32_t lith_init(void);
+extern void lith_cleanup(void);
+extern int32_t lith_open(const char* path, uint64_t path_len, void** db_out);
+extern int32_t lith_close(void* db);
+extern int32_t lith_create(const char* path, uint64_t path_len, uint64_t block_count, void** db_out);
 
-extern int32_t fdb_txn_begin(void* db, void** txn_out);
-extern int32_t fdb_txn_commit(void* txn);
-extern int32_t fdb_txn_rollback(void* txn);
+extern int32_t lith_txn_begin(void* db, void** txn_out);
+extern int32_t lith_txn_commit(void* txn);
+extern int32_t lith_txn_rollback(void* txn);
 
-extern int32_t fdb_query_execute(
+extern int32_t lith_query_execute(
     void* db,
     const char* query_str,
     uint64_t query_len,
@@ -31,14 +31,14 @@ extern int32_t fdb_query_execute(
     void** cursor_out
 );
 
-extern int32_t fdb_cursor_next(
+extern int32_t lith_cursor_next(
     void* cursor,
     char* document_json_out,
     uint64_t buffer_len,
     uint64_t* written_out
 );
 
-extern void fdb_cursor_close(void* cursor);
+extern void lith_cursor_close(void* cursor);
 
 // Status codes (matches Lith ABI)
 #define STATUS_OK 0
@@ -55,52 +55,52 @@ extern void fdb_cursor_close(void* cursor);
 #define STATUS_INTERNAL_ERROR 11
 
 // Resource types for Erlang resource management
-static ErlNifResourceType *FDB_DB_RESOURCE;
-static ErlNifResourceType *FDB_TXN_RESOURCE;
-static ErlNifResourceType *FDB_CURSOR_RESOURCE;
+static ErlNifResourceType *LITH_DB_RESOURCE;
+static ErlNifResourceType *LITH_TXN_RESOURCE;
+static ErlNifResourceType *LITH_CURSOR_RESOURCE;
 
 // Resource wrapper structures
 typedef struct {
     void* handle;
-} FdbDbResource;
+} LithDbResource;
 
 typedef struct {
     void* handle;
-} FdbTxnResource;
+} LithTxnResource;
 
 typedef struct {
     void* handle;
-} FdbCursorResource;
+} LithCursorResource;
 
 // Resource destructor for database
-static void fdb_db_resource_dtor(ErlNifEnv* env, void* obj) {
-    FdbDbResource* res = (FdbDbResource*)obj;
+static void lith_db_resource_dtor(ErlNifEnv* env, void* obj) {
+    LithDbResource* res = (LithDbResource*)obj;
     if (res->handle != NULL) {
-        fdb_close(res->handle);
+        lith_close(res->handle);
         res->handle = NULL;
     }
 }
 
 // Resource destructor for transaction
-static void fdb_txn_resource_dtor(ErlNifEnv* env, void* obj) {
-    FdbTxnResource* res = (FdbTxnResource*)obj;
+static void lith_txn_resource_dtor(ErlNifEnv* env, void* obj) {
+    LithTxnResource* res = (LithTxnResource*)obj;
     if (res->handle != NULL) {
-        fdb_txn_rollback(res->handle);  // Auto-rollback on GC
+        lith_txn_rollback(res->handle);  // Auto-rollback on GC
         res->handle = NULL;
     }
 }
 
 // Resource destructor for cursor
-static void fdb_cursor_resource_dtor(ErlNifEnv* env, void* obj) {
-    FdbCursorResource* res = (FdbCursorResource*)obj;
+static void lith_cursor_resource_dtor(ErlNifEnv* env, void* obj) {
+    LithCursorResource* res = (LithCursorResource*)obj;
     if (res->handle != NULL) {
-        fdb_cursor_close(res->handle);
+        lith_cursor_close(res->handle);
         res->handle = NULL;
     }
 }
 
 // Helper: Convert status code to Erlang atom
-// Convert status code to Gleam FdbError atom
+// Convert status code to Gleam LithError atom
 static ERL_NIF_TERM status_to_error_atom(ErlNifEnv* env, int32_t status) {
     switch (status) {
         case STATUS_INVALID_ARG: return enif_make_atom(env, "InvalidArg");
@@ -118,7 +118,7 @@ static ERL_NIF_TERM status_to_error_atom(ErlNifEnv* env, int32_t status) {
     }
 }
 
-// Convert status code to Gleam Result(Nil, FdbError)
+// Convert status code to Gleam Result(Nil, LithError)
 static ERL_NIF_TERM status_to_result(ErlNifEnv* env, int32_t status) {
     if (status == STATUS_OK) {
         // Return {ok, nil} for Gleam Result type
@@ -138,8 +138,8 @@ static ERL_NIF_TERM status_to_result(ErlNifEnv* env, int32_t status) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // Initialize Lith
-static ERL_NIF_TERM nif_fdb_init(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    int32_t status = fdb_init();
+static ERL_NIF_TERM nif_lith_init(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
+    int32_t status = lith_init();
     return status_to_result(env, status);
 }
 
@@ -153,10 +153,10 @@ static ERL_NIF_TERM nif_open(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]
             enif_make_atom(env, "badarg"));
     }
 
-    FdbDbResource* db_res = enif_alloc_resource(FDB_DB_RESOURCE, sizeof(FdbDbResource));
+    LithDbResource* db_res = enif_alloc_resource(LITH_DB_RESOURCE, sizeof(LithDbResource));
     db_res->handle = NULL;
 
-    int32_t status = fdb_open((const char*)path_bin.data, path_bin.size, &db_res->handle);
+    int32_t status = lith_open((const char*)path_bin.data, path_bin.size, &db_res->handle);
 
     if (status == STATUS_OK && db_res->handle != NULL) {
         ERL_NIF_TERM db_term = enif_make_resource(env, db_res);
@@ -182,10 +182,10 @@ static ERL_NIF_TERM nif_create(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv
             enif_make_atom(env, "badarg"));
     }
 
-    FdbDbResource* db_res = enif_alloc_resource(FDB_DB_RESOURCE, sizeof(FdbDbResource));
+    LithDbResource* db_res = enif_alloc_resource(LITH_DB_RESOURCE, sizeof(LithDbResource));
     db_res->handle = NULL;
 
-    int32_t status = fdb_create((const char*)path_bin.data, path_bin.size, block_count, &db_res->handle);
+    int32_t status = lith_create((const char*)path_bin.data, path_bin.size, block_count, &db_res->handle);
 
     if (status == STATUS_OK && db_res->handle != NULL) {
         ERL_NIF_TERM db_term = enif_make_resource(env, db_res);
@@ -201,18 +201,18 @@ static ERL_NIF_TERM nif_create(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv
 
 // Begin transaction: txn_begin(DbRef) -> {ok, TxnRef} | {error, Reason}
 static ERL_NIF_TERM nif_txn_begin(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    FdbDbResource* db_res;
+    LithDbResource* db_res;
 
-    if (!enif_get_resource(env, argv[0], FDB_DB_RESOURCE, (void**)&db_res)) {
+    if (!enif_get_resource(env, argv[0], LITH_DB_RESOURCE, (void**)&db_res)) {
         return enif_make_tuple2(env,
             enif_make_atom(env, "error"),
             enif_make_atom(env, "badarg"));
     }
 
-    FdbTxnResource* txn_res = enif_alloc_resource(FDB_TXN_RESOURCE, sizeof(FdbTxnResource));
+    LithTxnResource* txn_res = enif_alloc_resource(LITH_TXN_RESOURCE, sizeof(LithTxnResource));
     txn_res->handle = NULL;
 
-    int32_t status = fdb_txn_begin(db_res->handle, &txn_res->handle);
+    int32_t status = lith_txn_begin(db_res->handle, &txn_res->handle);
 
     if (status == STATUS_OK && txn_res->handle != NULL) {
         ERL_NIF_TERM txn_term = enif_make_resource(env, txn_res);
@@ -228,15 +228,15 @@ static ERL_NIF_TERM nif_txn_begin(ErlNifEnv* env, int argc, const ERL_NIF_TERM a
 
 // Commit transaction: txn_commit(TxnRef) -> ok | {error, Reason}
 static ERL_NIF_TERM nif_txn_commit(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    FdbTxnResource* txn_res;
+    LithTxnResource* txn_res;
 
-    if (!enif_get_resource(env, argv[0], FDB_TXN_RESOURCE, (void**)&txn_res)) {
+    if (!enif_get_resource(env, argv[0], LITH_TXN_RESOURCE, (void**)&txn_res)) {
         return enif_make_tuple2(env,
             enif_make_atom(env, "error"),
             enif_make_atom(env, "badarg"));
     }
 
-    int32_t status = fdb_txn_commit(txn_res->handle);
+    int32_t status = lith_txn_commit(txn_res->handle);
 
     if (status == STATUS_OK) {
         return enif_make_atom(env, "ok");
@@ -249,10 +249,10 @@ static ERL_NIF_TERM nif_txn_commit(ErlNifEnv* env, int argc, const ERL_NIF_TERM 
 
 // Execute query: query_execute(DbRef, QueryStr, ProvenanceJson) -> {ok, CursorRef} | {error, Reason}
 static ERL_NIF_TERM nif_query_execute(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    FdbDbResource* db_res;
+    LithDbResource* db_res;
     ErlNifBinary query_bin, prov_bin;
 
-    if (!enif_get_resource(env, argv[0], FDB_DB_RESOURCE, (void**)&db_res) ||
+    if (!enif_get_resource(env, argv[0], LITH_DB_RESOURCE, (void**)&db_res) ||
         !enif_inspect_binary(env, argv[1], &query_bin) ||
         !enif_inspect_binary(env, argv[2], &prov_bin)) {
         return enif_make_tuple2(env,
@@ -260,10 +260,10 @@ static ERL_NIF_TERM nif_query_execute(ErlNifEnv* env, int argc, const ERL_NIF_TE
             enif_make_atom(env, "badarg"));
     }
 
-    FdbCursorResource* cursor_res = enif_alloc_resource(FDB_CURSOR_RESOURCE, sizeof(FdbCursorResource));
+    LithCursorResource* cursor_res = enif_alloc_resource(LITH_CURSOR_RESOURCE, sizeof(LithCursorResource));
     cursor_res->handle = NULL;
 
-    int32_t status = fdb_query_execute(
+    int32_t status = lith_query_execute(
         db_res->handle,
         (const char*)query_bin.data,
         query_bin.size,
@@ -286,9 +286,9 @@ static ERL_NIF_TERM nif_query_execute(ErlNifEnv* env, int argc, const ERL_NIF_TE
 
 // Fetch next from cursor: cursor_next(CursorRef) -> {ok, JsonDoc} | done | {error, Reason}
 static ERL_NIF_TERM nif_cursor_next(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]) {
-    FdbCursorResource* cursor_res;
+    LithCursorResource* cursor_res;
 
-    if (!enif_get_resource(env, argv[0], FDB_CURSOR_RESOURCE, (void**)&cursor_res)) {
+    if (!enif_get_resource(env, argv[0], LITH_CURSOR_RESOURCE, (void**)&cursor_res)) {
         return enif_make_tuple2(env,
             enif_make_atom(env, "error"),
             enif_make_atom(env, "badarg"));
@@ -298,7 +298,7 @@ static ERL_NIF_TERM nif_cursor_next(ErlNifEnv* env, int argc, const ERL_NIF_TERM
     char buffer[65536];
     uint64_t written = 0;
 
-    int32_t status = fdb_cursor_next(cursor_res->handle, buffer, sizeof(buffer), &written);
+    int32_t status = lith_cursor_next(cursor_res->handle, buffer, sizeof(buffer), &written);
 
     if (status == STATUS_OK) {
         ERL_NIF_TERM json_bin;
@@ -319,7 +319,7 @@ static ERL_NIF_TERM nif_cursor_next(ErlNifEnv* env, int argc, const ERL_NIF_TERM
 ////////////////////////////////////////////////////////////////////////////////
 
 static ErlNifFunc nif_funcs[] = {
-    {"init", 0, nif_fdb_init},
+    {"init", 0, nif_lith_init},
     {"open", 1, nif_open},
     {"create", 2, nif_create},
     {"txn_begin", 1, nif_txn_begin},
@@ -330,19 +330,19 @@ static ErlNifFunc nif_funcs[] = {
 
 static int load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info) {
     // Create resource types
-    FDB_DB_RESOURCE = enif_open_resource_type(
-        env, NULL, "fdb_db", fdb_db_resource_dtor,
+    LITH_DB_RESOURCE = enif_open_resource_type(
+        env, NULL, "lith_db", lith_db_resource_dtor,
         ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER, NULL);
 
-    FDB_TXN_RESOURCE = enif_open_resource_type(
-        env, NULL, "fdb_txn", fdb_txn_resource_dtor,
+    LITH_TXN_RESOURCE = enif_open_resource_type(
+        env, NULL, "lith_txn", lith_txn_resource_dtor,
         ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER, NULL);
 
-    FDB_CURSOR_RESOURCE = enif_open_resource_type(
-        env, NULL, "fdb_cursor", fdb_cursor_resource_dtor,
+    LITH_CURSOR_RESOURCE = enif_open_resource_type(
+        env, NULL, "lith_cursor", lith_cursor_resource_dtor,
         ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER, NULL);
 
-    if (FDB_DB_RESOURCE == NULL || FDB_TXN_RESOURCE == NULL || FDB_CURSOR_RESOURCE == NULL) {
+    if (LITH_DB_RESOURCE == NULL || LITH_TXN_RESOURCE == NULL || LITH_CURSOR_RESOURCE == NULL) {
         return -1;
     }
 

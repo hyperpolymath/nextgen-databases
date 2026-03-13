@@ -79,7 +79,7 @@ check_dedup() {
     local response
     response=$(curl -sf -X POST "${LITH_URL}/query" \
         -H "Content-Type: application/json" \
-        -d "{\"fdql\": \"${query}\"}" 2>/dev/null) || return 1
+        -d "{\"gql\": \"${query}\"}" 2>/dev/null) || return 1
 
     # If the response contains a result row, the record already exists.
     if echo "$response" | grep -q '"sha256_hash"'; then
@@ -93,10 +93,10 @@ post_record() {
     local json_file="$1"
     local run_id="$2"
 
-    local fdql_body
-    fdql_body=$(cat <<ENDJSON
+    local gql_body
+    gql_body=$(cat <<ENDJSON
 {
-  "fdql": "INSERT INTO bofig_evidence $(cat "$json_file")\nWITH PROVENANCE {\n  actor: \"docudactyl-pipeline\",\n  rationale: \"Batch extraction run ${run_id}\"\n}",
+  "gql": "INSERT INTO bofig_evidence $(cat "$json_file")\nWITH PROVENANCE {\n  actor: \"docudactyl-pipeline\",\n  rationale: \"Batch extraction run ${run_id}\"\n}",
   "provenance": {
     "actor": "docudactyl-pipeline",
     "rationale": "Batch extraction run ${run_id}"
@@ -108,7 +108,7 @@ ENDJSON
     local http_code
     http_code=$(curl -sf -o /dev/null -w '%{http_code}' -X POST "${LITH_URL}/query" \
         -H "Content-Type: application/json" \
-        -d "$fdql_body" 2>/dev/null) || http_code="000"
+        -d "$gql_body" 2>/dev/null) || http_code="000"
 
     if [ "$http_code" = "200" ] || [ "$http_code" = "201" ]; then
         return 0

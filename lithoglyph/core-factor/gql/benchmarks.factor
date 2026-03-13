@@ -4,7 +4,7 @@
 ! Benchmarks for Parser, Planner, Executor, and Normalizer components.
 ! Used for establishing baseline performance and detecting regressions.
 
-USING: accessors arrays assocs calendar fdql fd-discovery formatting
+USING: accessors arrays assocs calendar gql fd-discovery formatting
 io kernel locals math math.parser math.statistics namespaces random
 sequences system vectors ;
 
@@ -56,18 +56,18 @@ IN: benchmarks
 ! ============================================================
 
 : bench-parse-simple-select ( -- ms )
-    [ "SELECT * FROM users" parse-fdql drop ] 100 average-time-ms ;
+    [ "SELECT * FROM users" parse-gql drop ] 100 average-time-ms ;
 
 : bench-parse-complex-select ( -- ms )
-    [ "SELECT name, dept, salary FROM employees WHERE dept = Engineering LIMIT 100 OFFSET 10" parse-fdql drop ]
+    [ "SELECT name, dept, salary FROM employees WHERE dept = Engineering LIMIT 100 OFFSET 10" parse-gql drop ]
     100 average-time-ms ;
 
 : bench-parse-insert ( -- ms )
-    [ "INSERT INTO users { name: Test, dept: HR }" parse-fdql drop ]
+    [ "INSERT INTO users { name: Test, dept: HR }" parse-gql drop ]
     100 average-time-ms ;
 
 : bench-parse-explain ( -- ms )
-    [ "EXPLAIN ANALYZE VERBOSE SELECT * FROM users WHERE salary > 50000" parse-fdql drop ]
+    [ "EXPLAIN ANALYZE VERBOSE SELECT * FROM users WHERE salary > 50000" parse-gql drop ]
     100 average-time-ms ;
 
 : run-parser-benchmarks ( -- )
@@ -83,15 +83,15 @@ IN: benchmarks
 ! ============================================================
 
 : bench-plan-simple-select ( -- ms )
-    "SELECT * FROM users" parse-fdql :> ast
+    "SELECT * FROM users" parse-gql :> ast
     [ ast plan-query drop ] 100 average-time-ms ;
 
 : bench-plan-complex-select ( -- ms )
-    "SELECT name, dept FROM users WHERE dept = Engineering LIMIT 50" parse-fdql :> ast
+    "SELECT name, dept FROM users WHERE dept = Engineering LIMIT 50" parse-gql :> ast
     [ ast plan-query drop ] 100 average-time-ms ;
 
 : bench-plan-insert ( -- ms )
-    "INSERT INTO users { name: Test }" parse-fdql :> ast
+    "INSERT INTO users { name: Test }" parse-gql :> ast
     [ ast plan-query drop ] 100 average-time-ms ;
 
 : run-planner-benchmarks ( -- )
@@ -107,12 +107,12 @@ IN: benchmarks
 
 :: bench-executor-select ( n -- ms )
     "bench_select" n setup-benchmark-collection
-    [ "SELECT * FROM bench_select" run-fdql drop ]
+    [ "SELECT * FROM bench_select" run-gql drop ]
     10 average-time-ms ;
 
 :: bench-executor-select-filtered ( n -- ms )
     "bench_filter" n setup-benchmark-collection
-    [ "SELECT * FROM bench_filter WHERE dept = Engineering" run-fdql drop ]
+    [ "SELECT * FROM bench_filter WHERE dept = Engineering" run-gql drop ]
     10 average-time-ms ;
 
 :: bench-executor-insert ( n -- ms )
@@ -120,13 +120,13 @@ IN: benchmarks
     [
         n [
             random-document :> doc
-            "INSERT INTO bench_insert { name: X }" run-fdql drop
+            "INSERT INTO bench_insert { name: X }" run-gql drop
         ] times
     ] measure-ms nip ;
 
 :: bench-executor-update ( n -- ms )
     "bench_update" n setup-benchmark-collection
-    [ "UPDATE bench_update SET salary = 999999 WHERE dept = Engineering" run-fdql drop ]
+    [ "UPDATE bench_update SET salary = 999999 WHERE dept = Engineering" run-gql drop ]
     10 average-time-ms ;
 
 : run-executor-benchmarks ( -- )
@@ -232,11 +232,11 @@ IN: benchmarks
     "bench_pipeline" n setup-benchmark-collection
     [
         ! Parse
-        "SELECT * FROM bench_pipeline WHERE dept = Engineering" parse-fdql :> ast
+        "SELECT * FROM bench_pipeline WHERE dept = Engineering" parse-gql :> ast
         ! Plan
         ast plan-query :> plan
         ! Execute
-        ast execute-fdql :> result
+        ast execute-gql :> result
         ! Discover FDs
         "bench_pipeline" get-collection
         fd-discovery-config new

@@ -42,7 +42,7 @@ Lithoglyph stores all data in fixed-size blocks. Each block has a header that pr
 | 0
 | 4
 | `magic`
-| Magic bytes: `FDB\x00` (0x46444200)
+| Magic bytes: `LGH\x00` (0x4C474800)
 
 | 4
 | 2
@@ -307,7 +307,7 @@ CRC32C (Castagnoli) of the payload bytes (64-4095).
 
 === Validation Rules
 
-1. Magic bytes must be `FDB\x00`
+1. Magic bytes must be `LGH\x00`
 2. Version must be recognized (currently: 1)
 3. Block type must be valid
 4. Payload length must be <= 4032

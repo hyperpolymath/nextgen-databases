@@ -138,8 +138,8 @@ let queryLith = async (model: string, ~where: option<string>=?, ~limit: option<i
     try {
       let whereClause = where->Option.map(w => ` WHERE ${w}`)->Option.getOr("")
       let limitClause = limit->Option.map(l => ` LIMIT ${Int.toString(l)}`)->Option.getOr("")
-      let fdql = `SELECT * FROM ${collection}${whereClause}${limitClause}`
-      let result = await client.query(fdql)
+      let gql = `SELECT * FROM ${collection}${whereClause}${limitClause}`
+      let result = await client.query(gql)
       Ok(result.rows)
     } catch {
     | Js.Exn.Error(e) =>

@@ -55,27 +55,27 @@ echo ""
 # Verify ABI exports
 echo "=== Verifying ABI exports ==="
 if [ -f "libbridge.so" ]; then
-    EXPORTS=$(nm -D libbridge.so | grep "fdb_" | wc -l)
-    echo "Found $EXPORTS exported fdb_* functions"
+    EXPORTS=$(nm -D libbridge.so | grep "lith_" | wc -l)
+    echo "Found $EXPORTS exported lith_* functions"
 
-    if nm -D libbridge.so | grep -q "fdb_db_open"; then
-        echo "✅ fdb_db_open found"
+    if nm -D libbridge.so | grep -q "lith_db_open"; then
+        echo "✅ lith_db_open found"
     else
-        echo "❌ fdb_db_open missing"
+        echo "❌ lith_db_open missing"
         exit 1
     fi
 
-    if nm -D libbridge.so | grep -q "fdb_apply"; then
-        echo "✅ fdb_apply found"
+    if nm -D libbridge.so | grep -q "lith_apply"; then
+        echo "✅ lith_apply found"
     else
-        echo "❌ fdb_apply missing"
+        echo "❌ lith_apply missing"
         exit 1
     fi
 
-    if nm -D libbridge.so | grep -q "fdb_txn_begin"; then
-        echo "✅ fdb_txn_begin found"
+    if nm -D libbridge.so | grep -q "lith_txn_begin"; then
+        echo "✅ lith_txn_begin found"
     else
-        echo "❌ fdb_txn_begin missing"
+        echo "❌ lith_txn_begin missing"
         exit 1
     fi
 else

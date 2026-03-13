@@ -239,7 +239,7 @@ function introspectStatement(rng) {
   return "INTROSPECT " + target + " " + collection;
 }
 
-function fdqlStatement(rng) {
+function gqlStatement(rng) {
   var stmtType = Core__Option.getOr(pick(rng, Lith_Property_Types.allStatementTypes), "Select");
   switch (stmtType) {
     case "Select" :
@@ -262,10 +262,10 @@ function fdqlStatement(rng) {
   }
 }
 
-function fdqlStatements(rng, count) {
+function gqlStatements(rng, count) {
   var result = [];
   for(var _for = 1; _for <= count; ++_for){
-    result.push(fdqlStatement(rng));
+    result.push(gqlStatement(rng));
   }
   return result;
 }
@@ -291,7 +291,7 @@ export {
   dropStatement ,
   explainStatement ,
   introspectStatement ,
-  fdqlStatement ,
-  fdqlStatements ,
+  gqlStatement ,
+  gqlStatements ,
 }
 /* No side effect */

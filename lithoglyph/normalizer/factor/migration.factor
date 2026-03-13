@@ -376,7 +376,7 @@ TUPLE: migration-state
     out ;
 
 ! ============================================================
-! FQL Integration
+! GQL Integration
 ! ============================================================
 
 TUPLE: migrate-stmt

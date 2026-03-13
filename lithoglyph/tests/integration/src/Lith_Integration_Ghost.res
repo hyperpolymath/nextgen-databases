@@ -48,7 +48,7 @@ let test_postPublishedEvent = async (): testResult => {
     {
       "method": "POST",
       "headers": Js.Dict.fromArray([("Content-Type", "application/json")]),
-      "body": `{"fdql": "INSERT INTO posts ${Js.Json.stringify(webhookPayload)}"}`,
+      "body": `{"gql": "INSERT INTO posts ${Js.Json.stringify(webhookPayload)}"}`,
     },
   )
 
@@ -72,7 +72,7 @@ let test_postUpdatedEvent = async (): testResult => {
     {
       "method": "POST",
       "headers": Js.Dict.fromArray([("Content-Type", "application/json")]),
-      "body": `{"fdql": "UPDATE posts SET {\\"title\\": \\"Updated Post\\"} WHERE id = \\"post-123\\""}`,
+      "body": `{"gql": "UPDATE posts SET {\\"title\\": \\"Updated Post\\"} WHERE id = \\"post-123\\""}`,
     },
   )
 
@@ -96,7 +96,7 @@ let test_postDeletedEvent = async (): testResult => {
     {
       "method": "POST",
       "headers": Js.Dict.fromArray([("Content-Type", "application/json")]),
-      "body": `{"fdql": "DELETE FROM posts WHERE id = \\"post-123\\""}`,
+      "body": `{"gql": "DELETE FROM posts WHERE id = \\"post-123\\""}`,
     },
   )
 

@@ -36,17 +36,17 @@ bindings/
 ├── rescript/
 │   ├── rescript.json
 │   ├── src/
-│   │   ├── FbqlDt.res              # Main API
-│   │   ├── FbqlDt_AST.res          # AST bindings
-│   │   ├── FbqlDt_TypeChecker.res  # Type checker bindings
-│   │   ├── FbqlDt_IR.res           # IR bindings
-│   │   └── FbqlDt_FFI.res          # Low-level FFI
+│   │   ├── GqlDt.res              # Main API
+│   │   ├── GqlDt_AST.res          # AST bindings
+│   │   ├── GqlDt_TypeChecker.res  # Type checker bindings
+│   │   ├── GqlDt_IR.res           # IR bindings
+│   │   └── GqlDt_FFI.res          # Low-level FFI
 │   └── package.json                # For npm compatibility if needed
 ```
 
 **Example ReScript API:**
 ```rescript
-// bindings/rescript/src/FbqlDt.res
+// bindings/rescript/src/GqlDt.res
 module Insert = {
   type t
 
@@ -165,7 +165,7 @@ pub fn build(b: *std.Build) void {
 **Example WASM Usage:**
 ```rescript
 // Web browser or Deno
-module FbqlDtWasm = {
+module GqlDtWasm = {
   @module("@gqldt/wasm")
   external initialize: unit => promise<unit> = "initialize"
 
@@ -178,12 +178,12 @@ module FbqlDtWasm = {
 
 // Client-side validation before sending to server
 let validateQuery = async (queryString: string) => {
-  await FbqlDtWasm.initialize()
+  await GqlDtWasm.initialize()
 
-  let parsed = await FbqlDtWasm.parseQuery(queryString)
+  let parsed = await GqlDtWasm.parseQuery(queryString)
   switch parsed {
   | Ok(ir) =>
-      let checked = await FbqlDtWasm.typeCheck(ir)
+      let checked = await GqlDtWasm.typeCheck(ir)
       switch checked {
       | Ok() => sendToServer(ir)  // Type-safe, send to Lithoglyph
       | Error(typeError) => showError(typeError)  // Caught client-side!
@@ -227,7 +227,7 @@ generated/abi/                    # Auto-generated from Idris2
 **Example: Idris2 ABI with Proofs**
 ```idris
 -- src/abi/Types.idr
-module FbqlDt.ABI.Types
+module GqlDt.ABI.Types
 
 import Data.So
 import Data.Bits
@@ -285,31 +285,31 @@ backwardCompatible = ?proof_backward_compat
 #include <stdbool.h>
 
 // Opaque handle (non-null guaranteed by Idris2 proof)
-typedef struct FbqlDt_Handle {
+typedef struct GqlDt_Handle {
     uint64_t ptr;  // Always non-zero
-} FbqlDt_Handle;
+} GqlDt_Handle;
 
 // Typed value (size=16, alignment=8, proven correct)
-typedef struct FbqlDt_TypedValue {
+typedef struct GqlDt_TypedValue {
     uint8_t tag;
     uint8_t _padding[7];
     uint64_t data;
-} FbqlDt_TypedValue;
+} GqlDt_TypedValue;
 
-_Static_assert(sizeof(FbqlDt_TypedValue) == 16, "TypedValue size");
-_Static_assert(_Alignof(FbqlDt_TypedValue) == 8, "TypedValue alignment");
+_Static_assert(sizeof(GqlDt_TypedValue) == 16, "TypedValue size");
+_Static_assert(_Alignof(GqlDt_TypedValue) == 8, "TypedValue alignment");
 
 // INSERT statement (size=40, alignment=8, proven correct)
-typedef struct FbqlDt_InsertStmt {
-    FbqlDt_Handle handle;
+typedef struct GqlDt_InsertStmt {
+    GqlDt_Handle handle;
     const char *table;
     const char **columns;
-    FbqlDt_TypedValue *values;
+    GqlDt_TypedValue *values;
     const uint8_t *proof_blob;
-} FbqlDt_InsertStmt;
+} GqlDt_InsertStmt;
 
-_Static_assert(sizeof(FbqlDt_InsertStmt) == 40, "InsertStmt size");
-_Static_assert(_Alignof(FbqlDt_InsertStmt) == 8, "InsertStmt alignment");
+_Static_assert(sizeof(GqlDt_InsertStmt) == 40, "InsertStmt size");
+_Static_assert(_Alignof(GqlDt_InsertStmt) == 8, "InsertStmt alignment");
 
 #endif // GQLDT_ABI_H
 ```
@@ -365,17 +365,17 @@ export fn gqldt_insert_create(
     table: [*:0]const u8,
     columns: [*]const [*:0]const u8,
     column_count: usize,
-    values: [*]const c.FbqlDt_TypedValue,
+    values: [*]const c.GqlDt_TypedValue,
     value_count: usize,
     rationale: [*:0]const u8,
-) callconv(.C) ?*c.FbqlDt_InsertStmt {
+) callconv(.C) ?*c.GqlDt_InsertStmt {
     const allocator = std.heap.c_allocator;
 
     // Validate non-null (redundant with Idris2 proof, but defensive)
     if (table[0] == 0) return null;
     if (rationale[0] == 0) return null;
 
-    const stmt = allocator.create(c.FbqlDt_InsertStmt) catch return null;
+    const stmt = allocator.create(c.GqlDt_InsertStmt) catch return null;
 
     stmt.* = .{
         .handle = .{ .ptr = @intFromPtr(stmt) },  // Non-null by construction
@@ -390,8 +390,8 @@ export fn gqldt_insert_create(
 
 // FFI: Execute INSERT on Lithoglyph
 export fn gqldt_insert_execute(
-    stmt: *c.FbqlDt_InsertStmt,
-    db: *c.FbqlDt_Database,
+    stmt: *c.GqlDt_InsertStmt,
+    db: *c.GqlDt_Database,
 ) callconv(.C) c_int {
     // Type checker already verified this at parse time
     // Just execute on storage layer
@@ -409,7 +409,7 @@ export fn gqldt_insert_execute(
 }
 
 // FFI: Free INSERT statement
-export fn gqldt_insert_free(stmt: *c.FbqlDt_InsertStmt) callconv(.C) void {
+export fn gqldt_insert_free(stmt: *c.GqlDt_InsertStmt) callconv(.C) void {
     const allocator = std.heap.c_allocator;
     allocator.destroy(stmt);
 }
@@ -417,7 +417,7 @@ export fn gqldt_insert_free(stmt: *c.FbqlDt_InsertStmt) callconv(.C) void {
 // FFI: Type check query
 export fn gqldt_typecheck(
     query: [*:0]const u8,
-    schema: *const c.FbqlDt_Schema,
+    schema: *const c.GqlDt_Schema,
     error_buffer: [*]u8,
     buffer_size: usize,
 ) callconv(.C) c_int {
@@ -441,7 +441,7 @@ export fn gqldt_typecheck(
 // Lean 4 extern declaration (from Lean's C backend)
 extern fn lean_gqldt_typecheck(
     query: [*:0]const u8,
-    schema: *const c.FbqlDt_Schema,
+    schema: *const c.GqlDt_Schema,
 ) callconv(.C) struct {
     ok: bool,
     error_msg: [*:0]const u8,
@@ -475,7 +475,7 @@ zig build -Dtarget=wasm32-wasi
 └────────────────────┬────────────────────────────────────┘
                      ↓
 ┌─────────────────────────────────────────────────────────┐
-│ Lean 4 Parser (src/FbqlDt/)                             │
+│ Lean 4 Parser (src/GqlDt/)                             │
 │ - Lexer, parser, type checker                            │
 │ - Generates typed AST with proofs                        │
 └────────────────────┬────────────────────────────────────┘

@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// Build configuration for Lith NIF
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+//
+// Build configuration for Lithoglyph NIF (Gleam/BEAM)
+//
+// Links the NIF against core-zig via Zig module import (same pattern as ffi/zig/).
+// The NIF source imports core_bridge to access real Lith functions and types.
 
 const std = @import("std");
 
@@ -7,14 +12,25 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    // Find Erlang include directory
+    // ================================================================
+    // Core-zig module (the real storage engine)
+    // ================================================================
+
+    const core_bridge_mod = b.createModule(.{
+        .root_source_file = b.path("../../../core-zig/src/bridge.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    // ================================================================
+    // Erlang NIF headers
+    // ================================================================
+
     const erl_include = blk: {
-        // Try to get from environment
         if (std.process.getEnvVarOwned(b.allocator, "ERL_INCLUDE_PATH")) |path| {
             break :blk path;
         } else |_| {}
 
-        // Try to find via erl command
         const result = std.process.Child.run(.{
             .allocator = b.allocator,
             .argv = &.{ "erl", "-noshell", "-eval", "io:format(\"~s\", [code:root_dir()])", "-s", "init", "stop" },
@@ -26,43 +42,53 @@ pub fn build(b: *std.Build) void {
         break :blk b.fmt("{s}/usr/include", .{root_dir});
     };
 
-    // Build the NIF shared library
-    const lib = b.addSharedLibrary(.{
-        .name = "lith_nif",
-        .root_source_file = b.path("src/lith_nif.zig"),
-        .target = target,
-        .optimize = optimize,
+    // ================================================================
+    // NIF shared library (links core-zig via module import)
+    // ================================================================
+
+    const lib = b.addLibrary(.{
+        .name = "lithoglyph_nif",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/lithoglyph_nif.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "core_bridge", .module = core_bridge_mod },
+            },
+        }),
+        .linkage = .dynamic,
     });
 
-    // Add Erlang NIF headers
-    lib.addIncludePath(.{ .cwd_relative = erl_include });
+    // Erlang NIF headers
+    lib.root_module.addIncludePath(.{ .cwd_relative = erl_include });
 
-    // Link against Lith
-    // In production, this would link against liblith.so
-    // For now, we'll add a stub or expect Lith to be linked separately
-    if (b.option([]const u8, "lith-path", "Path to Lith library")) |lith_path| {
-        lib.addLibraryPath(.{ .cwd_relative = lith_path });
-        lib.linkSystemLibrary("lith");
-    }
-
-    // Link libc for system calls
+    // libc for system calls
     lib.linkLibC();
 
-    // Install to priv directory
+    // Install to priv/ for Gleam/BEAM to find
     const install = b.addInstallArtifact(lib, .{
         .dest_dir = .{ .override = .{ .custom = "../priv" } },
     });
 
     b.getInstallStep().dependOn(&install.step);
 
-    // Tests
+    // ================================================================
+    // Tests (with core-zig module available)
+    // ================================================================
+
     const unit_tests = b.addTest(.{
-        .root_source_file = b.path("src/lith_nif.zig"),
-        .target = target,
-        .optimize = optimize,
+        .name = "nif-tests",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/lithoglyph_nif.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "core_bridge", .module = core_bridge_mod },
+            },
+        }),
     });
 
-    unit_tests.addIncludePath(.{ .cwd_relative = erl_include });
+    unit_tests.root_module.addIncludePath(.{ .cwd_relative = erl_include });
 
     const run_unit_tests = b.addRunArtifact(unit_tests);
     const test_step = b.step("test", "Run unit tests");

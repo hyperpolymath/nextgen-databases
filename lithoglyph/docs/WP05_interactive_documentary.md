@@ -119,7 +119,7 @@ i-docs must make their epistemology **visible and queryable**:
 > Counterpoint from landlords' association (PROMPT: 59, expert interview, not replicated)"
 
 Lith makes this queryable:
-```fql
+```gql
 -- Get all evidence supporting a claim, sorted by PROMPT overall score
 SELECT evidence.title, evidence.prompt_overall, 
        relationship.weight, relationship.reasoning
@@ -138,7 +138,7 @@ PROMPT (Provenance, Replicability, Objective, Methodology, Publication, Transpar
 
 Lith stores PROMPT scores as **narrative metadata**:
 
-```fql
+```gql
 CREATE COLLECTION evidence (
   id UUID PRIMARY KEY,
   title VARCHAR NOT NULL,
@@ -172,7 +172,7 @@ CREATE COLLECTION evidence (
 
 Scores change over time (retractions, replication failures):
 
-```fql
+```gql
 -- Initial scoring
 INSERT INTO evidence (title, prompt_scores) 
 VALUES ('Climate Study X', {
@@ -200,7 +200,7 @@ DISCLOSED_AT "2024-03-16T09:00:00Z";
 ```
 
 **Agents/readers can query score history**:
-```fql
+```gql
 INTROSPECT evidence.climate_study_x PROMPT_HISTORY;
 
 -- Returns:
@@ -224,7 +224,7 @@ Different audiences prioritize different dimensions:
 | Affected Person | Transparency, Objective | Provenance | (simplicity) |
 
 Lith supports audience-specific scoring:
-```fql
+```gql
 SELECT evidence.title,
        audience_weighted_prompt(evidence.prompt_scores, 'RESEARCHER') AS researcher_score,
        audience_weighted_prompt(evidence.prompt_scores, 'SKEPTIC') AS skeptic_score
@@ -248,7 +248,7 @@ CREATE FUNCTION audience_weighted_prompt(scores, audience) AS
 
 ### 4.1 Implementation in Lith
 
-```fql
+```gql
 CREATE COLLECTION navigation_paths (
   id UUID PRIMARY KEY,
   name VARCHAR NOT NULL,
@@ -272,7 +272,7 @@ CREATE COLLECTION path_nodes (
 ### 4.2 Example: UK Inflation 2023
 
 **Researcher Path**:
-```fql
+```gql
 CREATE NAVIGATION_PATH 'researcher_path_inflation'
 FOR INVESTIGATION 'uk_inflation_2023'
 AUDIENCE 'RESEARCHER'
@@ -307,7 +307,7 @@ CREATED_BY "journalist_jane";
 ```
 
 **Skeptic Path**:
-```fql
+```gql
 CREATE NAVIGATION_PATH 'skeptic_path_inflation'
 FOR INVESTIGATION 'uk_inflation_2023'
 AUDIENCE 'SKEPTIC'
@@ -337,7 +337,7 @@ CREATED_BY "editor_bob";
 ```
 
 **Affected Person Path**:
-```fql
+```gql
 CREATE NAVIGATION_PATH 'affected_person_path_inflation'
 FOR INVESTIGATION 'uk_inflation_2023'
 AUDIENCE 'AFFECTED_PERSON'
@@ -365,7 +365,7 @@ CREATED_BY "journalist_jane";
 
 Lith can auto-generate paths based on heuristics:
 
-```fql
+```gql
 -- Auto-generate skeptic path
 GENERATE NAVIGATION_PATH 
 FOR INVESTIGATION 'uk_inflation_2023'
@@ -392,7 +392,7 @@ RATIONALE "Auto-generated based on skeptic heuristics";
 ### 4.4 Path Metadata as Narrative
 
 Paths themselves carry narrative:
-```fql
+```gql
 INTROSPECT NAVIGATION_PATH 'researcher_path_inflation';
 
 -- Returns:
@@ -420,7 +420,7 @@ INTROSPECT NAVIGATION_PATH 'researcher_path_inflation';
 ### 5.1 Evidence Gathering
 
 **Phase 1: Import from Zotero**
-```fql
+```gql
 -- Journalist uses Zotero to manage sources
 -- Lith imports with metadata mapping
 
@@ -442,7 +442,7 @@ IMPORTED_AT NOW();
 ```
 
 **Phase 2: Connect to Claims**
-```fql
+```gql
 -- Reporter creates claim
 INSERT INTO claims (text, claim_type, confidence_level)
 VALUES (
@@ -470,7 +470,7 @@ VERIFIED_BY 'editor_bob';
 
 Multiple journalists work on same investigation:
 
-```fql
+```gql
 -- Reporter Alice adds claim
 INSERT INTO claims (...) ADDED_BY 'reporter_alice';
 
@@ -494,7 +494,7 @@ NOTE "Agreed. Final figures due March 2024, will update then.";
 
 **Scenario**: ONS revises inflation figures
 
-```fql
+```gql
 -- Original claim
 -- (created 2024-01-15)
 claim: "Rent inflation reached 12% in 2023"
@@ -521,7 +521,7 @@ SOURCE_URL 'https://ons.gov.uk/final-2023-cpi';
 ```
 
 **Retraction** (more serious):
-```fql
+```gql
 UPDATE claims
 SET confidence_level = 0.0,
     retracted = TRUE,
@@ -540,7 +540,7 @@ APOLOGY "We apologize for the error and have updated our editorial
 
 ### 5.4 Fact-Checking Workflow
 
-```fql
+```gql
 -- Fact-checker reviews claim
 SELECT claim.text, 
        evidence.title, 
@@ -590,7 +590,7 @@ PROMPT_ADJUSTMENTS {
 │  - Relationships context                    │
 │  - Navigation paths                         │
 └────────────────┬────────────────────────────┘
-                 │ FQL Queries
+                 │ GQL Queries
 ┌────────────────▼────────────────────────────┐
 │  Lith (Forth/Zig/Factor)                  │
 │  - Narrative-first database                 │
@@ -605,7 +605,7 @@ PROMPT_ADJUSTMENTS {
 
 **BoFIG Collections in Lith**:
 
-```fql
+```gql
 -- Claims (investigative journalism claims)
 CREATE COLLECTION bofig_claims (
   id UUID PRIMARY KEY,
@@ -675,9 +675,9 @@ CREATE COLLECTION bofig_navigation_paths (
 
 ### 6.3 Query Examples
 
-**FQL queries replacing AQL**:
+**GQL queries replacing AQL**:
 
-```fql
+```gql
 -- Get all high-confidence claims with supporting evidence
 SELECT claims.text, claims.confidence_level,
        ARRAY_AGG(evidence.title ORDER BY evidence.prompt_overall DESC) AS evidence_titles,
@@ -753,7 +753,7 @@ My-Newsroom uses Dempster-Shafer belief fusion (50-100 agents) for claim verific
 
 ### 7.2 Belief Fusion Audit Trail
 
-```fql
+```gql
 CREATE COLLECTION newsroom_belief_fusions (
   fusion_id UUID PRIMARY KEY,
   claim_text TEXT NOT NULL,
@@ -821,7 +821,7 @@ RATIONALE "Three agents agree with high confidence. Low conflict (0.03).
 
 Agents query their own reasoning history:
 
-```fql
+```gql
 -- Agent asks: "What claims have I verified about inflation?"
 SELECT fusion.claim_text, 
        belief.belief,
@@ -851,7 +851,7 @@ ORDER BY fusion.fused_at DESC
 
 When agents disagree:
 
-```fql
+```gql
 -- Agents disagree on controversial claim
 INSERT INTO newsroom_belief_fusions (
   claim_text, individual_beliefs, fusion_method, fusion_result, consensus_reached
@@ -891,7 +891,7 @@ REQUIRES_HUMAN_REVIEW TRUE
 - [ ] Migrate BoFIG from ArangoDB to Lith
 - [ ] Implement PROMPT score schema
 - [ ] Build navigation path collections
-- [ ] Create FQL equivalents for all current AQL queries
+- [ ] Create GQL equivalents for all current AQL queries
 - [ ] Migrate UK Inflation 2023 test dataset
 - [ ] Test with NUJ journalists (25 users)
 

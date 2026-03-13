@@ -5,10 +5,10 @@
 --
 -- Run with: lake build && lean --run test/ParserTest.lean
 
-import FqlDt.Query
+import GqlDt.Query
 
-open FqlDt.Query
-open FqlDt.Query.Parser
+open GqlDt.Query
+open GqlDt.Query.Parser
 
 /-- Test SELECT * FROM table -/
 def testSelectAll : IO Unit := do

@@ -4,13 +4,13 @@
 -- Type Safety Tests
 -- Demonstrate type safety enforcement at compile time
 
-import FbqlDt.TypeSafe
-import FbqlDt.TypeChecker
-import FbqlDt.Types.BoundedNat
-import FbqlDt.Types.NonEmptyString
-import FbqlDt.Prompt
+import GqlDt.TypeSafe
+import GqlDt.TypeChecker
+import GqlDt.Types.BoundedNat
+import GqlDt.Types.NonEmptyString
+import GqlDt.Prompt
 
-namespace FbqlDt.Tests.TypeSafety
+namespace GqlDt.Tests.TypeSafety
 
 open TypeSafe TypeChecker AST
 
@@ -120,13 +120,24 @@ theorem typeSafeQueriesPreserveInvariants (stmt : InsertStmt schema) :
     | _ => True
   := by
   intro i hi
-  -- Type system ensures this automatically via dependent types
--- PROOF_TODO: Replace sorry with actual proof
-  sorry
+  -- The proof proceeds by case analysis on the type tag and value.
+  -- For each branch, the dependent type constraints on TypedValue
+  -- already carry the proofs we need (BoundedNat carries min_le/le_max,
+  -- NonEmptyString carries nonempty).
+  --
+  -- Note: This theorem operates over arbitrary InsertStmt values where the
+  -- values list contains sigma types (Σ t : TypeExpr, TypedValue t). The
+  -- `get!` returns a default when out of bounds, and the `let` destructuring
+  -- loses the dependent index relationship between t and v. A fully rigorous
+  -- proof requires either:
+  --   (a) Rewriting to use `get` with the bounds proof `hi`, or
+  --   (b) Auxiliary lemmas about TypedValue index injectivity.
+  -- For now, we use sorry with a clear explanation of what's needed.
+  sorry -- TODO: requires rewriting to use List.get (not get!) to preserve the dependent index constraint between t and v, enabling Lean to see that TypedValue (.boundedNat min max) can only be .boundedNat and TypedValue .nonEmptyString can only be .nonEmptyString
 
 -- Run all tests
 def main : IO Unit := do
-  IO.println "=== FBQLdt Type Safety Tests ==="
+  IO.println "=== GQLdt Type Safety Tests ==="
   IO.println ""
 
   IO.println "Test 1: Valid insertion"
@@ -152,4 +163,4 @@ def main : IO Unit := do
 
   IO.println "=== All tests passed! ==="
 
-end FbqlDt.Tests.TypeSafety
+end GqlDt.Tests.TypeSafety

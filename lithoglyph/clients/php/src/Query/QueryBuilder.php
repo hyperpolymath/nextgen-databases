@@ -28,7 +28,7 @@ enum CompareOp: string
  */
 interface FilterExpr
 {
-    public function toFdql(): string;
+    public function toGql(): string;
 }
 
 /**
@@ -42,7 +42,7 @@ final class FieldFilter implements FilterExpr
         public readonly mixed $value,
     ) {}
 
-    public function toFdql(): string
+    public function toGql(): string
     {
         $valueStr = match (true) {
             is_string($this->value) => '"' . addslashes($this->value) . '"',
@@ -69,9 +69,9 @@ final class AndFilter implements FilterExpr
         public readonly FilterExpr $right,
     ) {}
 
-    public function toFdql(): string
+    public function toGql(): string
     {
-        return '(' . $this->left->toFdql() . ' AND ' . $this->right->toFdql() . ')';
+        return '(' . $this->left->toGql() . ' AND ' . $this->right->toGql() . ')';
     }
 }
 
@@ -85,9 +85,9 @@ final class OrFilter implements FilterExpr
         public readonly FilterExpr $right,
     ) {}
 
-    public function toFdql(): string
+    public function toGql(): string
     {
-        return '(' . $this->left->toFdql() . ' OR ' . $this->right->toFdql() . ')';
+        return '(' . $this->left->toGql() . ' OR ' . $this->right->toGql() . ')';
     }
 }
 
@@ -100,9 +100,9 @@ final class NotFilter implements FilterExpr
         public readonly FilterExpr $filter,
     ) {}
 
-    public function toFdql(): string
+    public function toGql(): string
     {
-        return 'NOT (' . $this->filter->toFdql() . ')';
+        return 'NOT (' . $this->filter->toGql() . ')';
     }
 }
 
@@ -212,9 +212,9 @@ final class QueryBuilder
     }
 
     /**
-     * Build the FDQL query string
+     * Build the GQL query string
      */
-    public function toFdql(): string
+    public function toGql(): string
     {
         if ($this->collection === null) {
             throw new \RuntimeException('Collection is required');
@@ -224,7 +224,7 @@ final class QueryBuilder
         $query = "SELECT {$fieldsStr} FROM {$this->collection}";
 
         if ($this->filter !== null) {
-            $query .= ' WHERE ' . $this->filter->toFdql();
+            $query .= ' WHERE ' . $this->filter->toGql();
         }
 
         if ($this->orderByField !== null) {
@@ -299,9 +299,9 @@ final class InsertBuilder
     }
 
     /**
-     * Build the FDQL insert string
+     * Build the GQL insert string
      */
-    public function toFdql(): string
+    public function toGql(): string
     {
         if ($this->collection === null) {
             throw new \RuntimeException('Collection is required');
@@ -382,9 +382,9 @@ final class UpdateBuilder
     }
 
     /**
-     * Build the FDQL update string
+     * Build the GQL update string
      */
-    public function toFdql(): string
+    public function toGql(): string
     {
         if ($this->collection === null) {
             throw new \RuntimeException('Collection is required');
@@ -407,7 +407,7 @@ final class UpdateBuilder
         $query = "UPDATE {$this->collection} SET " . implode(', ', $setClauses);
 
         if ($this->filter !== null) {
-            $query .= ' WHERE ' . $this->filter->toFdql();
+            $query .= ' WHERE ' . $this->filter->toGql();
         }
 
         if ($this->provenance !== null) {
@@ -468,9 +468,9 @@ final class DeleteBuilder
     }
 
     /**
-     * Build the FDQL delete string
+     * Build the GQL delete string
      */
-    public function toFdql(): string
+    public function toGql(): string
     {
         if ($this->collection === null) {
             throw new \RuntimeException('Collection is required');
@@ -479,7 +479,7 @@ final class DeleteBuilder
         $query = "DELETE FROM {$this->collection}";
 
         if ($this->filter !== null) {
-            $query .= ' WHERE ' . $this->filter->toFdql();
+            $query .= ' WHERE ' . $this->filter->toGql();
         }
 
         if ($this->provenance !== null) {

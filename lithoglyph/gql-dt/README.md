@@ -72,7 +72,7 @@ GQLdt extends [Lithoglyph](https://github.com/hyperpolymath/lithoglyph)'s query 
 
 **Recent Updates** (2026-02-01):
 - Seam analysis: Fixed 76 issues, resolved 33 compilation blockers
-- Namespace consistency: Global FqlDt → FbqlDt renaming across 24 files
+- Namespace consistency: Global GqlDt → GqlDt renaming across 24 files
 - Circular dependency: Created Serialization/Types.lean to break IR ↔ Serialization cycle
 - CBOR tags: Updated to vendor-specific range (55800-55804) to avoid IANA collisions
 - Lexer rewrite: Complete hand-rolled implementation (Parsec unavailable in Lean 4.15.0)
@@ -93,27 +93,27 @@ GQLdt compiles to operations on Form.Bridge, which uses Zig's stable ABI:
 /// Bidirectional FFI: Lean 4 → Zig → Forth core
 /// and Forth core → Zig → Lean 4 callbacks
 
-pub const FdbStatus = struct {
+pub const LithStatus = struct {
     code: i32,
     error_blob: ?[*]const u8,
     error_len: usize,
 };
 
 /// Forward: GQLdt → Form.Bridge
-pub export fn fdb_insert(
-    db: *FdbDb,
+pub export fn lith_insert(
+    db: *LithDb,
     collection: [*:0]const u8,
     document: [*]const u8,
     doc_len: usize,
     proof_blob: [*]const u8,  // Serialised proof from Lean 4
     proof_len: usize,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 
 /// Reverse: Form.Bridge → GQLdt (for constraint checking)
-pub export fn fdb_register_constraint_checker(
-    db: *FdbDb,
+pub export fn lith_register_constraint_checker(
+    db: *LithDb,
     checker: *const fn (doc: [*]const u8, len: usize) callconv(.C) bool,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 ```
 
 No C headers or libc required. Zig provides C-compatible calling convention for interop.

@@ -108,12 +108,12 @@ let stats = (cache: lruCache<'a>): {size: int, maxSize: int, hitRate: float} => 
 let queryPlanCache: lruCache<string> = make(~maxSize=1000, ~ttlMs=300000.0)
 
 /** Cache a query plan */
-let cachePlan = (fdql: string, plan: string): unit => {
-  let key = fdql // In production, would hash this
+let cachePlan = (gql: string, plan: string): unit => {
+  let key = gql // In production, would hash this
   set(queryPlanCache, key, plan)
 }
 
 /** Get cached plan */
-let getCachedPlan = (fdql: string): option<string> => {
-  get(queryPlanCache, fdql)
+let getCachedPlan = (gql: string): option<string> => {
+  get(queryPlanCache, gql)
 }

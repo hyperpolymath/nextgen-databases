@@ -4,7 +4,7 @@
 ;
 ; This file is distributed to all Lithoglyph ecosystem repos:
 ; - lithoglyph (core database)
-; - fdql-dt (dependently-typed query language)
+; - gql-dt (dependently-typed query language)
 ; - lithoglyph-studio (GUI)
 ; - lithoglyph-debugger (recovery tool)
 
@@ -26,7 +26,7 @@
         (completion 70)
         (role "Core database engine")
         (tech "Forth + Factor + Zig"))
-      (fdql-dt
+      (gql-dt
         (version "0.2.0")
         (completion 85)
         (role "Dependently-typed query language")
@@ -74,7 +74,7 @@
         (task "Expose Form.Bridge FFI for proof verification" priority: high status: pending)
         (task "Add CBOR proof blob acceptance in query path" priority: high status: pending))
 
-      (fdql-dt-tasks
+      (gql-dt-tasks
         (task "M5: Zig FFI bridge to Form.Bridge" priority: critical status: not-started)
         (task "M6: GQL parser (integrate with Lithoglyph's EBNF)" priority: high status: not-started)
         (task "Proof blob serialization (CBOR RFC 8949)" priority: high status: pending))
@@ -121,16 +121,16 @@
       (blocks "Studio M2" "Debugger Lithoglyph adapter")
       (priority critical))
 
-    (fdql-dt-m5
+    (gql-dt-m5
       (name "FQLdt Zig FFI Bridge")
       (blocks "Studio M3" "Real type checking")
       (depends-on "Lithoglyph Form.Bridge")
       (priority critical))
 
-    (fdql-dt-m6
+    (gql-dt-m6
       (name "FQLdt GQL Parser")
       (blocks "Full FQLdt compilation")
-      (depends-on "fdql-dt-m5")
+      (depends-on "gql-dt-m5")
       (priority high))
 
     (studio-m1
@@ -149,17 +149,17 @@
   (decisions-needed
     (decision (id "DECISION-002")
       (title "FQLdt parser approach")
-      (repo "fdql-dt")
+      (repo "gql-dt")
       (options
         "Hand-rolled parser (simple, no deps)"
         "Lean 4 Parsec (built-in)"
-        "Integrate with Lithoglyph's Factor-based FDQL parser")
+        "Integrate with Lithoglyph's Factor-based GQL parser")
       (recommendation "Integrate - reuse Lithoglyph's EBNF grammar via FFI")
       (impact "Affects M6 implementation"))
 
     (decision (id "DECISION-003")
       (title "Lithoglyph integration strategy for FQLdt")
-      (repo "fdql-dt")
+      (repo "gql-dt")
       (options
         "Mock Forth core for MVP"
         "Real Form.Bridge integration")

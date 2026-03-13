@@ -130,7 +130,7 @@ impl InsertBuilder {
                 self.table.as_ptr() as *const i8,
                 self.columns.as_ptr() as *const *const i8,
                 self.columns.len(),
-                self.values.as_ptr() as *const gqldt_sys::FbqlDt_TypedValue,
+                self.values.as_ptr() as *const gqldt_sys::GqlDt_TypedValue,
                 self.values.len(),
                 self.rationale.as_ptr() as *const i8,
             );
@@ -248,7 +248,7 @@ criterion = "0.5"  # For benchmarks
 bindings/julia/
 ├── Project.toml
 ├── src/
-│   ├── FbqlDt.jl              # Main module
+│   ├── GqlDt.jl              # Main module
 │   ├── ffi.jl                 # ccall bindings
 │   ├── insert.jl              # INSERT API
 │   ├── select.jl              # SELECT API
@@ -261,8 +261,8 @@ bindings/julia/
 
 **Example: Julia API**
 ```julia
-# bindings/julia/src/FbqlDt.jl
-module FbqlDt
+# bindings/julia/src/GqlDt.jl
+module GqlDt
 
 # Low-level FFI (ccall to Zig)
 module FFI
@@ -355,10 +355,10 @@ end
 export TypedValue, Nat, BoundedNat, NonEmptyString
 export InsertBuilder, column!, rationale!, execute!
 
-end # module FbqlDt
+end # module GqlDt
 
 # Usage example
-using FbqlDt
+using GqlDt
 
 insert = InsertBuilder("evidence")
 column!(insert, "title", NonEmptyString("ONS Data"))
@@ -369,7 +369,7 @@ execute!(insert, database)
 
 **Project.toml:**
 ```toml
-name = "FbqlDt"
+name = "GqlDt"
 uuid = "..." # Generate with UUIDs.uuid4()
 authors = ["Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"]
 version = "0.1.0"
@@ -548,7 +548,7 @@ bindings/elixir/
 **Example: Elixir API**
 ```elixir
 # bindings/elixir/lib/gql_dt/types.ex
-defmodule FbqlDt.Types do
+defmodule GqlDt.Types do
   @type typed_value ::
           {:nat, non_neg_integer()}
           | {:bounded_nat, non_neg_integer(), non_neg_integer(), non_neg_integer()}
@@ -567,8 +567,8 @@ defmodule FbqlDt.Types do
 end
 
 # bindings/elixir/lib/gql_dt/insert.ex
-defmodule FbqlDt.Insert do
-  alias FbqlDt.Types
+defmodule GqlDt.Insert do
+  alias GqlDt.Types
 
   defstruct table: "", columns: [], values: [], rationale: ""
 
@@ -594,20 +594,20 @@ defmodule FbqlDt.Insert do
 
   @spec execute(t(), pid()) :: :ok | {:error, String.t()}
   def execute(%__MODULE__{} = insert, database) do
-    case FbqlDt.NIF.insert_create(
+    case GqlDt.NIF.insert_create(
            insert.table,
            insert.columns,
            insert.values,
            insert.rationale
          ) do
-      {:ok, stmt} -> FbqlDt.NIF.insert_execute(stmt, database)
+      {:ok, stmt} -> GqlDt.NIF.insert_execute(stmt, database)
       {:error, msg} -> {:error, msg}
     end
   end
 end
 
 # Usage example
-alias FbqlDt.Insert
+alias GqlDt.Insert
 
 Insert.new("evidence")
 |> Insert.column("title", {:non_empty_string, "ONS Data"})
@@ -618,7 +618,7 @@ Insert.new("evidence")
 
 **mix.exs:**
 ```elixir
-defmodule FbqlDt.MixProject do
+defmodule GqlDt.MixProject do
   use Mix.Project
 
   def project do
@@ -655,8 +655,8 @@ end
 bindings/haskell/
 ├── gqldt.cabal
 ├── src/
-│   ├── FbqlDt.hs              # Main module
-│   ├── FbqlDt/
+│   ├── GqlDt.hs              # Main module
+│   ├── GqlDt/
 │   │   ├── FFI.hs             # Low-level FFI
 │   │   ├── Insert.hs          # INSERT API
 │   │   ├── Select.hs          # SELECT API
@@ -667,12 +667,12 @@ bindings/haskell/
 
 **Example: Haskell API**
 ```haskell
--- bindings/haskell/src/FbqlDt/Types.hs
+-- bindings/haskell/src/GqlDt/Types.hs
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE KindSignatures #-}
 
-module FbqlDt.Types where
+module GqlDt.Types where
 
 import Data.Word (Word64)
 import GHC.TypeLits (Nat, KnownNat)
@@ -691,11 +691,11 @@ data BoundedNat (min :: Nat) (max :: Nat)
 
 data NonEmptyString
 
--- bindings/haskell/src/FbqlDt/Insert.hs
-module FbqlDt.Insert where
+-- bindings/haskell/src/GqlDt/Insert.hs
+module GqlDt.Insert where
 
-import FbqlDt.Types
-import qualified FbqlDt.FFI as FFI
+import GqlDt.Types
+import qualified GqlDt.FFI as FFI
 
 data InsertBuilder = InsertBuilder
   { table :: String,
@@ -744,10 +744,10 @@ example = do
 
 **FFI (Haskell ↔ Zig):**
 ```haskell
--- bindings/haskell/src/FbqlDt/FFI.hs
+-- bindings/haskell/src/GqlDt/FFI.hs
 {-# LANGUAGE ForeignFunctionInterface #-}
 
-module FbqlDt.FFI where
+module GqlDt.FFI where
 
 import Foreign.C.String (CString, withCString)
 import Foreign.C.Types (CInt(..))

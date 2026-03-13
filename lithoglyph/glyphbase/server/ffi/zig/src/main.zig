@@ -10,14 +10,14 @@ const c = @cImport({
 });
 
 // Opaque handle types (matching Idris2 ABI and Lithoglyph)
-const FdbDb = opaque {};
-const FdbTxn = opaque {};
+const LithDb = opaque {};
+const LithTxn = opaque {};
 
-const DbHandle = FdbDb;
-const TxnHandle = FdbTxn;
+const DbHandle = LithDb;
+const TxnHandle = LithTxn;
 
 // Lithoglyph types (C ABI compatible)
-const FdbStatus = enum(i32) {
+const LithStatus = enum(i32) {
     ok = 0,
     err_db_not_found = 1001,
     err_db_already_open = 1002,
@@ -29,7 +29,7 @@ const FdbStatus = enum(i32) {
     err_not_implemented = 9004,
 };
 
-const FdbTxnMode = enum(u8) {
+const LithTxnMode = enum(u8) {
     read_only = 0,
     read_write = 1,
 };
@@ -40,13 +40,13 @@ const BlobEncoding = enum(u8) {
     reserved = 255,
 };
 
-const FdbBlob = extern struct {
+const LithBlob = extern struct {
     data: ?[*]const u8,
     len: usize,
     encoding: BlobEncoding,
     _padding: [7]u8,
 
-    fn empty() FdbBlob {
+    fn empty() LithBlob {
         return .{
             .data = null,
             .len = 0,
@@ -55,7 +55,7 @@ const FdbBlob = extern struct {
         };
     }
 
-    fn toSlice(self: FdbBlob) ?[]const u8 {
+    fn toSlice(self: LithBlob) ?[]const u8 {
         if (self.data) |ptr| {
             return ptr[0..self.len];
         }
@@ -63,42 +63,42 @@ const FdbBlob = extern struct {
     }
 };
 
-const FdbResult = extern struct {
-    result_blob: FdbBlob,
-    provenance_blob: FdbBlob,
-    status: FdbStatus,
+const LithResult = extern struct {
+    result_blob: LithBlob,
+    provenance_blob: LithBlob,
+    status: LithStatus,
     _padding: [4]u8,
-    err_blob: FdbBlob,
+    err_blob: LithBlob,
 };
 
 // Extern declarations for Lithoglyph C API
-extern fn fdb_db_open(
+extern fn lith_db_open(
     path_ptr: [*]const u8,
     path_len: usize,
     opts_ptr: ?[*]const u8,
     opts_len: usize,
-    out_db: *?*FdbDb,
-    out_err: *FdbBlob,
-) FdbStatus;
+    out_db: *?*LithDb,
+    out_err: *LithBlob,
+) LithStatus;
 
-extern fn fdb_db_close(db: ?*FdbDb) FdbStatus;
+extern fn lith_db_close(db: ?*LithDb) LithStatus;
 
-extern fn fdb_txn_begin(
-    db: ?*FdbDb,
-    mode: FdbTxnMode,
-    out_txn: *?*FdbTxn,
-    out_err: *FdbBlob,
-) FdbStatus;
+extern fn lith_txn_begin(
+    db: ?*LithDb,
+    mode: LithTxnMode,
+    out_txn: *?*LithTxn,
+    out_err: *LithBlob,
+) LithStatus;
 
-extern fn fdb_txn_commit(txn: ?*FdbTxn, out_err: *FdbBlob) FdbStatus;
+extern fn lith_txn_commit(txn: ?*LithTxn, out_err: *LithBlob) LithStatus;
 
-extern fn fdb_txn_abort(txn: ?*FdbTxn) FdbStatus;
+extern fn lith_txn_abort(txn: ?*LithTxn) LithStatus;
 
-extern fn fdb_apply(
-    txn: ?*FdbTxn,
+extern fn lith_apply(
+    txn: ?*LithTxn,
     op_ptr: [*]const u8,
     op_len: usize,
-) FdbResult;
+) LithResult;
 
 // Version struct (matching Idris2 Version record)
 const Version = extern struct {
@@ -134,10 +134,10 @@ export fn lithoglyph_nif_version(major: *u8, minor: *u8, patch: *u8) void {
 export fn lithoglyph_nif_db_open(path: [*:0]const u8) ?*DbHandle {
     const path_slice = std.mem.span(path);
 
-    var out_db: ?*FdbDb = null;
-    var out_err: FdbBlob = undefined;
+    var out_db: ?*LithDb = null;
+    var out_err: LithBlob = undefined;
 
-    const status = fdb_db_open(
+    const status = lith_db_open(
         path_slice.ptr,
         path_slice.len,
         null, // opts_ptr
@@ -160,7 +160,7 @@ export fn lithoglyph_nif_db_open(path: [*:0]const u8) ?*DbHandle {
 /// Close database connection
 /// Returns: 0 on success, -1 on error
 export fn lithoglyph_nif_db_close(handle: *DbHandle) c_int {
-    const status = fdb_db_close(handle);
+    const status = lith_db_close(handle);
     return if (status == .ok) 0 else -1;
 }
 
@@ -168,12 +168,12 @@ export fn lithoglyph_nif_db_close(handle: *DbHandle) c_int {
 /// mode: 0 = ReadOnly, 1 = ReadWrite
 /// Returns: TxnHandle pointer or NULL on error
 export fn lithoglyph_nif_txn_begin(handle: *DbHandle, mode_int: u32) ?*TxnHandle {
-    const mode: FdbTxnMode = if (mode_int == 0) .read_only else .read_write;
+    const mode: LithTxnMode = if (mode_int == 0) .read_only else .read_write;
 
-    var out_txn: ?*FdbTxn = null;
-    var out_err: FdbBlob = undefined;
+    var out_txn: ?*LithTxn = null;
+    var out_err: LithBlob = undefined;
 
-    const status = fdb_txn_begin(
+    const status = lith_txn_begin(
         handle,
         mode,
         &out_txn,
@@ -193,8 +193,8 @@ export fn lithoglyph_nif_txn_begin(handle: *DbHandle, mode_int: u32) ?*TxnHandle
 /// Commit transaction
 /// Returns: 0 on success, -1 on error
 export fn lithoglyph_nif_txn_commit(handle: *TxnHandle) c_int {
-    var out_err: FdbBlob = undefined;
-    const status = fdb_txn_commit(handle, &out_err);
+    var out_err: LithBlob = undefined;
+    const status = lith_txn_commit(handle, &out_err);
 
     if (status != .ok) {
         if (out_err.toSlice()) |err_slice| {
@@ -209,7 +209,7 @@ export fn lithoglyph_nif_txn_commit(handle: *TxnHandle) c_int {
 /// Abort transaction
 /// Returns: 0 on success, -1 on error
 export fn lithoglyph_nif_txn_abort(handle: *TxnHandle) c_int {
-    const status = fdb_txn_abort(handle);
+    const status = lith_txn_abort(handle);
     return if (status == .ok) 0 else -1;
 }
 
@@ -226,7 +226,7 @@ export fn lithoglyph_nif_apply(
     provenance_buffer: [*]u8,
 ) c_int {
     // Call Lithoglyph apply
-    const result = fdb_apply(
+    const result = lith_apply(
         handle,
         op_buffer,
         op_length,

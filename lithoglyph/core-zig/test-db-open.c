@@ -11,12 +11,12 @@ typedef struct {
     size_t len;
 } LgBlob;
 
-extern int fdb_version(void);
-extern int fdb_db_open(const uint8_t* path, size_t path_len, const uint8_t* opts, size_t opts_len, void** out_db, LgBlob* out_err);
-extern void fdb_db_close(void* db);
+extern int lith_version(void);
+extern int lith_db_open(const uint8_t* path, size_t path_len, const uint8_t* opts, size_t opts_len, void** out_db, LgBlob* out_err);
+extern void lith_db_close(void* db);
 
 int main() {
-    printf("Version: %d\n", fdb_version());
+    printf("Version: %d\n", lith_version());
 
     const char* path = "test-simple.lgh";
     void* db = NULL;
@@ -28,7 +28,7 @@ int main() {
     printf("  db ptr address: %p\n", (void*)&db);
     printf("  err ptr address: %p\n", (void*)&err);
 
-    int status = fdb_db_open((const uint8_t*)path, strlen(path), NULL, 0, &db, &err);
+    int status = lith_db_open((const uint8_t*)path, strlen(path), NULL, 0, &db, &err);
 
     printf("Status: %d\n", status);
     printf("DB handle: %p\n", db);
@@ -40,7 +40,7 @@ int main() {
 
     if (db) {
         printf("Closing database\n");
-        fdb_db_close(db);
+        lith_db_close(db);
     }
 
     return status;

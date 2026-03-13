@@ -128,8 +128,8 @@ check-lean:
 # Verify Zig ABI exports match expectations
 check-abi: build-zig
     @echo "=== ABI Export Verification ==="
-    nm -D core-zig/zig-out/lib/liblith_bridge.so | grep ' T fdb_' | sort
-    @echo "Expected: fdb_version, fdb_db_open, fdb_db_close, fdb_txn_begin, fdb_txn_commit, fdb_txn_abort, fdb_apply, fdb_introspect_schema, fdb_render_block, fdb_render_journal, fdb_blob_free"
+    nm -D core-zig/zig-out/lib/liblith_bridge.so | grep ' T lith_' | sort
+    @echo "Expected: lith_version, lith_db_open, lith_db_close, lith_txn_begin, lith_txn_commit, lith_txn_abort, lith_apply, lith_introspect_schema, lith_render_block, lith_render_journal, lith_blob_free"
 
 # Run all checks
 check: check-forth check-lean check-abi

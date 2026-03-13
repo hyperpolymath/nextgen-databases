@@ -12,7 +12,7 @@ require lithoglyph-blocks.fs
 \ Journal Constants
 \ ============================================================
 
-\ Journal magic: "FDBJ" = 0x4644424A
+\ Journal magic: 0x4644424A (legacy name "FDBJ", retained for format compatibility)
 $4644424A constant JOURNAL-MAGIC
 
 \ Entry header size: 48 bytes

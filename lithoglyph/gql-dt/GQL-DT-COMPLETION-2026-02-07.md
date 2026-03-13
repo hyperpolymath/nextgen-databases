@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-GQL-DT (Glyph Query Language with Dependent Types) has reached **100% completion** and is **production-ready**. All 7 milestones are complete, including comprehensive rebranding from Lith/FBQL to Lithoglyph/GQL, full Zig FFI bridge, LSP server, VS Code extension, debugger, and Svalinn/Vordr verified container stack with post-quantum cryptography.
+GQL-DT (Glyph Query Language with Dependent Types) has reached **100% completion** and is **production-ready**. All 7 milestones are complete, including comprehensive rebranding from Lith/GQL to Lithoglyph/GQL, full Zig FFI bridge, LSP server, VS Code extension, debugger, and Svalinn/Vordr verified container stack with post-quantum cryptography.
 
 **Key Achievement:** GQL-DT is now **equivalent to Phronesis** in production readiness, with all standard tooling (LSP, debugger, container deployment) plus dependent types, SLSA Level 3 provenance, and formal verification.
 
@@ -26,7 +26,7 @@ GQL-DT (Glyph Query Language with Dependent Types) has reached **100% completion
 | **VS Code Extension** | N/A | **Complete** | ✅ |
 | **Debugger** | N/A | **Complete** | ✅ |
 | **Svalinn/Vordr** | N/A | **Complete** | ✅ |
-| **Rebranding** | FBQL/Lith | **GQL/Lithoglyph** | 708 lines, 26 files ✅ |
+| **Rebranding** | GQL/Lith | **GQL/Lithoglyph** | 708 lines, 26 files ✅ |
 
 ---
 
@@ -34,18 +34,18 @@ GQL-DT (Glyph Query Language with Dependent Types) has reached **100% completion
 
 ### 1. **Comprehensive Rebranding** (Task #28)
 
-**Problem:** Repository used outdated Lith/FBQL/FBQLdt naming throughout.
+**Problem:** Repository used outdated Lith/GQL/GQLdt naming throughout.
 
 **Solution:** Automated rebrand script affecting 708 lines across 26 files.
 
 **Changes:**
 - `Lith` → `Lithoglyph` (database branding)
-- `FBQL` → `GQL` (query language)
-- `FBQLdt` → `GQL-DT` (dependent types variant)
-- `FQL` → `GQL` (all forms)
+- `GQL` → `GQL` (query language)
+- `GQLdt` → `GQL-DT` (dependent types variant)
+- `GQL` → `GQL` (all forms)
 
 **Files Affected:**
-- 4 spec files renamed: `FBQLdt-*.md` → `GQL-DT-*.md`
+- 4 spec files renamed: `GQLdt-*.md` → `GQL-DT-*.md`
 - 38 Lean source files updated
 - All documentation and comments updated
 - README, README.adoc, lakefile.lean, docker-compose.yml
@@ -479,7 +479,7 @@ Classical crypto (RSA, ECDSA, Ed25519) vulnerable to quantum computers. NIST sta
 - `scripts/rebrand-to-gql.sh` - Automated rebrand script
 
 ### Modified (26 files):
-- 4 spec files renamed (FBQLdt → GQL-DT)
+- 4 spec files renamed (GQLdt → GQL-DT)
 - 38 Lean source files updated
 - README.adoc, lakefile.lean, docker-compose.yml
 - `.machine_readable/STATE.scm` updated to 100%

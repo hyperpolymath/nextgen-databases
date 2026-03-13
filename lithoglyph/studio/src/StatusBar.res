@@ -43,7 +43,7 @@ let make = (~status: option<ServiceStatus.t>) => {
         <div className="service-status">
           {renderService(s.lith)}
           <span className="separator">{React.string(" | ")}</span>
-          {renderService(s.fbqldt)}
+          {renderService(s.gqldt)}
         </div>
         <div className="feature-status">
           {if s.features.schema_builder {

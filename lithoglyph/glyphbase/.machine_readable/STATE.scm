@@ -11,6 +11,7 @@
     (schema-version "1.0.0")
     (created "2026-01-01")
     (updated "2026-03-13")
+    (last-session "ip-rename-and-nif-linkage")
     (project "Glyphbase")
     (honest-audit-date "2026-03-13")
     (audit-note "Previous STATE.scm was a copy of language-bridges, not glyphbase. Replaced with honest assessment."))
@@ -27,8 +28,8 @@
 
   (current-position
     (phase "partial-implementation")
-    (overall-completion 35)
-    (note "HONEST AUDIT 2026-03-13: UI shell is 85-90% complete and compiles. Server backend is 15% stub. Collaboration is 20% (UI exists, WebSocket never connects). Previous 100% claims were misleading.")
+    (overall-completion 40)
+    (note "HONEST AUDIT 2026-03-13: UI shell is 85-90% complete and compiles. Server backend is 15% stub. Collaboration is 20% (UI exists, WebSocket never connects). NIF now builds and links to core-zig (19 bridge functions, type mismatch resolved, 9.3MB .so). Real data flow pending.")
     (components
       (ui-layer
         (status mostly-complete)
@@ -50,10 +51,10 @@
         (description "Yjs bindings exist but WebSocket never connects")
         (notes "providerConnect(), providerDisconnect() are console.log stubs"))
       (database-bridge
-        (status stub)
-        (completion 5)
-        (description "FFI structure exists but no real Lithoglyph core access")
-        (notes "Zig FFI has 6+ TODOs. Rust NIF returns dummy data (M10 PoC)."))
+        (status in-progress)
+        (completion 60)
+        (description "Zig NIF builds and links to core-zig — all 19 bridge functions available via module import")
+        (notes "Type mismatch resolved: NIF uses real LgBlob/LgStatus from core-zig. Builds to 9.3MB .so. Real data flow pending (UI still uses demo data)."))
       (tests
         (status stub)
         (completion 10)
@@ -88,7 +89,7 @@
       (action "Fix Gleam server build (priv directory conflict)")
       (action "Acknowledge misleading progress files in README"))
     (this-week
-      (action "Implement at least 1 real Zig FFI function (not stub)")
+      (action "Wire NIF bridge functions through Gleam server to UI (replace demo data)")
       (action "Wire UI to server API for basic data loading"))
     (this-month
       (action "Replace demo data with server-sourced data")

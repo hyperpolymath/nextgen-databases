@@ -13,7 +13,7 @@ Get Lith running and understand its core concepts in 15 minutes.
 ====
 **Project Status: Proof of Concept**
 
-Lith is in active development. The core Forth implementation (Form.Blocks, Form.Model) is functional. The FQL runtime and higher layers are being built. This quickstart demonstrates the intended workflow.
+Lith is in active development. The core Forth implementation (Form.Blocks, Form.Model) is functional. The GQL runtime and higher layers are being built. This quickstart demonstrates the intended workflow.
 ====
 
 toc::[]
@@ -58,7 +58,7 @@ Lith is a *narrative-first, reversible, audit-grade database*. Unlike traditiona
 
 | https://factorcode.org/[Factor]
 | 0.99+
-| Form.Runtime (FQL parser/executor)
+| Form.Runtime (GQL parser/executor)
 
 | https://ziglang.org/[Zig]
 | 0.11+
@@ -133,7 +133,7 @@ Lith is structured in layers:
 │  FD discovery, type encoding, proof-carrying normalization  │
 ├─────────────────────────────────────────────────────────────┤
 │  Form.Runtime (Factor)                                      │
-│  FQL parse/plan/exec, explain, introspection                │
+│  GQL parse/plan/exec, explain, introspection                │
 ├─────────────────────────────────────────────────────────────┤
 │  Form.Bridge (Zig)                                          │
 │  Stable ABI (no C dependency), safety governor              │
@@ -184,7 +184,7 @@ This means you can:
 
 Every mutation requires provenance:
 
-[source,fql]
+[source,gql]
 ----
 INSERT INTO evidence {
   "title": "Wirecard Internal Audit Report",
@@ -217,7 +217,7 @@ Lith includes a built-in `PROMPT_SCORE` type (0-100) for rating evidence quality
 | 0-29 | Dubious, contradicted, discredited
 |===
 
-[source,fql]
+[source,gql]
 ----
 -- Find all high-confidence evidence
 SELECT * FROM evidence WHERE prompt_score >= 80;
@@ -230,7 +230,7 @@ SELECT * FROM evidence WHERE prompt_score BETWEEN 30 AND 69;
 
 Lith supports edges as first-class citizens:
 
-[source,fql]
+[source,gql]
 ----
 -- Create an edge connecting a claim to its evidence
 INSERT EDGE supports FROM claims/claim-001 TO evidence/ev-042 {
@@ -243,9 +243,9 @@ WITH PROVENANCE {
 };
 ----
 
-Traverse edges with FQL:
+Traverse edges with GQL:
 
-[source,fql]
+[source,gql]
 ----
 -- Find all evidence supporting a claim
 SELECT e.*
@@ -272,7 +272,7 @@ DEPTH 3;
 
 Every operation has a defined inverse:
 
-[source,fql]
+[source,gql]
 ----
 -- See what undoing the last operation would do
 EXPLAIN REVERSE LAST;
@@ -296,7 +296,7 @@ Some operations are *irreversible-with-story*: they can't be undone, but the jou
 
 When constraints fail, Lith explains why:
 
-[source,fql]
+[source,gql]
 ----
 INSERT INTO evidence (source) VALUES ('Anonymous tip');
 ----
@@ -336,7 +336,7 @@ This tutorial walks through building a simple evidence database for investigativ
 
 === Step 1: Create Collections
 
-[source,fql]
+[source,gql]
 ----
 -- Evidence collection with quality scoring
 CREATE COLLECTION evidence (
@@ -393,7 +393,7 @@ CREATE COLLECTION sources (
 
 === Step 2: Insert Evidence
 
-[source,fql]
+[source,gql]
 ----
 -- Primary source with high confidence
 INSERT INTO evidence {
@@ -434,7 +434,7 @@ WITH PROVENANCE {
 
 === Step 3: Create Claims and Link to Evidence
 
-[source,fql]
+[source,gql]
 ----
 -- Create a claim
 INSERT INTO claims {
@@ -472,7 +472,7 @@ WITH PROVENANCE {
 
 === Step 4: Query and Analyze
 
-[source,fql]
+[source,gql]
 ----
 -- Find all high-quality evidence
 SELECT title, source, prompt_score
@@ -517,7 +517,7 @@ The `EXPLAIN` output shows:
 
 === Step 5: Introspect the Database
 
-[source,fql]
+[source,gql]
 ----
 -- List all collections
 INTROSPECT COLLECTIONS;
@@ -539,7 +539,7 @@ SINCE 0;
 
 === Step 6: Undo a Mistake
 
-[source,fql]
+[source,gql]
 ----
 -- Oops, we inserted evidence with wrong source
 -- First, see what would be undone
@@ -572,7 +572,7 @@ For those interested in the internals, Lith uses 4 KiB fixed-size blocks:
 [source,text]
 ----
 Block Header (64 bytes)
-├── magic (4 bytes): "FDB\0" (0x46444200)
+├── magic (4 bytes): "LGH\0" (0x4C474800)
 ├── version (2 bytes): Format version
 ├── block_type (2 bytes): TYPE-DOCUMENT, TYPE-EDGE, etc.
 ├── block_id (8 bytes): Unique block identifier
@@ -607,8 +607,8 @@ Block types include:
 
 == Next Steps
 
-* link:spec/fql.adoc[FQL Language Reference] - Complete query language specification
-* link:spec/fql-dependent-types.md[FQLdt Specification] - Compile-time verified queries with Lean 4
+* link:spec/gql.adoc[GQL Language Reference] - Complete query language specification
+* link:spec/gql-dependent-types.md[FQLdt Specification] - Compile-time verified queries with Lean 4
 * link:ARCHITECTURE.adoc[Architecture Guide] - Deep dive into the layer design
 * link:docs/DEPLOYMENT.adoc[Deployment Guide] - Run Lith in production
 * link:spec/self-normalizing.adoc[Self-Normalizing Spec] - Automatic functional dependency discovery
@@ -656,7 +656,7 @@ chmod -R u+w mydb/
 
 Inspect the schema to understand constraints:
 
-[source,fql]
+[source,gql]
 ----
 INTROSPECT SCHEMA evidence;
 INTROSPECT CONSTRAINTS evidence;
@@ -668,7 +668,7 @@ The error message includes `suggestions` - read them carefully.
 
 All mutations require a `WITH PROVENANCE` clause:
 
-[source,fql]
+[source,gql]
 ----
 -- Wrong
 INSERT INTO evidence {...};
@@ -690,7 +690,7 @@ WITH PROVENANCE {
 
 == Related Projects
 
-* https://github.com/hyperpolymath/fqldt[FQLdt] - Dependently-typed FQL (compile-time verified queries)
+* https://github.com/hyperpolymath/gqldt[GQLdt] - Dependently-typed GQL (compile-time verified queries)
 * https://github.com/hyperpolymath/lithoglyph-studio[Lith Studio] - Zero-friction GUI
 * https://github.com/hyperpolymath/lithoglyph-debugger[Lith Debugger] - Proof-carrying debugger
 * https://github.com/hyperpolymath/formbase[FormBase] - Open-source Airtable alternative with provenance

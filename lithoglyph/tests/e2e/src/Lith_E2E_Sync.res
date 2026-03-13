@@ -18,7 +18,7 @@ let test_syncCreate = async (env: testEnvironment): e2eResult => {
 
     // Simulate CMS create event
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`INSERT INTO ${collectionName} {"id": "cms-123", "title": "Synced Post", "source": "strapi"}`)),
+      ("gql", Js.Json.string(`INSERT INTO ${collectionName} {"id": "cms-123", "title": "Synced Post", "source": "strapi"}`)),
     ]))
     let response = await client.post("/v1/query", body)
 
@@ -39,7 +39,7 @@ let test_syncUpdate = async (env: testEnvironment): e2eResult => {
 
     // Simulate CMS update event
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`UPDATE ${collectionName} SET {"title": "Updated Synced Post"} WHERE id = "cms-123"`)),
+      ("gql", Js.Json.string(`UPDATE ${collectionName} SET {"title": "Updated Synced Post"} WHERE id = "cms-123"`)),
     ]))
     let response = await client.post("/v1/query", body)
 
@@ -60,7 +60,7 @@ let test_syncDelete = async (env: testEnvironment): e2eResult => {
 
     // Simulate CMS delete event
     let body = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`DELETE FROM ${collectionName} WHERE id = "cms-123"`)),
+      ("gql", Js.Json.string(`DELETE FROM ${collectionName} WHERE id = "cms-123"`)),
     ]))
     let response = await client.post("/v1/query", body)
 
@@ -81,13 +81,13 @@ let test_provenanceTracking = async (env: testEnvironment): e2eResult => {
 
     // Insert with provenance
     let insertBody = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`INSERT INTO ${collectionName} {"title": "Tracked"} WITH PROVENANCE {"actor": "test", "rationale": "E2E test"}`)),
+      ("gql", Js.Json.string(`INSERT INTO ${collectionName} {"title": "Tracked"} WITH PROVENANCE {"actor": "test", "rationale": "E2E test"}`)),
     ]))
     let _ = await client.post("/v1/query", insertBody)
 
     // Check journal for provenance
     let journalBody = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`INTROSPECT JOURNAL`)),
+      ("gql", Js.Json.string(`INTROSPECT JOURNAL`)),
     ]))
     let response = await client.post("/v1/query", journalBody)
 
@@ -108,19 +108,19 @@ let test_bidirectionalSync = async (env: testEnvironment): e2eResult => {
 
     // Create from "CMS"
     let createBody = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`INSERT INTO ${collectionName} {"id": "bi-1", "title": "From CMS", "source": "cms"}`)),
+      ("gql", Js.Json.string(`INSERT INTO ${collectionName} {"id": "bi-1", "title": "From CMS", "source": "cms"}`)),
     ]))
     let _ = await client.post("/v1/query", createBody)
 
     // Create from "Lith" (simulated)
     let createBody2 = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`INSERT INTO ${collectionName} {"id": "bi-2", "title": "From Lith", "source": "lith"}`)),
+      ("gql", Js.Json.string(`INSERT INTO ${collectionName} {"id": "bi-2", "title": "From Lith", "source": "lith"}`)),
     ]))
     let _ = await client.post("/v1/query", createBody2)
 
     // Query all
     let queryBody = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`SELECT * FROM ${collectionName}`)),
+      ("gql", Js.Json.string(`SELECT * FROM ${collectionName}`)),
     ]))
     let response = await client.post("/v1/query", queryBody)
 
@@ -141,19 +141,19 @@ let test_conflictResolution = async (env: testEnvironment): e2eResult => {
 
     // Create document
     let createBody = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`INSERT INTO ${collectionName} {"id": "conflict-1", "title": "Original", "version": 1}`)),
+      ("gql", Js.Json.string(`INSERT INTO ${collectionName} {"id": "conflict-1", "title": "Original", "version": 1}`)),
     ]))
     let _ = await client.post("/v1/query", createBody)
 
     // Concurrent update (simulated by sequential)
     let update1 = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`UPDATE ${collectionName} SET {"title": "Update A", "version": 2} WHERE id = "conflict-1"`)),
+      ("gql", Js.Json.string(`UPDATE ${collectionName} SET {"title": "Update A", "version": 2} WHERE id = "conflict-1"`)),
     ]))
     let _ = await client.post("/v1/query", update1)
 
     // Second update
     let update2 = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`UPDATE ${collectionName} SET {"title": "Update B", "version": 3} WHERE id = "conflict-1"`)),
+      ("gql", Js.Json.string(`UPDATE ${collectionName} SET {"title": "Update B", "version": 3} WHERE id = "conflict-1"`)),
     ]))
     let response = await client.post("/v1/query", update2)
 
@@ -174,21 +174,21 @@ let test_batchSync = async (env: testEnvironment): e2eResult => {
 
     // Create collection
     let createColl = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`CREATE COLLECTION ${collectionName}`)),
+      ("gql", Js.Json.string(`CREATE COLLECTION ${collectionName}`)),
     ]))
     let _ = await client.post("/v1/query", createColl)
 
     // Batch insert (simulated as sequential)
     for i in 1 to 10 {
       let body = Js.Json.object_(Js.Dict.fromArray([
-        ("fdql", Js.Json.string(`INSERT INTO ${collectionName} {"id": "batch-${Int.toString(i)}", "index": ${Int.toString(i)}}`)),
+        ("gql", Js.Json.string(`INSERT INTO ${collectionName} {"id": "batch-${Int.toString(i)}", "index": ${Int.toString(i)}}`)),
       ]))
       let _ = await client.post("/v1/query", body)
     }
 
     // Verify count
     let queryBody = Js.Json.object_(Js.Dict.fromArray([
-      ("fdql", Js.Json.string(`SELECT * FROM ${collectionName}`)),
+      ("gql", Js.Json.string(`SELECT * FROM ${collectionName}`)),
     ]))
     let response = await client.post("/v1/query", queryBody)
 

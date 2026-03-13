@@ -74,7 +74,7 @@ Completed all three M10 Day 3 priorities PLUS implemented M11 Core HTTP API. Lit
 - Set up correct directory structure
 
 #### ✅ Elixir Wrapper & Client (1 hour)
-- Created `FormdbNif` module (Elixir → Erlang bridge)
+- Created `LithNif` module (Elixir → Erlang bridge)
 - Created `Lithoglyph` high-level client API
 - Implemented `with_transaction` helper
 - Added proper error handling

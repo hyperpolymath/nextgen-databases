@@ -206,7 +206,7 @@ module TacticReference = {
     <div className="tactic-reference">
       <h3> {React.string("Common Proof Tactics")} </h3>
       <p className="hint">
-        {React.string("These are the building blocks for proving constraints in FBQLdt.")}
+        {React.string("These are the building blocks for proving constraints in GQLdt.")}
       </p>
       <div className="tactics-list">
         {Tactic.commonTactics
@@ -284,7 +284,7 @@ let make = () => {
     <h2> {React.string("Proof Assistant")} </h2>
     <p className="section-hint">
       {React.string(
-        "FBQLdt uses dependent types to verify constraints at compile time. This assistant helps you understand and resolve proof obligations.",
+        "GQLdt uses dependent types to verify constraints at compile time. This assistant helps you understand and resolve proof obligations.",
       )}
     </p>
 

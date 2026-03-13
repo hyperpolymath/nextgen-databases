@@ -180,7 +180,7 @@ The Rust NIF is **functional but stubbed**:
 To make this a real database (not stub):
 
 1. **Integrate Lithoglyph Forth Core**
-   - Link to `formbd/lith/database/core-forth/`
+   - Link to `lithoglyph/core-forth/`
    - Call Forth interpreter from Rust
    - Or: Rewrite in pure Rust (faster)
 

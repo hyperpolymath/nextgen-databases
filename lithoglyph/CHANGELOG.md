@@ -44,7 +44,7 @@ This release marks a major milestone: all 18 milestones complete, representing t
 | Category | Features |
 |----------|----------|
 | **Storage** | 4KiB blocks, CRC32C integrity, append-only journal |
-| **Query** | FBQL language, query planner, EXPLAIN modes |
+| **Query** | GQL language, query planner, EXPLAIN modes |
 | **Normalization** | DFD discovery, 1NF-BCNF analysis, three-phase migration |
 | **API** | REST, gRPC, GraphQL, WebSocket subscriptions |
 | **Distributed** | Cluster, Raft consensus, sharding, replication |
@@ -191,7 +191,7 @@ This release marks the first stable, production-ready version of Lith - a narrat
 - Crash recovery and replay semantics
 - Provenance tracking for audit trails
 
-#### Query Language (FBQL)
+#### Query Language (GQL)
 - SELECT, INSERT, UPDATE, DELETE operations
 - CREATE, DROP for schema management
 - EXPLAIN, INTROSPECT for debugging
@@ -377,7 +377,7 @@ This release completes Milestone M14, delivering a comprehensive testing framewo
 ### Added
 
 #### Property-Based Tests (`tests/property/`)
-- Random FBQL statement generators
+- Random GQL statement generators
 - Structural property verification
 - Configurable iterations and seed
 - Property test runner with result tracking
@@ -386,7 +386,7 @@ This release completes Milestone M14, delivering a comprehensive testing framewo
 - Multiple mutation strategies (BitFlip, ByteFlip, Dictionary, etc.)
 - Corpus-based fuzzing with seed inputs
 - Crash and interesting input detection
-- FBQL parser fuzz targets
+- GQL parser fuzz targets
 
 #### Integration Tests (`tests/integration/`)
 - Strapi plugin tests (9 test cases)
@@ -437,7 +437,7 @@ This release completes Milestone M13, delivering official CMS integration plugin
   - Action handlers for items.create, items.update, items.delete
   - Environment-based configuration
   - Selective collection sync via LITH_SYNC_COLLECTIONS
-  - Lith client with FBQL query execution
+  - Lith client with GQL query execution
 
 - **Ghost Integration** (`integrations/ghost/`)
   - Webhook server for Ghost CMS (Deno runtime)
@@ -505,7 +505,7 @@ This release completes Milestone M12, delivering official client libraries for R
   - Full type definitions: Provenance, QueryResult, Collection, JournalEntry
   - Fluent query builder with type-safe WHERE clauses
   - Filter expressions: Field, And, Or, Not
-  - Support for all FBQL operations (SELECT, INSERT, UPDATE, DELETE)
+  - Support for all GQL operations (SELECT, INSERT, UPDATE, DELETE)
   - Collection management (list, create, delete)
   - Journal access with filtering
   - Normalization operations (discover dependencies, analyze normal form)
@@ -635,8 +635,8 @@ This release completes Milestones M8-M10, delivering a fully functional query en
 ### Added
 
 #### Form.Runtime (M8) - Query Engine
-- **FBQL Parser** (`core-factor/fbql/fbql.factor`)
-  - Full PEG-based parser for FQL statements
+- **GQL Parser** (`core-factor/gql/gql.factor`)
+  - Full PEG-based parser for GQL statements
   - Support for SELECT, INSERT, UPDATE, DELETE, CREATE, DROP
   - EXPLAIN, INTROSPECT statements
   - WHERE clause with comparison operators
@@ -707,13 +707,13 @@ This release completes Milestones M8-M10, delivering a fully functional query en
   - Build configuration for FormNormalizer library
 
 #### Production Hardening (M10)
-- **Seam Tests** (`core-factor/fbql/seam-tests.factor`)
+- **Seam Tests** (`core-factor/gql/seam-tests.factor`)
   - End-to-end pipeline validation: Parser → Planner → Executor → Normalizer
   - EXPLAIN correlation tests
   - Error propagation tests
   - Large dataset stress tests
 
-- **Benchmarks** (`core-factor/fbql/benchmarks.factor`)
+- **Benchmarks** (`core-factor/gql/benchmarks.factor`)
   - Parser performance benchmarks
   - Planner performance benchmarks
   - Executor benchmarks (SELECT, INSERT, UPDATE with varying data sizes)
@@ -723,14 +723,14 @@ This release completes Milestones M8-M10, delivering a fully functional query en
   - Memory estimation utilities
   - Quick benchmark for CI regression detection
 
-- **Storage Backend** (`core-factor/fbql/storage-backend.factor`)
+- **Storage Backend** (`core-factor/gql/storage-backend.factor`)
   - Pluggable storage abstraction
   - Memory backend (default, for testing)
   - Bridge backend (persistent storage via Form.Bridge)
   - Runtime backend selection
 
 #### Ecosystem Alignment
-- Updated ECOSYSTEM.scm with alignment status for fbql-dt and lithoglyph-debugger
+- Updated ECOSYSTEM.scm with alignment status for gql-dt and lithoglyph-debugger
 - Cross-repo STATE.scm synchronization with integration points
 - Documented FFI compatibility (CBOR proof blobs)
 - Identified alignment gaps for future work
@@ -761,7 +761,7 @@ This release completes Milestone M7, providing comprehensive documentation for p
 - Complete documentation suite in `docs/`:
   - `docs/DEPLOYMENT.adoc` - Production deployment guide (Docker, Kubernetes, systemd)
   - `docs/SECURITY-AUTH.adoc` - Authentication, authorization, and security hardening
-  - `docs/API-REFERENCE.adoc` - Complete programmatic interface reference (Form.Bridge FFI, FQL API)
+  - `docs/API-REFERENCE.adoc` - Complete programmatic interface reference (Form.Bridge FFI, GQL API)
   - `docs/MIGRATION-FROM-RDBMS.adoc` - PostgreSQL/MySQL/SQLite migration guide with type mappings
   - `docs/OBSERVABILITY.adoc` - Logging, Prometheus metrics, OpenTelemetry tracing, Grafana dashboards
   - `docs/INTEGRATION-PATTERNS.adoc` - Message queues, search engines, analytics, AI/ML pipelines
@@ -785,13 +785,13 @@ This release completes Milestones M1-M6, establishing Lith as a functional proof
 ### Added
 
 #### Core Specifications (M1)
-- **FQL Language Specification** (`spec/fql.adoc`)
+- **GQL Language Specification** (`spec/gql.adoc`)
   - Complete EBNF grammar for PoC subset
   - 10 example queries covering all operations
   - Document, edge, schema, and introspection operations
   - Provenance syntax (`WITH PROVENANCE {...}`)
 
-- **FQL Dependent Types Specification** (`spec/fql-dependent-types.md`)
+- **GQL Dependent Types Specification** (`spec/gql-dependent-types.md`)
   - Full FQLdt specification with Lean 4 integration
   - Compile-time query verification
   - Proof-carrying schema evolution
@@ -818,7 +818,7 @@ This release completes Milestones M1-M6, establishing Lith as a functional proof
   - Object storage integration patterns
   - Tiered storage for hot/warm/cold data
 
-- **FQL Design Philosophy** (`spec/fql-philosophy.adoc`)
+- **GQL Design Philosophy** (`spec/gql-philosophy.adoc`)
   - Narrative-first query design
   - Comparison with SQL philosophy
   - Constraints as ethics
@@ -860,7 +860,7 @@ This release completes Milestones M1-M6, establishing Lith as a functional proof
   - Lith Debugger (proof-carrying debugger)
   - FormBase (Airtable alternative)
   - Zotero-Lith (reference manager)
-  - FQLdt (dependently-typed FQL)
+  - FQLdt (dependently-typed GQL)
 
 #### Machine-Readable Artefacts
 - 6SCM files for AI agent integration:
@@ -874,7 +874,7 @@ This release completes Milestones M1-M6, establishing Lith as a functional proof
 ### Changed
 - Eliminated C dependency in favor of Zig-only ABI (Form.Bridge)
 - Consolidated FQLdt specification into single comprehensive document
-- Clarified that FQL = Lith Query Language (not "forms" query language)
+- Clarified that GQL = Lith Query Language (not "forms" query language)
 
 ### Security
 - Fixed workflow security issues (ERR-WF-008, ERR-WF-009)

@@ -17,7 +17,7 @@ Development phases from concept to production.
 | M2-M5 | Forth PoC Implementation | v0.0.2 | ✅ Complete
 | M6 | Machine-Readable Artefacts | v0.0.2 | ✅ Complete
 | M7 | Complete Documentation Suite | v0.0.3 | ✅ Complete
-| M8 | Form.Runtime (FQL Engine) | v0.0.4 | ✅ Complete
+| M8 | Form.Runtime (GQL Engine) | v0.0.4 | ✅ Complete
 | M9 | Form.Normalizer | v0.0.4 | ✅ Complete
 | M10 | Production Hardening | v0.0.4 | ✅ Complete
 | M11 | Multi-Protocol API Server | v0.0.5 | ✅ Complete
@@ -40,11 +40,11 @@ Development phases from concept to production.
 * [x] Repository structure
 * [x] `spec/blocks.adoc` - Block format spec (4 KiB blocks, 64-byte headers)
 * [x] `spec/journal.adoc` - Journal format spec (append-only, sequence numbers)
-* [x] `spec/fql.adoc` - FQL grammar (EBNF, provenance syntax)
-* [x] `spec/fql-dependent-types.md` - FQLdt with Lean 4 integration
+* [x] `spec/gql.adoc` - GQL grammar (EBNF, provenance syntax)
+* [x] `spec/gql-dependent-types.md` - FQLdt with Lean 4 integration
 * [x] `spec/self-normalizing.adoc` - Self-normalizing database spec
 * [x] `spec/cloud-storage.adoc` - Object storage integration
-* [x] `spec/fql-philosophy.adoc` - Design philosophy
+* [x] `spec/gql-philosophy.adoc` - Design philosophy
 
 == Phase 1: Form.Blocks PoC ✅
 
@@ -112,7 +112,7 @@ Architecture changed from C ABI to Zig-only ABI for better safety and integratio
 * [x] `VERSIONING.adoc` - Stability policy
 * [x] `docs/DEPLOYMENT.adoc` - Docker, Kubernetes, systemd
 * [x] `docs/SECURITY-AUTH.adoc` - Authentication, authorization, hardening
-* [x] `docs/API-REFERENCE.adoc` - Form.Bridge FFI, FQL API
+* [x] `docs/API-REFERENCE.adoc` - Form.Bridge FFI, GQL API
 * [x] `docs/MIGRATION-FROM-RDBMS.adoc` - PostgreSQL/MySQL/SQLite migration
 * [x] `docs/OBSERVABILITY.adoc` - Logging, metrics, tracing, dashboards
 * [x] `docs/INTEGRATION-PATTERNS.adoc` - Message queues, search, analytics, AI/ML
@@ -121,11 +121,11 @@ Architecture changed from C ABI to Zig-only ABI for better safety and integratio
 
 *Status*: Complete (v0.0.4)
 
-*Goal*: FQL parser/planner/executor.
+*Goal*: GQL parser/planner/executor.
 
 === Deliverables
 
-* [x] FBQL parser (`core-factor/fbql/fbql.factor`) - Full PEG-based parser
+* [x] GQL parser (`core-factor/gql/gql.factor`) - Full PEG-based parser
 * [x] Query planner - Cost-based planning with step types
 * [x] Executor - In-memory and pluggable persistent storage
 * [x] EXPLAIN functionality - EXPLAIN, ANALYZE, VERBOSE modes
@@ -133,7 +133,7 @@ Architecture changed from C ABI to Zig-only ABI for better safety and integratio
 
 === Acceptance Criteria
 
-* ✅ FQL PoC subset fully functional
+* ✅ GQL PoC subset fully functional
 * ✅ EXPLAIN returns readable plans (including VERBOSE mode)
 * ✅ Provenance tracks to journal entries
 * ✅ Constraint rejections explained
@@ -147,7 +147,7 @@ Architecture changed from C ABI to Zig-only ABI for better safety and integratio
 === Deliverables
 
 * [x] FD discovery algorithm (`normalizer/factor/fd-discovery.factor`) - DFD algorithm
-* [x] `INTROSPECT SCHEMA` FQL command - Schema inspection
+* [x] `INTROSPECT SCHEMA` GQL command - Schema inspection
 * [x] Type encoding in Lean 4 (`normalizer/lean/FunDep.lean`)
 * [x] Normal form predicates (1NF through BCNF)
 * [x] Proposal generation (`denormalization-proposal`)
@@ -157,7 +157,7 @@ Architecture changed from C ABI to Zig-only ABI for better safety and integratio
 === Acceptance Criteria
 
 * ✅ Discover FDs with configurable confidence threshold (three-tier: high/medium/low)
-* ✅ FunDep.lean types compatible with FQL-dt
+* ✅ FunDep.lean types compatible with GQL-dt
 * ✅ Normal form analysis (1NF-BCNF) with violation detection
 * ✅ Generate human/agent-readable proposals
 * ✅ Three-phase migration (Announce → Shadow → Commit) with rollback
@@ -181,11 +181,11 @@ See link:spec/self-normalizing.adoc[Self-Normalizing Specification] for full det
 
 === Deliverables
 
-* [x] Seam tests (`core-factor/fbql/seam-tests.factor`) - Full pipeline validation
+* [x] Seam tests (`core-factor/gql/seam-tests.factor`) - Full pipeline validation
 * [x] End-to-end test suite - Parser → Planner → Executor → Normalizer
-* [x] Performance benchmarks (`core-factor/fbql/benchmarks.factor`)
+* [x] Performance benchmarks (`core-factor/gql/benchmarks.factor`)
 * [x] Migration tests (`normalizer/factor/migration-tests.factor`)
-* [x] Pluggable storage backend (`core-factor/fbql/storage-backend.factor`)
+* [x] Pluggable storage backend (`core-factor/gql/storage-backend.factor`)
 
 === Acceptance Criteria
 
@@ -217,7 +217,7 @@ See link:spec/self-normalizing.adoc[Self-Normalizing Specification] for full det
 
 [source]
 ----
-POST   /v1/query              # Execute FBQL query
+POST   /v1/query              # Execute GQL query
 POST   /v1/collections        # Create collection
 GET    /v1/collections        # List collections
 GET    /v1/collections/{name} # Get collection schema
@@ -253,12 +253,12 @@ type Query {
   collections: [Collection!]!
   collection(name: String!): Collection
   journal(since: Int, limit: Int): [JournalEntry!]!
-  query(fbql: String!, provenance: ProvenanceInput): QueryResult!
+  query(gql: String!, provenance: ProvenanceInput): QueryResult!
 }
 
 type Mutation {
   createCollection(name: String!, schema: SchemaInput!): Collection!
-  execute(fbql: String!, provenance: ProvenanceInput!): MutationResult!
+  execute(gql: String!, provenance: ProvenanceInput!): MutationResult!
   startMigration(collection: String!, target: NormalForm!): Migration!
 }
 
@@ -269,7 +269,7 @@ type Subscription {
 
 === Acceptance Criteria
 
-* ✅ All FBQL operations accessible via REST, gRPC, and GraphQL
+* ✅ All GQL operations accessible via REST, gRPC, and GraphQL
 * ✅ Provenance tracking across all protocols
 * ✅ Streaming support via WebSocket subscriptions (journal streaming)
 * ✅ OpenAPI, protobuf, and GraphQL SDL specs generate valid clients
@@ -290,7 +290,7 @@ type Subscription {
 === ReScript Client (`@lithoglyph/rescript`)
 
 * [ ] HTTP client using Fetch API
-* [ ] Type-safe FQL query builder
+* [ ] Type-safe GQL query builder
 * [ ] Provenance helpers
 * [ ] Response type definitions
 * [ ] Deno-compatible (no Node.js)
@@ -309,7 +309,7 @@ let result = await Lith.query(
 
 * [ ] PSR-18 HTTP client compatibility
 * [ ] Composer package
-* [ ] FQL query builder (fluent interface)
+* [ ] GQL query builder (fluent interface)
 * [ ] Provenance handling
 * [ ] Laravel/Symfony integration helpers
 

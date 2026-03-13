@@ -7,10 +7,10 @@
  * Random value generators for property-based testing.
  *
  * SECURITY NOTE: All identifiers and values are sanitized before being
- * interpolated into FDQL statements. Even though test generators draw
+ * interpolated into GQL statements. Even though test generators draw
  * from hardcoded safe arrays, we use parameterized-style construction
  * and input validation to demonstrate safe query patterns. This prevents
- * SQL/FDQL injection if generators are ever extended to accept external
+ * SQL/GQL injection if generators are ever extended to accept external
  * input (e.g. from fuzz harnesses or user-supplied seeds).
  */
 
@@ -60,7 +60,7 @@ let pick = (rng: rng, arr: array<'a>): option<'a> => {
 }
 
 // =============================================================================
-// Input Sanitization — prevents FDQL injection in generated queries
+// Input Sanitization — prevents GQL injection in generated queries
 // =============================================================================
 
 /**
@@ -97,7 +97,7 @@ let sanitizeIdentifier = (raw: string): string => {
 }
 
 /**
- * Escape a string value for safe interpolation into FDQL string literals.
+ * Escape a string value for safe interpolation into GQL string literals.
  * Escapes backslashes, double quotes, and control characters that could
  * break out of a quoted string context.
  */
@@ -115,9 +115,9 @@ let escapeStringValue = (raw: string): string => {
 // =============================================================================
 
 /**
- * Represents a parameterized FDQL statement. Parameters are bound separately
+ * Represents a parameterized GQL statement. Parameters are bound separately
  * from the query template, preventing injection even if values contain
- * FDQL metacharacters.
+ * GQL metacharacters.
  */
 type paramValue =
   | PString(string)
@@ -132,8 +132,8 @@ type paramQuery = {
   params: array<(string, paramValue)>,
 }
 
-/** Render a paramValue to a safe FDQL literal */
-let paramValueToFdql = (pv: paramValue): string =>
+/** Render a paramValue to a safe GQL literal */
+let paramValueToGql = (pv: paramValue): string =>
   switch pv {
   | PString(s) => `"${escapeStringValue(s)}"`
   | PInt(i) => Int.toString(i)
@@ -149,7 +149,7 @@ let paramValueToFdql = (pv: paramValue): string =>
 let renderParamQuery = (pq: paramQuery): string => {
   let result = ref(pq.template)
   pq.params->Array.forEach(((name, value)) => {
-    result := result.contents->String.replaceAll(`$${name}`, paramValueToFdql(value))
+    result := result.contents->String.replaceAll(`$${name}`, paramValueToGql(value))
   })
   result.contents
 }
@@ -158,7 +158,7 @@ let renderParamQuery = (pq: paramQuery): string => {
 // Generators — use sanitization and parameterized construction
 // =============================================================================
 
-/** Generate random identifier (valid FDQL identifier) */
+/** Generate random identifier (valid GQL identifier) */
 let identifier = (rng: rng): string => {
   let prefixes = ["user", "post", "article", "product", "order", "item", "comment", "tag", "category"]
   let suffixes = ["", "s", "_data", "_info", "_record"]
@@ -222,7 +222,7 @@ let whereClause = (rng: rng): string => {
   let field = fieldName(rng)
   let op = compareOp(rng)
   let value = valueType(rng)
-  let safeValue = paramValueToFdql(valueTypeToParam(value))
+  let safeValue = paramValueToGql(valueTypeToParam(value))
   `${field} ${compareOpToString(op)} ${safeValue}`
 }
 
@@ -256,7 +256,7 @@ let insertStatement = (rng: rng): string => {
   for _ in 1 to numFields {
     let field = fieldName(rng)
     let value = valueType(rng)
-    let safeValue = paramValueToFdql(valueTypeToParam(value))
+    let safeValue = paramValueToGql(valueTypeToParam(value))
     pairs->Array.push(`"${escapeStringValue(field)}": ${safeValue}`)->ignore
   }
   let document = "{" ++ pairs->Array.join(", ") ++ "}"
@@ -271,7 +271,7 @@ let updateStatement = (rng: rng): string => {
   for _ in 1 to numFields {
     let field = fieldName(rng)
     let value = valueType(rng)
-    let safeValue = paramValueToFdql(valueTypeToParam(value))
+    let safeValue = paramValueToGql(valueTypeToParam(value))
     pairs->Array.push(`"${escapeStringValue(field)}": ${safeValue}`)->ignore
   }
   let setClause = "{" ++ pairs->Array.join(", ") ++ "}"
@@ -328,8 +328,8 @@ let introspectStatement = (rng: rng): string => {
   }
 }
 
-/** Generate random FDQL statement (all branches use safe construction) */
-let fdqlStatement = (rng: rng): string => {
+/** Generate random GQL statement (all branches use safe construction) */
+let gqlStatement = (rng: rng): string => {
   let stmtType = pick(rng, allStatementTypes)->Option.getOr(Select)
   switch stmtType {
   | Select => selectStatement(rng)
@@ -344,10 +344,10 @@ let fdqlStatement = (rng: rng): string => {
 }
 
 /** Generate array of random statements */
-let fdqlStatements = (rng: rng, count: int): array<string> => {
+let gqlStatements = (rng: rng, count: int): array<string> => {
   let result = []
   for _ in 1 to count {
-    result->Array.push(fdqlStatement(rng))->ignore
+    result->Array.push(gqlStatement(rng))->ignore
   }
   result
 }

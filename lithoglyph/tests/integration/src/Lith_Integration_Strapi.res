@@ -49,7 +49,7 @@ let test_syncOnCreate = async (): testResult => {
       "headers": Js.Dict.fromArray([
         ("Content-Type", "application/json"),
       ]),
-      "body": `{"fdql": "INSERT INTO articles {\\"title\\": \\"Test Article\\"}"}`,
+      "body": `{"gql": "INSERT INTO articles {\\"title\\": \\"Test Article\\"}"}`,
     },
   )
 
@@ -77,7 +77,7 @@ let test_syncOnUpdate = async (): testResult => {
       "headers": Js.Dict.fromArray([
         ("Content-Type", "application/json"),
       ]),
-      "body": `{"fdql": "UPDATE articles SET {\\"title\\": \\"Updated\\"} WHERE id = \\"123\\""}`,
+      "body": `{"gql": "UPDATE articles SET {\\"title\\": \\"Updated\\"} WHERE id = \\"123\\""}`,
     },
   )
 
@@ -110,7 +110,7 @@ let test_syncOnDelete = async (): testResult => {
       "headers": Js.Dict.fromArray([
         ("Content-Type", "application/json"),
       ]),
-      "body": `{"fdql": "DELETE FROM articles WHERE id = \\"123\\""}`,
+      "body": `{"gql": "DELETE FROM articles WHERE id = \\"123\\""}`,
     },
   )
 
@@ -198,7 +198,7 @@ let test_apiKeyAuth = async (): testResult => {
         ("Content-Type", "application/json"),
         ("X-API-Key", "test-api-key"),
       ]),
-      "body": `{"fdql": "SELECT * FROM test"}`,
+      "body": `{"gql": "SELECT * FROM test"}`,
     },
   )
 

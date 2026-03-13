@@ -1,7 +1,7 @@
 ! SPDX-License-Identifier: PMPL-1.0-or-later
 ! Form.Runtime - Storage Backend Abstraction
 !
-! Pluggable storage layer for FDQL executor.
+! Pluggable storage layer for GQL executor.
 ! - memory: In-memory storage (default, for testing)
 ! - bridge: Persistent storage via Form.Bridge (production)
 
@@ -110,35 +110,35 @@ M: memory-backend backend-query
 ! ============================================================
 
 ! FFI type definitions matching generated/abi/bridge.h
-STRUCT: fdb-blob
+STRUCT: lith-blob
     { ptr void* }
     { len size_t } ;
 
 ! LgResult — matches bridge.h LgResult struct layout
-STRUCT: fdb-result
-    { data fdb-blob }
-    { provenance fdb-blob }
+STRUCT: lith-result
+    { data lith-blob }
+    { provenance lith-blob }
     { status int }
-    { error_blob fdb-blob } ;
+    { error_blob lith-blob } ;
 
 ! LgRenderOpts — matches bridge.h
 STRUCT: lg-render-opts
     { format int }
     { include_metadata bool } ;
 
-! Status codes matching bridge.h FdbStatus enum
-CONSTANT: FDB_OK 0
-CONSTANT: FDB_ERR_INTERNAL 1
-CONSTANT: FDB_ERR_NOT_FOUND 2
-CONSTANT: FDB_ERR_INVALID_ARGUMENT 3
-CONSTANT: FDB_ERR_OUT_OF_MEMORY 4
-CONSTANT: FDB_ERR_NOT_IMPLEMENTED 5
-CONSTANT: FDB_ERR_TXN_NOT_ACTIVE 6
-CONSTANT: FDB_ERR_TXN_ALREADY_COMMITTED 7
-CONSTANT: FDB_ERR_IO_ERROR 8
-CONSTANT: FDB_ERR_CORRUPTION 9
-CONSTANT: FDB_ERR_CONFLICT 10
-CONSTANT: FDB_ERR_ALREADY_EXISTS 11
+! Status codes matching bridge.h LithStatus enum
+CONSTANT: LITH_OK 0
+CONSTANT: LITH_ERR_INTERNAL 1
+CONSTANT: LITH_ERR_NOT_FOUND 2
+CONSTANT: LITH_ERR_INVALID_ARGUMENT 3
+CONSTANT: LITH_ERR_OUT_OF_MEMORY 4
+CONSTANT: LITH_ERR_NOT_IMPLEMENTED 5
+CONSTANT: LITH_ERR_TXN_NOT_ACTIVE 6
+CONSTANT: LITH_ERR_TXN_ALREADY_COMMITTED 7
+CONSTANT: LITH_ERR_IO_ERROR 8
+CONSTANT: LITH_ERR_CORRUPTION 9
+CONSTANT: LITH_ERR_CONFLICT 10
+CONSTANT: LITH_ERR_ALREADY_EXISTS 11
 
 ! Transaction mode constants matching bridge.h LgTxnMode
 CONSTANT: LG_TXN_READ_ONLY 0
@@ -151,44 +151,44 @@ CONSTANT: LG_TXN_READ_WRITE 1
 LIBRARY: lithoglyph-bridge
 
 ! Database lifecycle
-FUNCTION: int fdb_db_open ( void* path ulong path_len void* opts ulong opts_len void** out_db fdb-blob* out_err )
-FUNCTION: int fdb_db_close ( void* db )
-FUNCTION: uint fdb_version ( )
+FUNCTION: int lith_db_open ( void* path ulong path_len void* opts ulong opts_len void** out_db lith-blob* out_err )
+FUNCTION: int lith_db_close ( void* db )
+FUNCTION: uint lith_version ( )
 
 ! Transaction management
-FUNCTION: int fdb_txn_begin ( void* db int mode void** out_txn fdb-blob* out_err )
-FUNCTION: int fdb_txn_commit ( void* txn fdb-blob* out_err )
-FUNCTION: int fdb_txn_abort ( void* txn )
+FUNCTION: int lith_txn_begin ( void* db int mode void** out_txn lith-blob* out_err )
+FUNCTION: int lith_txn_commit ( void* txn lith-blob* out_err )
+FUNCTION: int lith_txn_abort ( void* txn )
 
 ! Operations (buffered until commit)
-FUNCTION: fdb-result fdb_apply ( void* txn void* op ulong op_len )
-FUNCTION: int fdb_update_block ( void* txn ulong block_id void* data ulong data_len fdb-blob* out_err )
-FUNCTION: int fdb_delete_block ( void* txn ulong block_id fdb-blob* out_err )
+FUNCTION: lith-result lith_apply ( void* txn void* op ulong op_len )
+FUNCTION: int lith_update_block ( void* txn ulong block_id void* data ulong data_len lith-blob* out_err )
+FUNCTION: int lith_delete_block ( void* txn ulong block_id lith-blob* out_err )
 
 ! Query (full block scan)
-FUNCTION: int fdb_read_blocks ( void* db ushort block_type fdb-blob* out_data fdb-blob* out_err )
+FUNCTION: int lith_read_blocks ( void* db ushort block_type lith-blob* out_data lith-blob* out_err )
 
 ! Introspection
-FUNCTION: int fdb_introspect_schema ( void* db fdb-blob* out_schema fdb-blob* out_err )
-FUNCTION: int fdb_introspect_constraints ( void* db fdb-blob* out_constraints fdb-blob* out_err )
-FUNCTION: int fdb_render_journal ( void* db ulong since lg-render-opts opts fdb-blob* out_text fdb-blob* out_err )
-FUNCTION: int fdb_render_block ( void* db ulong block_id lg-render-opts opts fdb-blob* out_text fdb-blob* out_err )
+FUNCTION: int lith_introspect_schema ( void* db lith-blob* out_schema lith-blob* out_err )
+FUNCTION: int lith_introspect_constraints ( void* db lith-blob* out_constraints lith-blob* out_err )
+FUNCTION: int lith_render_journal ( void* db ulong since lg-render-opts opts lith-blob* out_text lith-blob* out_err )
+FUNCTION: int lith_render_block ( void* db ulong block_id lg-render-opts opts lith-blob* out_text lith-blob* out_err )
 
 ! Proof verification
-FUNCTION: int fdb_proof_register_verifier ( void* type_ptr ulong type_len void* callback void* context )
-FUNCTION: int fdb_proof_unregister_verifier ( void* type_ptr ulong type_len )
-FUNCTION: int fdb_proof_verify ( void* proof_ptr ulong proof_len bool* out_valid fdb-blob* out_err )
-FUNCTION: int fdb_proof_init_builtins ( )
+FUNCTION: int lith_proof_register_verifier ( void* type_ptr ulong type_len void* callback void* context )
+FUNCTION: int lith_proof_unregister_verifier ( void* type_ptr ulong type_len )
+FUNCTION: int lith_proof_verify ( void* proof_ptr ulong proof_len bool* out_valid lith-blob* out_err )
+FUNCTION: int lith_proof_init_builtins ( )
 
 ! Resource cleanup
-FUNCTION: void fdb_blob_free ( fdb-blob* blob )
+FUNCTION: void lith_blob_free ( lith-blob* blob )
 
 ! ============================================================
 ! FFI Helper Functions
 ! ============================================================
 
-: make-fdb-blob ( -- blob )
-    fdb-blob malloc-struct
+: make-lith-blob ( -- blob )
+    lith-blob malloc-struct
         f >>ptr
         0 >>len ;
 
@@ -197,11 +197,11 @@ FUNCTION: void fdb_blob_free ( fdb-blob* blob )
         memory>byte-array utf8 decode
     ] [ 2drop f ] if ;
 
-: string>fdb-input ( str -- ptr len )
+: string>lith-input ( str -- ptr len )
     utf8 encode [ underlying>> ] [ length ] bi ;
 
-: check-fdb-status ( status err-blob -- )
-    swap FDB_OK = [
+: check-lith-status ( status err-blob -- )
+    swap LITH_OK = [
         drop
     ] [
         blob>string "FFI Error: %s\n" sprintf throw
@@ -235,24 +235,24 @@ CONSTANT: BLOCK_TYPE_DOCUMENT 0x0011
 ! ============================================================
 
 ! Execute a single-operation transaction: begin → apply → commit
-! Returns the block ID from fdb_apply result, or 0 on failure.
+! Returns the block ID from lith_apply result, or 0 on failure.
 : with-bridge-txn ( doc-json backend -- block-id )
     db-handle>> :> db
     f :> txn-handle!
-    make-fdb-blob :> err-blob
+    make-lith-blob :> err-blob
 
     ! Begin read-write transaction (mode 1 = read-write)
-    db LG_TXN_READ_WRITE txn-handle! err-blob fdb_txn_begin
-    err-blob check-fdb-status
+    db LG_TXN_READ_WRITE txn-handle! err-blob lith_txn_begin
+    err-blob check-lith-status
 
     ! Apply the operation (buffered, not written until commit)
-    swap string>fdb-input [
-        txn-handle fdb_apply
+    swap string>lith-input [
+        txn-handle lith_apply
     ] 2keep 2drop :> result
 
     ! Commit transaction (WAL: journal → sync → blocks → sync)
-    txn-handle err-blob fdb_txn_commit
-    err-blob check-fdb-status
+    txn-handle err-blob lith_txn_commit
+    err-blob check-lith-status
 
     ! Extract block_id from result (JSON: {"block_id":N,"status":"pending"})
     result data>> blob>string [
@@ -283,20 +283,20 @@ INSTANCE: bridge-backend storage-backend
 M:: backend-init ( backend -- ) bridge-backend
     backend db-path>> :> path
     f :> db-handle!
-    make-fdb-blob :> err-blob
+    make-lith-blob :> err-blob
 
-    path string>fdb-input f 0 { void* } [
-        db-handle! err-blob fdb_db_open
+    path string>lith-input f 0 { void* } [
+        db-handle! err-blob lith_db_open
     ] with-out-parameters
 
-    err-blob check-fdb-status
+    err-blob check-lith-status
     db-handle backend db-handle<<
     t backend is-open<<
     "Database opened: %s\n" path sprintf print ;
 
 M:: bridge-backend backend-close ( backend -- )
     backend is-open>> backend db-handle>> and [
-        backend db-handle>> fdb_db_close
+        backend db-handle>> lith_db_close
         f backend db-handle<<
         f backend is-open<<
         "Database closed\n" print
@@ -304,19 +304,19 @@ M:: bridge-backend backend-close ( backend -- )
 
 M:: bridge-backend backend-get-collection ( name backend -- data )
     backend db-handle>> [
-        make-fdb-blob :> data-blob
-        make-fdb-blob :> err-blob
+        make-lith-blob :> data-blob
+        make-lith-blob :> err-blob
 
-        ! Read all document blocks via fdb_read_blocks (type = 0x0011)
-        backend db-handle>> BLOCK_TYPE_DOCUMENT data-blob err-blob fdb_read_blocks
-        err-blob check-fdb-status
+        ! Read all document blocks via lith_read_blocks (type = 0x0011)
+        backend db-handle>> BLOCK_TYPE_DOCUMENT data-blob err-blob lith_read_blocks
+        err-blob check-lith-status
 
         ! Parse JSON result into vector of documents
         data-blob blob>string [ "[]" ] unless*
         parse-block-results
 
         ! Free the blob
-        data-blob fdb_blob_free
+        data-blob lith_blob_free
     ] [ V{ } clone ] if ;
 
 M:: bridge-backend backend-set-collection ( data name backend -- )
@@ -329,11 +329,11 @@ M:: bridge-backend backend-set-collection ( data name backend -- )
 
 M:: bridge-backend backend-list-collections ( backend -- names )
     backend db-handle>> [
-        make-fdb-blob :> schema-blob
-        make-fdb-blob :> err-blob
+        make-lith-blob :> schema-blob
+        make-lith-blob :> err-blob
 
-        backend db-handle>> schema-blob err-blob fdb_introspect_schema
-        err-blob check-fdb-status
+        backend db-handle>> schema-blob err-blob lith_introspect_schema
+        err-blob check-lith-status
 
         ! Parse JSON schema and extract collection names
         schema-blob blob>string [ "{\"version\":0,\"collections\":[]}" ] unless*
@@ -341,7 +341,7 @@ M:: bridge-backend backend-list-collections ( backend -- names )
             "collections" swap at [ { } ] unless*
         ] [ drop { } ] if
 
-        schema-blob fdb_blob_free
+        schema-blob lith_blob_free
     ] [ { } ] if ;
 
 M:: bridge-backend backend-delete-collection ( name backend -- )
@@ -364,42 +364,42 @@ M:: bridge-backend backend-insert ( doc collection backend -- id )
 M:: bridge-backend backend-update ( doc id collection backend -- success? )
     backend db-handle>> [
         f :> txn-handle!
-        make-fdb-blob :> err-blob
+        make-lith-blob :> err-blob
 
         ! Begin read-write transaction
-        backend db-handle>> LG_TXN_READ_WRITE txn-handle! err-blob fdb_txn_begin
-        err-blob check-fdb-status
+        backend db-handle>> LG_TXN_READ_WRITE txn-handle! err-blob lith_txn_begin
+        err-blob check-lith-status
 
         ! Serialize new document data
         doc >json :> doc-json
-        doc-json string>fdb-input :> ( data-ptr data-len )
+        doc-json string>lith-input :> ( data-ptr data-len )
 
         ! Update the block
-        txn-handle id data-ptr data-len err-blob fdb_update_block
-        err-blob check-fdb-status
+        txn-handle id data-ptr data-len err-blob lith_update_block
+        err-blob check-lith-status
 
         ! Commit
-        txn-handle err-blob fdb_txn_commit
-        err-blob check-fdb-status
+        txn-handle err-blob lith_txn_commit
+        err-blob check-lith-status
         t
     ] [ f ] if ;
 
 M:: bridge-backend backend-delete ( id collection backend -- success? )
     backend db-handle>> [
         f :> txn-handle!
-        make-fdb-blob :> err-blob
+        make-lith-blob :> err-blob
 
         ! Begin read-write transaction
-        backend db-handle>> LG_TXN_READ_WRITE txn-handle! err-blob fdb_txn_begin
-        err-blob check-fdb-status
+        backend db-handle>> LG_TXN_READ_WRITE txn-handle! err-blob lith_txn_begin
+        err-blob check-lith-status
 
         ! Delete the block
-        txn-handle id err-blob fdb_delete_block
-        err-blob check-fdb-status
+        txn-handle id err-blob lith_delete_block
+        err-blob check-lith-status
 
         ! Commit
-        txn-handle err-blob fdb_txn_commit
-        err-blob check-fdb-status
+        txn-handle err-blob lith_txn_commit
+        err-blob check-lith-status
         t
     ] [ f ] if ;
 

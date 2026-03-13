@@ -47,9 +47,9 @@ let make = (~baseUrl: string, ~apiKey: option<string>=?): lithClient => {
   }
 
   {
-    query: async (fdql: string): queryResult => {
+    query: async (gql: string): queryResult => {
       let body = Js.Json.object_(
-        Js.Dict.fromArray([("fdql", Js.Json.string(fdql))])
+        Js.Dict.fromArray([("gql", Js.Json.string(gql))])
       )
       let result = await request("POST", "/v1/query", Some(body))
       {
@@ -60,9 +60,9 @@ let make = (~baseUrl: string, ~apiKey: option<string>=?): lithClient => {
     },
 
     insert: async (collection: string, document: Js.Json.t): queryResult => {
-      let fdql = `INSERT INTO ${collection} ${Js.Json.stringify(document)}`
+      let gql = `INSERT INTO ${collection} ${Js.Json.stringify(document)}`
       let body = Js.Json.object_(
-        Js.Dict.fromArray([("fdql", Js.Json.string(fdql))])
+        Js.Dict.fromArray([("gql", Js.Json.string(gql))])
       )
       let result = await request("POST", "/v1/query", Some(body))
       {
@@ -74,9 +74,9 @@ let make = (~baseUrl: string, ~apiKey: option<string>=?): lithClient => {
 
     update: async (collection: string, document: Js.Json.t, id: string): queryResult => {
       let setClause = Js.Json.stringify(document)
-      let fdql = `UPDATE ${collection} SET ${setClause} WHERE id = "${id}"`
+      let gql = `UPDATE ${collection} SET ${setClause} WHERE id = "${id}"`
       let body = Js.Json.object_(
-        Js.Dict.fromArray([("fdql", Js.Json.string(fdql))])
+        Js.Dict.fromArray([("gql", Js.Json.string(gql))])
       )
       let result = await request("POST", "/v1/query", Some(body))
       {
@@ -87,9 +87,9 @@ let make = (~baseUrl: string, ~apiKey: option<string>=?): lithClient => {
     },
 
     delete: async (collection: string, id: string): queryResult => {
-      let fdql = `DELETE FROM ${collection} WHERE id = "${id}"`
+      let gql = `DELETE FROM ${collection} WHERE id = "${id}"`
       let body = Js.Json.object_(
-        Js.Dict.fromArray([("fdql", Js.Json.string(fdql))])
+        Js.Dict.fromArray([("gql", Js.Json.string(gql))])
       )
       let result = await request("POST", "/v1/query", Some(body))
       {

@@ -1,14 +1,14 @@
 ! SPDX-License-Identifier: PMPL-1.0-or-later
-! fbql-c-api - C API for FBQL Runtime
+! gql-c-api - C API for GQL Runtime
 !
 ! Exports C-callable functions for integration with Zig FFI
 
 USING: accessors alien alien.c-types alien.data alien.strings arrays
-assocs byte-arrays classes.struct combinators continuations fdql
+assocs byte-arrays classes.struct combinators continuations gql
 formatting hashtables io io.encodings.utf8 json json.writer kernel
 locals math namespaces sequences splitting storage-backend strings ;
 
-IN: fbql-c-api
+IN: gql-c-api
 
 ! ============================================================
 ! C API Structures
@@ -19,7 +19,7 @@ STRUCT: c-string-result
     { length size_t }
     { status int32_t } ;
 
-! Status codes matching FdbStatus in bridge.zig
+! Status codes matching LithStatus in bridge.zig
 CONSTANT: STATUS_OK 0
 CONSTANT: STATUS_INVALID_ARG 1
 CONSTANT: STATUS_NOT_FOUND 2
@@ -62,8 +62,8 @@ CONSTANT: STATUS_INTERNAL_ERROR 11
 ! C API Functions
 ! ============================================================
 
-! Initialize FBQL runtime
-:: c_fbql_init ( -- status )
+! Initialize GQL runtime
+:: c_gql_init ( -- status )
     [
         use-memory-storage
         STATUS_OK
@@ -72,7 +72,7 @@ CONSTANT: STATUS_INTERNAL_ERROR 11
     ] recover ;
 
 ! Initialize with persistent storage path
-:: c_fbql_init_with_path ( path -- status )
+:: c_gql_init_with_path ( path -- status )
     [
         path utf8 alien>string use-bridge-storage
         STATUS_OK
@@ -80,14 +80,14 @@ CONSTANT: STATUS_INTERNAL_ERROR 11
         drop STATUS_INTERNAL_ERROR
     ] recover ;
 
-! Execute FQL query and return JSON result
-:: c_fbql_execute ( query_str -- result )
+! Execute GQL query and return JSON result
+:: c_gql_execute ( query_str -- result )
     [
         ! Convert C string to Factor string
         query_str utf8 alien>string :> query
 
         ! Parse and execute
-        query run-fdql :> result-hash
+        query run-gql :> result-hash
 
         ! Convert result to JSON
         result-hash hashtable>json STATUS_OK make-c-result
@@ -100,12 +100,12 @@ CONSTANT: STATUS_INTERNAL_ERROR 11
     ] recover ;
 
 ! Free C result
-:: c_fbql_free_result ( result -- )
+:: c_gql_free_result ( result -- )
     result data>> [ free ] when*
     result free ;
 
-! Close FBQL runtime
-:: c_fbql_close ( -- status )
+! Close GQL runtime
+:: c_gql_close ( -- status )
     [
         close-backend
         STATUS_OK
@@ -118,10 +118,10 @@ CONSTANT: STATUS_INTERNAL_ERROR 11
 ! ============================================================
 
 ! Get query plan without executing
-:: c_fbql_explain ( query_str -- result )
+:: c_gql_explain ( query_str -- result )
     [
         query_str utf8 alien>string :> query
-        query explain-fdql :> plan-hash
+        query explain-gql :> plan-hash
         plan-hash hashtable>json STATUS_OK make-c-result
     ] [
         | err |
@@ -131,10 +131,10 @@ CONSTANT: STATUS_INTERNAL_ERROR 11
     ] recover ;
 
 ! Get query plan with execution timing
-:: c_fbql_explain_analyze ( query_str -- result )
+:: c_gql_explain_analyze ( query_str -- result )
     [
         query_str utf8 alien>string :> query
-        query explain-analyze-fdql :> plan-hash
+        query explain-analyze-gql :> plan-hash
         plan-hash hashtable>json STATUS_OK make-c-result
     ] [
         | err |
@@ -148,7 +148,7 @@ CONSTANT: STATUS_INTERNAL_ERROR 11
 ! ============================================================
 
 ! List all collections
-:: c_fbql_list_collections ( -- result )
+:: c_gql_list_collections ( -- result )
     [
         storage-list-collections >array :> collections
         H{
@@ -163,7 +163,7 @@ CONSTANT: STATUS_INTERNAL_ERROR 11
     ] recover ;
 
 ! Get collection schema
-:: c_fbql_get_schema ( collection_name -- result )
+:: c_gql_get_schema ( collection_name -- result )
     [
         collection_name utf8 alien>string :> coll
         coll storage-get-collection :> docs

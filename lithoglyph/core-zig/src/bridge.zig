@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// Form.Bridge - C ABI Layer
+// Lith.Bridge - C ABI Layer
 //
 // Provides stable C-compatible API for runtimes to interact with Lithoglyph.
 // All blob arguments and return values use CBOR encoding.
@@ -161,7 +161,7 @@ fn createErrorBlob(status: LgStatus, message: []const u8) LgBlob {
 /// @param out_db Output parameter for database handle
 /// @param out_err Output parameter for error blob
 /// @return Status code
-pub export fn fdb_db_open(
+pub export fn lith_db_open(
     path_ptr: [*]const u8,
     path_len: usize,
     opts_ptr: ?[*]const u8,
@@ -219,9 +219,9 @@ pub export fn fdb_db_open(
 ///
 /// @param db Database handle
 /// @return Status code
-pub export fn fdb_db_close(db: ?*LgDb) LgStatus {
+pub export fn lith_db_close(db: ?*LgDb) LgStatus {
     // SAFETY: db was originally a *DbState allocated by global_allocator.create()
-    // in fdb_db_open, then cast to *LgDb. The orelse guards null. Alignment is
+    // in lith_db_open, then cast to *LgDb. The orelse guards null. Alignment is
     // guaranteed because DbState was heap-allocated with proper alignment by the GPA.
     // The subsequent db_registry.contains() check validates the pointer is still live.
     const state: *DbState = @ptrCast(@alignCast(db orelse return .err_invalid_argument));
@@ -260,13 +260,13 @@ pub export fn fdb_db_close(db: ?*LgDb) LgStatus {
 /// @param out_txn Output parameter for transaction handle
 /// @param out_err Output parameter for error blob
 /// @return Status code
-pub export fn fdb_txn_begin(
+pub export fn lith_txn_begin(
     db: ?*LgDb,
     mode: LgTxnMode,
     out_txn: *?*LgTxn,
     out_err: *LgBlob,
 ) LgStatus {
-    // SAFETY: db was originally a *DbState from fdb_db_open, cast to opaque *LgDb.
+    // SAFETY: db was originally a *DbState from lith_db_open, cast to opaque *LgDb.
     // The orelse guards null. Alignment is safe because DbState was heap-allocated
     // by global_allocator.create() which respects @alignOf(DbState). The
     // db_registry.contains() check below validates the pointer is still registered.
@@ -315,8 +315,8 @@ pub export fn fdb_txn_begin(
 /// @param txn Transaction handle
 /// @param out_err Output parameter for error blob
 /// @return Status code
-pub export fn fdb_txn_commit(txn: ?*LgTxn, out_err: *LgBlob) LgStatus {
-    // SAFETY: txn was originally a *TxnState from fdb_txn_begin, cast to opaque
+pub export fn lith_txn_commit(txn: ?*LgTxn, out_err: *LgBlob) LgStatus {
+    // SAFETY: txn was originally a *TxnState from lith_txn_begin, cast to opaque
     // *LgTxn. The orelse guards null. Alignment is safe because TxnState was
     // heap-allocated by global_allocator.create(). The txn_registry.contains()
     // check below validates the pointer is still a live, registered handle.
@@ -390,8 +390,8 @@ pub export fn fdb_txn_commit(txn: ?*LgTxn, out_err: *LgBlob) LgStatus {
 ///
 /// @param txn Transaction handle
 /// @return Status code
-pub export fn fdb_txn_abort(txn: ?*LgTxn) LgStatus {
-    // SAFETY: txn was originally a *TxnState from fdb_txn_begin, cast to opaque
+pub export fn lith_txn_abort(txn: ?*LgTxn) LgStatus {
+    // SAFETY: txn was originally a *TxnState from lith_txn_begin, cast to opaque
     // *LgTxn. The orelse guards null. Alignment is safe because TxnState was
     // heap-allocated by global_allocator.create(). The txn_registry.contains()
     // check below validates the pointer is still a live, registered handle.
@@ -423,12 +423,12 @@ pub export fn fdb_txn_abort(txn: ?*LgTxn) LgStatus {
 /// @param op_len Length of data
 /// @return Result containing block ID and status
 /// Apply an operation within a transaction (buffered — not written until commit)
-pub export fn fdb_apply(
+pub export fn lith_apply(
     txn: ?*LgTxn,
     op_ptr: [*]const u8,
     op_len: usize,
 ) LgResult {
-    // SAFETY: txn was originally a *TxnState from fdb_txn_begin, cast to opaque
+    // SAFETY: txn was originally a *TxnState from lith_txn_begin, cast to opaque
     // *LgTxn. The orelse guards null. Alignment is safe because TxnState was
     // heap-allocated by global_allocator.create(). The txn_registry.contains()
     // check below validates the pointer is still a live, registered handle.
@@ -503,14 +503,14 @@ pub export fn fdb_apply(
 }
 
 /// Update an existing block within a transaction (buffered)
-pub export fn fdb_update_block(
+pub export fn lith_update_block(
     txn: ?*LgTxn,
     block_id: u64,
     data_ptr: [*]const u8,
     data_len: usize,
     out_err: *LgBlob,
 ) LgStatus {
-    // SAFETY: txn was originally a *TxnState from fdb_txn_begin, cast to opaque
+    // SAFETY: txn was originally a *TxnState from lith_txn_begin, cast to opaque
     // *LgTxn. The orelse guards null. Alignment is safe because TxnState was
     // heap-allocated by global_allocator.create(). State validity is checked
     // immediately after via is_active and mode fields.
@@ -564,12 +564,12 @@ pub export fn fdb_update_block(
 }
 
 /// Delete a block within a transaction (buffered)
-pub export fn fdb_delete_block(
+pub export fn lith_delete_block(
     txn: ?*LgTxn,
     block_id: u64,
     out_err: *LgBlob,
 ) LgStatus {
-    // SAFETY: txn was originally a *TxnState from fdb_txn_begin, cast to opaque
+    // SAFETY: txn was originally a *TxnState from lith_txn_begin, cast to opaque
     // *LgTxn. The orelse guards null. Alignment is safe because TxnState was
     // heap-allocated by global_allocator.create(). State validity is checked
     // immediately after via is_active and mode fields.
@@ -594,13 +594,13 @@ pub export fn fdb_delete_block(
 
 /// Read all blocks of a given type (full scan for PoC)
 /// Returns JSON array of objects with block_id and data fields.
-pub export fn fdb_read_blocks(
+pub export fn lith_read_blocks(
     db: ?*LgDb,
     block_type: u16,
     out_data: *LgBlob,
     out_err: *LgBlob,
 ) LgStatus {
-    // SAFETY: db was originally a *DbState from fdb_db_open, cast to opaque *LgDb.
+    // SAFETY: db was originally a *DbState from lith_db_open, cast to opaque *LgDb.
     // The orelse guards null. Alignment is safe because DbState was heap-allocated
     // by global_allocator.create(). The db_registry.contains() check below validates
     // the pointer is still a live, registered handle.
@@ -698,7 +698,7 @@ pub export fn fdb_read_blocks(
 /// @param out_text Output parameter for text blob
 /// @param out_err Output parameter for error blob
 /// @return Status code
-pub export fn fdb_render_block(
+pub export fn lith_render_block(
     db: ?*LgDb,
     block_id: u64,
     opts: LgRenderOpts,
@@ -707,7 +707,7 @@ pub export fn fdb_render_block(
 ) LgStatus {
     _ = opts;
 
-    // SAFETY: db was originally a *DbState from fdb_db_open, cast to opaque *LgDb.
+    // SAFETY: db was originally a *DbState from lith_db_open, cast to opaque *LgDb.
     // The orelse guards null. Alignment is safe because DbState was heap-allocated
     // by global_allocator.create(). The db_registry.contains() check below validates
     // the pointer is still a live, registered handle.
@@ -766,7 +766,7 @@ pub export fn fdb_render_block(
 /// @param out_text Output parameter for text blob
 /// @param out_err Output parameter for error blob
 /// @return Status code
-pub export fn fdb_render_journal(
+pub export fn lith_render_journal(
     db: ?*LgDb,
     since: u64,
     opts: LgRenderOpts,
@@ -775,7 +775,7 @@ pub export fn fdb_render_journal(
 ) LgStatus {
     _ = opts;
 
-    // SAFETY: db was originally a *DbState from fdb_db_open, cast to opaque *LgDb.
+    // SAFETY: db was originally a *DbState from lith_db_open, cast to opaque *LgDb.
     // The orelse guards null. Alignment is safe because DbState was heap-allocated
     // by global_allocator.create(). The db_registry.contains() check below validates
     // the pointer is still a live, registered handle.
@@ -818,12 +818,12 @@ pub export fn fdb_render_journal(
 /// @param out_schema Output parameter for schema blob
 /// @param out_err Output parameter for error blob
 /// @return Status code
-pub export fn fdb_introspect_schema(
+pub export fn lith_introspect_schema(
     db: ?*LgDb,
     out_schema: *LgBlob,
     out_err: *LgBlob,
 ) LgStatus {
-    // SAFETY: db was originally a *DbState from fdb_db_open, cast to opaque *LgDb.
+    // SAFETY: db was originally a *DbState from lith_db_open, cast to opaque *LgDb.
     // The orelse guards null. Alignment is safe because DbState was heap-allocated
     // by global_allocator.create(). The db_registry.contains() check below validates
     // the pointer is still a live, registered handle.
@@ -865,12 +865,12 @@ pub export fn fdb_introspect_schema(
 /// @param out_constraints Output parameter for constraints blob
 /// @param out_err Output parameter for error blob
 /// @return Status code
-pub export fn fdb_introspect_constraints(
+pub export fn lith_introspect_constraints(
     db: ?*LgDb,
     out_constraints: *LgBlob,
     out_err: *LgBlob,
 ) LgStatus {
-    // SAFETY: db was originally a *DbState from fdb_db_open, cast to opaque *LgDb.
+    // SAFETY: db was originally a *DbState from lith_db_open, cast to opaque *LgDb.
     // The orelse guards null. Alignment is safe because DbState was heap-allocated
     // by global_allocator.create(). The db_registry.contains() check below validates
     // the pointer is still a live, registered handle.
@@ -924,7 +924,7 @@ var verifier_registry = std.StringHashMap(VerifierEntry).init(global_allocator);
 /// @param callback Verification function
 /// @param context Optional context passed to callback
 /// @return Status code
-pub export fn fdb_proof_register_verifier(
+pub export fn lith_proof_register_verifier(
     type_ptr: [*]const u8,
     type_len: usize,
     callback: LgProofVerifier,
@@ -955,7 +955,7 @@ pub export fn fdb_proof_register_verifier(
 /// @param type_ptr Proof type identifier
 /// @param type_len Length of type identifier
 /// @return Status code
-pub export fn fdb_proof_unregister_verifier(
+pub export fn lith_proof_unregister_verifier(
     type_ptr: [*]const u8,
     type_len: usize,
 ) LgStatus {
@@ -976,7 +976,7 @@ pub export fn fdb_proof_unregister_verifier(
 /// @param out_valid Output: true if proof is valid
 /// @param out_err Output parameter for error blob
 /// @return Status code
-pub export fn fdb_proof_verify(
+pub export fn lith_proof_verify(
     proof_ptr: [*]const u8,
     proof_len: usize,
     out_valid: *bool,
@@ -1062,20 +1062,20 @@ fn builtin_normalization_verifier(
 }
 
 /// Initialize built-in proof verifiers
-pub export fn fdb_proof_init_builtins() LgStatus {
+pub export fn lith_proof_init_builtins() LgStatus {
     // Register FD-holds verifier
     const fd_type = "fd-holds";
-    var status = fdb_proof_register_verifier(fd_type.ptr, fd_type.len, builtin_fd_verifier, null);
+    var status = lith_proof_register_verifier(fd_type.ptr, fd_type.len, builtin_fd_verifier, null);
     if (status != .ok) return status;
 
     // Register normalization verifier
     const norm_type = "normalization";
-    status = fdb_proof_register_verifier(norm_type.ptr, norm_type.len, builtin_normalization_verifier, null);
+    status = lith_proof_register_verifier(norm_type.ptr, norm_type.len, builtin_normalization_verifier, null);
     if (status != .ok) return status;
 
     // Register denormalization verifier (same logic)
     const denorm_type = "denormalization";
-    status = fdb_proof_register_verifier(denorm_type.ptr, denorm_type.len, builtin_normalization_verifier, null);
+    status = lith_proof_register_verifier(denorm_type.ptr, denorm_type.len, builtin_normalization_verifier, null);
 
     return status;
 }
@@ -1087,7 +1087,7 @@ pub export fn fdb_proof_init_builtins() LgStatus {
 /// Free a blob allocated by the bridge
 ///
 /// @param blob Blob to free
-pub export fn fdb_blob_free(blob: *LgBlob) void {
+pub export fn lith_blob_free(blob: *LgBlob) void {
     if (blob.toSlice()) |slice| {
         global_allocator.free(@constCast(slice));
     }
@@ -1097,7 +1097,7 @@ pub export fn fdb_blob_free(blob: *LgBlob) void {
 /// Get Lith version
 ///
 /// @return Version as encoded integer (major * 10000 + minor * 100 + patch)
-pub export fn fdb_version() u32 {
+pub export fn lith_version() u32 {
     return 0 * 10000 + 1 * 100 + 0; // 0.1.0
 }
 
@@ -1109,13 +1109,13 @@ test "database lifecycle" {
     var db: ?*LgDb = null;
     var err_blob: LgBlob = undefined;
 
-    const path = "test.fdb";
-    const status = fdb_db_open(path.ptr, path.len, null, 0, &db, &err_blob);
+    const path = "test.lgh";
+    const status = lith_db_open(path.ptr, path.len, null, 0, &db, &err_blob);
 
     try std.testing.expectEqual(LgStatus.ok, status);
     try std.testing.expect(db != null);
 
-    const close_status = fdb_db_close(db);
+    const close_status = lith_db_close(db);
     try std.testing.expectEqual(LgStatus.ok, close_status);
 }
 
@@ -1123,23 +1123,23 @@ test "transaction lifecycle" {
     var db: ?*LgDb = null;
     var err_blob: LgBlob = undefined;
 
-    const path = "test_txn.fdb";
-    _ = fdb_db_open(path.ptr, path.len, null, 0, &db, &err_blob);
-    defer _ = fdb_db_close(db);
+    const path = "test_txn.lgh";
+    _ = lith_db_open(path.ptr, path.len, null, 0, &db, &err_blob);
+    defer _ = lith_db_close(db);
 
     var txn: ?*LgTxn = null;
     var txn_err: LgBlob = undefined;
 
-    const begin_status = fdb_txn_begin(db, .read_write, &txn, &txn_err);
+    const begin_status = lith_txn_begin(db, .read_write, &txn, &txn_err);
     try std.testing.expectEqual(LgStatus.ok, begin_status);
     try std.testing.expect(txn != null);
 
     var commit_err: LgBlob = undefined;
-    const commit_status = fdb_txn_commit(txn, &commit_err);
+    const commit_status = lith_txn_commit(txn, &commit_err);
     try std.testing.expectEqual(LgStatus.ok, commit_status);
 }
 
 test "version" {
-    const version = fdb_version();
+    const version = lith_version();
     try std.testing.expectEqual(@as(u32, 100), version); // 0.1.0
 }

@@ -32,9 +32,9 @@ let makeClient = (config: pluginConfig): lithClient => {
     }
   }
 
-  let request = async (fdql: string): Js.Json.t => {
+  let request = async (gql: string): Js.Json.t => {
     let url = config.lithUrl ++ "/v1/query"
-    let body = Js.Json.object_(Js.Dict.fromArray([("fdql", Js.Json.string(fdql))]))
+    let body = Js.Json.object_(Js.Dict.fromArray([("gql", Js.Json.string(gql))]))
     let options = {
       "method": "POST",
       "headers": headers,
@@ -47,21 +47,21 @@ let makeClient = (config: pluginConfig): lithClient => {
 
   {
     insert: async (collection: string, document: Js.Json.t): unit => {
-      let fdql = `INSERT INTO ${collection} ${Js.Json.stringify(document)}`
-      let _ = await request(fdql)
+      let gql = `INSERT INTO ${collection} ${Js.Json.stringify(document)}`
+      let _ = await request(gql)
       ()
     },
 
     update: async (collection: string, document: Js.Json.t, id: string): unit => {
       let setClause = Js.Json.stringify(document)
-      let fdql = `UPDATE ${collection} SET ${setClause} WHERE id = "${id}"`
-      let _ = await request(fdql)
+      let gql = `UPDATE ${collection} SET ${setClause} WHERE id = "${id}"`
+      let _ = await request(gql)
       ()
     },
 
     delete: async (collection: string, id: string): unit => {
-      let fdql = `DELETE FROM ${collection} WHERE id = "${id}"`
-      let _ = await request(fdql)
+      let gql = `DELETE FROM ${collection} WHERE id = "${id}"`
+      let _ = await request(gql)
       ()
     },
   }

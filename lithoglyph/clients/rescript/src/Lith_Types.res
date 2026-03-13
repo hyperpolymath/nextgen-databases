@@ -117,7 +117,7 @@ type migrationStatus = {
 
 /** Query request */
 type queryRequest = {
-  fdql: string,
+  gql: string,
   provenance?: provenance,
   explain?: bool,
 }

@@ -11,7 +11,7 @@
 
 ```
 lith/
-├── query/          # FBQLdt (dependently-typed query language)
+├── query/          # GQLdt (dependently-typed query language)
 ├── database/       # Lith core (this repo) - Forth implementation
 ├── bridge/         # Zig FFI bridge
 ├── studio/         # Web-based GUI

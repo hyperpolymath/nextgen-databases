@@ -1,6 +1,6 @@
 # This Repository Has Moved
 
-**FBQLdt is now part of the [Lithoglyph monorepo](https://github.com/hyperpolymath/lith).**
+**GQLdt is now part of the [Lithoglyph monorepo](https://github.com/hyperpolymath/lith).**
 
 ## New Location
 
@@ -9,11 +9,11 @@
 
 ## Why the Move?
 
-FBQLdt (Lithoglyph Query Language with dependent types) is the query interface for Lithoglyph. To improve discoverability and maintenance, we've consolidated the Lithoglyph ecosystem into a single monorepo:
+GQLdt (Lithoglyph Query Language with dependent types) is the query interface for Lithoglyph. To improve discoverability and maintenance, we've consolidated the Lithoglyph ecosystem into a single monorepo:
 
 ```
 lith/
-├── query/          # FBQLdt (this repo)
+├── query/          # GQLdt (this repo)
 ├── database/       # Form.Model + Form.Blocks (Forth core)
 ├── bridge/         # Zig FFI bridge
 ├── studio/         # Web-based GUI

@@ -9,7 +9,7 @@ image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,
 image:https://img.shields.io/badge/Stage-Development-orange.svg[Stage]
 
 [.lead]
-*Zero-friction interface for Lith with dependently-typed FBQL.*
+*Zero-friction interface for Lith with dependently-typed GQL.*
 
 Making verified, audit-grade databases accessible to everyone—even Apple users.
 
@@ -17,15 +17,15 @@ toc::[]
 
 == Overview
 
-Lith Studio is a graphical interface that lets non-technical users create and query Lith databases using FBQLdt (dependently-typed Lith Query Language) without needing to understand dependent types, proofs, or Lean 4.
+Lith Studio is a graphical interface that lets non-technical users create and query Lith databases using GQLdt (dependently-typed Lith Query Language) without needing to understand dependent types, proofs, or Lean 4.
 
 === The Problem
 
-FBQLdt provides compile-time verification of database constraints:
+GQLdt provides compile-time verification of database constraints:
 
 [source,gql]
 ----
--- FBQLdt: Requires understanding dependent types
+-- GQLdt: Requires understanding dependent types
 CREATE COLLECTION evidence (
   prompt_score : BoundedNat 0 100,  -- Type carries proof
   rationale : NonEmptyString        -- Can't be empty
@@ -69,7 +69,7 @@ Lith Studio provides a visual interface:
 └─────────────────────────────────────────────────────────────┘
 ----
 
-**Behind the scenes**: Studio generates FBQLdt with proofs automatically.
+**Behind the scenes**: Studio generates GQLdt with proofs automatically.
 
 == Architecture
 
@@ -82,11 +82,11 @@ Lith Studio provides a visual interface:
 │  └── Visual builders for schemas, queries, data entry,      │
 │      and schema normalization                               │
 ├─────────────────────────────────────────────────────────────┤
-│  FBQLdt (github.com/hyperpolymath/gqldt)                     │
+│  GQLdt (github.com/hyperpolymath/gqldt)                     │
 │  ├── Lean 4 type checker                                    │
 │  ├── Proof generation (incl. normalization proofs)          │
 │  ├── Normalization types (FunDep, 1NF-BCNF)                 │
-│  └── FBQL code generation                                    │
+│  └── GQL code generation                                    │
 ├─────────────────────────────────────────────────────────────┤
 │  Lith (github.com/hyperpolymath/lithoglyph)                   │
 │  ├── Form.Normalizer (Factor + Lean 4) - FD discovery       │
@@ -114,7 +114,7 @@ Visual query construction:
 * Point-and-click filters
 * Join visualization
 * Aggregation helpers
-* Live preview of generated FBQLdt
+* Live preview of generated GQLdt
 
 === Data Entry
 
@@ -144,7 +144,7 @@ Self-normalizing database features:
 * Proof-carrying schema evolution with rollback
 * "What's wrong with my schema?" in plain English
 
-See https://github.com/hyperpolymath/lithoglyph/blob/main/spec/self-normalizing.adoc[Lith Self-Normalizing Spec] and https://github.com/hyperpolymath/gqldt/blob/main/spec/normalization-types.md[FBQLdt Normalization Types].
+See https://github.com/hyperpolymath/lithoglyph/blob/main/spec/self-normalizing.adoc[Lith Self-Normalizing Spec] and https://github.com/hyperpolymath/gqldt/blob/main/spec/normalization-types.md[GQLdt Normalization Types].
 
 == Target Users
 
@@ -152,7 +152,7 @@ See https://github.com/hyperpolymath/lithoglyph/blob/main/spec/self-normalizing.
 | User Type | Pain Point | Studio Solution
 
 | Journalists
-| Need audit trails, don't know FBQL
+| Need audit trails, don't know GQL
 | Visual evidence entry with PROMPT scores
 
 | Researchers
@@ -186,7 +186,7 @@ See https://github.com/hyperpolymath/lithoglyph/blob/main/spec/self-normalizing.
 | No npm, secure by default
 
 | Type Checker
-| Lean 4 (via FBQLdt)
+| Lean 4 (via GQLdt)
 | Best IDE support, proof automation
 
 | Database
@@ -237,7 +237,7 @@ sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libsoup-3.0-dev \
 
 ==== Optional (for full functionality)
 
-* **Lean 4** (for FBQLdt type checking) - https://leanprover.github.io/lean4/doc/setup.html
+* **Lean 4** (for GQLdt type checking) - https://leanprover.github.io/lean4/doc/setup.html
 * **Deno** (alternative runtime) - `curl -fsSL https://deno.land/install.sh | sh`
 
 === Setup
@@ -307,7 +307,7 @@ lithoglyph-studio/
 │   ├── Types.res           # Shared type definitions
 │   ├── SchemaBuilder.res   # Collection creator UI
 │   ├── FieldEditor.res     # Field type picker
-│   ├── FqldtPreview.res    # Live FBQLdt code preview
+│   ├── FqldtPreview.res    # Live GQLdt code preview
 │   ├── QueryBuilder.res    # Visual query construction
 │   ├── DataEntryPanel.res  # Form-based data entry
 │   ├── ProofAssistant.res  # Proof generation UI
@@ -330,8 +330,8 @@ lithoglyph-studio/
 
 * [x] Visual collection creator
 * [x] Field type picker with constraints
-* [x] FBQLdt code generation (client-side)
-* [ ] Basic proof automation (awaiting FBQLdt M5)
+* [x] GQLdt code generation (client-side)
+* [ ] Basic proof automation (awaiting GQLdt M5)
 * [x] Copy code to clipboard
 * [x] Create collection workflow
 
@@ -363,19 +363,19 @@ lithoglyph-studio/
 * [x] Normal form visualization (1NF-BCNF)
 * [x] One-click normalization proposals UI
 * [ ] Backend integration (awaiting Lith M11)
-* [ ] FBQLdt proof integration for schema changes
+* [ ] GQLdt proof integration for schema changes
 
 === Blocking Dependencies
 
 * **Lith M11** - HTTP API Server (required for database operations)
-* **FBQLdt M5** - Zig FFI (required for real type checking)
+* **GQLdt M5** - Zig FFI (required for real type checking)
 
 == Related Projects
 
 * https://github.com/hyperpolymath/lithoglyph[Lith] - The narrative-first database
 * https://github.com/hyperpolymath/lithoglyph/blob/main/spec/self-normalizing.adoc[Lith Self-Normalizing] - Automatic FD discovery and proof-carrying schema evolution
-* https://github.com/hyperpolymath/gqldt[FBQLdt] - Dependently-typed Form Query Language
-* https://github.com/hyperpolymath/gqldt/blob/main/spec/normalization-types.md[FBQLdt Normalization Types] - Type-encoded functional dependencies and normal forms
+* https://github.com/hyperpolymath/gqldt[GQLdt] - Dependently-typed Form Query Language
+* https://github.com/hyperpolymath/gqldt/blob/main/spec/normalization-types.md[GQLdt Normalization Types] - Type-encoded functional dependencies and normal forms
 * https://github.com/hyperpolymath/bofig[BoFIG] - Evidence graph for investigative journalism
 * https://github.com/hyperpolymath/zotero-lithoglyph[Zotero-Lith] - Production pilot: reference manager with PROMPT scores
 * https://github.com/hyperpolymath/lithoglyph-debugger[Lith Debugger] - Proof-carrying database debugger (Lean 4 + Idris 2)

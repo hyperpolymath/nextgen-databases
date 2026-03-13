@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Lithoglyph BEAM NIF - Rust/Rustler implementation
 //
-// This NIF connects BEAM (Erlang/Gleam/Elixir) to Lithoglyph via the FormBD C ABI.
+// This NIF connects BEAM (Erlang/Gleam/Elixir) to Lithoglyph via the Lith C ABI.
 // Uses CBOR-encoded binaries for efficient data transfer.
 
 use rustler::{Encoder, Env, Error, ResourceArc, Term};

@@ -47,18 +47,18 @@ static void print_blob(const char* label, const LgBlob* blob) {
 
 static void free_blob(LgBlob* blob) {
     if (blob->ptr) {
-        fdb_blob_free(blob);
+        lith_blob_free(blob);
     }
 }
 
 /* Open a test database, return 0 on success */
-static int open_test_db(const char* name, FdbDb** db, LgBlob* err) {
-    FdbStatus s = fdb_db_open(
+static int open_test_db(const char* name, LithDb** db, LgBlob* err) {
+    LithStatus s = lith_db_open(
         (const uint8_t*)name, strlen(name),
         NULL, 0,
         db, err
     );
-    if (s != FDB_OK) {
+    if (s != LITH_OK) {
         print_blob("open error", err);
         free_blob(err);
         return 1;
@@ -70,7 +70,7 @@ static int open_test_db(const char* name, FdbDb** db, LgBlob* err) {
  * Test 1: Version
  * ============================================================ */
 static int test_version(void) {
-    uint32_t v = fdb_version();
+    uint32_t v = lith_version();
     printf("  version = %u (expected 100 = 0.1.0)\n", v);
     return (v == 100) ? 0 : 1;
 }
@@ -79,34 +79,34 @@ static int test_version(void) {
  * Test 2: Database Lifecycle (open + close)
  * ============================================================ */
 static int test_database_lifecycle(void) {
-    FdbDb* db = NULL;
+    LithDb* db = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-ffi.lgh", &db, &err)) return 1;
     printf("  db handle: %p\n", (void*)db);
 
-    FdbStatus s = fdb_db_close(db);
-    return (s == FDB_OK) ? 0 : 1;
+    LithStatus s = lith_db_close(db);
+    return (s == LITH_OK) ? 0 : 1;
 }
 
 /* ============================================================
  * Test 3: Transaction begin + commit (empty)
  * ============================================================ */
 static int test_transactions(void) {
-    FdbDb* db = NULL;
-    FdbTxn* txn = NULL;
+    LithDb* db = NULL;
+    LithTxn* txn = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-txn.lgh", &db, &err)) return 1;
 
-    FdbStatus s = fdb_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
-    if (s != FDB_OK) { print_blob("begin error", &err); free_blob(&err); fdb_db_close(db); return 1; }
+    LithStatus s = lith_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
+    if (s != LITH_OK) { print_blob("begin error", &err); free_blob(&err); lith_db_close(db); return 1; }
     printf("  txn handle: %p\n", (void*)txn);
 
-    s = fdb_txn_commit(txn, &err);
-    if (s != FDB_OK) { print_blob("commit error", &err); free_blob(&err); fdb_db_close(db); return 1; }
+    s = lith_txn_commit(txn, &err);
+    if (s != LITH_OK) { print_blob("commit error", &err); free_blob(&err); lith_db_close(db); return 1; }
 
-    fdb_db_close(db);
+    lith_db_close(db);
     return 0;
 }
 
@@ -114,56 +114,56 @@ static int test_transactions(void) {
  * Test 4: Transaction abort
  * ============================================================ */
 static int test_txn_abort(void) {
-    FdbDb* db = NULL;
-    FdbTxn* txn = NULL;
+    LithDb* db = NULL;
+    LithTxn* txn = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-abort.lgh", &db, &err)) return 1;
 
-    FdbStatus s = fdb_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    LithStatus s = lith_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     /* Apply something then abort — should not persist */
     const char* op = "{\"op\":\"insert\",\"doc\":{\"tmp\":true}}";
-    LgResult r = fdb_apply(txn, (const uint8_t*)op, strlen(op));
+    LgResult r = lith_apply(txn, (const uint8_t*)op, strlen(op));
     printf("  apply status before abort: %d\n", r.status);
     free_blob(&r.data);
     free_blob(&r.error_blob);
 
-    s = fdb_txn_abort(txn);
+    s = lith_txn_abort(txn);
     printf("  abort status: %d\n", s);
 
-    fdb_db_close(db);
-    return (s == FDB_OK) ? 0 : 1;
+    lith_db_close(db);
+    return (s == LITH_OK) ? 0 : 1;
 }
 
 /* ============================================================
  * Test 5: Apply operation (read-write, buffered)
  * ============================================================ */
 static int test_apply_readwrite(void) {
-    FdbDb* db = NULL;
-    FdbTxn* txn = NULL;
+    LithDb* db = NULL;
+    LithTxn* txn = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-apply-rw.lgh", &db, &err)) return 1;
 
     /* Must use read-write mode for apply */
-    FdbStatus s = fdb_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    LithStatus s = lith_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     const char* op = "{\"op\":\"insert\",\"collection\":\"users\",\"doc\":{\"name\":\"Alice\"}}";
-    LgResult result = fdb_apply(txn, (const uint8_t*)op, strlen(op));
+    LgResult result = lith_apply(txn, (const uint8_t*)op, strlen(op));
 
     printf("  result status: %d (expected 0 = OK)\n", result.status);
     print_blob("result data", &result.data);
 
-    int ok = (result.status == FDB_OK);
+    int ok = (result.status == LITH_OK);
     free_blob(&result.data);
     free_blob(&result.error_blob);
 
-    s = fdb_txn_commit(txn, &err);
+    s = lith_txn_commit(txn, &err);
     free_blob(&err);
-    fdb_db_close(db);
+    lith_db_close(db);
 
     return ok ? 0 : 1;
 }
@@ -172,36 +172,36 @@ static int test_apply_readwrite(void) {
  * Test 6: Apply + commit + read_blocks (round-trip)
  * ============================================================ */
 static int test_apply_commit_readback(void) {
-    FdbDb* db = NULL;
-    FdbTxn* txn = NULL;
+    LithDb* db = NULL;
+    LithTxn* txn = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-roundtrip.lgh", &db, &err)) return 1;
 
     /* Insert a document */
-    FdbStatus s = fdb_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    LithStatus s = lith_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     const char* doc = "{\"name\":\"Bob\",\"age\":30}";
-    LgResult r = fdb_apply(txn, (const uint8_t*)doc, strlen(doc));
+    LgResult r = lith_apply(txn, (const uint8_t*)doc, strlen(doc));
     free_blob(&r.data);
     free_blob(&r.error_blob);
 
-    s = fdb_txn_commit(txn, &err);
+    s = lith_txn_commit(txn, &err);
     free_blob(&err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     /* Read back all document blocks */
     LgBlob data = {0};
     LgBlob read_err = {0};
-    s = fdb_read_blocks(db, LG_BLOCK_TYPE_DOCUMENT, &data, &read_err);
+    s = lith_read_blocks(db, LG_BLOCK_TYPE_DOCUMENT, &data, &read_err);
     printf("  read_blocks status: %d\n", s);
     print_blob("blocks", &data);
 
-    int ok = (s == FDB_OK && data.ptr != NULL && data.len > 2); /* more than "[]" */
+    int ok = (s == LITH_OK && data.ptr != NULL && data.len > 2); /* more than "[]" */
     free_blob(&data);
     free_blob(&read_err);
-    fdb_db_close(db);
+    lith_db_close(db);
 
     return ok ? 0 : 1;
 }
@@ -210,42 +210,42 @@ static int test_apply_commit_readback(void) {
  * Test 7: Update block
  * ============================================================ */
 static int test_update_block(void) {
-    FdbDb* db = NULL;
-    FdbTxn* txn = NULL;
+    LithDb* db = NULL;
+    LithTxn* txn = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-update.lgh", &db, &err)) return 1;
 
     /* Insert first */
-    FdbStatus s = fdb_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    LithStatus s = lith_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     const char* doc1 = "{\"version\":1}";
-    LgResult r = fdb_apply(txn, (const uint8_t*)doc1, strlen(doc1));
+    LgResult r = lith_apply(txn, (const uint8_t*)doc1, strlen(doc1));
     /* Parse block_id from result — for simplicity, use block_id=1 (first allocation) */
     free_blob(&r.data);
     free_blob(&r.error_blob);
 
-    s = fdb_txn_commit(txn, &err);
+    s = lith_txn_commit(txn, &err);
     free_blob(&err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     /* Update the block */
-    s = fdb_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    s = lith_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     const char* doc2 = "{\"version\":2}";
     LgBlob update_err = {0};
-    s = fdb_update_block(txn, 1, (const uint8_t*)doc2, strlen(doc2), &update_err);
+    s = lith_update_block(txn, 1, (const uint8_t*)doc2, strlen(doc2), &update_err);
     printf("  update_block status: %d\n", s);
 
-    int ok = (s == FDB_OK);
+    int ok = (s == LITH_OK);
     free_blob(&update_err);
 
     LgBlob commit_err = {0};
-    fdb_txn_commit(txn, &commit_err);
+    lith_txn_commit(txn, &commit_err);
     free_blob(&commit_err);
-    fdb_db_close(db);
+    lith_db_close(db);
 
     return ok ? 0 : 1;
 }
@@ -254,38 +254,38 @@ static int test_update_block(void) {
  * Test 8: Delete block
  * ============================================================ */
 static int test_delete_block(void) {
-    FdbDb* db = NULL;
-    FdbTxn* txn = NULL;
+    LithDb* db = NULL;
+    LithTxn* txn = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-delete.lgh", &db, &err)) return 1;
 
     /* Insert a block */
-    FdbStatus s = fdb_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    LithStatus s = lith_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     const char* doc = "{\"delete_me\":true}";
-    LgResult r = fdb_apply(txn, (const uint8_t*)doc, strlen(doc));
+    LgResult r = lith_apply(txn, (const uint8_t*)doc, strlen(doc));
     free_blob(&r.data);
     free_blob(&r.error_blob);
-    fdb_txn_commit(txn, &err);
+    lith_txn_commit(txn, &err);
     free_blob(&err);
 
     /* Delete the block */
-    s = fdb_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    s = lith_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     LgBlob del_err = {0};
-    s = fdb_delete_block(txn, 1, &del_err);
+    s = lith_delete_block(txn, 1, &del_err);
     printf("  delete_block status: %d\n", s);
 
-    int ok = (s == FDB_OK);
+    int ok = (s == LITH_OK);
     free_blob(&del_err);
 
     LgBlob commit_err = {0};
-    fdb_txn_commit(txn, &commit_err);
+    lith_txn_commit(txn, &commit_err);
     free_blob(&commit_err);
-    fdb_db_close(db);
+    lith_db_close(db);
 
     return ok ? 0 : 1;
 }
@@ -294,15 +294,15 @@ static int test_delete_block(void) {
  * Test 9: Read blocks by type
  * ============================================================ */
 static int test_read_blocks_by_type(void) {
-    FdbDb* db = NULL;
-    FdbTxn* txn = NULL;
+    LithDb* db = NULL;
+    LithTxn* txn = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-read-type.lgh", &db, &err)) return 1;
 
     /* Insert some documents */
-    FdbStatus s = fdb_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    LithStatus s = lith_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     const char* docs[] = {
         "{\"item\":\"alpha\"}",
@@ -310,24 +310,24 @@ static int test_read_blocks_by_type(void) {
         "{\"item\":\"gamma\"}",
     };
     for (int i = 0; i < 3; i++) {
-        LgResult r = fdb_apply(txn, (const uint8_t*)docs[i], strlen(docs[i]));
+        LgResult r = lith_apply(txn, (const uint8_t*)docs[i], strlen(docs[i]));
         free_blob(&r.data);
         free_blob(&r.error_blob);
     }
-    fdb_txn_commit(txn, &err);
+    lith_txn_commit(txn, &err);
     free_blob(&err);
 
     /* Read by document type */
     LgBlob data = {0};
     LgBlob read_err = {0};
-    s = fdb_read_blocks(db, LG_BLOCK_TYPE_DOCUMENT, &data, &read_err);
+    s = lith_read_blocks(db, LG_BLOCK_TYPE_DOCUMENT, &data, &read_err);
     printf("  read_blocks (type 0x0011) status: %d\n", s);
     print_blob("blocks", &data);
 
-    int ok = (s == FDB_OK && data.ptr != NULL);
+    int ok = (s == LITH_OK && data.ptr != NULL);
     free_blob(&data);
     free_blob(&read_err);
-    fdb_db_close(db);
+    lith_db_close(db);
 
     return ok ? 0 : 1;
 }
@@ -336,35 +336,35 @@ static int test_read_blocks_by_type(void) {
  * Test 10: Render block
  * ============================================================ */
 static int test_render_block(void) {
-    FdbDb* db = NULL;
-    FdbTxn* txn = NULL;
+    LithDb* db = NULL;
+    LithTxn* txn = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-render-block.lgh", &db, &err)) return 1;
 
     /* Insert a document */
-    FdbStatus s = fdb_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    LithStatus s = lith_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     const char* doc = "{\"rendered\":true}";
-    LgResult r = fdb_apply(txn, (const uint8_t*)doc, strlen(doc));
+    LgResult r = lith_apply(txn, (const uint8_t*)doc, strlen(doc));
     free_blob(&r.data);
     free_blob(&r.error_blob);
-    fdb_txn_commit(txn, &err);
+    lith_txn_commit(txn, &err);
     free_blob(&err);
 
     /* Render block 1 */
     LgBlob text = {0};
     LgBlob render_err = {0};
     LgRenderOpts opts = { .format = 0, .include_metadata = false };
-    s = fdb_render_block(db, 1, opts, &text, &render_err);
+    s = lith_render_block(db, 1, opts, &text, &render_err);
     printf("  render_block status: %d\n", s);
     print_blob("rendered", &text);
 
-    int ok = (s == FDB_OK && text.ptr != NULL);
+    int ok = (s == LITH_OK && text.ptr != NULL);
     free_blob(&text);
     free_blob(&render_err);
-    fdb_db_close(db);
+    lith_db_close(db);
 
     return ok ? 0 : 1;
 }
@@ -373,35 +373,35 @@ static int test_render_block(void) {
  * Test 11: Render journal
  * ============================================================ */
 static int test_render_journal(void) {
-    FdbDb* db = NULL;
-    FdbTxn* txn = NULL;
+    LithDb* db = NULL;
+    LithTxn* txn = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-render-journal.lgh", &db, &err)) return 1;
 
     /* Insert something to generate journal entries */
-    FdbStatus s = fdb_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    LithStatus s = lith_txn_begin(db, LG_TXN_READ_WRITE, &txn, &err);
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     const char* doc = "{\"journaled\":true}";
-    LgResult r = fdb_apply(txn, (const uint8_t*)doc, strlen(doc));
+    LgResult r = lith_apply(txn, (const uint8_t*)doc, strlen(doc));
     free_blob(&r.data);
     free_blob(&r.error_blob);
-    fdb_txn_commit(txn, &err);
+    lith_txn_commit(txn, &err);
     free_blob(&err);
 
     /* Render journal since sequence 0 */
     LgBlob text = {0};
     LgBlob journal_err = {0};
     LgRenderOpts opts = { .format = 0, .include_metadata = false };
-    s = fdb_render_journal(db, 0, opts, &text, &journal_err);
+    s = lith_render_journal(db, 0, opts, &text, &journal_err);
     printf("  render_journal status: %d\n", s);
     print_blob("journal", &text);
 
-    int ok = (s == FDB_OK && text.ptr != NULL);
+    int ok = (s == LITH_OK && text.ptr != NULL);
     free_blob(&text);
     free_blob(&journal_err);
-    fdb_db_close(db);
+    lith_db_close(db);
 
     return ok ? 0 : 1;
 }
@@ -410,72 +410,72 @@ static int test_render_journal(void) {
  * Test 12: Introspection (schema + constraints)
  * ============================================================ */
 static int test_introspection(void) {
-    FdbDb* db = NULL;
+    LithDb* db = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-intro.lgh", &db, &err)) return 1;
 
     /* Schema */
     LgBlob schema = {0};
-    FdbStatus s = fdb_introspect_schema(db, &schema, &err);
+    LithStatus s = lith_introspect_schema(db, &schema, &err);
     printf("  schema status: %d\n", s);
     print_blob("schema", &schema);
     free_blob(&schema);
     free_blob(&err);
 
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     /* Constraints */
     LgBlob constraints = {0};
     LgBlob c_err = {0};
-    s = fdb_introspect_constraints(db, &constraints, &c_err);
+    s = lith_introspect_constraints(db, &constraints, &c_err);
     printf("  constraints status: %d\n", s);
     print_blob("constraints", &constraints);
     free_blob(&constraints);
     free_blob(&c_err);
 
-    fdb_db_close(db);
-    return (s == FDB_OK) ? 0 : 1;
+    lith_db_close(db);
+    return (s == LITH_OK) ? 0 : 1;
 }
 
 /* ============================================================
  * Test 13: Proof init builtins
  * ============================================================ */
 static int test_proof_init_builtins(void) {
-    FdbStatus s = fdb_proof_init_builtins();
+    LithStatus s = lith_proof_init_builtins();
     printf("  init_builtins status: %d\n", s);
-    return (s == FDB_OK) ? 0 : 1;
+    return (s == LITH_OK) ? 0 : 1;
 }
 
 /* ============================================================
  * Test 14: Proof register + unregister verifier
  * ============================================================ */
-static FdbStatus dummy_verifier(const uint8_t* proof, size_t len, void* ctx) {
+static LithStatus dummy_verifier(const uint8_t* proof, size_t len, void* ctx) {
     (void)proof; (void)len; (void)ctx;
-    return FDB_OK;
+    return LITH_OK;
 }
 
 static int test_proof_register_unregister(void) {
     const char* type_name = "test-verifier";
-    FdbStatus s = fdb_proof_register_verifier(
+    LithStatus s = lith_proof_register_verifier(
         (const uint8_t*)type_name, strlen(type_name),
         dummy_verifier, NULL
     );
     printf("  register status: %d\n", s);
-    if (s != FDB_OK) return 1;
+    if (s != LITH_OK) return 1;
 
-    s = fdb_proof_unregister_verifier(
+    s = lith_proof_unregister_verifier(
         (const uint8_t*)type_name, strlen(type_name)
     );
     printf("  unregister status: %d\n", s);
-    if (s != FDB_OK) return 1;
+    if (s != LITH_OK) return 1;
 
     /* Unregister again should fail with NOT_FOUND */
-    s = fdb_proof_unregister_verifier(
+    s = lith_proof_unregister_verifier(
         (const uint8_t*)type_name, strlen(type_name)
     );
-    printf("  double-unregister status: %d (expected %d = NOT_FOUND)\n", s, FDB_ERR_NOT_FOUND);
-    return (s == FDB_ERR_NOT_FOUND) ? 0 : 1;
+    printf("  double-unregister status: %d (expected %d = NOT_FOUND)\n", s, LITH_ERR_NOT_FOUND);
+    return (s == LITH_ERR_NOT_FOUND) ? 0 : 1;
 }
 
 /* ============================================================
@@ -483,20 +483,20 @@ static int test_proof_register_unregister(void) {
  * ============================================================ */
 static int test_proof_verify(void) {
     /* Ensure builtins are registered */
-    fdb_proof_init_builtins();
+    lith_proof_init_builtins();
 
     const char* proof_json = "{\"type\":\"fd-holds\",\"data\":\"dGVzdA==\"}";
     bool valid = false;
     LgBlob err = {0};
 
-    FdbStatus s = fdb_proof_verify(
+    LithStatus s = lith_proof_verify(
         (const uint8_t*)proof_json, strlen(proof_json),
         &valid, &err
     );
     printf("  verify status: %d, valid: %s\n", s, valid ? "true" : "false");
     free_blob(&err);
 
-    return (s == FDB_OK && valid) ? 0 : 1;
+    return (s == LITH_OK && valid) ? 0 : 1;
 }
 
 /* ============================================================
@@ -505,7 +505,7 @@ static int test_proof_verify(void) {
 static int test_blob_free_null(void) {
     LgBlob empty = { .ptr = NULL, .len = 0 };
     /* Should not crash */
-    fdb_blob_free(&empty);
+    lith_blob_free(&empty);
     printf("  blob_free(NULL) did not crash\n");
     return 0;
 }
@@ -514,25 +514,25 @@ static int test_blob_free_null(void) {
  * Test 17: Apply on read-only transaction (should fail)
  * ============================================================ */
 static int test_apply_readonly_rejected(void) {
-    FdbDb* db = NULL;
-    FdbTxn* txn = NULL;
+    LithDb* db = NULL;
+    LithTxn* txn = NULL;
     LgBlob err = {0};
 
     if (open_test_db("test-ro.lgh", &db, &err)) return 1;
 
-    FdbStatus s = fdb_txn_begin(db, LG_TXN_READ_ONLY, &txn, &err);
-    if (s != FDB_OK) { fdb_db_close(db); return 1; }
+    LithStatus s = lith_txn_begin(db, LG_TXN_READ_ONLY, &txn, &err);
+    if (s != LITH_OK) { lith_db_close(db); return 1; }
 
     const char* op = "{\"op\":\"insert\",\"doc\":{\"x\":1}}";
-    LgResult result = fdb_apply(txn, (const uint8_t*)op, strlen(op));
+    LgResult result = lith_apply(txn, (const uint8_t*)op, strlen(op));
 
     printf("  apply on read-only status: %d (expected non-zero)\n", result.status);
-    int ok = (result.status != FDB_OK); /* should be rejected */
+    int ok = (result.status != LITH_OK); /* should be rejected */
 
     free_blob(&result.data);
     free_blob(&result.error_blob);
-    fdb_txn_abort(txn);
-    fdb_db_close(db);
+    lith_txn_abort(txn);
+    lith_db_close(db);
 
     return ok ? 0 : 1;
 }

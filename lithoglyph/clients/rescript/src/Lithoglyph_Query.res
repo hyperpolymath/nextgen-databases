@@ -2,7 +2,7 @@
 // Copyright (c) 2026 Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>
 //
 // Lithoglyph ReScript Client - Query Builder
-// Type-safe FDQL query construction with fluent API
+// Type-safe GQL query construction with fluent API
 //
 // Compatible with Deno runtime (not Node/npm)
 
@@ -12,7 +12,7 @@ open Lithoglyph_Types
 // Comparison Operators
 // =============================================================================
 
-/** Comparison operators for FDQL WHERE clauses */
+/** Comparison operators for GQL WHERE clauses */
 type compareOp =
   | Eq
   | Ne
@@ -23,7 +23,7 @@ type compareOp =
   | Like
   | In
 
-/** Convert a comparison operator to its FDQL string representation */
+/** Convert a comparison operator to its GQL string representation */
 let compareOpToString = op =>
   switch op {
   | Eq => "="
@@ -47,8 +47,8 @@ type rec filterExpr =
   | Or(filterExpr, filterExpr)
   | Not(filterExpr)
 
-/** Convert a filter expression to its FDQL string representation */
-let rec filterToFdql = filter =>
+/** Convert a filter expression to its GQL string representation */
+let rec filterToGql = filter =>
   switch filter {
   | Field(name, op, value) => {
       let valueStr = switch value {
@@ -60,9 +60,9 @@ let rec filterToFdql = filter =>
       }
       `${name} ${compareOpToString(op)} ${valueStr}`
     }
-  | And(a, b) => `(${filterToFdql(a)} AND ${filterToFdql(b)})`
-  | Or(a, b) => `(${filterToFdql(a)} OR ${filterToFdql(b)})`
-  | Not(f) => `NOT (${filterToFdql(f)})`
+  | And(a, b) => `(${filterToGql(a)} AND ${filterToGql(b)})`
+  | Or(a, b) => `(${filterToGql(a)} OR ${filterToGql(b)})`
+  | Not(f) => `NOT (${filterToGql(f)})`
   }
 
 // =============================================================================
@@ -143,8 +143,8 @@ let withProvenance = (builder, prov) => {
   builder
 }
 
-/** Build the FDQL query string from the query builder */
-let toFdql = builder => {
+/** Build the GQL query string from the query builder */
+let toGql = builder => {
   let collection = switch builder.collection {
   | Some(c) => c
   | None => panic("Collection is required")
@@ -158,7 +158,7 @@ let toFdql = builder => {
   let mut query = `SELECT ${fieldsStr} FROM ${collection}`
 
   switch builder.filter {
-  | Some(filter) => query = query ++ ` WHERE ${filterToFdql(filter)}`
+  | Some(filter) => query = query ++ ` WHERE ${filterToGql(filter)}`
   | None => ()
   }
 
@@ -226,8 +226,8 @@ let insertWithProvenance = (builder, prov) => {
   builder
 }
 
-/** Build the FDQL INSERT string */
-let insertToFdql = builder => {
+/** Build the GQL INSERT string */
+let insertToGql = builder => {
   let collection = switch builder.collection {
   | Some(c) => c
   | None => panic("Collection is required")
@@ -294,8 +294,8 @@ let updateWithProvenance = (builder, prov) => {
   builder
 }
 
-/** Build the FDQL UPDATE string */
-let updateToFdql = builder => {
+/** Build the GQL UPDATE string */
+let updateToGql = builder => {
   let collection = switch builder.collection {
   | Some(c) => c
   | None => panic("Collection is required")
@@ -322,7 +322,7 @@ let updateToFdql = builder => {
   let mut query = `UPDATE ${collection} SET ${setsClauses}`
 
   switch builder.filter {
-  | Some(filter) => query = query ++ ` WHERE ${filterToFdql(filter)}`
+  | Some(filter) => query = query ++ ` WHERE ${filterToGql(filter)}`
   | None => ()
   }
 
@@ -372,8 +372,8 @@ let deleteWithProvenance = (builder, prov) => {
   builder
 }
 
-/** Build the FDQL DELETE string */
-let deleteToFdql = builder => {
+/** Build the GQL DELETE string */
+let deleteToGql = builder => {
   let collection = switch builder.collection {
   | Some(c) => c
   | None => panic("Collection is required")
@@ -382,7 +382,7 @@ let deleteToFdql = builder => {
   let mut query = `DELETE FROM ${collection}`
 
   switch builder.filter {
-  | Some(filter) => query = query ++ ` WHERE ${filterToFdql(filter)}`
+  | Some(filter) => query = query ++ ` WHERE ${filterToGql(filter)}`
   | None => ()
   }
 

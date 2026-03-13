@@ -270,7 +270,7 @@ def verifyProofPure (proof : Proof) : VerificationResult :=
 /-- Verify that an FD holds with given confidence -/
 def verifyFDHolds (det dep : List String) (conf : Float) : IO VerificationResult := do
   let proof := encodeFDProof det dep conf
-  -- In production: call FFI to fdb_proof_verify
+  -- In production: call FFI to lith_proof_verify
   -- For now: use pure verification
   return verifyProofPure proof
 

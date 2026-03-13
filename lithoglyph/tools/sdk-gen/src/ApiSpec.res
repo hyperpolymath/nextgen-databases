@@ -74,10 +74,10 @@ let lithSpec: apiSpec = {
       name: "query",
       method: POST,
       path: "/query",
-      description: "Execute an FDQL query",
+      description: "Execute an GQL query",
       parameters: [],
       requestBody: Some(Object([
-        ("fdql", String),
+        ("gql", String),
         ("provenance", Optional(Ref("Provenance"))),
         ("explain", Optional(Bool)),
       ])),

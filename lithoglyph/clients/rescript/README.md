@@ -70,11 +70,11 @@ let query = Lithoglyph_Query.make()
 let result = await client->Lithoglyph.queryWith(query)
 ```
 
-### Raw FDQL
+### Raw GQL
 
 ```rescript
 let result = await client->Lithoglyph.query(
-  ~fdql=`SELECT * FROM articles WHERE status = "published" LIMIT 10`,
+  ~gql=`SELECT * FROM articles WHERE status = "published" LIMIT 10`,
   ~provenance={
     actor: "editor@news.org",
     rationale: "Daily review"
@@ -91,7 +91,7 @@ switch result {
 
 ```rescript
 let result = await client->Lithoglyph.queryGraphQL(
-  ~fdql=`SELECT * FROM articles LIMIT 5`
+  ~gql=`SELECT * FROM articles LIMIT 5`
 )
 ```
 
@@ -99,7 +99,7 @@ let result = await client->Lithoglyph.queryGraphQL(
 
 ```rescript
 let plan = await client->Lithoglyph.explain(
-  ~fdql=`SELECT * FROM articles WHERE status = "published"`,
+  ~gql=`SELECT * FROM articles WHERE status = "published"`,
   ~analyze=true
 )
 
@@ -248,7 +248,7 @@ let client = Lithoglyph.make(
 |--------|---------|
 | `Lithoglyph` | Main client (REST + GraphQL) |
 | `Lithoglyph_Types` | All type definitions |
-| `Lithoglyph_Query` | FDQL query builder |
+| `Lithoglyph_Query` | GQL query builder |
 | `Lithoglyph_Subscriptions` | WebSocket real-time subscriptions |
 
 ## Error Handling

@@ -28,15 +28,15 @@ type Query {
     actor: String
   ): JournalConnection!
 
-  """Execute an FDQL query"""
+  """Execute an GQL query"""
   query(
-    fdql: String!
+    gql: String!
     provenance: ProvenanceInput
   ): QueryResult!
 
-  """Explain an FDQL query without executing"""
+  """Explain an GQL query without executing"""
   explain(
-    fdql: String!
+    gql: String!
     analyze: Boolean = false
     verbose: Boolean = false
   ): ExplainResult!
@@ -63,9 +63,9 @@ type Mutation {
     provenance: ProvenanceInput!
   ): DropCollectionResult!
 
-  """Execute an FDQL mutation (INSERT, UPDATE, DELETE)"""
+  """Execute an GQL mutation (INSERT, UPDATE, DELETE)"""
   execute(
-    fdql: String!
+    gql: String!
     provenance: ProvenanceInput!
   ): MutationResult!
 
@@ -114,7 +114,7 @@ type Subscription {
 
   """Stream query results for large result sets"""
   queryStream(
-    fdql: String!
+    gql: String!
     provenance: ProvenanceInput
   ): JSON!
 

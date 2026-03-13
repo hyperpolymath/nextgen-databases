@@ -27,7 +27,7 @@ mod atoms {
         alloc_failed,
         resource_alloc_failed,
         result_alloc_failed,
-        // Bridge status code atoms (match FdbStatus enum in bridge.h)
+        // Bridge status code atoms (match LithStatus enum in bridge.h)
         internal_error,
         not_found,
         out_of_memory,
@@ -50,11 +50,11 @@ mod atoms {
 // shared library links against liblith at load time.
 // ============================================================
 
-/// FdbStatus codes (must match bridge.h FdbStatus enum)
+/// LithStatus codes (must match bridge.h LithStatus enum)
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(dead_code)]
-enum FdbStatus {
+enum LithStatus {
     Ok = 0,
     ErrInternal = 1,
     ErrNotFound = 2,
@@ -69,8 +69,8 @@ enum FdbStatus {
     ErrAlreadyExists = 11,
 }
 
-impl FdbStatus {
-    /// Convert a raw C int status code to an FdbStatus enum variant.
+impl LithStatus {
+    /// Convert a raw C int status code to an LithStatus enum variant.
     fn from_raw(code: i32) -> Self {
         match code {
             0 => Self::Ok,
@@ -89,7 +89,7 @@ impl FdbStatus {
         }
     }
 
-    /// Convert an FdbStatus to a Rustler atom for BEAM error tuples.
+    /// Convert an LithStatus to a Rustler atom for BEAM error tuples.
     fn to_atom(&self) -> rustler::Atom {
         match self {
             Self::Ok => atoms::ok(),
@@ -110,13 +110,13 @@ impl FdbStatus {
 
 /// Opaque database handle from the core bridge
 #[repr(C)]
-struct FdbDb {
+struct LithDb {
     _opaque: [u8; 0],
 }
 
 /// Opaque transaction handle from the core bridge
 #[repr(C)]
-struct FdbTxn {
+struct LithTxn {
     _opaque: [u8; 0],
 }
 
@@ -164,45 +164,45 @@ struct LgRenderOpts {
 
 extern "C" {
     /// Open a Lith database.
-    fn fdb_db_open(
+    fn lith_db_open(
         path_ptr: *const u8,
         path_len: usize,
         opts_ptr: *const u8,
         opts_len: usize,
-        out_db: *mut *mut FdbDb,
+        out_db: *mut *mut LithDb,
         out_err: *mut LgBlob,
     ) -> i32;
 
     /// Close a Lith database and release resources.
-    fn fdb_db_close(db: *mut FdbDb) -> i32;
+    fn lith_db_close(db: *mut LithDb) -> i32;
 
     /// Begin a new transaction.
-    fn fdb_txn_begin(
-        db: *mut FdbDb,
+    fn lith_txn_begin(
+        db: *mut LithDb,
         mode: LgTxnMode,
-        out_txn: *mut *mut FdbTxn,
+        out_txn: *mut *mut LithTxn,
         out_err: *mut LgBlob,
     ) -> i32;
 
     /// Commit a transaction (6-phase WAL).
-    fn fdb_txn_commit(txn: *mut FdbTxn, out_err: *mut LgBlob) -> i32;
+    fn lith_txn_commit(txn: *mut LithTxn, out_err: *mut LgBlob) -> i32;
 
     /// Abort a transaction, discarding all buffered operations.
-    fn fdb_txn_abort(txn: *mut FdbTxn) -> i32;
+    fn lith_txn_abort(txn: *mut LithTxn) -> i32;
 
     /// Apply an insert operation within a transaction.
-    fn fdb_apply(txn: *mut FdbTxn, op_ptr: *const u8, op_len: usize) -> LgResult;
+    fn lith_apply(txn: *mut LithTxn, op_ptr: *const u8, op_len: usize) -> LgResult;
 
     /// Get database schema information as JSON.
-    fn fdb_introspect_schema(
-        db: *mut FdbDb,
+    fn lith_introspect_schema(
+        db: *mut LithDb,
         out_schema: *mut LgBlob,
         out_err: *mut LgBlob,
     ) -> i32;
 
     /// Render journal entries since a sequence number.
-    fn fdb_render_journal(
-        db: *mut FdbDb,
+    fn lith_render_journal(
+        db: *mut LithDb,
         since: u64,
         opts: LgRenderOpts,
         out_text: *mut LgBlob,
@@ -210,19 +210,19 @@ extern "C" {
     ) -> i32;
 
     /// Free a blob allocated by the bridge.
-    fn fdb_blob_free(blob: *mut LgBlob);
+    fn lith_blob_free(blob: *mut LgBlob);
 
     /// Get Lith version as encoded integer (major * 10000 + minor * 100 + patch).
-    fn fdb_version() -> u32;
+    fn lith_version() -> u32;
 }
 
 /// Helper: free an LgBlob if its pointer is non-null.
 fn free_blob_if_nonnull(blob: &mut LgBlob) {
     if !blob.ptr.is_null() {
         // SAFETY: blob.ptr is non-null (checked above). The bridge allocated this
-        // blob and fdb_blob_free is the designated deallocator for bridge-allocated
+        // blob and lith_blob_free is the designated deallocator for bridge-allocated
         // blobs. After this call, blob.ptr is set to null by the bridge.
-        unsafe { fdb_blob_free(blob) };
+        unsafe { lith_blob_free(blob) };
     }
 }
 
@@ -234,7 +234,7 @@ fn blob_to_vec_and_free(blob: &mut LgBlob) -> Vec<u8> {
     }
 
     // SAFETY: blob.ptr is non-null and blob.len > 0 (checked above). The bridge
-    // guarantees the pointer is valid for blob.len bytes until fdb_blob_free() is
+    // guarantees the pointer is valid for blob.len bytes until lith_blob_free() is
     // called. We copy the data before freeing, so no use-after-free.
     let data = unsafe { std::slice::from_raw_parts(blob.ptr, blob.len) }.to_vec();
     free_blob_if_nonnull(blob);
@@ -245,26 +245,26 @@ fn blob_to_vec_and_free(blob: &mut LgBlob) -> Vec<u8> {
 // NIF Handle Wrappers
 // ============================================================
 
-/// Database handle wrapper — holds a raw FdbDb pointer from the core bridge.
+/// Database handle wrapper — holds a raw LithDb pointer from the core bridge.
 /// The pointer is protected by a Mutex because BEAM NIF resources can be accessed
 /// from multiple scheduler threads. The Option allows us to close the database
 /// once and set the pointer to None.
 struct DbHandle {
-    fdb: Mutex<Option<*mut FdbDb>>,
+    lith: Mutex<Option<*mut LithDb>>,
     #[allow(dead_code)] // Retained for debug logging and error messages
     path: String,
 }
 
-// SAFETY: FdbDb is an opaque handle from the C bridge. The bridge implementation
+// SAFETY: LithDb is an opaque handle from the C bridge. The bridge implementation
 // (ffi/zig/src/bridge.zig) uses thread-local state and global locks internally.
 // We additionally protect the raw pointer with a Mutex to prevent concurrent
 // access from multiple BEAM scheduler threads at the NIF level.
 unsafe impl Send for DbHandle {}
 unsafe impl Sync for DbHandle {}
 
-/// Transaction handle wrapper — holds a raw FdbTxn pointer from the core bridge.
+/// Transaction handle wrapper — holds a raw LithTxn pointer from the core bridge.
 struct TxnHandle {
-    fdb_txn: Mutex<Option<*mut FdbTxn>>,
+    lith_txn: Mutex<Option<*mut LithTxn>>,
     #[allow(dead_code)] // Retained to prevent db from being dropped while txn is active
     db: ResourceArc<DbHandle>,
     #[allow(dead_code)] // Retained for commit/abort validation
@@ -305,27 +305,27 @@ fn load(env: Env, _info: Term) -> bool {
 /// Returns {Major, Minor, Patch} tuple.
 #[rustler::nif]
 fn version() -> (i32, i32, i32) {
-    // SAFETY: fdb_version is a pure function with no side effects that
+    // SAFETY: lith_version is a pure function with no side effects that
     // returns a u32 version encoding. No pointers, no allocations.
-    let ver = unsafe { fdb_version() };
+    let ver = unsafe { lith_version() };
     let major = (ver / 10000) as i32;
     let minor = ((ver % 10000) / 100) as i32;
     let patch = (ver % 100) as i32;
     (major, minor, patch)
 }
 
-/// Open a Lithoglyph database via the core bridge (fdb_db_open).
+/// Open a Lithoglyph database via the core bridge (lith_db_open).
 /// Returns {:ok, DbRef} | {:error, reason}
 #[rustler::nif]
 fn db_open(path: String) -> Result<ResourceArc<DbHandle>, rustler::Atom> {
-    let mut out_db: *mut FdbDb = ptr::null_mut();
+    let mut out_db: *mut LithDb = ptr::null_mut();
     let mut out_err = LgBlob::default();
 
     // SAFETY: path.as_ptr() and path.len() provide a valid byte slice for the
     // duration of the call. opts_ptr is null with opts_len 0 (no options).
     // out_db and out_err are valid mutable pointers to stack-allocated variables.
     let status_code = unsafe {
-        fdb_db_open(
+        lith_db_open(
             path.as_ptr(),
             path.len(),
             ptr::null(),
@@ -338,33 +338,33 @@ fn db_open(path: String) -> Result<ResourceArc<DbHandle>, rustler::Atom> {
     // Free error blob regardless of outcome
     free_blob_if_nonnull(&mut out_err);
 
-    let status = FdbStatus::from_raw(status_code);
-    if status != FdbStatus::Ok || out_db.is_null() {
+    let status = LithStatus::from_raw(status_code);
+    if status != LithStatus::Ok || out_db.is_null() {
         return Err(atoms::init_failed());
     }
 
     let db = DbHandle {
-        fdb: Mutex::new(Some(out_db)),
+        lith: Mutex::new(Some(out_db)),
         path,
     };
 
     Ok(ResourceArc::new(db))
 }
 
-/// Close a Lithoglyph database via the core bridge (fdb_db_close).
+/// Close a Lithoglyph database via the core bridge (lith_db_close).
 /// Returns :ok | {:error, reason}
 #[rustler::nif]
 fn db_close(db: ResourceArc<DbHandle>) -> Result<rustler::Atom, rustler::Atom> {
-    let mut guard = db.fdb.lock().map_err(|_| atoms::internal_error())?;
+    let mut guard = db.lith.lock().map_err(|_| atoms::internal_error())?;
 
     match guard.take() {
-        Some(fdb_ptr) => {
-            // SAFETY: fdb_ptr was obtained from a successful fdb_db_open call and
+        Some(lith_ptr) => {
+            // SAFETY: lith_ptr was obtained from a successful lith_db_open call and
             // has not been closed yet (we take() it from the Option to ensure
-            // single-close semantics). The pointer is valid for fdb_db_close.
-            let status_code = unsafe { fdb_db_close(fdb_ptr) };
-            let status = FdbStatus::from_raw(status_code);
-            if status != FdbStatus::Ok {
+            // single-close semantics). The pointer is valid for lith_db_close.
+            let status_code = unsafe { lith_db_close(lith_ptr) };
+            let status = LithStatus::from_raw(status_code);
+            if status != LithStatus::Ok {
                 return Err(status.to_atom());
             }
             Ok(atoms::ok())
@@ -376,7 +376,7 @@ fn db_close(db: ResourceArc<DbHandle>) -> Result<rustler::Atom, rustler::Atom> {
     }
 }
 
-/// Begin a transaction via the core bridge (fdb_txn_begin).
+/// Begin a transaction via the core bridge (lith_txn_begin).
 /// Returns {:ok, TxnRef} | {:error, reason}
 #[rustler::nif]
 fn txn_begin(
@@ -389,18 +389,18 @@ fn txn_begin(
         _ => return Err(atoms::invalid_argument()),
     };
 
-    let guard = db.fdb.lock().map_err(|_| atoms::internal_error())?;
-    let fdb_ptr = guard.ok_or_else(|| atoms::invalid_handle())?;
+    let guard = db.lith.lock().map_err(|_| atoms::internal_error())?;
+    let lith_ptr = guard.ok_or_else(|| atoms::invalid_handle())?;
 
-    let mut out_txn: *mut FdbTxn = ptr::null_mut();
+    let mut out_txn: *mut LithTxn = ptr::null_mut();
     let mut out_err = LgBlob::default();
 
-    // SAFETY: fdb_ptr is a valid, non-null FdbDb pointer obtained from a
-    // successful fdb_db_open (checked via Option::ok_or above). out_txn and
+    // SAFETY: lith_ptr is a valid, non-null LithDb pointer obtained from a
+    // successful lith_db_open (checked via Option::ok_or above). out_txn and
     // out_err are valid mutable pointers to stack-allocated variables.
     let status_code = unsafe {
-        fdb_txn_begin(
-            fdb_ptr,
+        lith_txn_begin(
+            lith_ptr,
             txn_mode.to_lg_mode(),
             &mut out_txn,
             &mut out_err,
@@ -410,8 +410,8 @@ fn txn_begin(
     // Free error blob regardless of outcome
     free_blob_if_nonnull(&mut out_err);
 
-    let status = FdbStatus::from_raw(status_code);
-    if status != FdbStatus::Ok || out_txn.is_null() {
+    let status = LithStatus::from_raw(status_code);
+    if status != LithStatus::Ok || out_txn.is_null() {
         return Err(status.to_atom());
     }
 
@@ -420,7 +420,7 @@ fn txn_begin(
     drop(guard);
 
     let txn = TxnHandle {
-        fdb_txn: Mutex::new(Some(out_txn)),
+        lith_txn: Mutex::new(Some(out_txn)),
         db,
         mode: txn_mode,
     };
@@ -428,27 +428,27 @@ fn txn_begin(
     Ok(ResourceArc::new(txn))
 }
 
-/// Commit a transaction via the core bridge (fdb_txn_commit).
+/// Commit a transaction via the core bridge (lith_txn_commit).
 /// Executes the 6-phase WAL: journal -> sync -> blocks -> deletes -> superblock -> sync.
 /// Returns :ok | {:error, reason}
 #[rustler::nif]
 fn txn_commit(txn: ResourceArc<TxnHandle>) -> Result<rustler::Atom, rustler::Atom> {
-    let mut guard = txn.fdb_txn.lock().map_err(|_| atoms::internal_error())?;
+    let mut guard = txn.lith_txn.lock().map_err(|_| atoms::internal_error())?;
 
     match guard.take() {
         Some(txn_ptr) => {
             let mut out_err = LgBlob::default();
 
-            // SAFETY: txn_ptr was obtained from a successful fdb_txn_begin call
+            // SAFETY: txn_ptr was obtained from a successful lith_txn_begin call
             // and has not been committed or aborted yet (we take() it from the
             // Option to ensure single-use semantics). out_err is a valid mutable
             // pointer to a stack-allocated LgBlob.
-            let status_code = unsafe { fdb_txn_commit(txn_ptr, &mut out_err) };
+            let status_code = unsafe { lith_txn_commit(txn_ptr, &mut out_err) };
 
             free_blob_if_nonnull(&mut out_err);
 
-            let status = FdbStatus::from_raw(status_code);
-            if status != FdbStatus::Ok {
+            let status = LithStatus::from_raw(status_code);
+            if status != LithStatus::Ok {
                 return Err(status.to_atom());
             }
             Ok(atoms::ok())
@@ -460,21 +460,21 @@ fn txn_commit(txn: ResourceArc<TxnHandle>) -> Result<rustler::Atom, rustler::Ato
     }
 }
 
-/// Abort a transaction via the core bridge (fdb_txn_abort).
+/// Abort a transaction via the core bridge (lith_txn_abort).
 /// Returns :ok | {:error, reason}
 #[rustler::nif]
 fn txn_abort(txn: ResourceArc<TxnHandle>) -> Result<rustler::Atom, rustler::Atom> {
-    let mut guard = txn.fdb_txn.lock().map_err(|_| atoms::internal_error())?;
+    let mut guard = txn.lith_txn.lock().map_err(|_| atoms::internal_error())?;
 
     match guard.take() {
         Some(txn_ptr) => {
-            // SAFETY: txn_ptr was obtained from a successful fdb_txn_begin call
+            // SAFETY: txn_ptr was obtained from a successful lith_txn_begin call
             // and has not been committed or aborted yet (we take() it from the
-            // Option). The pointer is valid for fdb_txn_abort.
-            let status_code = unsafe { fdb_txn_abort(txn_ptr) };
+            // Option). The pointer is valid for lith_txn_abort.
+            let status_code = unsafe { lith_txn_abort(txn_ptr) };
 
-            let status = FdbStatus::from_raw(status_code);
-            if status != FdbStatus::Ok {
+            let status = LithStatus::from_raw(status_code);
+            if status != LithStatus::Ok {
                 return Err(status.to_atom());
             }
             Ok(atoms::ok())
@@ -486,7 +486,7 @@ fn txn_abort(txn: ResourceArc<TxnHandle>) -> Result<rustler::Atom, rustler::Atom
     }
 }
 
-/// Apply an operation within a transaction via the core bridge (fdb_apply).
+/// Apply an operation within a transaction via the core bridge (lith_apply).
 /// The bridge parses the CBOR/JSON payload, validates it, and buffers the write.
 ///
 /// Returns {:ok, result_binary} | {:ok, result_binary, provenance_binary} | {:error, reason}
@@ -500,7 +500,7 @@ fn apply_op<'a>(env: Env<'a>, txn: ResourceArc<TxnHandle>, op_cbor: rustler::Bin
         return (atoms::error(), atoms::invalid_argument()).encode(env);
     }
 
-    let guard = match txn.fdb_txn.lock() {
+    let guard = match txn.lith_txn.lock() {
         Ok(g) => g,
         Err(_) => return (atoms::error(), atoms::internal_error()).encode(env),
     };
@@ -510,13 +510,13 @@ fn apply_op<'a>(env: Env<'a>, txn: ResourceArc<TxnHandle>, op_cbor: rustler::Bin
         None => return (atoms::error(), atoms::txn_not_active()).encode(env),
     };
 
-    // SAFETY: txn_ptr is a valid, non-null FdbTxn pointer obtained from a
-    // successful fdb_txn_begin (checked via Option match above). op_cbor.as_ref()
+    // SAFETY: txn_ptr is a valid, non-null LithTxn pointer obtained from a
+    // successful lith_txn_begin (checked via Option match above). op_cbor.as_ref()
     // provides a valid byte slice for the duration of the call.
-    let mut result = unsafe { fdb_apply(txn_ptr, op_cbor.as_ref().as_ptr(), op_cbor.len()) };
+    let mut result = unsafe { lith_apply(txn_ptr, op_cbor.as_ref().as_ptr(), op_cbor.len()) };
 
-    let status = FdbStatus::from_raw(result.status);
-    if status != FdbStatus::Ok {
+    let status = LithStatus::from_raw(result.status);
+    if status != LithStatus::Ok {
         free_blob_if_nonnull(&mut result.error_blob);
         free_blob_if_nonnull(&mut result.data);
         free_blob_if_nonnull(&mut result.provenance);
@@ -543,25 +543,25 @@ fn apply_op<'a>(env: Env<'a>, txn: ResourceArc<TxnHandle>, op_cbor: rustler::Bin
     (atoms::ok(), result_data).encode(env)
 }
 
-/// Get database schema via the core bridge (fdb_introspect_schema).
+/// Get database schema via the core bridge (lith_introspect_schema).
 /// Returns {:ok, schema_json_binary} | {:error, reason}
 #[rustler::nif]
 fn schema(db: ResourceArc<DbHandle>) -> Result<Vec<u8>, rustler::Atom> {
-    let guard = db.fdb.lock().map_err(|_| atoms::internal_error())?;
-    let fdb_ptr = guard.ok_or_else(|| atoms::invalid_handle())?;
+    let guard = db.lith.lock().map_err(|_| atoms::internal_error())?;
+    let lith_ptr = guard.ok_or_else(|| atoms::invalid_handle())?;
 
     let mut out_schema = LgBlob::default();
     let mut out_err = LgBlob::default();
 
-    // SAFETY: fdb_ptr is a valid, non-null FdbDb pointer (checked via Option::ok_or
+    // SAFETY: lith_ptr is a valid, non-null LithDb pointer (checked via Option::ok_or
     // above). out_schema and out_err are valid mutable pointers to stack-allocated
     // LgBlob structs.
-    let status_code = unsafe { fdb_introspect_schema(fdb_ptr, &mut out_schema, &mut out_err) };
+    let status_code = unsafe { lith_introspect_schema(lith_ptr, &mut out_schema, &mut out_err) };
 
     free_blob_if_nonnull(&mut out_err);
 
-    let status = FdbStatus::from_raw(status_code);
-    if status != FdbStatus::Ok {
+    let status = LithStatus::from_raw(status_code);
+    if status != LithStatus::Ok {
         free_blob_if_nonnull(&mut out_schema);
         return Err(status.to_atom());
     }
@@ -576,12 +576,12 @@ fn schema(db: ResourceArc<DbHandle>) -> Result<Vec<u8>, rustler::Atom> {
     Ok(data)
 }
 
-/// Get journal entries since a sequence number via the core bridge (fdb_render_journal).
+/// Get journal entries since a sequence number via the core bridge (lith_render_journal).
 /// Returns {:ok, journal_json_binary} | {:error, reason}
 #[rustler::nif]
 fn journal(db: ResourceArc<DbHandle>, since: i64) -> Result<Vec<u8>, rustler::Atom> {
-    let guard = db.fdb.lock().map_err(|_| atoms::internal_error())?;
-    let fdb_ptr = guard.ok_or_else(|| atoms::invalid_handle())?;
+    let guard = db.lith.lock().map_err(|_| atoms::internal_error())?;
+    let lith_ptr = guard.ok_or_else(|| atoms::invalid_handle())?;
 
     // Clamp negative values to 0 (meaning "from the beginning")
     let since_u64 = if since >= 0 { since as u64 } else { 0 };
@@ -594,17 +594,17 @@ fn journal(db: ResourceArc<DbHandle>, since: i64) -> Result<Vec<u8>, rustler::At
     let mut out_text = LgBlob::default();
     let mut out_err = LgBlob::default();
 
-    // SAFETY: fdb_ptr is a valid, non-null FdbDb pointer (checked via Option::ok_or
+    // SAFETY: lith_ptr is a valid, non-null LithDb pointer (checked via Option::ok_or
     // above). opts is a valid LgRenderOpts value. out_text and out_err are valid
     // mutable pointers to stack-allocated LgBlob structs.
     let status_code = unsafe {
-        fdb_render_journal(fdb_ptr, since_u64, opts, &mut out_text, &mut out_err)
+        lith_render_journal(lith_ptr, since_u64, opts, &mut out_text, &mut out_err)
     };
 
     free_blob_if_nonnull(&mut out_err);
 
-    let status = FdbStatus::from_raw(status_code);
-    if status != FdbStatus::Ok {
+    let status = LithStatus::from_raw(status_code);
+    if status != LithStatus::Ok {
         free_blob_if_nonnull(&mut out_text);
         return Err(status.to_atom());
     }

@@ -494,7 +494,7 @@ insertEvidence title scores
 **Document Status:** Complete guide to type safety enforcement
 
 **See Also:**
-- `src/FbqlDt/AST.lean` - Type-safe AST
-- `src/FbqlDt/TypeSafe.lean` - Smart constructors
-- `src/FbqlDt/TypeChecker.lean` - Type checking algorithm
+- `src/GqlDt/AST.lean` - Type-safe AST
+- `src/GqlDt/TypeSafe.lean` - Smart constructors
+- `src/GqlDt/TypeChecker.lean` - Type checking algorithm
 - `test/TypeSafetyTests.lean` - Demonstrations

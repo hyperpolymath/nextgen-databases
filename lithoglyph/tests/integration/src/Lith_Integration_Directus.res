@@ -73,7 +73,7 @@ let test_itemsCreateAction = async (): testResult => {
       "headers": Js.Dict.fromArray([("Content-Type", "application/json")]),
       "body": Js.Json.stringify(
         Js.Json.object_(Js.Dict.fromArray([
-          ("fdql", Js.Json.string(`INSERT INTO items ${Js.Json.stringify(payload)}`)),
+          ("gql", Js.Json.string(`INSERT INTO items ${Js.Json.stringify(payload)}`)),
         ])),
       ),
     },
@@ -99,7 +99,7 @@ let test_itemsUpdateAction = async (): testResult => {
     {
       "method": "POST",
       "headers": Js.Dict.fromArray([("Content-Type", "application/json")]),
-      "body": `{"fdql": "UPDATE items SET {\\"title\\": \\"Updated\\"} WHERE id = \\"123\\""}`,
+      "body": `{"gql": "UPDATE items SET {\\"title\\": \\"Updated\\"} WHERE id = \\"123\\""}`,
     },
   )
 
@@ -123,7 +123,7 @@ let test_itemsDeleteAction = async (): testResult => {
     {
       "method": "POST",
       "headers": Js.Dict.fromArray([("Content-Type", "application/json")]),
-      "body": `{"fdql": "DELETE FROM items WHERE id = \\"123\\""}`,
+      "body": `{"gql": "DELETE FROM items WHERE id = \\"123\\""}`,
     },
   )
 
@@ -150,7 +150,7 @@ let test_errorHandling = async (): testResult => {
     {
       "method": "POST",
       "headers": Js.Dict.fromArray([("Content-Type", "application/json")]),
-      "body": `{"fdql": "SELECT * FROM test"}`,
+      "body": `{"gql": "SELECT * FROM test"}`,
     },
   )
 

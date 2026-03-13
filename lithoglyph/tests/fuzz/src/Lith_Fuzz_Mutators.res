@@ -150,8 +150,8 @@ let byteReplace = (rng: rng, input: string): string => {
   }
 }
 
-/** FDQL dictionary for dictionary mutation */
-let fdqlDictionary: array<string> = [
+/** GQL dictionary for dictionary mutation */
+let gqlDictionary: array<string> = [
   "SELECT", "INSERT", "UPDATE", "DELETE", "FROM", "INTO", "SET", "WHERE",
   "CREATE", "DROP", "COLLECTION", "EDGE", "EXPLAIN", "ANALYZE", "VERBOSE",
   "INTROSPECT", "SCHEMA", "CONSTRAINTS", "COLLECTIONS", "JOURNAL",
@@ -163,7 +163,7 @@ let fdqlDictionary: array<string> = [
 
 /** Dictionary mutation */
 let dictionary = (rng: rng, input: string): string => {
-  let word = pick(rng, fdqlDictionary)->Option.getOr("SELECT")
+  let word = pick(rng, gqlDictionary)->Option.getOr("SELECT")
   let len = String.length(input)
   if len == 0 {
     word

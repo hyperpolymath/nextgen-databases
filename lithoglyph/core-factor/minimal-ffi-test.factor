@@ -14,12 +14,12 @@ IN: minimal-ffi-test
 
 ! Declare simplest function
 LIBRARY: lithoglyph-bridge
-FUNCTION: int fdb_get_version ( )
+FUNCTION: int lith_get_version ( )
 
 ! Test it
 : test-version ( -- )
-    "Testing fdb_get_version..." print
-    fdb_get_version "Version: " write . ;
+    "Testing lith_get_version..." print
+    lith_get_version "Version: " write . ;
 
 ! Run test
 test-version

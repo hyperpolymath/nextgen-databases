@@ -187,10 +187,10 @@ let graphqlRequest = async (client, ~query, ~variables=?, ~operationName=?) => {
 // Query Operations (REST)
 // =============================================================================
 
-/** Execute an FDQL query via REST API */
-let query = async (client, ~fdql, ~provenance=?, ~explain=?) => {
+/** Execute an GQL query via REST API */
+let query = async (client, ~gql, ~provenance=?, ~explain=?) => {
   let body: JSON.t = JSON.Encode.object([
-    ("fdql", JSON.Encode.string(fdql)),
+    ("gql", JSON.Encode.string(gql)),
     ...switch provenance {
     | Some(p) => [
         (
@@ -248,19 +248,19 @@ let query = async (client, ~fdql, ~provenance=?, ~explain=?) => {
 
 /** Execute a query using the query builder */
 let queryWith = async (client, builder) => {
-  let fdql = builder->toFdql
+  let gql = builder->toGql
   let provenance = builder.provenance
-  await query(client, ~fdql, ~provenance?)
+  await query(client, ~gql, ~provenance?)
 }
 
 // =============================================================================
 // Query Operations (GraphQL)
 // =============================================================================
 
-/** Execute an FDQL query via GraphQL API */
-let queryGraphQL = async (client, ~fdql, ~provenance=?) => {
+/** Execute an GQL query via GraphQL API */
+let queryGraphQL = async (client, ~gql, ~provenance=?) => {
   let variables: JSON.t = JSON.Encode.object([
-    ("fdql", JSON.Encode.string(fdql)),
+    ("gql", JSON.Encode.string(gql)),
     ...switch provenance {
     | Some(p) => [
         (
@@ -276,8 +276,8 @@ let queryGraphQL = async (client, ~fdql, ~provenance=?) => {
   ])
 
   let gqlQuery = `
-    query ExecuteQuery($fdql: String!, $provenance: ProvenanceInput) {
-      query(fdql: $fdql, provenance: $provenance) {
+    query ExecuteQuery($gql: String!, $provenance: ProvenanceInput) {
+      query(gql: $gql, provenance: $provenance) {
         rows
         rowCount
         journalSeq
@@ -338,9 +338,9 @@ let queryGraphQL = async (client, ~fdql, ~provenance=?) => {
 // =============================================================================
 
 /** Get the query execution plan without running the query */
-let explain = async (client, ~fdql, ~analyze=?, ~verbose=?) => {
+let explain = async (client, ~gql, ~analyze=?, ~verbose=?) => {
   let body: JSON.t = JSON.Encode.object([
-    ("fdql", JSON.Encode.string(fdql)),
+    ("gql", JSON.Encode.string(gql)),
     ("explain", JSON.Encode.bool(true)),
     ...switch analyze {
     | Some(true) => [("analyze", JSON.Encode.bool(true))]

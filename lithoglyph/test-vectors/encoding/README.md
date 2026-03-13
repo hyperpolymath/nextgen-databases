@@ -68,7 +68,7 @@ vectors:
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `JOURNAL_MAGIC` | `0x4644424A` | Magic bytes "FDBJ" |
+| `JOURNAL_MAGIC` | `0x4644424A` | Magic bytes (legacy "FDBJ", retained for format compatibility) |
 | `ENTRY_HEADER_SIZE` | 48 | Journal entry header size |
 | `MIN_JOURNAL_ENTRY_SIZE` | 21 | Minimum entry (header fields only) |
 | `MAX_JOURNAL_ENTRY_SIZE` | 10485760 | Maximum entry (10 MB) |

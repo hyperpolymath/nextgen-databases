@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (@hyperpolymath)
 //
-// query_executor.zig - Simple FQL Query Executor in Zig
+// query_executor.zig - Simple GQL Query Executor in Zig
 //
 // This is a minimal implementation for M5. Later it will call Factor runtime.
 
@@ -41,7 +41,7 @@ pub const SimpleExecutor = struct {
         self.collections.deinit();
     }
 
-    /// Execute a simple FQL query (hardcoded for M5)
+    /// Execute a simple GQL query (hardcoded for M5)
     pub fn execute(self: *SimpleExecutor, query: []const u8) !QueryResult {
         // Simple query parsing - just check for keywords
         if (std.mem.indexOf(u8, query, "SELECT") != null) {

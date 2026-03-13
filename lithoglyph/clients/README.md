@@ -56,7 +56,7 @@ foreach ($result->rows as $row) {
 
 All clients support:
 
-- **FDQL Queries** - Full query language support
+- **GQL Queries** - Full query language support
 - **Query Builder** - Type-safe, fluent query construction
 - **Provenance** - Audit trail metadata on all operations
 - **Collections** - List, create, delete collections

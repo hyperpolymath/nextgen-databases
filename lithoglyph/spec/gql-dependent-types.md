@@ -237,7 +237,7 @@ def head {α : Type} {n : Nat} : Vector α (n + 1) → α
 ```
 
 **GQL Usage**:
-```fql
+```gql
 -- Fixed-size array (compile-time checked)
 CREATE COLLECTION survey_responses (
   id : UUID,
@@ -264,7 +264,7 @@ def mkTracked (a : α) (actor : ActorId) (ts : Timestamp) (rat : Rationale)
 ```
 
 **GQL Usage**:
-```fql
+```gql
 -- All values automatically tracked
 CREATE COLLECTION claims (
   id : UUID,
@@ -302,7 +302,7 @@ def mkPromptScores (p r o m pub t : PromptDimension) : PromptScores :=
 ```
 
 **GQL Usage**:
-```fql
+```gql
 INSERT INTO evidence (prompt_scores)
 VALUES ({
   provenance: 100,
@@ -345,7 +345,7 @@ axiom roundTripPreservesIdentity {α : Type} (x : α) (f : α → α)
 ```
 
 **GQL Usage**:
-```fql
+```gql
 -- Reversible insertion
 INSERT INTO claims (text)
 VALUES ('Some claim')
@@ -387,7 +387,7 @@ def combineClaims {c1 c2 : Confidence}
 ```
 
 **GQL Usage**:
-```fql
+```gql
 -- Claim with confidence in type
 CREATE COLLECTION claims (
   id : UUID,
@@ -425,7 +425,7 @@ def createPath {ordering : Evidence → Evidence → Bool}
 ```
 
 **GQL Usage**:
-```fql
+```gql
 -- Path with proven ordering
 CREATE NAVIGATION_PATH 'skeptic_path'
 FOR INVESTIGATION 'uk_inflation_2023'
@@ -445,7 +445,7 @@ END;
 ### 5.1 CREATE COLLECTION (With Dependent Types)
 
 **Syntax**:
-```fql
+```gql
 CREATE COLLECTION [IF NOT EXISTS] collection_name (
   column_name : type [constraints],
   ...
@@ -455,7 +455,7 @@ CREATE COLLECTION [IF NOT EXISTS] collection_name (
 **Examples**:
 
 **Simple Refinement Types**:
-```fql
+```gql
 CREATE COLLECTION evidence (
   id : UUID,
   title : NonEmptyString,
@@ -469,7 +469,7 @@ CREATE COLLECTION evidence (
 ```
 
 **Provenance Tracking**:
-```fql
+```gql
 CREATE COLLECTION claims (
   id : UUID,
   text : NonEmptyString,
@@ -479,7 +479,7 @@ CREATE COLLECTION claims (
 ```
 
 **PROMPT Scores with Proof**:
-```fql
+```gql
 CREATE COLLECTION evidence (
   id : UUID,
   title : NonEmptyString,
@@ -488,7 +488,7 @@ CREATE COLLECTION evidence (
 ```
 
 **Length-Indexed Arrays**:
-```fql
+```gql
 CREATE COLLECTION survey (
   id : UUID,
   responses : Vector (BoundedNat 1 5) 10  -- Exactly 10 ratings (1-5 scale)
@@ -497,7 +497,7 @@ CREATE COLLECTION survey (
 
 ### 5.2 CREATE EDGE_COLLECTION (With Types)
 
-```fql
+```gql
 CREATE EDGE_COLLECTION relationships (
   from_id : UUID,
   to_id : UUID,
@@ -508,7 +508,7 @@ CREATE EDGE_COLLECTION relationships (
 
 ### 5.3 CREATE CONSTRAINT (With Proofs)
 
-```fql
+```gql
 CREATE CONSTRAINT chk_adult_content
 ON users (age : BoundedNat 0 150)
 CHECK (age.val ≥ 18)
@@ -524,7 +524,7 @@ APPROVERS "legal_team";
 ### 6.1 INSERT (With Proof Obligations)
 
 **Syntax**:
-```fql
+```gql
 INSERT INTO collection_name (columns : types)
 VALUES (values)
 RATIONALE (rationale : Rationale)
@@ -534,7 +534,7 @@ RATIONALE (rationale : Rationale)
 **Examples**:
 
 **Simple Bounded Values**:
-```fql
+```gql
 INSERT INTO evidence (title, prompt_provenance)
 VALUES (
   'ONS CPI Data',
@@ -544,7 +544,7 @@ RATIONALE "Official statistics";
 ```
 
 **Invalid Value (Type Error)**:
-```fql
+```gql
 INSERT INTO evidence (prompt_provenance)
 VALUES (150)  -- TYPE ERROR!
 RATIONALE "Test";
@@ -554,7 +554,7 @@ RATIONALE "Test";
 ```
 
 **PROMPT Scores (Auto-Computed)**:
-```fql
+```gql
 INSERT INTO evidence (prompt_scores)
 VALUES ({
   provenance: 100,
@@ -569,7 +569,7 @@ RATIONALE "Official statistics";
 ```
 
 **With Explicit Proof**:
-```fql
+```gql
 INSERT INTO claims (text, confidence, evidence_list)
 VALUES (
   'Inflation claim',
@@ -586,7 +586,7 @@ WITH_PROOF {
 ### 6.2 UPDATE (With Correction Proof)
 
 **Syntax**:
-```fql
+```gql
 UPDATE collection_name
 SET column = value
 WHERE condition
@@ -597,7 +597,7 @@ REASON (reason : Rationale)
 **Examples**:
 
 **Simple Update**:
-```fql
+```gql
 UPDATE evidence
 SET prompt_replicability = 30  -- Type checker: 0 ≤ 30 ≤ 100 ✓
 WHERE id = 'study_x'
@@ -606,7 +606,7 @@ DISCLOSED_AT NOW();
 ```
 
 **Update with Proof of Validity**:
-```fql
+```gql
 UPDATE claims
 SET text = 'Corrected text',
     confidence = 0.98
@@ -619,7 +619,7 @@ WITH_PROOF {
 ```
 
 **Reversible Update**:
-```fql
+```gql
 UPDATE claims
 SET text = 'New text'
 WHERE id = 'claim_123'
@@ -638,7 +638,7 @@ WITH_PROOF {
 ### 6.3 DELETE (With Justification)
 
 **Reversible Delete**:
-```fql
+```gql
 DELETE FROM temp_data
 WHERE created_at < NOW() - INTERVAL '30 days'
 REASON "Temporary data expired"
@@ -652,7 +652,7 @@ WITH_PROOF {
 ```
 
 **Irreversible Delete**:
-```fql
+```gql
 DELETE FROM sensitive_data
 WHERE user = 'xyz'
 REASON "GDPR right to erasure"
@@ -672,7 +672,7 @@ WITH_JUSTIFICATION {
 ### 7.1 SELECT with Type Refinements
 
 **Syntax**:
-```fql
+```gql
 SELECT (columns : refined_types)
 FROM collection
 WHERE (condition : Prop)
@@ -682,7 +682,7 @@ RETURNING (result : ResultType);
 **Examples**:
 
 **Simple Refinement**:
-```fql
+```gql
 -- Return only high-quality evidence
 SELECT (e : Evidence | e.prompt_overall > 90)
 FROM evidence e
@@ -692,7 +692,7 @@ WHERE investigation_id = 'uk_inflation_2023';
 ```
 
 **Multiple Refinements**:
-```fql
+```gql
 SELECT (
   c : Claim | c.confidence > 0.85,
   e : Evidence | e.prompt_overall > 90
@@ -706,7 +706,7 @@ WHERE r.relationship_type = 'SUPPORTS';
 ```
 
 **Exists with Witness**:
-```fql
+```gql
 -- Find claims with at least one supporting evidence
 SELECT (c : Claim, ∃ e : Evidence, supports(c, e))
 FROM claims c
@@ -720,7 +720,7 @@ WHERE EXISTS (
 
 ### 7.2 Aggregates with Proofs
 
-```fql
+```gql
 -- Compute average with proof it's in bounds
 SELECT (
   investigation_id,
@@ -735,7 +735,7 @@ GROUP BY investigation_id;
 
 ### 7.3 JOIN with Type Safety
 
-```fql
+```gql
 -- Type-safe join
 SELECT *
 FROM claims c
@@ -750,7 +750,7 @@ FROM claims c
 ### 8.1 Automatic Proof Search
 
 **Simple Arithmetic**:
-```fql
+```gql
 INSERT INTO evidence (prompt_provenance)
 VALUES (95);  -- Type checker auto-proves: 0 ≤ 95 ≤ 100
 
@@ -759,7 +759,7 @@ VALUES (95);  -- Type checker auto-proves: 0 ≤ 95 ≤ 100
 ```
 
 **Computed Fields**:
-```fql
+```gql
 INSERT INTO evidence (prompt_scores)
 VALUES ({provenance: 100, ...});
 -- Type checker auto-computes overall and proves correctness
@@ -771,7 +771,7 @@ VALUES ({provenance: 100, ...});
 ### 8.2 Manual Proofs
 
 **When Auto-Proof Fails**:
-```fql
+```gql
 INSERT INTO claims (text, confidence, evidence_list)
 VALUES ('Complex claim', 0.92, [e1, e2, e3])
 RATIONALE "Multi-source synthesis"
@@ -810,7 +810,7 @@ aesop           -- Automated search
 ```
 
 **Example Usage**:
-```fql
+```gql
 WITH_PROOF {
   score_in_bounds: by omega,
   overall_correct: by simp [computeOverall]; norm_num,
@@ -878,7 +878,7 @@ end Lithoglyph.Tactics
 ```
 
 **Usage in GQL**:
-```fql
+```gql
 WITH_PROOF {
   score_valid: by lith_prompt,
   provenance_exists: by lith_prov,
@@ -933,7 +933,7 @@ theorem cached_proof_12345 : P := by <...compiled proof...>
 
 ### 10.1 BoFIG UK Inflation 2023 (Fully Typed)
 
-```fql
+```gql
 -- Step 1: Create evidence collection with dependent types
 CREATE COLLECTION bofig_evidence (
   id : UUID,
@@ -1035,7 +1035,7 @@ RETURNING (List (Claim × Evidence × Relationship) |
 
 ### 10.2 Correction Workflow (With Reversiibility Proof)
 
-```fql
+```gql
 -- Original insertion
 INSERT INTO bofig_claims (text, confidence)
 VALUES ('Inflation reached 12% in 2023', 0.90)
@@ -1079,7 +1079,7 @@ RETURNING (List CorrectionEntry |
 
 ### 10.3 My-Newsroom Belief Fusion (Type-Safe)
 
-```fql
+```gql
 -- Define belief type
 abbrev AgentBelief := Belief Confidence String
 
@@ -1137,7 +1137,7 @@ WITH_PROOF {
 
 ### 10.4 Navigation Path (With Ordering Proof)
 
-```fql
+```gql
 -- Create path with proven ordering
 CREATE NAVIGATION_PATH 'skeptic_path_typed'
 FOR INVESTIGATION 'uk_inflation_2023'

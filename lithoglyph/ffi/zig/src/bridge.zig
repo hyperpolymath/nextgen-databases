@@ -21,7 +21,7 @@
 //   - Library-level init/cleanup lifecycle (not needed by core-zig)
 //   - Type adaptation between Idris2 ABI types and core-zig Lg* types
 //   - Collection-level operations (future, requires schema layer)
-//   - FQL query execution (future, requires Factor/Forth runtime)
+//   - GQL query execution (future, requires Factor/Forth runtime)
 //   - Cursor-based result iteration (future, requires query engine)
 //   - Seam boundary tests for multi-language integration
 //
@@ -39,7 +39,7 @@ const cbor = @import("cbor.zig");
 const query_executor = @import("query_executor.zig");
 
 // Import core-zig bridge (the real storage engine implementation).
-// This module provides all the Lg* types and fdb_* functions.
+// This module provides all the Lg* types and lith_* functions.
 // Its `export fn` declarations will appear in the shared library's symbol table.
 const core_bridge = @import("core_bridge");
 
@@ -48,10 +48,10 @@ const core_bridge = @import("core_bridge");
 // ============================================================
 
 /// Opaque database handle (delegates to core-zig LgDb)
-pub const FdbDb = core_bridge.LgDb;
+pub const LithDb = core_bridge.LgDb;
 
 /// Opaque transaction handle (delegates to core-zig LgTxn)
-pub const FdbTxn = core_bridge.LgTxn;
+pub const LithTxn = core_bridge.LgTxn;
 
 /// Core-zig types re-exported for FFI layer consumers
 pub const LgBlob = core_bridge.LgBlob;
@@ -61,7 +61,7 @@ pub const LgRenderOpts = core_bridge.LgRenderOpts;
 pub const LgTxnMode = core_bridge.LgTxnMode;
 pub const LgProofVerifier = core_bridge.LgProofVerifier;
 
-/// Status codes (matches Idris2 FdbStatus).
+/// Status codes (matches Idris2 LithStatus).
 /// Maps to/from core-zig LgStatus internally.
 pub const Status = enum(i32) {
     ok = 0,
@@ -79,11 +79,11 @@ pub const Status = enum(i32) {
 };
 
 // Opaque handle types for features not yet in core-zig
-pub const FdbCursor = opaque {};
-pub const FdbCollection = opaque {};
-pub const FdbSchema = opaque {};
-pub const FdbJournal = opaque {};
-pub const FdbMigration = opaque {};
+pub const LithCursor = opaque {};
+pub const LithCollection = opaque {};
+pub const LithSchema = opaque {};
+pub const LithJournal = opaque {};
+pub const LithMigration = opaque {};
 
 // ============================================================
 // Status Mapping: core-zig LgStatus <-> FFI Status
@@ -119,8 +119,8 @@ var global_executor: ?query_executor.SimpleExecutor = null;
 
 /// Initialize Lith library.
 /// Sets up the query executor and any global state needed by the FFI layer.
-/// The core-zig storage engine is initialized per-database via fdb_open.
-export fn fdb_init() callconv(.c) i32 {
+/// The core-zig storage engine is initialized per-database via lith_open.
+export fn lith_init() callconv(.c) i32 {
     if (initialized) return @intFromEnum(Status.ok);
 
     // Initialize query executor (M5 implementation)
@@ -135,7 +135,7 @@ export fn fdb_init() callconv(.c) i32 {
 
 /// Cleanup Lith library.
 /// Tears down global state. Individual databases should be closed first.
-export fn fdb_cleanup() callconv(.c) void {
+export fn lith_cleanup() callconv(.c) void {
     if (!initialized) return;
 
     if (global_executor) |*executor| {
@@ -149,27 +149,27 @@ export fn fdb_cleanup() callconv(.c) void {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Database Operations
-// Delegates to core-zig: fdb_db_open, fdb_db_close
+// Delegates to core-zig: lith_db_open, lith_db_close
 //
-// These have DIFFERENT C symbol names from core-zig (fdb_open vs fdb_db_open),
+// These have DIFFERENT C symbol names from core-zig (lith_open vs lith_db_open),
 // so they are declared as `export fn` without collision.
 ////////////////////////////////////////////////////////////////////////////////
 
 /// Open database.
-/// Delegates to core-zig/src/bridge.zig fdb_db_open which handles block
+/// Delegates to core-zig/src/bridge.zig lith_db_open which handles block
 /// storage initialization, superblock reading, and handle registration.
-export fn fdb_open(
+export fn lith_open(
     path: [*:0]const u8,
     path_len: u64,
-    db_out: *?*FdbDb,
+    db_out: *?*LithDb,
 ) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
     if (path_len == 0) return @intFromEnum(Status.invalid_arg);
     if (path_len > 4096) return @intFromEnum(Status.invalid_arg);
 
-    // Delegates to core-zig/src/bridge.zig fdb_db_open
+    // Delegates to core-zig/src/bridge.zig lith_db_open
     var err_blob: core_bridge.LgBlob = undefined;
-    const status = core_bridge.fdb_db_open(
+    const status = core_bridge.lith_db_open(
         @ptrCast(path),
         @intCast(path_len),
         null,
@@ -180,7 +180,7 @@ export fn fdb_open(
 
     if (status != .ok) {
         if (err_blob.ptr != null) {
-            core_bridge.fdb_blob_free(&err_blob);
+            core_bridge.lith_blob_free(&err_blob);
         }
     }
 
@@ -188,9 +188,9 @@ export fn fdb_open(
 }
 
 /// Close database.
-/// Delegates to core-zig/src/bridge.zig fdb_db_close which cleans up
+/// Delegates to core-zig/src/bridge.zig lith_db_close which cleans up
 /// active transactions, closes block storage, and deregisters the handle.
-export fn fdb_close(db: *FdbDb) callconv(.c) i32 {
+export fn lith_close(db: *LithDb) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
 
     // Clean up query executor if still active
@@ -199,30 +199,30 @@ export fn fdb_close(db: *FdbDb) callconv(.c) i32 {
         global_executor = null;
     }
 
-    // Delegates to core-zig/src/bridge.zig fdb_db_close
-    const status = core_bridge.fdb_db_close(db);
+    // Delegates to core-zig/src/bridge.zig lith_db_close
+    const status = core_bridge.lith_db_close(db);
     return fromLgStatus(status);
 }
 
 /// Create new database.
-/// Delegates to core-zig/src/bridge.zig fdb_db_open which creates a new
+/// Delegates to core-zig/src/bridge.zig lith_db_open which creates a new
 /// database file if one doesn't exist (open-or-create semantics).
-export fn fdb_create(
+export fn lith_create(
     path: [*:0]const u8,
     path_len: u64,
     block_count: u64,
-    db_out: *?*FdbDb,
+    db_out: *?*LithDb,
 ) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
     if (path_len == 0) return @intFromEnum(Status.invalid_arg);
     if (block_count == 0) return @intFromEnum(Status.invalid_arg);
     if (block_count > 1_000_000) return @intFromEnum(Status.invalid_arg); // 4GB limit
 
-    // Delegates to core-zig/src/bridge.zig fdb_db_open
-    // core-zig's fdb_db_open has open-or-create semantics via BlockStorage.open.
+    // Delegates to core-zig/src/bridge.zig lith_db_open
+    // core-zig's lith_db_open has open-or-create semantics via BlockStorage.open.
     // block_count is validated above but otherwise unused: core-zig auto-grows storage.
     var err_blob: core_bridge.LgBlob = undefined;
-    const status = core_bridge.fdb_db_open(
+    const status = core_bridge.lith_db_open(
         @ptrCast(path),
         @intCast(path_len),
         null,
@@ -233,7 +233,7 @@ export fn fdb_create(
 
     if (status != .ok) {
         if (err_blob.ptr != null) {
-            core_bridge.fdb_blob_free(&err_blob);
+            core_bridge.lith_blob_free(&err_blob);
         }
     }
 
@@ -242,26 +242,26 @@ export fn fdb_create(
 
 ////////////////////////////////////////////////////////////////////////////////
 // Transaction Operations
-// fdb_txn_begin and fdb_txn_commit have SAME C symbol names as core-zig but
+// lith_txn_begin and lith_txn_commit have SAME C symbol names as core-zig but
 // DIFFERENT signatures (FFI uses simpler i32 returns, core-zig uses LgStatus).
 // To avoid linker symbol collisions, these use `export fn` with unique names
-// that differ from core-zig (fdb_txn_rollback vs fdb_txn_abort).
-// For fdb_txn_begin/commit, the FFI versions shadow the core-zig versions.
+// that differ from core-zig (lith_txn_rollback vs lith_txn_abort).
+// For lith_txn_begin/commit, the FFI versions shadow the core-zig versions.
 ////////////////////////////////////////////////////////////////////////////////
 
 /// Begin transaction (FFI simplified API).
-/// Delegates to core-zig/src/bridge.zig fdb_txn_begin which creates a
+/// Delegates to core-zig/src/bridge.zig lith_txn_begin which creates a
 /// TxnState with pending write/delete buffers for WAL commit protocol.
 /// Uses read_write mode by default (the common case for FFI consumers).
-export fn fdb_ffi_txn_begin(
-    db: *FdbDb,
-    txn_out: *?*FdbTxn,
+export fn lith_ffi_txn_begin(
+    db: *LithDb,
+    txn_out: *?*LithTxn,
 ) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
 
-    // Delegates to core-zig/src/bridge.zig fdb_txn_begin
+    // Delegates to core-zig/src/bridge.zig lith_txn_begin
     var err_blob: core_bridge.LgBlob = undefined;
-    const status = core_bridge.fdb_txn_begin(
+    const status = core_bridge.lith_txn_begin(
         db,
         .read_write,
         txn_out,
@@ -270,7 +270,7 @@ export fn fdb_ffi_txn_begin(
 
     if (status != .ok) {
         if (err_blob.ptr != null) {
-            core_bridge.fdb_blob_free(&err_blob);
+            core_bridge.lith_blob_free(&err_blob);
         }
     }
 
@@ -278,7 +278,7 @@ export fn fdb_ffi_txn_begin(
 }
 
 /// Commit transaction (FFI simplified API).
-/// Delegates to core-zig/src/bridge.zig fdb_txn_commit which executes the
+/// Delegates to core-zig/src/bridge.zig lith_txn_commit which executes the
 /// 6-phase WAL commit protocol:
 ///   Phase 1: Write journal entries (WAL durable before data)
 ///   Phase 2: Sync journal to disk
@@ -286,16 +286,16 @@ export fn fdb_ffi_txn_begin(
 ///   Phase 4: Process deletions
 ///   Phase 5: Flush superblock
 ///   Phase 6: Final sync
-export fn fdb_ffi_txn_commit(txn: *FdbTxn) callconv(.c) i32 {
+export fn lith_ffi_txn_commit(txn: *LithTxn) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
 
-    // Delegates to core-zig/src/bridge.zig fdb_txn_commit
+    // Delegates to core-zig/src/bridge.zig lith_txn_commit
     var err_blob: core_bridge.LgBlob = undefined;
-    const status = core_bridge.fdb_txn_commit(txn, &err_blob);
+    const status = core_bridge.lith_txn_commit(txn, &err_blob);
 
     if (status != .ok) {
         if (err_blob.ptr != null) {
-            core_bridge.fdb_blob_free(&err_blob);
+            core_bridge.lith_blob_free(&err_blob);
         }
     }
 
@@ -303,14 +303,14 @@ export fn fdb_ffi_txn_commit(txn: *FdbTxn) callconv(.c) i32 {
 }
 
 /// Rollback transaction.
-/// Delegates to core-zig/src/bridge.zig fdb_txn_abort which discards all
+/// Delegates to core-zig/src/bridge.zig lith_txn_abort which discards all
 /// buffered operations (nothing written to disk yet due to WAL buffering).
-/// Named fdb_txn_rollback (vs core-zig's fdb_txn_abort) for Idris2 ABI compat.
-export fn fdb_txn_rollback(txn: *FdbTxn) callconv(.c) i32 {
+/// Named lith_txn_rollback (vs core-zig's lith_txn_abort) for Idris2 ABI compat.
+export fn lith_txn_rollback(txn: *LithTxn) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
 
-    // Delegates to core-zig/src/bridge.zig fdb_txn_abort
-    const status = core_bridge.fdb_txn_abort(txn);
+    // Delegates to core-zig/src/bridge.zig lith_txn_abort
+    const status = core_bridge.lith_txn_abort(txn);
     return fromLgStatus(status);
 }
 
@@ -323,51 +323,51 @@ export fn fdb_txn_rollback(txn: *FdbTxn) callconv(.c) i32 {
 ////////////////////////////////////////////////////////////////////////////////
 
 /// Apply an operation (insert a new block).
-/// Delegates to core-zig/src/bridge.zig fdb_apply which buffers the write
+/// Delegates to core-zig/src/bridge.zig lith_apply which buffers the write
 /// in the transaction's pending_writes list (not durable until commit).
 pub fn ffiApply(
-    txn: ?*FdbTxn,
+    txn: ?*LithTxn,
     op_ptr: [*]const u8,
     op_len: usize,
 ) core_bridge.LgResult {
-    // Delegates to core-zig/src/bridge.zig fdb_apply
-    return core_bridge.fdb_apply(txn, op_ptr, op_len);
+    // Delegates to core-zig/src/bridge.zig lith_apply
+    return core_bridge.lith_apply(txn, op_ptr, op_len);
 }
 
 /// Update an existing block within a transaction.
-/// Delegates to core-zig/src/bridge.zig fdb_update_block.
+/// Delegates to core-zig/src/bridge.zig lith_update_block.
 pub fn ffiUpdateBlock(
-    txn: ?*FdbTxn,
+    txn: ?*LithTxn,
     block_id: u64,
     data_ptr: [*]const u8,
     data_len: usize,
     out_err: *core_bridge.LgBlob,
 ) core_bridge.LgStatus {
-    // Delegates to core-zig/src/bridge.zig fdb_update_block
-    return core_bridge.fdb_update_block(txn, block_id, data_ptr, data_len, out_err);
+    // Delegates to core-zig/src/bridge.zig lith_update_block
+    return core_bridge.lith_update_block(txn, block_id, data_ptr, data_len, out_err);
 }
 
 /// Delete a block within a transaction.
-/// Delegates to core-zig/src/bridge.zig fdb_delete_block.
+/// Delegates to core-zig/src/bridge.zig lith_delete_block.
 pub fn ffiDeleteBlock(
-    txn: ?*FdbTxn,
+    txn: ?*LithTxn,
     block_id: u64,
     out_err: *core_bridge.LgBlob,
 ) core_bridge.LgStatus {
-    // Delegates to core-zig/src/bridge.zig fdb_delete_block
-    return core_bridge.fdb_delete_block(txn, block_id, out_err);
+    // Delegates to core-zig/src/bridge.zig lith_delete_block
+    return core_bridge.lith_delete_block(txn, block_id, out_err);
 }
 
 /// Read all blocks of a given type (full scan).
-/// Delegates to core-zig/src/bridge.zig fdb_read_blocks.
+/// Delegates to core-zig/src/bridge.zig lith_read_blocks.
 pub fn ffiReadBlocks(
-    db: ?*FdbDb,
+    db: ?*LithDb,
     block_type: u16,
     out_data: *core_bridge.LgBlob,
     out_err: *core_bridge.LgBlob,
 ) core_bridge.LgStatus {
-    // Delegates to core-zig/src/bridge.zig fdb_read_blocks
-    return core_bridge.fdb_read_blocks(db, block_type, out_data, out_err);
+    // Delegates to core-zig/src/bridge.zig lith_read_blocks
+    return core_bridge.lith_read_blocks(db, block_type, out_data, out_err);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -376,51 +376,51 @@ pub fn ffiReadBlocks(
 ////////////////////////////////////////////////////////////////////////////////
 
 /// Render a block as canonical text.
-/// Delegates to core-zig/src/bridge.zig fdb_render_block.
+/// Delegates to core-zig/src/bridge.zig lith_render_block.
 pub fn ffiRenderBlock(
-    db: ?*FdbDb,
+    db: ?*LithDb,
     block_id: u64,
     opts: core_bridge.LgRenderOpts,
     out_text: *core_bridge.LgBlob,
     out_err: *core_bridge.LgBlob,
 ) core_bridge.LgStatus {
-    // Delegates to core-zig/src/bridge.zig fdb_render_block
-    return core_bridge.fdb_render_block(db, block_id, opts, out_text, out_err);
+    // Delegates to core-zig/src/bridge.zig lith_render_block
+    return core_bridge.lith_render_block(db, block_id, opts, out_text, out_err);
 }
 
 /// Render journal entries since a sequence number.
-/// Delegates to core-zig/src/bridge.zig fdb_render_journal.
+/// Delegates to core-zig/src/bridge.zig lith_render_journal.
 pub fn ffiRenderJournal(
-    db: ?*FdbDb,
+    db: ?*LithDb,
     since: u64,
     opts: core_bridge.LgRenderOpts,
     out_text: *core_bridge.LgBlob,
     out_err: *core_bridge.LgBlob,
 ) core_bridge.LgStatus {
-    // Delegates to core-zig/src/bridge.zig fdb_render_journal
-    return core_bridge.fdb_render_journal(db, since, opts, out_text, out_err);
+    // Delegates to core-zig/src/bridge.zig lith_render_journal
+    return core_bridge.lith_render_journal(db, since, opts, out_text, out_err);
 }
 
 /// Get database schema information.
-/// Delegates to core-zig/src/bridge.zig fdb_introspect_schema.
+/// Delegates to core-zig/src/bridge.zig lith_introspect_schema.
 pub fn ffiIntrospectSchema(
-    db: ?*FdbDb,
+    db: ?*LithDb,
     out_schema: *core_bridge.LgBlob,
     out_err: *core_bridge.LgBlob,
 ) core_bridge.LgStatus {
-    // Delegates to core-zig/src/bridge.zig fdb_introspect_schema
-    return core_bridge.fdb_introspect_schema(db, out_schema, out_err);
+    // Delegates to core-zig/src/bridge.zig lith_introspect_schema
+    return core_bridge.lith_introspect_schema(db, out_schema, out_err);
 }
 
 /// Get constraint information.
-/// Delegates to core-zig/src/bridge.zig fdb_introspect_constraints.
+/// Delegates to core-zig/src/bridge.zig lith_introspect_constraints.
 pub fn ffiIntrospectConstraints(
-    db: ?*FdbDb,
+    db: ?*LithDb,
     out_constraints: *core_bridge.LgBlob,
     out_err: *core_bridge.LgBlob,
 ) core_bridge.LgStatus {
-    // Delegates to core-zig/src/bridge.zig fdb_introspect_constraints
-    return core_bridge.fdb_introspect_constraints(db, out_constraints, out_err);
+    // Delegates to core-zig/src/bridge.zig lith_introspect_constraints
+    return core_bridge.lith_introspect_constraints(db, out_constraints, out_err);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -429,44 +429,44 @@ pub fn ffiIntrospectConstraints(
 ////////////////////////////////////////////////////////////////////////////////
 
 /// Register a proof verifier for a specific proof type.
-/// Delegates to core-zig/src/bridge.zig fdb_proof_register_verifier.
+/// Delegates to core-zig/src/bridge.zig lith_proof_register_verifier.
 pub fn ffiProofRegisterVerifier(
     type_ptr: [*]const u8,
     type_len: usize,
     callback: core_bridge.LgProofVerifier,
     context: ?*anyopaque,
 ) core_bridge.LgStatus {
-    // Delegates to core-zig/src/bridge.zig fdb_proof_register_verifier
-    return core_bridge.fdb_proof_register_verifier(type_ptr, type_len, callback, context);
+    // Delegates to core-zig/src/bridge.zig lith_proof_register_verifier
+    return core_bridge.lith_proof_register_verifier(type_ptr, type_len, callback, context);
 }
 
 /// Unregister a proof verifier.
-/// Delegates to core-zig/src/bridge.zig fdb_proof_unregister_verifier.
+/// Delegates to core-zig/src/bridge.zig lith_proof_unregister_verifier.
 pub fn ffiProofUnregisterVerifier(
     type_ptr: [*]const u8,
     type_len: usize,
 ) core_bridge.LgStatus {
-    // Delegates to core-zig/src/bridge.zig fdb_proof_unregister_verifier
-    return core_bridge.fdb_proof_unregister_verifier(type_ptr, type_len);
+    // Delegates to core-zig/src/bridge.zig lith_proof_unregister_verifier
+    return core_bridge.lith_proof_unregister_verifier(type_ptr, type_len);
 }
 
 /// Verify a proof using registered verifiers.
-/// Delegates to core-zig/src/bridge.zig fdb_proof_verify.
+/// Delegates to core-zig/src/bridge.zig lith_proof_verify.
 pub fn ffiProofVerify(
     proof_ptr: [*]const u8,
     proof_len: usize,
     out_valid: *bool,
     out_err: *core_bridge.LgBlob,
 ) core_bridge.LgStatus {
-    // Delegates to core-zig/src/bridge.zig fdb_proof_verify
-    return core_bridge.fdb_proof_verify(proof_ptr, proof_len, out_valid, out_err);
+    // Delegates to core-zig/src/bridge.zig lith_proof_verify
+    return core_bridge.lith_proof_verify(proof_ptr, proof_len, out_valid, out_err);
 }
 
 /// Initialize built-in proof verifiers (fd-holds, normalization, denormalization).
-/// Delegates to core-zig/src/bridge.zig fdb_proof_init_builtins.
+/// Delegates to core-zig/src/bridge.zig lith_proof_init_builtins.
 pub fn ffiProofInitBuiltins() core_bridge.LgStatus {
-    // Delegates to core-zig/src/bridge.zig fdb_proof_init_builtins
-    return core_bridge.fdb_proof_init_builtins();
+    // Delegates to core-zig/src/bridge.zig lith_proof_init_builtins
+    return core_bridge.lith_proof_init_builtins();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -475,17 +475,17 @@ pub fn ffiProofInitBuiltins() core_bridge.LgStatus {
 ////////////////////////////////////////////////////////////////////////////////
 
 /// Free a blob allocated by the bridge.
-/// Delegates to core-zig/src/bridge.zig fdb_blob_free.
+/// Delegates to core-zig/src/bridge.zig lith_blob_free.
 pub fn ffiBlobFree(blob: *core_bridge.LgBlob) void {
-    // Delegates to core-zig/src/bridge.zig fdb_blob_free
-    core_bridge.fdb_blob_free(blob);
+    // Delegates to core-zig/src/bridge.zig lith_blob_free
+    core_bridge.lith_blob_free(blob);
 }
 
 /// Get Lith version.
-/// Delegates to core-zig/src/bridge.zig fdb_version.
+/// Delegates to core-zig/src/bridge.zig lith_version.
 pub fn ffiVersion() u32 {
-    // Delegates to core-zig/src/bridge.zig fdb_version
-    return core_bridge.fdb_version();
+    // Delegates to core-zig/src/bridge.zig lith_version
+    return core_bridge.lith_version();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -498,8 +498,8 @@ pub fn ffiVersion() u32 {
 /// Create collection with schema.
 /// NOT YET IMPLEMENTED: requires Idris2 schema validation layer (Proven.SafeJson)
 /// and collection metadata block type support in core-zig.
-export fn fdb_collection_create(
-    db: *FdbDb,
+export fn lith_collection_create(
+    db: *LithDb,
     name: [*:0]const u8,
     name_len: u64,
     schema_json: [*:0]const u8,
@@ -522,8 +522,8 @@ export fn fdb_collection_create(
 /// Drop collection.
 /// NOT YET IMPLEMENTED: requires collection registry and cascade deletion
 /// of all document/edge/index blocks belonging to the collection.
-export fn fdb_collection_drop(
-    db: *FdbDb,
+export fn lith_collection_drop(
+    db: *LithDb,
     name: [*:0]const u8,
     name_len: u64,
 ) callconv(.c) i32 {
@@ -539,10 +539,10 @@ export fn fdb_collection_drop(
 /// Get collection schema.
 /// NOT YET IMPLEMENTED: requires collection metadata block reading
 /// and schema deserialization.
-export fn fdb_collection_schema(
-    db: *FdbDb,
+export fn lith_collection_schema(
+    db: *LithDb,
     name: [*:0]const u8,
-    schema_out: *?*FdbSchema,
+    schema_out: *?*LithSchema,
 ) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
 
@@ -554,22 +554,22 @@ export fn fdb_collection_schema(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// FQL Query Execution
+// GQL Query Execution
 // NOT YET IMPLEMENTED: requires Factor/Forth runtime for full query planning.
 // The SimpleExecutor provides hardcoded responses for M5 testing only.
 ////////////////////////////////////////////////////////////////////////////////
 
-/// Execute FQL query with provenance.
+/// Execute GQL query with provenance.
 /// Partially implemented via SimpleExecutor (M5 hardcoded responses).
 /// NOT YET IMPLEMENTED: requires Factor runtime for real query planning,
 /// cursor creation from result sets, and provenance audit logging.
-export fn fdb_query_execute(
-    db: *FdbDb,
+export fn lith_query_execute(
+    db: *LithDb,
     query_str: [*:0]const u8,
     query_len: u64,
     provenance_json: [*:0]const u8,
     provenance_len: u64,
-    cursor_out: *?*FdbCursor,
+    cursor_out: *?*LithCursor,
 ) callconv(.c) i32 {
     if (!initialized) return @intFromEnum(Status.internal_error);
     if (query_len == 0) return @intFromEnum(Status.invalid_arg);
@@ -588,7 +588,7 @@ export fn fdb_query_execute(
         };
         defer result.deinit();
 
-        // NOT YET IMPLEMENTED: create FdbCursor from result set
+        // NOT YET IMPLEMENTED: create LithCursor from result set
         _ = cursor_out;
 
         if (std.mem.eql(u8, result.status, "ok")) {
@@ -601,11 +601,11 @@ export fn fdb_query_execute(
     return @intFromEnum(Status.internal_error);
 }
 
-/// Explain FQL query (get execution plan).
+/// Explain GQL query (get execution plan).
 /// NOT YET IMPLEMENTED: requires Factor runtime query planner with EXPLAIN
 /// output generation.
-export fn fdb_query_explain(
-    db: *FdbDb,
+export fn lith_query_explain(
+    db: *LithDb,
     query_str: [*:0]const u8,
     query_len: u64,
     explain_json_out: [*]u8,
@@ -632,8 +632,8 @@ export fn fdb_query_explain(
 /// Fetch next result from cursor.
 /// NOT YET IMPLEMENTED: requires cursor state management and result set
 /// iteration backed by block storage reads.
-export fn fdb_cursor_next(
-    cursor: *FdbCursor,
+export fn lith_cursor_next(
+    cursor: *LithCursor,
     document_json_out: [*]u8,
     buffer_len: u64,
     written_out: *u64,
@@ -650,7 +650,7 @@ export fn fdb_cursor_next(
 
 /// Close cursor.
 /// NOT YET IMPLEMENTED: requires cursor state cleanup.
-export fn fdb_cursor_close(cursor: *FdbCursor) callconv(.c) void {
+export fn lith_cursor_close(cursor: *LithCursor) callconv(.c) void {
     if (!initialized) return;
 
     // NOT YET IMPLEMENTED: requires cursor state management
@@ -665,9 +665,9 @@ export fn fdb_cursor_close(cursor: *FdbCursor) callconv(.c) void {
 
 /// SEAM TEST: Verify Idris2 -> Zig boundary.
 /// Tests that the core-zig bridge can be called and returns a valid status.
-export fn fdb_seam_test_idris_zig() callconv(.c) i32 {
+export fn lith_seam_test_idris_zig() callconv(.c) i32 {
     // Verify core-zig bridge is callable by checking version
-    const version = core_bridge.fdb_version();
+    const version = core_bridge.lith_version();
     if (version > 0) {
         return @intFromEnum(Status.ok);
     }
@@ -677,14 +677,14 @@ export fn fdb_seam_test_idris_zig() callconv(.c) i32 {
 
 /// SEAM TEST: Verify Zig -> Factor boundary.
 /// NOT YET IMPLEMENTED: requires Factor runtime linkage.
-export fn fdb_seam_test_zig_factor() callconv(.c) i32 {
+export fn lith_seam_test_zig_factor() callconv(.c) i32 {
     // NOT YET IMPLEMENTED: requires Factor runtime
     return @intFromEnum(Status.ok);
 }
 
 /// SEAM TEST: Verify Factor -> Forth boundary.
 /// NOT YET IMPLEMENTED: requires Forth runtime linkage.
-export fn fdb_seam_test_factor_forth() callconv(.c) i32 {
+export fn lith_seam_test_factor_forth() callconv(.c) i32 {
     // NOT YET IMPLEMENTED: requires Forth runtime
     return @intFromEnum(Status.ok);
 }
@@ -725,9 +725,9 @@ test "status codes match Idris2 ABI" {
 }
 
 test "library initialization" {
-    const status = fdb_init();
+    const status = lith_init();
     try testing.expectEqual(@intFromEnum(Status.ok), status);
-    fdb_cleanup();
+    lith_cleanup();
 }
 
 test "validate_c_string rejects empty strings" {
@@ -758,7 +758,7 @@ test "core-zig version delegation" {
 }
 
 test "seam test idris-zig passes" {
-    const status = fdb_seam_test_idris_zig();
+    const status = lith_seam_test_idris_zig();
     try testing.expectEqual(@intFromEnum(Status.ok), status);
 }
 

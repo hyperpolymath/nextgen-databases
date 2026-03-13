@@ -7,7 +7,7 @@
 :sectnums:
 
 [.lead]
-Complete API reference for Lith's programmatic interfaces: FQL query language, Zig ABI, HTTP REST API, and client libraries.
+Complete API reference for Lith's programmatic interfaces: GQL query language, Zig ABI, HTTP REST API, and client libraries.
 
 toc::[]
 
@@ -19,7 +19,7 @@ Lith exposes multiple interface layers for different use cases:
 |===
 | Layer | Description | Status | Use Case
 
-| **FQL**
+| **GQL**
 | High-level narrative query language
 | Specified
 | Interactive queries, scripts
@@ -40,9 +40,9 @@ Lith exposes multiple interface layers for different use cases:
 | Low-latency services
 |===
 
-== FQL API
+== GQL API
 
-The Lith Query Language (FQL) is the primary interface for interacting with Lith. See link:../spec/fql.adoc[FQL Specification] for the complete grammar.
+The Lith Query Language (GQL) is the primary interface for interacting with Lith. See link:../spec/gql.adoc[GQL Specification] for the complete grammar.
 
 === Connection
 
@@ -52,7 +52,7 @@ The Lith Query Language (FQL) is the primary interface for interacting with Lith
 lith shell mydb/
 
 # Execute query from file
-lith query mydb/ -f query.fql
+lith query mydb/ -f query.gql
 
 # Execute inline query
 lith query mydb/ -e "SELECT * FROM evidence LIMIT 10"
@@ -67,7 +67,7 @@ lith shell --host lith.example.com --port 5432 --tls
 
 Create a new document or edge collection.
 
-[source,fql]
+[source,gql]
 ----
 -- Document collection with schema
 CREATE COLLECTION evidence (
@@ -126,7 +126,7 @@ WITH PROVENANCE {
 
 Remove a collection and all its documents.
 
-[source,fql]
+[source,gql]
 ----
 -- Drop with provenance (soft delete, recoverable)
 DROP COLLECTION old_evidence
@@ -148,7 +148,7 @@ CONFIRM IRREVERSIBLE;
 
 Modify collection schema or settings.
 
-[source,fql]
+[source,gql]
 ----
 -- Add a new field
 ALTER COLLECTION evidence ADD COLUMN (
@@ -182,7 +182,7 @@ WITH PROVENANCE {
 
 Create new documents with mandatory provenance.
 
-[source,fql]
+[source,gql]
 ----
 -- Single document
 INSERT INTO evidence {
@@ -236,7 +236,7 @@ RETURNING _id, _created_at;
 
 Query documents with filtering, projection, and ordering.
 
-[source,fql]
+[source,gql]
 ----
 -- Basic query
 SELECT * FROM evidence;
@@ -303,7 +303,7 @@ WHERE verified IS NULL
 
 Modify existing documents.
 
-[source,fql]
+[source,gql]
 ----
 -- Update single document by ID
 UPDATE evidence
@@ -362,7 +362,7 @@ RETURNING _id, score, _updated_at;
 
 Remove documents (soft delete by default).
 
-[source,fql]
+[source,gql]
 ----
 -- Soft delete (recoverable)
 DELETE FROM evidence
@@ -397,7 +397,7 @@ CONFIRM IRREVERSIBLE;
 
 Connect documents with typed relationships.
 
-[source,fql]
+[source,gql]
 ----
 -- Create edge between documents
 CREATE EDGE cites FROM "doc_abc123" TO "doc_def456" {
@@ -427,7 +427,7 @@ WITH PROVENANCE {
 
 Navigate graph relationships.
 
-[source,fql]
+[source,gql]
 ----
 -- Outbound traversal (what does this document cite?)
 SELECT * FROM evidence
@@ -482,7 +482,7 @@ WHERE edge.confidence >= 80 AND target.verified = TRUE;
 
 Examine collection schemas.
 
-[source,fql]
+[source,gql]
 ----
 -- All collections
 INTROSPECT SCHEMA;
@@ -519,7 +519,7 @@ INTROSPECT SCHEMA evidence WITH HISTORY;
 
 View active constraints.
 
-[source,fql]
+[source,gql]
 ----
 -- All constraints
 INTROSPECT CONSTRAINTS;
@@ -556,7 +556,7 @@ INTROSPECT CONSTRAINTS evidence;
 
 Query the operation journal.
 
-[source,fql]
+[source,gql]
 ----
 -- Recent entries
 INTROSPECT JOURNAL LIMIT 100;
@@ -611,7 +611,7 @@ WHERE timestamp >= "2024-06-01" AND timestamp < "2024-07-01";
 
 View document change history.
 
-[source,fql]
+[source,gql]
 ----
 -- Full history of a document
 INTROSPECT HISTORY "doc_abc123";
@@ -628,7 +628,7 @@ WHERE timestamp >= "2024-01-01";
 
 Show query execution plan.
 
-[source,fql]
+[source,gql]
 ----
 EXPLAIN SELECT * FROM evidence
 WHERE score >= 70 AND source = "SEC Filing"
@@ -668,7 +668,7 @@ LIMIT 10;
 
 === Transaction Operations 🚧
 
-[source,fql]
+[source,gql]
 ----
 -- Begin transaction
 BEGIN TRANSACTION;
@@ -695,7 +695,7 @@ WITH PROVENANCE {
 
 === Undo Operations
 
-[source,fql]
+[source,gql]
 ----
 -- Undo last operation
 UNDO LAST
@@ -862,16 +862,16 @@ The Form.Bridge provides a stable C ABI for embedding Lith in other applications
 [source,zig]
 ----
 /// Opaque database handle
-pub const FdbDb = opaque {};
+pub const LithDb = opaque {};
 
 /// Opaque transaction handle
-pub const FdbTxn = opaque {};
+pub const LithTxn = opaque {};
 
 /// Opaque query result handle
-pub const FdbResult = opaque {};
+pub const LithResult = opaque {};
 
 /// Status code
-pub const FdbStatus = enum(i32) {
+pub const LithStatus = enum(i32) {
     ok = 0,
 
     // Client errors (1xxx)
@@ -898,7 +898,7 @@ pub const FdbStatus = enum(i32) {
 };
 
 /// Provenance structure
-pub const FdbProvenance = extern struct {
+pub const LithProvenance = extern struct {
     actor: [*:0]const u8,
     actor_len: usize,
     rationale: [*:0]const u8,
@@ -907,8 +907,8 @@ pub const FdbProvenance = extern struct {
 };
 
 /// Query result metadata
-pub const FdbResultMeta = extern struct {
-    status: FdbStatus,
+pub const LithResultMeta = extern struct {
+    status: LithStatus,
     count: usize,
     journal_sequence: u64,
     error_message: [*:0]const u8,
@@ -921,16 +921,16 @@ pub const FdbResultMeta = extern struct {
 [source,zig]
 ----
 /// Open or create a database
-/// Returns: FdbStatus (check before using db_out)
-pub extern fn fdb_open(
+/// Returns: LithStatus (check before using db_out)
+pub extern fn lith_open(
     path: [*:0]const u8,
     path_len: usize,
-    options: *const FdbOpenOptions,
-    db_out: **FdbDb,
-) callconv(.C) FdbStatus;
+    options: *const LithOpenOptions,
+    db_out: **LithDb,
+) callconv(.C) LithStatus;
 
 /// Open options
-pub const FdbOpenOptions = extern struct {
+pub const LithOpenOptions = extern struct {
     create_if_missing: bool = true,
     read_only: bool = false,
     journal_sync: bool = true,  // fsync after each write
@@ -938,15 +938,15 @@ pub const FdbOpenOptions = extern struct {
 };
 
 /// Close database and free resources
-pub extern fn fdb_close(db: *FdbDb) callconv(.C) FdbStatus;
+pub extern fn lith_close(db: *LithDb) callconv(.C) LithStatus;
 
 /// Get database statistics
-pub extern fn fdb_stats(
-    db: *FdbDb,
-    stats_out: *FdbStats,
-) callconv(.C) FdbStatus;
+pub extern fn lith_stats(
+    db: *LithDb,
+    stats_out: *LithStats,
+) callconv(.C) LithStatus;
 
-pub const FdbStats = extern struct {
+pub const LithStats = extern struct {
     collections: u32,
     documents: u64,
     edges: u64,
@@ -960,38 +960,38 @@ pub const FdbStats = extern struct {
 
 [source,zig]
 ----
-/// Execute FQL query
-pub extern fn fdb_query(
-    db: *FdbDb,
-    fql: [*]const u8,
-    fql_len: usize,
-    provenance: *const FdbProvenance,
-    result_out: **FdbResult,
-) callconv(.C) FdbStatus;
+/// Execute GQL query
+pub extern fn lith_query(
+    db: *LithDb,
+    gql: [*]const u8,
+    gql_len: usize,
+    provenance: *const LithProvenance,
+    result_out: **LithResult,
+) callconv(.C) LithStatus;
 
 /// Get result metadata
-pub extern fn fdb_result_meta(
-    result: *FdbResult,
-    meta_out: *FdbResultMeta,
-) callconv(.C) FdbStatus;
+pub extern fn lith_result_meta(
+    result: *LithResult,
+    meta_out: *LithResultMeta,
+) callconv(.C) LithStatus;
 
 /// Get result row as JSON
-pub extern fn fdb_result_row(
-    result: *FdbResult,
+pub extern fn lith_result_row(
+    result: *LithResult,
     index: usize,
     json_out: *[*]const u8,
     json_len_out: *usize,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 
 /// Iterate result rows
-pub extern fn fdb_result_next(
-    result: *FdbResult,
+pub extern fn lith_result_next(
+    result: *LithResult,
     json_out: *[*]const u8,
     json_len_out: *usize,
-) callconv(.C) FdbStatus;  // Returns err_not_found when exhausted
+) callconv(.C) LithStatus;  // Returns err_not_found when exhausted
 
 /// Free result
-pub extern fn fdb_result_free(result: *FdbResult) callconv(.C) void;
+pub extern fn lith_result_free(result: *LithResult) callconv(.C) void;
 ----
 
 === Document Operations
@@ -999,50 +999,50 @@ pub extern fn fdb_result_free(result: *FdbResult) callconv(.C) void;
 [source,zig]
 ----
 /// Insert document (JSON format)
-pub extern fn fdb_insert(
-    db: *FdbDb,
+pub extern fn lith_insert(
+    db: *LithDb,
     collection: [*:0]const u8,
     collection_len: usize,
     doc_json: [*]const u8,
     doc_json_len: usize,
-    provenance: *const FdbProvenance,
+    provenance: *const LithProvenance,
     id_out: *[*]const u8,
     id_len_out: *usize,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 
 /// Get document by ID
-pub extern fn fdb_get(
-    db: *FdbDb,
+pub extern fn lith_get(
+    db: *LithDb,
     collection: [*:0]const u8,
     collection_len: usize,
     id: [*:0]const u8,
     id_len: usize,
     doc_out: *[*]const u8,
     doc_len_out: *usize,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 
 /// Update document
-pub extern fn fdb_update(
-    db: *FdbDb,
+pub extern fn lith_update(
+    db: *LithDb,
     collection: [*:0]const u8,
     collection_len: usize,
     id: [*:0]const u8,
     id_len: usize,
     updates_json: [*]const u8,
     updates_json_len: usize,
-    provenance: *const FdbProvenance,
-) callconv(.C) FdbStatus;
+    provenance: *const LithProvenance,
+) callconv(.C) LithStatus;
 
 /// Delete document
-pub extern fn fdb_delete(
-    db: *FdbDb,
+pub extern fn lith_delete(
+    db: *LithDb,
     collection: [*:0]const u8,
     collection_len: usize,
     id: [*:0]const u8,
     id_len: usize,
     hard: bool,
-    provenance: *const FdbProvenance,
-) callconv(.C) FdbStatus;
+    provenance: *const LithProvenance,
+) callconv(.C) LithStatus;
 ----
 
 === Transaction Operations
@@ -1050,31 +1050,31 @@ pub extern fn fdb_delete(
 [source,zig]
 ----
 /// Begin transaction
-pub extern fn fdb_txn_begin(
-    db: *FdbDb,
-    txn_out: **FdbTxn,
-) callconv(.C) FdbStatus;
+pub extern fn lith_txn_begin(
+    db: *LithDb,
+    txn_out: **LithTxn,
+) callconv(.C) LithStatus;
 
 /// Execute query within transaction
-pub extern fn fdb_txn_query(
-    txn: *FdbTxn,
-    fql: [*]const u8,
-    fql_len: usize,
-    provenance: *const FdbProvenance,
-    result_out: **FdbResult,
-) callconv(.C) FdbStatus;
+pub extern fn lith_txn_query(
+    txn: *LithTxn,
+    gql: [*]const u8,
+    gql_len: usize,
+    provenance: *const LithProvenance,
+    result_out: **LithResult,
+) callconv(.C) LithStatus;
 
 /// Commit transaction
-pub extern fn fdb_txn_commit(
-    txn: *FdbTxn,
-    provenance: *const FdbProvenance,
-) callconv(.C) FdbStatus;
+pub extern fn lith_txn_commit(
+    txn: *LithTxn,
+    provenance: *const LithProvenance,
+) callconv(.C) LithStatus;
 
 /// Rollback transaction
-pub extern fn fdb_txn_rollback(
-    txn: *FdbTxn,
-    provenance: *const FdbProvenance,
-) callconv(.C) FdbStatus;
+pub extern fn lith_txn_rollback(
+    txn: *LithTxn,
+    provenance: *const LithProvenance,
+) callconv(.C) LithStatus;
 ----
 
 === Journal Operations
@@ -1082,26 +1082,26 @@ pub extern fn fdb_txn_rollback(
 [source,zig]
 ----
 /// Get current journal sequence
-pub extern fn fdb_journal_sequence(
-    db: *FdbDb,
+pub extern fn lith_journal_sequence(
+    db: *LithDb,
     seq_out: *u64,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 
 /// Read journal entries
-pub extern fn fdb_journal_read(
-    db: *FdbDb,
+pub extern fn lith_journal_read(
+    db: *LithDb,
     since_sequence: u64,
     limit: usize,
     entries_json_out: *[*]const u8,
     entries_json_len_out: *usize,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 
 /// Undo journal entry
-pub extern fn fdb_journal_undo(
-    db: *FdbDb,
+pub extern fn lith_journal_undo(
+    db: *LithDb,
     sequence: u64,
-    provenance: *const FdbProvenance,
-) callconv(.C) FdbStatus;
+    provenance: *const LithProvenance,
+) callconv(.C) LithStatus;
 ----
 
 === Error Handling
@@ -1109,15 +1109,15 @@ pub extern fn fdb_journal_undo(
 [source,zig]
 ----
 /// Get detailed error message for last error
-pub extern fn fdb_error_message(
-    db: *FdbDb,
+pub extern fn lith_error_message(
+    db: *LithDb,
     message_out: *[*]const u8,
     message_len_out: *usize,
 ) callconv(.C) void;
 
 /// Get error suggestions
-pub extern fn fdb_error_suggestions(
-    db: *FdbDb,
+pub extern fn lith_error_suggestions(
+    db: *LithDb,
     suggestions_json_out: *[*]const u8,
     suggestions_json_len_out: *usize,
 ) callconv(.C) void;
@@ -1128,10 +1128,10 @@ pub extern fn fdb_error_suggestions(
 [source,zig]
 ----
 /// Free string allocated by Lith
-pub extern fn fdb_free_string(ptr: [*]const u8, len: usize) callconv(.C) void;
+pub extern fn lith_free_string(ptr: [*]const u8, len: usize) callconv(.C) void;
 
 /// Free JSON allocated by Lith
-pub extern fn fdb_free_json(ptr: [*]const u8, len: usize) callconv(.C) void;
+pub extern fn lith_free_json(ptr: [*]const u8, len: usize) callconv(.C) void;
 ----
 
 === Example Usage
@@ -1139,14 +1139,14 @@ pub extern fn fdb_free_json(ptr: [*]const u8, len: usize) callconv(.C) void;
 [source,zig]
 ----
 const std = @import("std");
-const fdb = @cImport(@cInclude("lith.h"));
+const lith = @cImport(@cInclude("lith.h"));
 
 pub fn main() !void {
     // Open database
-    var db: *fdb.FdbDb = undefined;
-    const options = fdb.FdbOpenOptions{};
+    var db: *lith.LithDb = undefined;
+    const options = lith.LithOpenOptions{};
 
-    var status = fdb.fdb_open(
+    var status = lith.lith_open(
         "mydb/", 5,
         &options,
         &db
@@ -1155,13 +1155,13 @@ pub fn main() !void {
         std.debug.print("Failed to open database\n", .{});
         return;
     }
-    defer _ = fdb.fdb_close(db);
+    defer _ = lith.lith_close(db);
 
     // Insert document
     const doc =
         \\{"title": "Test Document", "score": 85}
     ;
-    const prov = fdb.FdbProvenance{
+    const prov = lith.LithProvenance{
         .actor = "user:test@example.com",
         .actor_len = 22,
         .rationale = "Test insert",
@@ -1172,7 +1172,7 @@ pub fn main() !void {
     var id_ptr: [*]const u8 = undefined;
     var id_len: usize = undefined;
 
-    status = fdb.fdb_insert(
+    status = lith.lith_insert(
         db,
         "evidence", 8,
         doc.ptr, doc.len,
@@ -1183,7 +1183,7 @@ pub fn main() !void {
     if (status == .ok) {
         const id = id_ptr[0..id_len];
         std.debug.print("Inserted document: {s}\n", .{id});
-        fdb.fdb_free_string(id_ptr, id_len);
+        lith.lith_free_string(id_ptr, id_len);
     }
 }
 ----
@@ -1204,7 +1204,7 @@ https://lith.example.com/v1
 [source,bash]
 ----
 # API Key (header)
-curl -H "X-Lith-API-Key: fdb_sk_live_abc123" \
+curl -H "X-Lith-API-Key: lith_sk_live_abc123" \
   https://lith.example.com/v1/query
 
 # JWT Bearer token
@@ -1216,13 +1216,13 @@ curl -H "Authorization: Bearer eyJhbG..." \
 
 ==== POST /v1/query
 
-Execute FQL query.
+Execute GQL query.
 
 **Request:**
 [source,json]
 ----
 {
-  "fql": "SELECT * FROM evidence WHERE score >= 70 LIMIT 10",
+  "gql": "SELECT * FROM evidence WHERE score >= 70 LIMIT 10",
   "provenance": {
     "actor": "user:api-client@example.com",
     "rationale": "Dashboard refresh"
@@ -1532,7 +1532,7 @@ message Provenance {
 }
 
 message QueryRequest {
-  string fql = 1;
+  string gql = 1;
   Provenance provenance = 2;
   QueryOptions options = 3;
 }
@@ -1684,7 +1684,7 @@ const { id } = await db.insert('evidence', {
 | Code | Name | Description
 
 | 0
-| `FDB_OK`
+| `LITH_OK`
 | Operation completed successfully
 |===
 
@@ -1695,51 +1695,51 @@ const { id } = await db.insert('evidence', {
 | Code | Name | Description
 
 | 1001
-| `FDB_ERR_NOT_FOUND`
+| `LITH_ERR_NOT_FOUND`
 | Document, collection, or resource not found
 
 | 1002
-| `FDB_ERR_ALREADY_EXISTS`
+| `LITH_ERR_ALREADY_EXISTS`
 | Resource already exists (duplicate key)
 
 | 1003
-| `FDB_ERR_CONSTRAINT_VIOLATION`
+| `LITH_ERR_CONSTRAINT_VIOLATION`
 | Constraint check failed
 
 | 1004
-| `FDB_ERR_PARSE_ERROR`
-| FQL syntax error
+| `LITH_ERR_PARSE_ERROR`
+| GQL syntax error
 
 | 1005
-| `FDB_ERR_INVALID_ARGUMENT`
+| `LITH_ERR_INVALID_ARGUMENT`
 | Invalid parameter value
 
 | 1006
-| `FDB_ERR_TYPE_MISMATCH`
+| `LITH_ERR_TYPE_MISMATCH`
 | Type conversion error
 
 | 1007
-| `FDB_ERR_MISSING_PROVENANCE`
+| `LITH_ERR_MISSING_PROVENANCE`
 | Provenance required but not provided
 
 | 1008
-| `FDB_ERR_PERMISSION_DENIED`
+| `LITH_ERR_PERMISSION_DENIED`
 | Insufficient permissions
 
 | 1009
-| `FDB_ERR_COLLECTION_NOT_EMPTY`
+| `LITH_ERR_COLLECTION_NOT_EMPTY`
 | Cannot drop non-empty collection
 
 | 1010
-| `FDB_ERR_INVALID_EDGE`
+| `LITH_ERR_INVALID_EDGE`
 | Edge references non-existent document
 
 | 1011
-| `FDB_ERR_QUERY_TOO_COMPLEX`
+| `LITH_ERR_QUERY_TOO_COMPLEX`
 | Query exceeds complexity limits
 
 | 1012
-| `FDB_ERR_RESULT_TOO_LARGE`
+| `LITH_ERR_RESULT_TOO_LARGE`
 | Result set exceeds size limits
 |===
 
@@ -1750,31 +1750,31 @@ const { id } = await db.insert('evidence', {
 | Code | Name | Description
 
 | 2001
-| `FDB_ERR_INTERNAL`
+| `LITH_ERR_INTERNAL`
 | Internal server error
 
 | 2002
-| `FDB_ERR_IO`
+| `LITH_ERR_IO`
 | I/O error (disk, network)
 
 | 2003
-| `FDB_ERR_JOURNAL_CORRUPTED`
+| `LITH_ERR_JOURNAL_CORRUPTED`
 | Journal integrity check failed
 
 | 2004
-| `FDB_ERR_OUT_OF_MEMORY`
+| `LITH_ERR_OUT_OF_MEMORY`
 | Memory allocation failed
 
 | 2005
-| `FDB_ERR_TIMEOUT`
+| `LITH_ERR_TIMEOUT`
 | Operation timed out
 
 | 2006
-| `FDB_ERR_STORAGE_FULL`
+| `LITH_ERR_STORAGE_FULL`
 | Storage capacity exceeded
 
 | 2007
-| `FDB_ERR_ENCRYPTION`
+| `LITH_ERR_ENCRYPTION`
 | Encryption/decryption failed
 |===
 
@@ -1785,25 +1785,25 @@ const { id } = await db.insert('evidence', {
 | Code | Name | Description
 
 | 3001
-| `FDB_ERR_TXN_CONFLICT`
+| `LITH_ERR_TXN_CONFLICT`
 | Transaction conflict (concurrent modification)
 
 | 3002
-| `FDB_ERR_TXN_ABORTED`
+| `LITH_ERR_TXN_ABORTED`
 | Transaction was aborted
 
 | 3003
-| `FDB_ERR_TXN_NOT_ACTIVE`
+| `LITH_ERR_TXN_NOT_ACTIVE`
 | No active transaction
 
 | 3004
-| `FDB_ERR_TXN_TOO_LARGE`
+| `LITH_ERR_TXN_TOO_LARGE`
 | Transaction exceeds size limits
 |===
 
 == See Also
 
-* link:../spec/fql.adoc[FQL Specification] - Complete FQL grammar
+* link:../spec/gql.adoc[GQL Specification] - Complete GQL grammar
 * link:../ARCHITECTURE.adoc[Architecture Guide] - System design
 * link:SECURITY-AUTH.adoc[Security Guide] - Authentication and authorization
 * link:DEPLOYMENT.adoc[Deployment Guide] - Production deployment

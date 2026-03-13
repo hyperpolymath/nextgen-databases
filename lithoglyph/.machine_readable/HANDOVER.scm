@@ -34,7 +34,7 @@
           (model   "Forth (Form.Model)"))
         (runtime
           (planner "Factor (Form.Runtime)")
-          (query-language "FQL"))
+          (query-language "GQL"))
         (interop
           (bridge "Zig (Form.Bridge) provides stable C ABI")
           (control-plane "Elixir/OTP (optional) for sessions+supervision+cluster edge"))))
@@ -110,9 +110,9 @@ The database is part of the story, not an opaque substrate.")
             "Opaque handles + byte buffers + explicit error codes"))
         (Form.Runtime
           (language "Factor")
-          (purpose "FQL parse/plan/exec + explain + introspection")
+          (purpose "GQL parse/plan/exec + explain + introspection")
           (must-provide
-            "FQL minimal subset for PoC"
+            "GQL minimal subset for PoC"
             "planner steps introspection"
             "constraint explanation surfaces"
             "provenance surfaces"))
@@ -123,11 +123,11 @@ The database is part of the story, not an opaque substrate.")
             "Prefer out-of-process core engine (port) over in-VM native calls"
             "Control plane must not redefine truth semantics"))
         (Form.Normalizer
-          (language "Factor + Lean 4 (via FQL-dt)")
+          (language "Factor + Lean 4 (via GQL-dt)")
           (purpose "self-normalizing database: FD discovery, type encoding, proof-carrying schema evolution")
           (must-provide
             "functional dependency discovery (DFD/TANE/FDHits algorithms)"
-            "type encoding of FDs in FQL-dt"
+            "type encoding of FDs in GQL-dt"
             "normal form predicates (1NF through BCNF)"
             "proposal generation with equivalence proofs"
             "narrative templates for normalization decisions"
@@ -143,7 +143,7 @@ The database is part of the story, not an opaque substrate.")
         "Every Model op maps to a sequence of journaled Block ops."
         "Every Model op has an inverse mapping or is explicitly classified.")
       (M<->R
-        "Constraints enforced identically whether invoked via FQL or direct API."
+        "Constraints enforced identically whether invoked via GQL or direct API."
         "Introspection must return reason graphs + provenance pointers.")
       (B<->R
         "Runtime cannot commit without journal-first acknowledgement from Blocks."
@@ -155,9 +155,9 @@ The database is part of the story, not an opaque substrate.")
     (abi
       (style "C ABI provided by Zig")
       (handles
-        (db "opaque fdb_db*")
-        (txn "opaque fdb_txn*")
-        (cursor "opaque fdb_cursor*"))
+        (db "opaque lith_db*")
+        (txn "opaque lith_txn*")
+        (cursor "opaque lith_cursor*"))
       (errors
         (model "status code + optional error blob")
         (rules
@@ -165,19 +165,19 @@ The database is part of the story, not an opaque substrate.")
           "Every error blob is renderable/explainable")))
       (functions
         ;; Lifecycle
-        "fdb_db_open(path, opts_bytes, opts_len) -> (db*, status, err_blob)"
-        "fdb_db_close(db*) -> status"
+        "lith_db_open(path, opts_bytes, opts_len) -> (db*, status, err_blob)"
+        "lith_db_close(db*) -> status"
         ;; Transactions
-        "fdb_txn_begin(db*, mode) -> (txn*, status, err_blob)"
-        "fdb_txn_commit(txn*) -> (status, err_blob)"
-        "fdb_txn_abort(txn*)  -> status"
+        "lith_txn_begin(db*, mode) -> (txn*, status, err_blob)"
+        "lith_txn_commit(txn*) -> (status, err_blob)"
+        "lith_txn_abort(txn*)  -> status"
         ;; Apply operations (runtime provides op blob; core returns result+provenance)
-        "fdb_apply(txn*, op_bytes, op_len) -> (result_blob, provenance_blob, status, err_blob)"
+        "lith_apply(txn*, op_bytes, op_len) -> (result_blob, provenance_blob, status, err_blob)"
         ;; Introspection/rendering (must be usable by agents)
-        "fdb_render_block(db*, block_id, render_opts) -> (text_blob, status, err_blob)"
-        "fdb_render_journal(db*, since, render_opts) -> (text_blob, status, err_blob)"
-        "fdb_introspect_schema(db*) -> (schema_blob, status, err_blob)"
-        "fdb_introspect_constraints(db*) -> (constraints_blob, status, err_blob)")
+        "lith_render_block(db*, block_id, render_opts) -> (text_blob, status, err_blob)"
+        "lith_render_journal(db*, since, render_opts) -> (text_blob, status, err_blob)"
+        "lith_introspect_schema(db*) -> (schema_blob, status, err_blob)"
+        "lith_introspect_constraints(db*) -> (constraints_blob, status, err_blob)")
       (blob-encodings
         (preferred
           "Cap'n Proto (if adopted) OR Protobuf (if adopted) for ABI blobs"
@@ -204,9 +204,9 @@ The database is part of the story, not an opaque substrate.")
         (candidates "HTTP+CBOR" "gRPC" "WebSocket streaming")))
 
     ;; ------------------------------------------------------------
-    ;; 7. FQL (PoC subset + introspection)
+    ;; 7. GQL (PoC subset + introspection)
     ;; ------------------------------------------------------------
-    (fql
+    (gql
       (poс-subset
         (must
           "INSERT document into collection"
@@ -274,14 +274,14 @@ The database is part of the story, not an opaque substrate.")
            "deterministic text render defined independent of blob encoding")
          (impacts "core-zig/Form.Bridge/*" "core-factor/Form.Runtime/*")
          (resolved-by "D-ABI-BLOBS-001"))
-      (q (id "Q-FQL-POC-001") (area fql) (status resolved)
-         (text "Define the exact PoC grammar + canonical examples for FQL.")
+      (q (id "Q-GQL-POC-001") (area gql) (status resolved)
+         (text "Define the exact PoC grammar + canonical examples for GQL.")
          (acceptance
            "grammar documented"
            "10 example queries + expected outputs"
            "EXPLAIN/INTROSPECT included")
-         (impacts "spec/fql.adoc" "core-factor/Form.Runtime/*")
-         (resolved-by "D-FQL-POC-001"))
+         (impacts "spec/gql.adoc" "core-factor/Form.Runtime/*")
+         (resolved-by "D-GQL-POC-001"))
       (q (id "Q-CTRL-PLANE-001") (area control-plane) (status resolved)
          (text "Is Elixir/OTP introduced at PoC time (gateway only), or deferred until after the core is stable?")
          (acceptance
@@ -315,12 +315,12 @@ The database is part of the story, not an opaque substrate.")
          (impacts "spec/self-normalizing.adoc" "core-factor/Form.Normalizer/*")
          (resolved-by "D-NORM-003"))
       (q (id "Q-NORM-004") (area normalizer) (status resolved)
-         (text "How to integrate Form.Normalizer with FQL-dt's existing proof system?")
+         (text "How to integrate Form.Normalizer with GQL-dt's existing proof system?")
          (acceptance
            "interface between Lean 4 proofs and Form.Normalizer defined"
            "proof verification flow documented"
            "bidirectional FFI via Form.Bridge specified")
-         (impacts "core-zig/Form.Bridge/*" "fqldt/*" "spec/self-normalizing.adoc")
+         (impacts "core-zig/Form.Bridge/*" "gqldt/*" "spec/self-normalizing.adoc")
          (resolved-by "D-NORM-004"))
       (q (id "Q-NORM-005") (area normalizer) (status resolved)
          (text "What happens when normalization would break existing queries?")
@@ -352,10 +352,10 @@ The database is part of the story, not an opaque substrate.")
          (rationale "Schema-optional, self-describing, wide language support (Zig, Factor, Forth, Lean 4, Elixir). Deterministic encoding via RFC 8949 §4.2 rules. Lith-specific tags 39001-39008 for block refs, doc IDs, provenance, PROMPT scores, proofs. LZ4 compression for large payloads. Full spec in spec/encoding.adoc.")
          (impacts "spec/encoding.adoc" "core-zig/Form.Bridge/*"))
 
-      (d (id "D-FQL-POC-001") (date "2026-01-11") (closes "Q-FQL-POC-001")
-         (decision "FQL PoC grammar with 10 canonical examples")
-         (rationale "Covers INSERT/SELECT/UPDATE/DELETE for documents and edges. CREATE/DROP for collections. TRAVERSE for edge traversal. EXPLAIN shows plan + rationale. INTROSPECT for schema/constraints/journal. WITH PROVENANCE for audit output. All errors include rationale + suggestions. Full grammar and 10 examples in spec/fql.adoc.")
-         (impacts "spec/fql.adoc" "core-factor/Form.Runtime/*"))
+      (d (id "D-GQL-POC-001") (date "2026-01-11") (closes "Q-GQL-POC-001")
+         (decision "GQL PoC grammar with 10 canonical examples")
+         (rationale "Covers INSERT/SELECT/UPDATE/DELETE for documents and edges. CREATE/DROP for collections. TRAVERSE for edge traversal. EXPLAIN shows plan + rationale. INTROSPECT for schema/constraints/journal. WITH PROVENANCE for audit output. All errors include rationale + suggestions. Full grammar and 10 examples in spec/gql.adoc.")
+         (impacts "spec/gql.adoc" "core-factor/Form.Runtime/*"))
 
       (d (id "D-CTRL-PLANE-001") (date "2026-01-12") (closes "Q-CTRL-PLANE-001")
          (decision "Defer Elixir/OTP control plane until after core is stable")
@@ -379,7 +379,7 @@ The database is part of the story, not an opaque substrate.")
 
       (d (id "D-NORM-004") (date "2026-01-12") (closes "Q-NORM-004")
          (decision "Form.Bridge exports proof verification FFI with external Lean 4 verifiers")
-         (rationale "Interface: (1) Form.Bridge exports fdb_proof_verify(proof_blob, len) -> (valid, err_blob) and fdb_proof_register_verifier(type, callback) -> status. (2) Lean 4 proofs compile to standalone C-ABI-compatible verifiers via lake build. (3) Proof references in journal entries use CBOR tag 39006. (4) Flow: Form.Normalizer (Factor) -> Form.Bridge (Zig) -> Lean 4 verifier -> result. This keeps proofs external to truth core (maintains 'truth core doesn't own semantics'). Form.Bridge already provides ABI boundary; proof verification is another FFI call. Lean 4's native compilation to C makes this practical. FQL-dt proofs become verifiable artefacts, not just documentation.")
+         (rationale "Interface: (1) Form.Bridge exports lith_proof_verify(proof_blob, len) -> (valid, err_blob) and lith_proof_register_verifier(type, callback) -> status. (2) Lean 4 proofs compile to standalone C-ABI-compatible verifiers via lake build. (3) Proof references in journal entries use CBOR tag 39006. (4) Flow: Form.Normalizer (Factor) -> Form.Bridge (Zig) -> Lean 4 verifier -> result. This keeps proofs external to truth core (maintains 'truth core doesn't own semantics'). Form.Bridge already provides ABI boundary; proof verification is another FFI call. Lean 4's native compilation to C makes this practical. GQL-dt proofs become verifiable artefacts, not just documentation.")
          (impacts "core-zig/Form.Bridge/*" "normalizer/lean/*" "spec/self-normalizing.adoc"))
 
       (d (id "D-NORM-005") (date "2026-01-12") (closes "Q-NORM-005")
@@ -396,7 +396,7 @@ The database is part of the story, not an opaque substrate.")
         (spec "format specs + rationale (AsciiDoc)")
         (core-forth "Form.Blocks + Form.Model (truth core)")
         (core-zig "Form.Bridge (ABI + port framing)")
-        (core-factor "Form.Runtime (FQL + introspection)")
+        (core-factor "Form.Runtime (GQL + introspection)")
         (control-plane "Elixir/OTP gateway (optional)")
         (tools "render/inspect/doctor utilities")
         (test-vectors "golden bytes + golden renders")

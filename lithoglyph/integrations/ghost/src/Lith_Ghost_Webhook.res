@@ -55,23 +55,23 @@ let makeClient = (config: integrationConfig): lithClient => {
 
   {
     insert: async (collection: string, document: Js.Json.t): unit => {
-      let fdql = `INSERT INTO ${collection} ${Js.Json.stringify(document)}`
-      let body = Js.Json.object_(Js.Dict.fromArray([("fdql", Js.Json.string(fdql))]))
+      let gql = `INSERT INTO ${collection} ${Js.Json.stringify(document)}`
+      let body = Js.Json.object_(Js.Dict.fromArray([("gql", Js.Json.string(gql))]))
       let _ = await request("POST", "/v1/query", Some(body))
       ()
     },
 
     update: async (collection: string, document: Js.Json.t, id: string): unit => {
       let setClause = Js.Json.stringify(document)
-      let fdql = `UPDATE ${collection} SET ${setClause} WHERE id = "${id}"`
-      let body = Js.Json.object_(Js.Dict.fromArray([("fdql", Js.Json.string(fdql))]))
+      let gql = `UPDATE ${collection} SET ${setClause} WHERE id = "${id}"`
+      let body = Js.Json.object_(Js.Dict.fromArray([("gql", Js.Json.string(gql))]))
       let _ = await request("POST", "/v1/query", Some(body))
       ()
     },
 
     delete: async (collection: string, id: string): unit => {
-      let fdql = `DELETE FROM ${collection} WHERE id = "${id}"`
-      let body = Js.Json.object_(Js.Dict.fromArray([("fdql", Js.Json.string(fdql))]))
+      let gql = `DELETE FROM ${collection} WHERE id = "${id}"`
+      let body = Js.Json.object_(Js.Dict.fromArray([("gql", Js.Json.string(gql))]))
       let _ = await request("POST", "/v1/query", Some(body))
       ()
     },

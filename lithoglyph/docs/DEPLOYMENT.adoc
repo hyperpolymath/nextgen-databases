@@ -58,7 +58,7 @@ Lith can be deployed in several configurations:
 
 | https://factorcode.org/[Factor]
 | 0.99+
-| Form.Runtime (FQL parser/executor)
+| Form.Runtime (GQL parser/executor)
 | Yes
 
 | https://ziglang.org/[Zig]
@@ -190,7 +190,7 @@ Single-server deployment for small to medium workloads.
 ----
 ┌─────────────────────────────────────────────────────────────┐
 │                      Client Applications                     │
-│              (FQL queries via HTTP/gRPC/Zig FFI)            │
+│              (GQL queries via HTTP/gRPC/Zig FFI)            │
 └─────────────────────────┬───────────────────────────────────┘
                           │
 ┌─────────────────────────▼───────────────────────────────────┐
@@ -201,7 +201,7 @@ Single-server deployment for small to medium workloads.
 │  └── Metrics collection                                     │
 ├─────────────────────────────────────────────────────────────┤
 │  Form.Runtime (Factor)                                      │
-│  ├── FQL parser and planner                                 │
+│  ├── GQL parser and planner                                 │
 │  ├── Query execution                                        │
 │  └── Introspection and explain                              │
 ├─────────────────────────────────────────────────────────────┤
@@ -322,12 +322,12 @@ path = "/metrics"
 ----
 /var/lib/lith/
 ├── data/
-│   ├── superblock.fdb       # Database metadata
+│   ├── superblock.lgh       # Database metadata
 │   ├── collections/
-│   │   ├── evidence.fdb     # Collection blocks
-│   │   └── claims.fdb
+│   │   ├── evidence.lgh     # Collection blocks
+│   │   └── claims.lgh
 │   └── edges/
-│       └── supports.fdb     # Edge blocks
+│       └── supports.lgh     # Edge blocks
 ├── journal/
 │   ├── 000001.journal       # Journal segments
 │   ├── 000002.journal
@@ -581,7 +581,7 @@ docker run -d \
   -v lith-data:/var/lib/lith \
   hyperpolymath/lith:latest
 
-# Execute FQL query
+# Execute GQL query
 docker exec lith lith query 'SELECT * FROM evidence;'
 
 # Backup

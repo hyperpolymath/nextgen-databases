@@ -1,13 +1,13 @@
 #!/bin/bash
 # SPDX-License-Identifier: PMPL-1.0-or-later
-# FormBD-Geo HTTP API Test Script
+# Lith-Geo HTTP API Test Script
 
 set -e
 
 BASE_URL="http://localhost:4000/api/v1"
 
 echo ""
-echo "=== FormBD-Geo HTTP API Test ==="
+echo "=== Lith-Geo HTTP API Test ==="
 echo ""
 
 # Test 1: Create database

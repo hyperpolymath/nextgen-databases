@@ -436,32 +436,32 @@ theorem fourth_nf_implies_bcnf (S : Schema) (fds : List (FunDep S)) (mvds : List
 ```zig
 /// Zig FFI for normalization proofs
 /// Forward: Form.Normalizer → GQL-dt (for proof verification)
-pub export fn fdb_verify_normalization_proof(
-    db: *FdbDb,
+pub export fn lith_verify_normalization_proof(
+    db: *LithDb,
     step_blob: [*]const u8,
     step_len: usize,
     proof_blob: [*]const u8,
     proof_len: usize,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 
 /// Reverse: GQL-dt → Form.Normalizer (register proof checker)
-pub export fn fdb_register_normalization_verifier(
-    db: *FdbDb,
+pub export fn lith_register_normalization_verifier(
+    db: *LithDb,
     verifier: *const fn (
         source_schema: [*]const u8,
         target_schema: [*]const u8,
         proof: [*]const u8,
         proof_len: usize,
     ) callconv(.C) bool,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 
 /// Get discovered FDs as typed structures
-pub export fn fdb_get_discovered_fds(
-    db: *FdbDb,
+pub export fn lith_get_discovered_fds(
+    db: *LithDb,
     collection: [*:0]const u8,
     out_fds: *[*]u8,
     out_len: *usize,
-) callconv(.C) FdbStatus;
+) callconv(.C) LithStatus;
 ```
 
 ### 5.2 Proof Obligations

@@ -4,7 +4,7 @@
 ;
 ; This file is distributed to all Lith ecosystem repos:
 ; - lith (core database)
-; - fbql-dt (dependently-typed query language)
+; - gql-dt (dependently-typed query language)
 ; - lithoglyph-studio (GUI)
 ; - lithoglyph-debugger (recovery tool)
 ; - lithoglyph-geo (geospatial projection layer)
@@ -28,7 +28,7 @@
         (completion 80)
         (role "Core database engine")
         (tech "Forth + Factor + Zig"))
-      (fbql-dt
+      (gql-dt
         (version "0.2.0")
         (completion 65)
         (role "Dependently-typed query language")
@@ -90,9 +90,9 @@
         (task "M13: CMS integration (WordPress)" priority: high status: pending)
         (task "M14: Form.ControlPlane (clustering)" priority: medium status: pending))
 
-      (fbql-dt-tasks
+      (gql-dt-tasks
         (task "M5: Zig FFI bridge to Form.Bridge" priority: critical status: not-started)
-        (task "M6: FQL parser (integrate with Lith's EBNF)" priority: high status: not-started)
+        (task "M6: GQL parser (integrate with Lith's EBNF)" priority: high status: not-started)
         (task "Proof blob serialization (CBOR RFC 8949)" priority: high status: pending))
 
       (checkpoint "FQLdt can compile a query → proof blob → Lith accepts and executes"))
@@ -143,16 +143,16 @@
       (blocks "Studio M2" "Debugger Lith adapter")
       (priority critical))
 
-    (fbql-dt-m5
+    (gql-dt-m5
       (name "FQLdt Zig FFI Bridge")
       (blocks "Studio M3" "Real type checking")
       (depends-on "Lith Form.Bridge")
       (priority critical))
 
-    (fbql-dt-m6
-      (name "FQLdt FQL Parser")
+    (gql-dt-m6
+      (name "FQLdt GQL Parser")
       (blocks "Full FQLdt compilation")
-      (depends-on "fbql-dt-m5")
+      (depends-on "gql-dt-m5")
       (priority high))
 
     (studio-m1
@@ -183,17 +183,17 @@
   (decisions-needed
     (decision (id "DECISION-002")
       (title "FQLdt parser approach")
-      (repo "fbql-dt")
+      (repo "gql-dt")
       (options
         "Hand-rolled parser (simple, no deps)"
         "Lean 4 Parsec (built-in)"
-        "Integrate with Lith's Factor-based FBQL parser")
+        "Integrate with Lith's Factor-based GQL parser")
       (recommendation "Integrate - reuse Lith's EBNF grammar via FFI")
       (impact "Affects M6 implementation"))
 
     (decision (id "DECISION-003")
       (title "Lith integration strategy for FQLdt")
-      (repo "fbql-dt")
+      (repo "gql-dt")
       (options
         "Mock Forth core for MVP"
         "Real Form.Bridge integration")
