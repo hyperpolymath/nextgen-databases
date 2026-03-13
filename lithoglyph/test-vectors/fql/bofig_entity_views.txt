@@ -1,0 +1,166 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# L4 — GQL test vectors for entity queries against the bofig_entities collection.
+# Covers alias search, co-reference resolution, merge/unmerge journal, and
+# entity-to-evidence traversal.
+
+# =============================================================================
+# Vector 1: Entity search by alias
+# =============================================================================
+
+INPUT:
+SELECT e.primary_name, e.entity_type, e.aliases, e.document_count, e.credibility_score
+FROM bofig_entities e
+WHERE e.aliases CONTAINS 'GM'
+WITH PROVENANCE {
+  actor: "analyst:entity-lookup",
+  rationale: "Resolve alias 'GM' to canonical entity for cross-referencing"
+}
+---
+PARSED:
+(select
+  (fields "e.primary_name" "e.entity_type" "e.aliases" "e.document_count" "e.credibility_score")
+  (from "bofig_entities" (alias "e"))
+  (where (contains "e.aliases" "GM"))
+  (provenance (actor "analyst:entity-lookup") (rationale "Resolve alias 'GM' to canonical entity for cross-referencing")))
+---
+RESULT:
+(result-set
+  (collection "bofig_entities")
+  (documents [
+    (row (primary_name "Ghislaine Maxwell") (entity_type "person")
+         (aliases ["G. Maxwell" "Maxwell, Ghislaine" "GM"])
+         (document_count 3104) (credibility_score 10))
+  ]))
+
+# =============================================================================
+# Vector 2: Co-reference resolution — fuzzy match candidates
+# =============================================================================
+
+INPUT:
+SELECT e.primary_name, e.aliases, e.entity_type,
+       SIMILARITY(e.primary_name, 'J. Epstein') AS match_score
+FROM bofig_entities e
+WHERE SIMILARITY(e.primary_name, 'J. Epstein') > 0.85
+   OR e.aliases CONTAINS 'J. Epstein'
+ORDER BY match_score DESC
+WITH PROVENANCE {
+  actor: "system:coref-resolver",
+  rationale: "Find co-reference candidates for 'J. Epstein' using Jaro-Winkler threshold >0.85"
+}
+---
+PARSED:
+(select
+  (fields "e.primary_name" "e.aliases" "e.entity_type"
+          (function similarity "e.primary_name" "J. Epstein" (alias "match_score")))
+  (from "bofig_entities" (alias "e"))
+  (where (or
+    (> (function similarity "e.primary_name" "J. Epstein") 0.85)
+    (contains "e.aliases" "J. Epstein")))
+  (order-by "match_score" desc)
+  (provenance (actor "system:coref-resolver") (rationale "Find co-reference candidates for 'J. Epstein' using Jaro-Winkler threshold >0.85")))
+---
+RESULT:
+(result-set
+  (collection "bofig_entities")
+  (documents [
+    (row (primary_name "Jeffrey Epstein")
+         (aliases ["J. Epstein" "Epstein, Jeffrey" "JE"])
+         (entity_type "person")
+         (match_score 0.96))
+  ]))
+
+# =============================================================================
+# Vector 3: Entity merge/unmerge journal queries
+# =============================================================================
+
+INPUT:
+MERGE ENTITY IN bofig_entities
+  SOURCE 'entity_jepstein_dup'
+  INTO 'entity_epstein'
+  ADOPT ALIASES
+WITH PROVENANCE {
+  actor: "analyst:entity-merge",
+  rationale: "Merge duplicate entity 'J. Epstein (FL)' into canonical 'Jeffrey Epstein' — same person confirmed via DOB match"
+}
+---
+PARSED:
+(merge-entity
+  (collection "bofig_entities")
+  (source "entity_jepstein_dup")
+  (target "entity_epstein")
+  (adopt-aliases true)
+  (provenance (actor "analyst:entity-merge") (rationale "Merge duplicate entity 'J. Epstein (FL)' into canonical 'Jeffrey Epstein' — same person confirmed via DOB match")))
+---
+RESULT:
+(ok (merged "entity_jepstein_dup" into "entity_epstein")
+    (aliases-adopted 2)
+    (journal-seq 4471)
+    (inverse "UNMERGE ENTITY IN bofig_entities SOURCE 'entity_epstein' EXTRACT 'entity_jepstein_dup' WITH ALIASES ['J. Epstein (FL)', 'Jeffrey E.']"))
+
+INPUT:
+UNMERGE ENTITY IN bofig_entities
+  SOURCE 'entity_epstein'
+  EXTRACT 'entity_jepstein_dup'
+  WITH ALIASES ['J. Epstein (FL)', 'Jeffrey E.']
+WITH PROVENANCE {
+  actor: "analyst:entity-unmerge",
+  rationale: "Reverse previous merge — further review shows these are different individuals (father vs son)"
+}
+---
+PARSED:
+(unmerge-entity
+  (collection "bofig_entities")
+  (source "entity_epstein")
+  (extract "entity_jepstein_dup")
+  (restore-aliases ["J. Epstein (FL)" "Jeffrey E."])
+  (provenance (actor "analyst:entity-unmerge") (rationale "Reverse previous merge — further review shows these are different individuals (father vs son)")))
+---
+RESULT:
+(ok (unmerged "entity_jepstein_dup" from "entity_epstein")
+    (aliases-restored 2)
+    (journal-seq 4472)
+    (inverse "MERGE ENTITY IN bofig_entities SOURCE 'entity_jepstein_dup' INTO 'entity_epstein' ADOPT ALIASES"))
+
+# =============================================================================
+# Vector 4: Entity-to-evidence traversal
+# =============================================================================
+
+INPUT:
+SELECT e.primary_name, e.entity_type,
+       ev.title, ev.evidence_type, ev.document_date,
+       ev.prompt_provenance, ev.prompt_overall
+FROM bofig_entities e
+TRAVERSE bofig_relationships r WHERE r.relationship_type = 'involves'
+TRAVERSE r -> bofig_evidence ev
+WHERE e.primary_name = 'Jeffrey Epstein'
+ORDER BY ev.document_date ASC
+WITH PROVENANCE {
+  actor: "analyst:evidence-audit",
+  rationale: "Enumerate all evidence records linked to entity 'Jeffrey Epstein' via involvement edges"
+}
+---
+PARSED:
+(select
+  (fields "e.primary_name" "e.entity_type"
+          "ev.title" "ev.evidence_type" "ev.document_date"
+          "ev.prompt_provenance" "ev.prompt_overall")
+  (from "bofig_entities" (alias "e"))
+  (traverse "bofig_relationships" (alias "r") (where (= "r.relationship_type" "involves")))
+  (traverse "r" "bofig_evidence" (alias "ev"))
+  (where (= "e.primary_name" "Jeffrey Epstein"))
+  (order-by "ev.document_date" asc)
+  (provenance (actor "analyst:evidence-audit") (rationale "Enumerate all evidence records linked to entity 'Jeffrey Epstein' via involvement edges")))
+---
+RESULT:
+(result-set
+  (collections "bofig_entities" "bofig_relationships" "bofig_evidence")
+  (documents [
+    (row (primary_name "Jeffrey Epstein") (entity_type "person")
+         (title "Flight Log — N908JE — 2002-03-15") (evidence_type "flight_log")
+         (document_date "2002-03-15") (prompt_provenance 85) (prompt_overall 73.3))
+    (row (primary_name "Jeffrey Epstein") (entity_type "person")
+         (title "Giuffre v. Maxwell — Deposition Transcript (2016)") (evidence_type "deposition")
+         (document_date "2016-05-03") (prompt_provenance 95) (prompt_overall 82.5))
+  ]))

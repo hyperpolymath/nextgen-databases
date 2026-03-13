@@ -1,0 +1,172 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# L4 — GQL test vectors for financial transaction chain analysis queries.
+# These operate on the bofig_financial_transactions collection defined in
+# bofig_financial_transactions.txt.
+
+# =============================================================================
+# Vector 1: JOIN-like traversal — follow money from entity to entity
+# =============================================================================
+
+INPUT:
+SELECT ft.source_entity_id, e1.primary_name AS source_name,
+       ft.destination_entity_id, e2.primary_name AS dest_name,
+       ft.amount, ft.currency, ft.transaction_date, ft.instrument
+FROM bofig_financial_transactions ft
+TRAVERSE ft.source_entity_id -> bofig_entities e1
+TRAVERSE ft.destination_entity_id -> bofig_entities e2
+WHERE ft.investigation_id = 'epstein_files_2024'
+ORDER BY ft.transaction_date ASC
+WITH PROVENANCE {
+  actor: "analyst:chain-review",
+  rationale: "Trace full money flow chain across all entities in investigation"
+}
+---
+PARSED:
+(select
+  (fields "ft.source_entity_id" (alias "e1.primary_name" "source_name")
+          "ft.destination_entity_id" (alias "e2.primary_name" "dest_name")
+          "ft.amount" "ft.currency" "ft.transaction_date" "ft.instrument")
+  (from "bofig_financial_transactions" (alias "ft"))
+  (traverse "ft.source_entity_id" "bofig_entities" (alias "e1"))
+  (traverse "ft.destination_entity_id" "bofig_entities" (alias "e2"))
+  (where (= "ft.investigation_id" "epstein_files_2024"))
+  (order-by "ft.transaction_date" asc)
+  (provenance (actor "analyst:chain-review") (rationale "Trace full money flow chain across all entities in investigation")))
+---
+RESULT:
+(result-set
+  (collections "bofig_financial_transactions" "bofig_entities")
+  (documents [
+    (row (source_entity_id "entity_epstein") (source_name "Jeffrey Epstein")
+         (destination_entity_id "entity_model_agency") (dest_name "MC2 Model Management")
+         (amount 50000) (currency "USD") (transaction_date "2003-06-15") (instrument "wire_transfer"))
+  ]))
+
+# =============================================================================
+# Vector 2: Aggregate SUM — total flow between entities
+# =============================================================================
+
+INPUT:
+SELECT ft.source_entity_id, e1.primary_name AS source_name,
+       ft.destination_entity_id, e2.primary_name AS dest_name,
+       SUM(ft.amount) AS total_flow, COUNT(*) AS txn_count
+FROM bofig_financial_transactions ft
+TRAVERSE ft.source_entity_id -> bofig_entities e1
+TRAVERSE ft.destination_entity_id -> bofig_entities e2
+WHERE ft.currency = 'USD'
+GROUP BY ft.source_entity_id, ft.destination_entity_id
+ORDER BY total_flow DESC
+WITH PROVENANCE {
+  actor: "analyst:flow-aggregation",
+  rationale: "Aggregate total USD flow between each entity pair for network analysis"
+}
+---
+PARSED:
+(select
+  (fields "ft.source_entity_id" (alias "e1.primary_name" "source_name")
+          "ft.destination_entity_id" (alias "e2.primary_name" "dest_name")
+          (aggregate sum "ft.amount" (alias "total_flow"))
+          (aggregate count "*" (alias "txn_count")))
+  (from "bofig_financial_transactions" (alias "ft"))
+  (traverse "ft.source_entity_id" "bofig_entities" (alias "e1"))
+  (traverse "ft.destination_entity_id" "bofig_entities" (alias "e2"))
+  (where (= "ft.currency" "USD"))
+  (group-by "ft.source_entity_id" "ft.destination_entity_id")
+  (order-by "total_flow" desc)
+  (provenance (actor "analyst:flow-aggregation") (rationale "Aggregate total USD flow between each entity pair for network analysis")))
+---
+RESULT:
+(result-set
+  (collections "bofig_financial_transactions" "bofig_entities")
+  (documents [
+    (row (source_entity_id "entity_epstein") (source_name "Jeffrey Epstein")
+         (destination_entity_id "entity_model_agency") (dest_name "MC2 Model Management")
+         (total_flow 50000) (txn_count 1))
+  ]))
+
+# =============================================================================
+# Vector 3: Anomaly detection — round numbers, structuring patterns
+# =============================================================================
+
+INPUT:
+SELECT ft.source_entity_id, e1.primary_name AS source_name,
+       ft.amount, ft.transaction_date, ft.instrument, ft.anomaly_flags
+FROM bofig_financial_transactions ft
+TRAVERSE ft.source_entity_id -> bofig_entities e1
+WHERE ft.investigation_id = 'epstein_files_2024'
+  AND (ft.anomaly_flags CONTAINS 'round_number'
+       OR ft.anomaly_flags CONTAINS 'structuring'
+       OR ft.anomaly_flags CONTAINS 'high_value')
+ORDER BY ft.amount DESC
+WITH PROVENANCE {
+  actor: "analyst:anomaly-review",
+  rationale: "Flag transactions with round numbers or structuring patterns for SAR cross-reference"
+}
+---
+PARSED:
+(select
+  (fields "ft.source_entity_id" (alias "e1.primary_name" "source_name")
+          "ft.amount" "ft.transaction_date" "ft.instrument" "ft.anomaly_flags")
+  (from "bofig_financial_transactions" (alias "ft"))
+  (traverse "ft.source_entity_id" "bofig_entities" (alias "e1"))
+  (where (and
+    (= "ft.investigation_id" "epstein_files_2024")
+    (or
+      (contains "ft.anomaly_flags" "round_number")
+      (contains "ft.anomaly_flags" "structuring")
+      (contains "ft.anomaly_flags" "high_value"))))
+  (order-by "ft.amount" desc)
+  (provenance (actor "analyst:anomaly-review") (rationale "Flag transactions with round numbers or structuring patterns for SAR cross-reference")))
+---
+RESULT:
+(result-set
+  (collections "bofig_financial_transactions" "bofig_entities")
+  (documents [
+    (row (source_entity_id "entity_epstein") (source_name "Jeffrey Epstein")
+         (amount 50000) (transaction_date "2003-06-15") (instrument "wire_transfer")
+         (anomaly_flags ["round_number"]))
+  ]))
+
+# =============================================================================
+# Vector 4: Date-range filtered query
+# =============================================================================
+
+INPUT:
+SELECT ft.source_entity_id, ft.destination_entity_id,
+       ft.amount, ft.currency, ft.transaction_date, ft.instrument,
+       ft.intermediary_entity_id, ft.source_evidence_id
+FROM bofig_financial_transactions ft
+WHERE ft.investigation_id = 'epstein_files_2024'
+  AND ft.transaction_date >= '2002-01-01'
+  AND ft.transaction_date <= '2005-12-31'
+ORDER BY ft.transaction_date ASC
+LIMIT 100
+WITH PROVENANCE {
+  actor: "analyst:timeline-review",
+  rationale: "Extract all financial transactions in 2002-2005 window for timeline reconstruction"
+}
+---
+PARSED:
+(select
+  (fields "ft.source_entity_id" "ft.destination_entity_id"
+          "ft.amount" "ft.currency" "ft.transaction_date" "ft.instrument"
+          "ft.intermediary_entity_id" "ft.source_evidence_id")
+  (from "bofig_financial_transactions" (alias "ft"))
+  (where (and
+    (= "ft.investigation_id" "epstein_files_2024")
+    (>= "ft.transaction_date" "2002-01-01")
+    (<= "ft.transaction_date" "2005-12-31")))
+  (order-by "ft.transaction_date" asc)
+  (limit 100)
+  (provenance (actor "analyst:timeline-review") (rationale "Extract all financial transactions in 2002-2005 window for timeline reconstruction")))
+---
+RESULT:
+(result-set
+  (collection "bofig_financial_transactions")
+  (documents [
+    (row (source_entity_id "entity_epstein") (destination_entity_id "entity_model_agency")
+         (amount 50000) (currency "USD") (transaction_date "2003-06-15") (instrument "wire_transfer")
+         (intermediary_entity_id nil) (source_evidence_id nil))
+  ]))

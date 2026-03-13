@@ -1,0 +1,311 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+//
+// L6 — gRPC protocol buffer definitions for Bofig evidence ingest.
+// Supports single and batch ingest from Docudactyl Cap'n Proto payloads,
+// with PROMPT scores, entity extraction, and financial data.
+
+syntax = "proto3";
+
+package lith.bofig.v1;
+
+option go_package = "github.com/hyperpolymath/lith/api/gen/go/lith/bofig/v1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// =============================================================================
+// BofigIngest Service
+// =============================================================================
+
+service BofigIngest {
+  // Ingest a single evidence record into the Bofig collections.
+  rpc IngestEvidence(IngestEvidenceRequest) returns (IngestEvidenceResponse);
+
+  // Batch ingest multiple evidence records with shared provenance.
+  rpc BatchIngest(BatchIngestRequest) returns (BatchIngestResponse);
+
+  // Get the status of a batch ingest run.
+  rpc IngestStatus(IngestStatusRequest) returns (IngestStatusResponse);
+
+  // Stream progress updates for a batch ingest run.
+  rpc IngestProgressStream(IngestProgressRequest) returns (stream IngestProgressUpdate);
+}
+
+// =============================================================================
+// Common Types
+// =============================================================================
+
+message Provenance {
+  string actor = 1;
+  string rationale = 2;
+}
+
+// PROMPT dimension scores (each 0-100).
+message PromptScores {
+  int32 provenance = 1;
+  int32 replicability = 2;
+  int32 objectivity = 3;
+  int32 methodology = 4;
+  int32 publication = 5;
+  int32 timeliness = 6;
+}
+
+// =============================================================================
+// Enums
+// =============================================================================
+
+enum EvidenceType {
+  EVIDENCE_TYPE_UNSPECIFIED = 0;
+  EVIDENCE_TYPE_COURT_FILING = 1;
+  EVIDENCE_TYPE_DEPOSITION = 2;
+  EVIDENCE_TYPE_TESTIMONY = 3;
+  EVIDENCE_TYPE_FLIGHT_LOG = 4;
+  EVIDENCE_TYPE_FINANCIAL_RECORD = 5;
+  EVIDENCE_TYPE_COMMUNICATION = 6;
+  EVIDENCE_TYPE_PHOTOGRAPH = 7;
+  EVIDENCE_TYPE_VIDEO = 8;
+  EVIDENCE_TYPE_OFFICIAL_STATISTICS = 9;
+  EVIDENCE_TYPE_NEWS_REPORT = 10;
+  EVIDENCE_TYPE_DOCUMENT = 11;
+  EVIDENCE_TYPE_DATASET = 12;
+  EVIDENCE_TYPE_INTERVIEW = 13;
+  EVIDENCE_TYPE_AFFIDAVIT = 14;
+  EVIDENCE_TYPE_SUBPOENA = 15;
+  EVIDENCE_TYPE_OTHER = 16;
+}
+
+enum RedactionStatus {
+  REDACTION_STATUS_UNSPECIFIED = 0;
+  REDACTION_STATUS_CLEAN = 1;
+  REDACTION_STATUS_REDACTED = 2;
+  REDACTION_STATUS_PARTIALLY_RECOVERED = 3;
+  REDACTION_STATUS_FULLY_RECOVERED = 4;
+  REDACTION_STATUS_NOT_APPLICABLE = 5;
+}
+
+enum SensitivityLevel {
+  SENSITIVITY_LEVEL_UNSPECIFIED = 0;
+  SENSITIVITY_LEVEL_PUBLIC = 1;
+  SENSITIVITY_LEVEL_RESTRICTED = 2;
+  SENSITIVITY_LEVEL_SEALED = 3;
+  SENSITIVITY_LEVEL_SOURCE_PROTECTED = 4;
+}
+
+enum EntityType {
+  ENTITY_TYPE_UNSPECIFIED = 0;
+  ENTITY_TYPE_PERSON = 1;
+  ENTITY_TYPE_ORGANIZATION = 2;
+  ENTITY_TYPE_LOCATION = 3;
+  ENTITY_TYPE_ACCOUNT = 4;
+  ENTITY_TYPE_VESSEL = 5;
+  ENTITY_TYPE_AIRCRAFT = 6;
+}
+
+enum CurrencyCode {
+  CURRENCY_CODE_UNSPECIFIED = 0;
+  CURRENCY_CODE_USD = 1;
+  CURRENCY_CODE_GBP = 2;
+  CURRENCY_CODE_EUR = 3;
+  CURRENCY_CODE_CHF = 4;
+  CURRENCY_CODE_JPY = 5;
+  CURRENCY_CODE_CAD = 6;
+  CURRENCY_CODE_AUD = 7;
+  CURRENCY_CODE_OTHER = 8;
+}
+
+enum FinancialInstrument {
+  FINANCIAL_INSTRUMENT_UNSPECIFIED = 0;
+  FINANCIAL_INSTRUMENT_WIRE_TRANSFER = 1;
+  FINANCIAL_INSTRUMENT_CHECK = 2;
+  FINANCIAL_INSTRUMENT_CASH = 3;
+  FINANCIAL_INSTRUMENT_CREDIT_CARD = 4;
+  FINANCIAL_INSTRUMENT_CRYPTO = 5;
+  FINANCIAL_INSTRUMENT_TRUST_PAYMENT = 6;
+  FINANCIAL_INSTRUMENT_SHELL_COMPANY = 7;
+  FINANCIAL_INSTRUMENT_OTHER = 8;
+}
+
+enum AnomalyFlag {
+  ANOMALY_FLAG_UNSPECIFIED = 0;
+  ANOMALY_FLAG_ROUND_NUMBER = 1;
+  ANOMALY_FLAG_STRUCTURING = 2;
+  ANOMALY_FLAG_UNUSUAL_TIMING = 3;
+  ANOMALY_FLAG_NEW_COUNTERPARTY = 4;
+  ANOMALY_FLAG_HIGH_VALUE = 5;
+  ANOMALY_FLAG_CROSS_BORDER = 6;
+}
+
+enum ClaimType {
+  CLAIM_TYPE_UNSPECIFIED = 0;
+  CLAIM_TYPE_FACTUAL = 1;
+  CLAIM_TYPE_TEMPORAL = 2;
+  CLAIM_TYPE_FINANCIAL = 3;
+  CLAIM_TYPE_TESTIMONIAL = 4;
+  CLAIM_TYPE_DOCUMENTARY = 5;
+  CLAIM_TYPE_CIRCUMSTANTIAL = 6;
+  CLAIM_TYPE_CORROBORATIVE = 7;
+  CLAIM_TYPE_CONTRADICTORY = 8;
+}
+
+enum IngestPhase {
+  INGEST_PHASE_UNSPECIFIED = 0;
+  INGEST_PHASE_VALIDATING = 1;
+  INGEST_PHASE_DEDUPLICATING = 2;
+  INGEST_PHASE_INSERTING_EVIDENCE = 3;
+  INGEST_PHASE_RESOLVING_ENTITIES = 4;
+  INGEST_PHASE_INSERTING_TRANSACTIONS = 5;
+  INGEST_PHASE_INSERTING_CLAIMS = 6;
+  INGEST_PHASE_CREATING_RELATIONSHIPS = 7;
+  INGEST_PHASE_COMPLETE = 8;
+  INGEST_PHASE_FAILED = 9;
+}
+
+// =============================================================================
+// Ingest Request Messages
+// =============================================================================
+
+// A single evidence record for ingest.
+message EvidenceRecord {
+  string investigation_id = 1;
+  string title = 2;
+  EvidenceType evidence_type = 3;
+  string content_text = 4;
+  string url_source = 5;
+  string sha256_hash = 6;
+  string perceptual_hash = 7;
+  int32 ocr_confidence = 8;
+  string language = 9;
+  google.protobuf.Timestamp document_date = 10;
+  repeated string entities_extracted = 11;
+  repeated string keywords = 12;
+  RedactionStatus redaction_status = 13;
+  int32 redaction_count = 14;
+  string extraction_run_id = 15;
+  google.protobuf.Struct dublin_core_metadata = 16;
+  SensitivityLevel sensitivity_level = 17;
+  PromptScores prompt_scores = 18;
+  string notes = 19;
+  repeated EntityRecord entities = 20;
+  repeated FinancialTransactionRecord financial_transactions = 21;
+  repeated ClaimRecord claims = 22;
+}
+
+// An entity extracted from evidence.
+message EntityRecord {
+  string primary_name = 1;
+  EntityType entity_type = 2;
+  repeated string aliases = 3;
+  string description = 4;
+  // If matched to an existing entity, provide its ID.
+  string existing_entity_id = 5;
+  // Jaro-Winkler similarity score if matched.
+  double match_score = 6;
+}
+
+// A financial transaction extracted from evidence.
+message FinancialTransactionRecord {
+  string source_entity = 1;
+  string destination_entity = 2;
+  int64 amount = 3;
+  CurrencyCode currency = 4;
+  google.protobuf.Timestamp transaction_date = 5;
+  FinancialInstrument instrument = 6;
+  string intermediary_entity = 7;
+  string source_account = 8;
+  string destination_account = 9;
+  repeated AnomalyFlag anomaly_flags = 10;
+  string notes = 11;
+}
+
+// A claim extracted from evidence.
+message ClaimRecord {
+  string claim_text = 1;
+  ClaimType claim_type = 2;
+  int32 confidence = 3;
+  string speaker_id = 4;
+  google.protobuf.Timestamp claim_date = 5;
+  google.protobuf.Timestamp assertion_date = 6;
+  PromptScores prompt_scores = 7;
+}
+
+// =============================================================================
+// RPC Request/Response Messages
+// =============================================================================
+
+message IngestEvidenceRequest {
+  EvidenceRecord record = 1;
+  Provenance provenance = 2;
+}
+
+message IngestEvidenceResponse {
+  bool success = 1;
+  string evidence_id = 2;
+  int64 journal_seq = 3;
+  int32 entities_processed = 4;
+  int32 transactions_processed = 5;
+  int32 claims_processed = 6;
+  repeated IngestError errors = 7;
+}
+
+message BatchIngestRequest {
+  string investigation_id = 1;
+  string extraction_run_id = 2;
+  repeated EvidenceRecord records = 3;
+  Provenance provenance = 4;
+  // Skip records that already exist (by sha256_hash).
+  bool deduplicate_by_hash = 5;
+  // Continue on individual record failure.
+  bool continue_on_error = 6;
+}
+
+message BatchIngestResponse {
+  string run_id = 1;
+  int32 total_submitted = 2;
+  int32 imported_count = 3;
+  int32 skipped_count = 4;
+  int32 failed_count = 5;
+  repeated IngestEvidenceResponse results = 6;
+  Timing timing = 7;
+}
+
+message IngestStatusRequest {
+  string run_id = 1;
+}
+
+message IngestStatusResponse {
+  string run_id = 1;
+  IngestPhase phase = 2;
+  double progress = 3;
+  int32 processed_count = 4;
+  int32 total_count = 5;
+  string message = 6;
+}
+
+message IngestProgressRequest {
+  string run_id = 1;
+}
+
+message IngestProgressUpdate {
+  string run_id = 1;
+  IngestPhase phase = 2;
+  double progress = 3;
+  int32 processed_count = 4;
+  int32 total_count = 5;
+  string message = 6;
+  string current_record = 7;
+}
+
+message IngestError {
+  int32 record_index = 1;
+  string code = 2;
+  string message = 3;
+  string sha256_hash = 4;
+}
+
+message Timing {
+  double parse_ms = 1;
+  double plan_ms = 2;
+  double execute_ms = 3;
+  double total_ms = 4;
+}

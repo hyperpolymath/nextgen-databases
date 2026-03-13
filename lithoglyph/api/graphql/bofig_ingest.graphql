@@ -1,0 +1,403 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# L6 — GraphQL schema extension for Bofig evidence ingest.
+# Supports single and batch ingest from Docudactyl Cap'n Proto payloads,
+# with PROMPT scores, entity extraction, and financial data.
+
+# =============================================================================
+# Extend Root Types
+# =============================================================================
+
+extend type Mutation {
+  """Ingest a single evidence record into the Bofig collections."""
+  ingestEvidence(input: IngestEvidenceInput!): IngestResult!
+
+  """Batch ingest multiple evidence records with shared provenance."""
+  batchIngestEvidence(input: BatchIngestInput!): BatchIngestResult!
+}
+
+extend type Subscription {
+  """Stream progress updates for a batch ingest run."""
+  ingestProgress(runId: ID!): IngestProgress!
+}
+
+# =============================================================================
+# Input Types
+# =============================================================================
+
+"""A single evidence record for ingest, typically from a Docudactyl pipeline."""
+input IngestEvidenceInput {
+  """Investigation this evidence belongs to."""
+  investigationId: String!
+
+  """Human-readable title for the evidence."""
+  title: String!
+
+  """Classification of evidence source type."""
+  evidenceType: EvidenceType!
+
+  """Extracted text content (OCR'd if from scanned document)."""
+  contentText: String
+
+  """URL or file path to original source document."""
+  urlSource: String
+
+  """SHA-256 hash for deduplication and integrity verification."""
+  sha256Hash: String!
+
+  """Perceptual hash for near-duplicate image detection."""
+  perceptualHash: String
+
+  """Tesseract OCR confidence score (0-100), if applicable."""
+  ocrConfidence: Int
+
+  """ISO 639-1 language code of primary content."""
+  language: String
+
+  """Date of the original document (not ingestion date)."""
+  documentDate: DateTime
+
+  """NER-extracted entity names."""
+  entitiesExtracted: [String!]
+
+  """Auto-extracted keywords from content."""
+  keywords: [String!]
+
+  """Redaction status of the document."""
+  redactionStatus: RedactionStatus
+
+  """Number of detected redaction annotations."""
+  redactionCount: Int
+
+  """Docudactyl pipeline run identifier for provenance chain."""
+  extractionRunId: String
+
+  """Dublin Core metadata as JSON string."""
+  dublinCoreMetadata: JSON
+
+  """Access control classification."""
+  sensitivityLevel: SensitivityLevel
+
+  """PROMPT dimension scores for research-grade data quality."""
+  promptScores: PromptScoresInput
+
+  """Analyst notes and observations."""
+  notes: String
+
+  """Entities to create or link (co-reference resolution candidates)."""
+  entities: [IngestEntityInput!]
+
+  """Financial transactions extracted from this evidence."""
+  financialTransactions: [IngestFinancialTransactionInput!]
+
+  """Claims extracted from this evidence."""
+  claims: [IngestClaimInput!]
+
+  """Provenance for this ingest operation."""
+  provenance: ProvenanceInput!
+}
+
+"""PROMPT dimension scores (each 0-100)."""
+input PromptScoresInput {
+  provenance: Int!
+  replicability: Int!
+  objectivity: Int!
+  methodology: Int!
+  publication: Int!
+  timeliness: Int!
+}
+
+"""An entity extracted from evidence, for creation or co-reference linking."""
+input IngestEntityInput {
+  """Candidate primary name."""
+  primaryName: String!
+
+  """Entity type classification."""
+  entityType: EntityTypeEnum!
+
+  """Known aliases for this entity."""
+  aliases: [String!]
+
+  """Brief description of entity role."""
+  description: String
+
+  """If this entity matches an existing entity, provide its ID for linking."""
+  existingEntityId: String
+
+  """Jaro-Winkler similarity score if matched to existing entity."""
+  matchScore: Float
+}
+
+"""A financial transaction extracted from evidence."""
+input IngestFinancialTransactionInput {
+  """Entity ID or name of the sender/payer."""
+  sourceEntity: String!
+
+  """Entity ID or name of the receiver/payee."""
+  destinationEntity: String!
+
+  """Transaction amount in original currency."""
+  amount: BigInt!
+
+  """Currency code."""
+  currency: CurrencyCode!
+
+  """Date of the transaction."""
+  transactionDate: DateTime!
+
+  """Payment instrument or method."""
+  instrument: FinancialInstrument
+
+  """Entity ID of any intermediary."""
+  intermediaryEntity: String
+
+  """Source account identifier (masked)."""
+  sourceAccount: String
+
+  """Destination account identifier."""
+  destinationAccount: String
+
+  """Automated anomaly detection flags."""
+  anomalyFlags: [AnomalyFlag!]
+
+  """Notes on this transaction."""
+  notes: String
+}
+
+"""A claim extracted from evidence."""
+input IngestClaimInput {
+  """The specific factual assertion."""
+  claimText: String!
+
+  """Claim type classification."""
+  claimType: ClaimType!
+
+  """Confidence in claim accuracy (0-100)."""
+  confidence: Int!
+
+  """Entity ID of person who made this claim (for testimony)."""
+  speakerId: String
+
+  """Date the claimed event occurred."""
+  claimDate: DateTime
+
+  """Date the claim was made."""
+  assertionDate: DateTime
+
+  """PROMPT scores for this claim."""
+  promptScores: PromptScoresInput
+}
+
+"""Batch ingest input wrapping multiple evidence records."""
+input BatchIngestInput {
+  """Investigation this batch belongs to."""
+  investigationId: String!
+
+  """Docudactyl extraction run ID for the entire batch."""
+  extractionRunId: String!
+
+  """Evidence records to ingest."""
+  records: [IngestEvidenceInput!]!
+
+  """Global provenance for the batch operation."""
+  provenance: ProvenanceInput!
+
+  """Skip records that already exist (by sha256Hash)."""
+  deduplicateByHash: Boolean = true
+
+  """Continue on individual record failure."""
+  continueOnError: Boolean = true
+}
+
+# =============================================================================
+# Enum Types
+# =============================================================================
+
+enum EvidenceType {
+  COURT_FILING
+  DEPOSITION
+  TESTIMONY
+  FLIGHT_LOG
+  FINANCIAL_RECORD
+  COMMUNICATION
+  PHOTOGRAPH
+  VIDEO
+  OFFICIAL_STATISTICS
+  NEWS_REPORT
+  DOCUMENT
+  DATASET
+  INTERVIEW
+  AFFIDAVIT
+  SUBPOENA
+  OTHER
+}
+
+enum RedactionStatus {
+  CLEAN
+  REDACTED
+  PARTIALLY_RECOVERED
+  FULLY_RECOVERED
+  NOT_APPLICABLE
+}
+
+enum SensitivityLevel {
+  PUBLIC
+  RESTRICTED
+  SEALED
+  SOURCE_PROTECTED
+}
+
+enum EntityTypeEnum {
+  PERSON
+  ORGANIZATION
+  LOCATION
+  ACCOUNT
+  VESSEL
+  AIRCRAFT
+}
+
+enum CurrencyCode {
+  USD
+  GBP
+  EUR
+  CHF
+  JPY
+  CAD
+  AUD
+  OTHER
+}
+
+enum FinancialInstrument {
+  WIRE_TRANSFER
+  CHECK
+  CASH
+  CREDIT_CARD
+  CRYPTO
+  TRUST_PAYMENT
+  SHELL_COMPANY
+  OTHER
+}
+
+enum AnomalyFlag {
+  ROUND_NUMBER
+  STRUCTURING
+  UNUSUAL_TIMING
+  NEW_COUNTERPARTY
+  HIGH_VALUE
+  CROSS_BORDER
+}
+
+enum ClaimType {
+  FACTUAL
+  TEMPORAL
+  FINANCIAL
+  TESTIMONIAL
+  DOCUMENTARY
+  CIRCUMSTANTIAL
+  CORROBORATIVE
+  CONTRADICTORY
+}
+
+# =============================================================================
+# Result Types
+# =============================================================================
+
+"""Result of a single evidence ingest operation."""
+type IngestResult {
+  """Whether the ingest succeeded."""
+  success: Boolean!
+
+  """ID of the created evidence record."""
+  evidenceId: String
+
+  """Journal sequence number for the operation."""
+  journalSeq: BigInt
+
+  """Number of entities created or linked."""
+  entitiesProcessed: Int!
+
+  """Number of financial transactions created."""
+  transactionsProcessed: Int!
+
+  """Number of claims created."""
+  claimsProcessed: Int!
+
+  """Errors encountered (empty on full success)."""
+  errors: [IngestError!]!
+}
+
+"""Result of a batch ingest operation."""
+type BatchIngestResult {
+  """Unique identifier for this ingest run."""
+  runId: ID!
+
+  """Total records submitted."""
+  totalSubmitted: Int!
+
+  """Records successfully imported."""
+  importedCount: Int!
+
+  """Records skipped (e.g., duplicate hash)."""
+  skippedCount: Int!
+
+  """Records that failed to import."""
+  failedCount: Int!
+
+  """Per-record results (in submission order)."""
+  results: [IngestResult!]!
+
+  """Timing information for the batch."""
+  timing: Timing
+}
+
+"""Progress update for a batch ingest run."""
+type IngestProgress {
+  """Ingest run identifier."""
+  runId: ID!
+
+  """Current phase of the ingest."""
+  phase: IngestPhase!
+
+  """Progress as a fraction (0.0 to 1.0)."""
+  progress: Float!
+
+  """Number of records processed so far."""
+  processedCount: Int!
+
+  """Total records in the batch."""
+  totalCount: Int!
+
+  """Human-readable status message."""
+  message: String!
+
+  """Current record being processed (if applicable)."""
+  currentRecord: String
+}
+
+"""An error encountered during ingest."""
+type IngestError {
+  """Zero-based index of the record that failed."""
+  recordIndex: Int
+
+  """Error code."""
+  code: String!
+
+  """Human-readable error message."""
+  message: String!
+
+  """SHA-256 hash of the failed record (for identification)."""
+  sha256Hash: String
+}
+
+enum IngestPhase {
+  VALIDATING
+  DEDUPLICATING
+  INSERTING_EVIDENCE
+  RESOLVING_ENTITIES
+  INSERTING_TRANSACTIONS
+  INSERTING_CLAIMS
+  CREATING_RELATIONSHIPS
+  COMPLETE
+  FAILED
+}

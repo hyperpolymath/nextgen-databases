@@ -25,7 +25,7 @@ servers:
 
 tags:
   - name: Query
-    description: FDQL query execution
+    description: GQL query execution
   - name: Collections
     description: Collection management
   - name: Journal
@@ -36,14 +36,16 @@ tags:
     description: Schema migration operations
   - name: Health
     description: Health and metrics
+  - name: Bofig Ingest
+    description: Bofig evidence ingest from Docudactyl Cap'n Proto payloads
 
 paths:
   /query:
     post:
       tags: [Query]
-      summary: Execute FDQL query
+      summary: Execute GQL query
       description: |
-        Execute any FDQL statement (SELECT, INSERT, UPDATE, DELETE, etc.)
+        Execute any GQL statement (SELECT, INSERT, UPDATE, DELETE, etc.)
         with optional provenance tracking.
       operationId: executeQuery
       requestBody:
@@ -60,7 +62,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/QueryResponse'
         '400':
-          description: Invalid FDQL syntax
+          description: Invalid GQL syntax
           content:
             application/json:
               schema:
@@ -304,6 +306,111 @@ paths:
               schema:
                 $ref: '#/components/schemas/MigrationResponse'
 
+  /bofig/ingest:
+    post:
+      tags: [Bofig Ingest]
+      summary: Ingest a single evidence record
+      description: |
+        Ingest a single evidence record into the Bofig collections.
+        Accepts evidence with optional embedded entities, financial
+        transactions, and claims. Deduplication by SHA-256 hash.
+      operationId: ingestEvidence
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngestEvidenceRequest'
+      responses:
+        '200':
+          description: Evidence ingested successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestResult'
+        '400':
+          description: Invalid evidence record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Duplicate evidence (SHA-256 hash already exists)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Ingest error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /bofig/batch-ingest:
+    post:
+      tags: [Bofig Ingest]
+      summary: Batch ingest evidence records
+      description: |
+        Batch ingest multiple evidence records with shared provenance.
+        Supports deduplication by SHA-256 hash and continue-on-error
+        semantics. Returns per-record results with imported/skipped/failed
+        counts.
+      operationId: batchIngestEvidence
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchIngestRequest'
+      responses:
+        '200':
+          description: Batch ingest completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchIngestResult'
+        '400':
+          description: Invalid batch request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Batch ingest error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /bofig/ingest/{runId}/status:
+    get:
+      tags: [Bofig Ingest]
+      summary: Get ingest run status
+      description: |
+        Get the progress and status of a batch ingest run.
+      operationId: getIngestStatus
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          description: Batch ingest run identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ingest run status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestProgress'
+        '404':
+          description: Ingest run not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /health:
     get:
       tags: [Health]
@@ -334,11 +441,11 @@ components:
   schemas:
     QueryRequest:
       type: object
-      required: [fdql]
+      required: [gql]
       properties:
-        fdql:
+        gql:
           type: string
-          description: FDQL statement to execute
+          description: GQL statement to execute
           example: "SELECT * FROM articles WHERE status = 'published' LIMIT 10"
         provenance:
           $ref: '#/components/schemas/Provenance'
@@ -528,7 +635,7 @@ components:
           $ref: '#/components/schemas/Provenance'
         inverse:
           type: string
-          description: FDQL statement to reverse this operation
+          description: GQL statement to reverse this operation
 
     JournalResponse:
       type: object
@@ -684,6 +791,302 @@ components:
           additionalProperties:
             type: string
             enum: [pass, fail]
+
+    IngestEvidenceRequest:
+      type: object
+      required: [investigationId, title, evidenceType, sha256Hash, provenance]
+      properties:
+        investigationId:
+          type: string
+          description: Investigation this evidence belongs to
+        title:
+          type: string
+          description: Human-readable title for the evidence
+        evidenceType:
+          type: string
+          enum: [court_filing, deposition, testimony, flight_log, financial_record, communication, photograph, video, official_statistics, news_report, document, dataset, interview, affidavit, subpoena, other]
+        contentText:
+          type: string
+          description: Extracted text content (OCR'd if from scanned document)
+        urlSource:
+          type: string
+          description: URL or file path to original source document
+        sha256Hash:
+          type: string
+          description: SHA-256 hash for deduplication and integrity verification
+        perceptualHash:
+          type: string
+          description: Perceptual hash for near-duplicate image detection
+        ocrConfidence:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Tesseract OCR confidence score
+        language:
+          type: string
+          description: ISO 639-1 language code
+        documentDate:
+          type: string
+          format: date-time
+          description: Date of the original document
+        entitiesExtracted:
+          type: array
+          items:
+            type: string
+          description: NER-extracted entity names
+        keywords:
+          type: array
+          items:
+            type: string
+          description: Auto-extracted keywords
+        redactionStatus:
+          type: string
+          enum: [clean, redacted, partially_recovered, fully_recovered, not_applicable]
+        redactionCount:
+          type: integer
+          minimum: 0
+        extractionRunId:
+          type: string
+          description: Docudactyl pipeline run identifier
+        dublinCoreMetadata:
+          type: object
+          additionalProperties: true
+          description: Dublin Core metadata
+        sensitivityLevel:
+          type: string
+          enum: [public, restricted, sealed, source_protected]
+        promptScores:
+          $ref: '#/components/schemas/PromptScoresInput'
+        notes:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngestEntityInput'
+        financialTransactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngestFinancialTransactionInput'
+        claims:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngestClaimInput'
+        provenance:
+          $ref: '#/components/schemas/Provenance'
+
+    PromptScoresInput:
+      type: object
+      required: [provenance, replicability, objectivity, methodology, publication, timeliness]
+      properties:
+        provenance:
+          type: integer
+          minimum: 0
+          maximum: 100
+        replicability:
+          type: integer
+          minimum: 0
+          maximum: 100
+        objectivity:
+          type: integer
+          minimum: 0
+          maximum: 100
+        methodology:
+          type: integer
+          minimum: 0
+          maximum: 100
+        publication:
+          type: integer
+          minimum: 0
+          maximum: 100
+        timeliness:
+          type: integer
+          minimum: 0
+          maximum: 100
+
+    IngestEntityInput:
+      type: object
+      required: [primaryName, entityType]
+      properties:
+        primaryName:
+          type: string
+        entityType:
+          type: string
+          enum: [person, organization, location, account, vessel, aircraft]
+        aliases:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+        existingEntityId:
+          type: string
+          description: Existing entity ID for co-reference linking
+        matchScore:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Jaro-Winkler similarity score if matched
+
+    IngestFinancialTransactionInput:
+      type: object
+      required: [sourceEntity, destinationEntity, amount, currency, transactionDate]
+      properties:
+        sourceEntity:
+          type: string
+          description: Entity ID or name of the sender/payer
+        destinationEntity:
+          type: string
+          description: Entity ID or name of the receiver/payee
+        amount:
+          type: integer
+          description: Transaction amount in original currency
+        currency:
+          type: string
+          enum: [USD, GBP, EUR, CHF, JPY, CAD, AUD, OTHER]
+        transactionDate:
+          type: string
+          format: date-time
+        instrument:
+          type: string
+          enum: [wire_transfer, check, cash, credit_card, crypto, trust_payment, shell_company, other]
+        intermediaryEntity:
+          type: string
+        sourceAccount:
+          type: string
+        destinationAccount:
+          type: string
+        anomalyFlags:
+          type: array
+          items:
+            type: string
+            enum: [round_number, structuring, unusual_timing, new_counterparty, high_value, cross_border]
+        notes:
+          type: string
+
+    IngestClaimInput:
+      type: object
+      required: [claimText, claimType, confidence]
+      properties:
+        claimText:
+          type: string
+          description: The specific factual assertion
+        claimType:
+          type: string
+          enum: [factual, temporal, financial, testimonial, documentary, circumstantial, corroborative, contradictory]
+        confidence:
+          type: integer
+          minimum: 0
+          maximum: 100
+        speakerId:
+          type: string
+        claimDate:
+          type: string
+          format: date-time
+        assertionDate:
+          type: string
+          format: date-time
+        promptScores:
+          $ref: '#/components/schemas/PromptScoresInput'
+
+    BatchIngestRequest:
+      type: object
+      required: [investigationId, extractionRunId, records, provenance]
+      properties:
+        investigationId:
+          type: string
+          description: Investigation this batch belongs to
+        extractionRunId:
+          type: string
+          description: Docudactyl extraction run ID for the batch
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngestEvidenceRequest'
+        provenance:
+          $ref: '#/components/schemas/Provenance'
+        deduplicateByHash:
+          type: boolean
+          default: true
+          description: Skip records that already exist by SHA-256 hash
+        continueOnError:
+          type: boolean
+          default: true
+          description: Continue on individual record failure
+
+    IngestResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        evidenceId:
+          type: string
+        journalSeq:
+          type: integer
+        entitiesProcessed:
+          type: integer
+        transactionsProcessed:
+          type: integer
+        claimsProcessed:
+          type: integer
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngestError'
+
+    BatchIngestResult:
+      type: object
+      properties:
+        runId:
+          type: string
+        totalSubmitted:
+          type: integer
+        importedCount:
+          type: integer
+        skippedCount:
+          type: integer
+        failedCount:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngestResult'
+        timing:
+          $ref: '#/components/schemas/Timing'
+
+    IngestProgress:
+      type: object
+      properties:
+        runId:
+          type: string
+        phase:
+          type: string
+          enum: [validating, deduplicating, inserting_evidence, resolving_entities, inserting_transactions, inserting_claims, creating_relationships, complete, failed]
+        progress:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Progress as a fraction (0.0 to 1.0)
+        processedCount:
+          type: integer
+        totalCount:
+          type: integer
+        message:
+          type: string
+        currentRecord:
+          type: string
+
+    IngestError:
+      type: object
+      properties:
+        recordIndex:
+          type: integer
+          description: Zero-based index of the failed record
+        code:
+          type: string
+        message:
+          type: string
+        sha256Hash:
+          type: string
 
     Error:
       type: object
