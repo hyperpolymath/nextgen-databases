@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Glyphbase Docker Compose Configuration
+
+services:
+  glyphbase:
+    image: ghcr.io/hyperpolymath/glyphbase:latest
+    container_name: glyphbase
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./data:/data
+    environment:
+      - PORT=4000
+      - DATABASE_PATH=/data
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # Optional: Lithoglyph standalone database
+  lithoglyph:
+    image: ghcr.io/hyperpolymath/lithoglyph:latest
+    container_name: lithoglyph-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - lithoglyph-data:/var/lib/lithoglyph
+    environment:
+      - LITHOGLYPH_DATA_DIR=/var/lib/lithoglyph
+    restart: unless-stopped
+    profiles:
+      - full
+
+volumes:
+  lithoglyph-data:
+    driver: local

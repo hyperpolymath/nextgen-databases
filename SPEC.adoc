@@ -1,0 +1,915 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Glyphbase Specification
+:toc:
+:toc-placement: preamble
+:toclevels: 4
+:sectnums:
+
+Technical specification for Glyphbase, the open-source Airtable alternative built on Lithoglyph.
+
+== Overview
+
+=== Purpose
+
+Glyphbase provides a spreadsheet-like interface for non-technical users to work with structured data, while leveraging Lithoglyph's unique capabilities: provenance tracking, reversibility proofs, and PROMPT quality scores.
+
+=== Design Principles
+
+1. **Provenance by default** - Every change is tracked automatically
+2. **Offline-first** - Full functionality without network
+3. **Keyboard-first** - Complete keyboard navigation
+4. **Accessibility** - WCAG 2.1 AA compliance
+5. **Self-hosted** - No vendor lock-in
+
+== Data Model
+
+=== Workspace
+
+A workspace is the top-level container, analogous to an Airtable workspace.
+
+[source,typescript]
+----
+interface Workspace {
+  id: WorkspaceId;           // UUID
+  name: string;              // Display name
+  slug: string;              // URL-safe identifier
+  owner: ActorId;            // Creator
+  members: Member[];         // Users with access
+  bases: BaseId[];           // Contained bases
+  created_at: Timestamp;
+  created_by: ActorId;
+  settings: WorkspaceSettings;
+}
+
+interface Member {
+  actor: ActorId;
+  role: 'owner' | 'admin' | 'editor' | 'viewer';
+  invited_at: Timestamp;
+  invited_by: ActorId;
+}
+----
+
+=== Base
+
+A base is a collection of related tables, analogous to a database.
+
+[source,typescript]
+----
+interface Base {
+  id: BaseId;                // UUID
+  workspace: WorkspaceId;
+  name: string;
+  description: string;
+  icon: Emoji | null;
+  color: Color | null;
+  tables: TableId[];
+  created_at: Timestamp;
+  created_by: ActorId;
+  settings: BaseSettings;
+}
+----
+
+=== Table
+
+A table contains rows of data with a defined schema.
+
+[source,typescript]
+----
+interface Table {
+  id: TableId;               // UUID
+  base: BaseId;
+  name: string;
+  description: string;
+  fields: Field[];           // Ordered list of columns
+  primary_field: FieldId;    // The "name" column
+  views: View[];             // Different presentations
+  created_at: Timestamp;
+  created_by: ActorId;
+}
+----
+
+=== Field (Column)
+
+Fields define the schema for a table.
+
+[source,typescript]
+----
+interface Field {
+  id: FieldId;               // UUID
+  table: TableId;
+  name: string;
+  type: FieldType;
+  options: FieldOptions;     // Type-specific options
+  required: boolean;
+  unique: boolean;
+  default_value: Value | null;
+  description: string | null;
+  created_at: Timestamp;
+  created_by: ActorId;
+}
+
+type FieldType =
+  | 'text'
+  | 'long_text'
+  | 'number'
+  | 'select'
+  | 'multi_select'
+  | 'date'
+  | 'datetime'
+  | 'checkbox'
+  | 'link'
+  | 'attachment'
+  | 'formula'
+  | 'rollup'
+  | 'lookup'
+  | 'url'
+  | 'email'
+  | 'phone'
+  | 'rating'
+  | 'barcode'
+  | 'created_time'
+  | 'modified_time'
+  | 'created_by'
+  | 'modified_by'
+  | 'autonumber'
+  | 'prompt_score';          // Lithoglyph-specific
+----
+
+=== Row (Record)
+
+Rows contain the actual data.
+
+[source,typescript]
+----
+interface Row {
+  id: RowId;                 // UUID
+  table: TableId;
+  cells: Map<FieldId, Cell>;
+
+  // Lithoglyph provenance (automatic)
+  created_at: Timestamp;
+  created_by: ActorId;
+  created_rationale: string;
+  modified_at: Timestamp;
+  modified_by: ActorId;
+}
+
+interface Cell {
+  field: FieldId;
+  value: Value;
+
+  // Lithoglyph provenance (automatic)
+  modified_at: Timestamp;
+  modified_by: ActorId;
+  modified_rationale: string | null;
+}
+----
+
+=== View
+
+Views are different presentations of the same table data.
+
+[source,typescript]
+----
+interface View {
+  id: ViewId;                // UUID
+  table: TableId;
+  name: string;
+  type: ViewType;
+  config: ViewConfig;
+  filters: Filter[];
+  sorts: Sort[];
+  groups: Group[];
+  hidden_fields: FieldId[];
+  field_order: FieldId[];
+  field_widths: Map<FieldId, number>;
+  created_at: Timestamp;
+  created_by: ActorId;
+}
+
+type ViewType = 'grid' | 'kanban' | 'calendar' | 'gallery' | 'form';
+----
+
+== Field Types
+
+=== Text
+
+Single-line text input.
+
+[source,typescript]
+----
+interface TextOptions {
+  max_length: number | null;
+  validate_regex: string | null;
+}
+----
+
+=== Long Text
+
+Multi-line text with optional rich formatting.
+
+[source,typescript]
+----
+interface LongTextOptions {
+  enable_rich_text: boolean;
+  max_length: number | null;
+}
+----
+
+=== Number
+
+Numeric values with formatting.
+
+[source,typescript]
+----
+interface NumberOptions {
+  precision: number;         // Decimal places
+  negative: boolean;         // Allow negative
+  format: 'number' | 'currency' | 'percent';
+  currency: string | null;   // e.g., 'USD', 'GBP'
+  min: number | null;
+  max: number | null;
+}
+----
+
+=== Select
+
+Single selection from predefined options.
+
+[source,typescript]
+----
+interface SelectOptions {
+  choices: Choice[];
+}
+
+interface Choice {
+  id: ChoiceId;
+  name: string;
+  color: Color;
+}
+----
+
+=== Multi-Select
+
+Multiple selections from predefined options.
+
+[source,typescript]
+----
+interface MultiSelectOptions {
+  choices: Choice[];
+  max_selections: number | null;
+}
+----
+
+=== Date / DateTime
+
+Date values with optional time.
+
+[source,typescript]
+----
+interface DateOptions {
+  include_time: boolean;
+  time_format: '12h' | '24h';
+  date_format: string;       // e.g., 'YYYY-MM-DD'
+  timezone: string | null;   // e.g., 'Europe/London'
+}
+----
+
+=== Checkbox
+
+Boolean value.
+
+[source,typescript]
+----
+interface CheckboxOptions {
+  style: 'checkbox' | 'toggle';
+}
+----
+
+=== Link
+
+Foreign key to another table.
+
+[source,typescript]
+----
+interface LinkOptions {
+  linked_table: TableId;
+  allow_multiple: boolean;
+  symmetric_field: FieldId | null;  // Auto-created reverse link
+}
+----
+
+=== Attachment
+
+File uploads.
+
+[source,typescript]
+----
+interface AttachmentOptions {
+  allowed_types: string[];   // MIME types, e.g., ['image/*', 'application/pdf']
+  max_size: number;          // Bytes
+  max_count: number;
+}
+
+interface Attachment {
+  id: AttachmentId;
+  filename: string;
+  mime_type: string;
+  size: number;
+  url: string;
+  thumbnails: Map<string, string>;  // size -> url
+}
+----
+
+=== Formula
+
+Computed value from other fields.
+
+[source,typescript]
+----
+interface FormulaOptions {
+  expression: string;        // Formula expression
+  result_type: FieldType;    // Output type
+}
+
+// Formula language (subset of Excel/Airtable formulas)
+// Examples:
+// - {Field A} + {Field B}
+// - IF({Status} = 'Done', 1, 0)
+// - CONCATENATE({First Name}, ' ', {Last Name})
+// - DATEADD({Due Date}, 7, 'days')
+----
+
+=== Rollup
+
+Aggregate linked records.
+
+[source,typescript]
+----
+interface RollupOptions {
+  link_field: FieldId;       // Must be a link field
+  rollup_field: FieldId;     // Field in linked table
+  function: RollupFunction;
+}
+
+type RollupFunction =
+  | 'count'
+  | 'sum'
+  | 'avg'
+  | 'min'
+  | 'max'
+  | 'and'
+  | 'or'
+  | 'array_join'
+  | 'array_unique'
+  | 'array_compact';
+----
+
+=== Lookup
+
+Display field from linked record.
+
+[source,typescript]
+----
+interface LookupOptions {
+  link_field: FieldId;       // Must be a link field
+  lookup_field: FieldId;     // Field in linked table
+}
+----
+
+=== PROMPT Score (Lithoglyph-specific)
+
+Evidence quality rating on six dimensions.
+
+[source,typescript]
+----
+interface PromptScoreOptions {
+  dimensions: ('P' | 'R' | 'O' | 'M' | 'P' | 'T')[];
+  require_all: boolean;
+}
+
+interface PromptScore {
+  provenance: BoundedInt<0, 100>;
+  replicability: BoundedInt<0, 100>;
+  objectivity: BoundedInt<0, 100>;
+  methodology: BoundedInt<0, 100>;
+  publication: BoundedInt<0, 100>;
+  transparency: BoundedInt<0, 100>;
+  overall: BoundedInt<0, 100>;
+  scored_by: ActorId;
+  scored_at: Timestamp;
+}
+----
+
+== Views
+
+=== Grid View
+
+Spreadsheet-like table view.
+
+[source,typescript]
+----
+interface GridViewConfig {
+  row_height: 'short' | 'medium' | 'tall' | 'extra_tall';
+  wrap_cells: boolean;
+  frozen_columns: number;
+}
+----
+
+==== Keyboard Navigation
+
+[cols="1,2"]
+|===
+| Key | Action
+
+| Arrow keys | Move selection
+| Tab / Shift+Tab | Move to next/previous cell
+| Enter | Edit cell / Move down
+| Escape | Cancel edit
+| Ctrl+C | Copy
+| Ctrl+V | Paste
+| Ctrl+Z | Undo
+| Ctrl+Shift+Z | Redo
+| Space | Toggle checkbox / Open select
+| Delete | Clear cell
+| Ctrl+Shift+K | Delete row
+| Ctrl+Enter | Insert row below
+|===
+
+=== Kanban View
+
+Cards organized in columns.
+
+[source,typescript]
+----
+interface KanbanViewConfig {
+  group_field: FieldId;      // Must be select/single-select
+  card_cover_field: FieldId | null;  // Attachment field for cover
+  card_title_field: FieldId;
+  card_fields: FieldId[];    // Fields to show on card
+  hide_empty_groups: boolean;
+  allow_uncategorized: boolean;
+}
+----
+
+=== Calendar View
+
+Events on a calendar.
+
+[source,typescript]
+----
+interface CalendarViewConfig {
+  date_field: FieldId;       // Start date
+  end_date_field: FieldId | null;  // End date for ranges
+  title_field: FieldId;
+  color_field: FieldId | null;  // Select field for color
+  default_view: 'month' | 'week' | 'day';
+}
+----
+
+=== Gallery View
+
+Cards in a grid.
+
+[source,typescript]
+----
+interface GalleryViewConfig {
+  cover_field: FieldId | null;  // Attachment field
+  title_field: FieldId;
+  card_fields: FieldId[];
+  card_size: 'small' | 'medium' | 'large';
+}
+----
+
+=== Form View
+
+Public form for data collection.
+
+[source,typescript]
+----
+interface FormViewConfig {
+  title: string;
+  description: string;
+  fields: FormField[];
+  submit_button_text: string;
+  success_message: string;
+  redirect_url: string | null;
+  require_login: boolean;
+  one_response_per_user: boolean;
+  show_logo: boolean;
+  custom_css: string | null;
+}
+
+interface FormField {
+  field: FieldId;
+  label: string | null;      // Override field name
+  description: string | null;
+  required: boolean;
+  prefill_value: Value | null;
+}
+----
+
+== Filtering
+
+[source,typescript]
+----
+interface Filter {
+  field: FieldId;
+  operator: FilterOperator;
+  value: Value | null;
+}
+
+type FilterOperator =
+  // Universal
+  | 'is_empty'
+  | 'is_not_empty'
+  | 'equals'
+  | 'not_equals'
+  // Text
+  | 'contains'
+  | 'not_contains'
+  | 'starts_with'
+  | 'ends_with'
+  // Number
+  | 'greater_than'
+  | 'less_than'
+  | 'greater_or_equal'
+  | 'less_or_equal'
+  // Date
+  | 'is_before'
+  | 'is_after'
+  | 'is_on_or_before'
+  | 'is_on_or_after'
+  | 'is_within'            // e.g., last 7 days
+  // Select
+  | 'is_any_of'
+  | 'is_none_of'
+  // Link
+  | 'has_any'
+  | 'has_all'
+  | 'has_none';
+
+interface FilterGroup {
+  conjunction: 'and' | 'or';
+  filters: (Filter | FilterGroup)[];
+}
+----
+
+== Sorting
+
+[source,typescript]
+----
+interface Sort {
+  field: FieldId;
+  direction: 'asc' | 'desc';
+}
+----
+
+== Grouping
+
+[source,typescript]
+----
+interface Group {
+  field: FieldId;
+  direction: 'asc' | 'desc';
+  collapsed_groups: Value[];  // Which groups are collapsed
+}
+----
+
+== Automations
+
+=== Triggers
+
+[source,typescript]
+----
+type Trigger =
+  | { type: 'row_created'; table: TableId }
+  | { type: 'row_updated'; table: TableId; fields?: FieldId[] }
+  | { type: 'row_deleted'; table: TableId }
+  | { type: 'field_changed'; table: TableId; field: FieldId; from?: Value; to?: Value }
+  | { type: 'form_submitted'; view: ViewId }
+  | { type: 'schedule'; cron: string }
+  | { type: 'webhook_received'; path: string }
+  | { type: 'prompt_score_below'; table: TableId; threshold: number };
+----
+
+=== Actions
+
+[source,typescript]
+----
+type Action =
+  | { type: 'create_row'; table: TableId; values: Map<FieldId, Value | Expression> }
+  | { type: 'update_row'; row: RowId | Expression; values: Map<FieldId, Value | Expression> }
+  | { type: 'delete_row'; row: RowId | Expression }
+  | { type: 'send_webhook'; url: string; method: string; body: string }
+  | { type: 'send_email'; to: string | Expression; subject: string; body: string }
+  | { type: 'send_slack'; webhook_url: string; message: string }
+  | { type: 'run_script'; script: string }
+  | { type: 'delay'; seconds: number }
+  | { type: 'condition'; if: Expression; then: Action[]; else?: Action[] };
+----
+
+=== Automation Definition
+
+[source,typescript]
+----
+interface Automation {
+  id: AutomationId;
+  base: BaseId;
+  name: string;
+  description: string;
+  enabled: boolean;
+  trigger: Trigger;
+  actions: Action[];
+  created_at: Timestamp;
+  created_by: ActorId;
+  last_run: Timestamp | null;
+  run_count: number;
+}
+----
+
+== API
+
+=== REST Endpoints
+
+[source,text]
+----
+# Workspaces
+GET    /api/workspaces
+POST   /api/workspaces
+GET    /api/workspaces/:id
+PATCH  /api/workspaces/:id
+DELETE /api/workspaces/:id
+
+# Bases
+GET    /api/workspaces/:ws/bases
+POST   /api/workspaces/:ws/bases
+GET    /api/bases/:id
+PATCH  /api/bases/:id
+DELETE /api/bases/:id
+
+# Tables
+GET    /api/bases/:base/tables
+POST   /api/bases/:base/tables
+GET    /api/tables/:id
+PATCH  /api/tables/:id
+DELETE /api/tables/:id
+
+# Fields
+GET    /api/tables/:table/fields
+POST   /api/tables/:table/fields
+PATCH  /api/fields/:id
+DELETE /api/fields/:id
+
+# Rows
+GET    /api/tables/:table/rows
+POST   /api/tables/:table/rows
+GET    /api/rows/:id
+PATCH  /api/rows/:id
+DELETE /api/rows/:id
+
+# Views
+GET    /api/tables/:table/views
+POST   /api/tables/:table/views
+GET    /api/views/:id
+PATCH  /api/views/:id
+DELETE /api/views/:id
+
+# Lithoglyph-specific
+GET    /api/rows/:id/provenance
+GET    /api/tables/:table/history?at=:timestamp
+GET    /api/rows/:id/prompt-scores
+PUT    /api/rows/:id/prompt-scores
+
+# Automations
+GET    /api/bases/:base/automations
+POST   /api/bases/:base/automations
+PATCH  /api/automations/:id
+DELETE /api/automations/:id
+POST   /api/automations/:id/run
+----
+
+=== WebSocket Protocol
+
+[source,typescript]
+----
+// Client -> Server
+type ClientMessage =
+  | { type: 'subscribe'; table: TableId }
+  | { type: 'unsubscribe'; table: TableId }
+  | { type: 'cursor_move'; table: TableId; cell: CellRef }
+  | { type: 'cell_edit'; table: TableId; row: RowId; field: FieldId; value: Value };
+
+// Server -> Client
+type ServerMessage =
+  | { type: 'row_created'; table: TableId; row: Row }
+  | { type: 'row_updated'; table: TableId; row: Row; changed_fields: FieldId[] }
+  | { type: 'row_deleted'; table: TableId; row: RowId }
+  | { type: 'cursor_moved'; table: TableId; user: ActorId; cell: CellRef }
+  | { type: 'user_joined'; table: TableId; user: ActorId }
+  | { type: 'user_left'; table: TableId; user: ActorId };
+----
+
+== Collaboration
+
+=== Real-time Sync
+
+Glyphbase uses CRDTs (via Yjs) for conflict-free real-time collaboration:
+
+* Cell-level granularity
+* Offline edits merge automatically
+* No "save" button - changes sync immediately
+
+=== Presence
+
+* Show active users in each base
+* Show cursors in grid view
+* Show who is editing each cell
+
+=== Comments
+
+[source,typescript]
+----
+interface Comment {
+  id: CommentId;
+  row: RowId;
+  field: FieldId | null;     // null = row-level comment
+  author: ActorId;
+  content: string;           // Markdown
+  mentions: ActorId[];
+  created_at: Timestamp;
+  resolved: boolean;
+  resolved_by: ActorId | null;
+  resolved_at: Timestamp | null;
+}
+----
+
+== Lithoglyph Integration
+
+=== Provenance
+
+Every mutation automatically records:
+
+* `actor_id` - Who made the change
+* `timestamp` - When
+* `rationale` - Why (optional in UI, required in API for programmatic changes)
+
+=== Time Travel
+
+[source,typescript]
+----
+// Get table state at any point in history
+GET /api/tables/:id/rows?at=2024-01-15T10:30:00Z
+
+// Compare two points in time
+GET /api/tables/:id/diff?from=2024-01-01&to=2024-01-31
+
+// Restore to previous state
+POST /api/tables/:id/restore?to=2024-01-15T10:30:00Z
+----
+
+=== Reversibility
+
+All operations are reversible:
+
+* Delete row -> stored in journal, can be restored
+* Update cell -> full history preserved
+* Delete table -> soft delete, 30-day recovery window
+
+=== PROMPT Scoring
+
+Any row can have a PROMPT score:
+
+[source,typescript]
+----
+POST /api/rows/:id/prompt-scores
+{
+  "provenance": 85,
+  "replicability": 70,
+  "objectivity": 90,
+  "methodology": 75,
+  "publication": 95,
+  "transparency": 80
+}
+----
+
+Views can filter by minimum score:
+
+[source,typescript]
+----
+GET /api/tables/:id/rows?min_prompt_score=80
+----
+
+== Security
+
+=== Authentication
+
+* Magic link (passwordless email)
+* OIDC (Google, GitHub, custom IdP)
+* API keys for programmatic access
+
+=== Authorization
+
+[source,typescript]
+----
+type Permission =
+  | 'workspace:admin'
+  | 'workspace:edit'
+  | 'workspace:view'
+  | 'base:admin'
+  | 'base:edit'
+  | 'base:view'
+  | 'table:admin'
+  | 'table:edit'
+  | 'table:view';
+
+interface Role {
+  name: string;
+  permissions: Permission[];
+}
+----
+
+=== Row-Level Security
+
+Optional per-table rules:
+
+[source,typescript]
+----
+interface RowLevelSecurity {
+  table: TableId;
+  enabled: boolean;
+  policy: 'none' | 'owner_only' | 'custom';
+  custom_filter: Filter | null;
+}
+----
+
+== Deployment
+
+=== Self-Hosted
+
+[source,yaml]
+----
+# docker-compose.yml
+version: '3.8'
+services:
+  glyphbase:
+    image: ghcr.io/hyperpolymath/glyphbase:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - LITH_PATH=/data
+      - AUTH_SECRET=your-secret-here
+    volumes:
+      - glyphbase-data:/data
+
+volumes:
+  glyphbase-data:
+----
+
+=== Cloud Storage
+
+Glyphbase supports storing data on:
+
+* Local filesystem
+* Dropbox (append-only safe)
+* Google Drive (append-only safe)
+* S3-compatible storage
+
+== Performance Targets
+
+[cols="1,1"]
+|===
+| Metric | Target
+
+| Table with 10,000 rows | < 500ms initial load
+| Cell update | < 50ms round-trip
+| Real-time cursor | < 100ms latency
+| Search across 100k rows | < 1s
+| Export 10k rows to CSV | < 2s
+|===
+
+== Accessibility
+
+* Full keyboard navigation
+* Screen reader support (ARIA)
+* High contrast mode
+* Reduced motion option
+* Focus indicators
+* WCAG 2.1 AA compliant
+
+== Appendix: Formula Functions
+
+=== Text
+`CONCATENATE`, `LEFT`, `RIGHT`, `MID`, `LEN`, `LOWER`, `UPPER`, `TRIM`, `SUBSTITUTE`, `FIND`, `SEARCH`, `REGEX_MATCH`, `REGEX_REPLACE`
+
+=== Number
+`SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT`, `ROUND`, `FLOOR`, `CEILING`, `ABS`, `MOD`, `POWER`, `SQRT`, `LOG`
+
+=== Date
+`TODAY`, `NOW`, `YEAR`, `MONTH`, `DAY`, `HOUR`, `MINUTE`, `DATEADD`, `DATEDIFF`, `WEEKDAY`, `WORKDAY`
+
+=== Logical
+`IF`, `AND`, `OR`, `NOT`, `SWITCH`, `BLANK`, `ERROR`, `ISERROR`
+
+=== Array
+`ARRAYCOMPACT`, `ARRAYFLATTEN`, `ARRAYJOIN`, `ARRAYUNIQUE`

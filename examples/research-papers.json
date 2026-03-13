@@ -1,0 +1,182 @@
+{
+  "name": "Research Paper Tracker",
+  "description": "Track research papers with PROMPT scores for data quality assessment",
+  "collections": [
+    {
+      "name": "papers",
+      "schema": {
+        "fields": [
+          {
+            "name": "title",
+            "type": "text",
+            "required": true
+          },
+          {
+            "name": "authors",
+            "type": "text"
+          },
+          {
+            "name": "year",
+            "type": "number"
+          },
+          {
+            "name": "journal",
+            "type": "text"
+          },
+          {
+            "name": "doi",
+            "type": "text"
+          },
+          {
+            "name": "abstract",
+            "type": "long_text"
+          },
+          {
+            "name": "field",
+            "type": "select",
+            "options": ["Computer Science", "Biology", "Physics", "Chemistry", "Medicine", "Social Science"]
+          },
+          {
+            "name": "read_status",
+            "type": "select",
+            "options": ["To Read", "Reading", "Read", "Referenced"],
+            "default": "To Read"
+          },
+          {
+            "name": "tags",
+            "type": "multi_select",
+            "options": ["Database", "AI", "Formal Methods", "Distributed Systems", "Security"]
+          },
+          {
+            "name": "prompt_provenance",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "Data source documentation score"
+          },
+          {
+            "name": "prompt_reproducibility",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "Can results be recreated?"
+          },
+          {
+            "name": "prompt_openness",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "Data and code availability"
+          },
+          {
+            "name": "prompt_methodology",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "Process documentation quality"
+          },
+          {
+            "name": "prompt_peer_review",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "Peer review and validation"
+          },
+          {
+            "name": "prompt_timeliness",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "Data currency and relevance"
+          },
+          {
+            "name": "prompt_total",
+            "type": "formula",
+            "formula": "AVERAGE({prompt_provenance}, {prompt_reproducibility}, {prompt_openness}, {prompt_methodology}, {prompt_peer_review}, {prompt_timeliness})"
+          },
+          {
+            "name": "notes",
+            "type": "long_text"
+          },
+          {
+            "name": "pdf",
+            "type": "attachment"
+          }
+        ]
+      },
+      "records": [
+        {
+          "title": "Dynamo: Amazon's Highly Available Key-value Store",
+          "authors": "DeCandia et al.",
+          "year": 2007,
+          "journal": "SOSP",
+          "doi": "10.1145/1294261.1294281",
+          "abstract": "Reliability at massive scale is one of the biggest challenges we face at Amazon.com...",
+          "field": "Computer Science",
+          "read_status": "Read",
+          "tags": ["Database", "Distributed Systems"],
+          "prompt_provenance": 100,
+          "prompt_reproducibility": 70,
+          "prompt_openness": 60,
+          "prompt_methodology": 95,
+          "prompt_peer_review": 100,
+          "prompt_timeliness": 50,
+          "notes": "Foundational paper on eventual consistency and distributed databases"
+        },
+        {
+          "title": "The Lean Theorem Prover",
+          "authors": "de Moura & Ullrich",
+          "year": 2021,
+          "journal": "CPP",
+          "doi": "10.1145/3437992.3439919",
+          "abstract": "Lean is a proof assistant and functional programming language...",
+          "field": "Computer Science",
+          "read_status": "Referenced",
+          "tags": ["Formal Methods", "AI"],
+          "prompt_provenance": 100,
+          "prompt_reproducibility": 95,
+          "prompt_openness": 100,
+          "prompt_methodology": 100,
+          "prompt_peer_review": 100,
+          "prompt_timeliness": 95,
+          "notes": "Used for our dependent-types query language (GQL-DT)"
+        },
+        {
+          "title": "Self-Normalizing Databases",
+          "authors": "Jewell, J.D.A.",
+          "year": 2026,
+          "journal": "arXiv",
+          "field": "Computer Science",
+          "read_status": "Reading",
+          "tags": ["Database", "Formal Methods"],
+          "prompt_provenance": 100,
+          "prompt_reproducibility": 90,
+          "prompt_openness": 100,
+          "prompt_methodology": 95,
+          "prompt_peer_review": 70,
+          "prompt_timeliness": 100,
+          "notes": "Our paper on Lithoglyph's automatic normalization"
+        }
+      ]
+    }
+  ],
+  "views": [
+    {
+      "name": "High Quality Papers",
+      "type": "grid",
+      "filters": [{"field": "prompt_total", "operator": ">=", "value": 80}],
+      "sort": [{"field": "prompt_total", "direction": "desc"}]
+    },
+    {
+      "name": "Reading List",
+      "type": "grid",
+      "filters": [{"field": "read_status", "operator": "in", "value": ["To Read", "Reading"]}],
+      "sort": [{"field": "year", "direction": "desc"}]
+    },
+    {
+      "name": "By Field",
+      "type": "grid",
+      "group_by": "field"
+    }
+  ]
+}

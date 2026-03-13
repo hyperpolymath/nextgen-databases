@@ -1,0 +1,113 @@
+{
+  "name": "Task Tracker",
+  "description": "Simple task management with status, priority, and assignee tracking",
+  "collections": [
+    {
+      "name": "tasks",
+      "schema": {
+        "fields": [
+          {
+            "name": "title",
+            "type": "text",
+            "required": true
+          },
+          {
+            "name": "description",
+            "type": "long_text"
+          },
+          {
+            "name": "status",
+            "type": "select",
+            "options": ["Todo", "In Progress", "Review", "Done"],
+            "default": "Todo"
+          },
+          {
+            "name": "priority",
+            "type": "select",
+            "options": ["Low", "Medium", "High", "Urgent"],
+            "default": "Medium"
+          },
+          {
+            "name": "assignee",
+            "type": "text"
+          },
+          {
+            "name": "due_date",
+            "type": "date"
+          },
+          {
+            "name": "tags",
+            "type": "multi_select",
+            "options": ["Bug", "Feature", "Documentation", "Testing", "Design"]
+          },
+          {
+            "name": "prompt_score",
+            "type": "number",
+            "min": 0,
+            "max": 100
+          }
+        ]
+      },
+      "records": [
+        {
+          "title": "Set up Glyphbase",
+          "description": "Install and configure Glyphbase for the team",
+          "status": "Done",
+          "priority": "High",
+          "assignee": "Alice",
+          "due_date": "2026-02-01",
+          "tags": ["Documentation"],
+          "prompt_score": 95
+        },
+        {
+          "title": "Create user guide",
+          "description": "Write comprehensive user documentation",
+          "status": "In Progress",
+          "priority": "High",
+          "assignee": "Bob",
+          "due_date": "2026-02-15",
+          "tags": ["Documentation"],
+          "prompt_score": 85
+        },
+        {
+          "title": "Fix login bug",
+          "description": "Users can't log in after password reset",
+          "status": "Todo",
+          "priority": "Urgent",
+          "assignee": "Charlie",
+          "due_date": "2026-02-07",
+          "tags": ["Bug"],
+          "prompt_score": 90
+        },
+        {
+          "title": "Add dark mode",
+          "description": "Implement dark mode theme option",
+          "status": "Todo",
+          "priority": "Low",
+          "assignee": "Diana",
+          "due_date": "2026-03-01",
+          "tags": ["Feature", "Design"],
+          "prompt_score": 75
+        }
+      ]
+    }
+  ],
+  "views": [
+    {
+      "name": "Kanban Board",
+      "type": "kanban",
+      "group_by": "status"
+    },
+    {
+      "name": "By Priority",
+      "type": "grid",
+      "sort": [{"field": "priority", "direction": "desc"}],
+      "filters": [{"field": "status", "operator": "!=", "value": "Done"}]
+    },
+    {
+      "name": "Calendar",
+      "type": "calendar",
+      "date_field": "due_date"
+    }
+  ]
+}
