@@ -66,7 +66,7 @@ structure VerifiedNormalizationStep where
 /-- Create a verified 3NF decomposition -/
 def createVerified3NFDecomposition
     (source : Schema)
-    (violations : List (NFViolation source))
+    (_violations : List (NFViolation source))
     (targets : List Schema)
     (joinAttrs : List Attribute) : IO VerifiedNormalizationStep := do
   let step : NormalizationStep := {
@@ -93,7 +93,7 @@ def createVerified3NFDecomposition
 /-- Create a verified BCNF decomposition -/
 def createVerifiedBCNFDecomposition
     (source : Schema)
-    (violations : List (NFViolation source))
+    (_violations : List (NFViolation source))
     (targets : List Schema)
     (joinAttrs : List Attribute) : IO VerifiedNormalizationStep := do
   let step : NormalizationStep := {

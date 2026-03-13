@@ -25,7 +25,7 @@ structure Schema where
 abbrev Tuple := Attribute → Option String
 
 /-- A relation is a collection of tuples -/
-abbrev Relation (s : Schema) := List Tuple
+abbrev Relation (_s : Schema) := List Tuple
 
 /-! # Functional Dependencies -/
 
@@ -168,7 +168,7 @@ structure DependencyPreserving (d : Decomposition) (fds : List (FunDep d.source)
     X+ = all attributes functionally determined by X.
     Uses fixed-point iteration: repeatedly add dependent attributes
     when the determinant is contained in the current closure. -/
-def attributeClosure (attrs : List Attribute) (fds : List (FunDep s)) : List Attribute :=
+def attributeClosure {s : Schema} (attrs : List Attribute) (fds : List (FunDep s)) : List Attribute :=
   -- Fixed-point iteration (bounded by number of FDs to ensure termination)
   let rec loop (closure : List Attribute) (fuel : Nat) : List Attribute :=
     match fuel with
@@ -192,32 +192,32 @@ def isSuperkeyClosure (s : Schema) (attrs : List Attribute) (fds : List (FunDep 
 
 /-- Remove an attribute from a determinant and check if the FD still holds
     (i.e., the remaining attributes still determine the dependent) -/
-def isRedundantInDeterminant (attr : Attribute) (fd : FunDep s)
+def isRedundantInDeterminant {s : Schema} (attr : Attribute) (fd : FunDep s)
     (fds : List (FunDep s)) : Bool :=
   let reduced := fd.determinant.filter (· != attr)
   let closure := attributeClosure reduced fds
   fd.dependent.all (· ∈ closure)
 
 /-- Reduce the left-hand side of each FD to minimal -/
-def reduceLeftSides (fds : List (FunDep s)) : List (FunDep s) :=
+def reduceLeftSides {s : Schema} (fds : List (FunDep s)) : List (FunDep s) :=
   fds.map fun fd =>
     let minDet := fd.determinant.filter fun attr =>
       !isRedundantInDeterminant attr fd fds
     { fd with determinant := if minDet.isEmpty then fd.determinant else minDet }
 
 /-- Check if two FDs have the same determinant and dependent -/
-def FunDep.sameAs (fd1 fd2 : FunDep s) : Bool :=
+def FunDep.sameAs {s : Schema} (fd1 fd2 : FunDep s) : Bool :=
   fd1.determinant == fd2.determinant && fd1.dependent == fd2.dependent
 
 /-- Remove redundant FDs (those implied by the remaining FDs) -/
-def removeRedundantFDs (fds : List (FunDep s)) : List (FunDep s) :=
+def removeRedundantFDs {s : Schema} (fds : List (FunDep s)) : List (FunDep s) :=
   fds.filter fun fd =>
     let others := fds.filter fun fd' => !fd'.sameAs fd
     let closure := attributeClosure fd.determinant others
     !fd.dependent.all (· ∈ closure)
 
 /-- Compute minimal cover: reduce left sides, then remove redundant FDs -/
-def minimalCover (fds : List (FunDep s)) : List (FunDep s) :=
+def minimalCover {s : Schema} (fds : List (FunDep s)) : List (FunDep s) :=
   removeRedundantFDs (reduceLeftSides fds)
 
 /-! # 3NF Synthesis Algorithm -/

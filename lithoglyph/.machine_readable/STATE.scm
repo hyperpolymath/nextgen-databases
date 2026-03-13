@@ -32,8 +32,8 @@
 
   (current-position
     (phase "ip-rename-complete")
-    (overall-completion 80)
-    (note "Core phases 1-4 complete. ABI formally verified. BEAM NIFs compile. L1 (Zig HTTP migration) COMPLETE. L2 (Lith rename) COMPLETE. L3 (Evidence collection schema) COMPLETE. IP rename: fdb_*→lith_*, FQL/FBQL/FDQL→GQL, FormBD/FormDB→Lith/Lithoglyph — all complete. Glyphbase NIF wired to core-zig via Zig module import (19 bridge functions, 9.3MB .so). All builds pass.")
+    (overall-completion 65)
+    (note "Core phases 1-4 complete. ABI verified. BEAM NIFs compile. IP rename mostly done. Test count: ~348 (lith-http 219, normalizer 52, gql-dt 12, Factor seam 53, Forth ~9, Zig build-tests). Remaining gaps: api layer broken (Zig 0.15.2), studio 11 mock commands, control-plane not started, glyphbase NIF pending real data flow.")
     (components
       (lith-blocks
         (status complete)
@@ -107,8 +107,8 @@
         (status complete)
         (completion 100)
         (version "v0.0.4")
-        (build-status "52 tests pass")
-        (files "core-lean/"))
+        (build-status "52 proofs pass, lake build clean")
+        (files "normalizer/lean/"))
       (beam-nif-zig
         (status complete)
         (completion 100)
@@ -137,11 +137,11 @@
           "beam/native_rust/src/lib.rs"
           "beam/native_rust/Cargo.toml"))
       (api-layer
-        (status complete)
-        (completion 100)
+        (status broken)
+        (completion 30)
         (version "v0.0.8")
-        (build-status "PASS — Zig 0.15.2 HTTP migration complete (83 call sites updated)")
-        (description "HTTP + gRPC API with real bridge calls, Reader/Writer pattern")
+        (build-status "BROKEN — 83 old std.http.Server call sites need Zig 0.15.2 migration")
+        (description "HTTP + gRPC API — code exists but does not compile on current Zig")
         (files
           "api/src/main.zig"
           "api/src/rest.zig"
@@ -322,6 +322,20 @@
         (description "11 backend commands return mock data"))))
 
   (session-history
+    (snapshot
+      (date "2026-03-13")
+      (session-id "parity-audit-and-test-expansion")
+      (accomplishments
+        "lith-http: 219 tests, 0 failures (was ~4 tests). Added 19 new test files."
+        "normalizer: created lakefile.lean + lean-toolchain. lake build passes clean."
+        "normalizer: fixed 6 autoImplicit errors in FunDep.lean"
+        "GQL-DT Pipeline: INSERT/UPDATE/DELETE IR generation now fully implemented (was stubs)"
+        "GQL-DT IR: complete CBOR serialization for all statement types"
+        "Fixed temporal_index range_query infinite loop bug"
+        "Fixed geo validation for wrong-coordinate-count Points"
+        "Fixed JWT expiry check (exp <= now instead of exp < now)"
+        "Honest STATE.scm audit: overall 80% → 65%, api-layer 100% → 30% (broken)"
+        "Total test count across Lithoglyph: ~348 (was ~25)"))
     (snapshot
       (date "2026-03-13")
       (session-id "ip-rename-and-glyphbase-nif-linkage")

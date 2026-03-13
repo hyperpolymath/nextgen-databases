@@ -248,9 +248,11 @@ defmodule LithHttp.TemporalIndex do
   end
 
   defp range_select(table_name, start_unix, end_unix, limit) do
-    # ETS ordered_set allows efficient range iteration
-    # Start from first key >= start_unix
-    range_select_loop(table_name, {start_unix, ""}, end_unix, limit, [])
+    # ETS ordered_set allows efficient range iteration.
+    # Find the first key >= {start_unix, ""} by looking after {start_unix - 1, {}}
+    # since {} sorts after all binaries in Erlang term ordering.
+    first_key = :ets.next(table_name, {start_unix - 1, {}})
+    range_select_loop(table_name, first_key, end_unix, limit, [])
   end
 
   defp range_select_loop(_table, _current_key, _end_unix, 0, acc) do
@@ -258,31 +260,18 @@ defmodule LithHttp.TemporalIndex do
     Enum.reverse(acc)
   end
 
-  defp range_select_loop(table_name, current_key, end_unix, remaining, acc) do
-    # Find next key >= current_key
-    case find_next_key(table_name, current_key) do
-      :"$end_of_table" ->
-        Enum.reverse(acc)
-
-      {timestamp_unix, point_id} = next_key ->
-        if timestamp_unix > end_unix do
-          # Exceeded range
-          Enum.reverse(acc)
-        else
-          # Add to results
-          range_select_loop(table_name, next_key, end_unix, remaining - 1, [point_id | acc])
-        end
-    end
+  defp range_select_loop(_table, :"$end_of_table", _end_unix, _remaining, acc) do
+    Enum.reverse(acc)
   end
 
-  defp find_next_key(table_name, {target_ts, _target_id}) do
-    # Find smallest key >= {target_ts, _target_id}
-    case :ets.next(table_name, {target_ts - 1, "~"}) do
-      :"$end_of_table" ->
-        :"$end_of_table"
-
-      key ->
-        key
+  defp range_select_loop(table_name, {timestamp_unix, point_id} = current_key, end_unix, remaining, acc) do
+    if timestamp_unix > end_unix do
+      # Exceeded range
+      Enum.reverse(acc)
+    else
+      # Add to results, then advance to next key
+      next_key = :ets.next(table_name, current_key)
+      range_select_loop(table_name, next_key, end_unix, remaining - 1, [point_id | acc])
     end
   end
 end

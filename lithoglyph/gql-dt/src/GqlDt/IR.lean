@@ -211,6 +211,22 @@ def generateIR_Insert
     typesMatch := stmt.typesMatch
   }
 
+/-- Convert AST.Condition to a simplified WhereClause predicate.
+
+    The AST uses a rich Condition type with dependent TypedValue constructors,
+    but WhereClause uses a simplified (column, op, value) triple for the parser
+    tier. We extract the first leaf comparison as the predicate representation.
+-/
+private def conditionToWhereClause : Condition → Option WhereClause
+  | .eq (t := .string) (.string col) (.string val) =>
+      some { predicate := (col, "=", .string val), proof := fun _ => trivial }
+  | .eq (t := .nat) (.nat col) (.nat val) =>
+      some { predicate := (toString col, "=", .nat val), proof := fun _ => trivial }
+  | .lt (t := .nat) (.nat col) (.nat val) =>
+      some { predicate := (toString col, "<", .nat val), proof := fun _ => trivial }
+  | .and c _ => conditionToWhereClause c  -- Use left side of AND as representative
+  | _ => none  -- Complex conditions fall back to no WHERE in IR (runtime eval handles them)
+
 /-- Generate IR from SELECT AST -/
 def generateIR_Select
   {α : Type}
@@ -220,10 +236,10 @@ def generateIR_Select
   .select {
     selectList := stmt.selectList,
     from_ := stmt.from_,
-    where_ := none,  -- TODO: Convert Condition to WhereClause
-    orderBy := none,  -- TODO: Parse ORDER BY
-    limit := none,     -- TODO: Parse LIMIT
-    returning := none,  -- TODO: Convert TypeRefinement
+    where_ := stmt.where_.bind conditionToWhereClause,
+    orderBy := none,  -- AST.SelectStmt does not carry ORDER BY (Pipeline uses ParsedSelect)
+    limit := none,     -- AST.SelectStmt does not carry LIMIT (Pipeline uses ParsedSelect)
+    returning := none,  -- TODO: Convert TypeRefinement (requires runtime type erasure)
     permissions := permissions
   }
 
@@ -494,6 +510,207 @@ def requiresProofs (ir : IR) : Bool :=
   | .update stmt => !stmt.proofs.isEmpty
   | .normalize stmt => !stmt.proofs.isEmpty
   | _ => false
+
+-- ============================================================================
+-- IR Evaluation (In-Memory)
+-- ============================================================================
+
+/-- In-memory row: column name to string value mapping -/
+structure EvalRow where
+  values : List (String × String)
+  deriving Repr
+
+/-- In-memory table: list of rows -/
+structure EvalTable where
+  name : String
+  columns : List String
+  rows : List EvalRow
+  deriving Repr
+
+/-- In-memory database: list of tables -/
+structure EvalDatabase where
+  tables : List EvalTable
+  deriving Repr
+
+namespace EvalDatabase
+
+/-- Find a table by name -/
+def findTable (db : EvalDatabase) (name : String) : Option EvalTable :=
+  db.tables.find? (·.name == name)
+
+/-- Replace a table by name -/
+def updateTable (db : EvalDatabase) (name : String) (f : EvalTable → EvalTable) : EvalDatabase :=
+  { tables := db.tables.map fun t => if t.name == name then f t else t }
+
+/-- Create empty database -/
+def empty : EvalDatabase := { tables := [] }
+
+end EvalDatabase
+
+/-- Convert a TypedValue to its string representation for in-memory storage -/
+def typedValueToString : {t : TypeExpr} → TypedValue t → String
+  | _, .nat n => toString n
+  | _, .int i => toString i
+  | _, .string s => s
+  | _, .bool b => toString b
+  | _, .float f => toString f
+  | _, .boundedNat _ _ bn => toString bn.val
+  | _, .nonEmptyString nes => nes.val
+  | _, .promptScores ps => toString ps.overall.val
+
+/-- Evaluate WHERE clause predicate against a row -/
+def evalWhereClause (row : EvalRow) (wc : WhereClause) : Bool :=
+  let (col, op, val) := wc.predicate
+  let rowVal := row.values.find? (·.1 == col) |>.map (·.2)
+  match rowVal with
+  | none => false
+  | some rv =>
+    let valStr := match val with
+      | .nat n => toString n
+      | .int i => toString i
+      | .string s => s
+      | .bool b => toString b
+      | .float f => toString f
+    match op with
+    | "=" => rv == valStr
+    | "!=" => rv != valStr
+    | "<" =>
+      match rv.toNat?, valStr.toNat? with
+      | some a, some b => a < b
+      | _, _ => rv < valStr
+    | ">" =>
+      match rv.toNat?, valStr.toNat? with
+      | some a, some b => a > b
+      | _, _ => rv > valStr
+    | "<=" =>
+      match rv.toNat?, valStr.toNat? with
+      | some a, some b => a ≤ b
+      | _, _ => rv ≤ valStr
+    | ">=" =>
+      match rv.toNat?, valStr.toNat? with
+      | some a, some b => a ≥ b
+      | _, _ => rv ≥ valStr
+    | _ => false
+
+/-- Apply ORDER BY to rows -/
+def applyOrderBy (rows : List EvalRow) (ob : OrderByClause) : List EvalRow :=
+  match ob.columns.head? with
+  | none => rows
+  | some (colName, direction) =>
+    let isAsc := direction == "ASC"
+    rows.toArray.qsort (fun r1 r2 =>
+      let v1 := r1.values.find? (·.1 == colName) |>.map (·.2) |>.getD ""
+      let v2 := r2.values.find? (·.1 == colName) |>.map (·.2) |>.getD ""
+      -- Try numeric comparison first, fall back to string
+      match v1.toNat?, v2.toNat? with
+      | some n1, some n2 => if isAsc then n1 < n2 else n1 > n2
+      | _, _ => if isAsc then v1 < v2 else v1 > v2
+    ) |>.toList
+
+/-- Result of evaluating an IR statement -/
+inductive EvalIRResult where
+  | rows : List String → List (List String) → EvalIRResult  -- columns, row values
+  | mutation : Nat → EvalIRResult  -- affected rows
+  | error : String → EvalIRResult
+  deriving Repr
+
+/-- Format an EvalIRResult for display -/
+def EvalIRResult.toString : EvalIRResult → String
+  | .rows cols rowData =>
+    if rowData.isEmpty then "(0 rows)"
+    else
+      let header := String.intercalate " | " cols
+      let separator := String.mk (List.replicate header.length '-')
+      let rowStrs := rowData.map fun row =>
+        String.intercalate " | " row
+      s!"{header}\n{separator}\n{String.intercalate "\n" rowStrs}\n({rowData.length} rows)"
+  | .mutation n => s!"OK, {n} row(s) affected"
+  | .error msg => s!"Error: {msg}"
+
+/-- Evaluate an IR statement against an in-memory database.
+
+    Returns the updated database and the result.
+-/
+def evalIR (db : EvalDatabase) (ir : IR) : EvalDatabase × EvalIRResult :=
+  match ir with
+  | .select stmt =>
+    let tableName := match stmt.from_.tables.head? with
+      | some t => t.name
+      | none => ""
+    match db.findTable tableName with
+    | none => (db, .error s!"Table not found: {tableName}")
+    | some table =>
+      -- Filter rows by WHERE clause
+      let filtered := match stmt.where_ with
+        | none => table.rows
+        | some wc => table.rows.filter (evalWhereClause · wc)
+      -- Apply ORDER BY
+      let sorted := match stmt.orderBy with
+        | none => filtered
+        | some ob => applyOrderBy filtered ob
+      -- Apply LIMIT
+      let limited := match stmt.limit with
+        | none => sorted
+        | some n => sorted.take n
+      -- Project columns
+      let cols := match stmt.selectList with
+        | .star => table.columns
+        | .columns cs => cs
+        | .typed _ _ => table.columns
+      let rowData := limited.map fun row =>
+        cols.map fun c =>
+          row.values.find? (·.1 == c) |>.map (·.2) |>.getD "NULL"
+      (db, .rows cols rowData)
+
+  | .insert stmt =>
+    let row : EvalRow := {
+      values := stmt.columns.zip (stmt.values.map fun ⟨_, v⟩ => typedValueToString v)
+    }
+    match db.findTable stmt.table with
+    | none =>
+      -- Create table if it doesn't exist
+      let newTable : EvalTable := {
+        name := stmt.table,
+        columns := stmt.columns,
+        rows := [row]
+      }
+      ({ tables := db.tables ++ [newTable] }, .mutation 1)
+    | some table =>
+      let newTable := { table with rows := table.rows ++ [row] }
+      (db.updateTable stmt.table (fun _ => newTable), .mutation 1)
+
+  | .update stmt =>
+    match db.findTable stmt.table with
+    | none => (db, .error s!"Table not found: {stmt.table}")
+    | some table =>
+      -- Find rows matching WHERE clause
+      let (matching, nonMatching) := match stmt.where_ with
+        | none => (table.rows, [])
+        | some wc =>
+          let m := table.rows.filter (evalWhereClause · wc)
+          let nm := table.rows.filter (fun r => !evalWhereClause r wc)
+          (m, nm)
+      -- Apply assignments to matching rows
+      let updated := matching.map fun row =>
+        stmt.assignments.foldl (fun r a =>
+          let newVal := typedValueToString a.value.2
+          { values := r.values.map fun (c, v) =>
+              if c == a.column then (c, newVal) else (c, v) }
+        ) row
+      let newTable := { table with rows := nonMatching ++ updated }
+      (db.updateTable stmt.table (fun _ => newTable), .mutation matching.length)
+
+  | .delete stmt =>
+    match db.findTable stmt.table with
+    | none => (db, .error s!"Table not found: {stmt.table}")
+    | some table =>
+      let matching := table.rows.filter (evalWhereClause · stmt.where_)
+      let remaining := table.rows.filter (fun r => !evalWhereClause r stmt.where_)
+      let newTable := { table with rows := remaining }
+      (db.updateTable stmt.table (fun _ => newTable), .mutation matching.length)
+
+  | .normalize _ =>
+    (db, .error "NORMALIZE not yet supported in evaluation")
 
 -- ============================================================================
 -- Example: IR Construction

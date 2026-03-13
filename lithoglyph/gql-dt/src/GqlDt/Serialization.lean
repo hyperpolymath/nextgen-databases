@@ -425,40 +425,92 @@ def decodeCBOR (bytes : ByteArray) : Except String CBORValue := do
 -- Binary Format (Lithoglyph Native)
 -- ============================================================================
 
-/-- Binary format for high-performance storage
+-- Binary format for high-performance storage
+--
+-- Format:
+-- - 1 byte: Type tag (discriminator)
+-- - N bytes: Value data (type-specific)
+-- - M bytes: Proof blob (optional, for audit)
 
-    Format:
-    - 1 byte: Type tag (discriminator)
-    - N bytes: Value data (type-specific)
-    - M bytes: Proof blob (optional, for audit)
--/
+/-- Encode a Nat as 8 bytes little-endian -/
+private def natToLE8 (n : Nat) : ByteArray :=
+  let b0 := (n % 256).toUInt8
+  let b1 := ((n / 256) % 256).toUInt8
+  let b2 := ((n / 65536) % 256).toUInt8
+  let b3 := ((n / 16777216) % 256).toUInt8
+  let b4 := ((n / 4294967296) % 256).toUInt8
+  let b5 := ((n / 1099511627776) % 256).toUInt8
+  let b6 := ((n / 281474976710656) % 256).toUInt8
+  let b7 := ((n / 72057594037927936) % 256).toUInt8
+  ByteArray.mk #[b0, b1, b2, b3, b4, b5, b6, b7]
+
+/-- Encode a Nat as 4 bytes little-endian -/
+private def natToLE4 (n : Nat) : ByteArray :=
+  let b0 := (n % 256).toUInt8
+  let b1 := ((n / 256) % 256).toUInt8
+  let b2 := ((n / 65536) % 256).toUInt8
+  let b3 := ((n / 16777216) % 256).toUInt8
+  ByteArray.mk #[b0, b1, b2, b3]
+
+/-- Decode 8 bytes little-endian to Nat -/
+private def le8ToNat (bytes : ByteArray) (offset : Nat) : Nat :=
+  let get (i : Nat) : Nat := (bytes.get! (offset + i)).toNat
+  get 0 + get 1 * 256 + get 2 * 65536 + get 3 * 16777216 +
+  get 4 * 4294967296 + get 5 * 1099511627776 +
+  get 6 * 281474976710656 + get 7 * 72057594037927936
+
+/-- Decode 4 bytes little-endian to Nat -/
+private def le4ToNat (bytes : ByteArray) (offset : Nat) : Nat :=
+  let get (i : Nat) : Nat := (bytes.get! (offset + i)).toNat
+  get 0 + get 1 * 256 + get 2 * 65536 + get 3 * 16777216
+
 def serializeTypedValueBinary (tv : Σ t : TypeExpr, TypedValue t) : ByteArray :=
   match tv with
-  | ⟨.nat, .nat _n⟩ =>
+  | ⟨.nat, .nat n⟩ =>
       -- Tag (0x01) + 8 bytes little-endian
-      let tag : UInt8 := 0x01
-      -- TODO: Implement toLittleEndian for Lean 4.15.0
-      let valueBytes := ByteArray.mk #[0, 0, 0, 0, 0, 0, 0, 0]
-      ByteArray.mk #[tag] ++ valueBytes
+      ByteArray.mk #[0x01] ++ natToLE8 n
 
-  | ⟨.boundedNat _min _max, .boundedNat _ _ _bn⟩ =>
+  | ⟨.int, .int i⟩ =>
+      -- Tag (0x04) + 8 bytes little-endian (two's complement via toNat on absolute value)
+      let tag : UInt8 := 0x04
+      let n := if i ≥ 0 then i.toNat else ((-i).toNat)  -- Stored as magnitude + sign byte
+      let signByte : UInt8 := if i ≥ 0 then 0 else 1
+      ByteArray.mk #[tag, signByte] ++ natToLE8 n
+
+  | ⟨.string, .string s⟩ =>
+      -- Tag (0x05) + length (4 bytes) + UTF-8 bytes
+      let utf8 := s.toUTF8
+      ByteArray.mk #[0x05] ++ natToLE4 utf8.size ++ utf8
+
+  | ⟨.bool, .bool b⟩ =>
+      -- Tag (0x06) + 1 byte (0 = false, 1 = true)
+      let bval : UInt8 := if b then 1 else 0
+      ByteArray.mk #[0x06, bval]
+
+  | ⟨.float, .float _f⟩ =>
+      -- Tag (0x07) + 8 bytes IEEE 754 double
+      -- TODO: Float.toUInt64 not available in Lean 4.15.0; use placeholder
+      ByteArray.mk #[0x07] ++ ByteArray.mk #[0, 0, 0, 0, 0, 0, 0, 0]
+
+  | ⟨.boundedNat min max, .boundedNat _ _ bn⟩ =>
       -- Tag (0x02) + min (8 bytes) + max (8 bytes) + value (8 bytes)
-      let tag : UInt8 := 0x02
-      -- TODO: Implement toLittleEndian for Lean 4.15.0
-      let minBytes := ByteArray.mk #[0, 0, 0, 0, 0, 0, 0, 0]
-      let maxBytes := ByteArray.mk #[0, 0, 0, 0, 0, 0, 0, 0]
-      let valBytes := ByteArray.mk #[0, 0, 0, 0, 0, 0, 0, 0]
-      ByteArray.mk #[tag] ++ minBytes ++ maxBytes ++ valBytes
+      ByteArray.mk #[0x02] ++ natToLE8 min ++ natToLE8 max ++ natToLE8 bn.val
 
   | ⟨.nonEmptyString, .nonEmptyString nes⟩ =>
       -- Tag (0x03) + length (4 bytes) + UTF-8 bytes
-      let tag : UInt8 := 0x03
       let utf8 := nes.val.toUTF8
-      -- TODO: Implement toLittleEndian for Lean 4.15.0
-      let lenBytes := ByteArray.mk #[0, 0, 0, 0]
-      ByteArray.mk #[tag] ++ lenBytes ++ utf8
+      ByteArray.mk #[0x03] ++ natToLE4 utf8.size ++ utf8
 
-  | _ => ByteArray.empty  -- TODO: Complete binary encoding
+  | ⟨.promptScores, .promptScores scores⟩ =>
+      -- Tag (0x08) + 7 x 8-byte scores (P R O M P T + overall)
+      ByteArray.mk #[0x08] ++
+        natToLE8 scores.provenance.val ++
+        natToLE8 scores.replicability.val ++
+        natToLE8 scores.objective.val ++
+        natToLE8 scores.methodology.val ++
+        natToLE8 scores.publication.val ++
+        natToLE8 scores.transparency.val ++
+        natToLE8 scores.overall.val
 
 /-- Deserialize from binary format -/
 def deserializeTypedValueBinary (bytes : ByteArray) : Except String (Σ t : TypeExpr, TypedValue t) :=
@@ -471,27 +523,66 @@ def deserializeTypedValueBinary (bytes : ByteArray) : Except String (Σ t : Type
         if bytes.size < 9 then
           .error "Insufficient bytes for Nat"
         else
-          -- TODO: Implement fromLittleEndian for Lean 4.15.0
-          .ok ⟨.nat, .nat 0⟩
+          let n := le8ToNat bytes 1
+          .ok ⟨.nat, .nat n⟩
 
     | 0x02 =>  -- BoundedNat
         if bytes.size < 25 then
           .error "Insufficient bytes for BoundedNat"
         else
-          -- TODO: Implement fromLittleEndian for Lean 4.15.0
-          -- Stub values until byte decoding is implemented
-          let min := 0
-          let max := 100
-          let val := 0
-          .ok ⟨.boundedNat min max, .boundedNat min max ⟨val, Nat.le_refl 0, Nat.zero_le 100⟩⟩
+          let min := le8ToNat bytes 1
+          let max := le8ToNat bytes 9
+          let val := le8ToNat bytes 17
+          if h1 : min ≤ val then
+            if h2 : val ≤ max then
+              .ok ⟨.boundedNat min max, .boundedNat min max ⟨val, h1, h2⟩⟩
+            else
+              .error s!"BoundedNat value {val} exceeds max {max}"
+          else
+            .error s!"BoundedNat value {val} below min {min}"
 
     | 0x03 =>  -- NonEmptyString
         if bytes.size < 5 then
           .error "Insufficient bytes for NonEmptyString"
         else
-          -- TODO: Implement fromLittleEndian and fromUTF8 for Lean 4.15.0
-          let s := "stub"
-          .ok ⟨.nonEmptyString, .nonEmptyString ⟨s, by decide⟩⟩
+          let len := le4ToNat bytes 1
+          if bytes.size < 5 + len then
+            .error "Insufficient bytes for NonEmptyString content"
+          else
+            let strBytes := bytes.extract 5 (5 + len)
+            let s := String.fromUTF8! strBytes
+            if h : s.length > 0 then
+              .ok ⟨.nonEmptyString, .nonEmptyString ⟨s, h⟩⟩
+            else
+              .error "Deserialized NonEmptyString is empty"
+
+    | 0x04 =>  -- Int
+        if bytes.size < 10 then
+          .error "Insufficient bytes for Int"
+        else
+          let signByte := bytes.get! 1
+          let mag := le8ToNat bytes 2
+          let i : Int := if signByte == 0 then Int.ofNat mag else -(Int.ofNat mag)
+          .ok ⟨.int, .int i⟩
+
+    | 0x05 =>  -- String
+        if bytes.size < 5 then
+          .error "Insufficient bytes for String"
+        else
+          let len := le4ToNat bytes 1
+          if bytes.size < 5 + len then
+            .error "Insufficient bytes for String content"
+          else
+            let strBytes := bytes.extract 5 (5 + len)
+            let s := String.fromUTF8! strBytes
+            .ok ⟨.string, .string s⟩
+
+    | 0x06 =>  -- Bool
+        if bytes.size < 2 then
+          .error "Insufficient bytes for Bool"
+        else
+          let b := bytes.get! 1 != 0
+          .ok ⟨.bool, .bool b⟩
 
     | _ => .error s!"Unknown type tag: {tag}"
 
