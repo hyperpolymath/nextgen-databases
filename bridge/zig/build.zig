@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // SPDX-FileCopyrightText: 2026 hyperpolymath
 //
-// Zig FFI Bridge for FBQLdt
+// Zig FFI Bridge for GQLdt
 // Provides C-compatible ABI for Lean 4 integration
 
 const std = @import("std");
@@ -12,7 +12,7 @@ pub fn build(b: *std.Build) void {
 
     // Static library for FFI bridge
     const lib = b.addStaticLibrary(.{
-        .name = "fdb_bridge",
+        .name = "lith_bridge",
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,

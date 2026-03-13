@@ -213,8 +213,8 @@ Quantified ::= ∀ (x : α), P x | ∃ (x : α), P x
 
 ### Phase 2: Zig FFI Bridge (⏳ Milestone 5 - Next)
 
-- [ ] `bridge/fdb_types.zig` - FFI type definitions
-- [ ] `bridge/fdb_insert.zig` - Insert with proof blob
+- [ ] `bridge/lith_types.zig` - FFI type definitions
+- [ ] `bridge/lith_insert.zig` - Insert with proof blob
 - [ ] Lean 4 @[extern] declarations
 - [ ] Integration tests
 
@@ -254,7 +254,7 @@ lossless_tactic -- Lossless transformation proofs
 
 ### Adding New Types
 
-1. Define type in Lean 4 (`src/FbqlDt/Types/YourType.lean`)
+1. Define type in Lean 4 (`src/GqlDt/Types/YourType.lean`)
 2. Add constructor proofs
 3. Add to type system spec (Section 3 or 4)
 4. Add to EBNF grammar (`<refined-type>` or `<dependent-type>`)

@@ -15,14 +15,14 @@
 **Status:** ✅ COMPLETE
 
 **Files:**
-- `src/FbqlDt/Types.lean` - Core type definitions
-- `src/FbqlDt/Types/BoundedNat.lean` - Bounded natural numbers with proofs
-- `src/FbqlDt/Types/BoundedInt.lean` - Bounded integers with proofs
-- `src/FbqlDt/Types/NonEmptyString.lean` - Non-empty strings with proofs
-- `src/FbqlDt/Types/Confidence.lean` - Confidence scores [0, 100]
-- `src/FbqlDt/Prompt.lean` - PROMPT score types
-- `src/FbqlDt/Prompt/PromptScores.lean` - Auto-computed overall scores
-- `src/FbqlDt/Provenance.lean` - Provenance tracking types
+- `src/GqlDt/Types.lean` - Core type definitions
+- `src/GqlDt/Types/BoundedNat.lean` - Bounded natural numbers with proofs
+- `src/GqlDt/Types/BoundedInt.lean` - Bounded integers with proofs
+- `src/GqlDt/Types/NonEmptyString.lean` - Non-empty strings with proofs
+- `src/GqlDt/Types/Confidence.lean` - Confidence scores [0, 100]
+- `src/GqlDt/Prompt.lean` - PROMPT score types
+- `src/GqlDt/Prompt/PromptScores.lean` - Auto-computed overall scores
+- `src/GqlDt/Provenance.lean` - Provenance tracking types
 
 **Custom Types Implemented:**
 
@@ -138,10 +138,10 @@ Level 11: ()  (function call, grouping)
 
 **Files:**
 - `docs/TYPE-SAFETY-ENFORCEMENT.md` - Complete guide (500+ lines)
-- `src/FbqlDt/AST.lean` - Type-safe AST
-- `src/FbqlDt/TypeSafe.lean` - Smart constructors
-- `src/FbqlDt/TypeChecker.lean` - Type checker with validation
-- `src/FbqlDt/TypeSafeQueries.lean` - Type safety examples
+- `src/GqlDt/AST.lean` - Type-safe AST
+- `src/GqlDt/TypeSafe.lean` - Smart constructors
+- `src/GqlDt/TypeChecker.lean` - Type checker with validation
+- `src/GqlDt/TypeSafeQueries.lean` - Type safety examples
 - `test/TypeSafetyTests.lean` - Test demonstrations
 
 **Type Safety Enforcement:**
@@ -209,8 +209,8 @@ Well-typed queries cannot produce runtime type errors.
 **Status:** ✅ COMPLETE
 
 **Files:**
-- `src/FbqlDt/Serialization.lean` - **NEW** Complete serialization (600+ lines)
-- `src/FbqlDt/IR.lean` - IR with CBOR support
+- `src/GqlDt/Serialization.lean` - **NEW** Complete serialization (600+ lines)
+- `src/GqlDt/IR.lean` - IR with CBOR support
 
 **Supported Formats:**
 
@@ -285,7 +285,7 @@ def fromSQLValue (sql : String) (hint : TypeExpr) : TypedValue t
 #### Type-Safe Bindings
 ✅ **ReScript API Design**
 ```rescript
-// bindings/rescript/src/FbqlDt.res
+// bindings/rescript/src/GqlDt.res
 module Insert = {
   type t
 
@@ -394,7 +394,7 @@ let insertEvidence = async () => {
 
 **Files:**
 - `docs/EXECUTION-STRATEGY.md` - Complete analysis (1500+ lines)
-- `src/FbqlDt/IR.lean` - Typed intermediate representation
+- `src/GqlDt/IR.lean` - Typed intermediate representation
 
 **Architecture:**
 ```
@@ -498,9 +498,9 @@ ReScript/Rust/Julia/Gleam/etc.
 **Current:** Type system, grammar, type safety, serialization all complete
 
 **Ready to implement:**
-1. ✅ IR data structures → **DONE** (src/FbqlDt/IR.lean)
-2. ✅ Type inference → **DONE** (src/FbqlDt/TypeInference.lean)
-3. ✅ Serialization → **DONE** (src/FbqlDt/Serialization.lean)
+1. ✅ IR data structures → **DONE** (src/GqlDt/IR.lean)
+2. ✅ Type inference → **DONE** (src/GqlDt/TypeInference.lean)
+3. ✅ Serialization → **DONE** (src/GqlDt/Serialization.lean)
 4. ⏳ Actual parser (text → AST) - NEXT
 5. ⏳ AST → IR generation - NEXT
 6. ⏳ CBOR encoding implementation - NEXT

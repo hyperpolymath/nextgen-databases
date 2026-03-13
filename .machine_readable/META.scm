@@ -1,12 +1,12 @@
 ;; SPDX-License-Identifier: PMPL-1.0-or-later
 ;; SPDX-FileCopyrightText: 2025 hyperpolymath
 ;;
-;; META.scm - Meta-level information for fdql-dt
+;; META.scm - Meta-level information for gql-dt
 ;; Media-Type: application/meta+scheme
 
 (meta
   (version "1.0.0")
-  (project "fdql-dt")
+  (project "gql-dt")
 
   (architecture-decisions
     (adr-001

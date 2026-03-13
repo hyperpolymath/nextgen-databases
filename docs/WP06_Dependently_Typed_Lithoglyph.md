@@ -691,7 +691,7 @@ WITH_PROOF {
 3. **Integration Script**:
    ```bash
    #!/bin/bash
-   # check_fql.sh
+   # check_gql.sh
    
    # 1. Type check with Idris
    idris2 --check Lithoglyph.idr $1
@@ -720,7 +720,7 @@ INSERT INTO evidence VALUES (...);
 ^D
 
 # Type check + execute
-./check_fql.sh example.gql.idr
+./check_gql.sh example.gql.idr
 ```
 
 ### 5.3 Phase 2: Proof-Carrying Code (Month 7-12)

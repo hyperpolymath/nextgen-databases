@@ -6,16 +6,16 @@
 const std = @import("std");
 const main = @import("main");
 
-test "fdb_insert stub returns ok" {
+test "lith_insert stub returns ok" {
     // Mock database handle (in production, would be created by Lith)
-    var db: main.FdbDb = undefined;
-    const db_ptr = @as(*main.FdbDb, @ptrCast(&db));
+    var db: main.LithDb = undefined;
+    const db_ptr = @as(*main.LithDb, @ptrCast(&db));
 
     const collection = "test_collection";
     const document = "{\"id\": 1, \"value\": 42}";
     const proof = "{}"; // Empty proof for stub
 
-    const status = main.fdb_insert(
+    const status = main.lith_insert(
         db_ptr,
         collection,
         document.ptr,
@@ -27,9 +27,9 @@ test "fdb_insert stub returns ok" {
     try std.testing.expectEqual(@as(c_int, 0), status);
 }
 
-test "fdb_register_constraint_checker stub" {
-    var db: main.FdbDb = undefined;
-    const db_ptr = @as(*main.FdbDb, @ptrCast(&db));
+test "lith_register_constraint_checker stub" {
+    var db: main.LithDb = undefined;
+    const db_ptr = @as(*main.LithDb, @ptrCast(&db));
 
     const checker = struct {
         fn check(doc: [*]const u8, len: usize) callconv(.C) bool {
@@ -39,7 +39,7 @@ test "fdb_register_constraint_checker stub" {
         }
     }.check;
 
-    const status = main.fdb_register_constraint_checker(db_ptr, checker);
+    const status = main.lith_register_constraint_checker(db_ptr, checker);
 
     try std.testing.expectEqual(@as(c_int, 0), status);
 }

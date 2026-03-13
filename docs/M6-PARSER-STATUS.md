@@ -12,7 +12,7 @@ Milestone 6 (GQL-DT/GQL Parser) has been substantially completed. The parser inf
 
 ## Completed Components
 
-### 1. Lexer (`src/FbqlDt/Lexer.lean`) ✅
+### 1. Lexer (`src/GqlDt/Lexer.lean`) ✅
 
 **Status:** 100% Complete
 
@@ -33,7 +33,7 @@ def lookupKeyword (s : String) : Option TokenType
 
 ---
 
-### 2. Parser Combinators (`src/FbqlDt/Parser.lean`) ✅
+### 2. Parser Combinators (`src/GqlDt/Parser.lean`) ✅
 
 **Status:** 95% Complete
 
@@ -69,7 +69,7 @@ def lookupKeyword (s : String) : Option TokenType
 
 ---
 
-### 3. Type Inference (`src/FbqlDt/TypeInference.lean`) ✅
+### 3. Type Inference (`src/GqlDt/TypeInference.lean`) ✅
 
 **Status:** 100% Complete
 
@@ -87,7 +87,7 @@ def inferInsert (schema : Schema) (table : String) (columns : List String) (valu
 
 ---
 
-### 4. Serialization (`src/FbqlDt/Serialization.lean`) ✅
+### 4. Serialization (`src/GqlDt/Serialization.lean`) ✅
 
 **Status:** 95% Complete
 
@@ -126,7 +126,7 @@ def inferInsert (schema : Schema) (table : String) (columns : List String) (valu
 
 ---
 
-### 5. Intermediate Representation (`src/FbqlDt/IR.lean`) ✅
+### 5. Intermediate Representation (`src/GqlDt/IR.lean`) ✅
 
 **Status:** 90% Complete
 
@@ -161,7 +161,7 @@ def inferInsert (schema : Schema) (table : String) (columns : List String) (valu
 
 ---
 
-### 6. Pipeline (`src/FbqlDt/Pipeline.lean`) ✅
+### 6. Pipeline (`src/GqlDt/Pipeline.lean`) ✅
 
 **Status:** 85% Complete
 
@@ -252,16 +252,16 @@ def inferInsert (schema : Schema) (table : String) (columns : List String) (valu
 
 | File | Lines | Status | Purpose |
 |------|-------|--------|---------|
-| `src/FbqlDt/Lexer.lean` | 407 | ✅ Complete | Tokenization |
-| `src/FbqlDt/Parser.lean` | 550+ | ✅ Complete | Parser combinators, statements |
-| `src/FbqlDt/TypeInference.lean` | ~200 | ✅ Complete | Type inference for GQL |
-| `src/FbqlDt/IR.lean` | 410 | 🟡 90% | Typed IR, serialization |
-| `src/FbqlDt/Serialization.lean` | 530+ | 🟡 95% | CBOR, JSON, Binary, SQL |
-| `src/FbqlDt/Pipeline.lean` | 290 | 🟡 85% | End-to-end orchestration |
+| `src/GqlDt/Lexer.lean` | 407 | ✅ Complete | Tokenization |
+| `src/GqlDt/Parser.lean` | 550+ | ✅ Complete | Parser combinators, statements |
+| `src/GqlDt/TypeInference.lean` | ~200 | ✅ Complete | Type inference for GQL |
+| `src/GqlDt/IR.lean` | 410 | 🟡 90% | Typed IR, serialization |
+| `src/GqlDt/Serialization.lean` | 530+ | 🟡 95% | CBOR, JSON, Binary, SQL |
+| `src/GqlDt/Pipeline.lean` | 290 | 🟡 85% | End-to-end orchestration |
 
 ### Updated Files
 
-- `src/FbqlDt.lean` - Import all M6 modules
+- `src/GqlDt.lean` - Import all M6 modules
 - `STATE.scm` - Updated completion (65% → 75%), added M6 snapshot
 - `docs/M6-PARSER-STATUS.md` - This file
 

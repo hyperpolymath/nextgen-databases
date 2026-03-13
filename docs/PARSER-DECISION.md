@@ -105,10 +105,10 @@ Code Generator → Standard GQL (for Lithoglyph runtime)
 
 **Example Implementation:**
 ```lean
--- src/FbqlDt/Parser.lean
+-- src/GqlDt/Parser.lean
 import Lean.Data.Parsec
 
-namespace FbqlDt.Parser
+namespace GqlDt.Parser
 
 open Lean Parsec
 
@@ -400,14 +400,14 @@ gqldt-verify query.gql
 
 ### Phase 1: Lean 4 Parser (Milestone 6)
 
-**File:** `src/FbqlDt/Parser.lean`
+**File:** `src/GqlDt/Parser.lean`
 
 ```lean
 import Lean.Data.Parsec
-import FbqlDt.Types
-import FbqlDt.AST
+import GqlDt.Types
+import GqlDt.AST
 
-namespace FbqlDt.Parser
+namespace GqlDt.Parser
 
 -- Use Lean 4 Parsec combinators
 def parseGQL : String → Except String TypedAST := ...
@@ -476,7 +476,7 @@ statement
 ## Next Steps
 
 1. ✅ **Accept Lean 4 as core dependency** (already done - Milestones 1-4 use Lean 4)
-2. Start Milestone 6: Implement parser in `src/FbqlDt/Parser.lean`
+2. Start Milestone 6: Implement parser in `src/GqlDt/Parser.lean`
 3. Add ANTLR grammar for tooling (optional, later)
 4. Document Lean 4 installation for users
 

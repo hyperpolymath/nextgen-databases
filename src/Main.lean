@@ -6,16 +6,16 @@
 -- Interactive query interface for the Lithoglyph Query Language.
 -- Demonstrates dependently-typed queries with provenance tracking.
 
-import FbqlDt.Query
-import FbqlDt.FFI
+import GqlDt.Query
+import GqlDt.FFI
 
-open FqlDt.Query
-open FqlDt.Query.Parser
-open FqlDt.Query.Schema
-open FqlDt.Query.Store
-open FqlDt.Query.TypeCheck
-open FqlDt.Query.Eval
-open FqlDt.FFI
+open GqlDt.Query
+open GqlDt.Query.Parser
+open GqlDt.Query.Schema
+open GqlDt.Query.Store
+open GqlDt.Query.TypeCheck
+open GqlDt.Query.Eval
+open GqlDt.FFI
 
 -- ============================================================================
 -- Default Schema
@@ -23,7 +23,7 @@ open FqlDt.FFI
 
 /-- Default example schema for the REPL -/
 def defaultSchema : Database := {
-  name := "fqldt_demo"
+  name := "gqldt_demo"
   tables := [
     {
       name := "users"
@@ -202,7 +202,7 @@ def executeQuery (db : Database) (store : DatabaseStore) (input : String)
 
 /-- Run the REPL loop -/
 partial def replLoop (db : Database) (store : DatabaseStore) : IO Unit := do
-  IO.print "fqldt> "
+  IO.print "gqldt> "
   let stdin ← IO.getStdin
   let input ← stdin.getLine
 
@@ -222,7 +222,7 @@ partial def replLoop (db : Database) (store : DatabaseStore) : IO Unit := do
       let ts ← IO.monoMsNow
       let status ← saveDB ts.toInt32
       if status.isOk then
-        IO.println "Database saved to fqldt.db"
+        IO.println "Database saved to gqldt.db"
       else
         IO.println s!"Save failed: {status.message}"
       replLoop db store
@@ -266,11 +266,11 @@ def main (args : List String) : IO Unit := do
   -- Initialize FFI persistence backend
   let dbPath := args.find? (·.startsWith "--db=")
     |>.map (·.drop 5)
-    |>.getD "fqldt.db"
+    |>.getD "gqldt.db"
 
   -- Initialize FFI persistence backend
-  let initResult := FqlDt.FFI.fdbInitFFI 0 dbPath.length.toUSize
-  let initStatus := FdbStatus.fromInt initResult.toInt
+  let initResult := GqlDt.FFI.lithInitFFI 0 dbPath.length.toUSize
+  let initStatus := LithStatus.fromInt initResult.toInt
   if !initStatus.isOk then
     IO.println s!"Warning: FFI backend init failed: {initStatus.message}"
     IO.println "Running in memory-only mode."

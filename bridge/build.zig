@@ -14,8 +14,8 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     // Create module for the library with PIC enabled for linking with Lean
-    const fdb_module = b.createModule(.{
-        .root_source_file = b.path("fdb_root.zig"),
+    const lith_module = b.createModule(.{
+        .root_source_file = b.path("lith_root.zig"),
         .target = target,
         .optimize = optimize,
         .pic = true, // Required for linking with Lean's PIE executable
@@ -24,16 +24,16 @@ pub fn build(b: *std.Build) void {
     // Static library for linking with Lean 4
     const lib = b.addLibrary(.{
         .linkage = .static,
-        .name = "fdb_bridge",
-        .root_module = fdb_module,
+        .name = "lith_bridge",
+        .root_module = lith_module,
     });
 
     // Install the library
     b.installArtifact(lib);
 
     // Create module for shared library
-    const fdb_shared_module = b.createModule(.{
-        .root_source_file = b.path("fdb_root.zig"),
+    const lith_shared_module = b.createModule(.{
+        .root_source_file = b.path("lith_root.zig"),
         .target = target,
         .optimize = optimize,
         .pic = true,
@@ -42,8 +42,8 @@ pub fn build(b: *std.Build) void {
     // Shared library option (for dynamic linking)
     const shared_lib = b.addLibrary(.{
         .linkage = .dynamic,
-        .name = "fdb_bridge",
-        .root_module = fdb_shared_module,
+        .name = "lith_bridge",
+        .root_module = lith_shared_module,
     });
 
     const shared_step = b.step("shared", "Build shared library");
@@ -51,7 +51,7 @@ pub fn build(b: *std.Build) void {
 
     // Unit tests - create module first
     const test_module = b.createModule(.{
-        .root_source_file = b.path("fdb_root.zig"),
+        .root_source_file = b.path("lith_root.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -66,7 +66,7 @@ pub fn build(b: *std.Build) void {
 
     // Type tests - create module first
     const type_test_module = b.createModule(.{
-        .root_source_file = b.path("fdb_types.zig"),
+        .root_source_file = b.path("lith_types.zig"),
         .target = target,
         .optimize = optimize,
     });

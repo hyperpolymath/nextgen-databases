@@ -7,7 +7,7 @@
 const std = @import("std");
 
 /// Status code for FFI operations
-pub const FdbStatus = enum(i32) {
+pub const LithStatus = enum(i32) {
     ok = 0,
     error_null_pointer = 1,
     error_invalid_proof = 2,
@@ -15,32 +15,32 @@ pub const FdbStatus = enum(i32) {
     error_constraint_violation = 4,
     error_out_of_memory = 5,
 
-    pub fn toC(self: FdbStatus) c_int {
+    pub fn toC(self: LithStatus) c_int {
         return @intFromEnum(self);
     }
 };
 
 /// Opaque database handle (non-null guaranteed by Lean 4 types)
-pub const FdbDb = opaque {};
+pub const LithDb = opaque {};
 
 /// FFI-safe string view (non-owning)
-pub const FdbString = struct {
+pub const LithString = struct {
     data: [*]const u8,
     len: usize,
 
-    pub fn fromSlice(slice: []const u8) FdbString {
+    pub fn fromSlice(slice: []const u8) LithString {
         return .{ .data = slice.ptr, .len = slice.len };
     }
 
-    pub fn toSlice(self: FdbString) []const u8 {
+    pub fn toSlice(self: LithString) []const u8 {
         return self.data[0..self.len];
     }
 };
 
 /// Forward: Lean 4 → Zig → Lith
 /// Insert operation with proof blob
-export fn fdb_insert(
-    db: *FdbDb,
+export fn lith_insert(
+    db: *LithDb,
     collection: [*:0]const u8,
     document: [*]const u8,
     doc_len: usize,
@@ -60,13 +60,13 @@ export fn fdb_insert(
     // 3. Insert into Lith via Forth FFI
     // 4. Return status
 
-    return FdbStatus.ok.toC();
+    return LithStatus.ok.toC();
 }
 
 /// Reverse: Lith → Zig → Lean 4
 /// Register constraint checker callback
-export fn fdb_register_constraint_checker(
-    db: *FdbDb,
+export fn lith_register_constraint_checker(
+    db: *LithDb,
     checker: *const fn (doc: [*]const u8, len: usize) callconv(.C) bool,
 ) callconv(.C) c_int {
     _ = db;
@@ -76,12 +76,12 @@ export fn fdb_register_constraint_checker(
     // Store function pointer for later invocation
     // When Lith validates data, call this Lean 4 checker
 
-    return FdbStatus.ok.toC();
+    return LithStatus.ok.toC();
 }
 
 /// Get discovered functional dependencies
-export fn fdb_get_discovered_fds(
-    db: *FdbDb,
+export fn lith_get_discovered_fds(
+    db: *LithDb,
     collection: [*:0]const u8,
     out_fds: *[*]u8,
     out_len: *usize,
@@ -97,12 +97,12 @@ export fn fdb_get_discovered_fds(
     // 3. Serialize FDs to CBOR
     // 4. Return pointer + length
 
-    return FdbStatus.ok.toC();
+    return LithStatus.ok.toC();
 }
 
 /// Verify normalization proof
-export fn fdb_verify_normalization_proof(
-    db: *FdbDb,
+export fn lith_verify_normalization_proof(
+    db: *LithDb,
     step_blob: [*]const u8,
     step_len: usize,
     proof_blob: [*]const u8,
@@ -120,23 +120,23 @@ export fn fdb_verify_normalization_proof(
     // 3. Verify proof is valid for step
     // 4. Return status
 
-    return FdbStatus.ok.toC();
+    return LithStatus.ok.toC();
 }
 
 /// Free memory allocated by FFI functions
-export fn fdb_free(ptr: [*]u8, len: usize) callconv(.C) void {
+export fn lith_free(ptr: [*]u8, len: usize) callconv(.C) void {
     const allocator = std.heap.c_allocator;
     const slice = ptr[0..len];
     allocator.free(slice);
 }
 
-test "FdbStatus roundtrip" {
-    const status = FdbStatus.ok;
+test "LithStatus roundtrip" {
+    const status = LithStatus.ok;
     try std.testing.expectEqual(@as(c_int, 0), status.toC());
 }
 
-test "FdbString conversion" {
+test "LithString conversion" {
     const str = "Hello, Lith!";
-    const fdb_str = FdbString.fromSlice(str);
-    try std.testing.expectEqualSlices(u8, str, fdb_str.toSlice());
+    const lith_str = LithString.fromSlice(str);
+    try std.testing.expectEqualSlices(u8, str, lith_str.toSlice());
 }

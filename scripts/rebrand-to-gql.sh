@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: PMPL-1.0-or-later
-# Rebrand Lith/FBQL to Lithoglyph/GQL throughout gql-dt project
+# Rebrand Lith/GQL to Lithoglyph/GQL throughout gql-dt project
 
 set -euo pipefail
 
@@ -32,15 +32,15 @@ FILES=(
   "docs/SEAM-ANALYSIS-2026-02-01.md"
   "docs/TWO-TIER-DESIGN.md"
   "docs/TYPE-SAFETY-ENFORCEMENT.md"
-  "spec/FBQLdt-Lexical.md"
-  "spec/FBQLdt-Railroad-Diagrams.md"
-  "spec/FQL_Dependent_Types_Complete_Specification.md"
+  "spec/GQLdt-Lexical.md"
+  "spec/GQLdt-Railroad-Diagrams.md"
+  "spec/GQL_Dependent_Types_Complete_Specification.md"
   "spec/normalization-types.md"
   "spec/README.md"
 )
 
 # Replacement rules (order matters!)
-# NOTE: Not replacing FbqlDt namespace in code - that's internal
+# NOTE: Not replacing GqlDt namespace in code - that's internal
 
 for file in "${FILES[@]}"; do
   if [[ -f "$file" ]]; then
@@ -51,17 +51,17 @@ for file in "${FILES[@]}"; do
 
     # Apply replacements (case-sensitive, whole-word where appropriate)
     sed -i \
-      -e 's/FBQLdt/GQL-DT/g' \
-      -e 's/FBQL/GQL/g' \
+      -e 's/GQLdt/GQL-DT/g' \
+      -e 's/GQL/GQL/g' \
       -e 's/\bFQL\b/GQL/g' \
       -e 's/Lith/Lithoglyph/g' \
       -e 's/lith/lithoglyph/g' \
-      -e 's/\bfbql\b/gql/g' \
+      -e 's/\bgql\b/gql/g' \
       -e 's/\bfql\b/gql/g' \
-      -e 's/fbql-/gql-/g' \
-      -e 's/fql-/gql-/g' \
-      -e 's/"fbql"/"gql"/g' \
-      -e 's/"fql"/"gql"/g' \
+      -e 's/gql-/gql-/g' \
+      -e 's/gql-/gql-/g' \
+      -e 's/"gql"/"gql"/g' \
+      -e 's/"gql"/"gql"/g' \
       "$file"
 
     # Show diff summary
@@ -82,8 +82,8 @@ echo "297 references updated across $(echo "${FILES[@]}" | wc -w) files"
 echo ""
 echo "Next steps:"
 echo "1. Review changes: git diff"
-echo "2. Rename spec files: mv spec/FBQLdt-* spec/GQL-DT-*"
+echo "2. Rename spec files: mv spec/GQLdt-* spec/GQL-DT-*"
 echo "3. Rename WP06 file: mv docs/WP06_Dependently_Typed_Lith.md docs/WP06_Dependently_Typed_Lithoglyph.md"
 echo "4. Update code comments in .lean files (manual)"
 echo "5. Verify build: lake build"
-echo "6. Commit: git add -A && git commit -m 'Rebrand Lith/FBQL to Lithoglyph/GQL'"
+echo "6. Commit: git add -A && git commit -m 'Rebrand Lith/GQL to Lithoglyph/GQL'"

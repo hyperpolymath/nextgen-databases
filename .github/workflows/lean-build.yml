@@ -92,7 +92,7 @@ jobs:
         run: |
           echo "Validating EBNF grammar..."
           # Basic validation - check for balanced brackets
-          if ! grep -E '::=' spec/FBQLdt-Grammar.ebnf > /dev/null; then
+          if ! grep -E '::=' spec/GQLdt-Grammar.ebnf > /dev/null; then
             echo "❌ No production rules found in grammar"
             exit 1
           fi
@@ -102,9 +102,9 @@ jobs:
         run: |
           for file in spec/GQL_Dependent_Types_Complete_Specification.md \
                       spec/normalization-types.md \
-                      spec/FBQLdt-Grammar.ebnf \
-                      spec/FBQLdt-Lexical.md \
-                      spec/FBQLdt-Railroad-Diagrams.md; do
+                      spec/GQLdt-Grammar.ebnf \
+                      spec/GQLdt-Lexical.md \
+                      spec/GQLdt-Railroad-Diagrams.md; do
             if [ ! -f "$file" ]; then
               echo "❌ Missing required spec file: $file"
               exit 1
@@ -115,9 +115,9 @@ jobs:
       - name: Check for naming consistency
         run: |
           echo "Checking for naming inconsistencies..."
-          # Check STATE.scm and ECOSYSTEM.scm use gql-dt not fdql-dt
-          if grep -i "fdql-dt" STATE.scm ECOSYSTEM.scm 2>/dev/null; then
-            echo "❌ Found old naming (fdql-dt instead of gql-dt)"
+          # Check STATE.scm and ECOSYSTEM.scm use gql-dt not gql-dt
+          if grep -i "gql-dt" STATE.scm ECOSYSTEM.scm 2>/dev/null; then
+            echo "❌ Found old naming (gql-dt instead of gql-dt)"
             exit 1
           fi
           echo "✅ Naming is consistent"

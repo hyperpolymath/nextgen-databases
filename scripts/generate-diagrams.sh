@@ -14,7 +14,7 @@ DIAGRAMS_DIR="$SPEC_DIR/diagrams"
 # Create diagrams directory
 mkdir -p "$DIAGRAMS_DIR"
 
-echo "=== FBQLdt Railroad Diagram Generator ==="
+echo "=== GQLdt Railroad Diagram Generator ==="
 echo ""
 echo "This script generates SVG railroad diagrams from the EBNF grammar."
 echo ""
@@ -52,7 +52,7 @@ EOF
     echo ""
     echo "3. Download as SVG and save to: $DIAGRAMS_DIR/create-collection.svg"
     echo ""
-    echo "4. Repeat for other constructs in spec/FBQLdt-Railroad-Diagrams.md"
+    echo "4. Repeat for other constructs in spec/GQLdt-Railroad-Diagrams.md"
 }
 
 generate_cli() {
@@ -116,4 +116,4 @@ echo "  - proof-clauses.svg"
 echo "  - update-statement.svg"
 echo "  - normalization-commands.svg"
 echo ""
-echo "See spec/FBQLdt-Railroad-Diagrams.md for all EBNF snippets"
+echo "See spec/GQLdt-Railroad-Diagrams.md for all EBNF snippets"
