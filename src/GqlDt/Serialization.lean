@@ -268,7 +268,7 @@ partial def encodeCBOR (value : CBORValue) : ByteArray :=
       else
         ByteArray.mk #[0xF8, n.toUInt8]
 
-  | .float f =>
+  | .float _f =>
       -- IEEE 754 single-precision float (major type 7, additional info 26)
       -- TODO: Implement Float.toBits.toLittleEndian for Lean 4.15.0
       ByteArray.mk #[0xFB, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -327,7 +327,7 @@ def decodeUnsignedCBOR (d : CBORDecoder) (addInfo : UInt8) : Except String (Nat 
   else if addInfo == 27 then
     -- 8-byte follows (big-endian)
     do
-      let (bytes, d') ← d.readBytes 8
+      let (_bytes, d') ← d.readBytes 8
       -- TODO: Implement UInt64.fromBigEndian for Lean 4.15.0
       let val := 0  -- Stub
       .ok (val, d')
@@ -356,7 +356,7 @@ partial def decodeCBORValue (d : CBORDecoder) : Except String (CBORValue × CBOR
 
   | 3 =>  -- Text string
       let (len, d2) ← decodeUnsignedCBOR d1 addInfo
-      let (bytes, d3) ← d2.readBytes len
+      let (_bytes, d3) ← d2.readBytes len
       let str := "" -- TODO: Implement String.fromUTF8 for Lean 4.15.0
       .ok (.textString str, d3)
 
@@ -398,14 +398,14 @@ partial def decodeCBORValue (d : CBORDecoder) : Except String (CBORValue × CBOR
       else if addInfo == 26 then
         -- Single-precision float (32-bit)
         do
-          let (bytes, d2) ← d1.readBytes 4
+          let (_bytes, d2) ← d1.readBytes 4
           -- TODO: Implement UInt32.fromLittleEndian for Lean 4.15.0
           let f := 0.0
           .ok (.float f, d2)
       else if addInfo == 27 then
         -- Double-precision float (64-bit)
         do
-          let (bytes, d2) ← d1.readBytes 8
+          let (_bytes, d2) ← d1.readBytes 8
           -- TODO: Implement UInt64.fromLittleEndian for Lean 4.15.0
           let f := 0.0
           .ok (.float f, d2)
@@ -434,14 +434,14 @@ def decodeCBOR (bytes : ByteArray) : Except String CBORValue := do
 -/
 def serializeTypedValueBinary (tv : Σ t : TypeExpr, TypedValue t) : ByteArray :=
   match tv with
-  | ⟨.nat, .nat n⟩ =>
+  | ⟨.nat, .nat _n⟩ =>
       -- Tag (0x01) + 8 bytes little-endian
       let tag : UInt8 := 0x01
       -- TODO: Implement toLittleEndian for Lean 4.15.0
       let valueBytes := ByteArray.mk #[0, 0, 0, 0, 0, 0, 0, 0]
       ByteArray.mk #[tag] ++ valueBytes
 
-  | ⟨.boundedNat min max, .boundedNat _ _ bn⟩ =>
+  | ⟨.boundedNat _min _max, .boundedNat _ _ _bn⟩ =>
       -- Tag (0x02) + min (8 bytes) + max (8 bytes) + value (8 bytes)
       let tag : UInt8 := 0x02
       -- TODO: Implement toLittleEndian for Lean 4.15.0
@@ -553,14 +553,14 @@ def fromSQLValue (sqlValue : String) (expectedType : TypeExpr) : Except String (
 def testJSONRoundTrip (tv : Σ t : TypeExpr, TypedValue t) : Bool :=
   let json := serializeTypedValueJSON tv
   match deserializeTypedValueJSON json with
-  | .ok tv' => true  -- TODO: Check equality
+  | .ok _tv' => true  -- TODO: Check equality
   | .error _ => false
 
 /-- Test: Binary round-trip -/
 def testBinaryRoundTrip (tv : Σ t : TypeExpr, TypedValue t) : Bool :=
   let bytes := serializeTypedValueBinary tv
   match deserializeTypedValueBinary bytes with
-  | .ok tv' => true  -- TODO: Check equality
+  | .ok _tv' => true  -- TODO: Check equality
   | .error _ => false
 
 -- ============================================================================
@@ -587,7 +587,7 @@ partial def jsonToBytes (json : JsonValue) : ByteArray :=
   (stringify json).toUTF8
 
 /-- Parse JSON from UTF-8 bytes -/
-def bytesToJson (bytes : ByteArray) : Except String JsonValue :=
+def bytesToJson (_bytes : ByteArray) : Except String JsonValue :=
   -- TODO: Full JSON parser (for now, stub)
   .error "JSON parsing not yet implemented"
 

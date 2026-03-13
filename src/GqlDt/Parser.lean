@@ -294,7 +294,7 @@ noncomputable def parseInsertGQLdt : Parser InferredInsert := do
 
   -- Extract columns and types
   let columns := typedColumns.map (·.1)
-  let expectedTypes := typedColumns.map (·.2)
+  let _expectedTypes := typedColumns.map (·.2)
 
   -- Type check values against expected types
   -- TODO: Verify values match expected types

@@ -287,7 +287,7 @@ partial def parseNumber (s : LexerState) : LexerState × String :=
   (final, s.input.extract start final.pos)
 
 partial def parseString (s : LexerState) (quote : Char) : LexerState × String :=
-  let start := s.pos
+  let _start := s.pos
   let rec loop (state : LexerState) (acc : String) : LexerState × String :=
     match state.curr with
     | none => (state, acc)

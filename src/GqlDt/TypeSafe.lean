@@ -193,7 +193,7 @@ def execute {schema : Schema} (stmt : InsertStmt schema) : IO Unit := do
 -- Stubbed due to satisfiesConstraints signature issue
 axiom executePreservesTypes {schema : Schema} (stmt : InsertStmt schema) :
   ∀ i, i < stmt.values.length →
-    let ⟨t, v⟩ := stmt.values.get! i
+    let ⟨_t, _v⟩ := stmt.values.get! i
     True  -- Placeholder
 
 end GqlDt.TypeSafe

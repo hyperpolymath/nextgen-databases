@@ -318,8 +318,8 @@ def parseLiteral (literal : String) : Except String InferredType :=
 
 /-- Parse GQL INSERT and perform type inference -/
 def parseGQLInsert
-  (schema : Schema)
-  (query : String)
+  (_schema : Schema)
+  (_query : String)
   : Except String InferredInsert := do
   -- TODO: Actual parser
   -- For now, assume query is already parsed to components
