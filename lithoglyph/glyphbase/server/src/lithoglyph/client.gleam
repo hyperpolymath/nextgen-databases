@@ -10,8 +10,8 @@
 import gleam/bit_array
 import gleam/dynamic
 import gleam/option.{type Option, None}
-import gleam/string
 import lithoglyph/nif_ffi
+import lithoglyph/safety
 
 /// Lith database handle (opaque reference from NIF)
 pub opaque type Connection {
@@ -54,12 +54,12 @@ pub type LithResult(a) =
 // ============================================================
 
 /// Validate a database path for directory traversal attacks.
-/// Rejects paths containing ".." components which could escape
-/// the intended directory.
+/// Uses proven-compatible SafePath checks (null bytes + ".." detection).
 fn validate_path(path: String) -> LithResult(String) {
-  case string.contains(path, "..") {
-    True -> Error(PathTraversal(path: path))
-    False -> Ok(path)
+  case safety.path_has_traversal(path) {
+    Ok(True) -> Error(PathTraversal(path: path))
+    Ok(False) -> Ok(path)
+    Error(reason) -> Error(ValidationError(message: reason))
   }
 }
 
