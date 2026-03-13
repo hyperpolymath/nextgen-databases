@@ -65,7 +65,7 @@ axum = "0.8"
 tokio = { version = "1", features = ["full"] }
 tower = "0.5"
 hyper = "1.0"
-reqwest = { version = "0.12", default-features = false, features = ["json", "http2", "rustls-tls-webpki-roots-no-provider"] }
+reqwest = { version = "0.13", default-features = false, features = ["json", "query", "http2", "rustls-no-provider"] }
 
 # Serialization
 # bincode removed — not used in codebase. Use postcard or ciborium for future serialization needs.
@@ -128,3 +128,8 @@ panic = "abort"
 # NOTE: lru 0.12.5 has RUSTSEC-2026-0002 (IterMut Stacked Borrows, LOW severity)
 # Transitive dependency of tantivy 0.25.0 and ratatui 0.29.0
 # Waiting for upstream fix. Not directly patchable without forking dependencies.
+
+# NOTE: quinn-proto 0.11.14 (Dependabot alert — build-time only, NOT runtime)
+# Chain: burn 0.20 → cubecl-cpu → tracel-llvm-bundler (build dep) → reqwest 0.12 → quinn → quinn-proto
+# This is a build-time dependency for LLVM artifact download, not in any production code path.
+# Waiting for burn 0.21 stable release. reqwest bumped to 0.13 for direct deps.
