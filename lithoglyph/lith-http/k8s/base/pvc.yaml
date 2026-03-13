@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lith-data
+  labels:
+    app: lith-http-api
+    component: storage
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: fast-ssd  # Adjust based on cloud provider
+  volumeMode: Filesystem

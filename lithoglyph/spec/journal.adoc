@@ -1,0 +1,476 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Lithoglyph Journal Format
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:sectnums:
+
+[.lead]
+Specification for Lithoglyph's append-only journal format.
+
+**Status**: PROPOSED (resolves Q-JOURNAL-ENTRY-001)
+
+toc::[]
+
+== Overview
+
+The journal is an append-only log of all mutations. Every change to the database is journaled before being applied to blocks. The journal provides:
+
+* **Durability**: Write-ahead logging for crash recovery
+* **Reversibility**: Every entry includes its inverse operation
+* **Provenance**: Complete audit trail with actor and rationale
+
+== Journal File Structure
+
+=== File Layout
+
+[source,text]
+----
+lith.journal
+├── Journal Header (4096 bytes = 1 block)
+├── Segment 0 (variable, block-aligned)
+├── Segment 1 (variable, block-aligned)
+├── ...
+└── Active Segment (being written)
+----
+
+=== Journal Header
+
+The journal header occupies the first block:
+
+[cols="1,1,3"]
+|===
+| Offset | Size | Field
+
+| 0
+| 4
+| Magic: `FDBJ` (0x4644424A)
+
+| 4
+| 4
+| Format version (current: 1)
+
+| 8
+| 16
+| Database UUID (must match database)
+
+| 24
+| 8
+| Head sequence (last committed)
+
+| 32
+| 8
+| Checkpoint sequence (last checkpoint)
+
+| 40
+| 8
+| Entry count
+
+| 48
+| 8
+| File size (bytes)
+
+| 56
+| 4008
+| Reserved
+|===
+
+== Journal Entry Schema
+
+Each journal entry has a fixed header followed by variable-length payloads.
+
+=== Entry Header (48 bytes)
+
+[cols="1,1,2,3"]
+|===
+| Offset | Size | Field | Description
+
+| 0
+| 8
+| `sequence`
+| Monotonic sequence number (uint64)
+
+| 8
+| 8
+| `timestamp`
+| Unix microseconds (uint64)
+
+| 16
+| 2
+| `op_type`
+| Operation type (see <<operation-types>>)
+
+| 18
+| 2
+| `flags`
+| Entry flags (see <<entry-flags>>)
+
+| 20
+| 4
+| `forward_len`
+| Forward payload length
+
+| 24
+| 4
+| `inverse_len`
+| Inverse payload length
+
+| 28
+| 4
+| `provenance_len`
+| Provenance payload length
+
+| 32
+| 8
+| `affected_block`
+| Primary block affected
+
+| 40
+| 4
+| `checksum`
+| CRC32C of entire entry
+
+| 44
+| 4
+| `entry_len`
+| Total entry length (header + payloads)
+|===
+
+=== Entry Layout
+
+[source,text]
+----
+Journal Entry:
+┌─────────────────────────────────────────┐ 0
+│ sequence [8]                            │
+├─────────────────────────────────────────┤ 8
+│ timestamp [8]                           │
+├─────────────────────────────────────────┤ 16
+│ op_type [2]       │ flags [2]           │
+├─────────────────────────────────────────┤ 20
+│ forward_len [4]   │ inverse_len [4]     │
+├─────────────────────────────────────────┤ 28
+│ provenance_len [4]│ affected_block [8]  │
+├─────────────────────────────────────────┤ 40
+│ checksum [4]      │ entry_len [4]       │
+├─────────────────────────────────────────┤ 48
+│ Forward Payload (variable)              │
+├─────────────────────────────────────────┤
+│ Inverse Payload (variable)              │
+├─────────────────────────────────────────┤
+│ Provenance Payload (variable)           │
+└─────────────────────────────────────────┘
+----
+
+[[operation-types]]
+== Operation Types
+
+[cols="1,2,3"]
+|===
+| Value | Name | Description
+
+| 0x0001
+| `DOC_INSERT`
+| Insert document
+
+| 0x0002
+| `DOC_UPDATE`
+| Update document fields
+
+| 0x0003
+| `DOC_DELETE`
+| Delete document
+
+| 0x0004
+| `DOC_REPLACE`
+| Replace entire document
+
+| 0x0010
+| `EDGE_INSERT`
+| Insert edge
+
+| 0x0011
+| `EDGE_DELETE`
+| Delete edge
+
+| 0x0012
+| `EDGE_UPDATE`
+| Update edge properties
+
+| 0x0020
+| `COLLECTION_CREATE`
+| Create collection
+
+| 0x0021
+| `COLLECTION_DROP`
+| Drop collection
+
+| 0x0022
+| `COLLECTION_RENAME`
+| Rename collection
+
+| 0x0030
+| `SCHEMA_CREATE`
+| Create/define schema
+
+| 0x0031
+| `SCHEMA_ALTER`
+| Alter schema
+
+| 0x0032
+| `SCHEMA_DROP`
+| Drop schema
+
+| 0x0040
+| `CONSTRAINT_ADD`
+| Add constraint
+
+| 0x0041
+| `CONSTRAINT_DROP`
+| Drop constraint
+
+| 0x0050
+| `INDEX_CREATE`
+| Create index
+
+| 0x0051
+| `INDEX_DROP`
+| Drop index
+
+| 0x0060
+| `MIGRATION_START`
+| Begin migration
+
+| 0x0061
+| `MIGRATION_STEP`
+| Migration step
+
+| 0x0062
+| `MIGRATION_COMPLETE`
+| Complete migration
+
+| 0x0063
+| `MIGRATION_ROLLBACK`
+| Rollback migration
+
+| 0x0070
+| `CHECKPOINT`
+| Checkpoint marker
+
+| 0x0071
+| `SNAPSHOT`
+| Snapshot marker
+
+| 0xFF00
+| `IRREVERSIBLE`
+| Explicitly irreversible (with rationale)
+|===
+
+[[entry-flags]]
+== Entry Flags
+
+[cols="1,2,3"]
+|===
+| Bit | Name | Description
+
+| 0
+| `COMMITTED`
+| Entry has been applied to blocks
+
+| 1
+| `ROLLED_BACK`
+| Entry was rolled back
+
+| 2
+| `CHECKPOINT`
+| Entry is a checkpoint
+
+| 3
+| `COMPRESSED`
+| Payloads are LZ4-compressed
+
+| 4
+| `IRREVERSIBLE`
+| No inverse (see IRREVERSIBLE type)
+
+| 5-15
+| Reserved
+| Must be 0
+|===
+
+== Payload Formats
+
+=== Forward Payload
+
+The forward payload contains CBOR-encoded data describing what was done:
+
+[source,json]
+----
+{
+  "collection": "evidence",
+  "document_id": "doc_abc123",
+  "fields": {
+    "claim": "Example claim",
+    "source": "ONS",
+    "prompt_score": 85
+  }
+}
+----
+
+=== Inverse Payload
+
+The inverse payload contains CBOR-encoded data for undoing the operation:
+
+[cols="1,2"]
+|===
+| Operation | Inverse Payload
+
+| `DOC_INSERT`
+| `{"delete": {"collection": "...", "document_id": "..."}}`
+
+| `DOC_UPDATE`
+| `{"restore_fields": {"field1": "old_value", ...}}`
+
+| `DOC_DELETE`
+| `{"restore": {"collection": "...", "document_id": "...", "content": {...}}}`
+
+| `COLLECTION_CREATE`
+| `{"drop": {"name": "..."}}`
+
+| `SCHEMA_ALTER`
+| `{"restore_schema": {"previous": {...}}}`
+|===
+
+=== Provenance Payload
+
+The provenance payload is CBOR-encoded and MUST include:
+
+[source,json]
+----
+{
+  "actor": {
+    "id": "user_12345",
+    "type": "human",
+    "name": "Alice Smith"
+  },
+  "rationale": "Adding evidence from ONS inflation report",
+  "source": {
+    "type": "api",
+    "endpoint": "/api/v1/documents",
+    "request_id": "req_abc123"
+  },
+  "timestamp": "2026-01-11T12:00:00.000000Z",
+  "session_id": "sess_xyz789",
+  "context": {
+    "investigation": "UK Inflation 2023",
+    "tags": ["economic", "primary-source"]
+  }
+}
+----
+
+==== Required Provenance Fields
+
+[cols="1,1,3"]
+|===
+| Field | Required | Description
+
+| `actor.id`
+| Yes
+| Unique identifier for the actor
+
+| `actor.type`
+| Yes
+| `human`, `system`, `agent`, `migration`
+
+| `rationale`
+| Yes
+| Human-readable explanation (non-empty)
+
+| `timestamp`
+| Yes
+| ISO 8601 with microseconds
+
+| `source.type`
+| Yes
+| `api`, `cli`, `migration`, `internal`
+|===
+
+== Crash Recovery
+
+=== Recovery Algorithm
+
+1. Read journal header, verify magic and UUID
+2. Scan forward from checkpoint sequence
+3. For each entry:
+   * Verify checksum
+   * If `COMMITTED` flag set: entry already applied
+   * If `COMMITTED` flag not set: apply forward payload to blocks
+4. Update superblock head sequence
+5. Write new checkpoint
+
+=== Incomplete Entries
+
+Entries are considered incomplete if:
+
+* Checksum doesn't match
+* Entry length exceeds remaining file size
+* Payloads are truncated
+
+Incomplete entries are discarded during recovery.
+
+=== Checkpointing
+
+Checkpoints are written periodically:
+
+[source,text]
+----
+JOURNAL seq=1000 op=CHECKPOINT
+  provenance: {actor: "system", rationale: "Periodic checkpoint"}
+  forward: {blocks_verified: 500, journal_size: 10485760}
+  inverse: {} (empty - checkpoints are irreversible markers)
+----
+
+After a checkpoint:
+
+* Journal can be truncated up to checkpoint
+* Blocks before checkpoint are guaranteed consistent
+
+== Canonical Rendering
+
+=== Entry Rendering
+
+[source,text]
+----
+JOURNAL seq=1234 op=DOC_INSERT timestamp=2026-01-11T12:00:00.000000Z
+  affected_block=42 flags=[COMMITTED]
+  forward: {
+    collection: "evidence"
+    document_id: "doc_abc123"
+    fields: {claim: "Example claim", source: "ONS"}
+  }
+  inverse: {
+    delete: {collection: "evidence", document_id: "doc_abc123"}
+  }
+  provenance: {
+    actor: {id: "user_12345", type: "human", name: "Alice Smith"}
+    rationale: "Adding evidence from ONS inflation report"
+    source: {type: "api", endpoint: "/api/v1/documents"}
+  }
+----
+
+== Test Vectors
+
+Golden test vectors in `test-vectors/journal/`:
+
+* `header.bin` - Valid journal header
+* `doc_insert.bin` - Document insert entry
+* `doc_insert.txt` - Canonical rendering
+* `doc_update_with_inverse.bin` - Update with full inverse
+* `checkpoint.bin` - Checkpoint entry
+* `incomplete_entry.bin` - Truncated entry for recovery testing
+
+== References
+
+* link:blocks.adoc[Block Storage Format]
+* link:encoding.adoc[Blob Encoding Specification]

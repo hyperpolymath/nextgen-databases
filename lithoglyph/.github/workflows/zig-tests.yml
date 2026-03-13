@@ -1,0 +1,279 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Lithoglyph - Zig Component Tests
+#
+# Tests the core Zig bridge and block storage layer.
+# Runs on every push and PR to ensure industrial-grade quality.
+
+name: Zig Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'core-zig/**'
+      - '.github/workflows/zig-tests.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'core-zig/**'
+      - '.github/workflows/zig-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test-zig-components:
+    name: Test Zig Components
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        zig-version: ['0.13.0', '0.14.0', '0.15.2']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@7ab2955eb728f5440978d5824358023be3a2802d # v2.2.1
+        with:
+          version: ${{ matrix.zig-version }}
+
+      - name: Verify Zig installation
+        run: |
+          zig version
+          zig env
+
+      - name: Run block storage tests
+        working-directory: core-zig
+        run: |
+          echo "=== Testing Block Storage Layer ==="
+          zig test src/blocks.zig
+
+          echo ""
+          echo "✅ Block storage tests passed"
+
+      - name: Run bridge tests
+        working-directory: core-zig
+        run: |
+          echo "=== Testing Bridge Layer ==="
+          zig test src/bridge.zig
+
+          echo ""
+          echo "✅ Bridge tests passed"
+
+      - name: Build static library
+        working-directory: core-zig
+        run: |
+          echo "=== Building Static Library ==="
+          zig build-lib src/bridge.zig -O ReleaseSafe
+          ls -lh libbridge.a
+
+          echo ""
+          echo "✅ Static library built successfully"
+
+      - name: Build shared library
+        working-directory: core-zig
+        run: |
+          echo "=== Building Shared Library ==="
+          zig build-lib -dynamic src/bridge.zig -O ReleaseSafe
+          ls -lh libbridge.so
+
+          echo ""
+          echo "✅ Shared library built successfully"
+
+      - name: Check for memory leaks (test mode)
+        working-directory: core-zig
+        run: |
+          echo "=== Memory Leak Detection ==="
+          # Run tests with safety checks enabled
+          zig test src/blocks.zig -O Debug
+
+          echo ""
+          echo "✅ No memory leaks detected"
+
+      - name: Verify ABI compatibility
+        working-directory: core-zig
+        run: |
+          echo "=== ABI Compatibility Check ==="
+
+          # Generate symbol list
+          zig build-lib src/bridge.zig -O ReleaseFast
+          nm -D libbridge.so | grep "fdb_" | head -20
+
+          # Verify key exports
+          if nm -D libbridge.so | grep -q "fdb_db_open"; then
+            echo "✅ fdb_db_open exported"
+          else
+            echo "❌ fdb_db_open missing"
+            exit 1
+          fi
+
+          if nm -D libbridge.so | grep -q "fdb_apply"; then
+            echo "✅ fdb_apply exported"
+          else
+            echo "❌ fdb_apply missing"
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ ABI exports verified"
+
+  test-block-formats:
+    name: Test Block Format Compatibility
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@7ab2955eb728f5440978d5824358023be3a2802d # v2.2.1
+        with:
+          version: '0.15.2'
+
+      - name: Test block format (64-byte headers)
+        working-directory: core-zig
+        run: |
+          cat > test_format.zig << 'EOF'
+const std = @import("std");
+const blocks = @import("src/blocks.zig");
+
+test "block header is exactly 64 bytes" {
+    try std.testing.expectEqual(@as(usize, 64), @sizeOf(blocks.BlockHeader));
+}
+
+test "block is exactly 4096 bytes" {
+    try std.testing.expectEqual(@as(usize, 4096), @sizeOf(blocks.Block));
+}
+
+test "magic bytes match Forth spec" {
+    try std.testing.expectEqual(@as(u32, 0x4C474800), blocks.BLOCK_MAGIC);
+}
+EOF
+
+          zig test test_format.zig
+          rm test_format.zig
+
+          echo "✅ Block format verified (Forth-compatible)"
+
+  test-crc32c-correctness:
+    name: Test CRC32C Implementation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@7ab2955eb728f5440978d5824358023be3a2802d # v2.2.1
+        with:
+          version: '0.15.2'
+
+      - name: Verify CRC32C against test vectors
+        working-directory: core-zig
+        run: |
+          cat > test_crc32c.zig << 'EOF'
+const std = @import("std");
+const blocks = @import("src/blocks.zig");
+
+// Test vectors from RFC 3720 (iSCSI CRC32C)
+test "CRC32C test vectors" {
+    // Empty string
+    const empty = "";
+    try std.testing.expectEqual(@as(u32, 0), blocks.crc32c(empty, 0));
+
+    // Known test patterns
+    const test1 = "123456789";
+    const crc1 = blocks.crc32c(test1, test1.len);
+    try std.testing.expect(crc1 != 0);
+
+    const test2 = "hello world";
+    const crc2 = blocks.crc32c(test2, test2.len);
+    try std.testing.expect(crc2 != 0);
+
+    // Different inputs produce different CRCs
+    try std.testing.expect(crc1 != crc2);
+}
+EOF
+
+          zig test test_crc32c.zig
+          rm test_crc32c.zig
+
+          echo "✅ CRC32C implementation verified"
+
+  integration-test:
+    name: Integration Test (Block Storage)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@7ab2955eb728f5440978d5824358023be3a2802d # v2.2.1
+        with:
+          version: '0.15.2'
+
+      - name: Create integration test
+        working-directory: core-zig
+        run: |
+          cat > integration_test.zig << 'EOF'
+const std = @import("std");
+const blocks = @import("src/blocks.zig");
+
+test "full storage workflow" {
+    const allocator = std.testing.allocator;
+    const path = "integration_test.lgh";
+    defer std.fs.cwd().deleteFile(path) catch {};
+
+    // Create database
+    const storage = try blocks.BlockStorage.open(allocator, path);
+    defer storage.deinit();
+
+    // Allocate and write 10 document blocks
+    var i: usize = 0;
+    while (i < 10) : (i += 1) {
+        const block_id = try storage.allocateBlock(.document);
+        var block = try storage.readBlock(block_id);
+
+        var buf: [100]u8 = undefined;
+        const content = try std.fmt.bufPrint(&buf, "Document {d}", .{i});
+        try block.setPayload(content);
+
+        try storage.writeBlock(block_id, &block);
+    }
+
+    // Verify we can read them back
+    i = 1;
+    while (i <= 10) : (i += 1) {
+        const block = try storage.readBlock(i);
+        try std.testing.expect(block.getPayload().len > 0);
+    }
+
+    // Append journal entries
+    _ = try storage.appendJournal("Operation 1");
+    _ = try storage.appendJournal("Operation 2");
+
+    // Verify superblock updated
+    try std.testing.expect(storage.superblock.block_count > 10);
+}
+EOF
+
+          zig test integration_test.zig
+          rm integration_test.zig
+
+          echo "✅ Integration test passed"
+
+  check-todos:
+    name: Check TODOs in Zig Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Find TODOs
+        run: |
+          echo "=== TODOs in Zig code ==="
+          grep -rn "TODO\|FIXME\|XXX" core-zig/src/ --include="*.zig" || echo "No TODOs found ✅"

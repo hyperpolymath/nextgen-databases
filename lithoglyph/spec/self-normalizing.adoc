@@ -1,0 +1,537 @@
+= Self-Normalizing Database
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:source-highlighter: rouge
+
+[.lead]
+Lithoglyph as a self-normalizing database: automatic functional dependency discovery, type-encoded normal forms, and proof-carrying schema evolution.
+
+toc::[]
+
+== Overview
+
+A *self-normalizing database* automatically:
+
+1. **Discovers** functional dependencies from data patterns
+2. **Encodes** dependencies in the type system (via GQL-dt)
+3. **Proves** schema satisfies target normal form
+4. **Proposes** refactorings with equivalence proofs
+5. **Narrates** every decision in human/agent-readable form
+6. **Applies** transformations with full reversibility
+
+This is not a fantasy. The pieces exist:
+
+* FD discovery algorithms (TANE, DFD, FDHits) are mature
+* GQL-dt provides dependent types for encoding constraints
+* Lithoglyph's journal guarantees reversibility
+* Lithoglyph's narrative philosophy demands explainability
+
+== Prior Art
+
+=== Functional Dependency Discovery
+
+[cols="1,2,1"]
+|===
+| Algorithm | Approach | Source
+
+| TANE | Lattice traversal, partition refinement | Huhtala et al., 1999
+| DFD | Depth-first lattice search, sample-based | Abedjan et al., 2014
+| FDHits | Hitting set enumeration, hybrid validation | ACM SIGMOD 2024
+| AutoNormalize | Python library using DFD | Alteryx, open source
+|===
+
+=== Machine Learning for Dependencies
+
+Flach & Savnik (1999) established ML approaches:
+
+* *Top-down*: Generate hypotheses, test against data
+* *Bottom-up*: Inspect data, infer what dependencies hold
+
+Modern approaches use neural networks for approximate FD discovery.
+
+=== What's Missing
+
+No existing system combines:
+
+* Automatic FD discovery
+* Dependent types for encoding FDs
+* Proof-carrying normalization
+* Narrative explanation
+* Full reversibility with provenance
+
+Lithoglyph + GQL-dt can be the first.
+
+== Architecture
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────────┐
+│  Form.Normalizer (new component)                            │
+├─────────────────────────────────────────────────────────────┤
+│  OBSERVE: Ingest data, discover FDs via DFD/TANE/ML         │
+├─────────────────────────────────────────────────────────────┤
+│  ENCODE: Express discovered FDs as dependent types          │
+├─────────────────────────────────────────────────────────────┤
+│  PROVE: Verify schema satisfies target normal form          │
+├─────────────────────────────────────────────────────────────┤
+│  PROPOSE: Generate schema refactoring + equivalence proof   │
+├─────────────────────────────────────────────────────────────┤
+│  NARRATE: Explain in human/agent-readable form              │
+├─────────────────────────────────────────────────────────────┤
+│  APPLY: Transform via Form.Model with full reversibility    │
+└─────────────────────────────────────────────────────────────┘
+----
+
+=== Integration with Existing Layers
+
+[source,text]
+----
+                    ┌─────────────────────┐
+                    │  Form.Normalizer    │
+                    │  (FD discovery +    │
+                    │   type encoding)    │
+                    └──────────┬──────────┘
+                               │
+       ┌───────────────────────┼───────────────────────┐
+       ▼                       ▼                       ▼
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│ GQL-dt      │         │ GQL         │         │ Form.Model  │
+│ (Lean 4)    │         │ (Factor)    │         │ (Forth)     │
+│ Type-check  │         │ Runtime     │         │ Apply       │
+│ proofs      │         │ queries     │         │ transforms  │
+└─────────────┘         └─────────────┘         └─────────────┘
+       │                       │                       │
+       └───────────────────────┼───────────────────────┘
+                               ▼
+                    ┌─────────────────────┐
+                    │  Form.Blocks        │
+                    │  (Journal +         │
+                    │   Reversibility)    │
+                    └─────────────────────┘
+----
+
+== Functional Dependencies in the Type System
+
+=== Basic Encoding
+
+A functional dependency `X → Y` states that X uniquely determines Y.
+
+[source,lean]
+----
+/-- A functional dependency between attribute sets -/
+structure FunDep (Schema : Type) where
+  determinant : List Attribute
+  dependent : List Attribute
+
+/-- Proof that the FD holds in a given relation -/
+structure FDHolds (fd : FunDep Schema) (r : Relation Schema) : Prop where
+  proof : ∀ t1 t2 : Tuple Schema,
+    (∀ a ∈ fd.determinant, t1.get a = t2.get a) →
+    (∀ a ∈ fd.dependent, t1.get a = t2.get a)
+----
+
+=== Normal Form Predicates
+
+[source,lean]
+----
+/-- First Normal Form: All attributes are atomic -/
+def FirstNormalForm (S : Schema) : Prop :=
+  ∀ attr ∈ S.attributes, attr.type.isAtomic
+
+/-- Second Normal Form: 1NF + no partial dependencies on candidate keys -/
+def SecondNormalForm (S : Schema) (fds : List (FunDep S)) : Prop :=
+  FirstNormalForm S ∧
+  ∀ fd ∈ fds,
+    ¬fd.determinant.isProperSubsetOf S.candidateKey →
+    fd.dependent ⊆ S.primeAttributes
+
+/-- Third Normal Form: 2NF + no transitive dependencies -/
+def ThirdNormalForm (S : Schema) (fds : List (FunDep S)) : Prop :=
+  SecondNormalForm S fds ∧
+  ∀ fd ∈ fds,
+    fd.determinant.isSuperkey ∨ fd.dependent ⊆ S.primeAttributes
+
+/-- Boyce-Codd Normal Form: Every determinant is a superkey -/
+def BCNF (S : Schema) (fds : List (FunDep S)) : Prop :=
+  ∀ fd ∈ fds, fd.determinant.isSuperkey
+----
+
+=== Normalization Transformations
+
+[source,lean]
+----
+/-- A normalization step with proof of equivalence -/
+structure NormalizationStep where
+  source : Schema
+  target : Schema
+  transform : Relation source → Relation target
+  inverse : Relation target → Relation source
+  equivalence : ∀ r, inverse (transform r) = r
+
+/-- Apply normalization with proof preservation -/
+def normalize (S : Schema) (fds : List (FunDep S))
+    (target : NormalForm) : NormalizationStep :=
+  -- Returns transformation + proof that:
+  -- 1. Target schema is in requested normal form
+  -- 2. Transformation is lossless (has inverse)
+  -- 3. All FDs are preserved or documented as lost
+----
+
+== FD Discovery Pipeline
+
+=== Phase 1: Observation
+
+[source,factor]
+----
+! GQL extension for FD discovery
+DISCOVER DEPENDENCIES
+  FROM collection
+  SAMPLE 10000           ! Sample size for large collections
+  CONFIDENCE 0.95        ! Statistical confidence threshold
+  ALGORITHM dfd          ! dfd | tane | fdhits | ml
+
+! Returns discovered FDs with confidence scores
+! Result is a narrative artefact, journaled
+----
+
+=== Phase 2: Encoding
+
+Discovered FDs are encoded as GQL-dt types:
+
+[source,text]
+----
+Discovered: {employee_id} → {name, department, salary}
+Confidence: 0.998
+
+Encoded as:
+  FunDep EmployeeSchema
+    { determinant := ["employee_id"]
+    , dependent := ["name", "department", "salary"]
+    , confidence := 0.998
+    , discovered_at := JournalEntry#4521
+    , sample_size := 10000
+    }
+----
+
+=== Phase 3: Proof Generation
+
+[source,lean]
+----
+/-- Attempt to prove schema is in target normal form -/
+theorem schema_is_3NF : ThirdNormalForm EmployeeSchema discoveredFDs := by
+  -- Automated proof search
+  -- If fails, generates counterexample + suggestion
+----
+
+=== Phase 4: Proposal
+
+If schema violates target normal form:
+
+[source,text]
+----
+NORMALIZATION PROPOSAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Current Schema: employees
+  Attributes: employee_id, name, department, dept_location, salary
+
+Violation: Transitive dependency
+  employee_id → department → dept_location
+
+Proposed Split:
+  1. employees(employee_id, name, department, salary)
+  2. departments(department, dept_location)
+
+Proof of Equivalence: [Link to Lean proof]
+  - Lossless join guaranteed
+  - All FDs preserved in decomposition
+
+Reversibility:
+  - Forward: SPLIT employees INTO employees, departments ON department
+  - Inverse: JOIN employees, departments ON department
+  - Journal entry: Will create #4522
+
+Narrative:
+  "The employees collection contains a transitive dependency where
+   department determines dept_location. This means if a department's
+   location changes, we'd need to update every employee record in that
+   department (update anomaly). Splitting into separate collections
+   ensures each fact is stored exactly once."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+----
+
+=== Phase 5: Application
+
+[source,factor]
+----
+! Apply with explicit consent + journaling
+APPLY NORMALIZATION proposal-4521
+  WITH ROLLBACK POINT "pre-3nf-normalization"
+  NARRATIVE "Normalizing to 3NF per proposal #4521"
+
+! Journal records:
+! - The transformation applied
+! - The inverse transformation
+! - The equivalence proof reference
+! - The narrative explanation
+----
+
+== Narrative Artefacts
+
+Every normalization decision produces a narrative:
+
+=== Discovery Narrative
+
+[source,text]
+----
+FUNCTIONAL DEPENDENCY DISCOVERY
+Collection: employees
+Date: 2026-01-11
+Sample: 10,000 of 1,234,567 records
+
+Discovered Dependencies:
+  1. {employee_id} → {name, department, salary}  [conf: 0.999]
+     "Each employee ID uniquely identifies their name, department, and salary."
+
+  2. {department} → {dept_location}  [conf: 0.997]
+     "Each department has exactly one location."
+
+  3. {project_id, employee_id} → {hours_worked}  [conf: 0.995]
+     "Each employee's work on a project has unique hours recorded."
+
+Approximate Dependencies (may indicate data quality issues):
+  4. {name} → {employee_id}  [conf: 0.89]
+     "Names are mostly unique but 11% have duplicates."
+     Recommendation: Investigate—may be data entry issues.
+
+Provenance: Journal entries #4515-#4518
+----
+
+=== Normalization Narrative
+
+[source,text]
+----
+SCHEMA EVOLUTION: NORMALIZATION TO 3NF
+Date: 2026-01-11
+Requested by: Agent/system-optimizer
+Approved by: human/jane-dba
+
+BEFORE:
+  employees(employee_id, name, department, dept_location, salary)
+  Normal form: 2NF (violates 3NF due to transitive dependency)
+
+TRANSFORMATION:
+  Split on transitive dependency: department → dept_location
+
+AFTER:
+  employees(employee_id, name, department, salary)  [3NF ✓]
+  departments(department, dept_location)            [3NF ✓]
+
+WHY:
+  The transitive dependency means department locations are stored
+  redundantly—once per employee in that department. This creates:
+  - Update anomaly: Changing a dept location requires N updates
+  - Insertion anomaly: Can't record a new dept without an employee
+  - Deletion anomaly: Deleting last employee loses dept location
+
+PROOF:
+  Equivalence verified by Lean 4 proof: proofs/normalize-4521.lean
+  Lossless join: ✓ (department is common attribute)
+  Dependency preservation: ✓ (all FDs map to exactly one new table)
+
+REVERSIBILITY:
+  Command: ROLLBACK TO "pre-3nf-normalization"
+  Journal: #4522 (forward), #4523 (inverse stored)
+----
+
+== Configuration
+
+=== Auto-Discovery Settings
+
+[source,scheme]
+----
+(normalization-config
+  (discovery
+    (enabled true)
+    (algorithm "dfd")
+    (sample-size 10000)
+    (confidence-threshold 0.95)
+    (schedule "on-significant-insert")  ; or "hourly" | "daily" | "manual"
+    (significant-insert-threshold 1000))
+
+  (target-normal-form "3NF")  ; "1NF" | "2NF" | "3NF" | "BCNF" | "4NF" | "5NF"
+
+  (auto-apply false)  ; If true, apply without human approval
+
+  (narrative
+    (verbosity "detailed")  ; "minimal" | "standard" | "detailed"
+    (include-proofs true)
+    (format "asciidoc")))
+----
+
+== Normal Form Coverage
+
+[cols="1,1,3"]
+|===
+| Normal Form | Supported | Notes
+
+| *1NF*
+| Full
+| Atomic value checking is straightforward; GQL-dt can encode atomicity in types
+
+| *2NF*
+| Full
+| Partial dependencies on candidate keys discovered via FD algorithms
+
+| *3NF*
+| Full
+| Transitive dependencies discovered via FD algorithms; most common target
+
+| *BCNF*
+| Full
+| Checking "every determinant is a superkey" is direct FD analysis
+
+| *4NF*
+| Partial
+| Requires multi-valued dependency (MVD) discovery—harder than FD but possible with extended algorithms
+
+| *5NF (PJNF)*
+| Limited
+| Requires join dependency discovery; computationally expensive, often requires domain hints
+
+| *6NF*
+| Theoretical
+| Decomposition to irreducible relations; rarely practical, included for completeness
+
+| *DKNF*
+| Out of Scope
+| Domain-Key Normal Form requires all constraints expressible as domain/key consequences; too abstract for automatic discovery
+|===
+
+=== Why Stop at BCNF for Most Use Cases?
+
+Most real-world databases target *3NF* or *BCNF*:
+
+* 3NF eliminates transitive dependencies while preserving all FDs
+* BCNF is stricter but may lose some FDs in decomposition
+* 4NF and beyond address multi-valued and join dependencies, which are:
+  - Rarer in practice
+  - Harder to discover automatically
+  - Often require domain expertise to identify
+
+Lithoglyph will *fully support 1NF through BCNF* with automatic discovery and proof generation.
+
+For 4NF and 5NF, Lithoglyph can:
+
+* Accept manually specified MVDs and JDs
+* Verify normalization against provided dependencies
+* Generate proofs for human-specified decompositions
+
+=== Multi-Valued Dependency Extension (Future)
+
+[source,lean]
+----
+/-- A multi-valued dependency X →→ Y -/
+structure MVD (Schema : Type) where
+  determinant : List Attribute
+  dependent : List Attribute
+  -- X →→ Y means: for any two tuples with same X values,
+  -- we can swap their Y values and both results are in the relation
+
+/-- Fourth Normal Form: BCNF + no non-trivial MVDs -/
+def FourthNormalForm (S : Schema) (fds : List (FunDep S)) (mvds : List (MVD S)) : Prop :=
+  BCNF S fds ∧
+  ∀ mvd ∈ mvds, mvd.isTrivial ∨ mvd.determinant.isSuperkey
+----
+
+== Open Questions
+
+[cols="1,3,2"]
+|===
+| ID | Question | Acceptance Criteria
+
+| Q-NORM-001
+| Which FD discovery algorithm should be the default?
+| Benchmark on representative datasets; choose based on accuracy/speed tradeoff
+
+| Q-NORM-002
+| How to handle approximate FDs (confidence < 1.0)?
+| Define policy for treating near-FDs; document data quality implications
+
+| Q-NORM-003
+| Should denormalization be supported with the same rigor?
+| If yes: define DenormalizationStep type with equivalent proofs
+
+| Q-NORM-004
+| How to integrate with GQL-dt's existing proof system?
+| Define interface between Lean 4 proofs and Form.Normalizer
+
+| Q-NORM-005
+| What happens when normalization would break existing queries?
+| Define query rewriting strategy or migration period
+|===
+
+== Implementation Phases
+
+=== Phase A: FD Discovery (Form.Normalizer Core)
+
+* Implement DFD algorithm in Forth (truth core) or Factor (runtime)
+* Create `DISCOVER DEPENDENCIES` GQL command
+* Journal all discoveries as narrative artefacts
+* Confidence scoring and approximate FD detection
+
+=== Phase B: Type Encoding (GQL-dt Integration)
+
+* Encode FunDep structure in Lean 4
+* Implement normal form predicates (1NF through 5NF)
+* Create proof tactics for common normalization scenarios
+* Integrate with Form.Bridge for bidirectional FFI
+
+=== Phase C: Proposal Generation
+
+* Implement decomposition algorithms (for 2NF, 3NF, BCNF)
+* Generate equivalence proofs automatically
+* Create narrative templates
+* Build approval workflow
+
+=== Phase D: Transformation Application
+
+* Implement APPLY NORMALIZATION command
+* Ensure journal records transformation + inverse
+* Create rollback mechanism
+* Add query rewriting for affected queries
+
+== Relationship to Core Invariants
+
+[cols="1,2"]
+|===
+| Invariant | How Self-Normalization Respects It
+
+| Truth Ownership
+| FD discovery reads from blocks; transformations go through Form.Model
+
+| Journal-First
+| Every discovery, proposal, and transformation is journaled before committed
+
+| Reversibility
+| Every normalization has a proven inverse; denormalization always possible
+
+| Renderability
+| Narratives are human/agent-readable; proofs are inspectable
+
+| Provenance
+| Every FD traced to sample data; every transformation traced to proposal
+
+| Constraints as Ethics
+| Normalization explains *why* the change improves data integrity
+|===
+
+== See Also
+
+* link:../README.adoc[README] - Lithoglyph overview
+* link:../ARCHITECTURE.adoc[ARCHITECTURE] - System architecture
+* https://github.com/hyperpolymath/fqldt[GQL-dt] - Dependent types for GQL
+* link:fql-dependent-types.md[GQL Dependent Types] - Type system specification

@@ -1,0 +1,22 @@
+# Lith-Geo Configuration Example
+# Copy to config.toml and adjust as needed
+
+[lithoglyph]
+# Lith HTTP API URL
+api_url = "http://localhost:8080"
+# Collection containing documents with location data
+collection = "evidence"
+# Field name containing location coordinates
+location_field = "location"
+
+[server]
+# Host to bind to
+host = "127.0.0.1"
+# Port to listen on
+port = 8081
+
+[index]
+# Auto-rebuild interval in minutes (0 = manual only via POST /geo/reindex)
+auto_rebuild_minutes = 0
+# Maximum memory for R-tree index in MB
+max_memory_mb = 512

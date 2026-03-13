@@ -1,0 +1,366 @@
+{
+  "description": "Test vectors for Lithoglyph block headers (64 bytes, little-endian). Header layout defined in core-zig/src/blocks.zig: magic(4) + version(2) + block_type(2) + block_id(8) + sequence(8) + created_at(8) + modified_at(8) + payload_len(4) + checksum(4) + prev_block_id(8) + flags(4) + reserved(4) = 64 bytes. Magic: 0x4C474800 ('LGH\\0'). Version: 1. All multi-byte fields stored little-endian.",
+  "constants": {
+    "BLOCK_SIZE": 4096,
+    "HEADER_SIZE": 64,
+    "PAYLOAD_SIZE": 4032,
+    "BLOCK_MAGIC": "0x4C474800",
+    "BLOCK_MAGIC_LE_HEX": "00484C47",
+    "BLOCK_VERSION": 1,
+    "CRC32C_POLYNOMIAL": "0x82F63B78"
+  },
+  "block_types": {
+    "free": "0x0000",
+    "superblock": "0x0001",
+    "collection_meta": "0x0010",
+    "document": "0x0011",
+    "document_overflow": "0x0012",
+    "edge_meta": "0x0020",
+    "edge": "0x0021",
+    "index_root": "0x0030",
+    "index_internal": "0x0031",
+    "index_leaf": "0x0032",
+    "journal_segment": "0x0040",
+    "schema": "0x0050",
+    "constraint": "0x0051",
+    "migration": "0x0060"
+  },
+  "block_flags": {
+    "compressed": "bit 0",
+    "encrypted": "bit 1",
+    "chained": "bit 2",
+    "deleted": "bit 3",
+    "reserved": "bits 4-7"
+  },
+  "vectors": [
+    {
+      "name": "valid_superblock_header",
+      "description": "Superblock header (block_id=0, sequence=0). The first block in every Lithoglyph database file.",
+      "input_hex": "00484c47010001000000000000000000000000000000000000943577950a0200000094357795_0a020000000000000000000000000000000000000000000000000000",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 1,
+        "block_type": "0x0001 (superblock)",
+        "block_id": 0,
+        "sequence": 0,
+        "created_at": 1736600000000,
+        "modified_at": 1736600000000,
+        "payload_len": 0,
+        "checksum": 0,
+        "prev_block_id": 0,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected": {
+        "magic_valid": true,
+        "version_valid": true,
+        "block_type": "superblock",
+        "payload_within_bounds": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_document_header",
+      "description": "Document block header (block_id=42, sequence=100, payload_len=256). Typical document storage block.",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 1,
+        "block_type": "0x0011 (document)",
+        "block_id": 42,
+        "sequence": 100,
+        "created_at": 1736600100000,
+        "modified_at": 1736600200000,
+        "payload_len": 256,
+        "checksum": "0x1A2B3C4D",
+        "prev_block_id": 0,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected": {
+        "magic_valid": true,
+        "version_valid": true,
+        "block_type": "document",
+        "payload_within_bounds": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_journal_segment_header",
+      "description": "Journal segment block (block_id=5, sequence=3, prev_block_id=4). Linked journal chain.",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 1,
+        "block_type": "0x0040 (journal_segment)",
+        "block_id": 5,
+        "sequence": 3,
+        "created_at": 1736601000000,
+        "modified_at": 1736601000000,
+        "payload_len": 512,
+        "checksum": "0xDEADBEEF",
+        "prev_block_id": 4,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected": {
+        "magic_valid": true,
+        "version_valid": true,
+        "block_type": "journal_segment",
+        "payload_within_bounds": true,
+        "prev_block_id": 4
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_compressed_chained_document",
+      "description": "Document block with compressed and chained flags set (payload spans multiple blocks).",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 1,
+        "block_type": "0x0011 (document)",
+        "block_id": 10,
+        "sequence": 50,
+        "created_at": 1736602000000,
+        "modified_at": 1736602500000,
+        "payload_len": 4032,
+        "checksum": "0xCAFEBABE",
+        "prev_block_id": 0,
+        "flags": "0x05 (compressed | chained)",
+        "reserved": 0
+      },
+      "expected": {
+        "magic_valid": true,
+        "version_valid": true,
+        "block_type": "document",
+        "payload_within_bounds": true,
+        "flags_compressed": true,
+        "flags_chained": true,
+        "flags_deleted": false
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_deleted_block",
+      "description": "Free block with deleted flag set (prev_block_id points to free list head).",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 1,
+        "block_type": "0x0000 (free)",
+        "block_id": 7,
+        "sequence": 200,
+        "created_at": 1736600000000,
+        "modified_at": 1736603000000,
+        "payload_len": 0,
+        "checksum": 0,
+        "prev_block_id": 3,
+        "flags": "0x08 (deleted)",
+        "reserved": 0
+      },
+      "expected": {
+        "magic_valid": true,
+        "version_valid": true,
+        "block_type": "free",
+        "flags_deleted": true,
+        "prev_block_id_is_free_list_head": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_index_root_header",
+      "description": "Index root block header for B-tree index structure.",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 1,
+        "block_type": "0x0030 (index_root)",
+        "block_id": 15,
+        "sequence": 75,
+        "created_at": 1736604000000,
+        "modified_at": 1736604000000,
+        "payload_len": 1024,
+        "checksum": "0xBAADF00D",
+        "prev_block_id": 0,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected": {
+        "magic_valid": true,
+        "version_valid": true,
+        "block_type": "index_root"
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_schema_block_header",
+      "description": "Schema definition block storing collection schema as CBOR payload.",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 1,
+        "block_type": "0x0050 (schema)",
+        "block_id": 20,
+        "sequence": 1,
+        "created_at": 1736600000000,
+        "modified_at": 1736600000000,
+        "payload_len": 384,
+        "checksum": "0x12345678",
+        "prev_block_id": 0,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected": {
+        "magic_valid": true,
+        "version_valid": true,
+        "block_type": "schema"
+      },
+      "valid": true
+    },
+    {
+      "name": "invalid_bad_magic",
+      "description": "Header with wrong magic bytes (0xDEADBEEF instead of 0x4C474800). Should fail validation with InvalidMagic.",
+      "input_fields": {
+        "magic": "0xDEADBEEF",
+        "version": 1,
+        "block_type": "0x0011 (document)",
+        "block_id": 1,
+        "sequence": 1,
+        "created_at": 1736600000000,
+        "modified_at": 1736600000000,
+        "payload_len": 0,
+        "checksum": 0,
+        "prev_block_id": 0,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected_error": "InvalidMagic",
+      "valid": false
+    },
+    {
+      "name": "invalid_wrong_version",
+      "description": "Header with unsupported version (99 instead of 1). Should fail validation with UnsupportedVersion.",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 99,
+        "block_type": "0x0011 (document)",
+        "block_id": 1,
+        "sequence": 1,
+        "created_at": 1736600000000,
+        "modified_at": 1736600000000,
+        "payload_len": 0,
+        "checksum": 0,
+        "prev_block_id": 0,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected_error": "UnsupportedVersion",
+      "valid": false
+    },
+    {
+      "name": "invalid_payload_too_large",
+      "description": "Header with payload_len exceeding PAYLOAD_SIZE (5000 > 4032). Should fail validation with PayloadTooLarge.",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 1,
+        "block_type": "0x0011 (document)",
+        "block_id": 1,
+        "sequence": 1,
+        "created_at": 1736600000000,
+        "modified_at": 1736600000000,
+        "payload_len": 5000,
+        "checksum": 0,
+        "prev_block_id": 0,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected_error": "PayloadTooLarge",
+      "valid": false
+    },
+    {
+      "name": "invalid_zero_magic",
+      "description": "Header with all-zero magic bytes. Should fail validation with InvalidMagic.",
+      "input_fields": {
+        "magic": "0x00000000",
+        "version": 1,
+        "block_type": "0x0011 (document)",
+        "block_id": 1,
+        "sequence": 1,
+        "created_at": 1736600000000,
+        "modified_at": 1736600000000,
+        "payload_len": 100,
+        "checksum": "0xABCDEF01",
+        "prev_block_id": 0,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected_error": "InvalidMagic",
+      "valid": false
+    },
+    {
+      "name": "invalid_payload_exactly_at_boundary",
+      "description": "Header with payload_len exactly at PAYLOAD_SIZE + 1 (4033 bytes). Off-by-one boundary test.",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 1,
+        "block_type": "0x0011 (document)",
+        "block_id": 1,
+        "sequence": 1,
+        "created_at": 1736600000000,
+        "modified_at": 1736600000000,
+        "payload_len": 4033,
+        "checksum": 0,
+        "prev_block_id": 0,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected_error": "PayloadTooLarge",
+      "valid": false
+    },
+    {
+      "name": "valid_max_payload",
+      "description": "Header with payload_len exactly at PAYLOAD_SIZE (4032 bytes). Boundary test: maximum valid payload.",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 1,
+        "block_type": "0x0011 (document)",
+        "block_id": 1,
+        "sequence": 1,
+        "created_at": 1736600000000,
+        "modified_at": 1736600000000,
+        "payload_len": 4032,
+        "checksum": "0xFEDCBA98",
+        "prev_block_id": 0,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected": {
+        "magic_valid": true,
+        "version_valid": true,
+        "payload_within_bounds": true,
+        "payload_at_max": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_zero_payload",
+      "description": "Header with empty payload (payload_len=0). Valid for newly allocated blocks.",
+      "input_fields": {
+        "magic": "0x4C474800",
+        "version": 1,
+        "block_type": "0x0011 (document)",
+        "block_id": 99,
+        "sequence": 50,
+        "created_at": 1736600000000,
+        "modified_at": 1736600000000,
+        "payload_len": 0,
+        "checksum": 0,
+        "prev_block_id": 0,
+        "flags": 0,
+        "reserved": 0
+      },
+      "expected": {
+        "magic_valid": true,
+        "version_valid": true,
+        "payload_within_bounds": true,
+        "empty_payload": true
+      },
+      "valid": true
+    }
+  ]
+}

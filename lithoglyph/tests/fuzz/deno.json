@@ -1,0 +1,13 @@
+{
+  "name": "@lith/fuzz-tests",
+  "version": "0.0.8",
+  "tasks": {
+    "build": "npx rescript build",
+    "fuzz": "deno run --allow-read --allow-env --allow-write src/Lith_Fuzz_Main.res.js",
+    "fuzz:quick": "deno run --allow-read --allow-env src/Lith_Fuzz_Main.res.js --iterations 1000",
+    "fuzz:long": "deno run --allow-read --allow-env --allow-write src/Lith_Fuzz_Main.res.js --iterations 100000"
+  },
+  "imports": {
+    "@lith/api": "../../api/src/mod.ts"
+  }
+}

@@ -1,0 +1,403 @@
+= Glyphbase User Guide
+:toc:
+:toclevels: 3
+
+[.lead]
+*Carve your data in stone* - A complete guide to using Glyphbase, the Airtable alternative with permanence.
+
+== Introduction
+
+Glyphbase is a spreadsheet-database hybrid that treats your data with the permanence it deserves. Unlike traditional spreadsheets where changes overwrite history, Glyphbase *carves every change in stone* - trackable, reversible, and provable forever.
+
+=== What Makes Glyphbase Different?
+
+[cols="2,3,3"]
+|===
+| Feature | Traditional Spreadsheets | Glyphbase
+
+| *History*
+| Limited undo, version history optional
+| Every change tracked forever, mathematical proof of reversibility
+
+| *Provenance*
+| "Who changed this?" = detective work
+| Built-in: who, when, why for every cell
+
+| *Cloud Sync*
+| Conflicts, corruption, lost data
+| Append-only journal = no conflicts ever
+
+| *Data Quality*
+| No validation beyond formulas
+| PROMPT scores for research-grade quality
+
+| *Collaboration*
+| Last edit wins, conflicts common
+| Full audit trail, deterministic merges
+|===
+
+== Installation
+
+=== Prerequisites
+
+- https://gleam.run[Gleam] (^1.0)
+- https://github.com/hyperpolymath/lithoglyph[Lithoglyph] database
+- Erlang/OTP 26+
+
+=== Quick Start
+
+[source,bash]
+----
+# Clone Glyphbase
+git clone https://github.com/hyperpolymath/glyphbase
+cd glyphbase/server
+
+# Install dependencies
+gleam deps download
+
+# Run the server
+gleam run
+
+# Open http://localhost:4000
+----
+
+== Core Concepts
+
+=== Tables (Collections)
+
+Tables in Glyphbase are called *collections* because they collect related data glyphs (records).
+
+Every collection has:
+
+- *Schema*: Field definitions with types and constraints
+- *Views*: Multiple ways to visualize the same data (Grid, Kanban, Calendar)
+- *Provenance*: Full history of who created/modified each record
+
+=== Fields
+
+Field types available:
+
+[cols="1,2,2"]
+|===
+| Type | Description | Example
+
+| *Text*
+| Short or long text
+| Names, descriptions, notes
+
+| *Number*
+| Integer or decimal
+| Age, price, quantity
+
+| *Date*
+| Calendar date
+| Birth date, deadline, event
+
+| *Boolean*
+| True/false checkbox
+| Active, completed, approved
+
+| *Select*
+| Single choice from options
+| Status, category, priority
+
+| *Multi-select*
+| Multiple choices
+| Tags, skills, interests
+
+| *Attachment*
+| Files (images, PDFs, etc.)
+| Photos, documents, receipts
+
+| *Link*
+| Relationship to another table
+| Customer → Orders
+
+| *Lookup*
+| Pull field from linked record
+| Order → Customer.Name
+
+| *Rollup*
+| Aggregate linked records
+| Customer → COUNT(Orders)
+|===
+
+=== Views
+
+Each table can have multiple views:
+
+==== Grid View
+Traditional spreadsheet layout - rows and columns.
+
+==== Kanban View
+Drag-and-drop cards across columns (like Trello).
+
+Best for: Project management, sales pipelines, content calendars
+
+==== Calendar View
+Records displayed on a calendar by date field.
+
+Best for: Event planning, editorial calendars, scheduling
+
+==== Gallery View
+Visual cards with images prominent.
+
+Best for: Product catalogs, portfolios, real estate
+
+==== Form View
+Public form for data entry (no Glyphbase account needed).
+
+Best for: Surveys, applications, feedback collection
+
+=== Provenance
+
+Every change in Glyphbase records:
+
+- *Who*: User ID or email
+- *When*: Timestamp (millisecond precision)
+- *Why*: Optional change message
+- *What*: Exact field values before and after
+
+Access provenance:
+
+1. Right-click any cell → "View History"
+2. See full timeline of changes
+3. Click any point to restore (creates new record, doesn't delete history)
+
+=== PROMPT Scores
+
+Glyphbase includes research-grade data quality scoring:
+
+- *Provenance*: Is the source documented?
+- *Reproducibility*: Can results be recreated?
+- *Openness*: Is the data accessible?
+- *Methodology*: Is the process documented?
+- *Peer Review*: Has it been validated?
+- *Timeliness*: Is the data current?
+
+Each record gets a PROMPT score (0-100). Use filters to show only high-quality data.
+
+== Working with Data
+
+=== Creating a Table
+
+[source,javascript]
+----
+1. Click "+ New Table"
+2. Choose a template or start blank
+3. Name your table
+4. Add fields (click "+" in header)
+5. Configure field types and options
+----
+
+=== Adding Records
+
+[cols="1,2"]
+|===
+| Method | How To
+
+| *Manual entry*
+| Click "+ New Record" or press `Cmd/Ctrl + N`
+
+| *Import CSV*
+| Table menu → Import → Upload CSV file
+
+| *Import from Airtable*
+| Table menu → Import → Paste Airtable share link
+
+| *API*
+| POST to `/api/collections/{name}/records`
+
+| *Form*
+| Create Form view → Share public link
+|===
+
+=== Filtering
+
+Click "Filter" button:
+
+- Combine multiple conditions (AND/OR)
+- Filter by any field type
+- Save filters as named views
+- Share filtered views with teammates
+
+=== Sorting
+
+Click any column header:
+
+- Sort A→Z or Z→A
+- Multi-level sorting (drag to reorder)
+- Save sort order with view
+
+=== Grouping
+
+Group records by any Select field:
+
+- Drag column header to "Group by" zone
+- Collapse/expand groups
+- See record counts per group
+- Works with Kanban and Grid views
+
+== Collaboration
+
+=== Sharing
+
+Share tables with different permission levels:
+
+[cols="1,3"]
+|===
+| Permission | Can Do
+
+| *Viewer*
+| Read data, export, comment
+
+| *Commenter*
+| Viewer + add comments on records
+
+| *Editor*
+| Commenter + create/edit/delete records
+
+| *Creator*
+| Editor + create new tables and views
+
+| *Owner*
+| Creator + manage sharing and billing
+|===
+
+=== Comments
+
+Add comments to any record:
+
+1. Open record detail (click row)
+2. Type in "Comments" section
+3. @mention teammates for notifications
+4. Comments are part of provenance trail
+
+=== Real-time Collaboration
+
+- See who's viewing the same table (avatars in top-right)
+- Live cursor tracking (see where teammates are typing)
+- Optimistic updates (see changes immediately)
+- Conflict-free merges (append-only journal)
+
+== Advanced Features
+
+=== Formulas
+
+Create computed fields with formulas:
+
+[source,javascript]
+----
+// Concatenate first and last name
+{First Name} & " " & {Last Name}
+
+// Calculate days until deadline
+DATETIME_DIFF({Deadline}, TODAY(), 'days')
+
+// Conditional formatting
+IF({Status} = "Done", "✅", "⏳")
+
+// Rollup total from linked records
+SUM({Line Items}::Amount)
+----
+
+=== Automations
+
+Trigger actions when conditions are met:
+
+- Send email when status changes
+- Create record in another table
+- Update field based on conditions
+- Webhook to external service
+
+=== API Access
+
+RESTful API for programmatic access:
+
+[source,bash]
+----
+# Get all records
+curl https://glyphbase.lithoglyph.org/api/collections/tasks/records \
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# Create record
+curl -X POST https://glyphbase.lithoglyph.org/api/collections/tasks/records \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"fields": {"Title": "New task", "Status": "Todo"}}'
+----
+
+== Data Export
+
+Export your data anytime:
+
+- *CSV*: Universal format, works everywhere
+- *JSON*: Programmatic access, includes metadata
+- *Lithoglyph Archive*: Full history + provenance (can reimport with history intact)
+
+== Self-Hosting
+
+Glyphbase can be self-hosted:
+
+[source,bash]
+----
+# Docker
+docker pull ghcr.io/hyperpolymath/glyphbase:latest
+docker run -p 4000:4000 -v ./data:/data glyphbase
+
+# From source
+git clone https://github.com/hyperpolymath/glyphbase
+cd glyphbase/server
+gleam run
+----
+
+Configuration via environment variables:
+
+- `DATABASE_PATH`: Path to Lithoglyph database (default: `./data`)
+- `PORT`: HTTP port (default: 4000)
+- `SECRET_KEY`: Session encryption key (required for production)
+
+== Troubleshooting
+
+=== Database won't start
+
+Check that Lithoglyph is properly installed:
+
+[source,bash]
+----
+# Verify Lithoglyph installation
+lithoglyph --version
+
+# Check database file
+ls -lh data/  # Should show *.lgh files
+----
+
+=== Sync conflicts
+
+Glyphbase uses an append-only journal, so conflicts are impossible. If you see unexpected data:
+
+1. Check provenance (who made recent changes)
+2. Use time-travel to see history
+3. Restore to known-good state if needed
+
+=== Performance slow
+
+For large datasets (100k+ records):
+
+- Use views to limit visible records
+- Index frequently filtered fields
+- Archive old data to separate table
+- Consider upgrading server resources
+
+== Getting Help
+
+- Documentation: https://docs.lithoglyph.org
+- Community: https://github.com/hyperpolymath/glyphbase/discussions
+- Issues: https://github.com/hyperpolymath/glyphbase/issues
+- Email: support@lithoglyph.org
+
+== License
+
+Glyphbase is licensed under PMPL-1.0-or-later (Palimpsest License).
+
+See: https://github.com/hyperpolymath/palimpsest-license

@@ -1,0 +1,406 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Lith gRPC API - Protocol Buffer Definitions
+
+syntax = "proto3";
+
+package lith.v1;
+
+option go_package = "github.com/hyperpolymath/lith/api/gen/go/lith/v1";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+// =============================================================================
+// Lith Service
+// =============================================================================
+
+service Lith {
+  // Query Operations
+  rpc Query(QueryRequest) returns (QueryResponse);
+  rpc QueryStream(QueryRequest) returns (stream QueryRow);
+  rpc Explain(QueryRequest) returns (ExplainResponse);
+
+  // Collection Operations
+  rpc CreateCollection(CreateCollectionRequest) returns (Collection);
+  rpc GetCollection(GetCollectionRequest) returns (Collection);
+  rpc ListCollections(ListCollectionsRequest) returns (ListCollectionsResponse);
+  rpc DropCollection(DropCollectionRequest) returns (DropCollectionResponse);
+
+  // Journal Operations
+  rpc GetJournal(JournalRequest) returns (JournalResponse);
+  rpc StreamJournal(JournalStreamRequest) returns (stream JournalEntry);
+
+  // Normalizer Operations
+  rpc DiscoverDependencies(DiscoverRequest) returns (DiscoverResponse);
+  rpc AnalyzeNormalForm(AnalyzeRequest) returns (AnalyzeResponse);
+
+  // Migration Operations
+  rpc StartMigration(MigrationStartRequest) returns (MigrationResponse);
+  rpc AdvanceToShadow(MigrationAdvanceRequest) returns (MigrationResponse);
+  rpc CommitMigration(MigrationCommitRequest) returns (MigrationResponse);
+  rpc AbortMigration(MigrationAbortRequest) returns (MigrationResponse);
+  rpc GetMigrationStatus(MigrationStatusRequest) returns (MigrationResponse);
+
+  // Health Operations
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+// =============================================================================
+// Common Types
+// =============================================================================
+
+message Provenance {
+  string actor = 1;
+  string rationale = 2;
+}
+
+message Timing {
+  double parse_ms = 1;
+  double plan_ms = 2;
+  double execute_ms = 3;
+  double total_ms = 4;
+}
+
+// =============================================================================
+// Query Messages
+// =============================================================================
+
+message QueryRequest {
+  string fdql = 1;
+  Provenance provenance = 2;
+  bool explain = 3;
+  bool analyze = 4;
+  bool verbose = 5;
+}
+
+message QueryResponse {
+  repeated QueryRow rows = 1;
+  int64 row_count = 2;
+  int64 journal_seq = 3;
+  Timing timing = 4;
+}
+
+message QueryRow {
+  google.protobuf.Struct data = 1;
+}
+
+message ExplainResponse {
+  QueryPlan plan = 1;
+  Timing timing = 2;
+  string verbose_output = 3;
+}
+
+message QueryPlan {
+  repeated PlanStep steps = 1;
+  double estimated_cost = 2;
+  string rationale = 3;
+}
+
+message PlanStep {
+  StepType type = 1;
+  string collection = 2;
+  google.protobuf.Struct details = 3;
+}
+
+enum StepType {
+  STEP_TYPE_UNSPECIFIED = 0;
+  STEP_TYPE_SCAN = 1;
+  STEP_TYPE_FILTER = 2;
+  STEP_TYPE_PROJECT = 3;
+  STEP_TYPE_LIMIT = 4;
+  STEP_TYPE_TRAVERSE = 5;
+  STEP_TYPE_INSERT = 6;
+  STEP_TYPE_UPDATE = 7;
+  STEP_TYPE_DELETE = 8;
+}
+
+// =============================================================================
+// Collection Messages
+// =============================================================================
+
+message CreateCollectionRequest {
+  string name = 1;
+  CollectionType type = 2;
+  Schema schema = 3;
+  Provenance provenance = 4;
+}
+
+message GetCollectionRequest {
+  string name = 1;
+}
+
+message ListCollectionsRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message ListCollectionsResponse {
+  repeated Collection collections = 1;
+  int32 total = 2;
+}
+
+message DropCollectionRequest {
+  string name = 1;
+  Provenance provenance = 2;
+}
+
+message DropCollectionResponse {
+  bool success = 1;
+  int64 journal_seq = 2;
+}
+
+message Collection {
+  string name = 1;
+  CollectionType type = 2;
+  Schema schema = 3;
+  int64 document_count = 4;
+  google.protobuf.Timestamp created_at = 5;
+  NormalForm normal_form = 6;
+}
+
+enum CollectionType {
+  COLLECTION_TYPE_UNSPECIFIED = 0;
+  COLLECTION_TYPE_DOCUMENT = 1;
+  COLLECTION_TYPE_EDGE = 2;
+}
+
+message Schema {
+  repeated Field fields = 1;
+  repeated Constraint constraints = 2;
+}
+
+message Field {
+  string name = 1;
+  FieldType type = 2;
+  bool nullable = 3;
+}
+
+enum FieldType {
+  FIELD_TYPE_UNSPECIFIED = 0;
+  FIELD_TYPE_STRING = 1;
+  FIELD_TYPE_INTEGER = 2;
+  FIELD_TYPE_FLOAT = 3;
+  FIELD_TYPE_BOOLEAN = 4;
+  FIELD_TYPE_DATE = 5;
+  FIELD_TYPE_DATETIME = 6;
+  FIELD_TYPE_JSON = 7;
+  FIELD_TYPE_BLOB = 8;
+}
+
+message Constraint {
+  ConstraintType type = 1;
+  repeated string fields = 2;
+  string expression = 3;
+}
+
+enum ConstraintType {
+  CONSTRAINT_TYPE_UNSPECIFIED = 0;
+  CONSTRAINT_TYPE_PRIMARY_KEY = 1;
+  CONSTRAINT_TYPE_UNIQUE = 2;
+  CONSTRAINT_TYPE_FOREIGN_KEY = 3;
+  CONSTRAINT_TYPE_CHECK = 4;
+  CONSTRAINT_TYPE_FUNCTIONAL_DEPENDENCY = 5;
+}
+
+// =============================================================================
+// Journal Messages
+// =============================================================================
+
+message JournalRequest {
+  int64 since = 1;
+  int32 limit = 2;
+  string collection = 3;
+  string actor = 4;
+}
+
+message JournalStreamRequest {
+  int64 since = 1;
+  string collection = 2;
+}
+
+message JournalResponse {
+  repeated JournalEntry entries = 1;
+  bool has_more = 2;
+  int64 next_seq = 3;
+}
+
+message JournalEntry {
+  int64 seq = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  OperationType operation = 3;
+  string collection = 4;
+  string document_id = 5;
+  google.protobuf.Struct before = 6;
+  google.protobuf.Struct after = 7;
+  Provenance provenance = 8;
+  string inverse = 9;
+}
+
+enum OperationType {
+  OPERATION_TYPE_UNSPECIFIED = 0;
+  OPERATION_TYPE_INSERT = 1;
+  OPERATION_TYPE_UPDATE = 2;
+  OPERATION_TYPE_DELETE = 3;
+  OPERATION_TYPE_CREATE_COLLECTION = 4;
+  OPERATION_TYPE_DROP_COLLECTION = 5;
+  OPERATION_TYPE_MIGRATION = 6;
+}
+
+// =============================================================================
+// Normalizer Messages
+// =============================================================================
+
+message DiscoverRequest {
+  string collection = 1;
+  int32 sample_size = 2;
+  double confidence_threshold = 3;
+}
+
+message DiscoverResponse {
+  string collection = 1;
+  repeated FunctionalDependency functional_dependencies = 2;
+  repeated CandidateKey candidate_keys = 3;
+}
+
+message FunctionalDependency {
+  repeated string determinant = 1;
+  string dependent = 2;
+  double confidence = 3;
+  ConfidenceTier tier = 4;
+}
+
+enum ConfidenceTier {
+  CONFIDENCE_TIER_UNSPECIFIED = 0;
+  CONFIDENCE_TIER_HIGH = 1;
+  CONFIDENCE_TIER_MEDIUM = 2;
+  CONFIDENCE_TIER_LOW = 3;
+}
+
+message CandidateKey {
+  repeated string fields = 1;
+}
+
+message AnalyzeRequest {
+  string collection = 1;
+}
+
+message AnalyzeResponse {
+  string collection = 1;
+  NormalForm current_form = 2;
+  repeated Violation violations = 3;
+  repeated Recommendation recommendations = 4;
+}
+
+enum NormalForm {
+  NORMAL_FORM_UNSPECIFIED = 0;
+  NORMAL_FORM_1NF = 1;
+  NORMAL_FORM_2NF = 2;
+  NORMAL_FORM_3NF = 3;
+  NORMAL_FORM_BCNF = 4;
+}
+
+message Violation {
+  ViolationType type = 1;
+  string description = 2;
+  repeated string affected_fields = 3;
+}
+
+enum ViolationType {
+  VIOLATION_TYPE_UNSPECIFIED = 0;
+  VIOLATION_TYPE_PARTIAL_DEPENDENCY = 1;
+  VIOLATION_TYPE_TRANSITIVE_DEPENDENCY = 2;
+  VIOLATION_TYPE_BCNF_VIOLATION = 3;
+}
+
+message Recommendation {
+  RecommendationAction action = 1;
+  string description = 2;
+  NormalForm target_form = 3;
+  repeated string migration_steps = 4;
+}
+
+enum RecommendationAction {
+  RECOMMENDATION_ACTION_UNSPECIFIED = 0;
+  RECOMMENDATION_ACTION_DECOMPOSE = 1;
+  RECOMMENDATION_ACTION_ADD_CONSTRAINT = 2;
+  RECOMMENDATION_ACTION_DENORMALIZE = 3;
+}
+
+// =============================================================================
+// Migration Messages
+// =============================================================================
+
+message MigrationStartRequest {
+  string collection = 1;
+  NormalForm target_form = 2;
+  Provenance provenance = 3;
+}
+
+message MigrationAdvanceRequest {
+  string migration_id = 1;
+  Provenance provenance = 2;
+}
+
+message MigrationCommitRequest {
+  string migration_id = 1;
+  Provenance provenance = 2;
+}
+
+message MigrationAbortRequest {
+  string migration_id = 1;
+  Provenance provenance = 2;
+}
+
+message MigrationStatusRequest {
+  string migration_id = 1;
+}
+
+message MigrationResponse {
+  string id = 1;
+  string collection = 2;
+  MigrationPhase phase = 3;
+  google.protobuf.Timestamp started_at = 4;
+  string narrative = 5;
+  repeated RewriteRule rewrite_rules = 6;
+}
+
+enum MigrationPhase {
+  MIGRATION_PHASE_UNSPECIFIED = 0;
+  MIGRATION_PHASE_ANNOUNCE = 1;
+  MIGRATION_PHASE_SHADOW = 2;
+  MIGRATION_PHASE_COMMIT = 3;
+  MIGRATION_PHASE_ABORTED = 4;
+  MIGRATION_PHASE_COMPLETE = 5;
+}
+
+message RewriteRule {
+  string old_path = 1;
+  string new_path = 2;
+  string transformation = 3;
+}
+
+// =============================================================================
+// Health Messages
+// =============================================================================
+
+message HealthRequest {}
+
+message HealthResponse {
+  HealthStatus status = 1;
+  string version = 2;
+  int64 uptime_seconds = 3;
+  map<string, CheckStatus> checks = 4;
+}
+
+enum HealthStatus {
+  HEALTH_STATUS_UNSPECIFIED = 0;
+  HEALTH_STATUS_HEALTHY = 1;
+  HEALTH_STATUS_DEGRADED = 2;
+  HEALTH_STATUS_UNHEALTHY = 3;
+}
+
+enum CheckStatus {
+  CHECK_STATUS_UNSPECIFIED = 0;
+  CHECK_STATUS_PASS = 1;
+  CHECK_STATUS_FAIL = 2;
+}

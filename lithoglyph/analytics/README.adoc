@@ -1,0 +1,179 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Lith-Analytics
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+
+OLAP analytics layer for Lith - columnar aggregations and time-series analysis.
+
+== Overview
+
+Lith-Analytics provides high-performance analytical queries over Lith documents.
+While Lith prioritizes auditability and reversibility, analytics workloads require
+different optimization strategies. This separation allows Lith to maintain its
+principles while enabling fast aggregations, rollups, and time-series analysis.
+
+== Architecture
+
+[source]
+----
+┌─────────────────────────────────────────────────────────────┐
+│                    Lith (Source of Truth)                  │
+│              Documents with PROMPT scores                    │
+└─────────────────────────────────┬───────────────────────────┘
+                                  │ HTTP API
+                                  ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Lith-Analytics                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │   Ingester   │  │   Columnar   │  │    Query     │       │
+│  │              │──▶│   Store      │──▶│   Engine     │       │
+│  │ (ETL from    │  │ (Arrow/      │  │ (DataFrames, │       │
+│  │  Lith)     │  │  Parquet)    │  │  Aggregates) │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
+└─────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼ HTTP API
+┌─────────────────────────────────────────────────────────────┐
+│        Consumers (lithoglyph-studio, dashboards, reports)        │
+└─────────────────────────────────────────────────────────────┘
+----
+
+== Key Features
+
+* **Columnar Storage**: Arrow/Parquet for analytical query patterns
+* **PROMPT Score Analytics**: Aggregations over epistemological dimensions
+* **Time-Series Analysis**: Document creation/modification trends
+* **Rollups**: Pre-computed aggregations for common queries
+* **Provenance Tracking**: Analyze who contributed what, when
+
+== Why Julia?
+
+Lith-Analytics uses Julia because:
+
+1. **Native columnar operations**: DataFrames.jl is optimized for analytical workloads
+2. **Arrow integration**: Arrow.jl provides zero-copy interop
+3. **Performance**: JIT compilation approaches C performance
+4. **Scientific computing**: Strong ecosystem for statistical analysis
+5. **Hyperpolymath policy**: Julia is the approved language for data/batch processing
+
+== API Endpoints
+
+=== Analytics Queries
+
+[source]
+----
+GET /analytics/health
+    Health check
+
+GET /analytics/stats
+    Overall statistics about indexed data
+
+POST /analytics/query
+    Execute analytical query
+    Body: { "query": "...", "params": {...} }
+
+GET /analytics/prompt-scores?collection=X&groupBy=Y
+    PROMPT score aggregations
+
+GET /analytics/time-series?collection=X&field=Y&interval=day
+    Time-series analysis
+
+GET /analytics/contributors?collection=X
+    Contributor/provenance analysis
+----
+
+=== Data Management
+
+[source]
+----
+POST /analytics/sync
+    Sync data from Lith (incremental or full)
+    Body: { "collection": "...", "mode": "incremental|full" }
+
+GET /analytics/collections
+    List synced collections with stats
+----
+
+== Configuration
+
+[source,toml]
+----
+[lithoglyph]
+api_url = "http://localhost:8080"
+collections = ["evidence", "claims"]
+
+[server]
+host = "127.0.0.1"
+port = 8082
+
+[storage]
+# Path for Parquet files
+data_dir = "./data"
+# Retention in days (0 = forever)
+retention_days = 0
+
+[sync]
+# Auto-sync interval in minutes (0 = manual only)
+auto_sync_minutes = 60
+----
+
+== PROMPT Score Analytics
+
+Lith documents may include PROMPT epistemological scores:
+
+* **P**rovenance - Source traceability
+* **R**eplicability - Can findings be reproduced?
+* **O**bjective - Methodological rigor
+* **M**ethodology - Analytical approach quality
+* **P**ublication - Peer review status
+* **T**ransparency - Data/method openness
+
+Lith-Analytics provides aggregations:
+
+[source,julia]
+----
+# Average PROMPT scores by collection
+prompt_stats(collection="evidence", groupby=:source)
+
+# Score distribution histograms
+prompt_distribution(collection="evidence", dimension=:provenance)
+
+# Correlation between dimensions
+prompt_correlations(collection="evidence")
+----
+
+== Development
+
+=== Prerequisites
+
+* Julia 1.10+
+* Lith instance running
+
+=== Setup
+
+[source,bash]
+----
+cd lithoglyph-analytics
+julia --project=. -e 'using Pkg; Pkg.instantiate()'
+----
+
+=== Running
+
+[source,bash]
+----
+julia --project=. src/main.jl --config config.toml
+----
+
+=== Testing
+
+[source,bash]
+----
+julia --project=. -e 'using Pkg; Pkg.test()'
+----
+
+== License
+
+PMPL-1.0-or-later
+
+Part of the Lith ecosystem.

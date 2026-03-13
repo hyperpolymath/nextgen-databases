@@ -1,0 +1,203 @@
+= Lith API Server
+:toc:
+
+Multi-protocol API server for Lith operations.
+
+== Overview
+
+The Lith API server provides three interfaces:
+
+* **REST API** - JSON over HTTP/1.1 (OpenAPI 3.1)
+* **gRPC** - Protocol Buffers over HTTP/2
+* **GraphQL** - SDL with queries, mutations, and subscriptions
+
+== Quick Start
+
+[source,bash]
+----
+# Build
+cd api
+zig build
+
+# Run (defaults to localhost:8080)
+./zig-out/bin/lith-server
+
+# Or with custom config
+LITH_HOST=0.0.0.0 LITH_PORT=9000 ./zig-out/bin/lith-server
+----
+
+== Configuration
+
+Environment variables:
+
+[cols="2,3,1"]
+|===
+| Variable | Description | Default
+
+| `LITH_HOST` | Listen address | `127.0.0.1`
+| `LITH_PORT` | Listen port | `8080`
+| `LITH_DB_PATH` | Database file path | `./lith.dat`
+| `LITH_JWT_SECRET` | JWT signing secret | (none)
+| `LITH_API_KEY_HEADER` | API key header name | `X-API-Key`
+| `LITH_REQUIRE_AUTH` | Require authentication | `false`
+| `LITH_TLS_CERT` | TLS certificate path | (none)
+| `LITH_TLS_KEY` | TLS private key path | (none)
+|===
+
+== API Specifications
+
+* **OpenAPI**: `spec/openapi.yaml`
+* **Protocol Buffers**: `proto/lith.proto`
+* **GraphQL SDL**: `graphql/schema.graphql`
+
+== Endpoints
+
+=== REST API (`/v1/`)
+
+[source]
+----
+POST   /v1/query              # Execute FDQL query
+GET    /v1/collections        # List collections
+POST   /v1/collections        # Create collection
+GET    /v1/collections/{name} # Get collection schema
+DELETE /v1/collections/{name} # Drop collection
+GET    /v1/journal            # Query journal entries
+POST   /v1/normalize/discover # Discover FDs
+POST   /v1/normalize/analyze  # Analyze normal form
+POST   /v1/migrate/start      # Start migration
+POST   /v1/migrate/{id}/shadow
+POST   /v1/migrate/{id}/commit
+POST   /v1/migrate/{id}/abort
+GET    /v1/health             # Health check
+GET    /v1/metrics            # Prometheus metrics
+----
+
+=== gRPC (`/grpc/`)
+
+[source,protobuf]
+----
+service Lith {
+  rpc Query(QueryRequest) returns (QueryResponse);
+  rpc ListCollections(Empty) returns (ListCollectionsResponse);
+  rpc CreateCollection(...) returns (Collection);
+  rpc GetJournal(...) returns (stream JournalEntry);
+  rpc DiscoverDependencies(...) returns (DiscoverResponse);
+  rpc StartMigration(...) returns (MigrationResponse);
+  rpc Health(...) returns (HealthResponse);
+}
+----
+
+=== GraphQL (`/graphql`)
+
+[source,graphql]
+----
+type Query {
+  collections: [Collection!]!
+  journal(since: Int): [JournalEntry!]!
+  query(fdql: String!): QueryResult!
+  health: Health!
+}
+
+type Mutation {
+  createCollection(...): Collection!
+  execute(fdql: String!): MutationResult!
+  startMigration(...): Migration!
+}
+
+type Subscription {
+  journalStream: JournalEntry!
+}
+----
+
+GET `/graphql` returns GraphiQL UI for interactive exploration.
+
+== Authentication
+
+=== API Key
+
+[source,bash]
+----
+curl -H "X-API-Key: your-key" http://localhost:8080/v1/collections
+----
+
+=== JWT Bearer Token
+
+[source,bash]
+----
+curl -H "Authorization: Bearer eyJ..." http://localhost:8080/v1/collections
+----
+
+=== mTLS (gRPC)
+
+For gRPC, mTLS can be configured for client certificate authentication.
+
+== Provenance
+
+All mutating operations support provenance tracking:
+
+[source,json]
+----
+{
+  "fdql": "INSERT INTO articles VALUES {...}",
+  "provenance": {
+    "actor": "editor@news.org",
+    "rationale": "New article creation"
+  }
+}
+----
+
+Or via headers:
+
+[source,bash]
+----
+curl -H "X-Provenance-Actor: editor@news.org" \
+     -H "X-Provenance-Rationale: New article" \
+     ...
+----
+
+== Metrics
+
+Prometheus metrics available at `/v1/metrics`:
+
+* `lith_requests_total` - Total requests
+* `lith_requests_by_status` - Requests by HTTP status
+* `lith_requests_by_protocol` - Requests by protocol (REST/gRPC/GraphQL)
+* `lith_request_duration_seconds` - Request latency histogram
+* `lith_active_connections` - Current connections
+* `lith_active_migrations` - Active migrations
+* `lith_uptime_seconds` - Server uptime
+
+== Development
+
+[source,bash]
+----
+# Run tests
+zig build test
+
+# Build release
+zig build -Doptimize=ReleaseFast
+----
+
+== Directory Structure
+
+[source]
+----
+api/
+├── build.zig           # Zig build configuration
+├── README.adoc         # This file
+├── spec/
+│   └── openapi.yaml    # OpenAPI 3.1 specification
+├── proto/
+│   └── lith.proto    # Protocol Buffer definitions
+├── graphql/
+│   └── schema.graphql  # GraphQL SDL schema
+└── src/
+    ├── main.zig        # Server entry point
+    ├── config.zig      # Configuration loading
+    ├── router.zig      # HTTP routing
+    ├── rest.zig        # REST API handlers
+    ├── grpc.zig        # gRPC handlers
+    ├── graphql.zig     # GraphQL handlers
+    ├── metrics.zig     # Prometheus metrics
+    └── auth.zig        # Authentication
+----

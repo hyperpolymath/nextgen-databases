@@ -1,0 +1,477 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Lith GraphQL API - Schema Definition Language
+
+# =============================================================================
+# Scalars
+# =============================================================================
+
+scalar DateTime
+scalar JSON
+scalar BigInt
+
+# =============================================================================
+# Root Types
+# =============================================================================
+
+type Query {
+  """List all collections"""
+  collections(limit: Int = 100, offset: Int = 0): CollectionConnection!
+
+  """Get a specific collection by name"""
+  collection(name: String!): Collection
+
+  """Query journal entries"""
+  journal(
+    since: BigInt
+    limit: Int = 100
+    collection: String
+    actor: String
+  ): JournalConnection!
+
+  """Execute an FDQL query"""
+  query(
+    fdql: String!
+    provenance: ProvenanceInput
+  ): QueryResult!
+
+  """Explain an FDQL query without executing"""
+  explain(
+    fdql: String!
+    analyze: Boolean = false
+    verbose: Boolean = false
+  ): ExplainResult!
+
+  """Get migration status"""
+  migration(id: ID!): Migration
+
+  """List active migrations"""
+  activeMigrations: [Migration!]!
+
+  """Health check"""
+  health: Health!
+}
+
+type Mutation {
+  """Create a new collection"""
+  createCollection(
+    input: CreateCollectionInput!
+  ): Collection!
+
+  """Drop a collection"""
+  dropCollection(
+    name: String!
+    provenance: ProvenanceInput!
+  ): DropCollectionResult!
+
+  """Execute an FDQL mutation (INSERT, UPDATE, DELETE)"""
+  execute(
+    fdql: String!
+    provenance: ProvenanceInput!
+  ): MutationResult!
+
+  """Discover functional dependencies in a collection"""
+  discoverDependencies(
+    collection: String!
+    sampleSize: Int = 1000
+    confidenceThreshold: Float = 0.95
+  ): DiscoverResult!
+
+  """Analyze normal form of a collection"""
+  analyzeNormalForm(
+    collection: String!
+  ): AnalyzeResult!
+
+  """Start a schema migration"""
+  startMigration(
+    input: MigrationStartInput!
+  ): Migration!
+
+  """Advance migration to shadow phase"""
+  advanceToShadow(
+    migrationId: ID!
+    provenance: ProvenanceInput!
+  ): Migration!
+
+  """Commit a migration"""
+  commitMigration(
+    migrationId: ID!
+    provenance: ProvenanceInput!
+  ): Migration!
+
+  """Abort a migration"""
+  abortMigration(
+    migrationId: ID!
+    provenance: ProvenanceInput!
+  ): Migration!
+}
+
+type Subscription {
+  """Stream new journal entries"""
+  journalStream(
+    collection: String
+    since: BigInt
+  ): JournalEntry!
+
+  """Stream query results for large result sets"""
+  queryStream(
+    fdql: String!
+    provenance: ProvenanceInput
+  ): JSON!
+
+  """Migration progress updates"""
+  migrationProgress(
+    migrationId: ID!
+  ): MigrationProgress!
+}
+
+# =============================================================================
+# Collection Types
+# =============================================================================
+
+type Collection {
+  name: String!
+  type: CollectionType!
+  schema: Schema
+  documentCount: BigInt!
+  createdAt: DateTime!
+  normalForm: NormalForm
+
+  """Sample documents from this collection"""
+  documents(limit: Int = 10, offset: Int = 0): DocumentConnection!
+
+  """Functional dependencies discovered in this collection"""
+  functionalDependencies: [FunctionalDependency!]!
+}
+
+type CollectionConnection {
+  edges: [CollectionEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type CollectionEdge {
+  node: Collection!
+  cursor: String!
+}
+
+enum CollectionType {
+  DOCUMENT
+  EDGE
+}
+
+type Schema {
+  fields: [Field!]!
+  constraints: [Constraint!]!
+}
+
+type Field {
+  name: String!
+  type: FieldType!
+  nullable: Boolean!
+}
+
+enum FieldType {
+  STRING
+  INTEGER
+  FLOAT
+  BOOLEAN
+  DATE
+  DATETIME
+  JSON
+  BLOB
+}
+
+type Constraint {
+  type: ConstraintType!
+  fields: [String!]!
+  expression: String
+}
+
+enum ConstraintType {
+  PRIMARY_KEY
+  UNIQUE
+  FOREIGN_KEY
+  CHECK
+  FUNCTIONAL_DEPENDENCY
+}
+
+type DocumentConnection {
+  edges: [DocumentEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type DocumentEdge {
+  node: JSON!
+  cursor: String!
+}
+
+# =============================================================================
+# Query Types
+# =============================================================================
+
+type QueryResult {
+  rows: [JSON!]!
+  rowCount: Int!
+  journalSeq: BigInt
+  timing: Timing
+}
+
+type MutationResult {
+  affectedCount: Int!
+  journalSeq: BigInt!
+  timing: Timing
+}
+
+type ExplainResult {
+  plan: QueryPlan!
+  timing: Timing
+  verboseOutput: String
+}
+
+type QueryPlan {
+  steps: [PlanStep!]!
+  estimatedCost: Float!
+  rationale: String
+}
+
+type PlanStep {
+  type: StepType!
+  collection: String
+  details: JSON
+}
+
+enum StepType {
+  SCAN
+  FILTER
+  PROJECT
+  LIMIT
+  TRAVERSE
+  INSERT
+  UPDATE
+  DELETE
+}
+
+type Timing {
+  parseMs: Float!
+  planMs: Float!
+  executeMs: Float!
+  totalMs: Float!
+}
+
+type DropCollectionResult {
+  success: Boolean!
+  journalSeq: BigInt
+}
+
+# =============================================================================
+# Journal Types
+# =============================================================================
+
+type JournalEntry {
+  seq: BigInt!
+  timestamp: DateTime!
+  operation: OperationType!
+  collection: String
+  documentId: String
+  before: JSON
+  after: JSON
+  provenance: Provenance
+  inverse: String
+}
+
+type JournalConnection {
+  edges: [JournalEdge!]!
+  pageInfo: PageInfo!
+  hasMore: Boolean!
+  nextSeq: BigInt
+}
+
+type JournalEdge {
+  node: JournalEntry!
+  cursor: String!
+}
+
+enum OperationType {
+  INSERT
+  UPDATE
+  DELETE
+  CREATE_COLLECTION
+  DROP_COLLECTION
+  MIGRATION
+}
+
+# =============================================================================
+# Normalizer Types
+# =============================================================================
+
+type FunctionalDependency {
+  determinant: [String!]!
+  dependent: String!
+  confidence: Float!
+  tier: ConfidenceTier!
+}
+
+enum ConfidenceTier {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+type DiscoverResult {
+  collection: String!
+  functionalDependencies: [FunctionalDependency!]!
+  candidateKeys: [[String!]!]!
+}
+
+type AnalyzeResult {
+  collection: String!
+  currentForm: NormalForm!
+  violations: [Violation!]!
+  recommendations: [Recommendation!]!
+}
+
+enum NormalForm {
+  NF_1NF
+  NF_2NF
+  NF_3NF
+  NF_BCNF
+  UNKNOWN
+}
+
+type Violation {
+  type: ViolationType!
+  description: String!
+  affectedFields: [String!]!
+}
+
+enum ViolationType {
+  PARTIAL_DEPENDENCY
+  TRANSITIVE_DEPENDENCY
+  BCNF_VIOLATION
+}
+
+type Recommendation {
+  action: RecommendationAction!
+  description: String!
+  targetForm: NormalForm
+  migrationSteps: [String!]!
+}
+
+enum RecommendationAction {
+  DECOMPOSE
+  ADD_CONSTRAINT
+  DENORMALIZE
+}
+
+# =============================================================================
+# Migration Types
+# =============================================================================
+
+type Migration {
+  id: ID!
+  collection: String!
+  phase: MigrationPhase!
+  targetForm: NormalForm!
+  startedAt: DateTime!
+  narrative: String!
+  rewriteRules: [RewriteRule!]!
+}
+
+enum MigrationPhase {
+  ANNOUNCE
+  SHADOW
+  COMMIT
+  ABORTED
+  COMPLETE
+}
+
+type RewriteRule {
+  oldPath: String!
+  newPath: String!
+  transformation: String
+}
+
+type MigrationProgress {
+  migrationId: ID!
+  phase: MigrationPhase!
+  progress: Float!
+  message: String!
+}
+
+# =============================================================================
+# Health Types
+# =============================================================================
+
+type Health {
+  status: HealthStatus!
+  version: String!
+  uptimeSeconds: BigInt!
+  checks: [HealthCheck!]!
+}
+
+enum HealthStatus {
+  HEALTHY
+  DEGRADED
+  UNHEALTHY
+}
+
+type HealthCheck {
+  name: String!
+  status: CheckStatus!
+}
+
+enum CheckStatus {
+  PASS
+  FAIL
+}
+
+# =============================================================================
+# Input Types
+# =============================================================================
+
+input ProvenanceInput {
+  actor: String!
+  rationale: String!
+}
+
+input CreateCollectionInput {
+  name: String!
+  type: CollectionType = DOCUMENT
+  schema: SchemaInput
+  provenance: ProvenanceInput!
+}
+
+input SchemaInput {
+  fields: [FieldInput!]!
+  constraints: [ConstraintInput!]
+}
+
+input FieldInput {
+  name: String!
+  type: FieldType!
+  nullable: Boolean = true
+}
+
+input ConstraintInput {
+  type: ConstraintType!
+  fields: [String!]!
+  expression: String
+}
+
+input MigrationStartInput {
+  collection: String!
+  targetForm: NormalForm!
+  provenance: ProvenanceInput!
+}
+
+# =============================================================================
+# Pagination Types
+# =============================================================================
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}

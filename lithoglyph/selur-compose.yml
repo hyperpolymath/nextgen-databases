@@ -1,0 +1,84 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+#
+# Lithoglyph local development stack
+#
+# Usage:
+#   podman-compose -f selur-compose.yml up lith        # production-like
+#   podman-compose -f selur-compose.yml up lith-dev    # development mode
+#
+# Requires: podman, podman-compose (or selur-compose)
+# NEVER use Docker — use Podman exclusively.
+
+version: "3"
+
+services:
+  # ---------------------------------------------------------------------------
+  # lith — Production-like API server from the Containerfile
+  # ---------------------------------------------------------------------------
+  lith:
+    build:
+      context: .
+      dockerfile: Containerfile
+    container_name: lithoglyph-lith
+    ports:
+      - "8080:8080"
+    environment:
+      # Auth token MUST be set — see api/src/auth.zig
+      - LITHOGLYPH_AUTH_TOKEN=${LITHOGLYPH_AUTH_TOKEN:-}
+      # Database path inside the container
+      - LITH_DB_PATH=/data/lithoglyph/lith.dat
+      # Optional JWT secret for Bearer token auth
+      - LITH_JWT_SECRET=${LITH_JWT_SECRET:-}
+      # Bind to all interfaces inside the container
+      - LITH_HOST=0.0.0.0
+      - LITH_PORT=8080
+    volumes:
+      - lith-data:/data/lithoglyph
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 5s
+      retries: 3
+
+  # ---------------------------------------------------------------------------
+  # lith-dev — Development mode with source volume mounts for live reload
+  # ---------------------------------------------------------------------------
+  lith-dev:
+    build:
+      context: .
+      dockerfile: Containerfile
+      target: builder
+    container_name: lithoglyph-lith-dev
+    ports:
+      - "8081:8080"
+    environment:
+      - LITHOGLYPH_AUTH_TOKEN=${LITHOGLYPH_AUTH_TOKEN:-dev-token-local}
+      - LITH_DB_PATH=/build/dev-data/lith.dat
+      - LITH_JWT_SECRET=${LITH_JWT_SECRET:-dev-secret-not-for-production}
+      - LITH_HOST=0.0.0.0
+      - LITH_PORT=8080
+      - LITH_REQUIRE_AUTH=false
+    volumes:
+      # Mount source directories for live development
+      - ./core-zig:/build/core-zig:z
+      - ./api:/build/api:z
+      - ./demo-server.zig:/build/demo-server.zig:z
+      - lith-dev-data:/build/dev-data
+    working_dir: /build
+    # In dev mode, rebuild and run on container start
+    command: >
+      sh -c "
+        cd /build/core-zig && zig build &&
+        cd /build && zig build-exe demo-server.zig -lc -O Debug &&
+        ./demo-server
+      "
+    restart: "no"
+
+volumes:
+  lith-data:
+    driver: local
+  lith-dev-data:
+    driver: local

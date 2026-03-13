@@ -1,0 +1,90 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Form.Normalizer
+:toc:
+
+Self-normalizing database component for automatic FD discovery and proof-carrying normalization.
+
+== Purpose
+
+* **OBSERVE**: Discover functional dependencies from data patterns
+* **ENCODE**: Express FDs as dependent types (Lean 4)
+* **PROVE**: Verify schema satisfies target normal form
+* **PROPOSE**: Generate schema refactoring + equivalence proof
+* **NARRATE**: Explain in human/agent-readable form
+* **APPLY**: Transform via Form.Model with full reversibility
+
+== Components
+
+=== Factor (Runtime Integration)
+
+`factor/fd-discovery.factor`::
+FD discovery algorithms (DFD, TANE, FDHits) implemented in Factor.
+Integrates with Form.Runtime for the `DISCOVER DEPENDENCIES` FQL command.
+
+Key types:
+* `functional-dependency` - Discovered FD with confidence
+* `fd-discovery-config` - Algorithm configuration
+* `fd-discovery-result` - Discovery output
+* `normalization-proposal` - Proposed schema transformation
+
+=== Lean 4 (Type Encoding)
+
+`lean/FunDep.lean`::
+Dependent types for FDs and normal form predicates.
+Enables proof-carrying normalization with verified equivalence.
+
+Key types:
+* `FunDep` - Functional dependency X → Y
+* `FDHolds` - Proof that FD holds in relation
+* `FirstNormalForm` through `BCNF` - Normal form predicates
+* `NormalizationStep` - Transformation with proof
+
+== FQL Extension
+
+[source,fql]
+----
+-- Discover functional dependencies
+DISCOVER DEPENDENCIES
+  FROM evidence
+  SAMPLE 10000
+  CONFIDENCE 0.95
+  ALGORITHM dfd;
+
+-- Check normal form
+CHECK NORMAL FORM 3NF
+  FOR evidence;
+
+-- Generate normalization proposal
+PROPOSE NORMALIZATION
+  FOR evidence
+  TARGET 3NF;
+
+-- Apply normalization (with approval)
+APPLY NORMALIZATION proposal-12345
+  WITH ROLLBACK POINT "pre-normalization";
+----
+
+== Normal Form Coverage
+
+[cols="1,1,2"]
+|===
+| Form | Support | Notes
+
+| 1NF | Full | Atomic values (type system enforced)
+| 2NF | Full | No partial key dependencies
+| 3NF | Full | No transitive dependencies
+| BCNF | Full | Every determinant is superkey
+| 4NF | Partial | Requires MVD specification
+| 5NF | Limited | Requires JD specification
+|===
+
+== Status
+
+Scaffolding complete. Implementation pending:
+
+* [ ] DFD algorithm core implementation
+* [ ] TANE algorithm implementation
+* [ ] Form.Bridge FFI for data access
+* [ ] Lean 4 proof tactics
+* [ ] FQL parser integration
+* [ ] Narrative template system

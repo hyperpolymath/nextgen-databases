@@ -1,0 +1,72 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: lith-http-api
+  labels:
+    app: lith-http-api
+spec:
+  podSelector:
+    matchLabels:
+      app: lith-http-api
+
+  policyTypes:
+  - Ingress
+  - Egress
+
+  ingress:
+  # Allow traffic from ingress controller
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 4000
+
+  # Allow traffic from Prometheus (for metrics scraping)
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+      podSelector:
+        matchLabels:
+          app: prometheus
+    ports:
+    - protocol: TCP
+      port: 4000
+
+  # Allow pod-to-pod communication (for clustering)
+  - from:
+    - podSelector:
+        matchLabels:
+          app: lith-http-api
+    ports:
+    - protocol: TCP
+      port: 4000
+
+  egress:
+  # Allow DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+
+  # Allow pod-to-pod
+  - to:
+    - podSelector:
+        matchLabels:
+          app: lith-http-api
+
+  # Allow HTTPS egress (for external APIs if needed)
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 443

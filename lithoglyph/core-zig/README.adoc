@@ -1,0 +1,37 @@
+= Form.Bridge (Zig)
+:toc:
+
+The ABI boundary layer, implemented in Zig.
+
+== Purpose
+
+* Stable C ABI for runtimes
+* Safety governor
+* Marshalling (no business logic duplication)
+
+== API Surface
+
+[source,c]
+----
+// Lifecycle
+fdb_db_open(path, opts_bytes, opts_len) -> (db*, status, err_blob)
+fdb_db_close(db*) -> status
+
+// Transactions
+fdb_txn_begin(db*, mode) -> (txn*, status, err_blob)
+fdb_txn_commit(txn*) -> (status, err_blob)
+fdb_txn_abort(txn*) -> status
+
+// Operations
+fdb_apply(txn*, op_bytes, op_len) -> (result_blob, provenance_blob, status, err_blob)
+
+// Introspection
+fdb_render_block(db*, block_id, render_opts) -> (text_blob, status, err_blob)
+fdb_render_journal(db*, since, render_opts) -> (text_blob, status, err_blob)
+fdb_introspect_schema(db*) -> (schema_blob, status, err_blob)
+fdb_introspect_constraints(db*) -> (constraints_blob, status, err_blob)
+----
+
+== Status
+
+Implementation pending specification completion.

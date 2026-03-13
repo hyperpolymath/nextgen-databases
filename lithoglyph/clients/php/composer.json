@@ -1,0 +1,55 @@
+{
+    "name": "lith/lith-php",
+    "description": "PHP client for Lith - the narrative-first, reversible, audit-grade database",
+    "version": "0.0.6",
+    "type": "library",
+    "license": "PMPL-1.0-or-later",
+    "authors": [
+        {
+            "name": "Jonathan D.A. Jewell",
+            "email": "jonathan@hyperpolymath.org"
+        }
+    ],
+    "homepage": "https://github.com/hyperpolymath/lith",
+    "keywords": [
+        "database",
+        "lith",
+        "fdql",
+        "audit",
+        "provenance",
+        "reversible"
+    ],
+    "require": {
+        "php": "^8.1",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0",
+        "psr/http-message": "^1.0|^2.0"
+    },
+    "require-dev": {
+        "guzzlehttp/guzzle": "^7.0",
+        "phpunit/phpunit": "^10.0",
+        "phpstan/phpstan": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lith\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Lith\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse src --level=8"
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "Required for HTTP requests",
+        "nyholm/psr7": "Lightweight PSR-7 implementation"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}

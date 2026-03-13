@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Lean 4 project configuration for Form.Normalizer
+
+name = "FormNormalizer"
+version = "0.0.4"
+defaultTargets = ["FormNormalizer"]
+
+[[lean_lib]]
+name = "FormNormalizer"
+roots = ["FunDep", "Bridge", "Proofs"]
+
+[[lean_exe]]
+name = "tests"
+root = "Tests"
+
+# Link to the Zig bridge library for FFI
+# The bridge is built as liblith_bridge.so/dylib/dll
+# [lean_exe.FormNormalizerCLI]
+# root = "Main"
+# moreLinkArgs = ["-L../../../core-zig/zig-out/lib", "-llith_bridge"]

@@ -1,0 +1,52 @@
+; SPDX-License-Identifier: PMPL-1.0-or-later
+; SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath)
+;
+; 0-AI-MANIFEST.a2ml — Universal AI entry point for Glyphbase
+; Media-Type: application/a2ml
+
+(manifest
+  (identity
+    (name "Glyphbase")
+    (full-name "Glyphbase Graph Storage Engine")
+    (version "0.1.0")
+    (license "PMPL-1.0-or-later")
+    (author "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>")
+    (parent-project "lithoglyph")
+    (monorepo-parent "nextgen-databases"))
+
+  (purpose
+    "Graph storage engine for Lithoglyph. Provides the graph modality
+     backing store with glyph-based entity representation, integration
+     with Proven safety library, and SafeDOM rendering.")
+
+  (canonical-locations
+    (ai-instructions "AI.a2ml")
+    (state ".machine_readable/STATE.scm")
+    (meta ".machine_readable/META.scm")
+    (ecosystem ".machine_readable/ECOSYSTEM.scm")
+    (build "justfile")
+    (container-build "Containerfile")
+    (container-deploy "selur-compose.yml")
+    (spec "SPEC.adoc"))
+
+  (tech-stack
+    (primary "Idris2" "Zig")
+    (ui "ReScript")
+    (container-runtime "Podman"))
+
+  (architecture
+    (server
+      (description "Graph storage server")
+      (location "server/"))
+    (ui
+      (description "Web UI for graph visualisation")
+      (location "ui/"))
+    (ffi
+      (description "Zig FFI bridge")
+      (location "ffi/")))
+
+  (critical-invariants
+    (rule "SCM files ONLY in .machine_readable/ — never root")
+    (rule "Zero believe_me in Idris2 — hard invariant")
+    (rule "Container runtime is Podman — never Docker")
+    (rule "Completion claims require honest audit")))

@@ -1,0 +1,1440 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Lith Observability Guide
+:toc: left
+:toclevels: 4
+:icons: font
+:source-highlighter: rouge
+:sectanchors:
+:sectlinks:
+
+[.lead]
+Comprehensive guide to monitoring, logging, tracing, metrics, alerting, backup, and operational visibility for Lith deployments.
+
+[NOTE]
+====
+**Status: Documentation Complete, Implementation Planned**
+
+This document provides complete observability guidance. Full observability features are planned for Milestone M10. Currently, basic logging and journal introspection are available.
+====
+
+== Observability Philosophy
+
+Lith's audit-first design provides unique observability advantages:
+
+[cols="1,2,2"]
+|===
+| Traditional DB | Lith | Advantage
+
+| Audit tables optional
+| Journal built-in
+| Complete operation history by default
+
+| "Who changed this?" = detective work
+| Provenance on every mutation
+| Actor + rationale always available
+
+| Schema history = migration files
+| Self-normalizing with proofs
+| Schema evolution is queryable
+
+| Metrics = external instrumentation
+| Introspection is native
+| Query the database about itself
+|===
+
+=== Three Pillars of Observability
+
+[cols="1,3"]
+|===
+| Pillar | Lith Implementation
+
+| **Logs**
+| Structured JSON logs with operation context, provenance, and timing
+
+| **Metrics**
+| Prometheus-compatible metrics for queries, journal, storage, and constraints
+
+| **Traces**
+| OpenTelemetry spans for distributed request tracing
+|===
+
+=== Built-In Observability
+
+Lith provides observability features that other databases require external tools for:
+
+[source,fql]
+----
+-- Query audit history (built-in)
+SELECT * FROM _journal
+WHERE collection = 'evidence'
+  AND provenance.actor = 'alice'
+ORDER BY sequence DESC
+LIMIT 100;
+
+-- Schema evolution history (built-in)
+SELECT * FROM _schema_history
+WHERE collection = 'evidence'
+ORDER BY version DESC;
+
+-- Constraint violation history (built-in)
+SELECT * FROM _constraint_violations
+WHERE occurred_at > NOW() - INTERVAL '1 hour';
+----
+
+== Logging
+
+=== Log Levels
+
+[cols="1,1,3"]
+|===
+| Level | Numeric | Description
+
+| `FATAL`
+| 0
+| Unrecoverable errors requiring immediate shutdown
+
+| `ERROR`
+| 1
+| Recoverable errors, constraint violations, failed operations
+
+| `WARN`
+| 2
+| Deprecation warnings, performance concerns, unusual conditions
+
+| `INFO`
+| 3
+| Operations, lifecycle events, configuration changes
+
+| `DEBUG`
+| 4
+| Detailed internal state, query plans, decision points
+
+| `TRACE`
+| 5
+| Very verbose, individual block operations (development only)
+|===
+
+=== Log Format
+
+Lith uses structured JSON logging for machine-parseable output:
+
+.Standard Log Entry
+[source,json]
+----
+{
+  "timestamp": "2026-01-12T10:30:45.123456Z",
+  "level": "INFO",
+  "component": "Form.Runtime",
+  "node_id": "fdb-prod-01",
+  "request_id": "req_abc123def456",
+  "trace_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "span_id": "00f067aa0ba902b7",
+  "message": "Query executed successfully",
+  "operation": "SELECT",
+  "collection": "evidence",
+  "documents_returned": 42,
+  "duration_ms": 12.5,
+  "actor": "user:alice@session:xyz",
+  "client_ip": "192.168.1.100"
+}
+----
+
+.Error Log Entry
+[source,json]
+----
+{
+  "timestamp": "2026-01-12T10:31:00.000000Z",
+  "level": "ERROR",
+  "component": "Form.Constraints",
+  "node_id": "fdb-prod-01",
+  "request_id": "req_def789ghi012",
+  "message": "Constraint violation",
+  "operation": "INSERT",
+  "collection": "evidence",
+  "constraint": "score_range",
+  "constraint_type": "CHECK",
+  "violation_details": {
+    "field": "score",
+    "value": 150,
+    "expected": "0 <= score <= 100"
+  },
+  "actor": "user:bob@session:abc",
+  "error_code": "CONSTRAINT_VIOLATION",
+  "error_id": 1003
+}
+----
+
+.Journal Operation Log
+[source,json]
+----
+{
+  "timestamp": "2026-01-12T10:32:15.789012Z",
+  "level": "INFO",
+  "component": "Form.Journal",
+  "node_id": "fdb-prod-01",
+  "message": "Journal entry written",
+  "sequence": 100542,
+  "operation": "UPDATE",
+  "collection": "evidence",
+  "document_key": "doc_12345",
+  "previous_sequence": 100541,
+  "block_id": 2048,
+  "provenance": {
+    "actor": "user:carol@session:mno",
+    "rationale": "Correcting source attribution per editor review"
+  },
+  "has_inverse": true
+}
+----
+
+=== Log Configuration
+
+.Configuration File (lith.toml)
+[source,toml]
+----
+[logging]
+# Log level: fatal, error, warn, info, debug, trace
+level = "info"
+
+# Output format: json, text, pretty
+format = "json"
+
+# Output destination: stdout, stderr, file, syslog
+output = "stdout"
+
+# File output settings (when output = "file")
+[logging.file]
+path = "/var/log/lith/lith.log"
+max_size_mb = 100
+max_files = 10
+compress = true
+
+# Syslog settings (when output = "syslog")
+[logging.syslog]
+facility = "local0"
+tag = "lith"
+
+# Component-specific log levels
+[logging.components]
+"Form.Runtime" = "info"
+"Form.Journal" = "info"
+"Form.Blocks" = "warn"
+"Form.Constraints" = "debug"  # More detail for constraint debugging
+"Form.HTTP" = "info"
+"Form.gRPC" = "info"
+
+# Sensitive data filtering
+[logging.filter]
+# Fields to redact from logs
+redact_fields = ["password", "api_key", "token", "secret"]
+# Truncate long values
+max_value_length = 1000
+----
+
+=== Log Destinations
+
+[cols="1,2,2"]
+|===
+| Destination | Use Case | Configuration
+
+| **stdout/stderr**
+| Container deployments (Docker, K8s)
+| `output = "stdout"`
+
+| **File**
+| Traditional server deployments
+| `output = "file"` with rotation
+
+| **Syslog**
+| Enterprise log aggregation
+| `output = "syslog"` with facility
+
+| **Journald**
+| systemd-based Linux systems
+| `output = "journald"`
+|===
+
+=== Log Aggregation Integration
+
+==== Fluentd Configuration
+
+[source,yaml]
+----
+# fluentd/lith.conf
+<source>
+  @type tail
+  path /var/log/lith/lith.log
+  pos_file /var/log/fluentd/lith.pos
+  tag lith
+  <parse>
+    @type json
+    time_key timestamp
+    time_format %Y-%m-%dT%H:%M:%S.%NZ
+  </parse>
+</source>
+
+<filter lith>
+  @type record_transformer
+  <record>
+    environment production
+    service lith
+  </record>
+</filter>
+
+<match lith>
+  @type elasticsearch
+  host elasticsearch.logging.svc.cluster.local
+  port 9200
+  index_name lith-logs
+  type_name _doc
+</match>
+----
+
+==== Vector Configuration
+
+[source,toml]
+----
+# vector/lith.toml
+[sources.lith_logs]
+type = "file"
+include = ["/var/log/lith/*.log"]
+read_from = "beginning"
+
+[transforms.lith_parse]
+type = "remap"
+inputs = ["lith_logs"]
+source = '''
+. = parse_json!(.message)
+.environment = "production"
+'''
+
+[sinks.loki]
+type = "loki"
+inputs = ["lith_parse"]
+endpoint = "http://loki:3100"
+labels.service = "lith"
+labels.component = "{{ component }}"
+labels.level = "{{ level }}"
+
+[sinks.datadog]
+type = "datadog_logs"
+inputs = ["lith_parse"]
+default_api_key = "${DATADOG_API_KEY}"
+----
+
+==== Loki Labels
+
+[source,yaml]
+----
+# Recommended Loki labels for Lith logs
+labels:
+  - service: lith
+  - environment: production
+  - node_id: fdb-prod-01
+  - component: Form.Runtime
+  - level: info
+  - operation: SELECT
+  - collection: evidence
+----
+
+== Metrics
+
+=== Prometheus Metrics
+
+Lith exports Prometheus-compatible metrics on the `/metrics` endpoint.
+
+==== Query Metrics
+
+[cols="1,1,3"]
+|===
+| Metric | Type | Description
+
+| `lith_queries_total`
+| Counter
+| Total queries executed, labeled by operation and collection
+
+| `lith_query_duration_seconds`
+| Histogram
+| Query execution time distribution
+
+| `lith_query_rows_returned`
+| Histogram
+| Number of documents returned per query
+
+| `lith_query_errors_total`
+| Counter
+| Query errors by error type
+
+| `lith_query_in_flight`
+| Gauge
+| Currently executing queries
+|===
+
+[source,prometheus]
+----
+# HELP lith_queries_total Total number of queries executed
+# TYPE lith_queries_total counter
+lith_queries_total{operation="SELECT",collection="evidence",status="success"} 15234
+lith_queries_total{operation="INSERT",collection="evidence",status="success"} 1234
+lith_queries_total{operation="INSERT",collection="evidence",status="error"} 12
+
+# HELP lith_query_duration_seconds Query execution time
+# TYPE lith_query_duration_seconds histogram
+lith_query_duration_seconds_bucket{operation="SELECT",le="0.001"} 1000
+lith_query_duration_seconds_bucket{operation="SELECT",le="0.01"} 5000
+lith_query_duration_seconds_bucket{operation="SELECT",le="0.1"} 10000
+lith_query_duration_seconds_bucket{operation="SELECT",le="1"} 15000
+lith_query_duration_seconds_bucket{operation="SELECT",le="+Inf"} 15234
+lith_query_duration_seconds_sum{operation="SELECT"} 152.34
+lith_query_duration_seconds_count{operation="SELECT"} 15234
+----
+
+==== Journal Metrics
+
+[cols="1,1,3"]
+|===
+| Metric | Type | Description
+
+| `lith_journal_entries_total`
+| Counter
+| Total journal entries written
+
+| `lith_journal_sequence`
+| Gauge
+| Current journal sequence number
+
+| `lith_journal_write_duration_seconds`
+| Histogram
+| Journal write latency
+
+| `lith_journal_replay_entries`
+| Counter
+| Entries replayed during recovery
+
+| `lith_journal_size_bytes`
+| Gauge
+| Total journal size on disk
+|===
+
+==== Storage Metrics
+
+[cols="1,1,3"]
+|===
+| Metric | Type | Description
+
+| `lith_storage_bytes_total`
+| Gauge
+| Total storage used
+
+| `lith_storage_blocks_total`
+| Gauge
+| Total blocks allocated
+
+| `lith_storage_blocks_free`
+| Gauge
+| Free blocks available
+
+| `lith_storage_collections`
+| Gauge
+| Number of collections
+
+| `lith_storage_documents_total`
+| Gauge
+| Total documents across all collections
+
+| `lith_storage_edges_total`
+| Gauge
+| Total edges across all edge collections
+|===
+
+==== Constraint Metrics
+
+[cols="1,1,3"]
+|===
+| Metric | Type | Description
+
+| `lith_constraint_checks_total`
+| Counter
+| Total constraint evaluations
+
+| `lith_constraint_violations_total`
+| Counter
+| Constraint violation count by constraint name
+
+| `lith_constraint_check_duration_seconds`
+| Histogram
+| Constraint evaluation time
+|===
+
+==== Connection Metrics
+
+[cols="1,1,3"]
+|===
+| Metric | Type | Description
+
+| `lith_connections_total`
+| Counter
+| Total connections opened
+
+| `lith_connections_active`
+| Gauge
+| Currently active connections
+
+| `lith_connections_idle`
+| Gauge
+| Idle connections in pool
+
+| `lith_connection_errors_total`
+| Counter
+| Connection errors by type
+|===
+
+=== Prometheus Configuration
+
+[source,yaml]
+----
+# prometheus/prometheus.yml
+scrape_configs:
+  - job_name: 'lith'
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - 'lith-prod-01:9090'
+          - 'lith-prod-02:9090'
+          - 'lith-prod-03:9090'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '([^:]+):\d+'
+        replacement: '${1}'
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'lith_.*'
+        action: keep
+----
+
+=== Alert Rules
+
+[source,yaml]
+----
+# prometheus/alerts/lith.yml
+groups:
+  - name: lith
+    rules:
+      # High query latency
+      - alert: LithHighQueryLatency
+        expr: |
+          histogram_quantile(0.99, sum(rate(lith_query_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High query latency detected"
+          description: "99th percentile query latency is {{ $value }}s"
+
+      # High error rate
+      - alert: LithHighErrorRate
+        expr: |
+          sum(rate(lith_query_errors_total[5m])) /
+          sum(rate(lith_queries_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High query error rate"
+          description: "Error rate is {{ $value | humanizePercentage }}"
+
+      # Journal write failures
+      - alert: LithJournalWriteFailures
+        expr: |
+          increase(lith_journal_write_errors_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Journal write failures detected"
+          description: "{{ $value }} journal write failures in last 5 minutes"
+
+      # Storage space low
+      - alert: LithStorageSpaceLow
+        expr: |
+          (lith_storage_blocks_free / lith_storage_blocks_total) < 0.1
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low storage space"
+          description: "Only {{ $value | humanizePercentage }} storage remaining"
+
+      # Connection pool exhaustion
+      - alert: LithConnectionPoolExhausted
+        expr: |
+          lith_connections_active / lith_connections_max > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Connection pool near exhaustion"
+          description: "{{ $value | humanizePercentage }} of connections in use"
+
+      # Constraint violations spike
+      - alert: LithConstraintViolationSpike
+        expr: |
+          increase(lith_constraint_violations_total[5m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High constraint violation rate"
+          description: "{{ $value }} constraint violations in 5 minutes"
+
+      # Node down
+      - alert: LithNodeDown
+        expr: up{job="lith"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Lith node is down"
+          description: "Node {{ $labels.instance }} is not responding"
+----
+
+=== Grafana Dashboards
+
+==== Overview Dashboard
+
+[source,json]
+----
+{
+  "title": "Lith Overview",
+  "panels": [
+    {
+      "title": "Query Rate",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "sum(rate(lith_queries_total[1m])) by (operation)",
+          "legendFormat": "{{operation}}"
+        }
+      ]
+    },
+    {
+      "title": "Query Latency (p99)",
+      "type": "graph",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(lith_query_duration_seconds_bucket[5m])) by (le, operation))",
+          "legendFormat": "{{operation}}"
+        }
+      ]
+    },
+    {
+      "title": "Error Rate",
+      "type": "singlestat",
+      "targets": [
+        {
+          "expr": "sum(rate(lith_query_errors_total[5m])) / sum(rate(lith_queries_total[5m]))"
+        }
+      ],
+      "format": "percentunit"
+    },
+    {
+      "title": "Active Connections",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(lith_connections_active)"
+        }
+      ]
+    },
+    {
+      "title": "Journal Sequence",
+      "type": "singlestat",
+      "targets": [
+        {
+          "expr": "lith_journal_sequence"
+        }
+      ]
+    },
+    {
+      "title": "Storage Used",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(lith_storage_bytes_total)"
+        }
+      ],
+      "format": "bytes"
+    }
+  ]
+}
+----
+
+==== Performance Dashboard Panels
+
+[source]
+----
+Query Performance:
+├── Query Rate by Operation (graph)
+├── Query Latency Percentiles (graph: p50, p90, p99)
+├── Slow Queries (table: queries > 100ms)
+├── Query Errors by Type (graph)
+└── Cache Hit Rate (gauge)
+
+Journal Performance:
+├── Journal Write Rate (graph)
+├── Journal Write Latency (graph)
+├── Journal Size Growth (graph)
+├── Sequence Number (counter)
+└── Replay Progress (during recovery)
+
+Storage Performance:
+├── Block Operations (graph: reads, writes)
+├── Block I/O Latency (graph)
+├── Storage Utilization (gauge)
+├── Free Blocks Trend (graph)
+└── Compaction Activity (graph)
+
+Constraint Performance:
+├── Constraint Checks per Second (graph)
+├── Constraint Check Latency (graph)
+├── Violations by Constraint (bar chart)
+└── Constraint Evaluation Cache Hit Rate (gauge)
+----
+
+== Tracing
+
+=== OpenTelemetry Integration
+
+Lith supports OpenTelemetry for distributed tracing.
+
+==== Configuration
+
+[source,toml]
+----
+[tracing]
+# Enable/disable tracing
+enabled = true
+
+# Sampling rate (0.0 to 1.0)
+sample_rate = 0.1
+
+# Exporter: otlp, jaeger, zipkin
+exporter = "otlp"
+
+# OTLP endpoint
+[tracing.otlp]
+endpoint = "http://otel-collector:4317"
+protocol = "grpc"  # or "http"
+
+# Jaeger endpoint (if exporter = "jaeger")
+[tracing.jaeger]
+endpoint = "http://jaeger:14268/api/traces"
+
+# Resource attributes
+[tracing.resource]
+service.name = "lith"
+service.version = "0.0.2"
+deployment.environment = "production"
+----
+
+==== Span Structure
+
+[source]
+----
+Trace: lith.query
+├── lith.query.parse        (1ms)
+│   └── Parse FQL query string
+├── lith.query.plan         (2ms)
+│   └── Generate query execution plan
+├── lith.query.validate     (1ms)
+│   └── Validate query against schema
+├── lith.query.execute      (50ms)
+│   ├── lith.storage.read   (45ms)
+│   │   ├── lith.block.read (10ms)
+│   │   ├── lith.block.read (10ms)
+│   │   └── lith.block.read (10ms)
+│   └── lith.filter         (5ms)
+└── lith.serialize          (2ms)
+    └── Convert results to JSON
+----
+
+==== Trace Attributes
+
+[cols="1,2"]
+|===
+| Attribute | Description
+
+| `db.system`
+| Always "lith"
+
+| `db.operation`
+| FQL operation (SELECT, INSERT, UPDATE, DELETE)
+
+| `db.collection`
+| Target collection name
+
+| `db.statement`
+| Sanitized FQL query (parameters removed)
+
+| `lith.sequence`
+| Journal sequence number (for mutations)
+
+| `lith.actor`
+| Provenance actor
+
+| `lith.documents_affected`
+| Number of documents affected
+
+| `lith.constraint_checks`
+| Number of constraints evaluated
+|===
+
+==== Context Propagation
+
+[source,rust]
+----
+// Rust client example
+use opentelemetry::trace::{Tracer, TraceContextExt};
+use lith::Client;
+
+async fn query_with_tracing(client: &Client, query: &str) -> Result<Vec<Document>> {
+    let tracer = global::tracer("my-application");
+
+    tracer.in_span("my_operation", |cx| async {
+        // Trace context is automatically propagated
+        let result = client.query(query).await?;
+
+        // Add custom attributes
+        cx.span().set_attribute(KeyValue::new("app.query_purpose", "user_lookup"));
+
+        Ok(result)
+    }).await
+}
+----
+
+=== Jaeger UI Queries
+
+[source]
+----
+# Find slow queries
+service=lith operation=lith.query.execute minDuration=100ms
+
+# Find failed operations
+service=lith error=true
+
+# Find queries for specific collection
+service=lith db.collection=evidence
+
+# Find queries by actor
+service=lith lith.actor=user:alice
+----
+
+== Health Checks
+
+=== Endpoints
+
+[cols="1,2,2"]
+|===
+| Endpoint | Purpose | Response
+
+| `GET /health`
+| Basic liveness
+| `200 OK` if process is running
+
+| `GET /health/ready`
+| Readiness to serve traffic
+| `200 OK` if can accept queries
+
+| `GET /health/live`
+| Kubernetes liveness probe
+| `200 OK` if not deadlocked
+
+| `GET /health/startup`
+| Kubernetes startup probe
+| `200 OK` after initialization
+|===
+
+=== Detailed Health Response
+
+[source,json]
+----
+{
+  "status": "healthy",
+  "timestamp": "2026-01-12T10:30:00Z",
+  "version": "0.0.2",
+  "uptime_seconds": 86400,
+  "components": {
+    "journal": {
+      "status": "healthy",
+      "sequence": 100542,
+      "last_write": "2026-01-12T10:29:55Z",
+      "write_latency_ms": 2.5
+    },
+    "storage": {
+      "status": "healthy",
+      "blocks_total": 100000,
+      "blocks_free": 45000,
+      "utilization": 0.55
+    },
+    "connections": {
+      "status": "healthy",
+      "active": 25,
+      "idle": 75,
+      "max": 200
+    },
+    "memory": {
+      "status": "healthy",
+      "heap_used_bytes": 536870912,
+      "heap_total_bytes": 1073741824,
+      "gc_pause_ms": 1.2
+    }
+  },
+  "checks": {
+    "journal_writable": true,
+    "storage_writable": true,
+    "can_accept_queries": true
+  }
+}
+----
+
+=== Kubernetes Probes
+
+[source,yaml]
+----
+# kubernetes/lith-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lith
+spec:
+  template:
+    spec:
+      containers:
+        - name: lith
+          image: lith:0.0.2
+          ports:
+            - containerPort: 8765
+              name: fql
+            - containerPort: 9090
+              name: metrics
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 9090
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 9090
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: 9090
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 30
+----
+
+== Backup & Restore
+
+=== Backup Strategy
+
+Lith's append-only journal enables powerful backup capabilities:
+
+[cols="1,3"]
+|===
+| Strategy | Description
+
+| **Full Backup**
+| Complete database snapshot including journal, blocks, and metadata
+
+| **Incremental Backup**
+| Only journal entries since last backup (extremely efficient)
+
+| **Continuous Archival**
+| Stream journal to object storage in real-time
+
+| **Point-in-Time Recovery**
+| Restore to any journal sequence number
+|===
+
+=== Backup Commands
+
+[source,bash]
+----
+# Full backup to local directory
+lith backup \
+    --type full \
+    --source /var/lib/lith/data \
+    --destination /backup/lith-full-$(date +%Y%m%d)
+
+# Full backup to S3
+lith backup \
+    --type full \
+    --source /var/lib/lith/data \
+    --destination s3://my-bucket/lith/full-$(date +%Y%m%d)
+
+# Incremental backup (since last full backup)
+lith backup \
+    --type incremental \
+    --source /var/lib/lith/data \
+    --since-sequence 100000 \
+    --destination s3://my-bucket/lith/incr-$(date +%Y%m%d%H%M)
+
+# Continuous backup (streaming)
+lith backup \
+    --type continuous \
+    --source /var/lib/lith/data \
+    --destination s3://my-bucket/lith/journal/ \
+    --daemon
+----
+
+=== Backup Configuration
+
+[source,toml]
+----
+[backup]
+# Enable automatic backups
+enabled = true
+
+# Backup schedule
+[backup.schedule]
+# Full backup: weekly on Sunday at 2 AM
+full = "0 2 * * 0"
+# Incremental: hourly
+incremental = "0 * * * *"
+
+# Backup destinations
+[backup.destinations.primary]
+type = "s3"
+bucket = "lith-backups"
+prefix = "production/"
+region = "us-east-1"
+storage_class = "STANDARD_IA"
+
+[backup.destinations.secondary]
+type = "gcs"
+bucket = "lith-backups-dr"
+prefix = "production/"
+region = "us-central1"
+
+# Retention policy
+[backup.retention]
+full_backups_keep = 4      # Keep 4 weekly full backups
+incremental_keep_days = 7  # Keep 7 days of incrementals
+journal_archive_days = 90  # Archive journal for 90 days
+
+# Encryption
+[backup.encryption]
+enabled = true
+key_source = "kms"
+kms_key_id = "alias/lith-backup-key"
+----
+
+=== Restore Procedures
+
+[source,bash]
+----
+# Restore from full backup
+lith restore \
+    --source s3://my-bucket/lith/full-20260112 \
+    --destination /var/lib/lith/data \
+    --verify
+
+# Restore to specific point in time
+lith restore \
+    --source s3://my-bucket/lith/full-20260105 \
+    --destination /var/lib/lith/data \
+    --apply-incremental s3://my-bucket/lith/incr-* \
+    --to-sequence 105000
+
+# Restore to timestamp
+lith restore \
+    --source s3://my-bucket/lith/full-20260105 \
+    --destination /var/lib/lith/data \
+    --apply-incremental s3://my-bucket/lith/incr-* \
+    --to-timestamp "2026-01-10T14:30:00Z"
+
+# Verify backup integrity
+lith backup verify \
+    --source s3://my-bucket/lith/full-20260112 \
+    --checksum
+
+# List available restore points
+lith restore list \
+    --source s3://my-bucket/lith/ \
+    --from 2026-01-01 \
+    --to 2026-01-12
+----
+
+=== Backup Verification
+
+[source,bash]
+----
+# Verify backup integrity without restore
+lith backup verify \
+    --source s3://my-bucket/lith/full-20260112 \
+    --deep  # Verify all blocks and checksums
+
+# Test restore to temporary location
+lith restore \
+    --source s3://my-bucket/lith/full-20260112 \
+    --destination /tmp/lith-test \
+    --verify \
+    --readonly
+
+# Compare backup with live database
+lith backup compare \
+    --backup s3://my-bucket/lith/full-20260112 \
+    --live /var/lib/lith/data \
+    --report /tmp/compare-report.json
+----
+
+== Disaster Recovery
+
+=== Recovery Objectives
+
+[cols="1,2,2"]
+|===
+| Objective | Target | Implementation
+
+| **RPO** (Recovery Point Objective)
+| < 1 hour
+| Hourly incremental backups + continuous journal archival
+
+| **RTO** (Recovery Time Objective)
+| < 4 hours
+| Automated restore procedures + standby instances
+
+| **Data Integrity**
+| Zero data loss for committed transactions
+| Journal durability + backup verification
+|===
+
+=== DR Architecture
+
+[source]
+----
+Primary Region (us-east-1)
+├── Lith Primary (active)
+│   ├── Journal → S3 (continuous backup)
+│   └── Metrics → CloudWatch
+├── Lith Replica (standby)
+└── Backup Storage (S3)
+    ├── Full backups (weekly)
+    └── Incremental (hourly)
+
+DR Region (us-west-2)
+├── Lith Standby (cold standby)
+├── Backup Storage (S3, replicated)
+└── DNS Failover (Route 53)
+----
+
+=== Failover Procedures
+
+.Automated Failover
+[source,yaml]
+----
+# Runbook: Automated Failover
+---
+name: Lith Automated Failover
+trigger:
+  - health_check_failed for 5m
+  - manual_trigger
+
+steps:
+  - name: Verify primary is truly down
+    command: lith health --target primary --timeout 30s
+    expect: failure
+
+  - name: Stop writes to primary
+    command: lith drain --target primary
+    timeout: 60s
+
+  - name: Promote replica to primary
+    command: lith promote --target replica
+    verify: lith health --target replica
+
+  - name: Update DNS
+    command: |
+      aws route53 change-resource-record-sets \
+        --hosted-zone-id $ZONE_ID \
+        --change-batch file://failover-dns.json
+
+  - name: Verify new primary
+    command: lith verify --target new-primary
+    expect: success
+
+  - name: Notify on-call
+    command: pagerduty trigger --severity critical --message "Lith failover completed"
+----
+
+.Manual Recovery from Backup
+[source,bash]
+----
+#!/bin/bash
+# manual-recovery.sh - Manual Lith recovery procedure
+
+set -euo pipefail
+
+BACKUP_SOURCE="s3://lith-backups/production/full-latest"
+RESTORE_TARGET="/var/lib/lith/data"
+TIMESTAMP="${1:-now}"
+
+echo "=== Lith Manual Recovery ==="
+echo "Backup Source: $BACKUP_SOURCE"
+echo "Target: $RESTORE_TARGET"
+echo "Timestamp: $TIMESTAMP"
+
+# 1. Stop Lith if running
+echo "Stopping Lith..."
+systemctl stop lith || true
+
+# 2. Backup current state (if any)
+if [ -d "$RESTORE_TARGET" ]; then
+    echo "Backing up current state..."
+    mv "$RESTORE_TARGET" "${RESTORE_TARGET}.pre-recovery-$(date +%s)"
+fi
+
+# 3. Restore from backup
+echo "Restoring from backup..."
+lith restore \
+    --source "$BACKUP_SOURCE" \
+    --destination "$RESTORE_TARGET" \
+    --to-timestamp "$TIMESTAMP" \
+    --verify
+
+# 4. Verify restore
+echo "Verifying restore..."
+lith verify --data-dir "$RESTORE_TARGET"
+
+# 5. Start Lith
+echo "Starting Lith..."
+systemctl start lith
+
+# 6. Health check
+echo "Running health check..."
+sleep 10
+lith health --wait 60s
+
+echo "=== Recovery Complete ==="
+lith status
+----
+
+=== DR Testing
+
+[source,toml]
+----
+# DR test schedule (quarterly)
+[dr_test]
+schedule = "0 2 1 */3 *"  # First day of each quarter at 2 AM
+
+[dr_test.scenarios]
+# Test 1: Backup/Restore
+backup_restore = """
+1. Create test data in isolated namespace
+2. Perform full backup
+3. Delete test data
+4. Restore from backup
+5. Verify data integrity
+"""
+
+# Test 2: Failover
+failover = """
+1. Simulate primary failure
+2. Trigger automated failover
+3. Verify replica becomes primary
+4. Verify no data loss
+5. Restore primary and fail back
+"""
+
+# Test 3: Point-in-Time Recovery
+pitr = """
+1. Create test data with known timestamp
+2. Perform backup
+3. Create more data
+4. Restore to earlier timestamp
+5. Verify only pre-timestamp data exists
+"""
+----
+
+== Operational Runbooks
+
+=== Common Operations
+
+==== Investigating Slow Queries
+
+[source,fql]
+----
+-- 1. Check current slow queries
+SELECT * FROM _slow_query_log
+WHERE duration_ms > 100
+  AND occurred_at > NOW() - INTERVAL '1 hour'
+ORDER BY duration_ms DESC
+LIMIT 20;
+
+-- 2. Analyze query plan
+EXPLAIN ANALYZE
+SELECT * FROM evidence
+WHERE source = 'leaked-document'
+  AND score > 80;
+
+-- 3. Check index usage
+INTROSPECT COLLECTION evidence;
+
+-- 4. Review constraint overhead
+SELECT * FROM _constraint_timing
+WHERE collection = 'evidence'
+  AND check_duration_ms > 10;
+----
+
+==== Recovering from Constraint Violation Spike
+
+[source,bash]
+----
+#!/bin/bash
+# runbook: constraint-violation-spike.sh
+
+# 1. Identify which constraints are failing
+lith query "
+  SELECT constraint_name, COUNT(*) as violations
+  FROM _constraint_violations
+  WHERE occurred_at > NOW() - INTERVAL '30 minutes'
+  GROUP BY constraint_name
+  ORDER BY violations DESC
+"
+
+# 2. Get sample violations
+lith query "
+  SELECT *
+  FROM _constraint_violations
+  WHERE constraint_name = '\$CONSTRAINT_NAME'
+  LIMIT 10
+"
+
+# 3. Identify actor patterns
+lith query "
+  SELECT actor, COUNT(*) as violations
+  FROM _constraint_violations
+  WHERE occurred_at > NOW() - INTERVAL '30 minutes'
+  GROUP BY actor
+  ORDER BY violations DESC
+"
+
+# 4. If caused by bad data, consider temporary constraint relaxation
+# lith alter collection evidence DROP CONSTRAINT score_range;
+# ... fix data ...
+# lith alter collection evidence ADD CONSTRAINT score_range CHECK (score >= 0 AND score <= 100);
+----
+
+==== Journal Compaction
+
+[source,bash]
+----
+#!/bin/bash
+# runbook: journal-compaction.sh
+
+# 1. Check journal size
+lith journal stats
+
+# 2. Estimate compaction impact
+lith journal compact --dry-run --since 30d
+
+# 3. Perform compaction (during low-traffic window)
+lith journal compact \
+    --since 30d \
+    --archive s3://lith-archive/journal/ \
+    --verify
+
+# 4. Verify journal health after compaction
+lith journal verify
+----
+
+==== Recovering from Corruption
+
+[source,bash]
+----
+#!/bin/bash
+# runbook: corruption-recovery.sh
+
+# 1. Stop Lith
+systemctl stop lith
+
+# 2. Run integrity check
+lith verify --data-dir /var/lib/lith/data --deep
+
+# 3. If corruption found, identify affected blocks
+lith verify --data-dir /var/lib/lith/data --report /tmp/corruption-report.json
+
+# 4. Attempt repair from journal
+lith repair \
+    --data-dir /var/lib/lith/data \
+    --replay-journal \
+    --verify
+
+# 5. If repair fails, restore from backup
+lith restore \
+    --source s3://lith-backups/latest \
+    --destination /var/lib/lith/data.restored \
+    --verify
+
+# 6. Swap directories and restart
+mv /var/lib/lith/data /var/lib/lith/data.corrupted
+mv /var/lib/lith/data.restored /var/lib/lith/data
+systemctl start lith
+----
+
+=== Capacity Planning
+
+[source,fql]
+----
+-- Storage growth analysis
+SELECT
+    date_trunc('day', created_at) as day,
+    COUNT(*) as documents_added,
+    SUM(document_size_bytes) as bytes_added
+FROM _storage_audit
+WHERE created_at > NOW() - INTERVAL '30 days'
+GROUP BY day
+ORDER BY day;
+
+-- Project storage needs
+SELECT
+    current_size_gb,
+    daily_growth_gb,
+    current_size_gb + (daily_growth_gb * 90) as size_in_90_days,
+    current_size_gb + (daily_growth_gb * 365) as size_in_1_year
+FROM (
+    SELECT
+        SUM(size_bytes) / 1e9 as current_size_gb,
+        AVG(daily_growth_bytes) / 1e9 as daily_growth_gb
+    FROM _storage_summary
+);
+
+-- Query load projection
+SELECT
+    date_trunc('day', timestamp) as day,
+    COUNT(*) as queries,
+    AVG(duration_ms) as avg_latency
+FROM _query_log
+WHERE timestamp > NOW() - INTERVAL '30 days'
+GROUP BY day
+ORDER BY day;
+----
+
+== See Also
+
+* link:DEPLOYMENT.adoc[Deployment Guide] - Production deployment
+* link:SECURITY-AUTH.adoc[Security & Authentication] - Security hardening
+* link:API-REFERENCE.adoc[API Reference] - Programmatic interfaces
+* link:../ARCHITECTURE.adoc[Architecture] - Technical design
+* link:../spec/journal.adoc[Journal Specification] - Journal format details

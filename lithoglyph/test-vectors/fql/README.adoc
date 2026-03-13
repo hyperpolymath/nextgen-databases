@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= FQL Test Vectors
+:toc:
+
+Golden test data for the FQL (Form Query Language) parser and executor.
+
+Each `.txt` file contains an input query followed by the expected parse result
+and execution output, separated by `---`.
+
+== Format
+
+----
+INPUT:
+<fql query text>
+---
+PARSED:
+<expected AST representation>
+---
+RESULT:
+<expected execution output>
+----
+
+== Categories
+
+* `select_*.txt` - SELECT queries
+* `insert_*.txt` - INSERT operations
+* `update_*.txt` - UPDATE operations
+* `delete_*.txt` - DELETE operations
+* `introspect_*.txt` - INTROSPECT queries
+* `explain_*.txt` - EXPLAIN queries
+* `edge_*.txt` - Edge traversal queries
+* `error_*.txt` - Expected error cases

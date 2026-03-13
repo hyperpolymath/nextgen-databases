@@ -1,0 +1,409 @@
+= GQL Design Philosophy
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:source-highlighter: rouge
+
+[.lead]
+GQL (Lithoglyph Query Language) is not just another query language. This specification documents the philosophical principles that distinguish GQL from traditional query languages like SQL, AQL, and GraphQL.
+
+toc::[]
+
+== Core Thesis
+
+[quote]
+The database is part of the story, not an opaque substrate.
+
+Traditional query languages answer: "What data matches this query?"
+
+GQL answers: "What data, who put it there, why, and can we undo it?"
+
+== AQL vs GQL: Principled Comparison
+
+ArangoDB's AQL represents a modern, well-designed query language for graph and document databases. GQL shares some surface similarities but differs fundamentally in philosophy.
+
+=== Design Philosophy
+
+[source,text]
+----
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    AQL vs GQL: Design Philosophy                              ║
+╠═══════════════════════════════════════════════════════════════════════════════╣
+║                                                                               ║
+║  AQL (ArangoDB)                    GQL (Lithoglyph)                               ║
+║  ──────────────                    ────────────                               ║
+║                                                                               ║
+║  "Get the data"                    "Tell the story of the data"              ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+----
+
+=== Principle-by-Principle Comparison
+
+[cols="2,3,3"]
+|===
+| Principle | AQL | GQL
+
+| **Core question**
+| "What data matches this query?"
+| "What data, who put it there, why, and can we undo it?"
+
+| **Provenance**
+| Optional (application responsibility)
+| Required by type system—cannot insert without actor + rationale
+
+| **Reversibility**
+| Transaction rollback only
+| Every operation has proven inverse OR explicit "irreversible-with-story"
+
+| **Constraint failure**
+| Returns error code
+| Returns error + reasons + pointers + narrative rationale
+
+| **Query result**
+| Data only
+| Data + optional provenance pointers to journal
+
+| **Auditability**
+| External logging required
+| Journal IS the audit trail
+
+| **Explain**
+| Query plan (performance-focused)
+| Query plan + constraint reasoning + provenance chain
+
+| **Schema changes**
+| DDL executes immediately
+| DDL proposes + requires proof of equivalence (GQL-dt)
+
+| **Trust model**
+| Trust the query
+| Verify the query (dependent types optional)
+
+| **Optimization priority**
+| Performance first
+| Meaning first, performance second
+|===
+
+=== Data Flow Comparison
+
+[source,text]
+----
+AQL Flow:
+┌─────────┐    ┌─────────┐    ┌─────────┐
+│ Query   │───►│ Execute │───►│ Results │
+└─────────┘    └─────────┘    └─────────┘
+     │              │              │
+     └──────────────┴──────────────┘
+           "What happened?" 🤷
+
+GQL Flow:
+┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────────┐
+│ Query   │───►│ Plan    │───►│ Execute │───►│ Results +   │
+│         │    │ +Explain│    │ +Journal│    │ Provenance  │
+└─────────┘    └─────────┘    └─────────┘    └─────────────┘
+     │              │              │              │
+     ▼              ▼              ▼              ▼
+  Parsed        Reasons        Recorded      Linked to
+  +Typed        Shown          +Actor        Journal
+                               +Time
+----
+
+=== Philosophical Summary
+
+[cols="1,1"]
+|===
+| AQL | GQL
+
+| Database is a **black box** that answers questions
+| Database is a **narrative artefact** that tells its own story
+
+| Optimized for **throughput**
+| Optimized for **understanding**
+
+| Schema is **infrastructure**
+| Schema is **part of the story**
+
+| Errors are **failures**
+| Errors are **explanations**
+
+| History is **optional**
+| History is **mandatory**
+|===
+
+== GQL Core Principles
+
+=== 1. Provenance by Construction
+
+You cannot insert data without saying who added it and why.
+
+[source,fql]
+----
+-- This will NOT compile in GQL:
+INSERT INTO evidence (name, type)
+VALUES ('ONS CPI Data', 'report');
+-- Error: Missing required ADDED_BY clause
+-- Error: Missing required RATIONALE clause
+
+-- This WILL compile:
+INSERT INTO evidence (name, type)
+VALUES ('ONS CPI Data', 'report')
+ADDED_BY "researcher_alice"
+RATIONALE "Primary source for UK inflation analysis";
+----
+
+In GQL-dt (dependently-typed GQL), this is enforced at the type level:
+
+[source,lean]
+----
+structure InsertOp where
+  collection : CollectionName
+  document : Document
+  actor : ActorId          -- Non-optional
+  rationale : Rationale    -- Non-optional
+  timestamp : Timestamp    -- Auto-generated
+----
+
+=== 2. Reversibility as First-Class
+
+Every mutating operation must have a defined inverse, or be explicitly marked as irreversible with a story explaining why.
+
+[source,fql]
+----
+-- Regular insert (reversible)
+INSERT INTO evidence (name) VALUES ('Report')
+ADDED_BY "alice" RATIONALE "Initial entry";
+-- Inverse: DELETE with journal pointer
+
+-- Schema migration (reversible)
+ALTER COLLECTION evidence ADD COLUMN score : Int DEFAULT 0;
+-- Inverse: ALTER COLLECTION evidence DROP COLUMN score;
+
+-- Destructive operation (must be marked)
+TRUNCATE evidence
+IRREVERSIBLE_WITH_STORY "Data migrated to new system, old format deprecated"
+ADDED_BY "admin" RATIONALE "v2 migration";
+----
+
+=== 3. Constraints as Ethics
+
+When a constraint rejects an operation, GQL returns:
+* The constraint that failed
+* Why it failed (not just "constraint violation")
+* Pointers to relevant schema definitions
+* Narrative rationale for the constraint's existence
+
+[source,text]
+----
+AQL constraint failure:
+  ERROR 1620: unique constraint violated
+
+GQL constraint failure:
+  CONSTRAINT_VIOLATION:
+    constraint: evidence.source_url UNIQUE
+    reason: "Document with source_url 'https://ons.gov.uk/cpi' already exists"
+    existing_document: doc-abc123 (added by bob, 2026-01-10)
+    constraint_rationale: "Each evidence source should be entered once to prevent duplicate counting in analysis"
+    suggestion: "Use UPDATE to modify existing document, or add as RELATED_EVIDENCE"
+    journal_pointer: entry-45678
+----
+
+=== 4. Explain Everything
+
+GQL's EXPLAIN goes beyond query plans to include reasoning:
+
+[source,fql]
+----
+EXPLAIN
+SELECT * FROM evidence
+WHERE prompt_score.overall > 80
+  AND source_type = 'official';
+----
+
+Returns:
+
+[source,text]
+----
+QUERY PLAN:
+  1. Scan: evidence (estimated 10,000 docs)
+  2. Filter: prompt_score.overall > 80 (estimated 2,500 docs)
+  3. Filter: source_type = 'official' (estimated 500 docs)
+
+CONSTRAINT REASONING:
+  - prompt_score.overall is BoundedNat 0 100 (valid range check)
+  - source_type is enum ['official', 'academic', 'media', 'interview']
+
+PROVENANCE CHAIN:
+  - Results will include provenance pointers
+  - Each document traceable to journal entry
+  - Actor and rationale available for all matches
+
+INDEX USAGE:
+  - Using idx_prompt_score on prompt_score.overall
+  - Full scan on source_type (consider adding index)
+----
+
+=== 5. Results Carry Provenance
+
+Query results can optionally include provenance metadata:
+
+[source,fql]
+----
+SELECT name, source_url, prompt_score
+FROM evidence
+WHERE source_type = 'official'
+WITH PROVENANCE;
+----
+
+Returns:
+
+[source,json]
+----
+{
+  "results": [
+    {
+      "name": "ONS CPI Data 2023",
+      "source_url": "https://ons.gov.uk/cpi",
+      "prompt_score": { "overall": 97 },
+      "_provenance": {
+        "journal_entry": "entry-12345",
+        "added_by": "researcher_alice",
+        "added_at": "2026-01-10T14:30:00Z",
+        "rationale": "Primary source for UK inflation analysis",
+        "last_modified": "entry-12350",
+        "modification_count": 2
+      }
+    }
+  ]
+}
+----
+
+=== 6. Schema is Narrative
+
+Schema changes are not silent infrastructure updates—they are recorded narrative events:
+
+[source,fql]
+----
+ALTER COLLECTION evidence
+ADD COLUMN confidence : BoundedNat 0 100
+DEFAULT 50
+ADDED_BY "schema_admin"
+RATIONALE "Adding confidence scoring per reviewer feedback from NUJ pilot"
+MIGRATION_STORY "Existing documents get default 50 (neutral confidence)";
+----
+
+The schema change is:
+* Recorded in the journal
+* Attributed to an actor
+* Explained with rationale
+* Reversible (with proof in GQL-dt)
+
+== Comparison with Other Query Languages
+
+=== SQL
+
+[cols="1,2,2"]
+|===
+| Aspect | SQL | GQL
+
+| History
+| Optional (triggers, audit tables)
+| Mandatory (journal)
+
+| Provenance
+| Application layer
+| Type system
+
+| Constraint errors
+| Error codes
+| Narrative explanations
+
+| Schema changes
+| DDL executes
+| DDL with proof + story
+
+| Reversibility
+| Transactions only
+| All operations
+|===
+
+=== GraphQL
+
+[cols="1,2,2"]
+|===
+| Aspect | GraphQL | GQL
+
+| Purpose
+| API query language
+| Database query language
+
+| Type safety
+| Schema validation
+| Dependent types (GQL-dt)
+
+| Provenance
+| Not addressed
+| Core requirement
+
+| Mutations
+| Arbitrary resolvers
+| Journal-backed, reversible
+|===
+
+=== Datalog
+
+[cols="1,2,2"]
+|===
+| Aspect | Datalog | GQL
+
+| Paradigm
+| Logic programming
+| Imperative + narrative
+
+| Provenance
+| Can be encoded
+| Built-in
+
+| Reversibility
+| Not addressed
+| Core requirement
+
+| Explanation
+| Proof trees
+| Narrative + proof trees
+|===
+
+== Target Domains
+
+GQL's philosophy is designed for domains where understanding matters more than raw performance:
+
+* **Investigative journalism**: Every claim needs traceable evidence
+* **Governance/compliance**: Audit trails are legally required
+* **Research data management**: Reproducibility demands provenance
+* **Long-term archives**: Future readers need context, not just data
+* **Agentic systems**: AI agents need to explain their data choices
+
+== Non-Goals
+
+GQL explicitly does NOT optimize for:
+
+* Maximum throughput (use PostgreSQL)
+* Minimal latency (use Redis)
+* Massive scale (use Cassandra)
+* Drop-in SQL replacement (use CockroachDB)
+
+GQL optimizes for:
+
+* Auditability over performance
+* Meaning over features
+* Reversibility over throughput
+* Agent understanding (required)
+
+== See Also
+
+* link:../README.adoc[README] - Lithoglyph overview
+* link:../ARCHITECTURE.adoc[ARCHITECTURE] - System architecture
+* link:fql-dependent-types.md[GQL Dependent Types] - Compile-time verification
+* link:self-normalizing.adoc[Self-Normalizing] - Schema evolution
+* link:cloud-storage.adoc[Cloud Storage] - Sync safety guarantees

@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: lith-production
+
+bases:
+- ../../base
+
+namePrefix: prod-
+
+commonLabels:
+  environment: production
+
+# Production-specific patches
+patchesStrategicMerge:
+- deployment-patch.yaml
+- ingress-patch.yaml
+
+images:
+- name: lith-http-api
+  newName: ghcr.io/hyperpolymath/lith-http-api
+  newTag: v1.0.0  # Use specific version in production
+
+configMapGenerator:
+- name: lith-config
+  behavior: merge
+  literals:
+  - LOG_LEVEL=info
+  - METRICS_ENABLED=true
+  - RATE_LIMIT_ENABLED=true

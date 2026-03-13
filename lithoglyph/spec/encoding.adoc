@@ -1,0 +1,384 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Lithoglyph Blob Encoding Specification
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:sectnums:
+
+[.lead]
+Specification for blob encoding in Lithoglyph's ABI and storage layers.
+
+**Status**: PROPOSED (resolves Q-ABI-BLOBS-001)
+
+toc::[]
+
+== Decision Summary
+
+**Chosen Encoding**: CBOR (Concise Binary Object Representation)
+
+**Rationale**:
+
+[cols="1,1,1,1,1"]
+|===
+| Criteria | Cap'n Proto | Protobuf | CBOR | MsgPack
+
+| Schema Required
+| Yes
+| Yes
+| No
+| No
+
+| Zero-Copy Access
+| Yes
+| No
+| No
+| No
+
+| Self-Describing
+| No
+| No
+| Yes
+| Yes
+
+| Deterministic
+| Partial
+| No (map ordering)
+| Yes (with constraints)
+| No (map ordering)
+
+| Zig Support
+| Poor
+| Good (prost)
+| Excellent (zig-cbor)
+| Good
+
+| Forth Support
+| None
+| None
+| Feasible
+| Feasible
+
+| Factor Support
+| None
+| None
+| Feasible
+| Feasible
+
+| Complexity
+| High
+| Medium
+| Low
+| Low
+
+| Human Debugging
+| Hard
+| Hard
+| Easier
+| Easier
+|===
+
+== CBOR Selection Rationale
+
+=== Advantages for Lithoglyph
+
+1. **Schema-optional**: Works without code generation
+2. **Self-describing**: Values carry type information
+3. **Deterministic**: With CBOR canonicalization rules (RFC 8949 §4.2)
+4. **Wide support**: Implementations in Zig, Factor, Forth, Lean 4, Elixir
+5. **Standards-based**: IETF RFC 8949
+6. **Extensible**: Tagged types for custom semantics
+
+=== Why Not Cap'n Proto
+
+* Requires schema compilation for every type
+* Poor Zig tooling (no mature library)
+* No Forth/Factor implementations
+* Overkill for PoC phase
+
+=== Why Not Protobuf
+
+* Map key ordering is non-deterministic (Google's implementation)
+* Requires proto files and code generation
+* More complex than needed for PoC
+
+=== Why Not MsgPack
+
+* No standardized deterministic encoding
+* Less extensible (no tags)
+* CBOR is a superset with better semantics
+
+== CBOR Usage Rules
+
+=== Deterministic Encoding (RFC 8949 §4.2)
+
+Lithoglyph REQUIRES deterministic CBOR encoding:
+
+1. **Integer encoding**: Use smallest representation
+2. **Map key ordering**: Lexicographic by encoded key bytes
+3. **No indefinite lengths**: All lengths must be definite
+4. **Float encoding**: Use smallest representation (half/single/double)
+5. **No duplicate keys**: Maps must have unique keys
+
+=== Tagged Types
+
+Lithoglyph uses CBOR tags for domain-specific types:
+
+[cols="1,2,3"]
+|===
+| Tag | Type | Description
+
+| 0
+| RFC 3339 datetime
+| Timestamps (standard CBOR)
+
+| 32
+| URI
+| Resource identifiers (standard CBOR)
+
+| 55799
+| Self-described CBOR
+| Optional wrapper (standard CBOR)
+
+| 39001
+| Lithoglyph Block Reference
+| Reference to a block by ID
+
+| 39002
+| Lithoglyph Document ID
+| Document identifier
+
+| 39003
+| Lithoglyph Collection Name
+| Collection identifier
+
+| 39004
+| Lithoglyph Provenance
+| Provenance payload
+
+| 39005
+| Lithoglyph Actor
+| Actor information
+
+| 39006
+| Lithoglyph PROMPT Score
+| PROMPT evidence score
+
+| 39007
+| Lithoglyph Functional Dependency
+| FD encoding for normalizer
+
+| 39008
+| Lithoglyph Proof
+| GQLdt proof blob
+|===
+
+NOTE: Tags 39001-39999 are in the "first come first served" range per RFC 8949.
+
+=== Example Encodings
+
+==== Document Payload
+
+[source,text]
+----
+Document: {"claim": "Inflation at 10%", "source": "ONS", "score": 85}
+
+CBOR (diagnostic notation):
+{
+  "claim": "Inflation at 10%",
+  "source": "ONS",
+  "score": 39006(85)  // Tagged PROMPT score
+}
+
+CBOR (hex):
+A3                          # map(3)
+   65 636C61696D            # "claim"
+   70 496E666C6174696F6E... # "Inflation at 10%"
+   66 736F75726365          # "source"
+   63 4F4E53                # "ONS"
+   65 73636F7265            # "score"
+   D9 9866 18 55            # tag(39006) + unsigned(85)
+----
+
+==== Provenance Payload
+
+[source,text]
+----
+CBOR (diagnostic notation):
+39004({
+  "actor": 39005({"id": "user_123", "type": "human"}),
+  "rationale": "Adding ONS data",
+  "timestamp": 0("2026-01-11T12:00:00Z")
+})
+----
+
+== ABI Blob Interface
+
+=== Blob Structure
+
+All blobs passed through Form.Bridge follow this structure:
+
+[source,zig]
+----
+pub const FdbBlob = struct {
+    data: [*]const u8,
+    len: usize,
+    encoding: BlobEncoding,
+};
+
+pub const BlobEncoding = enum(u8) {
+    cbor = 0,          // Default for PoC
+    cbor_compressed = 1, // LZ4-compressed CBOR
+    reserved = 255,
+};
+----
+
+=== Error Blobs
+
+Error blobs use a standard structure:
+
+[source,text]
+----
+CBOR (diagnostic notation):
+{
+  "code": 1001,
+  "message": "Document not found",
+  "details": {
+    "collection": "evidence",
+    "document_id": "doc_abc123"
+  },
+  "provenance": {...}
+}
+----
+
+=== Result Blobs
+
+Result blobs include optional provenance:
+
+[source,text]
+----
+CBOR (diagnostic notation):
+{
+  "status": "ok",
+  "data": {...},
+  "provenance": 39004({...}),  // Optional
+  "explain": {...}             // Optional for EXPLAIN queries
+}
+----
+
+== Canonical Text Rendering
+
+All CBOR blobs MUST have deterministic text rendering for audit:
+
+=== Rendering Rules
+
+1. Use CBOR diagnostic notation as base
+2. Expand Lithoglyph-specific tags to human-readable form
+3. Timestamps rendered as ISO 8601
+4. Document IDs rendered with collection context
+5. Provenance rendered with actor name
+
+=== Example Rendering
+
+CBOR blob:
+[source,hex]
+----
+D99869 A3 65636C61696D 70496E666C6174696F6E...
+----
+
+Canonical text:
+[source,text]
+----
+Document {
+  claim: "Inflation at 10%"
+  source: "ONS"
+  prompt_score: 85
+}
+----
+
+== Compression
+
+=== When to Compress
+
+* Payloads > 512 bytes: Optional LZ4 compression
+* Journal entries: Compress if forward + inverse > 1024 bytes
+* Blocks: Compress based on block type and size
+
+=== Compression Format
+
+LZ4 frame format with:
+
+* Block size: 64 KB
+* No block checksum (entry checksum covers compressed data)
+* No content checksum (entry checksum covers compressed data)
+
+== Language-Specific Notes
+
+=== Zig (Form.Bridge)
+
+Use `zig-cbor` library:
+
+[source,zig]
+----
+const cbor = @import("cbor");
+
+pub fn encode_document(doc: Document) ![]u8 {
+    var encoder = cbor.Encoder.init(allocator);
+    try encoder.encodeMap(doc);
+    return encoder.finish();
+}
+----
+
+=== Forth (Form.Blocks, Form.Model)
+
+Minimal CBOR implementation:
+
+[source,forth]
+----
+: encode-uint ( n -- ) \ Encode unsigned integer
+  dup 24 < if emit exit then
+  dup 256 < if 24 emit emit exit then
+  \ ... etc
+;
+----
+
+=== Factor (Form.Runtime)
+
+Use `cbor` vocabulary:
+
+[source,factor]
+----
+USING: cbor ;
+
+: encode-document ( doc -- bytes )
+    >cbor ;
+----
+
+=== Elixir (Form.ControlPlane)
+
+Use `cbor` hex package:
+
+[source,elixir]
+----
+def encode_document(doc) do
+  CBOR.encode(doc)
+end
+----
+
+== Test Vectors
+
+Golden test vectors in `test-vectors/encoding/`:
+
+* `simple_document.cbor` - Simple document encoding
+* `simple_document.txt` - Canonical text rendering
+* `provenance.cbor` - Full provenance encoding
+* `tagged_types.cbor` - All Lithoglyph-specific tags
+* `deterministic_map.cbor` - Map with ordered keys
+* `compressed_document.lz4` - LZ4-compressed CBOR
+
+== References
+
+* RFC 8949: Concise Binary Object Representation (CBOR)
+* RFC 8610: Concise Data Definition Language (CDDL)
+* link:blocks.adoc[Block Storage Format]
+* link:journal.adoc[Journal Format]

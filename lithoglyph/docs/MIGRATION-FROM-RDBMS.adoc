@@ -1,0 +1,1468 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Migrating to Lith from RDBMS
+:toc: left
+:toclevels: 4
+:icons: font
+:source-highlighter: rouge
+:sectanchors:
+:sectlinks:
+
+[.lead]
+Comprehensive guide for migrating from traditional relational databases (PostgreSQL, MySQL, SQLite) to Lith, including schema translation, data migration, and provenance strategies.
+
+[NOTE]
+====
+**Status: Documentation Complete, Tooling Planned**
+
+This document provides complete migration guidance. Migration tooling (`lith-migrate` CLI) is planned for Milestone M12. Currently, migrations use the documented manual processes and scripts.
+====
+
+== Philosophy: From SQL to Narrative
+
+Before beginning a migration, understand that Lith is not a drop-in replacement for traditional RDBMS. It represents a fundamental shift in how data is treated:
+
+[cols="1,2,2"]
+|===
+| Aspect | Traditional RDBMS | Lith
+
+| **Primary Concern**
+| Performance, ACID transactions
+| Auditability, provenance, reversibility
+
+| **Data Model**
+| Tables with rows
+| Documents and edges (graph-document hybrid)
+
+| **History**
+| Optional (audit tables, triggers)
+| Built-in (every operation journaled)
+
+| **Deletions**
+| Permanent (unless soft-delete)
+| Reversible (tombstones with inverse)
+
+| **Mutations**
+| Who/when via triggers
+| Who/why/when required (provenance)
+
+| **Schema Evolution**
+| Manual migrations
+| Self-normalizing with proofs
+
+| **Query Philosophy**
+| Declarative (what)
+| Narrative (why + what)
+|===
+
+=== When Lith is the Right Choice
+
+Lith excels for:
+
+* **Investigative Journalism**: Complete chain of custody for evidence
+* **Compliance/Governance**: Built-in audit trails for regulators
+* **Agentic AI Systems**: Explain and reverse AI decisions
+* **Long-Term Archives**: Decades-scale data with provenance
+* **Research Data**: Reproducible data transformations
+* **Legal Discovery**: Immutable evidence trails
+
+=== When to Stay with RDBMS
+
+Lith is NOT suitable for:
+
+* **High-Throughput OLTP**: >10,000 TPS requirements
+* **Analytics/OLAP**: Columnar analytics, data warehousing
+* **Drop-In Replacement**: Apps expecting SQL compatibility
+* **Performance-Critical**: Sub-millisecond query requirements
+* **Ephemeral Data**: Cache, sessions, temp data
+
+== Migration Assessment
+
+=== Readiness Checklist
+
+Before migrating, assess your current system:
+
+[cols="1,3,1"]
+|===
+| Item | Description | Ready?
+
+| **Data Volume**
+| Lith handles datasets up to ~100GB efficiently. Larger datasets require tiered storage.
+| ☐
+
+| **Transaction Rate**
+| Maximum ~1,000 TPS per node. Higher requires sharding (🚧 planned).
+| ☐
+
+| **Query Complexity**
+| Complex JOINs become edge traversals. Assess query patterns.
+| ☐
+
+| **Audit Requirements**
+| Lith provides superior audit trails—verify this is needed.
+| ☐
+
+| **Schema Stability**
+| Self-normalizing handles evolution, but frequent changes add overhead.
+| ☐
+
+| **Application Changes**
+| Applications need modification for FQL and provenance.
+| ☐
+
+| **Team Training**
+| Developers need FQL and provenance concept training.
+| ☐
+|===
+
+=== Data Inventory
+
+Catalog your existing database:
+
+[source,sql]
+----
+-- PostgreSQL: List all tables and row counts
+SELECT
+    schemaname,
+    tablename,
+    n_tup_ins - n_tup_del as row_count_estimate
+FROM pg_stat_user_tables
+ORDER BY row_count_estimate DESC;
+
+-- List foreign key relationships (become edges)
+SELECT
+    tc.table_name as from_table,
+    kcu.column_name as from_column,
+    ccu.table_name as to_table,
+    ccu.column_name as to_column
+FROM information_schema.table_constraints tc
+JOIN information_schema.key_column_usage kcu
+    ON tc.constraint_name = kcu.constraint_name
+JOIN information_schema.constraint_column_usage ccu
+    ON ccu.constraint_name = tc.constraint_name
+WHERE tc.constraint_type = 'FOREIGN KEY';
+----
+
+[source,sql]
+----
+-- MySQL: List all tables and row counts
+SELECT
+    table_schema,
+    table_name,
+    table_rows
+FROM information_schema.tables
+WHERE table_schema = 'your_database'
+ORDER BY table_rows DESC;
+
+-- List foreign key relationships
+SELECT
+    table_name as from_table,
+    column_name as from_column,
+    referenced_table_name as to_table,
+    referenced_column_name as to_column
+FROM information_schema.key_column_usage
+WHERE referenced_table_name IS NOT NULL
+    AND table_schema = 'your_database';
+----
+
+=== Migration Complexity Score
+
+Calculate migration complexity:
+
+[source]
+----
+Score = (Tables × 1) + (Foreign Keys × 2) + (Stored Procedures × 5)
+      + (Triggers × 3) + (Views × 2)
+
+Complexity Levels:
+  0-20:   Simple (1-2 weeks)
+  21-50:  Moderate (2-4 weeks)
+  51-100: Complex (1-2 months)
+  100+:   Enterprise (3+ months, phased approach)
+----
+
+== Schema Translation
+
+=== Type Mapping Reference
+
+[cols="1,1,2"]
+|===
+| SQL Type | FQL Type | Notes
+
+3+h| **Numeric Types**
+
+| `SMALLINT`, `INTEGER`, `BIGINT`
+| `INTEGER`
+| Arbitrary precision in Lith
+
+| `DECIMAL(p,s)`, `NUMERIC(p,s)`
+| `DECIMAL(p,s)` 🚧
+| Planned. Use `FLOAT` or `STRING` for now
+
+| `REAL`, `FLOAT`, `DOUBLE`
+| `FLOAT`
+| IEEE 754 double precision
+
+| `SERIAL`, `BIGSERIAL`
+| (auto-generated)
+| Lith uses UUIDs by default
+
+3+h| **String Types**
+
+| `CHAR(n)`, `VARCHAR(n)`
+| `STRING`
+| No length limits in Lith
+
+| `TEXT`
+| `STRING`
+| Same as VARCHAR
+
+| `BYTEA`, `BLOB`
+| `BINARY`
+| Base64 encoded in JSON
+
+3+h| **Date/Time Types**
+
+| `DATE`
+| `DATE`
+| ISO 8601 date
+
+| `TIME`
+| `TIME`
+| ISO 8601 time
+
+| `TIMESTAMP`, `DATETIME`
+| `TIMESTAMP`
+| ISO 8601 with timezone
+
+| `INTERVAL`
+| `DURATION` 🚧
+| Planned. Use ISO 8601 duration string
+
+3+h| **Boolean & JSON**
+
+| `BOOLEAN`
+| `BOOLEAN`
+| true/false
+
+| `JSON`, `JSONB`
+| `JSON`
+| Native JSON support
+
+3+h| **Special Types**
+
+| `UUID`
+| `UUID`
+| Native UUID support
+
+| `ARRAY[]`
+| JSON array
+| Use `["a", "b", "c"]` syntax
+
+| `ENUM(...)`
+| `STRING` + constraint
+| Add CHECK constraint for valid values
+
+| `POINT`, `GEOMETRY`
+| `GEO` 🚧
+| Planned. Use GeoJSON for now
+
+3+h| **Lith-Specific Types**
+
+| (no equivalent)
+| `PROMPT_SCORE`
+| 0-100 evidence quality rating
+
+| (no equivalent)
+| `PROVENANCE`
+| Actor + rationale (auto-managed)
+
+| (no equivalent)
+| `DOCUMENT_REF`
+| Reference to another document
+|===
+
+=== Constraint Translation
+
+[cols="1,2,2"]
+|===
+| SQL Constraint | FQL Equivalent | Example
+
+| `NOT NULL`
+| `NOT NULL`
+| `title STRING NOT NULL`
+
+| `UNIQUE`
+| `UNIQUE`
+| `email STRING UNIQUE`
+
+| `PRIMARY KEY`
+| (auto-generated `_key`)
+| Documents have automatic UUIDs
+
+| `CHECK (expr)`
+| `CHECK (expr)`
+| `CHECK (score >= 0 AND score <= 100)`
+
+| `DEFAULT value`
+| `DEFAULT value`
+| `status STRING DEFAULT 'draft'`
+
+| `FOREIGN KEY`
+| Edge collection
+| See relationship migration section
+|===
+
+=== Schema Migration Examples
+
+==== Simple Table Migration
+
+.PostgreSQL Source
+[source,sql]
+----
+CREATE TABLE articles (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
+    author_id INTEGER REFERENCES users(id),
+    published_at TIMESTAMP,
+    views INTEGER DEFAULT 0,
+    status VARCHAR(20) CHECK (status IN ('draft', 'published', 'archived')),
+    metadata JSONB
+);
+----
+
+.Lith Target
+[source,fql]
+----
+CREATE COLLECTION articles (
+    title STRING NOT NULL,
+    content STRING,
+    published_at TIMESTAMP,
+    views INTEGER DEFAULT 0,
+    status STRING DEFAULT 'draft'
+        CHECK (status IN ('draft', 'published', 'archived')),
+    metadata JSON
+) WITH DESCRIPTION 'News articles with publication workflow';
+
+-- Foreign key becomes an edge collection
+CREATE EDGE COLLECTION authored_by
+FROM articles TO users
+WITH PROPERTIES (
+    role STRING DEFAULT 'author'
+);
+----
+
+==== Complex Table with Multiple Relationships
+
+.PostgreSQL Source
+[source,sql]
+----
+CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    order_number VARCHAR(50) UNIQUE NOT NULL,
+    customer_id INTEGER NOT NULL REFERENCES customers(id),
+    shipping_address_id INTEGER REFERENCES addresses(id),
+    billing_address_id INTEGER REFERENCES addresses(id),
+    status VARCHAR(30) NOT NULL DEFAULT 'pending',
+    total_amount DECIMAL(10,2) NOT NULL,
+    tax_amount DECIMAL(10,2) DEFAULT 0,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    CONSTRAINT valid_status CHECK (
+        status IN ('pending', 'confirmed', 'shipped', 'delivered', 'cancelled')
+    ),
+    CONSTRAINT positive_amounts CHECK (
+        total_amount >= 0 AND tax_amount >= 0
+    )
+);
+
+CREATE TABLE order_items (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    product_id INTEGER NOT NULL REFERENCES products(id),
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    unit_price DECIMAL(10,2) NOT NULL,
+    discount_percent DECIMAL(5,2) DEFAULT 0
+);
+----
+
+.Lith Target
+[source,fql]
+----
+-- Main orders collection
+CREATE COLLECTION orders (
+    order_number STRING UNIQUE NOT NULL,
+    status STRING NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'confirmed', 'shipped', 'delivered', 'cancelled')),
+    total_amount FLOAT NOT NULL CHECK (total_amount >= 0),
+    tax_amount FLOAT DEFAULT 0 CHECK (tax_amount >= 0),
+    notes STRING,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP
+) WITH DESCRIPTION 'Customer orders with status tracking';
+
+-- Customer relationship
+CREATE EDGE COLLECTION placed_by
+FROM orders TO customers
+WITH PROPERTIES (
+    placed_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Address relationships (two edge types for different purposes)
+CREATE EDGE COLLECTION ships_to
+FROM orders TO addresses
+WITH PROPERTIES (
+    address_type STRING DEFAULT 'shipping'
+);
+
+CREATE EDGE COLLECTION bills_to
+FROM orders TO addresses
+WITH PROPERTIES (
+    address_type STRING DEFAULT 'billing'
+);
+
+-- Order items as separate collection with edges
+CREATE COLLECTION order_items (
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    unit_price FLOAT NOT NULL,
+    discount_percent FLOAT DEFAULT 0
+) WITH DESCRIPTION 'Individual items within an order';
+
+-- Relationships for order items
+CREATE EDGE COLLECTION contains_item
+FROM orders TO order_items
+WITH PROPERTIES (
+    line_number INTEGER
+);
+
+CREATE EDGE COLLECTION item_is_product
+FROM order_items TO products;
+----
+
+== Database-Specific Migration
+
+=== PostgreSQL Migration
+
+==== Export Data
+
+[source,bash]
+----
+#!/bin/bash
+# export-postgres.sh - Export PostgreSQL database for Lith migration
+
+DATABASE="your_database"
+OUTPUT_DIR="./lith-export"
+mkdir -p "$OUTPUT_DIR"
+
+# Export each table as JSON (preferred format)
+for table in $(psql -d "$DATABASE" -t -c "SELECT tablename FROM pg_tables WHERE schemaname = 'public'"); do
+    echo "Exporting $table..."
+    psql -d "$DATABASE" -c "\COPY (SELECT row_to_json(t) FROM (SELECT * FROM $table) t) TO '$OUTPUT_DIR/${table}.jsonl'"
+done
+
+# Export schema information
+pg_dump --schema-only "$DATABASE" > "$OUTPUT_DIR/schema.sql"
+
+# Export foreign key relationships for edge creation
+psql -d "$DATABASE" -t -c "
+    SELECT json_build_object(
+        'from_table', tc.table_name,
+        'from_column', kcu.column_name,
+        'to_table', ccu.table_name,
+        'to_column', ccu.column_name,
+        'constraint_name', tc.constraint_name
+    )
+    FROM information_schema.table_constraints tc
+    JOIN information_schema.key_column_usage kcu
+        ON tc.constraint_name = kcu.constraint_name
+    JOIN information_schema.constraint_column_usage ccu
+        ON ccu.constraint_name = tc.constraint_name
+    WHERE tc.constraint_type = 'FOREIGN KEY'
+" > "$OUTPUT_DIR/relationships.jsonl"
+
+echo "Export complete. Files in $OUTPUT_DIR"
+----
+
+==== Import to Lith
+
+[source,fql]
+----
+-- Create collections based on exported schema
+-- (Run schema translation first)
+
+-- Import documents with default provenance for migration
+INSERT INTO articles
+IMPORT FROM 'articles.jsonl'
+WITH PROVENANCE {
+    actor: "migration-script",
+    rationale: "Bulk import from PostgreSQL migration on 2026-01-12"
+};
+
+-- Verify import
+SELECT COUNT(*) FROM articles;
+INTROSPECT COLLECTION articles;
+----
+
+==== Handle PostgreSQL-Specific Features
+
+[cols="1,2"]
+|===
+| PostgreSQL Feature | Lith Approach
+
+| **Schemas (namespaces)**
+| Prefix collection names: `public_users` or use separate databases
+
+| **Sequences**
+| Use UUID `_key` (auto-generated) or custom ID generation
+
+| **Materialized Views**
+| Create read-through collections (🚧 planned)
+
+| **Stored Procedures**
+| Move logic to application layer
+
+| **Triggers**
+| Use journal subscriptions (🚧 planned)
+
+| **Full-Text Search**
+| Integration with Meilisearch/Typesense (🚧 planned)
+
+| **PostGIS Geometry**
+| Use GeoJSON in JSON field, native GEO type planned
+
+| **Arrays**
+| Use JSON arrays
+
+| **JSONB operators**
+| Native JSON support with similar operators
+
+| **CTEs (WITH clause)**
+| Chain queries or use TRAVERSE for graph queries
+|===
+
+=== MySQL Migration
+
+==== Export Data
+
+[source,bash]
+----
+#!/bin/bash
+# export-mysql.sh - Export MySQL database for Lith migration
+
+DATABASE="your_database"
+OUTPUT_DIR="./lith-export"
+mkdir -p "$OUTPUT_DIR"
+
+# Export each table as JSON
+for table in $(mysql -N -e "SHOW TABLES" "$DATABASE"); do
+    echo "Exporting $table..."
+    mysql -N -e "SELECT JSON_OBJECT($(mysql -N -e "SELECT GROUP_CONCAT(CONCAT(\"'\", COLUMN_NAME, \"', \", COLUMN_NAME)) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='$DATABASE' AND TABLE_NAME='$table'")) FROM $table" "$DATABASE" > "$OUTPUT_DIR/${table}.jsonl"
+done
+
+# Export schema
+mysqldump --no-data "$DATABASE" > "$OUTPUT_DIR/schema.sql"
+
+# Export foreign keys
+mysql -N -e "
+    SELECT JSON_OBJECT(
+        'from_table', TABLE_NAME,
+        'from_column', COLUMN_NAME,
+        'to_table', REFERENCED_TABLE_NAME,
+        'to_column', REFERENCED_COLUMN_NAME,
+        'constraint_name', CONSTRAINT_NAME
+    )
+    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE REFERENCED_TABLE_NAME IS NOT NULL
+        AND TABLE_SCHEMA = '$DATABASE'
+" "$DATABASE" > "$OUTPUT_DIR/relationships.jsonl"
+
+echo "Export complete."
+----
+
+==== MySQL-Specific Considerations
+
+[cols="1,2"]
+|===
+| MySQL Feature | Lith Approach
+
+| **AUTO_INCREMENT**
+| Use UUID `_key` (auto-generated)
+
+| **ENUM type**
+| STRING with CHECK constraint
+
+| **SET type**
+| JSON array with validation
+
+| **Spatial types**
+| GeoJSON in JSON field
+
+| **FULLTEXT indexes**
+| External search integration
+
+| **Stored Procedures**
+| Application layer logic
+
+| **Events (scheduled)**
+| External scheduler (cron, systemd timers)
+
+| **Partitioning**
+| Collection sharding (🚧 planned)
+|===
+
+=== SQLite Migration
+
+==== Export Data
+
+[source,bash]
+----
+#!/bin/bash
+# export-sqlite.sh - Export SQLite database for Lith migration
+
+DATABASE="your_database.db"
+OUTPUT_DIR="./lith-export"
+mkdir -p "$OUTPUT_DIR"
+
+# Get list of tables
+tables=$(sqlite3 "$DATABASE" "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+
+# Export each table as JSON
+for table in $tables; do
+    echo "Exporting $table..."
+    sqlite3 -json "$DATABASE" "SELECT * FROM $table" > "$OUTPUT_DIR/${table}.json"
+done
+
+# Export schema
+sqlite3 "$DATABASE" ".schema" > "$OUTPUT_DIR/schema.sql"
+
+echo "Export complete."
+----
+
+==== SQLite-Specific Considerations
+
+[cols="1,2"]
+|===
+| SQLite Feature | Lith Approach
+
+| **ROWID/INTEGER PRIMARY KEY**
+| Use UUID `_key`
+
+| **Dynamic typing**
+| Explicit type declarations in FQL
+
+| **ATTACH DATABASE**
+| Separate Lith databases
+
+| **Virtual tables (FTS5)**
+| External search integration
+
+| **JSON1 extension**
+| Native JSON support
+
+| **Window functions**
+| Query decomposition or application logic
+|===
+
+== Relationship Migration
+
+Foreign keys in RDBMS become edge collections in Lith. This is one of the most significant changes in migration.
+
+=== Foreign Key to Edge Mapping
+
+.RDBMS Foreign Key
+[source,sql]
+----
+-- articles.author_id → users.id
+ALTER TABLE articles
+ADD CONSTRAINT fk_author
+FOREIGN KEY (author_id) REFERENCES users(id);
+----
+
+.Lith Edge Collection
+[source,fql]
+----
+-- Remove author_id from articles collection
+-- Create edge collection instead
+CREATE EDGE COLLECTION written_by
+FROM articles TO users
+WITH PROPERTIES (
+    role STRING DEFAULT 'author'
+);
+----
+
+=== Migration Script for Relationships
+
+[source,bash]
+----
+#!/bin/bash
+# migrate-relationships.sh - Convert foreign keys to edges
+
+# For each relationship in relationships.jsonl:
+while IFS= read -r line; do
+    from_table=$(echo "$line" | jq -r '.from_table')
+    from_column=$(echo "$line" | jq -r '.from_column')
+    to_table=$(echo "$line" | jq -r '.to_table')
+
+    # Generate edge collection name
+    edge_name="${from_table}_to_${to_table}"
+
+    echo "Creating edge collection: $edge_name"
+
+    # Generate FQL for edge creation
+    cat << EOF
+CREATE EDGE COLLECTION $edge_name
+FROM $from_table TO $to_table;
+
+-- Migrate existing relationships
+INSERT INTO $edge_name
+SELECT
+    a._key as _from,
+    (SELECT _key FROM $to_table WHERE old_id = a.$from_column) as _to
+FROM $from_table a
+WHERE a.$from_column IS NOT NULL
+WITH PROVENANCE {
+    actor: "migration-script",
+    rationale: "Converting foreign key $from_column to edge"
+};
+EOF
+
+done < relationships.jsonl
+----
+
+=== Many-to-Many Relationships
+
+.RDBMS Junction Table
+[source,sql]
+----
+CREATE TABLE article_tags (
+    article_id INTEGER REFERENCES articles(id),
+    tag_id INTEGER REFERENCES tags(id),
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (article_id, tag_id)
+);
+----
+
+.Lith Edge Collection
+[source,fql]
+----
+-- Junction table becomes edge collection with properties
+CREATE EDGE COLLECTION tagged_with
+FROM articles TO tags
+WITH PROPERTIES (
+    added_at TIMESTAMP DEFAULT NOW(),
+    added_by STRING
+);
+
+-- Migrate existing tag relationships
+INSERT INTO tagged_with
+SELECT
+    (SELECT _key FROM articles WHERE old_id = jt.article_id) as _from,
+    (SELECT _key FROM tags WHERE old_id = jt.tag_id) as _to,
+    jt.added_at as added_at
+FROM article_tags_import jt
+WITH PROVENANCE {
+    actor: "migration-script",
+    rationale: "Converting article_tags junction table"
+};
+----
+
+=== Self-Referencing Relationships
+
+.RDBMS Self-Reference
+[source,sql]
+----
+CREATE TABLE employees (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    manager_id INTEGER REFERENCES employees(id)
+);
+----
+
+.Lith Self-Referencing Edge
+[source,fql]
+----
+CREATE COLLECTION employees (
+    name STRING NOT NULL
+);
+
+CREATE EDGE COLLECTION reports_to
+FROM employees TO employees
+WITH PROPERTIES (
+    relationship STRING DEFAULT 'direct_report'
+);
+
+-- Query the hierarchy
+TRAVERSE
+    START employees WHERE name = 'Jane'
+    FOLLOW reports_to DEPTH 3
+    DIRECTION INBOUND
+    RETURN employees.name, DEPTH;
+----
+
+== Query Translation
+
+=== Basic Queries
+
+[cols="1,1"]
+|===
+| SQL | FQL
+
+| `SELECT * FROM users`
+| `SELECT * FROM users`
+
+| `SELECT name, email FROM users`
+| `SELECT name, email FROM users`
+
+| `SELECT * FROM users WHERE active = true`
+| `SELECT * FROM users WHERE active = true`
+
+| `SELECT * FROM users ORDER BY name`
+| `SELECT * FROM users ORDER BY name`
+
+| `SELECT * FROM users LIMIT 10`
+| `SELECT * FROM users LIMIT 10`
+
+| `SELECT * FROM users LIMIT 10 OFFSET 20`
+| `SELECT * FROM users OFFSET 20 LIMIT 10`
+
+| `SELECT COUNT(*) FROM users`
+| `SELECT COUNT(*) FROM users`
+
+| `SELECT DISTINCT status FROM orders`
+| `SELECT DISTINCT status FROM orders`
+|===
+
+=== Aggregations
+
+[cols="1,1"]
+|===
+| SQL | FQL
+
+| `SELECT COUNT(*), status FROM orders GROUP BY status`
+| `SELECT COUNT(*), status FROM orders GROUP BY status`
+
+| `SELECT SUM(amount) FROM orders`
+| `SELECT SUM(amount) FROM orders`
+
+| `SELECT AVG(score) FROM reviews WHERE product_id = 123`
+| `SELECT AVG(score) FROM reviews WHERE product_id = '123'`
+
+| `SELECT MAX(created_at) FROM logs`
+| `SELECT MAX(created_at) FROM logs`
+|===
+
+=== JOINs → TRAVERSE
+
+The biggest difference: SQL JOINs become graph traversals.
+
+.SQL JOIN
+[source,sql]
+----
+SELECT
+    a.title,
+    u.name as author_name
+FROM articles a
+JOIN users u ON a.author_id = u.id
+WHERE a.status = 'published';
+----
+
+.FQL TRAVERSE
+[source,fql]
+----
+-- First, ensure edge collection exists
+-- Then traverse the relationship
+TRAVERSE
+    START articles WHERE status = 'published'
+    FOLLOW written_by
+    RETURN articles.title, users.name as author_name;
+----
+
+.SQL Multiple JOINs
+[source,sql]
+----
+SELECT
+    o.order_number,
+    c.name as customer_name,
+    p.name as product_name,
+    oi.quantity
+FROM orders o
+JOIN customers c ON o.customer_id = c.id
+JOIN order_items oi ON oi.order_id = o.id
+JOIN products p ON oi.product_id = p.id
+WHERE o.status = 'shipped';
+----
+
+.FQL Multiple Traversals
+[source,fql]
+----
+TRAVERSE
+    START orders WHERE status = 'shipped'
+    FOLLOW placed_by, contains_item
+    FOLLOW item_is_product FROM order_items
+    RETURN
+        orders.order_number,
+        customers.name as customer_name,
+        products.name as product_name,
+        order_items.quantity;
+----
+
+=== Subqueries
+
+.SQL Subquery
+[source,sql]
+----
+SELECT * FROM users
+WHERE id IN (
+    SELECT DISTINCT author_id
+    FROM articles
+    WHERE status = 'published'
+);
+----
+
+.FQL (using edge traversal)
+[source,fql]
+----
+-- Reverse traversal: find users who have published articles
+TRAVERSE
+    START articles WHERE status = 'published'
+    FOLLOW written_by
+    DIRECTION OUTBOUND
+    RETURN DISTINCT users.*;
+----
+
+=== INSERT Statements
+
+[cols="1,1"]
+|===
+| SQL | FQL
+
+a|
+[source,sql]
+----
+INSERT INTO users (name, email)
+VALUES ('John', 'john@example.com');
+----
+a|
+[source,fql]
+----
+INSERT INTO users {
+    "name": "John",
+    "email": "john@example.com"
+}
+WITH PROVENANCE {
+    actor: "api-user-123",
+    rationale: "User registration"
+};
+----
+|===
+
+=== UPDATE Statements
+
+[cols="1,1"]
+|===
+| SQL | FQL
+
+a|
+[source,sql]
+----
+UPDATE users
+SET email = 'new@example.com'
+WHERE id = 123;
+----
+a|
+[source,fql]
+----
+UPDATE users
+WHERE _key = '123'
+SET email = 'new@example.com'
+WITH PROVENANCE {
+    actor: "admin-456",
+    rationale: "Email change request #789"
+};
+----
+|===
+
+=== DELETE Statements
+
+[cols="1,1"]
+|===
+| SQL | FQL
+
+a|
+[source,sql]
+----
+DELETE FROM users
+WHERE id = 123;
+----
+a|
+[source,fql]
+----
+DELETE FROM users
+WHERE _key = '123'
+WITH PROVENANCE {
+    actor: "admin-456",
+    rationale: "GDPR deletion request #101"
+};
+----
+|===
+
+Note: Lith DELETE creates a tombstone with inverse operation, allowing UNDO.
+
+== Provenance Strategy
+
+Provenance is mandatory for all mutations in Lith. Plan how to capture actor and rationale.
+
+=== Application Architecture Changes
+
+.Before (RDBMS)
+[source,javascript]
+----
+// Simple insert - no audit context
+async function createArticle(title, content, authorId) {
+    await db.query(
+        'INSERT INTO articles (title, content, author_id) VALUES ($1, $2, $3)',
+        [title, content, authorId]
+    );
+}
+----
+
+.After (Lith)
+[source,javascript]
+----
+// Insert with provenance context
+async function createArticle(title, content, authorId, context) {
+    await fdb.query(`
+        INSERT INTO articles {
+            "title": $1,
+            "content": $2
+        }
+        WITH PROVENANCE {
+            actor: $3,
+            rationale: $4
+        }
+    `, [title, content, context.userId, context.reason]);
+
+    // Create edge to author
+    await fdb.query(`
+        CREATE EDGE written_by
+        FROM articles/_last TO users/$1
+        WITH PROVENANCE {
+            actor: $2,
+            rationale: "Article authorship"
+        }
+    `, [authorId, context.userId]);
+}
+----
+
+=== Provenance Context Middleware
+
+.Express.js Middleware Example
+[source,javascript]
+----
+// middleware/provenance.js
+function provenanceMiddleware(req, res, next) {
+    // Extract user from JWT or session
+    const userId = req.user?.id || 'anonymous';
+    const sessionId = req.sessionID;
+
+    // Attach provenance context to request
+    req.provenance = {
+        actor: `user:${userId}@session:${sessionId}`,
+        // Rationale comes from request or defaults
+        rationale: req.body._rationale || req.query._rationale ||
+                   `${req.method} ${req.path} from ${req.ip}`
+    };
+
+    next();
+}
+
+// Usage in route
+app.post('/articles', provenanceMiddleware, async (req, res) => {
+    const { title, content } = req.body;
+
+    await fdb.insert('articles', { title, content }, {
+        actor: req.provenance.actor,
+        rationale: req.body.rationale || 'Created via API'
+    });
+});
+----
+
+=== Bulk Migration Provenance
+
+For migrated data, use migration-specific provenance:
+
+[source,fql]
+----
+-- Set migration context for bulk imports
+SET PROVENANCE DEFAULTS {
+    actor: "migration-script-v1.0",
+    rationale: "Initial data migration from PostgreSQL (production backup 2026-01-10)"
+};
+
+-- Bulk imports use default provenance
+INSERT INTO articles IMPORT FROM 'articles.jsonl';
+INSERT INTO users IMPORT FROM 'users.jsonl';
+
+-- Clear defaults when done
+CLEAR PROVENANCE DEFAULTS;
+----
+
+=== Provenance Patterns by Use Case
+
+[cols="1,2,2"]
+|===
+| Scenario | Actor Format | Rationale Example
+
+| User action
+| `user:123@session:abc`
+| "Updated profile email"
+
+| API integration
+| `service:payment-processor`
+| "Payment confirmed #PAY-456"
+
+| Scheduled job
+| `job:daily-cleanup@host:prod-1`
+| "Expired sessions purge"
+
+| Migration
+| `migration:v1.0.0`
+| "PostgreSQL migration from backup 2026-01-10"
+
+| Admin override
+| `admin:jane@sudo`
+| "Emergency data fix per ticket #INC-789"
+
+| AI agent
+| `agent:document-classifier@model:v2`
+| "Automated classification confidence=0.95"
+|===
+
+== Testing Migration
+
+=== Validation Queries
+
+[source,fql]
+----
+-- Compare row counts
+SELECT COUNT(*) as lith_count FROM articles;
+-- Compare with: SELECT COUNT(*) FROM articles; (in PostgreSQL)
+
+-- Verify all relationships migrated
+SELECT
+    COUNT(*) as edge_count,
+    (SELECT COUNT(*) FROM articles WHERE author_id IS NOT NULL) as expected
+FROM written_by;
+
+-- Check for data integrity
+SELECT * FROM articles
+WHERE title IS NULL OR title = '';
+
+-- Verify provenance on migrated data
+SELECT _provenance FROM articles LIMIT 5;
+----
+
+=== Regression Testing
+
+Create test queries that should return identical results:
+
+[source,javascript]
+----
+// test/migration-validation.js
+const testCases = [
+    {
+        name: 'Article count by status',
+        postgres: 'SELECT status, COUNT(*) FROM articles GROUP BY status',
+        lith: 'SELECT status, COUNT(*) FROM articles GROUP BY status'
+    },
+    {
+        name: 'Users with articles',
+        postgres: `
+            SELECT u.name, COUNT(a.id) as article_count
+            FROM users u
+            LEFT JOIN articles a ON a.author_id = u.id
+            GROUP BY u.id
+        `,
+        lith: `
+            TRAVERSE
+                START users
+                FOLLOW written_by DIRECTION INBOUND
+                RETURN users.name, COUNT(articles) as article_count
+                GROUP BY users._key
+        `
+    }
+];
+
+async function validateMigration() {
+    for (const test of testCases) {
+        const pgResult = await postgres.query(test.postgres);
+        const fdbResult = await lith.query(test.lith);
+
+        assert.deepEqual(
+            normalizeResult(pgResult),
+            normalizeResult(fdbResult),
+            `Mismatch in: ${test.name}`
+        );
+    }
+}
+----
+
+=== Data Sampling
+
+[source,fql]
+----
+-- Sample random documents to verify data integrity
+SELECT * FROM articles
+ORDER BY RANDOM()
+LIMIT 10;
+
+-- Check for missing references (should be 0)
+SELECT COUNT(*) FROM written_by
+WHERE _to NOT IN (SELECT _key FROM users);
+
+-- Verify timestamps preserved
+SELECT
+    MIN(created_at) as earliest,
+    MAX(created_at) as latest,
+    COUNT(*) as total
+FROM articles;
+----
+
+== Rollback Planning
+
+Maintain parallel operation during migration:
+
+=== Dual-Write Strategy
+
+[source,javascript]
+----
+// During migration: write to both systems
+async function createArticle(data, context) {
+    // Write to Lith (new system)
+    const fdbResult = await lith.insert('articles', data, context.provenance);
+
+    // Write to PostgreSQL (old system) for rollback safety
+    await postgres.query(
+        'INSERT INTO articles (id, title, content) VALUES ($1, $2, $3)',
+        [fdbResult._key, data.title, data.content]
+    );
+
+    return fdbResult;
+}
+----
+
+=== Migration Phases
+
+[source]
+----
+Phase 1: Preparation (1-2 weeks)
+├── Schema translation complete
+├── Export scripts tested
+├── Import scripts tested
+├── Application changes coded (feature flagged)
+└── Rollback procedures documented
+
+Phase 2: Shadow Mode (1-2 weeks)
+├── Dual-write enabled
+├── Read from PostgreSQL (source of truth)
+├── Write to both PostgreSQL and Lith
+├── Compare query results continuously
+└── Fix discrepancies
+
+Phase 3: Cutover (1 day)
+├── Stop writes to PostgreSQL
+├── Final sync to Lith
+├── Verify data consistency
+├── Switch reads to Lith
+├── Enable Lith as source of truth
+└── Keep PostgreSQL read-only for rollback
+
+Phase 4: Cleanup (1 week)
+├── Monitor Lith in production
+├── Remove dual-write code
+├── Archive PostgreSQL backup
+└── Decommission PostgreSQL (after confidence period)
+----
+
+== Migration Tooling
+
+=== Current Tools (Manual)
+
+[cols="1,2,2"]
+|===
+| Tool | Purpose | Status
+
+| Export scripts
+| Shell scripts for RDBMS export
+| Examples in this guide
+
+| Schema translator
+| SQL DDL → FQL DDL
+| Manual process
+
+| Bulk import
+| FQL `IMPORT FROM` command
+| Available
+
+| Validation queries
+| Data integrity checks
+| Manual queries
+|===
+
+=== Planned Tools (Milestone M12)
+
+[cols="1,2,2"]
+|===
+| Tool | Purpose | Timeline
+
+| `lith-migrate`
+| CLI migration tool
+| 🚧 Planned
+
+| PostgreSQL adapter
+| Direct pg_dump integration
+| 🚧 Planned
+
+| MySQL adapter
+| Direct mysqldump integration
+| 🚧 Planned
+
+| SQLite adapter
+| Direct SQLite integration
+| 🚧 Planned
+
+| Schema analyzer
+| Automatic SQL→FQL translation
+| 🚧 Planned
+
+| Relationship detector
+| FK to edge auto-conversion
+| 🚧 Planned
+
+| Validation framework
+| Automated migration testing
+| 🚧 Planned
+|===
+
+=== CLI Tool Design (Preview)
+
+[source,bash]
+----
+# Planned lith-migrate CLI
+
+# Analyze source database
+lith-migrate analyze \
+    --source postgres://user:pass@host/db \
+    --output analysis.json
+
+# Generate FQL schema
+lith-migrate schema \
+    --from analysis.json \
+    --output schema.fql
+
+# Export data with transformation
+lith-migrate export \
+    --source postgres://user:pass@host/db \
+    --format jsonl \
+    --output ./export/
+
+# Import to Lith
+lith-migrate import \
+    --target lith://localhost:8765/mydb \
+    --schema schema.fql \
+    --data ./export/ \
+    --provenance '{"actor": "migration", "rationale": "Initial import"}'
+
+# Validate migration
+lith-migrate validate \
+    --source postgres://user:pass@host/db \
+    --target lith://localhost:8765/mydb \
+    --report validation-report.html
+----
+
+== Troubleshooting
+
+=== Common Migration Issues
+
+[cols="1,2,2"]
+|===
+| Issue | Cause | Solution
+
+| **Type mismatch**
+| PostgreSQL types not mapping cleanly
+| Use explicit type conversion in export
+
+| **Missing relationships**
+| Foreign keys not captured
+| Re-run relationship export, check junction tables
+
+| **Duplicate keys**
+| ID collision during import
+| Use UUID generation, don't preserve integer IDs
+
+| **Provenance errors**
+| Missing actor/rationale
+| Set default provenance for bulk imports
+
+| **Slow imports**
+| Large dataset, no batching
+| Use batch imports with progress tracking
+
+| **Encoding issues**
+| Non-UTF8 data in source
+| Convert encoding during export
+
+| **NULL handling**
+| Different NULL semantics
+| Explicit NULL checks in validation
+|===
+
+=== Debugging Queries
+
+[source,fql]
+----
+-- Find documents without edges (orphaned data)
+SELECT * FROM articles
+WHERE _key NOT IN (SELECT _from FROM written_by);
+
+-- Find edges pointing to non-existent documents
+SELECT * FROM written_by
+WHERE _to NOT IN (SELECT _key FROM users);
+
+-- Check for duplicate data
+SELECT title, COUNT(*) as count
+FROM articles
+GROUP BY title
+HAVING COUNT(*) > 1;
+
+-- Inspect journal for migration activity
+SELECT * FROM _journal
+WHERE provenance.actor LIKE 'migration%'
+ORDER BY sequence DESC
+LIMIT 100;
+----
+
+=== Performance Tuning
+
+[source,fql]
+----
+-- Create indexes for common query patterns
+CREATE INDEX idx_articles_status ON articles(status);
+CREATE INDEX idx_articles_created ON articles(created_at);
+
+-- For edge traversals, ensure edge indexes
+CREATE INDEX idx_written_by_from ON written_by(_from);
+CREATE INDEX idx_written_by_to ON written_by(_to);
+
+-- Analyze query performance
+EXPLAIN SELECT * FROM articles WHERE status = 'published';
+----
+
+== See Also
+
+* link:../QUICKSTART.adoc[Quickstart Guide] - Getting started with Lith
+* link:../spec/fql.adoc[FQL Specification] - Complete FQL language reference
+* link:API-REFERENCE.adoc[API Reference] - Programmatic interfaces
+* link:DEPLOYMENT.adoc[Deployment Guide] - Production deployment
+* link:../ARCHITECTURE.adoc[Architecture] - Technical architecture

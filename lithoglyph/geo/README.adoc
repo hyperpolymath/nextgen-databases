@@ -1,0 +1,299 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: 2026 hyperpolymath
+= Lith-Geo
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+
+image:https://img.shields.io/badge/Stage-Development-orange.svg[Stage]
+image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
+
+[.lead]
+*Geospatial extension for Lith - spatial indexing without compromising auditability.*
+
+Location-aware evidence tracking for investigative journalism.
+
+toc::[]
+
+== Overview
+
+Lith-Geo adds geospatial capabilities to Lith while preserving the core guarantees:
+
+* **Auditability preserved** - Spatial operations are projections, source data remains in Lith
+* **Reversibility maintained** - Spatial index is derived, can be rebuilt from journal
+* **Provenance tracked** - "Where did this location data come from?"
+
+=== Use Cases
+
+* **Investigative journalism**: Map evidence locations, track movement patterns
+* **Compliance**: Geographic jurisdiction tracking, data sovereignty
+* **Cultural archives**: Historical location mapping, site preservation
+
+== Architecture
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────────┐
+│  Lith-Geo API                                              │
+│  REST endpoints for spatial queries                          │
+├─────────────────────────────────────────────────────────────┤
+│  Spatial Index (R-tree)                                      │
+│  Materialized projection of Lith data                      │
+│  Rebuilt on demand from Lith journal                       │
+├─────────────────────────────────────────────────────────────┤
+│  Lith HTTP API (reads)                                     │
+│  All writes go through Lith (provenance preserved)         │
+└─────────────────────────────────────────────────────────────┘
+----
+
+=== Key Principle: Projection, Not Storage
+
+Lith-Geo does NOT store source data. It:
+
+1. Reads documents from Lith via HTTP API
+2. Extracts location fields (lat/lon, GeoJSON, WKT)
+3. Builds spatial index as materialized view
+4. Serves spatial queries against the index
+5. Returns Lith document IDs for full provenance
+
+[source,text]
+----
+Lith Journal (source of truth)
+    │
+    ├── doc_123: { location: { lat: 51.5, lon: -0.1 }, ... }
+    ├── doc_456: { location: { lat: 48.8, lon: 2.3 }, ... }
+    │
+    ▼
+Lith-Geo R-tree Index (derived)
+    │
+    ├── Point(51.5, -0.1) → doc_123
+    ├── Point(48.8, 2.3) → doc_456
+    │
+    ▼
+Spatial Query: "within 10km of London"
+    │
+    ▼
+Result: [doc_123] (with full Lith provenance)
+----
+
+== Features
+
+=== Spatial Query Types
+
+* **Point queries**: Find documents at exact coordinates
+* **Bounding box**: Documents within rectangular region
+* **Radius search**: Documents within distance of point
+* **Polygon containment**: Documents within arbitrary shape
+* **Nearest neighbor**: K closest documents to point
+
+=== Supported Geometry Types
+
+* Point (lat/lon)
+* LineString
+* Polygon
+* MultiPoint, MultiLineString, MultiPolygon
+* GeometryCollection
+
+=== Coordinate Systems
+
+* WGS84 (EPSG:4326) - default
+* Web Mercator (EPSG:3857)
+* Custom CRS via PROJ
+
+== API
+
+=== Endpoints
+
+[source,text]
+----
+GET  /geo/within-bbox?minLat=...&minLon=...&maxLat=...&maxLon=...
+GET  /geo/within-radius?lat=...&lon=...&radius=...&unit=km
+GET  /geo/within-polygon?geojson=...
+GET  /geo/nearest?lat=...&lon=...&k=10
+POST /geo/reindex                    # Rebuild from Lith
+GET  /geo/health                     # Index status
+----
+
+=== Example Queries
+
+[source,bash]
+----
+# Find evidence within 50km of London
+curl "http://localhost:8081/geo/within-radius?lat=51.5074&lon=-0.1278&radius=50&unit=km"
+
+# Find evidence in bounding box (UK)
+curl "http://localhost:8081/geo/within-bbox?minLat=49.9&minLon=-6.4&maxLat=55.8&maxLon=1.8"
+
+# Find 10 nearest documents to a location
+curl "http://localhost:8081/geo/nearest?lat=48.8566&lon=2.3522&k=10"
+----
+
+=== Response Format
+
+[source,json]
+----
+{
+  "query": {
+    "type": "within-radius",
+    "center": { "lat": 51.5074, "lon": -0.1278 },
+    "radius_km": 50
+  },
+  "results": [
+    {
+      "lithoglyph_id": "doc_123",
+      "location": { "lat": 51.5, "lon": -0.1 },
+      "distance_km": 0.82,
+      "provenance_url": "http://lithoglyph:8080/documents/doc_123"
+    }
+  ],
+  "index_timestamp": "2026-01-16T12:00:00Z",
+  "total_indexed": 15234
+}
+----
+
+== Installation
+
+=== Prerequisites
+
+* Rust 1.75+ (stable)
+* Lith running with HTTP API enabled
+
+=== Build
+
+[source,bash]
+----
+git clone https://github.com/hyperpolymath/lithoglyph-geo
+cd lithoglyph-geo
+cargo build --release
+----
+
+=== Configuration
+
+[source,toml]
+----
+# lithoglyph-geo.toml
+[lithoglyph]
+api_url = "http://localhost:8080"
+collection = "evidence"           # Collection to index
+location_field = "location"       # Field containing coordinates
+
+[server]
+host = "127.0.0.1"
+port = 8081
+
+[index]
+# Rebuild interval (0 = manual only)
+auto_rebuild_minutes = 0
+# Memory limit for R-tree
+max_memory_mb = 512
+----
+
+=== Run
+
+[source,bash]
+----
+# Start the server
+./target/release/lithoglyph-geo --config lithoglyph-geo.toml
+
+# Build initial index
+curl -X POST http://localhost:8081/geo/reindex
+----
+
+== Technology Stack
+
+|===
+| Component | Technology | Rationale
+
+| Core
+| Rust
+| Performance, memory safety, no GC pauses
+
+| Spatial Index
+| rstar (R-tree)
+| Pure Rust, no C dependencies
+
+| HTTP Server
+| axum
+| Async, tower ecosystem
+
+| Geometry
+| geo crate
+| Rust-native geometry primitives
+
+| Serialization
+| serde + GeoJSON
+| Standard formats
+|===
+
+== Non-Goals
+
+* **Not a PostGIS replacement** - Use PostGIS for heavy GIS workloads
+* **Not a tile server** - Use Martin/pg_tileserv for map tiles
+* **Not storing source data** - Lith is the source of truth
+* **Not real-time tracking** - Batch indexing from Lith journal
+
+== Project Structure
+
+[source,text]
+----
+lithoglyph-geo/
+├── src/
+│   ├── main.rs              # Entry point
+│   ├── lib.rs               # Library root
+│   ├── index/
+│   │   ├── mod.rs
+│   │   ├── rtree.rs         # R-tree implementation
+│   │   └── projection.rs    # Lith → spatial projection
+│   ├── api/
+│   │   ├── mod.rs
+│   │   ├── routes.rs        # HTTP endpoints
+│   │   └── queries.rs       # Spatial query handlers
+│   ├── lithoglyph/
+│   │   ├── mod.rs
+│   │   └── client.rs        # Lith HTTP client
+│   └── config.rs            # Configuration
+├── spec/
+│   └── spatial-queries.adoc # Query specification
+├── Cargo.toml
+├── README.adoc
+├── ECOSYSTEM.scm
+├── STATE.scm
+├── META.scm
+└── LICENSE
+----
+
+== Roadmap
+
+=== v0.1.0: Core Indexing (MVP)
+* [ ] R-tree spatial index
+* [ ] Lith HTTP client
+* [ ] Bounding box queries
+* [ ] Radius queries
+* [ ] Manual reindex endpoint
+
+=== v0.2.0: Advanced Queries
+* [ ] Polygon containment
+* [ ] Nearest neighbor (k-NN)
+* [ ] LineString queries (route intersection)
+
+=== v0.3.0: Performance
+* [ ] Incremental index updates (watch Lith journal)
+* [ ] Index persistence (avoid full rebuild on restart)
+* [ ] Query result caching
+
+=== v0.4.0: Integration
+* [ ] Lith Studio integration (map view)
+* [ ] GeoJSON export
+* [ ] Bulk import from external GIS
+
+== Related Projects
+
+* https://github.com/hyperpolymath/lithoglyph[Lith] - The narrative-first database (source of truth)
+* https://github.com/hyperpolymath/lithoglyph-studio[Lith Studio] - GUI (map visualization target)
+* https://github.com/hyperpolymath/lithoglyph-analytics[Lith Analytics] - OLAP analytics engine
+* https://github.com/hyperpolymath/bofig[BoFIG] - Evidence graph (potential consumer)
+
+== License
+
+PMPL-1.0-or-later

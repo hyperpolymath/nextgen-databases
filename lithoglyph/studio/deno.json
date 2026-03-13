@@ -1,0 +1,26 @@
+{
+  "name": "@hyperpolymath/lith-studio",
+  "version": "0.1.0",
+  "exports": "./src/main.ts",
+  "tasks": {
+    "dev": "cargo tauri dev",
+    "build": "cargo tauri build",
+    "rescript": "^12.0.0",
+    "rescript:build": "npx rescript build",
+    "bundle": "deno run -A npm:esbuild src/main.tsx --bundle --outfile=dist/app.js --format=esm --external:@tauri-apps/api",
+    "fmt": "deno fmt src/"
+  },
+  "imports": {
+    "@tauri-apps/api": "npm:@tauri-apps/api@^2",
+    "react": "npm:react@^18",
+    "react-dom": "npm:react-dom@^18",
+    "rescript": "^12.0.0",
+    "@rescript/core": "npm:@rescript/core@^1.6.0",
+    "@rescript/react": "npm:@rescript/react@^0.13.0",
+    "esbuild": "npm:esbuild@^0.24.0"
+  },
+  "fmt": {
+    "indentWidth": 2,
+    "singleQuote": true
+  }
+}

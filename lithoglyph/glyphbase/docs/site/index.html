@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<!-- SPDX-License-Identifier: PMPL-1.0-or-later -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Glyphbase - The open-source Airtable alternative with permanence. Carve your data in stone.">
+    <title>Glyphbase - Carve Your Data in Stone</title>
+    <style>
+        :root {
+            --stone: #4a5568;
+            --carved: #2d3748;
+            --glyph: #805ad5;
+            --light: #f7fafc;
+            --accent: #667eea;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--carved);
+            background: linear-gradient(135deg, var(--light) 0%, #e6f2ff 100%);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--stone) 0%, var(--carved) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        header .tagline {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            font-weight: 300;
+            margin-bottom: 2rem;
+        }
+
+        header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .hero-actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: var(--glyph);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--stone);
+            border: 2px solid var(--stone);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .feature-card h3 {
+            color: var(--glyph);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .comparison {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 3rem 0;
+        }
+
+        .comparison h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--carved);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: var(--stone);
+            color: white;
+            font-weight: 600;
+        }
+
+        .check {
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .cross {
+            color: #f56565;
+        }
+
+        footer {
+            background: var(--carved);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .quick-start {
+            background: #f7f7f7;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .quick-start code {
+            display: block;
+            padding: 0.5rem;
+            background: #2d3748;
+            color: #a0aec0;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🪨 Glyphbase</h1>
+        <div class="tagline">Carve your data in stone.</div>
+        <div class="subtitle">
+            The open-source Airtable alternative with permanence.
+            Every change tracked forever, fully reversible, mathematically proven.
+        </div>
+        <div class="hero-actions">
+            <a href="#install" class="btn btn-primary">Get Started</a>
+            <a href="https://github.com/hyperpolymath/glyphbase" class="btn btn-secondary">View on GitHub</a>
+            <a href="/docs/USER-GUIDE.html" class="btn btn-secondary">Documentation</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">📜</div>
+                <h3>Provenance by Default</h3>
+                <p>Every cell change records <strong>who</strong>, <strong>when</strong>, and <strong>why</strong>. Not optional, built into the core.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⏮️</div>
+                <h3>Full Reversibility</h3>
+                <p>Undo any change, forever, with mathematical proof. Time travel through your entire data history.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">☁️</div>
+                <h3>Cloud-Safe Sync</h3>
+                <p>Sync via Dropbox/GDrive without corruption. Append-only journal means no conflicts, ever.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🏠</div>
+                <h3>Self-Hosted</h3>
+                <p>Your data stays on your servers. Run locally, on-prem, or in your own cloud.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>PROMPT Scores</h3>
+                <p>Research-grade data quality scoring: Provenance, Reproducibility, Openness, Methodology, Peer review, Timeliness.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">👁️</div>
+                <h3>Multiple Views</h3>
+                <p>Grid, Kanban, Calendar, Gallery, and Form views. One dataset, infinite perspectives.</p>
+            </div>
+        </section>
+
+        <section class="comparison">
+            <h2>Why Glyphbase?</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Airtable</th>
+                        <th>NocoDB</th>
+                        <th>Baserow</th>
+                        <th><strong>Glyphbase</strong></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Self-hosted</td>
+                        <td class="cross">✗</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check"><strong>✓</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Open source</td>
+                        <td class="cross">✗</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check"><strong>✓</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Provenance tracking</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="check"><strong>✓ Built-in</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Full undo history</td>
+                        <td>Limited</td>
+                        <td>Limited</td>
+                        <td>Limited</td>
+                        <td class="check"><strong>✓ Forever</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Cloud sync safe</td>
+                        <td>N/A</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="check"><strong>✓ Append-only</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Data quality scores</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="check"><strong>✓ PROMPT</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="install">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Quick Start</h2>
+            <div class="quick-start">
+                <h3>Install with Docker</h3>
+                <code>docker pull ghcr.io/hyperpolymath/glyphbase:latest</code>
+                <code>docker run -p 4000:4000 -v ./data:/data glyphbase</code>
+
+                <h3 style="margin-top: 2rem;">Or from source</h3>
+                <code>git clone https://github.com/hyperpolymath/glyphbase</code>
+                <code>cd glyphbase/server && gleam run</code>
+                <code># Open http://localhost:4000</code>
+            </div>
+
+            <p style="text-align: center; margin-top: 2rem;">
+                <a href="/QUICKSTART.html" class="btn btn-primary">View Full Installation Guide →</a>
+            </p>
+        </section>
+
+        <section style="margin-top: 4rem; text-align: center;">
+            <h2>Built on Lithoglyph</h2>
+            <p style="max-width: 800px; margin: 1rem auto; color: var(--stone);">
+                Glyphbase is powered by <a href="https://lithoglyph.org" style="color: var(--glyph); font-weight: 600;">Lithoglyph</a>,
+                the narrative-first database engine that treats data with the permanence it deserves.
+                Every glyph (record) is carved in stone, with full provenance and reversibility guaranteed by mathematics.
+            </p>
+        </section>
+    </div>
+
+    <footer>
+        <p>
+            <strong>Glyphbase</strong> is open source under the
+            <a href="https://github.com/hyperpolymath/palimpsest-license">Palimpsest License (PMPL-1.0)</a>
+        </p>
+        <p style="margin-top: 1rem;">
+            <a href="https://github.com/hyperpolymath/glyphbase">GitHub</a> ·
+            <a href="https://github.com/hyperpolymath/glyphbase/discussions">Community</a> ·
+            <a href="https://github.com/hyperpolymath/glyphbase/issues">Issues</a> ·
+            <a href="mailto:support@lithoglyph.org">Support</a>
+        </p>
+        <p style="margin-top: 1rem; opacity: 0.7; font-size: 0.9rem;">
+            © 2025 Jonathan D.A. Jewell. Carve your data in stone. 🪨
+        </p>
+    </footer>
+</body>
+</html>

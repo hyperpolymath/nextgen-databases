@@ -1,0 +1,108 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Multi-stage Dockerfile for Lithoglyph HTTP API
+
+# ============================================================
+# Stage 1: Build Rust NIF
+# ============================================================
+FROM docker.io/library/rust:1.78-slim-bookworm AS rust-builder
+
+# Install build dependencies for Rustler NIF
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app/native_rust
+
+COPY native_rust/Cargo.toml native_rust/Cargo.lock ./
+COPY native_rust/src ./src
+
+RUN cargo build --release
+
+# ============================================================
+# Stage 2: Build Elixir Release
+# ============================================================
+FROM docker.io/hexpm/elixir:1.15.7-erlang-26.2.1-debian-bookworm-20231009-slim AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set build environment
+ENV MIX_ENV=prod
+
+WORKDIR /app
+
+# Install hex and rebar
+RUN mix local.hex --force && \
+    mix local.rebar --force
+
+# Copy dependency files
+COPY mix.exs mix.lock ./
+COPY config config
+
+# Fetch and compile dependencies
+RUN mix deps.get --only prod && \
+    mix deps.compile
+
+# Copy Rust NIF from previous stage
+COPY --from=rust-builder /app/native_rust/target/release/liblith_nif.so priv/native/
+
+# Copy application source
+COPY lib lib
+COPY priv priv
+COPY src src
+
+# Compile application
+RUN mix compile
+
+# Build release
+RUN mix release
+
+# ============================================================
+# Stage 3: Runtime (Chainguard Wolfi - Security Hardened)
+# ============================================================
+FROM cgr.dev/chainguard/wolfi-base:latest
+
+# Install runtime dependencies
+# Wolfi uses apk like Alpine but with security-focused package updates
+RUN apk add --no-cache \
+    libstdc++ \
+    ncurses \
+    openssl \
+    ca-certificates \
+    bash \
+    wget
+
+# Create non-root user
+RUN addgroup -g 1000 lith && \
+    adduser -D -u 1000 -G lith lith
+
+WORKDIR /app
+
+# Copy release from builder
+COPY --from=builder --chown=lith:lith /app/_build/prod/rel/lith_http ./
+
+# Create data directory
+RUN mkdir -p /data && chown -R lith:lith /data
+
+USER lith
+
+# Environment
+ENV PORT=4000
+ENV MIX_ENV=prod
+# Disable Erlang distribution by default (standalone container)
+# Set to "name" or "sname" to enable clustering
+ENV RELEASE_DISTRIBUTION=none
+
+# Expose ports
+EXPOSE 4000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:4000/health || exit 1
+
+# Entrypoint
+ENTRYPOINT ["/app/bin/lith_http"]
+CMD ["start"]

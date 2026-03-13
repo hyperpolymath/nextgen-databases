@@ -1,0 +1,20 @@
+INPUT:
+CREATE COLLECTION bofig_entities (
+  primary_name STRING NOT NULL,
+  entity_type STRING NOT NULL,
+  description STRING,
+  first_appearance_date TIMESTAMP,
+  document_count INTEGER DEFAULT 0,
+  credibility_score PROMPT_SCORE,
+  merge_history JSON
+)
+WITH PROVENANCE {
+  actor: "system:schema-init",
+  rationale: "Bofig entity collection — resolved people, orgs, locations with alias tracking"
+}
+---
+PARSED:
+(create-collection "bofig_entities" (fields 7) (provenance (actor "system:schema-init") (rationale "Bofig entity collection — resolved people, orgs, locations with alias tracking")))
+---
+RESULT:
+(ok (created "bofig_entities") (fields 7))

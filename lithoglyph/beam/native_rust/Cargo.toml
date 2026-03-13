@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+[package]
+name = "lith_nif"
+version = "1.0.0"
+edition = "2021"
+authors = ["Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"]
+description = "Lithoglyph BEAM NIF - Rust/Rustler bridge to the Lith C ABI"
+
+[lib]
+name = "lith_nif"
+crate-type = ["cdylib"]
+
+[dependencies]
+rustler = "0.35"
+
+# Link against liblith (the core Zig FFI bridge).
+# Set LITH_LIB_DIR to the directory containing liblith.so
+# at build time, or place it in a standard library search path.
+[package.metadata.lith]
+link = "lith"

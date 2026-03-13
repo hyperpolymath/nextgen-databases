@@ -1,0 +1,8 @@
+INPUT:
+DELETE FROM users WHERE name = "Charlie"
+---
+PARSED:
+(delete (from "users") (where (= "name" "Charlie")))
+---
+RESULT:
+(ok (deleted 0) (collection "users"))

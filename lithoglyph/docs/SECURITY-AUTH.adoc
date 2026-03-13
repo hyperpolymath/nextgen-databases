@@ -1,0 +1,1634 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Lith Security & Authentication Guide
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:sectnums:
+
+[.lead]
+Security architecture, authentication models, authorization patterns, and hardening guidelines for Lith deployments.
+
+toc::[]
+
+== Overview
+
+Lith is designed with security as a foundational principle, not an afterthought. As an audit-grade database targeting investigative journalism, governance, and compliance workloads, security is integral to the narrative-first philosophy.
+
+[IMPORTANT]
+====
+**Current Status: Pre-1.0 Development**
+
+Security features are being implemented incrementally. This document describes both current capabilities and planned features. Sections marked with 🚧 indicate planned functionality.
+====
+
+=== Security Philosophy
+
+Lith's security model follows these core principles:
+
+[cols="1,3"]
+|===
+| Principle | Implementation
+
+| **Auditability First**
+| Every operation is journaled with full provenance (actor, timestamp, rationale). Security events are immutable audit records.
+
+| **Defense in Depth**
+| Multiple security layers: network, transport, authentication, authorization, data encryption, and application-level constraints.
+
+| **Fail Secure**
+| When security checks fail, access is denied. No silent failures—all rejections include explanations.
+
+| **Least Privilege**
+| Default to minimal permissions. Explicit grants required for each capability.
+
+| **Reversibility with Accountability**
+| Operations can be undone, but the undo itself is recorded. Deletion is "soft" by default with provenance preserved.
+
+| **Constraint Enforcement**
+| All constraints enforced at the Form.Bridge layer before data reaches storage. Cannot be bypassed by direct access.
+|===
+
+== Threat Model
+
+=== Assets to Protect
+
+[cols="1,2,2"]
+|===
+| Asset | Sensitivity | Protection Requirements
+
+| **Document Data**
+| Variable (public to highly sensitive)
+| Access control, encryption at rest
+
+| **Edge Relationships**
+| Often more sensitive than nodes
+| Graph traversal controls
+
+| **Provenance Records**
+| Critical for audit integrity
+| Immutable, tamper-evident
+
+| **Journal Entries**
+| Complete operation history
+| Append-only, cryptographic chaining
+
+| **Schema Definitions**
+| Business logic exposure
+| Read-restricted by default
+
+| **Credentials**
+| Authentication secrets
+| Never stored, only hashed references
+
+| **Encryption Keys**
+| Data confidentiality
+| HSM integration, key rotation
+|===
+
+=== Threat Categories
+
+==== External Threats
+
+[cols="1,2,2"]
+|===
+| Threat | Description | Mitigations
+
+| **Unauthorized Access**
+| Attackers gaining system access
+| Strong authentication, network controls, TLS
+
+| **Data Exfiltration**
+| Bulk extraction of sensitive data
+| Rate limiting, anomaly detection, query auditing
+
+| **Injection Attacks**
+| FQL injection, parameter tampering
+| Parameterized queries, input validation
+
+| **Man-in-the-Middle**
+| Network traffic interception
+| TLS 1.3 required, certificate pinning
+
+| **Denial of Service**
+| Resource exhaustion attacks
+| Rate limiting, query complexity limits
+|===
+
+==== Internal Threats
+
+[cols="1,2,2"]
+|===
+| Threat | Description | Mitigations
+
+| **Insider Abuse**
+| Authorized users exceeding permissions
+| RBAC/ABAC, query auditing, anomaly detection
+
+| **Credential Compromise**
+| Stolen or leaked credentials
+| Short-lived tokens, MFA, credential rotation
+
+| **Configuration Errors**
+| Misconfigured security settings
+| Secure defaults, configuration validation
+
+| **Supply Chain**
+| Compromised dependencies
+| Dependency scanning, reproducible builds
+|===
+
+==== Data Integrity Threats
+
+[cols="1,2,2"]
+|===
+| Threat | Description | Mitigations
+
+| **Tampering**
+| Unauthorized data modification
+| Cryptographic checksums, journal verification
+
+| **Repudiation**
+| Denying performed actions
+| Immutable provenance, signed operations
+
+| **Journal Manipulation**
+| Altering audit history
+| Append-only storage, Merkle tree verification
+|===
+
+== Authentication
+
+Authentication verifies the identity of actors (users, services, agents) before granting access.
+
+=== Actor Model
+
+Lith uses a unified actor model for all authentication:
+
+[source,fql]
+----
+-- Every operation requires an actor
+INSERT INTO evidence {
+  title: "Document analysis",
+  content: "..."
+}
+WITH PROVENANCE {
+  actor: "user:alice@example.com",    -- Who
+  rationale: "Initial case upload",   -- Why
+  timestamp: NOW()                    -- When (auto-filled)
+};
+----
+
+Actor identifiers follow a URI scheme:
+
+[cols="1,2,2"]
+|===
+| Scheme | Example | Use Case
+
+| `user:`
+| `user:alice@example.com`
+| Human users
+
+| `service:`
+| `service:ingestion-pipeline`
+| Automated services
+
+| `agent:`
+| `agent:claude-research-assistant`
+| AI agents
+
+| `system:`
+| `system:scheduler`
+| Internal system operations
+
+| `anonymous:`
+| `anonymous:session-abc123`
+| Unauthenticated access (if permitted)
+|===
+
+=== API Key Authentication
+
+Simple token-based authentication for programmatic access.
+
+==== Configuration
+
+[source,toml]
+----
+[auth]
+enabled = true
+methods = ["api_key", "jwt"]
+
+[auth.api_key]
+enabled = true
+header_name = "X-Lith-API-Key"
+# Alternative: query parameter (less secure, for debugging only)
+query_param = "api_key"
+query_param_enabled = false
+----
+
+==== Key Management
+
+[source,bash]
+----
+# Generate a new API key
+lith auth create-key \
+  --name "ingestion-service" \
+  --actor "service:ingestion-pipeline" \
+  --permissions "collections:write,documents:create" \
+  --expires "2025-12-31"
+
+# Output:
+# API Key: fdb_sk_live_abc123...xyz789
+# Key ID: key_01234567
+# WARNING: This key will only be shown once. Store it securely.
+
+# List keys (shows metadata only, not secrets)
+lith auth list-keys
+
+# Revoke a key
+lith auth revoke-key key_01234567 --reason "Rotation"
+----
+
+==== Usage
+
+[source,bash]
+----
+# HTTP header (preferred)
+curl -H "X-Lith-API-Key: fdb_sk_live_abc123...xyz789" \
+  https://lith.example.com/v1/query
+
+# In FQL session
+lith shell --api-key "fdb_sk_live_abc123...xyz789"
+----
+
+==== Key Scopes
+
+API keys support fine-grained permission scopes:
+
+[cols="1,2"]
+|===
+| Scope | Permissions
+
+| `read`
+| Read documents, edges, schemas
+
+| `write`
+| Create, update documents and edges
+
+| `admin`
+| Schema changes, collection management
+
+| `journal:read`
+| Read journal entries
+
+| `introspect`
+| INTROSPECT and EXPLAIN commands
+
+| `*`
+| Full access (use sparingly)
+|===
+
+=== JWT Authentication
+
+Stateless token-based authentication with claims.
+
+==== Configuration
+
+[source,toml]
+----
+[auth.jwt]
+enabled = true
+# Algorithm: RS256 (RSA), ES256 (ECDSA), or HS256 (HMAC, not recommended)
+algorithm = "RS256"
+
+# Public key for verification (RS256/ES256)
+public_key_file = "/etc/lith/jwt-public.pem"
+# Or inline:
+# public_key = """
+# -----BEGIN PUBLIC KEY-----
+# ...
+# -----END PUBLIC KEY-----
+# """
+
+# For HS256 (shared secret, not recommended for production)
+# secret = "${JWT_SECRET}"
+
+# Token validation
+issuer = "https://auth.example.com"
+audience = "lith-api"
+clock_skew_seconds = 30
+
+# Claims mapping
+claims.actor = "sub"           # Subject claim → actor
+claims.permissions = "scope"   # Scope claim → permissions
+claims.tenant = "tenant_id"    # Custom claim → tenant
+----
+
+==== Token Structure
+
+Lith expects JWTs with these claims:
+
+[source,json]
+----
+{
+  "iss": "https://auth.example.com",
+  "sub": "user:alice@example.com",
+  "aud": "lith-api",
+  "exp": 1735689600,
+  "iat": 1735686000,
+  "scope": "read write",
+  "tenant_id": "acme-corp",
+  "lith": {
+    "collections": ["evidence", "sources"],
+    "max_query_depth": 5
+  }
+}
+----
+
+==== Usage
+
+[source,bash]
+----
+# Obtain token from your identity provider
+TOKEN=$(curl -s https://auth.example.com/oauth/token \
+  -d "grant_type=client_credentials" \
+  -d "client_id=$CLIENT_ID" \
+  -d "client_secret=$CLIENT_SECRET" \
+  | jq -r '.access_token')
+
+# Use with Lith
+curl -H "Authorization: Bearer $TOKEN" \
+  https://lith.example.com/v1/query
+----
+
+=== OIDC/OAuth2 Integration 🚧
+
+Enterprise SSO integration via OpenID Connect.
+
+==== Configuration
+
+[source,toml]
+----
+[auth.oidc]
+enabled = true
+
+# Discovery endpoint (auto-configures from .well-known)
+issuer = "https://login.example.com"
+# Or manual configuration:
+# authorization_endpoint = "https://login.example.com/oauth2/authorize"
+# token_endpoint = "https://login.example.com/oauth2/token"
+# userinfo_endpoint = "https://login.example.com/oauth2/userinfo"
+# jwks_uri = "https://login.example.com/.well-known/jwks.json"
+
+client_id = "${OIDC_CLIENT_ID}"
+client_secret = "${OIDC_CLIENT_SECRET}"
+
+# Scopes to request
+scopes = ["openid", "profile", "email", "groups"]
+
+# Claims mapping
+claims.actor = "email"
+claims.groups = "groups"
+claims.tenant = "organization"
+
+# Group-to-role mapping
+[auth.oidc.role_mapping]
+"lith-admins" = "admin"
+"lith-editors" = "editor"
+"lith-viewers" = "viewer"
+----
+
+==== Supported Providers
+
+[cols="1,2"]
+|===
+| Provider | Notes
+
+| **Keycloak**
+| Full support, recommended for self-hosted
+
+| **Auth0**
+| Full support
+
+| **Okta**
+| Full support
+
+| **Azure AD**
+| Full support (configure tenant ID)
+
+| **Google Workspace**
+| Supported via Google Identity Platform
+
+| **GitHub**
+| OAuth2 only (not OIDC), limited claims
+|===
+
+=== Mutual TLS (mTLS) 🚧
+
+Certificate-based authentication for service-to-service communication.
+
+==== Configuration
+
+[source,toml]
+----
+[tls]
+enabled = true
+cert_file = "/etc/lith/server.crt"
+key_file = "/etc/lith/server.key"
+
+[tls.mtls]
+enabled = true
+# Require client certificates
+require_client_cert = true
+# CA for validating client certificates
+client_ca_file = "/etc/lith/client-ca.crt"
+
+# Certificate-to-actor mapping
+[tls.mtls.mapping]
+# Map certificate CN to actor
+cn_pattern = "^(.+)@example\\.com$"
+actor_template = "service:{1}"
+# Or use certificate fingerprint
+# fingerprint."SHA256:abc123..." = "service:trusted-ingester"
+----
+
+==== Certificate Requirements
+
+* X.509 v3 certificates
+* RSA 2048-bit or ECDSA P-256 minimum
+* Extended Key Usage: clientAuth
+* Subject Alternative Name recommended
+
+=== FIDO2/WebAuthn 🚧
+
+Passwordless authentication for web interfaces.
+
+[source,toml]
+----
+[auth.webauthn]
+enabled = true
+rp_id = "lith.example.com"
+rp_name = "Lith"
+rp_origins = ["https://lith.example.com"]
+
+# Authenticator requirements
+user_verification = "preferred"  # required, preferred, discouraged
+authenticator_attachment = "cross-platform"  # platform, cross-platform
+resident_key = "preferred"
+----
+
+=== Multi-Factor Authentication 🚧
+
+Additional authentication factors for sensitive operations.
+
+[source,toml]
+----
+[auth.mfa]
+enabled = true
+required_for = ["admin", "schema_changes", "bulk_delete"]
+
+[auth.mfa.totp]
+enabled = true
+issuer = "Lith"
+digits = 6
+period = 30
+
+[auth.mfa.webauthn]
+enabled = true
+# Reuse WebAuthn config
+----
+
+== Authorization
+
+Authorization determines what authenticated actors can do.
+
+=== Permission Model
+
+Lith uses a capability-based permission model:
+
+[source,text]
+----
+<resource>:<action>
+
+Examples:
+  documents:read
+  documents:create
+  documents:update
+  documents:delete
+  edges:create
+  edges:traverse
+  collections:create
+  collections:drop
+  schema:read
+  schema:modify
+  journal:read
+  journal:replay
+  admin:*
+----
+
+=== Role-Based Access Control (RBAC)
+
+Predefined roles simplify permission management.
+
+==== Built-in Roles
+
+[cols="1,2,3"]
+|===
+| Role | Permissions | Use Case
+
+| `viewer`
+| `documents:read`, `edges:read`, `schema:read`
+| Read-only access
+
+| `editor`
+| `viewer` + `documents:create,update`, `edges:create,update`
+| Content creators
+
+| `analyst`
+| `editor` + `edges:traverse`, `journal:read`, introspect
+| Investigators, auditors
+
+| `admin`
+| All permissions except `superuser:*`
+| Database administrators
+
+| `superuser`
+| All permissions including dangerous operations
+| Emergency access only
+|===
+
+==== Custom Roles
+
+[source,fql]
+----
+-- Create a custom role
+CREATE ROLE evidence_reviewer WITH {
+  permissions: [
+    "documents:read",
+    "documents:update",
+    "edges:read",
+    "journal:read"
+  ],
+  description: "Can review and annotate evidence but not create"
+}
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Role for external reviewers"
+};
+
+-- Assign role to user
+GRANT ROLE evidence_reviewer TO "user:reviewer@partner.org"
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Partner organization reviewer onboarding"
+};
+----
+
+==== Role Hierarchy
+
+[source,toml]
+----
+[authorization.roles]
+# Roles can inherit from others
+[authorization.roles.senior_analyst]
+inherits = ["analyst"]
+additional_permissions = ["documents:delete", "edges:delete"]
+
+[authorization.roles.lead_investigator]
+inherits = ["senior_analyst"]
+additional_permissions = ["collections:create", "schema:modify"]
+----
+
+=== Attribute-Based Access Control (ABAC) 🚧
+
+Fine-grained access control based on attributes.
+
+==== Policy Language
+
+[source,yaml]
+----
+# /etc/lith/policies/evidence-access.yaml
+policies:
+  - name: "evidence-classification-access"
+    description: "Restrict access based on classification level"
+    effect: "deny"
+    resources:
+      - "collection:evidence"
+    conditions:
+      - attribute: "document.classification"
+        operator: "in"
+        value: ["SECRET", "TOP_SECRET"]
+      - attribute: "actor.clearance"
+        operator: "less_than"
+        value: "document.classification"
+
+  - name: "time-restricted-access"
+    description: "Restrict sensitive access to business hours"
+    effect: "deny"
+    resources:
+      - "collection:financial_records"
+    conditions:
+      - attribute: "request.time.hour"
+        operator: "not_between"
+        value: [9, 17]
+      - attribute: "request.time.day_of_week"
+        operator: "in"
+        value: ["Saturday", "Sunday"]
+    exceptions:
+      - role: "admin"
+      - role: "emergency_access"
+----
+
+==== Attribute Sources
+
+[cols="1,2,2"]
+|===
+| Source | Attributes | Example
+
+| **Actor**
+| From authentication claims
+| `actor.department`, `actor.clearance`
+
+| **Resource**
+| From document/edge metadata
+| `document.classification`, `edge.sensitivity`
+
+| **Environment**
+| Runtime context
+| `request.time`, `request.ip`, `request.location`
+
+| **Relationship**
+| Graph relationships
+| `actor.owns(document)`, `actor.member_of(team)`
+|===
+
+=== Collection-Level Permissions
+
+[source,fql]
+----
+-- Set collection permissions
+ALTER COLLECTION evidence SET PERMISSIONS {
+  read: ["role:analyst", "role:admin"],
+  write: ["role:editor", "role:admin"],
+  schema: ["role:admin"],
+  owner: "user:lead@example.com"
+}
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Restrict evidence collection to authorized personnel"
+};
+----
+
+=== Row-Level Security 🚧
+
+Filter documents based on actor attributes.
+
+[source,fql]
+----
+-- Create a row-level security policy
+CREATE POLICY department_isolation ON evidence
+  FOR ALL
+  USING (
+    document.department = actor.department
+    OR actor.role = 'admin'
+  )
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Users can only see documents in their department"
+};
+----
+
+=== Query Depth Limits
+
+Prevent excessive graph traversals:
+
+[source,toml]
+----
+[authorization.query_limits]
+# Maximum TRAVERSE depth
+max_depth = 10
+# Maximum results per query
+max_results = 10000
+# Query timeout
+timeout_seconds = 30
+
+# Per-role overrides
+[authorization.query_limits.roles.analyst]
+max_depth = 20
+max_results = 100000
+timeout_seconds = 300
+----
+
+== Multi-Tenancy
+
+Lith supports multiple isolation models for multi-tenant deployments.
+
+=== Isolation Levels
+
+[cols="1,2,2,1"]
+|===
+| Level | Description | Use Case | Overhead
+
+| **Database**
+| Separate database files per tenant
+| Highest security requirements
+| High
+
+| **Collection**
+| Shared database, separate collections
+| Moderate isolation needs
+| Medium
+
+| **Row**
+| Shared collections with RLS policies
+| Cost-optimized multi-tenancy
+| Low
+|===
+
+=== Database-Level Isolation
+
+[source,toml]
+----
+[tenancy]
+mode = "database"
+tenant_header = "X-Tenant-ID"
+# Or from JWT claim:
+# tenant_claim = "tenant_id"
+
+[tenancy.database]
+# Directory structure: {data_dir}/{tenant_id}/
+data_dir = "/var/lib/lith/tenants"
+# Create database on first access
+auto_provision = true
+# Template for new tenant databases
+template_db = "/var/lib/lith/template.lith"
+----
+
+=== Collection-Level Isolation
+
+[source,toml]
+----
+[tenancy]
+mode = "collection"
+tenant_header = "X-Tenant-ID"
+
+[tenancy.collection]
+# Collection naming: {tenant_id}_{collection_name}
+prefix_separator = "_"
+# Prevent cross-tenant collection access
+strict_isolation = true
+----
+
+=== Row-Level Isolation
+
+[source,toml]
+----
+[tenancy]
+mode = "row"
+tenant_header = "X-Tenant-ID"
+
+[tenancy.row]
+# Column containing tenant ID
+tenant_column = "_tenant_id"
+# Auto-inject tenant ID on writes
+auto_inject = true
+# Filter reads by tenant
+auto_filter = true
+----
+
+== Data Security
+
+=== Encryption at Rest 🚧
+
+Protect data stored on disk.
+
+[source,toml]
+----
+[encryption]
+enabled = true
+algorithm = "AES-256-GCM"
+
+# Key management
+[encryption.keys]
+# Local key file (development only)
+# key_file = "/etc/lith/master.key"
+
+# AWS KMS
+provider = "aws-kms"
+key_id = "arn:aws:kms:us-east-1:123456789:key/abc-123"
+
+# HashiCorp Vault
+# provider = "vault"
+# address = "https://vault.example.com"
+# path = "secret/lith/master-key"
+# token = "${VAULT_TOKEN}"
+
+# Key rotation
+rotation_period_days = 90
+keep_old_keys = 3
+----
+
+==== Block-Level Encryption
+
+[source,text]
+----
+Block Header (64 bytes):
+┌─────────────────────────────────────────────────────────────────┐
+│ magic (4) │ version (2) │ type (2) │ flags (4) │ ...           │
+│           │             │          │ [encrypted bit set]        │
+├─────────────────────────────────────────────────────────────────┤
+│ encryption_key_id (16 bytes)                                    │
+├─────────────────────────────────────────────────────────────────┤
+│ nonce/IV (12 bytes)                                             │
+└─────────────────────────────────────────────────────────────────┘
+
+Block Payload (4032 bytes):
+┌─────────────────────────────────────────────────────────────────┐
+│ AES-256-GCM encrypted content                                   │
+│ + 16-byte authentication tag                                    │
+└─────────────────────────────────────────────────────────────────┘
+----
+
+=== Field-Level Encryption 🚧
+
+Encrypt sensitive fields while keeping others queryable.
+
+[source,fql]
+----
+-- Define encrypted fields in schema
+ALTER COLLECTION users ADD SCHEMA {
+  email: STRING,
+  ssn: ENCRYPTED STRING,      -- Always encrypted
+  phone: ENCRYPTED STRING,    -- Always encrypted
+  name: STRING
+}
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "PII protection compliance"
+};
+
+-- Queries on encrypted fields require decryption key
+SELECT name, DECRYPT(ssn) FROM users
+WHERE id = "user_123"
+WITH PROVENANCE {
+  actor: "user:compliance@example.com",
+  rationale: "Audit request #AR-2024-001"
+};
+----
+
+=== Encryption Key Management
+
+==== Key Hierarchy
+
+[source,text]
+----
+                    ┌─────────────────┐
+                    │   Master Key    │  (in HSM/KMS)
+                    │   (KEK)         │
+                    └────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+     ┌────────────┐  ┌────────────┐  ┌────────────┐
+     │ Block DEK  │  │ Journal    │  │ Field      │
+     │            │  │ DEK        │  │ DEK        │
+     └────────────┘  └────────────┘  └────────────┘
+              │              │              │
+              ▼              ▼              ▼
+        Block Data     Journal Data   Sensitive Fields
+----
+
+==== Key Rotation
+
+[source,bash]
+----
+# Initiate key rotation
+lith admin rotate-keys --type master
+
+# Status check
+lith admin key-status
+
+# Output:
+# Master Key:
+#   Current: key_v3 (created: 2024-06-01, expires: 2024-09-01)
+#   Previous: key_v2 (created: 2024-03-01, status: decrypt-only)
+#   Rotation: 45 days remaining
+#
+# Data Encryption Keys:
+#   Blocks: 1,234 re-encrypted, 56 pending
+#   Journal: Complete
+#   Fields: 789 re-encrypted, 12 pending
+----
+
+=== Data Masking 🚧
+
+Mask sensitive data for non-privileged users.
+
+[source,fql]
+----
+-- Create masking policy
+CREATE MASKING POLICY email_mask ON users.email
+  FOR SELECT
+  USING (
+    CASE
+      WHEN actor.role = 'admin' THEN email
+      ELSE CONCAT(LEFT(email, 2), '***@***', RIGHT(email, 4))
+    END
+  )
+WITH PROVENANCE {
+  actor: "user:security@example.com",
+  rationale: "GDPR email protection"
+};
+
+-- Result for non-admin:
+-- al***@***.com
+----
+
+== Network Security
+
+=== TLS Configuration
+
+[source,toml]
+----
+[tls]
+enabled = true
+min_version = "1.3"  # TLS 1.3 required
+
+# Server certificate
+cert_file = "/etc/lith/server.crt"
+key_file = "/etc/lith/server.key"
+
+# Certificate chain (if using intermediate CA)
+# ca_file = "/etc/lith/ca-chain.crt"
+
+# Cipher suites (TLS 1.3 uses fixed suites)
+# For TLS 1.2 fallback (if enabled):
+# cipher_suites = [
+#   "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+#   "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
+# ]
+
+# OCSP stapling
+ocsp_stapling = true
+
+# Session resumption (performance vs. forward secrecy trade-off)
+session_tickets = false  # Disable for maximum forward secrecy
+----
+
+=== Network Policies
+
+==== IP Allowlisting
+
+[source,toml]
+----
+[network]
+# Only accept connections from these CIDRs
+allowed_cidrs = [
+  "10.0.0.0/8",        # Internal network
+  "192.168.1.0/24",    # Office network
+  "203.0.113.50/32"    # Specific host
+]
+
+# Deny list takes precedence
+denied_cidrs = [
+  "10.0.99.0/24"       # Untrusted subnet
+]
+----
+
+==== Rate Limiting
+
+[source,toml]
+----
+[network.rate_limiting]
+enabled = true
+
+# Global limits
+requests_per_second = 1000
+burst_size = 100
+
+# Per-IP limits
+per_ip_requests_per_second = 100
+per_ip_burst_size = 20
+
+# Per-actor limits (authenticated)
+per_actor_requests_per_second = 500
+per_actor_burst_size = 50
+
+# Exempt certain IPs (monitoring, health checks)
+exempt_cidrs = ["10.0.0.1/32"]
+----
+
+==== Connection Limits
+
+[source,toml]
+----
+[network.connections]
+# Maximum concurrent connections
+max_connections = 10000
+
+# Per-IP connection limit
+max_connections_per_ip = 100
+
+# Idle timeout
+idle_timeout_seconds = 300
+
+# Read/write timeouts
+read_timeout_seconds = 30
+write_timeout_seconds = 30
+----
+
+=== Kubernetes Network Policies
+
+[source,yaml]
+----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: lith-network-policy
+  namespace: lith
+spec:
+  podSelector:
+    matchLabels:
+      app: lith
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow from application pods
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: application
+          podSelector:
+            matchLabels:
+              needs-lith: "true"
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow from monitoring
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090  # Metrics
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow to backup storage
+    - to:
+        - ipBlock:
+            cidr: 10.0.100.0/24
+      ports:
+        - protocol: TCP
+          port: 443
+----
+
+== Audit Logging
+
+=== Audit Events
+
+All security-relevant events are logged to the journal and optionally to external systems.
+
+==== Event Categories
+
+[cols="1,2,2"]
+|===
+| Category | Events | Example
+
+| **Authentication**
+| Login, logout, token refresh, MFA
+| `auth.login.success`, `auth.mfa.required`
+
+| **Authorization**
+| Permission checks, role changes
+| `authz.denied`, `authz.role.granted`
+
+| **Data Access**
+| Queries, reads, traversals
+| `data.query`, `data.traverse`
+
+| **Data Modification**
+| Creates, updates, deletes
+| `data.create`, `data.delete`
+
+| **Schema Changes**
+| Collection/schema modifications
+| `schema.alter`, `collection.create`
+
+| **Administration**
+| Config changes, user management
+| `admin.config.change`, `admin.user.create`
+
+| **Security**
+| Encryption, key operations
+| `security.key.rotate`, `security.encrypt`
+|===
+
+=== Audit Log Format
+
+[source,json]
+----
+{
+  "timestamp": "2024-06-15T14:30:22.123Z",
+  "event_id": "evt_abc123",
+  "category": "data.query",
+  "severity": "info",
+  "actor": {
+    "type": "user",
+    "id": "user:alice@example.com",
+    "ip": "192.168.1.100",
+    "user_agent": "lith-cli/0.1.0"
+  },
+  "resource": {
+    "type": "collection",
+    "id": "evidence",
+    "path": "/collections/evidence"
+  },
+  "action": {
+    "type": "SELECT",
+    "query_hash": "sha256:abc123...",
+    "result_count": 42,
+    "duration_ms": 150
+  },
+  "context": {
+    "session_id": "sess_xyz789",
+    "request_id": "req_def456",
+    "tenant_id": "acme-corp"
+  },
+  "provenance": {
+    "rationale": "Case review for investigation #INV-2024-100",
+    "journal_seq": 12345
+  }
+}
+----
+
+=== External Audit Destinations 🚧
+
+[source,toml]
+----
+[audit]
+enabled = true
+# Always write to journal
+journal = true
+
+# External destinations
+[audit.syslog]
+enabled = true
+address = "syslog.example.com:514"
+protocol = "tcp"
+format = "rfc5424"
+
+[audit.splunk]
+enabled = true
+hec_url = "https://splunk.example.com:8088/services/collector"
+token = "${SPLUNK_HEC_TOKEN}"
+index = "lith_audit"
+
+[audit.elasticsearch]
+enabled = true
+nodes = ["https://es1.example.com:9200", "https://es2.example.com:9200"]
+index = "lith-audit"
+username = "${ES_USERNAME}"
+password = "${ES_PASSWORD}"
+
+[audit.s3]
+enabled = true
+bucket = "lith-audit-logs"
+prefix = "audit/"
+region = "us-east-1"
+# Rotate files hourly
+rotation_period = "1h"
+----
+
+== Secrets Management
+
+=== Environment Variables
+
+[source,bash]
+----
+# Secrets should be injected via environment
+export LITH_AUTH_JWT_SECRET="..."
+export LITH_ENCRYPTION_MASTER_KEY="..."
+export LITH_OIDC_CLIENT_SECRET="..."
+----
+
+=== HashiCorp Vault Integration 🚧
+
+[source,toml]
+----
+[secrets]
+provider = "vault"
+
+[secrets.vault]
+address = "https://vault.example.com"
+auth_method = "kubernetes"  # or "token", "approle"
+
+# Kubernetes auth
+kubernetes_role = "lith"
+kubernetes_mount = "kubernetes"
+
+# Secret paths
+[secrets.vault.paths]
+master_key = "secret/data/lith/master-key"
+jwt_secret = "secret/data/lith/jwt-secret"
+oidc_secret = "secret/data/lith/oidc-client"
+
+# Dynamic secrets for database connections
+# postgres_creds = "database/creds/lith-role"
+----
+
+=== AWS Secrets Manager Integration 🚧
+
+[source,toml]
+----
+[secrets]
+provider = "aws-secrets-manager"
+
+[secrets.aws]
+region = "us-east-1"
+
+[secrets.aws.paths]
+master_key = "lith/master-key"
+jwt_secret = "lith/jwt-secret"
+oidc_secret = "lith/oidc-client"
+----
+
+== Security Hardening
+
+=== Operating System
+
+[source,bash]
+----
+# Run as non-root user
+useradd -r -s /sbin/nologin lith
+chown -R lith:lith /var/lib/lith
+
+# Restrict file permissions
+chmod 700 /var/lib/lith
+chmod 600 /etc/lith/lith.toml
+chmod 400 /etc/lith/*.key
+
+# Limit capabilities
+setcap 'cap_net_bind_service=+ep' /usr/bin/lith  # If binding to port <1024
+----
+
+=== Systemd Hardening
+
+[source,ini]
+----
+[Service]
+User=lith
+Group=lith
+
+# Security hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+ReadWritePaths=/var/lib/lith
+ReadOnlyPaths=/etc/lith
+
+# Restrict capabilities
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+# Restrict system calls
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+# Memory protection
+MemoryDenyWriteExecute=yes
+
+# Network
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+----
+
+=== Container Hardening
+
+[source,dockerfile]
+----
+FROM gcr.io/distroless/cc-debian12:nonroot
+
+# Run as non-root
+USER 65532:65532
+
+# Read-only root filesystem
+# (configured in orchestrator, not Dockerfile)
+
+COPY --chown=65532:65532 lith /usr/bin/lith
+
+ENTRYPOINT ["/usr/bin/lith"]
+----
+
+[source,yaml]
+----
+# Kubernetes security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+----
+
+=== Query Injection Prevention
+
+Lith uses parameterized queries to prevent FQL injection:
+
+[source,fql]
+----
+-- WRONG: String interpolation (vulnerable)
+-- SELECT * FROM users WHERE name = '{user_input}'
+
+-- CORRECT: Parameterized query
+SELECT * FROM users WHERE name = $name
+WITH PARAMS {
+  name: @user_input
+};
+----
+
+The Form.Bridge layer validates all inputs before execution.
+
+== Compliance
+
+=== GDPR
+
+Lith's provenance system supports GDPR requirements:
+
+[cols="1,2"]
+|===
+| Requirement | Lith Feature
+
+| **Right to Access**
+| `INTROSPECT HISTORY document_id` returns all changes with provenance
+
+| **Right to Rectification**
+| Updates preserve history; provenance records correction reason
+
+| **Right to Erasure**
+| Soft delete with provenance; hard delete available with audit trail
+
+| **Data Portability**
+| Export entire collection with provenance as JSON
+
+| **Purpose Limitation**
+| Provenance `rationale` field documents processing purpose
+|===
+
+[source,fql]
+----
+-- GDPR data export
+SELECT * FROM users WHERE id = "user_123"
+WITH PROVENANCE_HISTORY
+EXPORT FORMAT JSON
+WITH PROVENANCE {
+  actor: "user:dpo@example.com",
+  rationale: "GDPR Article 15 access request #SAR-2024-001"
+};
+
+-- GDPR erasure with audit trail
+DELETE FROM users WHERE id = "user_123"
+WITH PROVENANCE {
+  actor: "user:dpo@example.com",
+  rationale: "GDPR Article 17 erasure request #ER-2024-042"
+};
+-- Document is soft-deleted; provenance preserved for audit
+----
+
+=== SOC 2 🚧
+
+[cols="1,2"]
+|===
+| Control | Lith Support
+
+| **Access Control (CC6.1)**
+| RBAC/ABAC, authentication, authorization
+
+| **Logical Access (CC6.2)**
+| Multi-tenancy, collection permissions, RLS
+
+| **System Operations (CC7.1)**
+| Health checks, monitoring, alerting
+
+| **Change Management (CC8.1)**
+| Schema versioning, migration tracking
+
+| **Risk Mitigation (CC9.1)**
+| Encryption, backup, disaster recovery
+
+| **Logging (CC7.2)**
+| Immutable journal, audit events
+|===
+
+=== HIPAA 🚧
+
+[cols="1,2"]
+|===
+| Safeguard | Lith Support
+
+| **Access Controls**
+| Authentication, authorization, session management
+
+| **Audit Controls**
+| Immutable journal with provenance
+
+| **Integrity Controls**
+| CRC32C checksums, Merkle tree verification
+
+| **Transmission Security**
+| TLS 1.3, mTLS
+
+| **Encryption**
+| At-rest and field-level encryption
+|===
+
+== Security Operations
+
+=== Vulnerability Scanning
+
+[source,bash]
+----
+# Scan Lith binary
+trivy fs /usr/bin/lith
+
+# Scan container image
+trivy image lith:latest
+
+# Scan dependencies (Forth/Zig)
+# (Manual review required - limited automated tooling)
+
+# Check for CVEs affecting Lith
+lith admin security-check
+----
+
+=== Incident Response
+
+==== Detection
+
+[source,fql]
+----
+-- Query for suspicious activity
+SELECT * FROM $journal
+WHERE timestamp > NOW() - INTERVAL '1 hour'
+  AND (
+    event_type = 'auth.login.failed'
+    OR event_type = 'authz.denied'
+    OR event_type LIKE 'admin.%'
+  )
+ORDER BY timestamp DESC
+WITH PROVENANCE {
+  actor: "service:security-monitor",
+  rationale: "Automated security monitoring"
+};
+----
+
+==== Response Procedures
+
+[source,bash]
+----
+# Emergency: Disable all external access
+lith admin emergency-lockdown --reason "Security incident"
+
+# Revoke all active sessions
+lith auth revoke-all-sessions --except-admin
+
+# Export forensic evidence
+lith journal export \
+  --since "2024-06-15T00:00:00Z" \
+  --output incident-journal.jsonl
+
+# Rotate compromised keys
+lith admin rotate-keys --all --reason "Incident response"
+----
+
+=== Security Monitoring
+
+[source,yaml]
+----
+# Prometheus alerts for security events
+groups:
+  - name: lith-security
+    rules:
+      - alert: HighAuthFailureRate
+        expr: rate(lith_auth_failures_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High authentication failure rate"
+
+      - alert: UnauthorizedAccessAttempts
+        expr: rate(lith_authz_denied_total[5m]) > 5
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Multiple unauthorized access attempts"
+
+      - alert: SuspiciousQueryPattern
+        expr: lith_query_complexity > 1000
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Unusually complex query detected"
+----
+
+== Security Checklist
+
+=== Pre-Production Checklist
+
+[cols="1,1,3"]
+|===
+| Category | Check | Action
+
+| **TLS**
+| [ ]
+| TLS 1.3 enabled, valid certificates, no self-signed in production
+
+| **Authentication**
+| [ ]
+| At least one auth method configured, API keys rotated
+
+| **Authorization**
+| [ ]
+| RBAC configured, no default admin passwords
+
+| **Encryption**
+| [ ]
+| Encryption at rest enabled, keys in HSM/KMS
+
+| **Network**
+| [ ]
+| Firewall configured, unnecessary ports closed
+
+| **Logging**
+| [ ]
+| Audit logging enabled, logs shipped externally
+
+| **Backups**
+| [ ]
+| Automated backups, tested restore procedure
+
+| **Secrets**
+| [ ]
+| No secrets in config files, using secrets manager
+
+| **Updates**
+| [ ]
+| Patch management process defined
+|===
+
+=== Periodic Review Checklist
+
+[cols="1,1,3"]
+|===
+| Frequency | Check | Action
+
+| **Weekly**
+| [ ]
+| Review authentication failures, check for anomalies
+
+| **Monthly**
+| [ ]
+| Rotate API keys, review access permissions
+
+| **Quarterly**
+| [ ]
+| Rotate encryption keys, conduct access review
+
+| **Annually**
+| [ ]
+| Full security audit, penetration testing
+|===
+
+== Security Reporting
+
+Found a security vulnerability? See link:../SECURITY.md[SECURITY.md] for responsible disclosure procedures.
+
+**Do not report security vulnerabilities through public GitHub issues.**
+
+== See Also
+
+* link:../SECURITY.md[Security Policy] - Vulnerability reporting
+* link:DEPLOYMENT.adoc[Deployment Guide] - Production hardening
+* link:OBSERVABILITY.adoc[Observability Guide] - Security monitoring
+* link:../ARCHITECTURE.adoc[Architecture] - Security architecture overview

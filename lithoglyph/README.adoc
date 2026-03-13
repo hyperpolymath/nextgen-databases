@@ -1,0 +1,250 @@
+= Lithoglyph
+
+image:https://img.shields.io/badge/License-PMPL--1.0--or--later-indigo.svg[License: PMPL-1.0-or-later,link="https://github.com/hyperpolymath/palimpsest-license"]
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: 2025-2026 hyperpolymath
+
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:source-highlighter: rouge
+
+image:https://img.shields.io/badge/standard-RSR--compliant-green.svg[RSR Compliant]
+
+[.lead]
+*Stone-carved data for the ages.*
+
+_Where Forth carves glyphs into permanence._
+
+toc::[]
+
+== Overview
+
+[NOTE]
+====
+**Project status: Active, secondary priority.** LithoGlyph is working towards production for specialist use in **journalism, narrative arts, and media/communications**. It is not the primary priority project right now — that is https://github.com/hyperpolymath/verisimdb[VeriSimDB], which is a substantial undertaking in cross-modal database consistency. Lessons learned from VeriSimDB (drift detection, formal verification, federation architecture) will directly improve LithoGlyph when development focus returns here.
+
+**For most journalism, storytelling, and media workflows, LithoGlyph and its query language GQL are likely the database you want.** The narrative-first, reversible, audit-grade design is built specifically for this domain. https://github.com/hyperpolymath/verisimdb[VeriSimDB] and https://github.com/hyperpolymath/gql-dt[VQL/VQL-DT] become more relevant when your work involves cross-source investigative verification, large-scale entity tracking across multiple systems, long-term identity consistency, or situations where you need to prove that data across different databases has not drifted apart. For everything else — the story you want to write, the sources you want to cite, the narrative you want to build — LithoGlyph is designed to be your storage layer.
+
+In the long run, LithoGlyph is intended to work intimately with tools like bofig in the portfolio and serve as a database for journalism and PR applications more broadly.
+====
+
+**Lithoglyph** (from Greek *lithos* "stone" + *glyphein* "to carve") is a *narrative-first, reversible, audit-grade database core*. Like ancient glyphs carved in stone, Lithoglyph treats schemas, constraints, migrations, blocks, and journals as permanent narrative artefacts—the database is part of the story, not an opaque substrate.
+
+The name reflects the core metaphor: **Forth code sculpts data onto disk**, carving each operation into permanent, auditable stone.
+
+=== Core Thesis
+
+> Schemas, constraints, migrations, blocks, and journals are narrative artefacts.
+> The database is part of the story, not an opaque substrate.
+> Data is carved in stone—permanent, auditable, reversible.
+
+=== Primary Values
+
+[cols="2,1"]
+|===
+| Principle | Priority
+
+| Auditability | > Performance
+| Meaning | > Features
+| Reversibility | > Throughput
+| Agent Understanding | Required
+|===
+
+== Target Domains
+
+* Investigative journalism
+* Governance/compliance
+* Agentic ecosystems + multi-repo handover
+* Long-term cultural/institutional archives
+
+== Repository Structure
+
+[source,text]
+----
+lithoglyph/
+├── spec/              # Format specs + rationale (AsciiDoc)
+├── core-forth/        # Form.Blocks + Form.Model (truth core)
+├── core-zig/          # Form.Bridge (ABI + port framing)
+├── core-factor/       # Form.Runtime (GQL + introspection)
+├── control-plane/     # Elixir/OTP gateway (optional)
+├── tools/             # Render/inspect/doctor utilities
+├── test-vectors/      # Golden bytes + golden renders
+└── stories/           # Narrative examples + onboarding artefacts
+----
+
+== Architecture
+
+Lithoglyph is structured in layers, each with a specific language and responsibility:
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────────┐
+│  Form.ControlPlane (Elixir/OTP - optional)                  │
+│  Sessions, supervision, cluster edge                        │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Normalizer (Factor + Lean 4)                          │
+│  FD discovery, type encoding, proof-carrying normalization  │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Runtime (Factor)                                      │
+│  GQL parse/plan/exec, explain, introspection                │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Bridge (Zig)                                          │
+│  Stable Zig ABI (no C), safety governor                     │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Model (Forth)                                         │
+│  Multi-model logical layer: documents, edges, schemas       │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Blocks (Forth)                                        │
+│  Deterministic storage, journal, reversibility primitives   │
+└─────────────────────────────────────────────────────────────┘
+----
+
+=== Layer Details
+
+==== Form.Blocks (Forth)
+* Fixed-size blocks with symbolic headers
+* Append-only journal
+* Crash recovery and integrity checks
+* Repair guidance
+
+==== Form.Model (Forth)
+* Document collections
+* Edge collections
+* Schema + constraint metadata
+* Migration artefacts
+
+==== Form.Bridge (Zig)
+* Stable Zig ABI for runtimes (no C dependency)
+* Opaque handles + byte buffers + explicit error codes
+* Marshalling only; no business logic duplication
+* Uses `callconv(.C)` for FFI compatibility without requiring C toolchain
+
+==== Form.Runtime (Factor)
+* GQL minimal subset for PoC
+* Planner steps introspection
+* Constraint explanation surfaces
+* Provenance surfaces
+
+==== Form.Normalizer (Factor + Lean 4)
+* Automatic functional dependency discovery (DFD/TANE/FDHits)
+* Type encoding of FDs in GQL-DT
+* Normal form predicates (1NF through BCNF)
+* Proof-carrying schema evolution
+* Narrative explanations for all normalization decisions
+* See link:spec/self-normalizing.adoc[Self-Normalizing Specification]
+
+==== Form.ControlPlane (Elixir/OTP, optional)
+* Out-of-process core engine via port
+* Sessions and supervision
+* Cluster edge coordination
+
+== Core Invariants
+
+These are *non-negotiable* guarantees:
+
+[horizontal]
+Truth Ownership:: On-disk truth is owned by the block/journal layer; higher layers do not bypass it.
+Journal-First:: Every mutating operation is journaled before being considered committed.
+Reversibility:: Every committed operation MUST have a defined inverse OR be explicitly marked irreversible-with-story.
+Renderability:: Blocks and journal entries MUST be renderable deterministically into human/agent-readable form.
+Provenance:: All query results can optionally include provenance pointers to journal and blocks.
+Constraints as Ethics:: Constraints are explainable: rejections must return reasons + pointers + narrative rationale.
+
+== GQL (Glyph Query Language)
+
+GQL is the query language for Lithoglyph—the native query interface for this narrative-first database. The name "Glyph Query Language" reflects the stone-carving metaphor: each query carves new glyphs (data) into permanence.
+
+PoC subset capabilities:
+
+* `INSERT` document into collection
+* `INSERT` edge (from, to, type, props)
+* `SELECT` with simple predicates
+* `EXPLAIN` (returns plan + reasons)
+* `INTROSPECT` schema/constraints
+* Optional provenance output
+
+== Non-Goals
+
+* Be a drop-in Postgres replacement
+* Win microbenchmarks
+* Ship full distributed consensus in the first PoC
+
+== PoC Acceptance Criteria
+
+* Single-node db open/close
+* Append-only journal with deterministic rendering
+* Document + edge insert/select
+* Constraint rejection returns explain payload
+* Migration artefact recorded + reversible
+* Golden test vectors pass
+* Seam checks (B↔M, M↔R, B↔R) pass at freeze
+
+== Open Questions
+
+See link:lithoglyph.scm[lithoglyph.scm] for structured open questions with acceptance criteria:
+
+=== Core PoC
+* `Q-BLOCK-HEADER-001`: Minimal block header layout
+* `Q-JOURNAL-ENTRY-001`: Minimal journal entry schema
+* `Q-ABI-BLOBS-001`: ABI blob encoding choice
+* `Q-GQL-POC-001`: GQL PoC grammar
+* `Q-CTRL-PLANE-001`: Elixir/OTP introduction timing
+
+=== Self-Normalizing (Form.Normalizer)
+* `Q-NORM-001`: Default FD discovery algorithm (DFD vs TANE vs FDHits)
+* `Q-NORM-002`: Approximate FD handling policy
+* `Q-NORM-003`: Denormalization support scope
+* `Q-NORM-004`: GQL-DT proof integration interface
+* `Q-NORM-005`: Query rewriting for affected queries
+
+== Documentation
+
+=== Getting Started
+* link:QUICKSTART.adoc[Quickstart Guide] - Get running in 5 minutes
+* link:VERSIONING.adoc[Versioning & Stability] - API stability guarantees
+* link:CHANGELOG.md[Changelog] - Release history
+
+=== Architecture & Design
+* link:ARCHITECTURE.adoc[Architecture] - Technical architecture deep-dive
+* link:ROADMAP.adoc[Roadmap] - Development roadmap
+* link:PHILOSOPHY.adoc[Philosophy] - Design philosophy and principles
+* link:lithoglyph.scm[lithoglyph.scm] - Machine-readable specification
+
+=== Specifications
+* link:spec/gql.adoc[GQL Specification] - Query language reference
+* link:spec/gql-dependent-types.md[GQL Dependent Types] - Compile-time verified queries
+* link:spec/self-normalizing.adoc[Self-Normalizing Database] - Automatic FD discovery, proof-carrying schema evolution
+* link:spec/blocks.adoc[Block Format] - Storage layer specification
+* link:spec/journal.adoc[Journal Format] - Audit log specification
+
+=== Operations
+* link:docs/DEPLOYMENT.adoc[Deployment Guide] - Run Lithoglyph in production
+* link:docs/OBSERVABILITY.adoc[Observability] - Monitoring, logging, tracing
+* link:docs/SECURITY-AUTH.adoc[Security & Auth] - Authentication and hardening
+
+=== Integration
+* link:docs/API-REFERENCE.adoc[API Reference] - Programmatic interfaces
+* link:docs/MIGRATION-FROM-RDBMS.adoc[Migration from RDBMS] - Moving from PostgreSQL/MySQL
+* link:docs/INTEGRATION-PATTERNS.adoc[Integration Patterns] - Queues, search, analytics
+
+=== Domain-Specific
+* link:docs/WP05_interactive_documentary.md[WP05] - Lithoglyph for Interactive Documentary/Journalism
+
+== Related Projects
+
+* https://github.com/hyperpolymath/gql-dt[GQL-DT] - Dependently-typed GQL (same database, compile-time proofs)
+* https://github.com/hyperpolymath/lithoglyph-studio[Lithoglyph Studio] - Zero-friction GUI for non-technical users
+* https://github.com/hyperpolymath/bofig[BoFIG] - Evidence graph for investigative journalism
+* https://github.com/hyperpolymath/zotero-lithoglyph[Zotero-Lithoglyph] - Post-truth reference manager with PROMPT scores
+* https://github.com/hyperpolymath/lithoglyph-debugger[Lithoglyph Debugger] - Proof-carrying database debugger (Lean 4 + Idris 2)
+* https://github.com/hyperpolymath/formbase[FormBase] - Open-source Airtable alternative with provenance
+
+== License
+
+https://github.com/hyperpolymath/palimpsest-license[Palimpsest-MPL 1.0] (PMPL-1.0)
+
+== Contributing
+
+See link:CONTRIBUTING.adoc[CONTRIBUTING.adoc] for guidelines.

@@ -1,0 +1,62 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+[package]
+name = "lithoglyph-geo"
+version = "0.1.0"
+edition = "2021"
+authors = ["hyperpolymath"]
+description = "Geospatial extension for Lith - spatial indexing without compromising auditability"
+license = "PMPL-1.0-or-later"
+repository = "https://github.com/hyperpolymath/lithoglyph-geo"
+keywords = ["lithoglyph", "geospatial", "spatial-index", "r-tree", "gis"]
+categories = ["database", "science::geo"]
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+
+# HTTP server
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+
+# Spatial indexing
+rstar = "0.12"
+geo = "0.28"
+geojson = "0.24"
+
+# HTTP client (for Lith API)
+reqwest = { version = "0.11", features = ["json"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Date/time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Configuration
+toml = "0.8"
+config = "0.14"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# CLI
+clap = { version = "4.4", features = ["derive"] }
+
+[dev-dependencies]
+# Testing
+tokio-test = "0.4"
+assert_cmd = "2.0"
+predicates = "3.0"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

@@ -1,0 +1,28 @@
+;; SPDX-License-Identifier: PMPL-1.0-or-later
+;; ECOSYSTEM.scm - Ecosystem relationships for lithoglyph-beam
+;; Media-Type: application/vnd.ecosystem+scm
+
+(ecosystem
+  (version "1.0.0")
+  (name "lithoglyph-beam")
+  (type "library")  ;; or: application, library, specification, template
+  (purpose "Hyperpolymath ecosystem component")
+
+  (position-in-ecosystem
+    "Part of the hyperpolymath ecosystem of 500+ repositories "
+    "following Rhodium Standard Repository (RSR) conventions.")
+
+  (related-projects
+    ;; Examples - customize based on actual relationships:
+    ;; (sibling-standard "rsr-template-repo" "Template for new repos")
+    ;; (dependency "hypatia" "Security scanning")
+    ;; (consumer "gitbot-fleet" "Quality enforcement")
+    )
+
+  (what-this-is
+    "A component of the hyperpolymath ecosystem. "
+    "[TODO: Add specific description]")
+
+  (what-this-is-not
+    "This is not a standalone project - it integrates with "
+    "the broader hyperpolymath librarying ecosystem."))

@@ -1,0 +1,76 @@
+= Contributing to Lith
+:toc:
+
+Thank you for your interest in contributing to Lith!
+
+== Code of Conduct
+
+Be respectful, inclusive, and constructive. We value diverse perspectives and collaborative problem-solving.
+
+== Getting Started
+
+1. Read link:README.adoc[README.adoc] for project overview
+2. Read link:lithoglyph.scm[lithoglyph.scm] for detailed specification
+3. Review link:META.scm[META.scm] for architecture decisions
+4. Check link:STATE.scm[STATE.scm] for current project state
+
+== How to Contribute
+
+=== Reporting Issues
+
+* Search existing issues first
+* Include reproduction steps
+* Specify version and environment
+
+=== Proposing Changes
+
+1. Open an issue to discuss the change
+2. Reference relevant open questions from `lithoglyph.scm`
+3. Fork and create a feature branch
+4. Follow the coding conventions below
+5. Submit a pull request
+
+=== Closing Open Questions
+
+If your contribution addresses an open question from `lithoglyph.scm`:
+
+1. Add a decision record to the `(decisions ...)` section
+2. Document rationale and impacts
+3. Update affected specifications
+
+== Coding Conventions
+
+=== Forth (core-forth/)
+
+* One word per line for complex definitions
+* Document stack effects: `( before -- after )`
+* Keep words small and composable
+
+=== Zig (core-zig/)
+
+* Follow Zig style guide
+* Explicit error handling
+* No hidden allocations
+
+=== Factor (core-factor/)
+
+* Use vocabularies to organize code
+* Document stack effects
+* Prefer quotations over complex control flow
+
+=== Elixir (control-plane/)
+
+* Standard Elixir formatting (`mix format`)
+* Dialyzer type specs
+* OTP patterns for supervision
+
+== Pull Request Process
+
+1. Ensure all tests pass
+2. Update documentation as needed
+3. Add entries to CHANGELOG if applicable
+4. Request review from maintainers
+
+== License
+
+By contributing, you agree that your contributions will be licensed under PMPL-1.0-or-later.

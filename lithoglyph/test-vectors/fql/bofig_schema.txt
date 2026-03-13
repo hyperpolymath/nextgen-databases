@@ -1,0 +1,35 @@
+INPUT:
+CREATE COLLECTION bofig_evidence (
+  investigation_id STRING NOT NULL,
+  title STRING NOT NULL,
+  evidence_type STRING NOT NULL,
+  content_text STRING,
+  url_source STRING,
+  sha256_hash STRING NOT NULL,
+  perceptual_hash STRING,
+  ocr_confidence PROMPT_SCORE,
+  language STRING,
+  document_date TIMESTAMP,
+  redaction_status STRING DEFAULT 'clean',
+  redaction_count INTEGER DEFAULT 0,
+  extraction_run_id STRING,
+  dublin_core_metadata JSON,
+  sensitivity_level STRING DEFAULT 'public',
+  prompt_provenance PROMPT_SCORE,
+  prompt_replicability PROMPT_SCORE,
+  prompt_objectivity PROMPT_SCORE,
+  prompt_methodology PROMPT_SCORE,
+  prompt_publication PROMPT_SCORE,
+  prompt_timeliness PROMPT_SCORE,
+  notes STRING
+)
+WITH PROVENANCE {
+  actor: "system:schema-init",
+  rationale: "Bofig evidence collection for investigative journalism pipeline"
+}
+---
+PARSED:
+(create-collection "bofig_evidence" (fields 22) (provenance (actor "system:schema-init") (rationale "Bofig evidence collection for investigative journalism pipeline")))
+---
+RESULT:
+(ok (created "bofig_evidence") (fields 22))

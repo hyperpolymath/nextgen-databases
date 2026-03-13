@@ -1,0 +1,137 @@
+; SPDX-License-Identifier: PMPL-1.0-or-later
+; SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath)
+;
+; 0-AI-MANIFEST.a2ml — Universal AI entry point for Lithoglyph
+; Media-Type: application/a2ml
+
+(manifest
+  (identity
+    (name "Lithoglyph")
+    (full-name "Lithoglyph: Narrative-First, Reversible, Audit-Grade Database")
+    (former-name "Lith")
+    (version "0.0.7")
+    (repo "https://github.com/hyperpolymath/lithoglyph")
+    (license "PMPL-1.0-or-later")
+    (author "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>")
+    (monorepo-parent "nextgen-databases"))
+
+  (purpose
+    "Narrative-first, reversible, audit-grade database core. Every mutation
+     is a story event with full provenance. Block-based storage with Forth
+     kernel, Zig bridge providing C ABI, Idris2 dependent-type ABI proofs,
+     Factor runtime with FQL query language, and Lean 4 normalization proofs.")
+
+  (canonical-locations
+    (ai-instructions ".claude/CLAUDE.md")
+    (state ".machine_readable/STATE.scm")
+    (meta ".machine_readable/META.scm")
+    (ecosystem ".machine_readable/ECOSYSTEM.scm")
+    (agentic ".machine_readable/AGENTIC.scm")
+    (neurosym ".machine_readable/NEUROSYM.scm")
+    (playbook ".machine_readable/PLAYBOOK.scm")
+    (legacy-handover ".machine_readable/HANDOVER.scm")
+    (roadmap ".machine_readable/ROADMAP.scm")
+    (topology "TOPOLOGY.md")
+    (build "justfile")
+    (container-build "Containerfile")
+    (container-deploy "selur-compose.yml")
+    (honest-status "HONEST-STATUS-2026-02-13.md")
+    (security ".well-known/security.txt"))
+
+  (tech-stack
+    (storage-layer "Forth" "Block storage kernel — 17 passing tests")
+    (bridge-layer "Zig" "C ABI bridge — 19 functions, WAL commit")
+    (abi-layer "Idris2" "Dependent-type ABI proofs — zero believe_me")
+    (runtime-layer "Factor" "FQL parser, planner, executor")
+    (normalizer-layer "Lean 4" "Normalization proofs — 52 passing")
+    (beam-layer "Zig + Rust" "BEAM NIFs for Elixir/Erlang")
+    (control-plane "Elixir/OTP" "Clustering, supervision (planned)")
+    (query-language "GQL-DT" "Dependently-typed, Lean 4 verified")
+    (http-layer "Elixir" "lith-http — Phoenix-based API")
+    (config "Nickel")
+    (container-runtime "Podman")
+    (base-image "cgr.dev/chainguard/wolfi-base:latest"))
+
+  (architecture
+    (core-forth
+      (description "Forth block storage kernel")
+      (location "core-forth/")
+      (status "complete — 17/17 tests pass"))
+    (core-zig
+      (description "C ABI bridge with WAL, block allocator, compaction")
+      (location "core-zig/")
+      (status "complete — build + test pass"))
+    (ffi-zig
+      (description "FFI delegation layer — delegates to core-zig")
+      (location "ffi/zig/")
+      (status "complete — build + test pass"))
+    (idris2-abi
+      (description "Dependent-type ABI definitions with formal proofs")
+      (location "src/Lith/")
+      (status "complete — 3 files type-check clean"))
+    (core-factor
+      (description "GQL runtime — FQL parser, planner, executor")
+      (location "core-factor/")
+      (status "complete — builds"))
+    (normalizer
+      (description "Lean 4 normalization with FD discovery")
+      (location "normalizer/")
+      (status "complete — 52 proofs pass"))
+    (beam-zig-nif
+      (description "Zig-based BEAM NIF")
+      (location "beam/native/")
+      (status "builds — real FFI calls"))
+    (beam-rust-nif
+      (description "Rust-based BEAM NIF via Rustler 0.35")
+      (location "beam/native_rust/")
+      (status "builds — 0 warnings"))
+    (gql-dt
+      (description "Dependently-typed Glyph Query Language")
+      (location "gql-dt/")
+      (status "claims 100% — needs audit"))
+    (glyphbase
+      (description "Graph storage engine")
+      (location "glyphbase/")
+      (status "claims complete — needs audit"))
+    (lith-http
+      (description "Elixir/Phoenix HTTP API layer")
+      (location "lith-http/")
+      (status "M15 complete — production builds"))
+    (studio
+      (description "Tauri desktop GUI")
+      (location "studio/")
+      (status "11 TODO commands — returns mock data"))
+    (api
+      (description "Zig HTTP/gRPC API layer")
+      (location "api/")
+      (status "BROKEN — 83 call sites need Zig 0.15.2 migration")))
+
+  (subproject-manifests
+    (gql-dt "gql-dt/0-AI-MANIFEST.a2ml")
+    (glyphbase "glyphbase/0-AI-MANIFEST.a2ml")
+    (lith-http "lith-http/0-AI-MANIFEST.a2ml"))
+
+  (critical-invariants
+    (rule "SCM files ONLY in .machine_readable/ — never root")
+    (rule "Zero believe_me in Idris2 ABI — hard invariant")
+    (rule "All Zig unsafe casts must have // SAFETY: comments")
+    (rule "core-zig/src/bridge.zig is the WORKING implementation — ffi/zig/ delegates to it")
+    (rule "No SQL injection — parameterized query builders only")
+    (rule "Container runtime is Podman — never Docker")
+    (rule "Container images MUST use Chainguard base (cgr.dev)")
+    (rule "IP rename pending: Lith/Form → Litho/Lithoglyph before public release"))
+
+  (container-ecosystem
+    (selur "selur-compose.yml — deployment orchestration")
+    (svalinn "TLS gateway with policy enforcement")
+    (vordr "Runtime verification and formal proof checking")
+    (cerro-torre "Image signing with ML-DSA-87 post-quantum crypto")
+    (rokur "Secret rotation with argon2id"))
+
+  (related-projects
+    (verisimdb "Octad database sibling — shares GQL patterns")
+    (quandledb "Knot-theoretic database sibling")
+    (nqc "Normal-form Query Compiler")
+    (proven "Formally verified safety library")
+    (hypatia "Neurosymbolic CI/CD scanner")
+    (gitbot-fleet "Bot orchestration")))

@@ -1,0 +1,606 @@
+{
+  "name": "Bofig Investigative Evidence",
+  "description": "Evidence graph collections for investigative journalism. Three collections: evidence records, claims, and relationships between them. All collections have full PROMPT scoring and provenance tracking.",
+  "collections": [
+    {
+      "name": "bofig_evidence",
+      "description": "Core evidence records — documents, testimonies, financial records ingested via Docudactyl or manual entry. Each record carries PROMPT scores and provenance metadata.",
+      "schema": {
+        "fields": [
+          {
+            "name": "investigation_id",
+            "type": "text",
+            "required": true,
+            "description": "Investigation this evidence belongs to"
+          },
+          {
+            "name": "title",
+            "type": "text",
+            "required": true,
+            "description": "Human-readable title for the evidence"
+          },
+          {
+            "name": "evidence_type",
+            "type": "select",
+            "required": true,
+            "options": [
+              "court_filing", "deposition", "testimony", "flight_log",
+              "financial_record", "communication", "photograph", "video",
+              "official_statistics", "news_report", "document", "dataset",
+              "interview", "affidavit", "subpoena", "other"
+            ],
+            "description": "Classification of evidence source type"
+          },
+          {
+            "name": "content_text",
+            "type": "long_text",
+            "description": "Extracted text content (OCR'd if from scanned document)"
+          },
+          {
+            "name": "url_source",
+            "type": "text",
+            "description": "URL or file path to original source document"
+          },
+          {
+            "name": "sha256_hash",
+            "type": "text",
+            "required": true,
+            "description": "SHA-256 hash for deduplication and integrity verification"
+          },
+          {
+            "name": "perceptual_hash",
+            "type": "text",
+            "description": "Perceptual hash for near-duplicate image detection"
+          },
+          {
+            "name": "ocr_confidence",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "Tesseract OCR confidence score (if applicable)"
+          },
+          {
+            "name": "language",
+            "type": "text",
+            "description": "ISO 639-1 language code of primary content"
+          },
+          {
+            "name": "document_date",
+            "type": "date",
+            "description": "Date of the original document (not ingestion date)"
+          },
+          {
+            "name": "entities_extracted",
+            "type": "multi_select",
+            "options": [],
+            "description": "NER-extracted entity names (people, orgs, locations)"
+          },
+          {
+            "name": "keywords",
+            "type": "multi_select",
+            "options": [],
+            "description": "Auto-extracted keywords from content"
+          },
+          {
+            "name": "redaction_status",
+            "type": "select",
+            "options": ["clean", "redacted", "partially_recovered", "fully_recovered", "not_applicable"],
+            "default": "clean",
+            "description": "Whether document contains redactions and recovery status"
+          },
+          {
+            "name": "redaction_count",
+            "type": "number",
+            "min": 0,
+            "description": "Number of detected redaction annotations"
+          },
+          {
+            "name": "extraction_run_id",
+            "type": "text",
+            "description": "Docudactyl pipeline run identifier for provenance"
+          },
+          {
+            "name": "dublin_core_metadata",
+            "type": "long_text",
+            "description": "Dublin Core metadata as JSON (creator, publisher, rights, etc.)"
+          },
+          {
+            "name": "sensitivity_level",
+            "type": "select",
+            "options": ["public", "restricted", "sealed", "source_protected"],
+            "default": "public",
+            "description": "Access control classification"
+          },
+          {
+            "name": "prompt_provenance",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "PROMPT: Data source documentation and chain of custody"
+          },
+          {
+            "name": "prompt_replicability",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "PROMPT: Can the evidence be independently verified?"
+          },
+          {
+            "name": "prompt_objectivity",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "PROMPT: Freedom from bias or conflicts of interest"
+          },
+          {
+            "name": "prompt_methodology",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "PROMPT: Quality of evidence collection methodology"
+          },
+          {
+            "name": "prompt_publication",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "PROMPT: Publication venue credibility (court vs tabloid)"
+          },
+          {
+            "name": "prompt_timeliness",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "PROMPT: Currency and relevance of the evidence"
+          },
+          {
+            "name": "prompt_overall",
+            "type": "formula",
+            "formula": "AVERAGE({prompt_provenance}, {prompt_replicability}, {prompt_objectivity}, {prompt_methodology}, {prompt_publication}, {prompt_timeliness})"
+          },
+          {
+            "name": "notes",
+            "type": "long_text",
+            "description": "Analyst notes and observations"
+          }
+        ]
+      },
+      "records": [
+        {
+          "investigation_id": "epstein_files_2024",
+          "title": "Flight Log — N908JE — 2002-03-15",
+          "evidence_type": "flight_log",
+          "content_text": "Departure: Teterboro (TEB). Arrival: St. Thomas (STT). Passengers: JE, GM, JD3, JD7...",
+          "sha256_hash": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+          "ocr_confidence": 72,
+          "language": "en",
+          "document_date": "2002-03-15",
+          "redaction_status": "partially_recovered",
+          "redaction_count": 3,
+          "extraction_run_id": "docudactyl-run-001",
+          "sensitivity_level": "public",
+          "prompt_provenance": 85,
+          "prompt_replicability": 90,
+          "prompt_objectivity": 70,
+          "prompt_methodology": 60,
+          "prompt_publication": 95,
+          "prompt_timeliness": 40,
+          "notes": "Passenger initials cross-referenced with deposition testimony"
+        },
+        {
+          "investigation_id": "epstein_files_2024",
+          "title": "Giuffre v. Maxwell — Deposition Transcript (2016)",
+          "evidence_type": "deposition",
+          "content_text": "Q: Can you describe what happened when you arrived at the property?...",
+          "sha256_hash": "f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5",
+          "ocr_confidence": 94,
+          "language": "en",
+          "document_date": "2016-05-03",
+          "redaction_status": "redacted",
+          "redaction_count": 47,
+          "extraction_run_id": "docudactyl-run-001",
+          "sensitivity_level": "restricted",
+          "prompt_provenance": 95,
+          "prompt_replicability": 85,
+          "prompt_objectivity": 65,
+          "prompt_methodology": 90,
+          "prompt_publication": 100,
+          "prompt_timeliness": 60,
+          "notes": "Court-ordered release. 47 redactions, some names recoverable from context."
+        }
+      ]
+    },
+    {
+      "name": "bofig_claims",
+      "description": "Claims extracted from evidence — specific factual assertions that can be corroborated, contradicted, or qualified. Each claim links to supporting evidence and carries a confidence score.",
+      "schema": {
+        "fields": [
+          {
+            "name": "investigation_id",
+            "type": "text",
+            "required": true
+          },
+          {
+            "name": "claim_text",
+            "type": "long_text",
+            "required": true,
+            "description": "The specific factual assertion"
+          },
+          {
+            "name": "claim_type",
+            "type": "select",
+            "required": true,
+            "options": [
+              "factual", "temporal", "financial", "testimonial",
+              "documentary", "circumstantial", "corroborative", "contradictory"
+            ]
+          },
+          {
+            "name": "confidence",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "required": true,
+            "description": "Confidence in claim accuracy (0-100)"
+          },
+          {
+            "name": "source_evidence_ids",
+            "type": "multi_select",
+            "options": [],
+            "description": "Evidence record IDs supporting this claim"
+          },
+          {
+            "name": "speaker_id",
+            "type": "text",
+            "description": "Entity ID of person who made this claim (for testimony)"
+          },
+          {
+            "name": "claim_date",
+            "type": "date",
+            "description": "Date the claimed event occurred"
+          },
+          {
+            "name": "assertion_date",
+            "type": "date",
+            "description": "Date the claim was made (deposition date, filing date, etc.)"
+          },
+          {
+            "name": "corroboration_count",
+            "type": "number",
+            "min": 0,
+            "default": 0,
+            "description": "Number of independent sources corroborating this claim"
+          },
+          {
+            "name": "contradiction_count",
+            "type": "number",
+            "min": 0,
+            "default": 0,
+            "description": "Number of sources contradicting this claim"
+          },
+          {
+            "name": "impeachment_flag",
+            "type": "select",
+            "options": ["none", "self_contradicted", "externally_contradicted", "retracted"],
+            "default": "none",
+            "description": "Whether the speaker has contradicted their own claim"
+          },
+          {
+            "name": "prompt_provenance",
+            "type": "number",
+            "min": 0,
+            "max": 100
+          },
+          {
+            "name": "prompt_replicability",
+            "type": "number",
+            "min": 0,
+            "max": 100
+          },
+          {
+            "name": "prompt_objectivity",
+            "type": "number",
+            "min": 0,
+            "max": 100
+          },
+          {
+            "name": "prompt_methodology",
+            "type": "number",
+            "min": 0,
+            "max": 100
+          },
+          {
+            "name": "prompt_publication",
+            "type": "number",
+            "min": 0,
+            "max": 100
+          },
+          {
+            "name": "prompt_timeliness",
+            "type": "number",
+            "min": 0,
+            "max": 100
+          },
+          {
+            "name": "prompt_overall",
+            "type": "formula",
+            "formula": "AVERAGE({prompt_provenance}, {prompt_replicability}, {prompt_objectivity}, {prompt_methodology}, {prompt_publication}, {prompt_timeliness})"
+          }
+        ]
+      },
+      "records": [
+        {
+          "investigation_id": "epstein_files_2024",
+          "claim_text": "Jeffrey Epstein flew from Teterboro to St. Thomas on 2002-03-15 with at least 4 passengers",
+          "claim_type": "factual",
+          "confidence": 92,
+          "claim_date": "2002-03-15",
+          "corroboration_count": 3,
+          "contradiction_count": 0,
+          "impeachment_flag": "none",
+          "prompt_provenance": 90,
+          "prompt_replicability": 95,
+          "prompt_objectivity": 85,
+          "prompt_methodology": 70,
+          "prompt_publication": 95,
+          "prompt_timeliness": 40
+        }
+      ]
+    },
+    {
+      "name": "bofig_entities",
+      "description": "Resolved entities (people, organizations, locations) with alias tracking for co-reference resolution. Merges and splits are journaled and reversible.",
+      "schema": {
+        "fields": [
+          {
+            "name": "primary_name",
+            "type": "text",
+            "required": true,
+            "description": "Canonical name for this entity"
+          },
+          {
+            "name": "entity_type",
+            "type": "select",
+            "required": true,
+            "options": ["person", "organization", "location", "account", "vessel", "aircraft"]
+          },
+          {
+            "name": "aliases",
+            "type": "multi_select",
+            "options": [],
+            "description": "All known aliases and name variants"
+          },
+          {
+            "name": "description",
+            "type": "long_text",
+            "description": "Brief description of entity role in investigation"
+          },
+          {
+            "name": "first_appearance_date",
+            "type": "date",
+            "description": "Earliest document date mentioning this entity"
+          },
+          {
+            "name": "document_count",
+            "type": "number",
+            "min": 0,
+            "default": 0,
+            "description": "Number of documents mentioning this entity"
+          },
+          {
+            "name": "credibility_score",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "Current credibility score (for witness entities)"
+          },
+          {
+            "name": "merge_history",
+            "type": "long_text",
+            "description": "JSON log of entity merge/split operations"
+          }
+        ]
+      },
+      "records": [
+        {
+          "primary_name": "Jeffrey Epstein",
+          "entity_type": "person",
+          "aliases": ["J. Epstein", "Epstein, Jeffrey", "JE"],
+          "description": "Primary subject of investigation",
+          "document_count": 4721,
+          "credibility_score": 15
+        },
+        {
+          "primary_name": "Ghislaine Maxwell",
+          "entity_type": "person",
+          "aliases": ["G. Maxwell", "Maxwell, Ghislaine", "GM"],
+          "description": "Co-conspirator, convicted 2021",
+          "document_count": 3104,
+          "credibility_score": 10
+        },
+        {
+          "primary_name": "N908JE",
+          "entity_type": "aircraft",
+          "aliases": ["Lolita Express", "Boeing 727-31"],
+          "description": "Epstein's private aircraft, Boeing 727",
+          "document_count": 892
+        }
+      ]
+    },
+    {
+      "name": "bofig_financial_transactions",
+      "description": "Financial transactions extracted from bank records, wire transfers, and financial filings. Supports chain analysis and anomaly detection.",
+      "schema": {
+        "fields": [
+          {
+            "name": "investigation_id",
+            "type": "text",
+            "required": true
+          },
+          {
+            "name": "source_entity_id",
+            "type": "text",
+            "required": true,
+            "description": "Entity ID of the sender/payer"
+          },
+          {
+            "name": "destination_entity_id",
+            "type": "text",
+            "required": true,
+            "description": "Entity ID of the receiver/payee"
+          },
+          {
+            "name": "amount",
+            "type": "number",
+            "required": true,
+            "description": "Transaction amount in original currency"
+          },
+          {
+            "name": "currency",
+            "type": "select",
+            "required": true,
+            "options": ["USD", "GBP", "EUR", "CHF", "JPY", "CAD", "AUD", "OTHER"]
+          },
+          {
+            "name": "transaction_date",
+            "type": "date",
+            "required": true
+          },
+          {
+            "name": "instrument",
+            "type": "select",
+            "options": ["wire_transfer", "check", "cash", "credit_card", "crypto", "trust_payment", "shell_company", "other"],
+            "description": "Payment instrument or method"
+          },
+          {
+            "name": "intermediary_entity_id",
+            "type": "text",
+            "description": "Entity ID of any intermediary (bank, shell company, trust)"
+          },
+          {
+            "name": "source_account",
+            "type": "text",
+            "description": "Account identifier (masked for privacy)"
+          },
+          {
+            "name": "destination_account",
+            "type": "text",
+            "description": "Destination account identifier"
+          },
+          {
+            "name": "source_evidence_id",
+            "type": "text",
+            "description": "Evidence record this transaction was extracted from"
+          },
+          {
+            "name": "anomaly_flags",
+            "type": "multi_select",
+            "options": ["round_number", "structuring", "unusual_timing", "new_counterparty", "high_value", "cross_border"],
+            "description": "Automated anomaly detection flags"
+          },
+          {
+            "name": "notes",
+            "type": "long_text"
+          }
+        ]
+      },
+      "records": [
+        {
+          "investigation_id": "epstein_files_2024",
+          "source_entity_id": "entity_epstein",
+          "destination_entity_id": "entity_model_agency",
+          "amount": 50000,
+          "currency": "USD",
+          "transaction_date": "2003-06-15",
+          "instrument": "wire_transfer",
+          "anomaly_flags": ["round_number"],
+          "notes": "Monthly payment to MC2 Model Management"
+        }
+      ]
+    }
+  ],
+  "edge_collections": [
+    {
+      "name": "bofig_relationships",
+      "description": "Weighted edges connecting evidence, claims, and entities. Relationship types indicate evidential support, contradiction, involvement, or temporal sequence.",
+      "schema": {
+        "fields": [
+          {
+            "name": "relationship_type",
+            "type": "select",
+            "required": true,
+            "options": [
+              "supports", "contradicts", "qualifies", "supersedes",
+              "corroborates", "cites", "involves", "witnessed_by",
+              "paid_by", "paid_to", "traveled_with", "employed_by",
+              "preceded_by", "followed_by", "co_occurred_with"
+            ]
+          },
+          {
+            "name": "weight",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "required": true,
+            "description": "Relationship strength (0-100)"
+          },
+          {
+            "name": "reasoning",
+            "type": "long_text",
+            "required": true,
+            "description": "Non-empty rationale for this relationship (Lithoglyph invariant)"
+          },
+          {
+            "name": "confidence",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "description": "Confidence in relationship accuracy"
+          },
+          {
+            "name": "automated",
+            "type": "select",
+            "options": ["manual", "ner_extracted", "co_reference", "financial_analysis", "temporal_analysis"],
+            "default": "manual",
+            "description": "How this relationship was established"
+          }
+        ]
+      }
+    }
+  ],
+  "views": [
+    {
+      "name": "High-Confidence Evidence",
+      "type": "grid",
+      "collection": "bofig_evidence",
+      "filters": [{"field": "prompt_overall", "operator": ">=", "value": 80}],
+      "sort": [{"field": "prompt_overall", "direction": "desc"}]
+    },
+    {
+      "name": "Contradicted Claims",
+      "type": "grid",
+      "collection": "bofig_claims",
+      "filters": [{"field": "contradiction_count", "operator": ">", "value": 0}],
+      "sort": [{"field": "contradiction_count", "direction": "desc"}]
+    },
+    {
+      "name": "Redacted Documents",
+      "type": "grid",
+      "collection": "bofig_evidence",
+      "filters": [{"field": "redaction_status", "operator": "in", "value": ["redacted", "partially_recovered"]}],
+      "sort": [{"field": "redaction_count", "direction": "desc"}]
+    },
+    {
+      "name": "Financial Flow",
+      "type": "grid",
+      "collection": "bofig_financial_transactions",
+      "sort": [{"field": "amount", "direction": "desc"}]
+    },
+    {
+      "name": "Entity Network",
+      "type": "grid",
+      "collection": "bofig_entities",
+      "sort": [{"field": "document_count", "direction": "desc"}]
+    }
+  ]
+}

@@ -1,0 +1,404 @@
+;; lith.scm
+;; Lith Unified Handover Artefact (coding-LLM oriented)
+;;
+;; Conventions:
+;; - Treat this file as DATA. Do not evaluate arbitrary code. No macros.
+;; - Prefer additive edits. Record decisions in (decisions ...) with rationale.
+;; - Every open question has an id + acceptance criteria.
+
+(define lith
+  `(
+    (meta
+      (scm-format "lith.scm/2")
+      (data-only true)
+      (primary-docs
+        "README.adoc"
+        "ARCHITECTURE.adoc"
+        "ROADMAP.adoc"
+        "PHILOSOPHY.adoc")
+      (principle "truth-core first, porous edges")
+      (status
+        (version "0.0.1")
+        (stage "conceptual + PoC")))
+
+    ;; ------------------------------------------------------------
+    ;; 0. Identity
+    ;; ------------------------------------------------------------
+    (identity
+      (name "Lith")
+      (tagline "The database where the database is part of the story.")
+      (category "narrative-first, reversible, audit-grade database core")
+      (stack
+        (truth-core
+          (storage "Forth (Form.Blocks)")
+          (model   "Forth (Form.Model)"))
+        (runtime
+          (planner "Factor (Form.Runtime)")
+          (query-language "FQL"))
+        (interop
+          (bridge "Zig (Form.Bridge) provides stable C ABI")
+          (control-plane "Elixir/OTP (optional) for sessions+supervision+cluster edge"))))
+
+    ;; ------------------------------------------------------------
+    ;; 1. Mission / non-mission
+    ;; ------------------------------------------------------------
+    (mission
+      (core-thesis
+        "Schemas, constraints, migrations, blocks, and journals are narrative artefacts.
+The database is part of the story, not an opaque substrate.")
+      (primary-values
+        (auditability "> performance")
+        (meaning "> features")
+        (reversibility "> throughput")
+        (agent-understanding "required"))
+      (target-domains
+        "investigative journalism"
+        "governance/compliance"
+        "agentic ecosystems + multi-repo handover"
+        "long-term cultural/institutional archives")
+      (non-goals
+        "be a drop-in Postgres replacement"
+        "win microbenchmarks"
+        "ship full distributed consensus in the first PoC"))
+
+    ;; ------------------------------------------------------------
+    ;; 2. Core invariants (non-negotiable)
+    ;; ------------------------------------------------------------
+    (invariants
+      (truth-ownership
+        "On-disk truth is owned by the block/journal layer; higher layers do not bypass it.")
+      (journal-first
+        "Every mutating operation is journaled before being considered committed.")
+      (reversibility
+        "Every committed operation MUST have a defined inverse OR be explicitly marked irreversible-with-story.")
+      (renderability
+        "Blocks and journal entries MUST be renderable deterministically into human/agent-readable form.")
+      (provenance
+        "All query results can optionally include provenance pointers to journal and blocks.")
+      (constraints-as-ethics
+        "Constraints are explainable: rejections must return reasons + pointers + narrative rationale."))
+
+    ;; ------------------------------------------------------------
+    ;; 3. Architectural layers
+    ;; ------------------------------------------------------------
+    (architecture
+      (layers
+        (Form.Blocks
+          (language "Forth")
+          (purpose "deterministic storage + journal + reversibility primitives")
+          (must-provide
+            "fixed-size blocks"
+            "symbolic headers (stable render)"
+            "append-only journal"
+            "crash recovery"
+            "integrity checks + repair guidance"))
+        (Form.Model
+          (language "Forth")
+          (purpose "multi-model logical layer on top of blocks")
+          (must-provide
+            "document collections"
+            "edge collections"
+            "schema + constraint metadata"
+            "migration artefacts")
+          (note "Model operations are expressed as journaled block operations."))
+        (Form.Bridge
+          (language "Zig")
+          (purpose "stable ABI boundary + safety governor")
+          (contract
+            "Expose a narrow C ABI to runtimes"
+            "Marshalling only; no business logic duplication"
+            "Opaque handles + byte buffers + explicit error codes"))
+        (Form.Runtime
+          (language "Factor")
+          (purpose "FQL parse/plan/exec + explain + introspection")
+          (must-provide
+            "FQL minimal subset for PoC"
+            "planner steps introspection"
+            "constraint explanation surfaces"
+            "provenance surfaces"))
+        (Form.ControlPlane
+          (language "Elixir/OTP (optional)")
+          (purpose "dependable sessions/supervision/edge clustering")
+          (rules
+            "Prefer out-of-process core engine (port) over in-VM native calls"
+            "Control plane must not redefine truth semantics"))
+        (Form.Normalizer
+          (language "Factor + Lean 4 (via FQL-dt)")
+          (purpose "self-normalizing database: FD discovery, type encoding, proof-carrying schema evolution")
+          (must-provide
+            "functional dependency discovery (DFD/TANE/FDHits algorithms)"
+            "type encoding of FDs in FQL-dt"
+            "normal form predicates (1NF through BCNF)"
+            "proposal generation with equivalence proofs"
+            "narrative templates for normalization decisions"
+            "DISCOVER DEPENDENCIES command"
+            "APPLY NORMALIZATION command with rollback")
+          (spec "spec/self-normalizing.adoc"))))
+
+    ;; ------------------------------------------------------------
+    ;; 4. Cross-layer seam checks (must run at stage freezes)
+    ;; ------------------------------------------------------------
+    (seams
+      (B<->M
+        "Every Model op maps to a sequence of journaled Block ops."
+        "Every Model op has an inverse mapping or is explicitly classified.")
+      (M<->R
+        "Constraints enforced identically whether invoked via FQL or direct API."
+        "Introspection must return reason graphs + provenance pointers.")
+      (B<->R
+        "Runtime cannot commit without journal-first acknowledgement from Blocks."
+        "Render tools must work without Factor runtime present."))
+
+    ;; ------------------------------------------------------------
+    ;; 5. Interfaces: Zig C ABI (minimum for PoC)
+    ;; ------------------------------------------------------------
+    (abi
+      (style "C ABI provided by Zig")
+      (handles
+        (db "opaque fdb_db*")
+        (txn "opaque fdb_txn*")
+        (cursor "opaque fdb_cursor*"))
+      (errors
+        (model "status code + optional error blob")
+        (rules
+          "No exceptions across ABI"
+          "Every error blob is renderable/explainable")))
+      (functions
+        ;; Lifecycle
+        "fdb_db_open(path, opts_bytes, opts_len) -> (db*, status, err_blob)"
+        "fdb_db_close(db*) -> status"
+        ;; Transactions
+        "fdb_txn_begin(db*, mode) -> (txn*, status, err_blob)"
+        "fdb_txn_commit(txn*) -> (status, err_blob)"
+        "fdb_txn_abort(txn*)  -> status"
+        ;; Apply operations (runtime provides op blob; core returns result+provenance)
+        "fdb_apply(txn*, op_bytes, op_len) -> (result_blob, provenance_blob, status, err_blob)"
+        ;; Introspection/rendering (must be usable by agents)
+        "fdb_render_block(db*, block_id, render_opts) -> (text_blob, status, err_blob)"
+        "fdb_render_journal(db*, since, render_opts) -> (text_blob, status, err_blob)"
+        "fdb_introspect_schema(db*) -> (schema_blob, status, err_blob)"
+        "fdb_introspect_constraints(db*) -> (constraints_blob, status, err_blob)")
+      (blob-encodings
+        (preferred
+          "Cap'n Proto (if adopted) OR Protobuf (if adopted) for ABI blobs"
+          "CBOR or MessagePack acceptable for PoC")
+        (rule
+          "Regardless of blob encoding, provide deterministic text render for audit.")))
+
+    ;; ------------------------------------------------------------
+    ;; 6. On-disk formats (spec-first)
+    ;; ------------------------------------------------------------
+    (formats
+      (on-disk
+        (must
+          "block header: versioned + fixed field layout"
+          "journal entry: op type + forward payload + inverse payload + provenance ids"
+          "canonical render: deterministic, stable across implementations")
+        (deliverables
+          "spec/blocks.adoc"
+          "spec/journal.adoc"
+          "spec/rendering.adoc"
+          "test-vectors/ (golden bytes + golden renders)"))
+      (wire
+        (note "Wire protocol comes after PoC; ABI is enough initially.")
+        (candidates "HTTP+CBOR" "gRPC" "WebSocket streaming")))
+
+    ;; ------------------------------------------------------------
+    ;; 7. FQL (PoC subset + introspection)
+    ;; ------------------------------------------------------------
+    (fql
+      (poс-subset
+        (must
+          "INSERT document into collection"
+          "INSERT edge (from,to,type,props)"
+          "SELECT with simple predicates"
+          "EXPLAIN (returns plan + reasons)"
+          "INTROSPECT schema/constraints"
+          "OPTIONAL provenance output"))
+      (non-goals
+        "full SQL equivalence"
+        "complex joins/aggregations in PoC"))
+
+    ;; ------------------------------------------------------------
+    ;; 8. PoC acceptance (definition of done)
+    ;; ------------------------------------------------------------
+    (poc
+      (acceptance
+        "single-node db open/close"
+        "append-only journal with deterministic rendering"
+        "document+edge insert/select"
+        "constraint rejection returns explain payload"
+        "migration artefact recorded + reversible"
+        "golden test vectors pass"
+        "seam checks B<->M, M<->R, B<->R pass at freeze"))
+
+    ;; ------------------------------------------------------------
+    ;; 9. Work rules for coding LLMs (very explicit)
+    ;; ------------------------------------------------------------
+    (llm-rules
+      (must
+        "Keep the truth-core small, readable, test-vector driven."
+        "Do not duplicate semantics across layers."
+        "When adding features, add a renderable narrative delta."
+        "When closing an open question, add a decision record.")
+      (must-not
+        "Turn Lith into generic CRUD"
+        "Hide block/journal meaning behind opaque structures"
+        "Introduce irreversible operations without explicit classification + story"
+        "Make runtime capable of bypassing journal-first"))
+
+    ;; ------------------------------------------------------------
+    ;; 10. Open questions (structured)
+    ;; ------------------------------------------------------------
+    (open-questions
+      (q (id "Q-BLOCK-HEADER-001") (area storage) (status resolved)
+         (text "What is the minimal block header layout (fields + sizes) that supports renderability, integrity, and forward compatibility?")
+         (acceptance
+           "fields enumerated + fixed sizes"
+           "versioning + reserved bits defined"
+           "canonical rendering rules defined")
+         (impacts "spec/blocks.adoc" "core-forth/Form.Blocks/*")
+         (resolved-by "D-BLOCK-HEADER-001"))
+      (q (id "Q-JOURNAL-ENTRY-001") (area storage) (status resolved)
+         (text "What is the minimal journal entry schema to guarantee reversibility and provenance pointers?")
+         (acceptance
+           "forward+inverse payload representation chosen"
+           "provenance ids defined"
+           "crash recovery rules defined")
+         (impacts "spec/journal.adoc" "core-forth/Form.Blocks/*")
+         (resolved-by "D-JOURNAL-ENTRY-001"))
+      (q (id "Q-ABI-BLOBS-001") (area interop) (status resolved)
+         (text "Choose ABI blob encoding: Cap'n Proto vs Protobuf vs CBOR/MsgPack for PoC.")
+         (acceptance
+           "one chosen for PoC"
+           "deterministic text render defined independent of blob encoding")
+         (impacts "core-zig/Form.Bridge/*" "core-factor/Form.Runtime/*")
+         (resolved-by "D-ABI-BLOBS-001"))
+      (q (id "Q-FQL-POC-001") (area fql) (status resolved)
+         (text "Define the exact PoC grammar + canonical examples for FQL.")
+         (acceptance
+           "grammar documented"
+           "10 example queries + expected outputs"
+           "EXPLAIN/INTROSPECT included")
+         (impacts "spec/fql.adoc" "core-factor/Form.Runtime/*")
+         (resolved-by "D-FQL-POC-001"))
+      (q (id "Q-CTRL-PLANE-001") (area control-plane) (status resolved)
+         (text "Is Elixir/OTP introduced at PoC time (gateway only), or deferred until after the core is stable?")
+         (acceptance
+           "decision recorded with rationale"
+           "if yes: port protocol defined; if no: deferral rationale documented")
+         (impacts "control-plane/*" "docs/ARCHITECTURE.adoc")
+         (resolved-by "D-CTRL-PLANE-001"))
+      ;; Self-Normalizing Database Questions
+      (q (id "Q-NORM-001") (area normalizer) (status resolved)
+         (text "Which FD discovery algorithm should be the default: DFD, TANE, or FDHits?")
+         (acceptance
+           "benchmark on representative datasets completed"
+           "accuracy/speed tradeoff documented"
+           "default chosen with rationale")
+         (impacts "core-factor/Form.Normalizer/*" "spec/self-normalizing.adoc")
+         (resolved-by "D-NORM-001"))
+      (q (id "Q-NORM-002") (area normalizer) (status resolved)
+         (text "How should approximate FDs (confidence < 1.0) be handled?")
+         (acceptance
+           "policy for near-FDs defined"
+           "data quality implications documented"
+           "threshold configuration supported")
+         (impacts "core-factor/Form.Normalizer/*" "spec/self-normalizing.adoc")
+         (resolved-by "D-NORM-002"))
+      (q (id "Q-NORM-003") (area normalizer) (status resolved)
+         (text "Should denormalization be supported with the same rigor as normalization?")
+         (acceptance
+           "if yes: DenormalizationStep type defined with proofs"
+           "performance optimization use cases documented"
+           "reversibility guarantees specified")
+         (impacts "spec/self-normalizing.adoc" "core-factor/Form.Normalizer/*")
+         (resolved-by "D-NORM-003"))
+      (q (id "Q-NORM-004") (area normalizer) (status resolved)
+         (text "How to integrate Form.Normalizer with FQL-dt's existing proof system?")
+         (acceptance
+           "interface between Lean 4 proofs and Form.Normalizer defined"
+           "proof verification flow documented"
+           "bidirectional FFI via Form.Bridge specified")
+         (impacts "core-zig/Form.Bridge/*" "fqldt/*" "spec/self-normalizing.adoc")
+         (resolved-by "D-NORM-004"))
+      (q (id "Q-NORM-005") (area normalizer) (status resolved)
+         (text "What happens when normalization would break existing queries?")
+         (acceptance
+           "query rewriting strategy defined"
+           "migration period policy documented"
+           "backward compatibility guarantees specified")
+         (impacts "core-factor/Form.Runtime/*" "spec/self-normalizing.adoc")
+         (resolved-by "D-NORM-005")))
+
+    ;; ------------------------------------------------------------
+    ;; 11. Decisions log (append-only)
+    ;; ------------------------------------------------------------
+    (decisions
+      ;; (d (id "D-...") (date "YYYY-MM-DD") (closes "Q-...") (decision "...") (rationale "...") (impacts "..."))
+
+      (d (id "D-BLOCK-HEADER-001") (date "2026-01-11") (closes "Q-BLOCK-HEADER-001")
+         (decision "4096-byte blocks with 64-byte fixed header")
+         (rationale "Matches filesystem/SSD page sizes. Header provides: magic (4), version (2), type (2), block_id (8), sequence (8), timestamps (16), payload_len (4), checksum (4), prev_block (8), flags (4), reserved (4). CRC32C for integrity. Full spec in spec/blocks.adoc.")
+         (impacts "spec/blocks.adoc"))
+
+      (d (id "D-JOURNAL-ENTRY-001") (date "2026-01-11") (closes "Q-JOURNAL-ENTRY-001")
+         (decision "48-byte entry header with CBOR payloads for forward/inverse/provenance")
+         (rationale "Header includes: sequence (8), timestamp (8), op_type (2), flags (2), lengths (12), affected_block (8), checksum (4), entry_len (4). Variable-length CBOR payloads for forward operation, inverse operation, and provenance (actor + rationale required). Crash recovery via journal replay. Full spec in spec/journal.adoc.")
+         (impacts "spec/journal.adoc"))
+
+      (d (id "D-ABI-BLOBS-001") (date "2026-01-11") (closes "Q-ABI-BLOBS-001")
+         (decision "CBOR (RFC 8949) with deterministic encoding")
+         (rationale "Schema-optional, self-describing, wide language support (Zig, Factor, Forth, Lean 4, Elixir). Deterministic encoding via RFC 8949 §4.2 rules. Lith-specific tags 39001-39008 for block refs, doc IDs, provenance, PROMPT scores, proofs. LZ4 compression for large payloads. Full spec in spec/encoding.adoc.")
+         (impacts "spec/encoding.adoc" "core-zig/Form.Bridge/*"))
+
+      (d (id "D-FQL-POC-001") (date "2026-01-11") (closes "Q-FQL-POC-001")
+         (decision "FQL PoC grammar with 10 canonical examples")
+         (rationale "Covers INSERT/SELECT/UPDATE/DELETE for documents and edges. CREATE/DROP for collections. TRAVERSE for edge traversal. EXPLAIN shows plan + rationale. INTROSPECT for schema/constraints/journal. WITH PROVENANCE for audit output. All errors include rationale + suggestions. Full grammar and 10 examples in spec/fql.adoc.")
+         (impacts "spec/fql.adoc" "core-factor/Form.Runtime/*"))
+
+      (d (id "D-CTRL-PLANE-001") (date "2026-01-12") (closes "Q-CTRL-PLANE-001")
+         (decision "Defer Elixir/OTP control plane until after core is stable")
+         (rationale "PoC goal is proving narrative-first, reversible database concept. Control plane doesn't own truth semantics (per architecture). Form.Bridge provides sufficient ABI for external orchestration. Adding Elixir/OTP adds complexity without proving core thesis. Can integrate after Form.Runtime is complete and tested. Port protocol will be defined when needed.")
+         (impacts "docs/ARCHITECTURE.adoc" "ROADMAP.adoc"))
+
+      (d (id "D-NORM-001") (date "2026-01-12") (closes "Q-NORM-001")
+         (decision "DFD (Depth-First Discovery) as default FD discovery algorithm")
+         (rationale "DFD is sample-based, making it practical for large datasets without loading entire relations into memory. More memory-efficient than TANE (no full lattice needed). Already scaffolded in fd-discovery.factor. FDHits is newer (2024) but less battle-tested. For Lith's target use cases (journalism, governance, archives), accuracy matters more than microsecond-level speed. Can add TANE (--algorithm tane) and FDHits (--algorithm fdhits) as alternatives later. DFD's depth-first approach finds minimal FDs efficiently.")
+         (impacts "core-factor/Form.Normalizer/*" "spec/self-normalizing.adoc"))
+
+      (d (id "D-NORM-002") (date "2026-01-12") (closes "Q-NORM-002")
+         (decision "Three-tier policy for approximate FDs based on confidence thresholds")
+         (rationale "Policy: (1) Exact FDs (conf >= 0.99): treat as true FDs, can trigger normalization proposals. (2) Strong approximate FDs (0.95 <= conf < 0.99): report as 'probable FDs', require human confirmation before normalization. (3) Weak approximate FDs (conf < 0.95): report as 'data quality warnings', never trigger normalization. Approximate FDs often indicate data quality issues (typos, legacy data, duplicate records). Surfacing them as warnings supports Lith's audit mission. Requiring confirmation prevents false positives from driving schema changes. Threshold configurable via confidence-threshold setting (default 0.95).")
+         (impacts "core-factor/Form.Normalizer/*" "spec/self-normalizing.adoc"))
+
+      (d (id "D-NORM-003") (date "2026-01-12") (closes "Q-NORM-003")
+         (decision "Yes, support denormalization with same rigor as normalization")
+         (rationale "Define DenormalizationStep type parallel to NormalizationStep in Lean 4. Require performance justification narrative (explaining read optimization goals). Store equivalence proof (same as normalization - join of denormalized is lossless). Journal with explicit 'intentional-denormalization' classification and CBOR tag. Real workloads sometimes need denormalization for read performance. Lith's 'reversibility' invariant means denormalization must be undoable. 'Constraints as ethics' means denormalization must explain trade-offs. Without rigorous denormalization support, users would work around the system.")
+         (impacts "spec/self-normalizing.adoc" "core-factor/Form.Normalizer/*" "normalizer/lean/FunDep.lean"))
+
+      (d (id "D-NORM-004") (date "2026-01-12") (closes "Q-NORM-004")
+         (decision "Form.Bridge exports proof verification FFI with external Lean 4 verifiers")
+         (rationale "Interface: (1) Form.Bridge exports fdb_proof_verify(proof_blob, len) -> (valid, err_blob) and fdb_proof_register_verifier(type, callback) -> status. (2) Lean 4 proofs compile to standalone C-ABI-compatible verifiers via lake build. (3) Proof references in journal entries use CBOR tag 39006. (4) Flow: Form.Normalizer (Factor) -> Form.Bridge (Zig) -> Lean 4 verifier -> result. This keeps proofs external to truth core (maintains 'truth core doesn't own semantics'). Form.Bridge already provides ABI boundary; proof verification is another FFI call. Lean 4's native compilation to C makes this practical. FQL-dt proofs become verifiable artefacts, not just documentation.")
+         (impacts "core-zig/Form.Bridge/*" "normalizer/lean/*" "spec/self-normalizing.adoc"))
+
+      (d (id "D-NORM-005") (date "2026-01-12") (closes "Q-NORM-005")
+         (decision "Three-phase migration with query rewriting: Announce -> Shadow -> Commit")
+         (rationale "Phase 1 Announce (configurable, default 24h): Normalization proposal journaled; affected queries identified via Form.Runtime query log analysis; applications warned via INTROSPECT warnings. Phase 2 Shadow (configurable, default 7 days): Both old and new schemas exist; queries auto-rewritten to equivalent joins on new schema; compatibility views created automatically; performance metrics collected to validate no regression. Phase 3 Commit: Old schema removed; rewrite rules made permanent; compatibility views removed. Query rewriting rules: SELECT FROM old_table -> SELECT FROM (JOIN new_tables ON split_key). Lith's audience (journalism, governance, archives) needs high availability. Breaking changes must be phased, not abrupt. Shadow phase allows testing before commit. Provenance tracking identifies all affected queries.")
+         (impacts "core-factor/Form.Runtime/*" "spec/self-normalizing.adoc"))
+      )
+
+    ;; ------------------------------------------------------------
+    ;; 12. Repo layout (suggested)
+    ;; ------------------------------------------------------------
+    (repo
+      (dirs
+        (spec "format specs + rationale (AsciiDoc)")
+        (core-forth "Form.Blocks + Form.Model (truth core)")
+        (core-zig "Form.Bridge (ABI + port framing)")
+        (core-factor "Form.Runtime (FQL + introspection)")
+        (control-plane "Elixir/OTP gateway (optional)")
+        (tools "render/inspect/doctor utilities")
+        (test-vectors "golden bytes + golden renders")
+        (stories "narrative examples + onboarding/handover artefacts")))
+))

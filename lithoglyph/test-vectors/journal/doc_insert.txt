@@ -1,0 +1,23 @@
+JOURNAL seq=1 op=DOC_INSERT timestamp=2026-01-11T12:00:00.000000Z
+  affected_block=1 flags=[COMMITTED]
+  forward: {
+    collection: "evidence"
+    document_id: "doc_abc123"
+    fields: {
+      claim: "UK inflation reached 10.1%"
+      source: "ONS"
+      prompt_score: 95
+    }
+  }
+  inverse: {
+    delete: {
+      collection: "evidence"
+      document_id: "doc_abc123"
+    }
+  }
+  provenance: {
+    actor: {id: "user_alice", type: "human", name: "Alice Smith"}
+    rationale: "Adding primary source from ONS"
+    source: {type: "api", endpoint: "/api/v1/documents"}
+    timestamp: "2026-01-11T12:00:00.000000Z"
+  }

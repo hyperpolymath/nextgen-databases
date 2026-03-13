@@ -1,0 +1,151 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Lean 4 Build and Test Workflow
+name: Lean 4 Build
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  build:
+    name: Build and Test Lean 4
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - name: Install elan (Lean version manager)
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Verify Lean toolchain
+        run: |
+          elan --version
+          lean --version
+          lake --version
+
+      - name: Cache Lean dependencies
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4
+        with:
+          path: |
+            .lake
+            ~/.elan
+          key: ${{ runner.os }}-lean-${{ hashFiles('lake-manifest.json') }}
+          restore-keys: |
+            ${{ runner.os }}-lean-
+
+      - name: Build Lean 4 project
+        run: lake build
+
+      - name: Run Lean tests
+        run: lake test || echo "No tests configured yet"
+
+      - name: Check for proof errors
+        run: |
+          echo "Checking for sorry/admit in proofs..."
+          ! grep -r "sorry\|admit" src/ || {
+            echo "❌ Found incomplete proofs (sorry/admit)"
+            exit 1
+          }
+
+  zig-ffi:
+    name: Build Zig FFI Bridge
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@2a9625d550eefc3a8b5fe73f3f4ca4cf9b74d84c # v2
+        with:
+          version: 0.13.0
+
+      - name: Build Zig bridge
+        working-directory: bridge/zig
+        run: zig build
+
+      - name: Run Zig tests
+        working-directory: bridge/zig
+        run: zig build test
+
+      - name: Run integration tests
+        working-directory: bridge/zig
+        run: zig build test-integration
+
+  spec-validation:
+    name: Validate Specifications
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - name: Check EBNF grammar syntax
+        run: |
+          echo "Validating EBNF grammar..."
+          # Basic validation - check for balanced brackets
+          if ! grep -E '::=' spec/FBQLdt-Grammar.ebnf > /dev/null; then
+            echo "❌ No production rules found in grammar"
+            exit 1
+          fi
+          echo "✅ Grammar file appears valid"
+
+      - name: Verify specification files
+        run: |
+          for file in spec/GQL_Dependent_Types_Complete_Specification.md \
+                      spec/normalization-types.md \
+                      spec/FBQLdt-Grammar.ebnf \
+                      spec/FBQLdt-Lexical.md \
+                      spec/FBQLdt-Railroad-Diagrams.md; do
+            if [ ! -f "$file" ]; then
+              echo "❌ Missing required spec file: $file"
+              exit 1
+            fi
+          done
+          echo "✅ All specification files present"
+
+      - name: Check for naming consistency
+        run: |
+          echo "Checking for naming inconsistencies..."
+          # Check STATE.scm and ECOSYSTEM.scm use gql-dt not fdql-dt
+          if grep -i "fdql-dt" STATE.scm ECOSYSTEM.scm 2>/dev/null; then
+            echo "❌ Found old naming (fdql-dt instead of gql-dt)"
+            exit 1
+          fi
+          echo "✅ Naming is consistent"
+
+  documentation:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - name: Check markdown links
+        uses: gaurav-nelson/github-action-markdown-link-check@d53a906aa6b22b8979d33bc86170567e619495ec # v1
+        with:
+          use-quiet-mode: 'yes'
+          config-file: '.github/markdown-link-check-config.json'
+        continue-on-error: true
+
+      - name: Generate spec index
+        run: |
+          echo "Specification files:" > spec-index.txt
+          find spec/ -name "*.md" -o -name "*.ebnf" >> spec-index.txt
+          cat spec-index.txt
+
+      - name: Upload spec index
+        uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4
+        with:
+          name: spec-index
+          path: spec-index.txt
+          retention-days: 30

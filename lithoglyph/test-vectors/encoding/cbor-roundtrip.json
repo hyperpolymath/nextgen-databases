@@ -1,0 +1,451 @@
+{
+  "description": "CBOR serialization/deserialization roundtrip test vectors for Lithoglyph. Tests the CBOR encoder/decoder in core-zig/src/cbor.zig and ffi/zig/src/cbor.zig against RFC 8949. Lithoglyph requires deterministic CBOR encoding (Section 4.2): smallest integer representation, lexicographic key ordering, definite lengths only, smallest float representation, no duplicate keys. All hex values are the expected CBOR wire encoding.",
+  "constants": {
+    "RFC": "RFC 8949 (Concise Binary Object Representation)",
+    "DETERMINISTIC_RULES": "RFC 8949 Section 4.2",
+    "LITHOGLYPH_TAG_RANGE": "39001-39008"
+  },
+  "cbor_major_types": {
+    "0": "unsigned integer",
+    "1": "negative integer",
+    "2": "byte string",
+    "3": "text string",
+    "4": "array",
+    "5": "map",
+    "6": "tag",
+    "7": "simple/float"
+  },
+  "vectors": [
+    {
+      "name": "unsigned_zero",
+      "description": "Encode/decode unsigned integer 0. Smallest representation: single byte 0x00.",
+      "value": 0,
+      "type": "unsigned",
+      "expected_hex": "00",
+      "expected_bytes": [0],
+      "valid": true
+    },
+    {
+      "name": "unsigned_23",
+      "description": "Encode/decode unsigned integer 23. Last value that fits in single byte.",
+      "value": 23,
+      "type": "unsigned",
+      "expected_hex": "17",
+      "expected_bytes": [23],
+      "valid": true
+    },
+    {
+      "name": "unsigned_24",
+      "description": "Encode/decode unsigned integer 24. First value requiring 1-byte additional info.",
+      "value": 24,
+      "type": "unsigned",
+      "expected_hex": "1818",
+      "expected_bytes": [24, 24],
+      "valid": true
+    },
+    {
+      "name": "unsigned_255",
+      "description": "Encode/decode unsigned integer 255. Maximum 1-byte additional info.",
+      "value": 255,
+      "type": "unsigned",
+      "expected_hex": "18ff",
+      "expected_bytes": [24, 255],
+      "valid": true
+    },
+    {
+      "name": "unsigned_256",
+      "description": "Encode/decode unsigned integer 256. First value requiring 2-byte additional info.",
+      "value": 256,
+      "type": "unsigned",
+      "expected_hex": "190100",
+      "expected_bytes": [25, 1, 0],
+      "valid": true
+    },
+    {
+      "name": "unsigned_65535",
+      "description": "Encode/decode unsigned integer 65535. Maximum 2-byte additional info.",
+      "value": 65535,
+      "type": "unsigned",
+      "expected_hex": "19ffff",
+      "expected_bytes": [25, 255, 255],
+      "valid": true
+    },
+    {
+      "name": "unsigned_65536",
+      "description": "Encode/decode unsigned integer 65536. First value requiring 4-byte additional info.",
+      "value": 65536,
+      "type": "unsigned",
+      "expected_hex": "1a00010000",
+      "expected_bytes": [26, 0, 1, 0, 0],
+      "valid": true
+    },
+    {
+      "name": "unsigned_4294967295",
+      "description": "Encode/decode unsigned integer 4294967295 (u32 max). Maximum 4-byte additional info.",
+      "value": 4294967295,
+      "type": "unsigned",
+      "expected_hex": "1affffffff",
+      "expected_bytes": [26, 255, 255, 255, 255],
+      "valid": true
+    },
+    {
+      "name": "unsigned_4294967296",
+      "description": "Encode/decode unsigned integer 4294967296 (u32 max + 1). First value requiring 8-byte additional info.",
+      "value": 4294967296,
+      "type": "unsigned",
+      "expected_hex": "1b0000000100000000",
+      "expected_bytes": [27, 0, 0, 0, 1, 0, 0, 0, 0],
+      "valid": true
+    },
+    {
+      "name": "negative_one",
+      "description": "Encode/decode negative integer -1. CBOR major type 1, value 0 (encodes -1-n where n=0).",
+      "value": -1,
+      "type": "negative",
+      "expected_hex": "20",
+      "expected_bytes": [32],
+      "valid": true
+    },
+    {
+      "name": "negative_100",
+      "description": "Encode/decode negative integer -100. CBOR major type 1, value 99.",
+      "value": -100,
+      "type": "negative",
+      "expected_hex": "3863",
+      "expected_bytes": [56, 99],
+      "valid": true
+    },
+    {
+      "name": "text_empty",
+      "description": "Encode/decode empty text string.",
+      "value": "",
+      "type": "text",
+      "expected_hex": "60",
+      "expected_bytes": [96],
+      "valid": true
+    },
+    {
+      "name": "text_hello",
+      "description": "Encode/decode text string 'hello'. 5 bytes UTF-8.",
+      "value": "hello",
+      "type": "text",
+      "expected_hex": "6568656c6c6f",
+      "expected_bytes": [101, 104, 101, 108, 108, 111],
+      "valid": true
+    },
+    {
+      "name": "text_lithoglyph",
+      "description": "Encode/decode text string 'Lithoglyph'. 10 bytes UTF-8.",
+      "value": "Lithoglyph",
+      "type": "text",
+      "expected_hex": "6a4c6974686f676c797068",
+      "expected_bytes": [106, 76, 105, 116, 104, 111, 103, 108, 121, 112, 104],
+      "valid": true
+    },
+    {
+      "name": "text_unicode",
+      "description": "Encode/decode text string with Unicode characters. Tests UTF-8 handling.",
+      "value": "stone\u2192data",
+      "type": "text",
+      "expected_hex_note": "0x6c prefix (text, 12 bytes) + UTF-8 encoded 'stone' + E2 86 92 (arrow) + 'data'",
+      "valid": true
+    },
+    {
+      "name": "bytes_empty",
+      "description": "Encode/decode empty byte string.",
+      "value_hex": "",
+      "type": "bytes",
+      "expected_hex": "40",
+      "expected_bytes": [64],
+      "valid": true
+    },
+    {
+      "name": "bytes_deadbeef",
+      "description": "Encode/decode byte string 0xDEADBEEF.",
+      "value_hex": "deadbeef",
+      "type": "bytes",
+      "expected_hex": "44deadbeef",
+      "expected_bytes": [68, 222, 173, 190, 239],
+      "valid": true
+    },
+    {
+      "name": "bool_true",
+      "description": "Encode/decode boolean true. CBOR simple value 21 (0xF5).",
+      "value": true,
+      "type": "boolean",
+      "expected_hex": "f5",
+      "expected_bytes": [245],
+      "valid": true
+    },
+    {
+      "name": "bool_false",
+      "description": "Encode/decode boolean false. CBOR simple value 20 (0xF4).",
+      "value": false,
+      "type": "boolean",
+      "expected_hex": "f4",
+      "expected_bytes": [244],
+      "valid": true
+    },
+    {
+      "name": "null_value",
+      "description": "Encode/decode null. CBOR simple value 22 (0xF6).",
+      "value": null,
+      "type": "null",
+      "expected_hex": "f6",
+      "expected_bytes": [246],
+      "valid": true
+    },
+    {
+      "name": "float_zero",
+      "description": "Encode/decode float 0.0. Deterministic: use half-precision (smallest representation). 0xF9 0000.",
+      "value": 0.0,
+      "type": "float",
+      "expected_hex": "f90000",
+      "expected_bytes": [249, 0, 0],
+      "valid": true
+    },
+    {
+      "name": "float_one",
+      "description": "Encode/decode float 1.0. Half-precision: 0xF9 3C00.",
+      "value": 1.0,
+      "type": "float",
+      "expected_hex": "f93c00",
+      "expected_bytes": [249, 60, 0],
+      "valid": true
+    },
+    {
+      "name": "float_0_85",
+      "description": "Encode/decode float 0.85. Cannot be represented in half-precision; requires single-precision. 0xFA 3F59999A.",
+      "value": 0.85,
+      "type": "float",
+      "expected_hex_note": "0xFA prefix (single-precision float) if 0.85 round-trips through f32, otherwise 0xFB (double-precision)",
+      "valid": true
+    },
+    {
+      "name": "float_0_92",
+      "description": "Encode/decode float 0.92. Typical confidence score value.",
+      "value": 0.92,
+      "type": "float",
+      "expected_hex_note": "Uses smallest representation per RFC 8949 Section 4.2. Likely requires double-precision (0xFB prefix).",
+      "valid": true
+    },
+    {
+      "name": "array_empty",
+      "description": "Encode/decode empty array. CBOR 0x80.",
+      "value": [],
+      "type": "array",
+      "expected_hex": "80",
+      "expected_bytes": [128],
+      "valid": true
+    },
+    {
+      "name": "array_integers",
+      "description": "Encode/decode array of unsigned integers [1, 2, 3].",
+      "value": [1, 2, 3],
+      "type": "array",
+      "expected_hex": "83010203",
+      "expected_bytes": [131, 1, 2, 3],
+      "valid": true
+    },
+    {
+      "name": "array_strings",
+      "description": "Encode/decode array of text strings ['economic', 'primary-source', 'quarterly']. Typical tags array from evidence documents.",
+      "value": ["economic", "primary-source", "quarterly"],
+      "type": "array",
+      "expected_hex_note": "0x83 (array of 3) + 3 text strings with their length prefixes",
+      "valid": true
+    },
+    {
+      "name": "map_empty",
+      "description": "Encode/decode empty map. CBOR 0xA0.",
+      "value": {},
+      "type": "map",
+      "expected_hex": "a0",
+      "expected_bytes": [160],
+      "valid": true
+    },
+    {
+      "name": "map_simple",
+      "description": "Encode/decode simple map {\"name\": \"Lith\", \"version\": 1}. Deterministic: keys sorted lexicographically by encoded bytes.",
+      "value": {"name": "Lith", "version": 1},
+      "type": "map",
+      "expected_hex_note": "0xA2 (map of 2 pairs). Key order: 'name' before 'version' (lexicographic by CBOR-encoded bytes).",
+      "expected_key_order": ["name", "version"],
+      "valid": true
+    },
+    {
+      "name": "map_lith_document",
+      "description": "Encode/decode a Lith evidence document with Lithoglyph-specific CBOR tags.",
+      "value": {
+        "claim": "UK CPI rose 4.2% year-on-year",
+        "source": "ONS",
+        "score": 90
+      },
+      "type": "map",
+      "expected_key_order_note": "Deterministic key order: 'claim', 'score', 'source' (by encoded bytes, shorter keys first)",
+      "expected_contains_tag_39006": "score field wrapped in tag(39006) for PROMPT scores",
+      "valid": true
+    },
+    {
+      "name": "tag_datetime",
+      "description": "Encode/decode CBOR tag 0 (RFC 3339 datetime) wrapping a text string.",
+      "value": "2026-01-11T12:00:00Z",
+      "type": "tagged",
+      "tag": 0,
+      "expected_hex_note": "0xC0 (tag 0) followed by text string '2026-01-11T12:00:00Z'",
+      "valid": true
+    },
+    {
+      "name": "tag_block_reference",
+      "description": "Encode/decode Lithoglyph tag 39001 (block reference) wrapping an unsigned integer.",
+      "value": 42,
+      "type": "tagged",
+      "tag": 39001,
+      "expected_hex_note": "0xD9 (2-byte tag prefix) 9869 (39001 big-endian) followed by 0x182A (unsigned 42)",
+      "valid": true
+    },
+    {
+      "name": "tag_document_id",
+      "description": "Encode/decode Lithoglyph tag 39002 (document ID) wrapping a text string.",
+      "value": "doc_ev_001",
+      "type": "tagged",
+      "tag": 39002,
+      "expected_hex_note": "0xD9 986A (tag 39002) followed by text 'doc_ev_001'",
+      "valid": true
+    },
+    {
+      "name": "tag_collection_name",
+      "description": "Encode/decode Lithoglyph tag 39003 (collection name) wrapping a text string.",
+      "value": "evidence",
+      "type": "tagged",
+      "tag": 39003,
+      "expected_hex_note": "0xD9 986B (tag 39003) followed by text 'evidence'",
+      "valid": true
+    },
+    {
+      "name": "tag_provenance",
+      "description": "Encode/decode Lithoglyph tag 39004 (provenance) wrapping a map. Tests the full provenance encoding from spec/encoding.adoc.",
+      "value": {
+        "actor": {"id": "user_123", "type": "human"},
+        "rationale": "Adding ONS data",
+        "timestamp": "2026-01-11T12:00:00Z"
+      },
+      "type": "tagged",
+      "tag": 39004,
+      "expected_hex_note": "0xD9 986C (tag 39004) followed by map(3) with actor (tagged 39005), rationale (text), timestamp (tagged 0)",
+      "nested_tags": [39005, 0],
+      "valid": true
+    },
+    {
+      "name": "tag_prompt_score",
+      "description": "Encode/decode Lithoglyph tag 39006 (PROMPT score) wrapping an unsigned integer.",
+      "value": 85,
+      "type": "tagged",
+      "tag": 39006,
+      "expected_hex": "d99866181855",
+      "expected_hex_note": "0xD9 9866 (tag 39006) followed by 0x1855 (unsigned 85, 1-byte arg because 85 > 23)",
+      "valid": true
+    },
+    {
+      "name": "tag_functional_dependency",
+      "description": "Encode/decode Lithoglyph tag 39007 (functional dependency) wrapping an FD.",
+      "value": {
+        "determinant": ["source"],
+        "dependent": ["confidence"]
+      },
+      "type": "tagged",
+      "tag": 39007,
+      "expected_hex_note": "0xD9 9867 (tag 39007) followed by map(2) with determinant array and dependent array",
+      "valid": true
+    },
+    {
+      "name": "tag_proof",
+      "description": "Encode/decode Lithoglyph tag 39008 (proof blob) wrapping a byte string.",
+      "value_hex": "a164747970656866642d686f6c6473",
+      "type": "tagged",
+      "tag": 39008,
+      "expected_hex_note": "0xD9 9868 (tag 39008) followed by byte string containing the proof data",
+      "valid": true
+    },
+    {
+      "name": "deterministic_key_order",
+      "description": "Map with keys that must be sorted by encoded CBOR bytes for deterministic encoding. Tests RFC 8949 Section 4.2.1.",
+      "value": {
+        "z": 1,
+        "a": 2,
+        "bb": 3,
+        "aa": 4
+      },
+      "type": "map",
+      "expected_key_order": ["a", "z", "aa", "bb"],
+      "deterministic_note": "Keys sorted by encoded bytes: shorter encodings first, then lexicographic. 'a' (0x6161) < 'z' (0x617A) < 'aa' (0x626161) < 'bb' (0x626262). Single-byte-length keys sort before two-byte-length keys.",
+      "valid": true
+    },
+    {
+      "name": "roundtrip_full_evidence_document",
+      "description": "Full roundtrip test for a complete evidence document as used in Lithoglyph, with all tag types.",
+      "value": {
+        "document_id": "doc_ev_042",
+        "collection": "evidence",
+        "fields": {
+          "claim": "Interest rates held at 5.25%",
+          "source": "Bank of England",
+          "confidence": 0.98,
+          "score": 92,
+          "tags": ["monetary-policy", "primary-source"]
+        },
+        "provenance": {
+          "actor": {"id": "user_456", "type": "human"},
+          "rationale": "BoE decision announcement",
+          "timestamp": "2026-02-01T14:00:00Z"
+        }
+      },
+      "type": "map",
+      "tagged_fields": {
+        "document_id": "tag 39002",
+        "collection": "tag 39003",
+        "fields.score": "tag 39006",
+        "provenance": "tag 39004",
+        "provenance.actor": "tag 39005",
+        "provenance.timestamp": "tag 0"
+      },
+      "roundtrip_guarantee": "encode(value) == encode(decode(encode(value)))",
+      "valid": true
+    },
+    {
+      "name": "error_blob_encoding",
+      "description": "Roundtrip test for a Lith error blob (map with code and message fields).",
+      "value": {
+        "code": 3001,
+        "message": "Document not found"
+      },
+      "type": "map",
+      "expected_hex_note": "0xA2 (map 2) + 'code' key + unsigned 3001 + 'message' key + text 'Document not found'",
+      "valid": true
+    },
+    {
+      "name": "invalid_indefinite_length",
+      "description": "CBOR with indefinite-length array (0x9F ... 0xFF). Lithoglyph requires definite lengths per deterministic encoding rules.",
+      "input_hex": "9f010203ff",
+      "input_description": "Indefinite-length array [1, 2, 3] with break code 0xFF",
+      "expected_error": "IndefiniteLengthNotAllowed",
+      "valid": false
+    },
+    {
+      "name": "invalid_non_minimal_integer",
+      "description": "Non-minimal integer encoding: value 10 encoded as 2-byte (0x190A instead of 0x0A). Violates RFC 8949 Section 4.2.",
+      "input_hex": "19000a",
+      "input_description": "Unsigned 10 encoded with 2-byte additional info instead of inline",
+      "expected_error": "NonMinimalEncoding",
+      "valid": false
+    },
+    {
+      "name": "invalid_duplicate_keys",
+      "description": "Map with duplicate key 'name'. Violates deterministic encoding rules.",
+      "input_hex_note": "0xA2 + 'name' + 'Alice' + 'name' + 'Bob'",
+      "input_description": "Map {\"name\": \"Alice\", \"name\": \"Bob\"} - duplicate key",
+      "expected_error": "DuplicateMapKey",
+      "valid": false
+    }
+  ]
+}

@@ -1,0 +1,1634 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Lith Integration Patterns
+:toc: left
+:toclevels: 4
+:icons: font
+:source-highlighter: rouge
+:sectanchors:
+:sectlinks:
+
+[.lead]
+Comprehensive guide to integrating Lith with message queues, search engines, analytics platforms, AI/ML pipelines, and other external systems while maintaining audit-first guarantees.
+
+[NOTE]
+====
+**Status: Documentation Complete, Adapters Planned**
+
+This document provides complete integration patterns. Native adapters are planned for Milestone M11. Currently, integrations use the documented patterns with FQL API or HTTP REST interface.
+====
+
+== Integration Philosophy
+
+Lith integrations follow core principles:
+
+[cols="1,3"]
+|===
+| Principle | Implementation
+
+| **Provenance Preservation**
+| External system references captured in provenance (Kafka offset, S3 ETag)
+
+| **Journal as Source**
+| All external sync derives from journal, enabling replay and recovery
+
+| **Exactly-Once Semantics**
+| Sequence numbers enable idempotent processing
+
+| **Audit Trail Extension**
+| External system actions logged with Lith provenance
+|===
+
+=== Integration Patterns Overview
+
+[source]
+----
+              ┌──────────────────────────────────────────────────────────┐
+              │                      Lith Core                         │
+              │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐      │
+              │  │   Journal   │  │ Collections │  │    Edges    │      │
+              │  └─────────────┘  └─────────────┘  └─────────────┘      │
+              └────────┬───────────────────────────────────────────────┘
+                       │
+           ┌───────────┼───────────┬───────────────┬──────────────┐
+           │           │           │               │              │
+           ▼           ▼           ▼               ▼              ▼
+    ┌────────────┐ ┌────────┐ ┌─────────┐ ┌────────────┐ ┌────────────┐
+    │   Message  │ │ Search │ │Analytics│ │   Graph    │ │   AI/ML    │
+    │   Queues   │ │Engines │ │   & BI  │ │ Databases  │ │ Pipelines  │
+    └────────────┘ └────────┘ └─────────┘ └────────────┘ └────────────┘
+----
+
+== Message Queues
+
+=== Kafka Integration
+
+==== Inbound: Kafka → Lith
+
+Consume Kafka messages and store with provenance tracking:
+
+[source]
+----
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Producers  │────▶│   Kafka     │────▶│   Lith    │
+└─────────────┘     └─────────────┘     └─────────────┘
+                                              │
+                                              ▼
+                                        [Journal with
+                                         Kafka offset
+                                         in provenance]
+----
+
+.Kafka Consumer Configuration
+[source,toml]
+----
+[integrations.kafka.inbound]
+enabled = true
+bootstrap_servers = ["kafka-1:9092", "kafka-2:9092", "kafka-3:9092"]
+group_id = "lith-consumer"
+topics = ["events", "documents", "updates"]
+
+# Auto-commit disabled for exactly-once semantics
+auto_commit = false
+# Commit after Lith journal write confirmed
+commit_strategy = "after_journal"
+
+# Message to FQL mapping
+[integrations.kafka.inbound.mapping]
+topic = "events"
+collection = "events"
+key_field = "event_id"
+
+# Provenance from Kafka metadata
+[integrations.kafka.inbound.provenance]
+actor_template = "kafka:${topic}:${partition}"
+rationale_template = "Kafka message offset=${offset} timestamp=${timestamp}"
+----
+
+.Consumer Implementation Example
+[source,javascript]
+----
+// Kafka → Lith consumer with exactly-once semantics
+import { Kafka } from 'kafkajs';
+import { LithClient } from 'lith-client';
+
+const kafka = new Kafka({ brokers: ['kafka:9092'] });
+const consumer = kafka.consumer({ groupId: 'lith-consumer' });
+const lith = new LithClient('lith://localhost:8765');
+
+await consumer.connect();
+await consumer.subscribe({ topic: 'events', fromBeginning: false });
+
+await consumer.run({
+    eachMessage: async ({ topic, partition, message }) => {
+        const event = JSON.parse(message.value.toString());
+
+        // Insert with Kafka provenance
+        await lith.query(`
+            INSERT INTO events $1
+            WITH PROVENANCE {
+                actor: $2,
+                rationale: $3
+            }
+        `, [
+            event,
+            `kafka:${topic}:${partition}`,
+            `offset=${message.offset} key=${message.key}`
+        ]);
+
+        // Commit only after successful insert
+        await consumer.commitOffsets([{
+            topic,
+            partition,
+            offset: (parseInt(message.offset) + 1).toString()
+        }]);
+    }
+});
+----
+
+==== Outbound: Lith → Kafka
+
+Publish journal changes to Kafka topics:
+
+.CDC to Kafka Configuration
+[source,toml]
+----
+[integrations.kafka.outbound]
+enabled = true
+bootstrap_servers = ["kafka-1:9092", "kafka-2:9092", "kafka-3:9092"]
+client_id = "lith-publisher"
+
+# Topic per collection
+topic_template = "lith.${collection}"
+# Or single topic
+# topic = "lith-changes"
+
+# What to publish
+include_collections = ["*"]  # All collections
+exclude_collections = ["_internal"]
+
+# Message format
+[integrations.kafka.outbound.format]
+type = "json"  # json, avro, protobuf
+include_provenance = true
+include_before = true  # For updates
+include_after = true
+
+# Delivery guarantees
+[integrations.kafka.outbound.delivery]
+acks = "all"
+retries = 3
+idempotent = true
+----
+
+.Outbound Message Format
+[source,json]
+----
+{
+  "sequence": 100542,
+  "timestamp": "2026-01-12T10:30:00Z",
+  "operation": "INSERT",
+  "collection": "evidence",
+  "key": "doc_12345",
+  "before": null,
+  "after": {
+    "_key": "doc_12345",
+    "title": "Leaked memo",
+    "source": "anonymous",
+    "score": 85
+  },
+  "provenance": {
+    "actor": "user:alice@session:xyz",
+    "rationale": "New evidence from whistleblower"
+  }
+}
+----
+
+=== RabbitMQ Integration
+
+.RabbitMQ Configuration
+[source,toml]
+----
+[integrations.rabbitmq]
+enabled = true
+uri = "amqp://user:pass@rabbitmq:5672/lith"
+
+[integrations.rabbitmq.inbound]
+queue = "lith-inbound"
+exchange = "documents"
+routing_key = "document.*"
+prefetch = 100
+
+[integrations.rabbitmq.outbound]
+exchange = "lith-changes"
+exchange_type = "topic"
+routing_key_template = "${collection}.${operation}"
+----
+
+.RabbitMQ Consumer Example
+[source,javascript]
+----
+import amqp from 'amqplib';
+import { LithClient } from 'lith-client';
+
+const connection = await amqp.connect('amqp://rabbitmq:5672');
+const channel = await connection.createChannel();
+const lith = new LithClient('lith://localhost:8765');
+
+await channel.assertQueue('lith-inbound', { durable: true });
+
+channel.consume('lith-inbound', async (msg) => {
+    const document = JSON.parse(msg.content.toString());
+
+    try {
+        await lith.insert(document.collection, document.data, {
+            actor: `rabbitmq:${msg.properties.messageId}`,
+            rationale: `RabbitMQ delivery tag=${msg.fields.deliveryTag}`
+        });
+
+        channel.ack(msg);
+    } catch (error) {
+        // Requeue on failure
+        channel.nack(msg, false, true);
+    }
+});
+----
+
+=== NATS Integration
+
+.NATS Configuration
+[source,toml]
+----
+[integrations.nats]
+enabled = true
+servers = ["nats://nats-1:4222", "nats://nats-2:4222"]
+
+[integrations.nats.jetstream]
+enabled = true
+stream = "LITHOGLYPH"
+consumer = "lith-processor"
+
+[integrations.nats.inbound]
+subjects = ["documents.>", "events.>"]
+
+[integrations.nats.outbound]
+subject_template = "lith.changes.${collection}"
+----
+
+.NATS JetStream Consumer
+[source,javascript]
+----
+import { connect, StringCodec } from 'nats';
+import { LithClient } from 'lith-client';
+
+const nc = await connect({ servers: 'nats://localhost:4222' });
+const js = nc.jetstream();
+const lith = new LithClient('lith://localhost:8765');
+const sc = StringCodec();
+
+const sub = await js.subscribe('documents.*', {
+    durable: 'lith-processor',
+    ack_policy: 'explicit'
+});
+
+for await (const msg of sub) {
+    const document = JSON.parse(sc.decode(msg.data));
+
+    await lith.insert('documents', document, {
+        actor: `nats:${msg.subject}`,
+        rationale: `NATS seq=${msg.seq}`
+    });
+
+    msg.ack();
+}
+----
+
+=== Apache Pulsar Integration
+
+.Pulsar Configuration
+[source,toml]
+----
+[integrations.pulsar]
+enabled = true
+service_url = "pulsar://pulsar:6650"
+admin_url = "http://pulsar:8080"
+
+[integrations.pulsar.inbound]
+topics = ["persistent://tenant/namespace/documents"]
+subscription = "lith-subscription"
+subscription_type = "Shared"
+
+[integrations.pulsar.outbound]
+topic = "persistent://tenant/namespace/lith-changes"
+batching = true
+batch_max_messages = 100
+----
+
+== Search Engines
+
+=== Elasticsearch / OpenSearch
+
+==== Journal → Search Index Sync
+
+[source]
+----
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Lith    │────▶│     CDC     │────▶│Elasticsearch│
+│   Journal   │     │  Connector  │     │   Index     │
+└─────────────┘     └─────────────┘     └─────────────┘
+       │                   │
+       │              ┌────┴────┐
+       │              │ Offset  │
+       │              │ Tracker │
+       │              └─────────┘
+       │                   │
+       └───────────────────┘
+         Checkpoint stored
+         in Lith
+----
+
+.Elasticsearch Sync Configuration
+[source,toml]
+----
+[integrations.elasticsearch]
+enabled = true
+hosts = ["https://es-node-1:9200", "https://es-node-2:9200"]
+api_key = "${ELASTICSEARCH_API_KEY}"
+
+# Index naming
+index_template = "lith-${collection}"
+
+# Field mappings
+[integrations.elasticsearch.mappings.evidence]
+title = { type = "text", analyzer = "english" }
+content = { type = "text", analyzer = "english" }
+source = { type = "keyword" }
+score = { type = "integer" }
+created_at = { type = "date" }
+_provenance = { type = "object", enabled = false }  # Don't index provenance
+
+# Sync settings
+[integrations.elasticsearch.sync]
+batch_size = 100
+flush_interval_ms = 1000
+checkpoint_collection = "_es_checkpoints"
+----
+
+.Elasticsearch Sync Implementation
+[source,javascript]
+----
+import { Client } from '@elastic/elasticsearch';
+import { LithClient } from 'lith-client';
+
+const es = new Client({ node: 'https://elasticsearch:9200' });
+const lith = new LithClient('lith://localhost:8765');
+
+async function syncToElasticsearch() {
+    // Get last synced sequence
+    const checkpoint = await lith.query(`
+        SELECT sequence FROM _es_checkpoints
+        WHERE index = 'evidence'
+    `);
+    const lastSeq = checkpoint[0]?.sequence || 0;
+
+    // Get journal entries since checkpoint
+    const entries = await lith.query(`
+        SELECT * FROM _journal
+        WHERE sequence > $1
+          AND collection = 'evidence'
+        ORDER BY sequence
+        LIMIT 1000
+    `, [lastSeq]);
+
+    if (entries.length === 0) return;
+
+    // Bulk index to Elasticsearch
+    const body = entries.flatMap(entry => {
+        switch (entry.op_type) {
+            case 'DOC_INSERT':
+            case 'DOC_UPDATE':
+                return [
+                    { index: { _index: 'lith-evidence', _id: entry.document_key } },
+                    entry.data
+                ];
+            case 'DOC_DELETE':
+                return [
+                    { delete: { _index: 'lith-evidence', _id: entry.document_key } }
+                ];
+            default:
+                return [];
+        }
+    });
+
+    await es.bulk({ body, refresh: true });
+
+    // Update checkpoint
+    const maxSeq = Math.max(...entries.map(e => e.sequence));
+    await lith.query(`
+        UPSERT _es_checkpoints
+        WHERE index = 'evidence'
+        SET sequence = $1
+        WITH PROVENANCE {
+            actor: "es-sync",
+            rationale: "Elasticsearch sync checkpoint"
+        }
+    `, [maxSeq]);
+}
+
+// Run sync every 5 seconds
+setInterval(syncToElasticsearch, 5000);
+----
+
+==== Search Query Forwarding
+
+.Federated Search Configuration
+[source,toml]
+----
+[integrations.elasticsearch.search]
+# Enable search through FQL
+enabled = true
+
+# FQL SEARCH operator uses Elasticsearch
+search_operator = "elasticsearch"
+
+# Fallback to Lith scan if ES unavailable
+fallback_to_scan = true
+----
+
+.Using Elasticsearch Search in FQL
+[source,fql]
+----
+-- FQL with Elasticsearch search
+SELECT * FROM evidence
+WHERE SEARCH("leaked memo corruption")
+  AND score > 70
+ORDER BY _score DESC
+LIMIT 10;
+
+-- Full-text search with filters
+SELECT * FROM evidence
+WHERE SEARCH("financial irregularities")
+  AND source IN ('internal', 'whistleblower')
+WITH PROVENANCE {
+    actor: "investigator:jane",
+    rationale: "Research for Panama Papers follow-up"
+};
+----
+
+=== Meilisearch Integration
+
+.Meilisearch Configuration
+[source,toml]
+----
+[integrations.meilisearch]
+enabled = true
+host = "http://meilisearch:7700"
+api_key = "${MEILISEARCH_API_KEY}"
+
+# Index settings
+[integrations.meilisearch.indexes.evidence]
+primary_key = "_key"
+searchable_attributes = ["title", "content", "source"]
+filterable_attributes = ["score", "source", "created_at"]
+sortable_attributes = ["score", "created_at"]
+----
+
+.Meilisearch Sync
+[source,javascript]
+----
+import { MeiliSearch } from 'meilisearch';
+import { LithClient } from 'lith-client';
+
+const meili = new MeiliSearch({
+    host: 'http://meilisearch:7700',
+    apiKey: process.env.MEILISEARCH_API_KEY
+});
+const lith = new LithClient('lith://localhost:8765');
+
+async function syncToMeilisearch() {
+    const checkpoint = await getCheckpoint('meilisearch', 'evidence');
+    const entries = await lith.journalSince(checkpoint, 'evidence', 500);
+
+    const updates = entries
+        .filter(e => ['DOC_INSERT', 'DOC_UPDATE'].includes(e.op_type))
+        .map(e => e.data);
+
+    const deletes = entries
+        .filter(e => e.op_type === 'DOC_DELETE')
+        .map(e => e.document_key);
+
+    if (updates.length > 0) {
+        await meili.index('evidence').addDocuments(updates);
+    }
+    if (deletes.length > 0) {
+        await meili.index('evidence').deleteDocuments(deletes);
+    }
+
+    await updateCheckpoint('meilisearch', 'evidence', entries);
+}
+----
+
+=== Typesense Integration
+
+.Typesense Configuration
+[source,toml]
+----
+[integrations.typesense]
+enabled = true
+nodes = [
+    { host = "ts-1", port = 8108, protocol = "https" },
+    { host = "ts-2", port = 8108, protocol = "https" }
+]
+api_key = "${TYPESENSE_API_KEY}"
+
+[integrations.typesense.collections.evidence]
+fields = [
+    { name = "title", type = "string" },
+    { name = "content", type = "string" },
+    { name = "source", type = "string", facet = true },
+    { name = "score", type = "int32" },
+    { name = "created_at", type = "int64" }
+]
+default_sorting_field = "score"
+----
+
+== Analytics & BI
+
+=== Data Warehouse Export
+
+==== Journal → Parquet → Warehouse
+
+[source]
+----
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Lith    │────▶│   Parquet   │────▶│  BigQuery/  │
+│   Journal   │     │   Export    │     │  Snowflake  │
+└─────────────┘     └─────────────┘     └─────────────┘
+                          │
+                          ▼
+                    ┌─────────────┐
+                    │     S3/     │
+                    │    GCS      │
+                    └─────────────┘
+----
+
+.Parquet Export Configuration
+[source,toml]
+----
+[integrations.warehouse.export]
+enabled = true
+format = "parquet"
+compression = "snappy"
+
+# Export schedule
+schedule = "0 * * * *"  # Hourly
+
+# Output destination
+[integrations.warehouse.export.destination]
+type = "s3"
+bucket = "lith-analytics"
+prefix = "exports/"
+partition_by = ["date", "collection"]
+
+# BigQuery load job
+[integrations.warehouse.bigquery]
+enabled = true
+project = "my-project"
+dataset = "lith_analytics"
+table_prefix = "lith_"
+----
+
+.Export Script
+[source,bash]
+----
+#!/bin/bash
+# export-to-warehouse.sh
+
+# Export journal to Parquet
+lith export \
+    --format parquet \
+    --collection evidence \
+    --since "$(date -d 'yesterday' +%Y-%m-%d)" \
+    --until "$(date +%Y-%m-%d)" \
+    --output s3://lith-analytics/exports/$(date +%Y/%m/%d)/
+
+# Load to BigQuery
+bq load \
+    --source_format=PARQUET \
+    --replace \
+    my-project:lith_analytics.evidence_$(date +%Y%m%d) \
+    "gs://lith-analytics/exports/$(date +%Y/%m/%d)/evidence_*.parquet"
+----
+
+=== Apache Arrow / DuckDB Integration
+
+.DuckDB Direct Query
+[source,sql]
+----
+-- DuckDB can query Lith exports directly
+SELECT
+    date_trunc('day', created_at) as day,
+    source,
+    COUNT(*) as count,
+    AVG(score) as avg_score
+FROM read_parquet('s3://lith-analytics/exports/**/*.parquet')
+WHERE score > 70
+GROUP BY day, source
+ORDER BY day, count DESC;
+----
+
+.Arrow Flight Integration
+[source,toml]
+----
+[integrations.arrow_flight]
+enabled = true
+port = 8815
+
+# Collections exposed via Arrow Flight
+expose_collections = ["evidence", "sources", "articles"]
+
+# Query result caching
+cache_enabled = true
+cache_ttl_seconds = 300
+----
+
+.Python Arrow Flight Client
+[source,python]
+----
+import pyarrow.flight as flight
+
+# Connect to Lith Arrow Flight endpoint
+client = flight.connect("grpc://lith:8815")
+
+# Execute FQL query and get Arrow table
+info = client.get_flight_info(
+    flight.FlightDescriptor.for_command(
+        b"SELECT * FROM evidence WHERE score > 80"
+    )
+)
+
+# Stream results as Arrow batches
+reader = client.do_get(info.endpoints[0].ticket)
+table = reader.read_all()
+
+# Convert to pandas
+df = table.to_pandas()
+print(df.describe())
+----
+
+=== Apache Spark Integration
+
+.Spark Connector Configuration
+[source,scala]
+----
+// Spark DataFrame from Lith
+val df = spark.read
+  .format("lith")
+  .option("host", "lith://localhost:8765")
+  .option("collection", "evidence")
+  .option("query", "SELECT * FROM evidence WHERE score > 70")
+  .load()
+
+df.groupBy("source")
+  .agg(
+    count("*").as("count"),
+    avg("score").as("avg_score")
+  )
+  .write
+  .mode("overwrite")
+  .parquet("s3://analytics/evidence-summary/")
+----
+
+== Graph Databases
+
+=== Neo4j Integration
+
+Lith edge collections can sync to Neo4j for graph analytics.
+
+.Neo4j Sync Configuration
+[source,toml]
+----
+[integrations.neo4j]
+enabled = true
+uri = "bolt://neo4j:7687"
+username = "${NEO4J_USER}"
+password = "${NEO4J_PASSWORD}"
+database = "lith"
+
+# Sync document collections as nodes
+[integrations.neo4j.nodes]
+evidence = { label = "Evidence", id_field = "_key" }
+sources = { label = "Source", id_field = "_key" }
+people = { label = "Person", id_field = "_key" }
+
+# Sync edge collections as relationships
+[integrations.neo4j.relationships]
+cites = { type = "CITES", from = "evidence", to = "sources" }
+authored_by = { type = "AUTHORED_BY", from = "evidence", to = "people" }
+mentions = { type = "MENTIONS", from = "evidence", to = "people" }
+----
+
+.Neo4j Sync Implementation
+[source,javascript]
+----
+import neo4j from 'neo4j-driver';
+import { LithClient } from 'lith-client';
+
+const driver = neo4j.driver('bolt://neo4j:7687',
+    neo4j.auth.basic('neo4j', 'password'));
+const lith = new LithClient('lith://localhost:8765');
+
+async function syncEdgesToNeo4j(edgeCollection, relType) {
+    const checkpoint = await getCheckpoint('neo4j', edgeCollection);
+    const entries = await lith.journalSince(checkpoint, edgeCollection, 1000);
+
+    const session = driver.session();
+
+    for (const entry of entries) {
+        if (entry.op_type === 'EDGE_INSERT') {
+            await session.run(`
+                MATCH (a {lith_key: $from})
+                MATCH (b {lith_key: $to})
+                MERGE (a)-[r:${relType} {lith_key: $key}]->(b)
+                SET r += $props
+            `, {
+                from: entry.data._from,
+                to: entry.data._to,
+                key: entry.data._key,
+                props: entry.data.properties || {}
+            });
+        } else if (entry.op_type === 'EDGE_DELETE') {
+            await session.run(`
+                MATCH ()-[r:${relType} {lith_key: $key}]->()
+                DELETE r
+            `, { key: entry.document_key });
+        }
+    }
+
+    await session.close();
+    await updateCheckpoint('neo4j', edgeCollection, entries);
+}
+----
+
+.Querying Neo4j for Graph Analytics
+[source,cypher]
+----
+// Find shortest path between two pieces of evidence
+MATCH path = shortestPath(
+    (a:Evidence {lith_key: 'ev_001'})-[*]-(b:Evidence {lith_key: 'ev_002'})
+)
+RETURN path;
+
+// Find evidence connected to a person through multiple hops
+MATCH (p:Person {name: 'John Doe'})<-[:MENTIONS|AUTHORED_BY*1..3]-(e:Evidence)
+RETURN e, p;
+
+// Community detection
+CALL gds.louvain.stream('evidence-graph')
+YIELD nodeId, communityId
+RETURN gds.util.asNode(nodeId).title, communityId
+ORDER BY communityId;
+----
+
+=== RDF / SPARQL Integration
+
+.RDF Mapping Configuration
+[source,toml]
+----
+[integrations.rdf]
+enabled = true
+base_uri = "https://lith.example.org/"
+
+# Vocabulary prefixes
+[integrations.rdf.prefixes]
+fdb = "https://lith.example.org/ontology#"
+dc = "http://purl.org/dc/elements/1.1/"
+prov = "http://www.w3.org/ns/prov#"
+schema = "https://schema.org/"
+
+# Collection to RDF class mapping
+[integrations.rdf.classes]
+evidence = "fdb:Evidence"
+sources = "fdb:Source"
+people = "schema:Person"
+
+# Property mappings
+[integrations.rdf.properties.evidence]
+title = "dc:title"
+content = "dc:description"
+source = "dc:source"
+score = "fdb:promptScore"
+created_at = "dc:date"
+_provenance.actor = "prov:wasAttributedTo"
+----
+
+.SPARQL Endpoint
+[source,toml]
+----
+[integrations.sparql]
+enabled = true
+port = 8890
+endpoint = "/sparql"
+
+# Allow SPARQL updates (mutations)
+allow_updates = false  # Read-only for safety
+
+# Query timeout
+timeout_seconds = 30
+----
+
+.SPARQL Queries
+[source,sparql]
+----
+PREFIX fdb: <https://lith.example.org/ontology#>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+# Find all evidence by a specific actor
+SELECT ?evidence ?title ?score
+WHERE {
+    ?evidence a fdb:Evidence ;
+              dc:title ?title ;
+              fdb:promptScore ?score ;
+              prov:wasAttributedTo ?actor .
+    FILTER (?actor = "user:alice")
+    FILTER (?score > 70)
+}
+ORDER BY DESC(?score)
+
+# Count evidence by source
+SELECT ?source (COUNT(?evidence) as ?count)
+WHERE {
+    ?evidence a fdb:Evidence ;
+              dc:source ?source .
+}
+GROUP BY ?source
+ORDER BY DESC(?count)
+----
+
+== Event Sourcing
+
+Lith's journal-first design naturally supports event sourcing patterns.
+
+=== Journal as Event Store
+
+[source]
+----
+Lith Journal Entry = Event
+───────────────────────────
+{
+  "sequence": 1001,              // Event sequence number
+  "timestamp": "2026-01-12T...", // Event time
+  "op_type": "DOC_INSERT",       // Event type
+  "collection": "orders",        // Aggregate type
+  "document_key": "ord_123",     // Aggregate ID
+  "data": {...},                 // Event payload
+  "provenance": {                // Event metadata
+    "actor": "user:alice",
+    "rationale": "Order placed via checkout"
+  }
+}
+----
+
+=== Event Projection
+
+.Projection Configuration
+[source,toml]
+----
+[projections.order_summary]
+# Source: journal events
+source_collection = "orders"
+
+# Target: materialized view
+target_collection = "order_summaries"
+
+# Projection logic
+[projections.order_summary.handlers]
+DOC_INSERT = """
+UPSERT order_summaries
+WHERE order_id = $event.data._key
+SET
+    status = $event.data.status,
+    total = $event.data.total,
+    item_count = LEN($event.data.items),
+    last_updated = $event.timestamp
+"""
+
+DOC_UPDATE = """
+UPDATE order_summaries
+WHERE order_id = $event.document_key
+SET
+    status = $event.data.status,
+    last_updated = $event.timestamp
+"""
+----
+
+.Projection Implementation
+[source,javascript]
+----
+import { LithClient } from 'lith-client';
+
+const lith = new LithClient('lith://localhost:8765');
+
+// Subscribe to journal changes
+const subscription = await lith.subscribeJournal({
+    collection: 'orders',
+    startSequence: await getProjectionCheckpoint('order_summary')
+});
+
+for await (const event of subscription) {
+    switch (event.op_type) {
+        case 'DOC_INSERT':
+            await lith.query(`
+                INSERT INTO order_summaries {
+                    "order_id": $1,
+                    "status": $2,
+                    "total": $3,
+                    "item_count": $4,
+                    "created_at": $5
+                }
+                WITH PROVENANCE {
+                    actor: "projection:order_summary",
+                    rationale: "Materialized view update"
+                }
+            `, [
+                event.data._key,
+                event.data.status,
+                event.data.total,
+                event.data.items.length,
+                event.timestamp
+            ]);
+            break;
+
+        case 'DOC_UPDATE':
+            await lith.query(`
+                UPDATE order_summaries
+                WHERE order_id = $1
+                SET status = $2, last_updated = $3
+                WITH PROVENANCE {
+                    actor: "projection:order_summary",
+                    rationale: "Status update from order change"
+                }
+            `, [event.document_key, event.data.status, event.timestamp]);
+            break;
+    }
+
+    await updateProjectionCheckpoint('order_summary', event.sequence);
+}
+----
+
+=== Event Replay
+
+[source,bash]
+----
+# Rebuild projection from scratch
+lith projection rebuild \
+    --name order_summary \
+    --from-sequence 0 \
+    --parallel 4
+
+# Replay specific time range
+lith projection rebuild \
+    --name order_summary \
+    --from-timestamp "2026-01-01T00:00:00Z" \
+    --to-timestamp "2026-01-12T00:00:00Z"
+
+# Verify projection consistency
+lith projection verify \
+    --name order_summary \
+    --sample-rate 0.1
+----
+
+== Change Data Capture (CDC)
+
+=== CDC Architecture
+
+[source]
+----
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Lith    │     │     CDC     │     │   External  │
+│   Journal   │────▶│  Connector  │────▶│   Systems   │
+└─────────────┘     └─────────────┘     └─────────────┘
+       │                   │
+       │              ┌────┴────┐
+       │              │Watermark│
+       │              │ Storage │
+       │              └─────────┘
+       │                   │
+       └───────────────────┘
+         High watermark stored
+         in Lith
+----
+
+=== Debezium-Compatible CDC
+
+.CDC Connector Configuration
+[source,toml]
+----
+[cdc]
+enabled = true
+connector_class = "io.debezium.connector.lith.LithConnector"
+
+# Source
+[cdc.source]
+lith_host = "lith://localhost:8765"
+database = "production"
+collections = ["evidence", "sources", "people"]
+
+# Sink (Kafka)
+[cdc.sink]
+bootstrap_servers = "kafka:9092"
+topic_prefix = "lith.cdc"
+
+# Format
+[cdc.format]
+key_format = "json"
+value_format = "json"
+include_schema = true  # Debezium envelope
+
+# Watermark tracking
+[cdc.watermark]
+storage = "lith"  # Store watermarks in Lith
+collection = "_cdc_watermarks"
+----
+
+.CDC Message Format (Debezium Envelope)
+[source,json]
+----
+{
+  "schema": {...},
+  "payload": {
+    "before": null,
+    "after": {
+      "_key": "ev_12345",
+      "title": "New evidence",
+      "score": 85
+    },
+    "source": {
+      "version": "0.0.2",
+      "connector": "lith",
+      "name": "production",
+      "ts_ms": 1704980400000,
+      "sequence": 100542,
+      "collection": "evidence",
+      "actor": "user:alice",
+      "rationale": "Evidence submission"
+    },
+    "op": "c",  // c=create, u=update, d=delete
+    "ts_ms": 1704980400000
+  }
+}
+----
+
+=== Webhook Publisher
+
+.Webhook Configuration
+[source,toml]
+----
+[webhooks]
+enabled = true
+
+[[webhooks.endpoints]]
+name = "slack-notifications"
+url = "https://hooks.slack.com/services/xxx"
+collections = ["evidence"]
+operations = ["DOC_INSERT"]
+filter = "score > 90"  # Only high-score evidence
+format = "slack"
+retry_max = 3
+retry_delay_ms = 1000
+
+[[webhooks.endpoints]]
+name = "analytics-pipeline"
+url = "https://analytics.example.com/ingest"
+collections = ["*"]
+operations = ["*"]
+format = "json"
+headers = { "Authorization" = "Bearer ${ANALYTICS_API_KEY}" }
+batch_size = 100
+batch_delay_ms = 5000
+----
+
+.Webhook Payload
+[source,json]
+----
+{
+  "event_id": "evt_abc123",
+  "timestamp": "2026-01-12T10:30:00Z",
+  "source": "lith",
+  "type": "evidence.created",
+  "sequence": 100542,
+  "data": {
+    "_key": "ev_12345",
+    "title": "Critical evidence",
+    "score": 95
+  },
+  "provenance": {
+    "actor": "user:alice",
+    "rationale": "High-priority submission"
+  }
+}
+----
+
+== API Gateway Integration
+
+=== GraphQL Federation
+
+.GraphQL Schema
+[source,graphql]
+----
+type Evidence @key(fields: "_key") {
+    _key: ID!
+    title: String!
+    content: String
+    source: String
+    score: Int!
+    createdAt: DateTime!
+    provenance: Provenance!
+
+    # Relationships via edges
+    authors: [Person!]! @requires(fields: "_key")
+    citedSources: [Source!]! @requires(fields: "_key")
+}
+
+type Provenance {
+    actor: String!
+    rationale: String!
+    timestamp: DateTime!
+}
+
+type Query {
+    evidence(key: ID!): Evidence
+    searchEvidence(query: String!, limit: Int = 10): [Evidence!]!
+    evidenceByScore(minScore: Int!, limit: Int = 10): [Evidence!]!
+}
+
+type Mutation {
+    createEvidence(input: EvidenceInput!, provenance: ProvenanceInput!): Evidence!
+    updateEvidence(key: ID!, input: EvidenceInput!, provenance: ProvenanceInput!): Evidence!
+}
+
+input ProvenanceInput {
+    actor: String!
+    rationale: String!
+}
+----
+
+.GraphQL Resolver
+[source,javascript]
+----
+import { LithClient } from 'lith-client';
+
+const lith = new LithClient('lith://localhost:8765');
+
+const resolvers = {
+    Query: {
+        evidence: async (_, { key }) => {
+            const result = await lith.query(
+                `SELECT * FROM evidence WHERE _key = $1`,
+                [key]
+            );
+            return result[0];
+        },
+
+        searchEvidence: async (_, { query, limit }) => {
+            return lith.query(`
+                SELECT * FROM evidence
+                WHERE SEARCH($1)
+                LIMIT $2
+            `, [query, limit]);
+        }
+    },
+
+    Mutation: {
+        createEvidence: async (_, { input, provenance }) => {
+            return lith.insert('evidence', input, {
+                actor: provenance.actor,
+                rationale: provenance.rationale
+            });
+        }
+    },
+
+    Evidence: {
+        authors: async (evidence) => {
+            return lith.query(`
+                TRAVERSE
+                    START evidence WHERE _key = $1
+                    FOLLOW authored_by
+                    RETURN people.*
+            `, [evidence._key]);
+        }
+    }
+};
+----
+
+=== REST API Gateway
+
+.Kong Gateway Configuration
+[source,yaml]
+----
+services:
+  - name: lith-api
+    url: http://lith:8765
+    routes:
+      - name: lith-collections
+        paths:
+          - /api/v1/collections
+        methods:
+          - GET
+          - POST
+        plugins:
+          - name: rate-limiting
+            config:
+              minute: 100
+          - name: jwt
+
+  - name: lith-graphql
+    url: http://lith-graphql:4000
+    routes:
+      - name: graphql
+        paths:
+          - /graphql
+        plugins:
+          - name: cors
+          - name: jwt
+----
+
+== AI/ML Pipelines
+
+=== Vector Embeddings
+
+.Vector Integration Configuration
+[source,toml]
+----
+[integrations.vector]
+enabled = true
+
+# Embedding model
+[integrations.vector.embedding]
+provider = "openai"  # openai, cohere, huggingface, local
+model = "text-embedding-3-small"
+dimensions = 1536
+
+# Vector database
+[integrations.vector.store]
+type = "pinecone"  # pinecone, weaviate, qdrant, chroma
+index = "lith-evidence"
+
+# Sync settings
+[integrations.vector.sync]
+collections = ["evidence", "articles"]
+fields_to_embed = ["title", "content"]
+batch_size = 100
+checkpoint_collection = "_vector_checkpoints"
+----
+
+.Vector Sync Implementation
+[source,python]
+----
+import openai
+from pinecone import Pinecone
+from lith import LithClient
+
+openai_client = openai.OpenAI()
+pc = Pinecone()
+index = pc.Index("lith-evidence")
+lith = LithClient("lith://localhost:8765")
+
+async def sync_vectors():
+    checkpoint = await lith.query(
+        "SELECT sequence FROM _vector_checkpoints WHERE collection = 'evidence'"
+    )
+    last_seq = checkpoint[0]['sequence'] if checkpoint else 0
+
+    entries = await lith.query("""
+        SELECT * FROM _journal
+        WHERE sequence > $1 AND collection = 'evidence'
+        ORDER BY sequence LIMIT 100
+    """, [last_seq])
+
+    for entry in entries:
+        if entry['op_type'] in ('DOC_INSERT', 'DOC_UPDATE'):
+            # Generate embedding
+            text = f"{entry['data']['title']} {entry['data'].get('content', '')}"
+            response = openai_client.embeddings.create(
+                model="text-embedding-3-small",
+                input=text
+            )
+            vector = response.data[0].embedding
+
+            # Upsert to Pinecone
+            index.upsert(vectors=[{
+                "id": entry['document_key'],
+                "values": vector,
+                "metadata": {
+                    "collection": "evidence",
+                    "title": entry['data']['title'],
+                    "score": entry['data'].get('score', 0),
+                    "source": entry['data'].get('source', '')
+                }
+            }])
+
+        elif entry['op_type'] == 'DOC_DELETE':
+            index.delete(ids=[entry['document_key']])
+
+    if entries:
+        max_seq = max(e['sequence'] for e in entries)
+        await lith.query("""
+            UPSERT _vector_checkpoints
+            WHERE collection = 'evidence'
+            SET sequence = $1
+            WITH PROVENANCE {
+                actor: 'vector-sync',
+                rationale: 'Vector embedding checkpoint'
+            }
+        """, [max_seq])
+----
+
+=== Semantic Search in FQL
+
+[source,fql]
+----
+-- Semantic search using vector similarity
+SELECT * FROM evidence
+WHERE SIMILAR_TO("documents about financial corruption in government", 0.8)
+  AND score > 70
+ORDER BY _similarity DESC
+LIMIT 10
+WITH PROVENANCE {
+    actor: "investigator:jane",
+    rationale: "Semantic search for corruption investigation"
+};
+----
+
+=== LLM Integration
+
+.LLM Agent Configuration
+[source,toml]
+----
+[integrations.llm]
+enabled = true
+
+[integrations.llm.agent]
+# Agent identification in provenance
+actor_prefix = "agent:"
+model_tracking = true  # Track model version in provenance
+
+# Rate limiting
+requests_per_minute = 60
+tokens_per_minute = 100000
+
+# Audit requirements
+require_rationale = true
+log_prompts = true
+log_responses = true
+----
+
+.LLM Agent Usage
+[source,javascript]
+----
+import { LithClient } from 'lith-client';
+import OpenAI from 'openai';
+
+const lith = new LithClient('lith://localhost:8765');
+const openai = new OpenAI();
+
+async function classifyDocument(documentKey) {
+    // Retrieve document
+    const doc = await lith.query(
+        `SELECT * FROM evidence WHERE _key = $1`,
+        [documentKey]
+    );
+
+    // LLM classification
+    const response = await openai.chat.completions.create({
+        model: "gpt-4-turbo",
+        messages: [
+            { role: "system", content: "Classify the following document..." },
+            { role: "user", content: doc.content }
+        ]
+    });
+
+    const classification = response.choices[0].message.content;
+
+    // Update with full provenance
+    await lith.query(`
+        UPDATE evidence
+        WHERE _key = $1
+        SET
+            category = $2,
+            ai_classification = $3
+        WITH PROVENANCE {
+            actor: $4,
+            rationale: $5
+        }
+    `, [
+        documentKey,
+        classification.category,
+        classification,
+        `agent:document-classifier@model:gpt-4-turbo`,
+        `AI classification confidence=${classification.confidence}`
+    ]);
+}
+----
+
+=== Human-in-the-Loop Patterns
+
+[source,fql]
+----
+-- Find AI-generated content pending review
+SELECT * FROM evidence
+WHERE _provenance.actor LIKE 'agent:%'
+  AND review_status = 'pending'
+ORDER BY created_at;
+
+-- Approve AI-generated content
+UPDATE evidence
+WHERE _key = 'ev_12345'
+SET review_status = 'approved'
+WITH PROVENANCE {
+    actor: "reviewer:jane",
+    rationale: "Verified AI classification is accurate"
+};
+
+-- Audit AI agent activity
+SELECT
+    _provenance.actor as agent,
+    COUNT(*) as actions,
+    AVG(confidence) as avg_confidence
+FROM evidence
+WHERE _provenance.actor LIKE 'agent:%'
+  AND created_at > NOW() - INTERVAL '7 days'
+GROUP BY _provenance.actor;
+----
+
+== Real-Time Applications
+
+=== WebSocket Subscriptions
+
+.WebSocket Configuration
+[source,toml]
+----
+[realtime.websocket]
+enabled = true
+port = 8766
+path = "/ws"
+
+# Authentication
+auth_required = true
+auth_method = "jwt"
+
+# Rate limiting
+max_connections_per_client = 10
+max_subscriptions_per_connection = 50
+
+# Heartbeat
+ping_interval_seconds = 30
+pong_timeout_seconds = 10
+----
+
+.WebSocket Subscription Protocol
+[source,javascript]
+----
+// Client-side WebSocket subscription
+const ws = new WebSocket('wss://lith.example.com/ws');
+
+ws.onopen = () => {
+    // Authenticate
+    ws.send(JSON.stringify({
+        type: 'auth',
+        token: 'jwt-token-here'
+    }));
+
+    // Subscribe to collection changes
+    ws.send(JSON.stringify({
+        type: 'subscribe',
+        id: 'sub_001',
+        collection: 'evidence',
+        filter: { score: { $gt: 80 } },
+        operations: ['INSERT', 'UPDATE']
+    }));
+};
+
+ws.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+
+    switch (message.type) {
+        case 'change':
+            console.log('Document changed:', message.data);
+            // { operation: 'INSERT', document: {...}, provenance: {...} }
+            break;
+        case 'error':
+            console.error('Subscription error:', message.error);
+            break;
+    }
+};
+----
+
+=== Server-Sent Events (SSE)
+
+.SSE Configuration
+[source,toml]
+----
+[realtime.sse]
+enabled = true
+path = "/events"
+
+# Connection settings
+keep_alive_seconds = 30
+max_connections = 1000
+----
+
+.SSE Subscription
+[source,javascript]
+----
+// Client-side SSE subscription
+const eventSource = new EventSource(
+    'https://lith.example.com/events?' +
+    'collection=evidence&' +
+    'filter=score>80&' +
+    'token=jwt-token'
+);
+
+eventSource.onmessage = (event) => {
+    const change = JSON.parse(event.data);
+    console.log('Evidence changed:', change);
+};
+
+eventSource.onerror = (error) => {
+    console.error('SSE error:', error);
+    eventSource.close();
+};
+----
+
+== Authentication Provider Integration
+
+=== OIDC/OAuth2 Integration
+
+.OIDC Configuration
+[source,toml]
+----
+[auth.oidc]
+enabled = true
+issuer = "https://auth.example.com"
+client_id = "${OIDC_CLIENT_ID}"
+client_secret = "${OIDC_CLIENT_SECRET}"
+
+# Token validation
+audience = "lith-api"
+algorithms = ["RS256"]
+
+# User mapping
+[auth.oidc.claims]
+actor = "sub"  # JWT claim for actor identity
+email = "email"
+name = "name"
+roles = "roles"
+
+# Role to permission mapping
+[auth.oidc.roles]
+admin = ["*"]
+editor = ["read", "write"]
+viewer = ["read"]
+----
+
+See link:SECURITY-AUTH.adoc[Security & Authentication] for complete authentication configuration.
+
+== Monitoring Integration
+
+=== Prometheus Metrics Export
+
+See link:OBSERVABILITY.adoc[Observability Guide] for complete metrics configuration.
+
+=== Datadog Integration
+
+.Datadog Configuration
+[source,toml]
+----
+[integrations.datadog]
+enabled = true
+api_key = "${DATADOG_API_KEY}"
+site = "datadoghq.com"
+
+[integrations.datadog.metrics]
+prefix = "lith"
+tags = ["env:production", "service:lith"]
+
+[integrations.datadog.logs]
+enabled = true
+source = "lith"
+service = "lith"
+
+[integrations.datadog.apm]
+enabled = true
+service = "lith"
+env = "production"
+----
+
+== See Also
+
+* link:API-REFERENCE.adoc[API Reference] - Complete API documentation
+* link:SECURITY-AUTH.adoc[Security & Authentication] - Authentication configuration
+* link:OBSERVABILITY.adoc[Observability Guide] - Monitoring and metrics
+* link:DEPLOYMENT.adoc[Deployment Guide] - Production deployment
+* link:../ARCHITECTURE.adoc[Architecture] - Technical design
+* link:../spec/journal.adoc[Journal Specification] - Journal format details

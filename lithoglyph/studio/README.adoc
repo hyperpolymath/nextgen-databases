@@ -1,0 +1,386 @@
+image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: 2025 hyperpolymath= Lith Studio
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+
+image:https://img.shields.io/badge/Stage-Development-orange.svg[Stage]
+
+[.lead]
+*Zero-friction interface for Lith with dependently-typed FBQL.*
+
+Making verified, audit-grade databases accessible to everyone—even Apple users.
+
+toc::[]
+
+== Overview
+
+Lith Studio is a graphical interface that lets non-technical users create and query Lith databases using FBQLdt (dependently-typed Lith Query Language) without needing to understand dependent types, proofs, or Lean 4.
+
+=== The Problem
+
+FBQLdt provides compile-time verification of database constraints:
+
+[source,gql]
+----
+-- FBQLdt: Requires understanding dependent types
+CREATE COLLECTION evidence (
+  prompt_score : BoundedNat 0 100,  -- Type carries proof
+  rationale : NonEmptyString        -- Can't be empty
+) WITH DEPENDENT_TYPES;
+
+INSERT INTO evidence (prompt_score, rationale)
+VALUES (95, 'ONS official data')
+WITH_PROOF { score_valid: by omega };  -- What's omega?!
+----
+
+**Problem**: Most users don't know what `BoundedNat`, `WITH_PROOF`, or `omega` mean.
+
+=== The Solution
+
+Lith Studio provides a visual interface:
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────────┐
+│  Lith Studio                                    [_][□][×] │
+├─────────────────────────────────────────────────────────────┤
+│  📁 New Collection                                          │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │ Name: evidence                                        │  │
+│  ├───────────────────────────────────────────────────────┤  │
+│  │ Fields:                                               │  │
+│  │  ┌─────────────┬──────────────┬─────────────────────┐ │  │
+│  │  │ Name        │ Type         │ Constraints         │ │  │
+│  │  ├─────────────┼──────────────┼─────────────────────┤ │  │
+│  │  │ prompt_score│ Number ▼     │ [✓] Min: 0  Max: 100│ │  │
+│  │  │ rationale   │ Text ▼       │ [✓] Required        │ │  │
+│  │  └─────────────┴──────────────┴─────────────────────┘ │  │
+│  │                                                       │  │
+│  │  [+ Add Field]                                        │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                                                             │
+│  [Create Collection]                                        │
+│                                                             │
+│  ✓ Types verified • All constraints will be checked at     │
+│    compile time, not runtime                                │
+└─────────────────────────────────────────────────────────────┘
+----
+
+**Behind the scenes**: Studio generates FBQLdt with proofs automatically.
+
+== Architecture
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────────┐
+│  Lith Studio (This Project)                               │
+│  ├── Tauri 2.0 (Rust) - Cross-platform desktop app          │
+│  ├── ReScript UI - Type-safe reactive interface             │
+│  └── Visual builders for schemas, queries, data entry,      │
+│      and schema normalization                               │
+├─────────────────────────────────────────────────────────────┤
+│  FBQLdt (github.com/hyperpolymath/gqldt)                     │
+│  ├── Lean 4 type checker                                    │
+│  ├── Proof generation (incl. normalization proofs)          │
+│  ├── Normalization types (FunDep, 1NF-BCNF)                 │
+│  └── FBQL code generation                                    │
+├─────────────────────────────────────────────────────────────┤
+│  Lith (github.com/hyperpolymath/lithoglyph)                   │
+│  ├── Form.Normalizer (Factor + Lean 4) - FD discovery       │
+│  ├── Form.Bridge (Zig) - Bidirectional ABI                  │
+│  ├── Form.Model (Forth) - Multi-model layer                 │
+│  └── Form.Blocks (Forth) - Storage + journal                │
+└─────────────────────────────────────────────────────────────┘
+----
+
+== Features
+
+=== Schema Builder
+
+Visual interface for creating collections:
+
+* Drag-and-drop field ordering
+* Type picker with constraint helpers
+* PROMPT score templates for journalism
+* Automatic proof generation
+
+=== Query Builder
+
+Visual query construction:
+
+* Point-and-click filters
+* Join visualization
+* Aggregation helpers
+* Live preview of generated FBQLdt
+
+=== Data Entry
+
+Form-based data entry:
+
+* Validation feedback before submission
+* Constraint explanations in plain English
+* Provenance tracking (who added what, when, why)
+* RATIONALE prompts for audit compliance
+
+=== Proof Assistant
+
+When manual proofs are needed:
+
+* Plain English explanation of what's needed
+* Suggested fixes
+* One-click proof tactics
+* "I don't know" option with guidance
+
+=== Schema Normalization
+
+Self-normalizing database features:
+
+* Automatic functional dependency discovery from data
+* Visual normal form analysis (1NF through BCNF)
+* One-click normalization proposals with narrative explanations
+* Proof-carrying schema evolution with rollback
+* "What's wrong with my schema?" in plain English
+
+See https://github.com/hyperpolymath/lithoglyph/blob/main/spec/self-normalizing.adoc[Lith Self-Normalizing Spec] and https://github.com/hyperpolymath/gqldt/blob/main/spec/normalization-types.md[FBQLdt Normalization Types].
+
+== Target Users
+
+|===
+| User Type | Pain Point | Studio Solution
+
+| Journalists
+| Need audit trails, don't know FBQL
+| Visual evidence entry with PROMPT scores
+
+| Researchers
+| Want reproducibility proofs
+| Automatic provenance tracking
+
+| Compliance Officers
+| Need reversibility guarantees
+| Visual correction workflow with proofs
+
+| Developers
+| Learning curve for dependent types
+| Gradual complexity revelation
+|===
+
+== Technology Stack
+
+|===
+| Component | Technology | Rationale
+
+| Desktop App
+| Tauri 2.0
+| Cross-platform (Mac, Windows, Linux), Rust backend
+
+| Frontend UI
+| ReScript
+| Type-safe, compiles to JS, React-like
+
+| Runtime
+| Deno
+| No npm, secure by default
+
+| Type Checker
+| Lean 4 (via FBQLdt)
+| Best IDE support, proof automation
+
+| Database
+| Lith
+| Narrative-first, reversible, audit-grade
+|===
+
+== Development
+
+=== Prerequisites
+
+==== Required
+
+[cols="1,2,2"]
+|===
+| Tool | Version | Installation
+
+| Rust
+| stable (1.70+)
+| `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \| sh`
+
+| Node.js
+| 18+ (for npm/npx)
+| https://nodejs.org/ or `asdf install nodejs 20.10.0`
+
+| Tauri CLI
+| 2.x
+| `cargo install tauri-cli`
+|===
+
+==== Linux-Specific Dependencies
+
+On Fedora/RHEL:
+[source,bash]
+----
+sudo dnf install webkit2gtk4.1-devel gtk3-devel libsoup3-devel \
+  javascriptcore6.0-devel libadwaita-devel pango-devel cairo-devel \
+  gdk-pixbuf2-devel atk-devel librsvg2-devel
+----
+
+On Ubuntu/Debian:
+[source,bash]
+----
+sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libsoup-3.0-dev \
+  libjavascriptcoregtk-4.1-dev libadwaita-1-dev libpango1.0-dev \
+  libcairo2-dev libgdk-pixbuf-2.0-dev libatk1.0-dev librsvg2-dev
+----
+
+==== Optional (for full functionality)
+
+* **Lean 4** (for FBQLdt type checking) - https://leanprover.github.io/lean4/doc/setup.html
+* **Deno** (alternative runtime) - `curl -fsSL https://deno.land/install.sh | sh`
+
+=== Setup
+
+[source,bash]
+----
+# Clone
+git clone https://github.com/hyperpolymath/lithoglyph-studio
+cd lithoglyph-studio
+
+# Install Node dependencies (ReScript, React, esbuild)
+npm install
+
+# Build ReScript
+npx rescript build
+
+# Bundle frontend
+npx esbuild src/App.res.js --bundle --outfile=dist/app.js
+
+# Development mode (hot reload)
+cd src-tauri && cargo tauri dev
+
+# Build for production
+cd src-tauri && cargo tauri build
+----
+
+=== Quick Start (TL;DR)
+
+[source,bash]
+----
+npm install && npx rescript build && \
+npx esbuild src/App.res.js --bundle --outfile=dist/app.js && \
+cd src-tauri && cargo tauri dev
+----
+
+=== Build Outputs
+
+After `cargo tauri build`:
+
+[cols="1,2"]
+|===
+| Format | Location
+
+| Binary
+| `src-tauri/target/release/lithoglyph-studio`
+
+| Debian package
+| `src-tauri/target/release/bundle/deb/Lith Studio_*.deb`
+
+| RPM package
+| `src-tauri/target/release/bundle/rpm/Lith Studio-*.rpm`
+|===
+
+=== Project Structure
+
+[source,text]
+----
+lithoglyph-studio/
+├── src-tauri/              # Rust backend (Tauri 2.0)
+│   ├── src/
+│   │   └── main.rs         # Entry point + all Tauri commands
+│   ├── icons/              # App icons (indigo theme)
+│   ├── Cargo.toml          # Rust dependencies
+│   └── tauri.conf.json     # Tauri configuration
+├── src/                    # ReScript frontend
+│   ├── App.res             # Main app with navigation
+│   ├── Types.res           # Shared type definitions
+│   ├── SchemaBuilder.res   # Collection creator UI
+│   ├── FieldEditor.res     # Field type picker
+│   ├── FqldtPreview.res    # Live FBQLdt code preview
+│   ├── QueryBuilder.res    # Visual query construction
+│   ├── DataEntryPanel.res  # Form-based data entry
+│   ├── ProofAssistant.res  # Proof generation UI
+│   └── NormalizationPanel.res # Schema normalization
+├── dist/                   # Build outputs
+│   ├── index.html          # Entry HTML
+│   ├── app.js              # Bundled frontend
+│   └── styles.css          # UI styles (indigo theme)
+├── package.json            # Node dependencies
+├── rescript.json           # ReScript config
+├── STATE.scm               # Project state tracking
+├── ECOSYSTEM.scm           # Ecosystem relationships
+├── META.scm                # Project metadata
+└── README.adoc
+----
+
+== Roadmap
+
+=== Phase 1: Schema Builder (MVP) - IN PROGRESS
+
+* [x] Visual collection creator
+* [x] Field type picker with constraints
+* [x] FBQLdt code generation (client-side)
+* [ ] Basic proof automation (awaiting FBQLdt M5)
+* [x] Copy code to clipboard
+* [x] Create collection workflow
+
+=== Phase 2: Query Builder - UI COMPLETE
+
+* [x] Visual query construction UI
+* [x] Filter/join visualization
+* [ ] Result preview (awaiting Lith M11)
+* [ ] Query history
+
+=== Phase 3: Data Entry - UI COMPLETE
+
+* [x] Form-based entry UI
+* [x] Validation feedback UI
+* [x] Provenance prompts
+* [ ] Backend integration (awaiting Lith M11)
+* [ ] Bulk import
+
+=== Phase 4: Advanced Features
+
+* [x] Proof assistant UI
+* [ ] Navigation path builder
+* [ ] Multi-user collaboration
+* [ ] Export to standard formats
+
+=== Phase 5: Schema Normalization - UI COMPLETE
+
+* [x] Functional dependency discovery UI
+* [x] Normal form visualization (1NF-BCNF)
+* [x] One-click normalization proposals UI
+* [ ] Backend integration (awaiting Lith M11)
+* [ ] FBQLdt proof integration for schema changes
+
+=== Blocking Dependencies
+
+* **Lith M11** - HTTP API Server (required for database operations)
+* **FBQLdt M5** - Zig FFI (required for real type checking)
+
+== Related Projects
+
+* https://github.com/hyperpolymath/lithoglyph[Lith] - The narrative-first database
+* https://github.com/hyperpolymath/lithoglyph/blob/main/spec/self-normalizing.adoc[Lith Self-Normalizing] - Automatic FD discovery and proof-carrying schema evolution
+* https://github.com/hyperpolymath/gqldt[FBQLdt] - Dependently-typed Form Query Language
+* https://github.com/hyperpolymath/gqldt/blob/main/spec/normalization-types.md[FBQLdt Normalization Types] - Type-encoded functional dependencies and normal forms
+* https://github.com/hyperpolymath/bofig[BoFIG] - Evidence graph for investigative journalism
+* https://github.com/hyperpolymath/zotero-lithoglyph[Zotero-Lith] - Production pilot: reference manager with PROMPT scores
+* https://github.com/hyperpolymath/lithoglyph-debugger[Lith Debugger] - Proof-carrying database debugger (Lean 4 + Idris 2)
+* https://github.com/hyperpolymath/formbase[FormBase] - Open-source Airtable alternative with provenance
+
+== License
+
+PMPL-1.0-or-later

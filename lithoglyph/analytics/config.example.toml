@@ -1,0 +1,24 @@
+# Lith-Analytics Configuration Example
+# Copy to config.toml and adjust as needed
+
+[lithoglyph]
+# Lith HTTP API URL
+api_url = "http://localhost:8080"
+# Collections to sync for analytics
+collections = ["evidence", "claims"]
+
+[server]
+# Host to bind to
+host = "127.0.0.1"
+# Port to listen on
+port = 8082
+
+[storage]
+# Directory for Parquet data files
+data_dir = "./data"
+# Retention in days (0 = forever)
+retention_days = 0
+
+[sync]
+# Auto-sync interval in minutes (0 = manual only via POST /analytics/sync)
+auto_sync_minutes = 60

@@ -1,0 +1,440 @@
+= Lithoglyph Roadmap
+:toc:
+:icons: font
+
+[.lead]
+Development phases from concept to production.
+
+**Note:** This project was formerly known as "lith" until 2026-02-05, when it was renamed to Lithoglyph to avoid trademark conflicts and better reflect the stone-carving metaphor of Forth sculpting data onto disk.
+
+== Milestone Summary
+
+[cols="1,2,1,1"]
+|===
+| Milestone | Description | Version | Status
+
+| M1 | Core Specifications | v0.0.2 | ✅ Complete
+| M2-M5 | Forth PoC Implementation | v0.0.2 | ✅ Complete
+| M6 | Machine-Readable Artefacts | v0.0.2 | ✅ Complete
+| M7 | Complete Documentation Suite | v0.0.3 | ✅ Complete
+| M8 | Form.Runtime (FQL Engine) | v0.0.4 | ✅ Complete
+| M9 | Form.Normalizer | v0.0.4 | ✅ Complete
+| M10 | Production Hardening | v0.0.4 | ✅ Complete
+| M11 | Multi-Protocol API Server | v0.0.5 | ✅ Complete
+| M12 | Language Bindings (ReScript, PHP) | v0.0.6 | 🚧 Next
+| M13 | CMS Integration (WordPress) | v0.0.7 | 📋 Planned
+| M14 | Form.ControlPlane (Clustering) | v0.1.0 | 📋 Planned
+| M14.5 | Final Naming and Branding | v0.9.0 | 📋 Planned
+| M15 | 1.0.0 Release Candidate | v1.0.0-rc | 📋 Planned
+|===
+
+== Phase 0: Specification ✅
+
+*Status*: Complete (v0.0.2)
+
+*Goal*: Complete specifications for all core components.
+
+=== Deliverables
+
+* [x] `lithoglyph.scm` - Unified specification (formerly lithoglyph.scm)
+* [x] Repository structure
+* [x] `spec/blocks.adoc` - Block format spec (4 KiB blocks, 64-byte headers)
+* [x] `spec/journal.adoc` - Journal format spec (append-only, sequence numbers)
+* [x] `spec/fql.adoc` - FQL grammar (EBNF, provenance syntax)
+* [x] `spec/fql-dependent-types.md` - FQLdt with Lean 4 integration
+* [x] `spec/self-normalizing.adoc` - Self-normalizing database spec
+* [x] `spec/cloud-storage.adoc` - Object storage integration
+* [x] `spec/fql-philosophy.adoc` - Design philosophy
+
+== Phase 1: Form.Blocks PoC ✅
+
+*Status*: Complete (v0.0.2)
+
+*Goal*: Working storage layer with journal and reversibility.
+
+=== Deliverables
+
+* [x] Fixed-size block implementation (`core-forth/src/lithoglyph-blocks.fs`)
+* [x] Block header structure with magic, version, type, checksums
+* [x] Memory buffer management
+* [x] CRC32C implementation (Castagnoli polynomial)
+
+== Phase 2: Form.Journal PoC ✅
+
+*Status*: Complete (v0.0.2)
+
+*Goal*: Append-only journal with crash recovery.
+
+=== Deliverables
+
+* [x] Append-only journal (`core-forth/src/lithoglyph-journal.fs`)
+* [x] Sequence numbering
+* [x] Operation logging with inverses
+* [x] Crash recovery primitives
+
+== Phase 3: Form.Model PoC ✅
+
+*Status*: Complete (v0.0.2)
+
+*Goal*: Multi-model layer on top of blocks.
+
+=== Deliverables
+
+* [x] Document collection support (`core-forth/src/lithoglyph-model.fs`)
+* [x] Edge collection support
+* [x] Schema metadata storage
+* [x] Constraint storage
+
+== Phase 4: Form.Bridge ✅
+
+*Status*: Complete (v0.0.2)
+
+*Goal*: Stable ABI for runtime integration.
+
+=== Deliverables
+
+* [x] Zig-only ABI (C dependency eliminated)
+* [x] FFI design for Factor integration
+
+=== Note
+
+Architecture changed from C ABI to Zig-only ABI for better safety and integration.
+
+== Phase 5: Documentation ✅
+
+*Status*: Complete (v0.0.3)
+
+*Goal*: Comprehensive documentation for production use.
+
+=== Deliverables
+
+* [x] `QUICKSTART.adoc` - 15-minute tutorial
+* [x] `VERSIONING.adoc` - Stability policy
+* [x] `docs/DEPLOYMENT.adoc` - Docker, Kubernetes, systemd
+* [x] `docs/SECURITY-AUTH.adoc` - Authentication, authorization, hardening
+* [x] `docs/API-REFERENCE.adoc` - Form.Bridge FFI, FQL API
+* [x] `docs/MIGRATION-FROM-RDBMS.adoc` - PostgreSQL/MySQL/SQLite migration
+* [x] `docs/OBSERVABILITY.adoc` - Logging, metrics, tracing, dashboards
+* [x] `docs/INTEGRATION-PATTERNS.adoc` - Message queues, search, analytics, AI/ML
+
+== Phase 6: Form.Runtime PoC ✅
+
+*Status*: Complete (v0.0.4)
+
+*Goal*: FQL parser/planner/executor.
+
+=== Deliverables
+
+* [x] FBQL parser (`core-factor/fbql/fbql.factor`) - Full PEG-based parser
+* [x] Query planner - Cost-based planning with step types
+* [x] Executor - In-memory and pluggable persistent storage
+* [x] EXPLAIN functionality - EXPLAIN, ANALYZE, VERBOSE modes
+* [x] Provenance output - WITH PROVENANCE clause support
+
+=== Acceptance Criteria
+
+* ✅ FQL PoC subset fully functional
+* ✅ EXPLAIN returns readable plans (including VERBOSE mode)
+* ✅ Provenance tracks to journal entries
+* ✅ Constraint rejections explained
+
+== Phase 7: Form.Normalizer (Self-Normalizing) ✅
+
+*Status*: Complete (v0.0.4)
+
+*Goal*: Automatic functional dependency discovery, type-encoded normal forms, and proof-carrying schema evolution.
+
+=== Deliverables
+
+* [x] FD discovery algorithm (`normalizer/factor/fd-discovery.factor`) - DFD algorithm
+* [x] `INTROSPECT SCHEMA` FQL command - Schema inspection
+* [x] Type encoding in Lean 4 (`normalizer/lean/FunDep.lean`)
+* [x] Normal form predicates (1NF through BCNF)
+* [x] Proposal generation (`denormalization-proposal`)
+* [x] Three-phase migration (`normalizer/factor/migration.factor`)
+* [x] Query rewriting during migration transitions
+
+=== Acceptance Criteria
+
+* ✅ Discover FDs with configurable confidence threshold (three-tier: high/medium/low)
+* ✅ FunDep.lean types compatible with FQL-dt
+* ✅ Normal form analysis (1NF-BCNF) with violation detection
+* ✅ Generate human/agent-readable proposals
+* ✅ Three-phase migration (Announce → Shadow → Commit) with rollback
+* ✅ Lean4 proofs for verified transformations
+
+=== Resolved Questions
+
+* ✅ Q-NORM-001: DFD algorithm chosen (depth-first with partition refinement)
+* ✅ Q-NORM-002: Three-tier confidence classification
+* ✅ Q-NORM-003: Denormalization proposals with join-based approach
+* ✅ Q-NORM-004: CBOR-encoded proof blobs for FFI
+* ✅ Q-NORM-005: Query rewriting via migration framework
+
+See link:spec/self-normalizing.adoc[Self-Normalizing Specification] for full details.
+
+== Phase 8: Production Hardening ✅
+
+*Status*: Complete (v0.0.4)
+
+*Goal*: Complete PoC with all seam checks passing, production-ready.
+
+=== Deliverables
+
+* [x] Seam tests (`core-factor/fbql/seam-tests.factor`) - Full pipeline validation
+* [x] End-to-end test suite - Parser → Planner → Executor → Normalizer
+* [x] Performance benchmarks (`core-factor/fbql/benchmarks.factor`)
+* [x] Migration tests (`normalizer/factor/migration-tests.factor`)
+* [x] Pluggable storage backend (`core-factor/fbql/storage-backend.factor`)
+
+=== Acceptance Criteria
+
+* ✅ All seam tests pass (full pipeline)
+* ✅ Benchmark suite for regression detection
+* ✅ Memory/bridge backend abstraction
+* ✅ EXPLAIN correlation tests
+* ✅ Large dataset stress tests
+
+== Phase 9: Multi-Protocol API Server ✅
+
+*Status*: Complete (v0.0.5)
+
+*Goal*: Production API server with REST, gRPC, and GraphQL interfaces.
+
+=== Deliverables
+
+* [x] API server binary (`lithoglyph-server`) in Zig
+* [x] REST API with OpenAPI 3.1 specification (`api/spec/openapi.yaml`)
+* [x] gRPC API with Protocol Buffers (`api/proto/lith.proto`)
+* [x] GraphQL API with SDL schema (`api/graphql/schema.graphql`)
+* [x] WebSocket support for GraphQL subscriptions (`api/src/websocket.zig`)
+* [x] Authentication middleware (JWT, API keys)
+* [x] Health check and Prometheus metrics endpoints
+* [x] Form.Bridge FFI integration (`api/src/bridge_client.zig`)
+* [x] Integration tests for all protocols (`api/src/integration_tests.zig`)
+
+=== REST API Design
+
+[source]
+----
+POST   /v1/query              # Execute FBQL query
+POST   /v1/collections        # Create collection
+GET    /v1/collections        # List collections
+GET    /v1/collections/{name} # Get collection schema
+DELETE /v1/collections/{name} # Drop collection
+GET    /v1/journal            # Query journal entries
+POST   /v1/normalize/discover # Discover FDs
+POST   /v1/normalize/analyze  # Analyze normal form
+POST   /v1/migrate/start      # Start migration
+POST   /v1/migrate/commit     # Commit migration
+GET    /v1/health             # Health check
+GET    /v1/metrics            # Prometheus metrics
+----
+
+=== gRPC Service Definition
+
+[source,protobuf]
+----
+service Lith {
+  rpc Query(QueryRequest) returns (QueryResponse);
+  rpc CreateCollection(CreateCollectionRequest) returns (CreateCollectionResponse);
+  rpc ListCollections(Empty) returns (ListCollectionsResponse);
+  rpc GetJournal(JournalRequest) returns (stream JournalEntry);
+  rpc DiscoverDependencies(DiscoverRequest) returns (DiscoverResponse);
+  rpc StartMigration(MigrationRequest) returns (MigrationResponse);
+}
+----
+
+=== GraphQL Schema
+
+[source,graphql]
+----
+type Query {
+  collections: [Collection!]!
+  collection(name: String!): Collection
+  journal(since: Int, limit: Int): [JournalEntry!]!
+  query(fbql: String!, provenance: ProvenanceInput): QueryResult!
+}
+
+type Mutation {
+  createCollection(name: String!, schema: SchemaInput!): Collection!
+  execute(fbql: String!, provenance: ProvenanceInput!): MutationResult!
+  startMigration(collection: String!, target: NormalForm!): Migration!
+}
+
+type Subscription {
+  journalStream(collection: String): JournalEntry!
+}
+----
+
+=== Acceptance Criteria
+
+* ✅ All FBQL operations accessible via REST, gRPC, and GraphQL
+* ✅ Provenance tracking across all protocols
+* ✅ Streaming support via WebSocket subscriptions (journal streaming)
+* ✅ OpenAPI, protobuf, and GraphQL SDL specs generate valid clients
+* ✅ Prometheus metrics endpoint
+* ✅ Full protobuf serialization/deserialization
+* ✅ graphql-ws protocol for subscriptions
+
+== Phase 10: Language Bindings (M12)
+
+*Status*: 🚧 Next
+
+*Target*: v0.0.6
+
+*Goal*: Native client libraries for ReScript and PHP.
+
+*Dependencies*: Phase 9 (HTTP API) complete ✅
+
+=== ReScript Client (`@lithoglyph/rescript`)
+
+* [ ] HTTP client using Fetch API
+* [ ] Type-safe FQL query builder
+* [ ] Provenance helpers
+* [ ] Response type definitions
+* [ ] Deno-compatible (no Node.js)
+
+[source,rescript]
+----
+// Example usage
+let result = await Lith.query(
+  ~collection="articles",
+  ~where=Field("status", Eq, "published"),
+  ~provenance={actor: "editor@news.org", rationale: "Daily review"},
+)
+----
+
+=== PHP Client (`lithoglyph/lithoglyph-php`)
+
+* [ ] PSR-18 HTTP client compatibility
+* [ ] Composer package
+* [ ] FQL query builder (fluent interface)
+* [ ] Provenance handling
+* [ ] Laravel/Symfony integration helpers
+
+[source,php]
+----
+<?php
+// Example usage
+$result = $lithoglyph->query()
+    ->collection('articles')
+    ->where('status', '=', 'published')
+    ->withProvenance('editor@news.org', 'Daily review')
+    ->execute();
+----
+
+=== Acceptance Criteria
+
+* Both clients pass integration tests against lithoglyph-server
+* ReScript client works with Deno
+* PHP client installable via Composer
+* Documentation with examples
+
+== Phase 11: CMS Integration (WordPress)
+
+*Status*: 📋 Planned
+
+*Goal*: WordPress plugin for Lith-backed content with full provenance.
+
+*Dependencies*: Phase 10 (PHP client) must be complete.
+
+=== Deliverables
+
+* [ ] WordPress plugin (`lithoglyph-wordpress`)
+* [ ] Custom post type backed by Lith
+* [ ] Edit history with provenance (who changed what, why)
+* [ ] Time-travel: view any historical version
+* [ ] Revision comparison with narrative diffs
+* [ ] Admin UI for Lith connection settings
+* [ ] WP-CLI commands for Lith operations
+
+=== Features
+
+* **Provenance on Save**: Every post edit records actor + rationale
+* **Audit Log**: Complete history visible in admin
+* **Rollback**: Restore any previous version with one click
+* **Evidence Chain**: For journalism, link sources to claims
+* **Multi-site**: Shared Lith across WordPress network
+
+=== Acceptance Criteria
+
+* Plugin installable from WordPress admin
+* Posts stored in Lith with full provenance
+* Revision history shows narrative explanations
+* Rollback works without data loss
+* Compatible with WordPress 6.x+
+
+== Future Phases (Post-PoC)
+
+=== Form.ControlPlane
+
+* Gleam/OTP session management
+* Cluster coordination
+* Production supervision
+
+=== Distribution
+
+* Multi-node replication
+* Consensus protocol selection
+* Network protocol design
+
+=== Ecosystem
+
+* Additional language bindings (Rust, Python via HTTP)
+* IDE integration (VS Code, JetBrains)
+* Visualization tools
+* Lith Studio (zero-friction GUI)
+* Lith Debugger (proof-carrying debugger)
+* Other CMS integrations (Drupal, Ghost, Strapi)
+
+== Non-Goals (Explicitly Deferred)
+
+* SQL compatibility layer
+* OLAP optimizations
+* Full-text search (use integration patterns instead)
+* Time-series optimizations
+* Real-time subscriptions (use CDC/webhooks instead)
+
+These may be addressed post-PoC based on community needs.
+
+== Path to 1.0.0
+
+=== Semantic Versioning Plan
+
+[cols="1,2,3"]
+|===
+| Version | Milestone | Focus
+
+| v0.0.6 | M12 | Language bindings (ReScript, PHP)
+| v0.0.7 | M13 | CMS integration (WordPress)
+| v0.1.0 | M14 | Form.ControlPlane (clustering, supervision)
+| v0.2.0 | - | Distribution (multi-node replication)
+| v0.9.0 | M14.5 | Final Naming and Branding (replace "Lith" temporary name)
+| v1.0.0-rc | M15 | Release candidate (stability, testing)
+| v1.0.0 | GA | General availability
+|===
+
+=== 1.0.0 Requirements
+
+* [ ] All M1-M14.5 milestones complete
+* [ ] Six months of stability (no breaking changes)
+* [ ] Production deployments validated
+* [ ] Security audit completed
+* [ ] Performance benchmarks published
+* [ ] Comprehensive documentation
+
+== Version History
+
+[cols="1,1,2"]
+|===
+| Version | Date | Milestone
+
+| v0.0.5 | 2026-01-12 | M11 - Multi-Protocol API Server
+| v0.0.4 | 2026-01-12 | M8-M10 - MVP Complete (Form.Runtime + Form.Normalizer)
+| v0.0.3 | 2026-01-12 | M7 - Complete Documentation Suite
+| v0.0.2 | 2026-01-11 | M1-M6 - Core Specs + Forth PoC
+| v0.0.1 | 2026-01-03 | Repository Initialization
+|===
+
+See link:CHANGELOG.md[CHANGELOG] for detailed release notes.

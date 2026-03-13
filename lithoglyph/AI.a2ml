@@ -1,0 +1,60 @@
+# AI Assistant Instructions
+
+# Machine-Readable Metadata
+
+Project metadata and AI agent configuration files are located in `.machine_readable/`:
+
+- **STATE.scm** - Current project state, progress, blockers, next actions
+- **ECOSYSTEM.scm** - Position in ecosystem, relationships to other projects
+- **META.scm** - Architecture decisions, governance, development practices
+- **PLAYBOOK.scm** - Operational runbook, procedures, alerts
+- **AGENTIC.scm** - AI agent interaction patterns and constraints
+- **NEUROSYM.scm** - Neurosymbolic integration configuration
+
+**These files are the canonical source of truth for project metadata.**
+
+## Critical Invariants
+
+1. **IP Rename PENDING**: Code still uses `Lith`/`Lith` internally. Must be renamed to `Lith`/`Litho`/`Lithoglyph` before any public release (IP claim on "Form"). Keep "form" only where it literally means HTML/data forms.
+
+2. **ABI Standard**: Idris2 ABI definitions (`src/Lith/`) are the single source of truth for interface contracts. Zero `believe_me` — this is a hard invariant.
+
+3. **Bridge Architecture**: `core-zig/src/bridge.zig` is the WORKING implementation. `ffi/zig/` delegates to it. Never add new functionality to `ffi/zig/` directly.
+
+4. **Proven Library**: The real Proven library is at `/var/mnt/eclipse/repos/proven/` (104+ modules). Do NOT create inline copies. FormBridge.idr has temporary inline validation that should eventually delegate to Proven.
+
+5. **Banned Patterns**: No `believe_me`, `assert_total`, `assert_smaller`, `unsafePerformIO` in Idris2. All Zig unsafe casts must have `// SAFETY:` comments.
+
+## Workflow
+
+1. Read `.machine_readable/*.scm` files at session start
+2. Check STATE.scm for current phase, blockers, next actions
+3. Follow patterns and constraints from AGENTIC.scm
+4. Update STATE.scm after completing work
+
+## Build Verification
+
+```bash
+# Core Zig bridge
+cd core-zig && zig build test
+
+# FFI delegation layer
+cd ffi/zig && zig build test
+
+# Forth kernel
+cd core-forth && gforth test/lithoglyph-tests.fs
+
+# Lean 4 proofs
+cd core-lean && lake build
+
+# Idris2 ABI type-check
+idris2 --source-dir src --check src/Lith/FormBridge.idr
+idris2 --source-dir src --check src/Lith/FormLayout.idr
+idris2 --source-dir src --check src/Lith/FormForeign.idr
+
+# BEAM NIF (Rust)
+cd beam/native_rust && cargo build
+
+# BEAM NIF (Zig)
+cd beam/native && zig build
+```

@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: v1
+kind: Service
+metadata:
+  name: lith-http-api
+  labels:
+    app: lith-http-api
+    component: api
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "4000"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  selector:
+    app: lith-http-api
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+    protocol: TCP
+  - name: metrics
+    port: 4000
+    targetPort: metrics
+    protocol: TCP
+  sessionAffinity: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lith-http-api-headless
+  labels:
+    app: lith-http-api
+    component: api
+spec:
+  type: ClusterIP
+  clusterIP: None  # Headless service for direct pod access
+  selector:
+    app: lith-http-api
+  ports:
+  - name: http
+    port: 4000
+    targetPort: http
+    protocol: TCP
+  publishNotReadyAddresses: true  # Allow traffic to pods before ready

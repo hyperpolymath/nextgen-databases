@@ -1,0 +1,280 @@
+; SPDX-License-Identifier: PMPL-1.0-or-later
+; SPDX-FileCopyrightText: 2026 hyperpolymath
+;
+; Trustfile - Cryptographic Standards and Security Requirements
+; Media-Type: application/vnd.trust+scm
+;
+; Defines cryptographic algorithms, standards, and security policies
+; for the Lith ecosystem (fbql-dt, lith, lith-studio, etc.)
+
+(trustfile
+  (metadata
+    (version "1.0.0")
+    (created "2026-02-01")
+    (updated "2026-02-01")
+    (scope "lith-ecosystem")
+    (enforcement "mandatory"))
+
+  ;; ============================================================================
+  ;; PASSWORD HASHING
+  ;; ============================================================================
+  (password-hashing
+    (algorithm "Argon2id")
+    (parameters
+      (memory-cost "512 MiB")
+      (iterations 8)
+      (parallelism 4))
+    (nist-fips "—")
+    (rationale "Maximum memory/iterations for GPU/ASIC resistance; proactive security stance")
+    (enforcement
+      (status "mandatory")
+      (terminate-immediately "PBKDF2" "bcrypt" "scrypt")))
+
+  ;; ============================================================================
+  ;; GENERAL HASHING
+  ;; ============================================================================
+  (general-hashing
+    (algorithm "SHAKE3-512")
+    (output-size "512 bits")
+    (nist-fips "FIPS 202")
+    (rationale "Post-quantum; use for provenance, key derivation, long-term storage")
+    (use-cases
+      "provenance-tracking"
+      "key-derivation"
+      "long-term-storage"
+      "content-addressing")
+    (enforcement
+      (status "mandatory")
+      (terminate-immediately "SHA-1" "MD5")))
+
+  ;; ============================================================================
+  ;; POST-QUANTUM SIGNATURES
+  ;; ============================================================================
+  (post-quantum-signatures
+    (primary
+      (algorithm "Dilithium5-AES")
+      (mode "hybrid")
+      (nist-fips "ML-DSA-87 (FIPS 204)")
+      (rationale "Hybrid with AES-256 for belt-and-suspenders security"))
+    (fallback
+      (algorithm "SPHINCS+")
+      (rationale "Conservative PQ backup; use if Dilithium5 is ever compromised"))
+    (enforcement
+      (status "mandatory")
+      (terminate-immediately "RSA" "DSA" "ECDSA-P256")))
+
+  ;; ============================================================================
+  ;; POST-QUANTUM KEY EXCHANGE
+  ;; ============================================================================
+  (post-quantum-key-exchange
+    (kem
+      (algorithm "Kyber-1024")
+      (nist-fips "ML-KEM-1024 (FIPS 203)"))
+    (kdf
+      (algorithm "SHAKE256-KDF")
+      (rationale "Consistent with SHAKE3-512 hashing preference"))
+    (enforcement
+      (status "mandatory")
+      (terminate-immediately "ECDH-P256" "X25519")))
+
+  ;; ============================================================================
+  ;; CLASSICAL SIGNATURES (HYBRID)
+  ;; ============================================================================
+  (classical-signatures
+    (algorithm "Ed448")
+    (hybrid-with "Dilithium5")
+    (nist-fips "—")
+    (rationale "Ed448 for classical compatibility; Dilithium5 for PQ")
+    (enforcement
+      (status "mandatory")
+      (terminate-immediately "Ed25519" "SHA-1" "RSA-2048")))
+
+  ;; ============================================================================
+  ;; SYMMETRIC ENCRYPTION
+  ;; ============================================================================
+  (symmetric-encryption
+    (algorithm "XChaCha20-Poly1305")
+    (key-size "256 bits")
+    (rationale "Larger nonce space; 256-bit keys for quantum margin")
+    (use-cases
+      "data-at-rest"
+      "data-in-transit"
+      "proof-blobs")
+    (enforcement
+      (status "mandatory")
+      (terminate-immediately "AES-128" "3DES" "RC4")))
+
+  ;; ============================================================================
+  ;; KEY DERIVATION
+  ;; ============================================================================
+  (key-derivation
+    (algorithm "HKDF-SHAKE512")
+    (nist-fips "FIPS 202")
+    (rationale "Post-quantum KDF; use with all secret key material")
+    (enforcement
+      (status "mandatory")
+      (apply-to "all-secret-keys")))
+
+  ;; ============================================================================
+  ;; RANDOM NUMBER GENERATION
+  ;; ============================================================================
+  (random-number-generation
+    (algorithm "ChaCha20-DRBG")
+    (seed-size "512 bits")
+    (nist-fips "SP 800-90Ar1")
+    (rationale "CSPRNG for deterministic, high-entropy needs")
+    (enforcement
+      (status "mandatory")
+      (terminate-immediately "DUAL_EC_DRBG" "Mersenne-Twister")))
+
+  ;; ============================================================================
+  ;; USER-FRIENDLY HASH NAMES
+  ;; ============================================================================
+  (user-friendly-hashing
+    (algorithm "Base32(SHAKE256(hash)) → Wordlist")
+    (rationale "Memorable, deterministic mapping (e.g., 'Gigantic-Giraffe-7' for drivers)")
+    (use-cases
+      "commit-hashes"
+      "proof-identifiers"
+      "session-tokens")
+    (enforcement
+      (status "recommended")))
+
+  ;; ============================================================================
+  ;; DATABASE HASHING
+  ;; ============================================================================
+  (database-hashing
+    (speed-optimized
+      (algorithm "BLAKE3")
+      (output-size "512 bits")
+      (use-cases "content-addressing" "deduplication"))
+    (long-term-storage
+      (algorithm "SHAKE3-512")
+      (output-size "512 bits")
+      (use-cases "semantic-xml" "aria-tags" "audit-logs"))
+    (enforcement
+      (status "mandatory")))
+
+  ;; ============================================================================
+  ;; SEMANTIC XML / GRAPHQL
+  ;; ============================================================================
+  (semantic-data
+    (database
+      (engine "Virtuoso (VOS)")
+      (query-language "SPARQL 1.2"))
+    (accessibility
+      (standards "WCAG 2.3 AAA" "ARIA")
+      (formal-verification true))
+    (enforcement
+      (status "mandatory")
+      (rationale "Accessibility/compliance requirements")))
+
+  ;; ============================================================================
+  ;; VM / EXECUTION ENVIRONMENT
+  ;; ============================================================================
+  (execution-environment
+    (vm "GraalVM")
+    (formal-verification true)
+    (rationale "Introspective, reversible design alignment")
+    (enforcement
+      (status "recommended")))
+
+  ;; ============================================================================
+  ;; PROTOCOL STACK
+  ;; ============================================================================
+  (protocol-stack
+    (transport "QUIC")
+    (application "HTTP/3")
+    (network "IPv6")
+    (enforcement
+      (status "mandatory")
+      (terminate-immediately "HTTP/1.1" "HTTP/2" "IPv4" "FTP" "Telnet"))
+    (rationale "Terminate legacy protocols per 'danger zone' policy"))
+
+  ;; ============================================================================
+  ;; ACCESSIBILITY STANDARDS
+  ;; ============================================================================
+  (accessibility
+    (wcag-version "2.3")
+    (compliance-level "AAA")
+    (aria true)
+    (semantic-xml true)
+    (design-philosophy "CSS-first, HTML-second")
+    (enforcement
+      (status "mandatory")
+      (rationale "Full compliance with accessibility requirements")))
+
+  ;; ============================================================================
+  ;; FORMAL VERIFICATION
+  ;; ============================================================================
+  (formal-verification
+    (tools "Coq" "Isabelle" "Lean 4")
+    (apply-to
+      "cryptographic-primitives"
+      "protocol-implementations"
+      "proof-carrying-code")
+    (enforcement
+      (status "mandatory")
+      (rationale "Proactive attestation and transparent logic per system design")))
+
+  ;; ============================================================================
+  ;; IMMEDIATE TERMINATION LIST
+  ;; ============================================================================
+  (danger-zone
+    (algorithms-to-terminate-immediately
+      "SHA-1"           ; Collision attacks (2017)
+      "MD5"             ; Collision attacks (2004)
+      "Ed25519"         ; Replaced by Ed448 + Dilithium5
+      "RSA-2048"        ; Insufficient quantum margin
+      "ECDSA-P256"      ; Insufficient quantum margin
+      "X25519"          ; Replaced by Kyber-1024
+      "PBKDF2"          ; Replaced by Argon2id
+      "bcrypt"          ; Replaced by Argon2id
+      "3DES"            ; 64-bit block size
+      "RC4"             ; Biased keystream
+      "DUAL_EC_DRBG")   ; NSA backdoor
+    (protocols-to-terminate-immediately
+      "HTTP/1.1"        ; Replaced by HTTP/3
+      "HTTP/2"          ; Replaced by HTTP/3
+      "IPv4"            ; Replaced by IPv6
+      "FTP"             ; Plaintext credentials
+      "Telnet"          ; No encryption
+      "SSL"             ; All versions
+      "TLS 1.0"         ; Deprecated
+      "TLS 1.1"))       ; Deprecated
+
+  ;; ============================================================================
+  ;; IMPLEMENTATION NOTES
+  ;; ============================================================================
+  (implementation-notes
+    (note
+      (title "Hybrid Cryptography Rationale")
+      (content "All PQ algorithms paired with classical equivalents for belt-and-suspenders security during transition period (2026-2030)."))
+    (note
+      (title "Quantum Margin")
+      (content "256-bit symmetric keys, 512-bit hashes, highest security parameters (Kyber-1024, Dilithium5) to provide margin against quantum attacks."))
+    (note
+      (title "Performance vs Security")
+      (content "BLAKE3 for high-performance needs (content addressing), SHAKE3-512 for long-term storage. Never compromise security for performance in authentication/authorization."))
+    (note
+      (title "Accessibility First")
+      (content "WCAG 2.3 AAA is non-negotiable. All UI must be navigable without CSS, JavaScript, or images. Semantic XML + ARIA for screen readers."))
+    (note
+      (title "Formal Verification")
+      (content "All cryptographic primitives must have formal proofs in Coq, Isabelle, or Lean 4. No ad-hoc implementations."))
+    (note
+      (title "Protocol Migration")
+      (content "HTTP/1.1, HTTP/2, IPv4 must be disabled in all deployments. IPv6-only. QUIC+HTTP/3 mandatory."))))
+
+;; Helper functions for trust policy queries
+(define (get-algorithm category)
+  (trustfile category 'algorithm))
+
+(define (is-terminated? algorithm-or-protocol)
+  (member algorithm-or-protocol
+    (append
+      (trustfile 'danger-zone 'algorithms-to-terminate-immediately)
+      (trustfile 'danger-zone 'protocols-to-terminate-immediately))))
+
+(define (get-enforcement-status category)
+  (trustfile category 'enforcement 'status))

@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: lith
+
+resources:
+- rbac.yaml
+- configmap.yaml
+- pvc.yaml
+- deployment.yaml
+- service.yaml
+- ingress.yaml
+- hpa.yaml
+- pdb.yaml
+- networkpolicy.yaml
+
+commonLabels:
+  app.kubernetes.io/name: lith-http-api
+  app.kubernetes.io/version: v1.0.0
+  app.kubernetes.io/component: api
+  app.kubernetes.io/part-of: lith
+  app.kubernetes.io/managed-by: kustomize
+
+images:
+- name: lith-http-api
+  newName: ghcr.io/hyperpolymath/lith-http-api
+  newTag: latest

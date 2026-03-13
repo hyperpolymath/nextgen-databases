@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: lith-http-api
+  labels:
+    app: lith-http-api
+spec:
+  minAvailable: 2  # Always keep at least 2 pods running
+  selector:
+    matchLabels:
+      app: lith-http-api

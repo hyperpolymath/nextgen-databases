@@ -1,0 +1,225 @@
+{
+  "description": "Test vectors for Lithoglyph block payloads. Payloads are stored in the 4032-byte region following the 64-byte block header. Document payloads are CBOR-encoded (RFC 8949). The checksum in the block header is CRC32C (Castagnoli polynomial 0x82F63B78) computed over the full 4032-byte payload region, even if payload_len < 4032 (trailing bytes are zero-filled). See core-zig/src/blocks.zig Block.setPayload().",
+  "constants": {
+    "PAYLOAD_SIZE": 4032,
+    "BLOCK_TYPE_DOCUMENT": "0x0011",
+    "BLOCK_TYPE_DOCUMENT_OVERFLOW": "0x0012",
+    "BLOCK_TYPE_EDGE": "0x0021",
+    "BLOCK_TYPE_COLLECTION_META": "0x0010",
+    "BLOCK_TYPE_SCHEMA": "0x0050",
+    "CBOR_MAP_PREFIX": "0xA0-0xB7 (0-23 pairs) or 0xB8+ (24+ pairs)",
+    "CBOR_TEXT_PREFIX": "0x60-0x77 (0-23 bytes) or 0x78+ (24+ bytes)"
+  },
+  "vectors": [
+    {
+      "name": "valid_simple_document",
+      "description": "Simple document payload: {\"claim\": \"Inflation at 10%\", \"source\": \"ONS\", \"score\": 85}. CBOR-encoded per spec/encoding.adoc example.",
+      "block_type": "document",
+      "input_cbor_hex": "a365636c61696d70496e666c6174696f6e206174203130252566736f7572636563634f4e536565736f7265d99866181855",
+      "input_cbor_diagnostic": "{\"claim\": \"Inflation at 10%\", \"source\": \"ONS\", \"score\": 39006(85)}",
+      "input_json": {
+        "claim": "Inflation at 10%",
+        "source": "ONS",
+        "score": 85
+      },
+      "expected": {
+        "payload_len": 47,
+        "within_bounds": true,
+        "cbor_major_type_at_start": "map(3)",
+        "contains_prompt_score_tag": true,
+        "prompt_score_tag": 39006
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_document_with_nested_fields",
+      "description": "Document with nested structure representing an evidence record with metadata.",
+      "block_type": "document",
+      "input_json": {
+        "document_id": "doc_ev_001",
+        "collection": "evidence",
+        "fields": {
+          "claim": "UK GDP grew 2.1% in Q3 2025",
+          "source": "Office for National Statistics",
+          "confidence": 0.92,
+          "tags": ["economic", "primary-source", "quarterly"]
+        },
+        "created_at": "2026-01-11T12:00:00Z"
+      },
+      "input_cbor_diagnostic": "{\"document_id\": 39002(\"doc_ev_001\"), \"collection\": 39003(\"evidence\"), \"fields\": {\"claim\": \"UK GDP grew 2.1% in Q3 2025\", \"source\": \"Office for National Statistics\", \"confidence\": 0.92, \"tags\": [\"economic\", \"primary-source\", \"quarterly\"]}, \"created_at\": 0(\"2026-01-11T12:00:00Z\")}",
+      "expected": {
+        "within_bounds": true,
+        "cbor_major_type_at_start": "map(4)",
+        "contains_document_id_tag": true,
+        "contains_collection_name_tag": true,
+        "contains_datetime_tag": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_edge_payload",
+      "description": "Edge payload linking two documents with relationship metadata.",
+      "block_type": "edge",
+      "input_json": {
+        "from_document": "doc_ev_001",
+        "to_document": "doc_ev_002",
+        "relationship": "cites",
+        "weight": 0.85,
+        "metadata": {
+          "created_by": "user_12345",
+          "rationale": "ONS report cites Bank of England data"
+        }
+      },
+      "input_cbor_diagnostic": "{\"from_document\": 39002(\"doc_ev_001\"), \"to_document\": 39002(\"doc_ev_002\"), \"relationship\": \"cites\", \"weight\": 0.85, \"metadata\": {\"created_by\": \"user_12345\", \"rationale\": \"ONS report cites Bank of England data\"}}",
+      "expected": {
+        "within_bounds": true,
+        "cbor_major_type_at_start": "map(5)"
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_collection_meta_payload",
+      "description": "Collection metadata block defining the 'evidence' collection.",
+      "block_type": "collection_meta",
+      "input_json": {
+        "name": "evidence",
+        "schema_block_id": 20,
+        "document_count": 1542,
+        "index_root_block_id": 15,
+        "created_at": "2026-01-01T00:00:00Z",
+        "settings": {
+          "journaling": true,
+          "provenance_required": true,
+          "max_document_size": 4032
+        }
+      },
+      "expected": {
+        "within_bounds": true,
+        "cbor_major_type_at_start": "map(6)"
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_schema_payload",
+      "description": "Schema definition for the evidence collection, stored as CBOR in a schema block.",
+      "block_type": "schema",
+      "input_json": {
+        "collection": "evidence",
+        "version": 1,
+        "fields": {
+          "claim": {"type": "text", "required": true, "max_length": 2048},
+          "source": {"type": "text", "required": true, "max_length": 512},
+          "confidence": {"type": "float64", "required": false, "min": 0.0, "max": 1.0},
+          "tags": {"type": "array", "items": "text", "required": false},
+          "prompt_score": {"type": "uint32", "required": false, "min": 0, "max": 100}
+        },
+        "constraints": [
+          {"type": "unique", "fields": ["claim", "source"]},
+          {"type": "functional_dependency", "determinant": ["source"], "dependent": ["confidence"]}
+        ]
+      },
+      "expected": {
+        "within_bounds": true,
+        "cbor_major_type_at_start": "map(4)"
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_max_size_document",
+      "description": "Document payload at maximum size (4032 bytes). Tests boundary condition for payload fitting in a single block.",
+      "block_type": "document",
+      "input_description": "A document whose CBOR encoding is exactly 4032 bytes. The 'content' field contains a text string padded to fill the remaining space after the map overhead, field keys, and other values.",
+      "input_json": {
+        "document_id": "doc_max_001",
+        "collection": "large_documents",
+        "content": "<4000-byte UTF-8 text string filling the block>"
+      },
+      "expected": {
+        "payload_len": 4032,
+        "within_bounds": true,
+        "at_max_capacity": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_empty_document",
+      "description": "Minimal valid document: empty CBOR map. Represents a document with no fields yet.",
+      "block_type": "document",
+      "input_cbor_hex": "a0",
+      "input_cbor_diagnostic": "{}",
+      "input_json": {},
+      "expected": {
+        "payload_len": 1,
+        "within_bounds": true,
+        "cbor_major_type_at_start": "map(0)"
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_document_with_provenance",
+      "description": "Document payload including inline provenance using Lithoglyph CBOR tags (39004 provenance, 39005 actor).",
+      "block_type": "document",
+      "input_cbor_diagnostic": "{\"claim\": \"Test claim\", \"provenance\": 39004({\"actor\": 39005({\"id\": \"user_123\", \"type\": \"human\"}), \"rationale\": \"Adding test data\", \"timestamp\": 0(\"2026-01-11T12:00:00Z\")})}",
+      "input_json": {
+        "claim": "Test claim",
+        "provenance": {
+          "actor": {"id": "user_123", "type": "human"},
+          "rationale": "Adding test data",
+          "timestamp": "2026-01-11T12:00:00Z"
+        }
+      },
+      "expected": {
+        "within_bounds": true,
+        "contains_provenance_tag": true,
+        "provenance_tag": 39004,
+        "contains_actor_tag": true,
+        "actor_tag": 39005,
+        "contains_datetime_tag": true,
+        "datetime_tag": 0
+      },
+      "valid": true
+    },
+    {
+      "name": "invalid_payload_exceeds_block",
+      "description": "Payload whose CBOR encoding exceeds 4032 bytes. Must be rejected by Block.setPayload() with PayloadTooLarge error.",
+      "block_type": "document",
+      "input_description": "A CBOR byte string of length 5000 (0x42 prefix + 5000 bytes). Exceeds PAYLOAD_SIZE.",
+      "input_payload_len": 5003,
+      "expected_error": "PayloadTooLarge",
+      "valid": false
+    },
+    {
+      "name": "invalid_checksum_mismatch",
+      "description": "Valid document payload but with corrupted checksum in header (0x00000000 instead of correct CRC32C). Block.validate() should return ChecksumMismatch.",
+      "block_type": "document",
+      "input_cbor_hex": "a365636c61696d6a7465737420636c61696d66736f757263656a746573745f736f75726365",
+      "input_cbor_diagnostic": "{\"claim\": \"test claim\", \"source\": \"test_source\"}",
+      "header_checksum": "0x00000000",
+      "correct_checksum_note": "CRC32C should be computed over full 4032-byte payload region (CBOR data + zero padding)",
+      "expected_error": "ChecksumMismatch",
+      "valid": false
+    },
+    {
+      "name": "valid_superblock_payload",
+      "description": "Superblock payload containing database metadata. Stored in block 0, type 0x0001. Struct layout: version(u32) + block_count(u64) + free_list_head(u64) + journal_head(u64) + journal_tail(u64) + root_collection_id(u64) + flags(u32) + created_at(u64) + last_checkpoint(u64) + reserved(3968 bytes).",
+      "block_type": "superblock",
+      "input_fields": {
+        "version": 1,
+        "block_count": 100,
+        "free_list_head": 7,
+        "journal_head": 5,
+        "journal_tail": 5,
+        "root_collection_id": 2,
+        "flags": 0,
+        "created_at": 1736600000000,
+        "last_checkpoint": 1736601000000
+      },
+      "expected": {
+        "within_bounds": true,
+        "is_binary_struct": true,
+        "struct_size_note": "Superblock struct is exactly 4032 bytes (including 3968 reserved)"
+      },
+      "valid": true
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lith-http-api
+  annotations:
+    # Production-specific annotations
+    nginx.ingress.kubernetes.io/limit-rps: "500"  # Higher limits
+    nginx.ingress.kubernetes.io/limit-connections: "200"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  tls:
+  - hosts:
+    - api.lith.io  # Production domain
+    secretName: lith-api-prod-tls
+  rules:
+  - host: api.lith.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: lith-http-api
+            port:
+              number: 80

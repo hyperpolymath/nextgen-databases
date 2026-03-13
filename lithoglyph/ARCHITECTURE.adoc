@@ -1,0 +1,277 @@
+= Lith Architecture
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+
+[.lead]
+Technical deep-dive into Lith's layered architecture.
+
+toc::[]
+
+== Overview
+
+Lith is structured as a stack of layers, each with a specific responsibility and language choice.
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────────┐
+│                    User Applications                        │
+├─────────────────────────────────────────────────────────────┤
+│  Form.ControlPlane (Elixir/OTP)                             │
+│  ├── Session management                                     │
+│  ├── Cluster coordination                                   │
+│  └── Port communication with core                           │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Runtime (Factor)                                      │
+│  ├── FQL parser                                             │
+│  ├── Query planner                                          │
+│  ├── Executor                                               │
+│  └── Introspection surfaces                                 │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Bridge (Zig)                                          │
+│  ├── Zig ABI surface (no C dependency)                      │
+│  ├── Safety governor                                        │
+│  └── Marshalling                                            │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Model (Forth)                                         │
+│  ├── Document collections                                   │
+│  ├── Edge collections                                       │
+│  ├── Schema metadata                                        │
+│  └── Migration artefacts                                    │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Blocks (Forth)                                        │
+│  ├── Fixed-size blocks                                      │
+│  ├── Append-only journal                                    │
+│  ├── Crash recovery                                         │
+│  └── Integrity checks                                       │
+├─────────────────────────────────────────────────────────────┤
+│                    File System                              │
+└─────────────────────────────────────────────────────────────┘
+----
+
+== Layer Details
+
+=== Form.Blocks (Truth Core - Storage)
+
+The lowest layer, responsible for durable storage.
+
+==== Responsibilities
+
+* **Block Management**: Fixed-size blocks with symbolic headers
+* **Journal**: Append-only log of all mutations
+* **Recovery**: Crash recovery from journal
+* **Integrity**: Checksums and repair guidance
+
+==== Key Invariants
+
+* Journal entries are written before block mutations
+* All blocks have deterministic text rendering
+* No hidden state or implicit behavior
+
+==== Data Structures
+
+[source,text]
+----
+Block:
+┌─────────────────────────────────────────┐
+│ Header (versioned, fixed layout)        │
+├─────────────────────────────────────────┤
+│ Payload (block-type specific)           │
+└─────────────────────────────────────────┘
+
+Journal Entry:
+┌─────────────────────────────────────────┐
+│ Sequence number                         │
+├─────────────────────────────────────────┤
+│ Operation type                          │
+├─────────────────────────────────────────┤
+│ Forward payload (what was done)         │
+├─────────────────────────────────────────┤
+│ Inverse payload (how to undo)           │
+├─────────────────────────────────────────┤
+│ Provenance IDs                          │
+└─────────────────────────────────────────┘
+----
+
+=== Form.Model (Truth Core - Logical)
+
+Multi-model logical layer built on blocks.
+
+==== Responsibilities
+
+* **Documents**: JSON-like document storage
+* **Edges**: Graph relationships between documents
+* **Schemas**: Type and constraint definitions
+* **Migrations**: Schema evolution artefacts
+
+==== Key Invariants
+
+* All operations translate to journaled block operations
+* Every operation has a defined inverse
+* Constraints produce explainable rejections
+
+=== Form.Bridge (Interop)
+
+Stable ABI boundary between core and runtimes. Written entirely in Zig with no C dependency.
+
+==== Responsibilities
+
+* **Zig ABI**: Platform-independent interface via Zig's stable ABI
+* **Safety Governor**: Validation at boundary
+* **Marshalling**: Data format translation
+
+==== API Design
+
+[source,zig]
+----
+/// All functions return status + optional error blob
+pub const FdbStatus = struct {
+    code: i32,
+    error_blob: ?[*]const u8,
+    error_len: usize,
+};
+
+/// Handles are opaque pointers
+pub const FdbDb = opaque {};
+pub const FdbTxn = opaque {};
+pub const FdbCursor = opaque {};
+
+/// Example: Open database
+pub export fn fdb_open(path: [*:0]const u8, path_len: usize) callconv(.C) FdbStatus {
+    // Zig provides C-compatible calling convention for FFI
+    // without requiring C headers or toolchain
+}
+----
+
+NOTE: Zig's `callconv(.C)` provides C-compatible calling convention for interop with Factor, Elixir ports, and other runtimes, but the implementation is pure Zig with no C headers or libc dependency.
+
+==== Bidirectional FFI
+
+Form.Bridge supports bidirectional communication—runtimes can call into the core, and the core can call back into runtimes for constraint checking, provenance validation, and proof verification.
+
+[source,zig]
+----
+/// Forward direction: Runtime → Core
+/// Used by FQL (Factor), FQLdt (Lean 4), Elixir control plane
+pub export fn fdb_insert(
+    db: *FdbDb,
+    collection: [*:0]const u8,
+    document: [*]const u8,
+    doc_len: usize,
+) callconv(.C) FdbStatus;
+
+/// Reverse direction: Core → Runtime
+/// For constraint checking, proof verification, provenance callbacks
+pub export fn fdb_register_constraint_checker(
+    db: *FdbDb,
+    checker: *const fn (doc: [*]const u8, len: usize) callconv(.C) bool,
+) callconv(.C) FdbStatus;
+
+pub export fn fdb_register_proof_verifier(
+    db: *FdbDb,
+    verifier: *const fn (proof: [*]const u8, len: usize) callconv(.C) bool,
+) callconv(.C) FdbStatus;
+----
+
+This enables:
+
+* **FQLdt integration**: Lean 4 can register proof verifiers that the core calls before committing
+* **Custom constraints**: Runtimes can implement domain-specific validators
+* **Provenance hooks**: External systems can be notified of data lineage events
+
+=== Form.Runtime (Query Layer)
+
+FQL parser, planner, and executor.
+
+==== Responsibilities
+
+* **Parser**: FQL syntax → AST
+* **Planner**: AST → execution plan
+* **Executor**: Plan → results
+* **Introspection**: Schema and constraint queries
+
+==== FQL Design
+
+FQL is not SQL. Key differences:
+
+|===
+| SQL | FQL
+
+| `SELECT * FROM t` | `SELECT FROM collection`
+| Implicit joins | Explicit edge traversal
+| `EXPLAIN` shows plan | `EXPLAIN` shows plan + rationale
+| No provenance | Optional provenance output
+|===
+
+=== Form.ControlPlane (Optional)
+
+Session and cluster management.
+
+==== Responsibilities
+
+* **Sessions**: User session lifecycle
+* **Supervision**: OTP supervisors for reliability
+* **Clustering**: Multi-node coordination
+
+==== Integration
+
+Control plane communicates with core via Erlang ports:
+
+[source,elixir]
+----
+# Simplified example
+defmodule Lith.Core do
+  use GenServer
+
+  def init(_) do
+    port = Port.open({:spawn, "lithoglyph-core"}, [:binary])
+    {:ok, %{port: port}}
+  end
+end
+----
+
+== Seam Checks
+
+Cross-layer invariants verified at stage freezes:
+
+=== B↔M (Blocks ↔ Model)
+
+* Every Model op maps to journaled Block ops
+* Every Model op has inverse mapping or classification
+
+=== M↔R (Model ↔ Runtime)
+
+* Constraints enforced identically via FQL or direct API
+* Introspection returns reason graphs + provenance
+
+=== B↔R (Blocks ↔ Runtime)
+
+* Runtime cannot commit without journal-first acknowledgement
+* Render tools work without Factor runtime
+
+== Blob Encoding
+
+For PoC, we use CBOR for ABI blobs:
+
+* Compact binary format
+* Schema-optional
+* Wide language support
+
+Regardless of encoding, all blobs have deterministic text rendering for audit purposes.
+
+== Concurrency Model
+
+* **Single-writer**: One transaction modifies at a time
+* **Multi-reader**: Concurrent read transactions
+* **MVCC**: (future) Multi-version concurrency control
+
+== Failure Modes
+
+|===
+| Failure | Recovery
+
+| Process crash during write | Replay journal from last checkpoint
+| Corruption detected | Integrity check → repair guidance
+| Constraint violation | Explainable rejection, no state change
+|===

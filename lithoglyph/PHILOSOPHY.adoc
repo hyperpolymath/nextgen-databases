@@ -1,0 +1,145 @@
+= Lith Philosophy
+:toc:
+:icons: font
+
+[.lead]
+The principles and values that guide Lith's design.
+
+== Core Thesis
+
+[quote]
+Schemas, constraints, migrations, blocks, and journals are narrative artefacts. The database is part of the story, not an opaque substrate.
+
+Traditional databases hide their internals. Lith exposes them as readable, auditable artefacts.
+
+== Value Hierarchy
+
+Lith explicitly prioritizes certain values over others:
+
+=== Auditability > Performance
+
+If a performance optimization obscures auditability, we don't make it.
+
+Every operation should be traceable. Every state change should be explainable. If we can't answer "why is this data here?" then we've failed.
+
+=== Meaning > Features
+
+Features that add capability but reduce meaning are rejected.
+
+A database full of features nobody understands is worse than a simple one everyone can audit. We add features only when they add meaning.
+
+=== Reversibility > Throughput
+
+If an optimization makes operations irreversible, we don't make it.
+
+The ability to understand "how did we get here?" and "what was the state at time T?" is more valuable than faster writes.
+
+=== Agent Understanding Required
+
+Human or AI agents must be able to understand the database state.
+
+This isn't just about documentation. The database itself must be readable. Blocks must render to meaningful text. Journals must tell coherent stories.
+
+== Design Principles
+
+=== Truth Core First, Porous Edges
+
+The truth core (Form.Blocks, Form.Model) is small, simple, and inviolable. Higher layers are convenience, not truth.
+
+[source,text]
+----
+                    ┌─────────────────┐
+                    │  Applications   │  ← Porous: flexible, adaptable
+                    ├─────────────────┤
+                    │    Runtime      │  ← Porous: language choice
+                    ├─────────────────┤
+                    │     Bridge      │  ← Boundary: stable ABI
+                    ├─────────────────┤
+                    │      Model      │  ← Truth Core: strict invariants
+                    ├─────────────────┤
+                    │     Blocks      │  ← Truth Core: strict invariants
+                    └─────────────────┘
+----
+
+=== Journal-First Semantics
+
+Every mutation is recorded in the journal before it's considered committed.
+
+This isn't just for durability—it's for meaning. The journal is the authoritative record of what happened and why.
+
+=== Constraints as Ethics
+
+Constraints aren't just validation rules. They're explainable ethical boundaries.
+
+When a constraint rejects an operation, it must explain:
+- What rule was violated
+- Why that rule exists
+- What would need to change for the operation to succeed
+
+=== Renderability is Non-Negotiable
+
+Every internal structure must have a deterministic text rendering.
+
+Not for debugging. For auditing. A human (or AI) must be able to read the database without specialized tools.
+
+== Anti-Patterns We Avoid
+
+=== Hidden State
+
+No global variables. No implicit caches. No magic.
+
+If state exists, it's in blocks. If a mutation happened, it's in the journal.
+
+=== Opaque Errors
+
+"Error code 42" is unacceptable.
+
+Every error must explain what happened, why it happened, and what to do about it.
+
+=== Implicit Behavior
+
+No auto-migrations. No background compaction without journaling. No silent fixes.
+
+Every action the database takes should be visible and reversible.
+
+=== Feature Creep
+
+Lith will never be a drop-in PostgreSQL replacement.
+
+We serve specific use cases (journalism, compliance, archives, agents) extremely well, rather than serving all use cases poorly.
+
+== Target Users
+
+=== Investigative Journalists
+
+Who need to prove data provenance and maintain audit trails for legal protection.
+
+=== Compliance Officers
+
+Who need to answer "what was the state at time T?" with legal certainty.
+
+=== Agentic Systems
+
+Where AI agents need to understand and reason about data state, not just query it.
+
+=== Cultural Archivists
+
+Who measure success in decades, not milliseconds.
+
+== What Lith Is Not
+
+* A performance-optimized OLTP database
+* A SQL database with extra features
+* A general-purpose data store
+* A distributed system (yet)
+
+== Conclusion
+
+Lith exists because we believe:
+
+1. Databases should be readable
+2. History should be preserved
+3. Constraints should explain themselves
+4. The database is part of the story
+
+If these beliefs resonate with you, welcome. If they don't, there are many excellent databases that prioritize other values.

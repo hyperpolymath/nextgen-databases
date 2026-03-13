@@ -1,0 +1,404 @@
+{
+  "description": "Test vectors for Lithoglyph WAL journal entries. Journal entry layout defined in spec/journal.adoc: 48-byte header (sequence(8) + timestamp(8) + op_type(2) + flags(2) + forward_len(4) + inverse_len(4) + provenance_len(4) + affected_block(8) + checksum(4) + entry_len(4)) followed by variable-length forward, inverse, and provenance payloads. All payloads are CBOR-encoded. Journal header magic: 0x4644424A ('FDBJ'). All multi-byte fields are little-endian.",
+  "constants": {
+    "JOURNAL_MAGIC": "0x4644424A",
+    "ENTRY_HEADER_SIZE": 48,
+    "MIN_ENTRY_SIZE": 21,
+    "MAX_ENTRY_SIZE": 10485760,
+    "JOURNAL_FORMAT_VERSION": 1
+  },
+  "operation_types": {
+    "DOC_INSERT": "0x0001",
+    "DOC_UPDATE": "0x0002",
+    "DOC_DELETE": "0x0003",
+    "DOC_REPLACE": "0x0004",
+    "EDGE_INSERT": "0x0010",
+    "EDGE_DELETE": "0x0011",
+    "EDGE_UPDATE": "0x0012",
+    "COLLECTION_CREATE": "0x0020",
+    "COLLECTION_DROP": "0x0021",
+    "SCHEMA_CREATE": "0x0030",
+    "SCHEMA_ALTER": "0x0031",
+    "CONSTRAINT_ADD": "0x0040",
+    "INDEX_CREATE": "0x0050",
+    "INDEX_DROP": "0x0051",
+    "CHECKPOINT": "0x0070",
+    "IRREVERSIBLE": "0xFF00"
+  },
+  "entry_flags": {
+    "COMMITTED": "bit 0 (0x0001)",
+    "ROLLED_BACK": "bit 1 (0x0002)",
+    "CHECKPOINT": "bit 2 (0x0004)",
+    "COMPRESSED": "bit 3 (0x0008)",
+    "IRREVERSIBLE": "bit 4 (0x0010)"
+  },
+  "vectors": [
+    {
+      "name": "valid_doc_insert_committed",
+      "description": "Committed document insert entry with forward, inverse, and provenance payloads. Represents inserting a new evidence document.",
+      "input_header": {
+        "sequence": 1234,
+        "timestamp": 1736600000000000,
+        "op_type": "0x0001 (DOC_INSERT)",
+        "flags": "0x0001 (COMMITTED)",
+        "forward_len": 89,
+        "inverse_len": 42,
+        "provenance_len": 156,
+        "affected_block": 42,
+        "checksum": "CRC32C of entire entry (header + all payloads)",
+        "entry_len": 335
+      },
+      "input_forward_payload_json": {
+        "collection": "evidence",
+        "document_id": "doc_abc123",
+        "fields": {
+          "claim": "Inflation at 10%",
+          "source": "ONS",
+          "prompt_score": 85
+        }
+      },
+      "input_inverse_payload_json": {
+        "delete": {
+          "collection": "evidence",
+          "document_id": "doc_abc123"
+        }
+      },
+      "input_provenance_payload_json": {
+        "actor": {
+          "id": "user_12345",
+          "type": "human",
+          "name": "Alice Smith"
+        },
+        "rationale": "Adding evidence from ONS inflation report",
+        "source": {
+          "type": "api",
+          "endpoint": "/api/v1/documents",
+          "request_id": "req_abc123"
+        },
+        "timestamp": "2026-01-11T12:00:00.000000Z",
+        "session_id": "sess_xyz789"
+      },
+      "expected": {
+        "entry_len_matches": true,
+        "checksum_valid": true,
+        "has_forward_payload": true,
+        "has_inverse_payload": true,
+        "has_provenance_payload": true,
+        "is_committed": true,
+        "is_reversible": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_doc_update_committed",
+      "description": "Committed document update with field-level forward and inverse payloads.",
+      "input_header": {
+        "sequence": 1235,
+        "timestamp": 1736600100000000,
+        "op_type": "0x0002 (DOC_UPDATE)",
+        "flags": "0x0001 (COMMITTED)",
+        "forward_len": 67,
+        "inverse_len": 72,
+        "provenance_len": 120,
+        "affected_block": 42,
+        "checksum": "CRC32C of entire entry",
+        "entry_len": 307
+      },
+      "input_forward_payload_json": {
+        "collection": "evidence",
+        "document_id": "doc_abc123",
+        "update_fields": {
+          "confidence": 0.95,
+          "tags": ["economic", "primary-source"]
+        }
+      },
+      "input_inverse_payload_json": {
+        "restore_fields": {
+          "confidence": null,
+          "tags": null
+        }
+      },
+      "input_provenance_payload_json": {
+        "actor": {
+          "id": "user_12345",
+          "type": "human"
+        },
+        "rationale": "Adding confidence score and tags after review",
+        "timestamp": "2026-01-11T12:01:40.000000Z"
+      },
+      "expected": {
+        "is_committed": true,
+        "is_reversible": true,
+        "inverse_restores_previous_values": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_doc_delete_committed",
+      "description": "Committed document deletion. The inverse payload contains the full document content for undo.",
+      "input_header": {
+        "sequence": 1300,
+        "timestamp": 1736610000000000,
+        "op_type": "0x0003 (DOC_DELETE)",
+        "flags": "0x0001 (COMMITTED)",
+        "forward_len": 42,
+        "inverse_len": 156,
+        "provenance_len": 130,
+        "affected_block": 42,
+        "checksum": "CRC32C of entire entry",
+        "entry_len": 376
+      },
+      "input_forward_payload_json": {
+        "collection": "evidence",
+        "document_id": "doc_abc123"
+      },
+      "input_inverse_payload_json": {
+        "restore": {
+          "collection": "evidence",
+          "document_id": "doc_abc123",
+          "content": {
+            "claim": "Inflation at 10%",
+            "source": "ONS",
+            "confidence": 0.95,
+            "tags": ["economic", "primary-source"],
+            "prompt_score": 85
+          }
+        }
+      },
+      "input_provenance_payload_json": {
+        "actor": {
+          "id": "admin_001",
+          "type": "system"
+        },
+        "rationale": "Removing duplicate evidence entry",
+        "source": {
+          "type": "cli",
+          "endpoint": "lith delete"
+        },
+        "timestamp": "2026-01-12T15:20:00.000000Z"
+      },
+      "expected": {
+        "is_committed": true,
+        "is_reversible": true,
+        "inverse_contains_full_document": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_collection_create",
+      "description": "Create a new collection entry in the journal.",
+      "input_header": {
+        "sequence": 1,
+        "timestamp": 1736500000000000,
+        "op_type": "0x0020 (COLLECTION_CREATE)",
+        "flags": "0x0001 (COMMITTED)",
+        "forward_len": 45,
+        "inverse_len": 28,
+        "provenance_len": 90,
+        "affected_block": 2,
+        "checksum": "CRC32C of entire entry",
+        "entry_len": 211
+      },
+      "input_forward_payload_json": {
+        "name": "evidence",
+        "schema": {
+          "claim": "text",
+          "source": "text",
+          "confidence": "float64"
+        }
+      },
+      "input_inverse_payload_json": {
+        "drop": {
+          "name": "evidence"
+        }
+      },
+      "expected": {
+        "is_committed": true,
+        "is_reversible": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_checkpoint_entry",
+      "description": "Checkpoint marker entry. Has empty inverse payload (checkpoints are irreversible markers). Uses CHECKPOINT flag.",
+      "input_header": {
+        "sequence": 1000,
+        "timestamp": 1736605000000000,
+        "op_type": "0x0070 (CHECKPOINT)",
+        "flags": "0x0005 (COMMITTED | CHECKPOINT)",
+        "forward_len": 48,
+        "inverse_len": 0,
+        "provenance_len": 72,
+        "affected_block": 0,
+        "checksum": "CRC32C of entire entry",
+        "entry_len": 168
+      },
+      "input_forward_payload_json": {
+        "blocks_verified": 500,
+        "journal_size": 10485760,
+        "head_sequence": 999,
+        "database_checksum": "0xABCDEF01"
+      },
+      "input_inverse_payload_json": null,
+      "input_provenance_payload_json": {
+        "actor": {
+          "id": "system",
+          "type": "system"
+        },
+        "rationale": "Periodic checkpoint (every 1000 entries)",
+        "timestamp": "2026-01-11T13:23:20.000000Z"
+      },
+      "expected": {
+        "is_committed": true,
+        "is_checkpoint": true,
+        "is_reversible": false,
+        "inverse_len_is_zero": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_rolled_back_entry",
+      "description": "An entry that was rolled back (transaction aborted). Both COMMITTED and ROLLED_BACK flags are clear, only ROLLED_BACK set.",
+      "input_header": {
+        "sequence": 1236,
+        "timestamp": 1736600200000000,
+        "op_type": "0x0001 (DOC_INSERT)",
+        "flags": "0x0002 (ROLLED_BACK)",
+        "forward_len": 55,
+        "inverse_len": 30,
+        "provenance_len": 80,
+        "affected_block": 50,
+        "checksum": "CRC32C of entire entry",
+        "entry_len": 213
+      },
+      "input_forward_payload_json": {
+        "collection": "evidence",
+        "document_id": "doc_xyz789",
+        "fields": {
+          "claim": "Rolled back claim",
+          "source": "INVALID"
+        }
+      },
+      "expected": {
+        "is_committed": false,
+        "is_rolled_back": true,
+        "should_skip_during_recovery": true
+      },
+      "valid": true
+    },
+    {
+      "name": "valid_compressed_entry",
+      "description": "Journal entry with LZ4-compressed payloads (COMPRESSED flag set). Payloads larger than 1024 bytes may be compressed.",
+      "input_header": {
+        "sequence": 2000,
+        "timestamp": 1736700000000000,
+        "op_type": "0x0004 (DOC_REPLACE)",
+        "flags": "0x0009 (COMMITTED | COMPRESSED)",
+        "forward_len": 800,
+        "inverse_len": 750,
+        "provenance_len": 100,
+        "affected_block": 42,
+        "checksum": "CRC32C of entire entry (over compressed data)",
+        "entry_len": 1698
+      },
+      "expected": {
+        "is_committed": true,
+        "is_compressed": true,
+        "payloads_must_be_decompressed_before_use": true
+      },
+      "valid": true
+    },
+    {
+      "name": "invalid_truncated_entry",
+      "description": "Incomplete journal entry where file ends before entry_len bytes are read. Used for crash recovery testing.",
+      "input_header": {
+        "sequence": 5000,
+        "timestamp": 1736800000000000,
+        "op_type": "0x0001 (DOC_INSERT)",
+        "flags": "0x0000 (no flags, not committed)",
+        "forward_len": 200,
+        "inverse_len": 150,
+        "provenance_len": 100,
+        "affected_block": 60,
+        "checksum": "0x00000000",
+        "entry_len": 498
+      },
+      "actual_bytes_available": 300,
+      "expected_error": "IncompleteEntry",
+      "recovery_action": "Discard entry during crash recovery (entry not committed, data truncated)",
+      "valid": false
+    },
+    {
+      "name": "invalid_checksum_mismatch",
+      "description": "Entry with correct structure but corrupted checksum. CRC32C does not match entry contents.",
+      "input_header": {
+        "sequence": 1237,
+        "timestamp": 1736600300000000,
+        "op_type": "0x0001 (DOC_INSERT)",
+        "flags": "0x0001 (COMMITTED)",
+        "forward_len": 40,
+        "inverse_len": 20,
+        "provenance_len": 60,
+        "affected_block": 43,
+        "checksum": "0xDEADBEEF (incorrect)",
+        "entry_len": 168
+      },
+      "expected_error": "ChecksumMismatch",
+      "recovery_action": "Discard entry during crash recovery",
+      "valid": false
+    },
+    {
+      "name": "invalid_entry_exceeds_max_size",
+      "description": "Entry with entry_len exceeding MAX_ENTRY_SIZE (10 MB). Must be rejected as invalid.",
+      "input_header": {
+        "sequence": 9999,
+        "timestamp": 1736900000000000,
+        "op_type": "0x0001 (DOC_INSERT)",
+        "flags": "0x0000",
+        "forward_len": 11000000,
+        "inverse_len": 0,
+        "provenance_len": 100,
+        "affected_block": 70,
+        "checksum": "0x00000000",
+        "entry_len": 11000148
+      },
+      "expected_error": "EntryTooLarge",
+      "valid": false
+    },
+    {
+      "name": "valid_journal_header",
+      "description": "Journal file header occupying the first block (4096 bytes). Contains database metadata for the journal.",
+      "input_fields": {
+        "magic": "0x4644424A (FDBJ)",
+        "format_version": 1,
+        "database_uuid": "550e8400-e29b-41d4-a716-446655440000",
+        "head_sequence": 1300,
+        "checkpoint_sequence": 1000,
+        "entry_count": 1300,
+        "file_size": 524288,
+        "reserved": "4008 bytes of zeros"
+      },
+      "expected": {
+        "magic_valid": true,
+        "version_valid": true,
+        "head_sequence_gte_checkpoint": true
+      },
+      "valid": true
+    },
+    {
+      "name": "invalid_journal_header_bad_magic",
+      "description": "Journal header with wrong magic bytes. Should be rejected during journal open.",
+      "input_fields": {
+        "magic": "0x00000000",
+        "format_version": 1,
+        "database_uuid": "550e8400-e29b-41d4-a716-446655440000",
+        "head_sequence": 0,
+        "checkpoint_sequence": 0,
+        "entry_count": 0,
+        "file_size": 4096
+      },
+      "expected_error": "InvalidJournalMagic",
+      "valid": false
+    }
+  ]
+}

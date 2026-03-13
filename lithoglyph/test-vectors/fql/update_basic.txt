@@ -1,0 +1,8 @@
+INPUT:
+UPDATE users SET email = "bob@new.com" WHERE name = "Bob"
+---
+PARSED:
+(update (collection "users") (set ("email" "bob@new.com")) (where (= "name" "Bob")))
+---
+RESULT:
+(ok (updated 0) (collection "users"))

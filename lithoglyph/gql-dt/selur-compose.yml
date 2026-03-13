@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-FileCopyrightText: 2026 hyperpolymath
+#
+# Docker Compose for FBQLdt development
+
+version: '3.8'
+
+services:
+  gqldt-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gqldt:dev
+    container_name: gqldt-dev
+    volumes:
+      - .:/workspace
+      - lean-cache:/root/.elan
+      - zig-cache:/workspace/bridge/zig/.zig-cache
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+volumes:
+  lean-cache:
+  zig-cache:

@@ -1,0 +1,8 @@
+INPUT:
+SELECT * FROM users OUTBOUND friends WHERE depth <= 2
+---
+PARSED:
+(select (fields *) (from "users") (edge outbound "friends") (where (<= "depth" 2)))
+---
+RESULT:
+(result-set (collection "users") (edge-traversal outbound "friends" (max-depth 2)) (documents []))

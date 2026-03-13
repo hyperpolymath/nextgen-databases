@@ -1,0 +1,8 @@
+INPUT:
+INSERT INTO users { "name": "Alice", "email": "alice@example.com" }
+---
+PARSED:
+(insert (into "users") (document {"name": "Alice", "email": "alice@example.com"}))
+---
+RESULT:
+(ok (inserted 1) (collection "users"))

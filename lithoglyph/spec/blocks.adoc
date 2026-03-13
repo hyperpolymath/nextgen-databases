@@ -1,0 +1,362 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Lithoglyph Block Storage Format
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:sectnums:
+
+[.lead]
+Specification for Lithoglyph's fixed-size block storage format.
+
+**Status**: PROPOSED (resolves Q-BLOCK-HEADER-001)
+
+toc::[]
+
+== Overview
+
+Lithoglyph stores all data in fixed-size blocks. Each block has a header that provides:
+
+* **Renderability**: Deterministic text representation for audit
+* **Integrity**: Checksums and validation
+* **Forward Compatibility**: Versioning and reserved space
+
+== Block Size
+
+**Decision**: 4096 bytes (4 KiB)
+
+**Rationale**:
+
+* Matches most filesystem block sizes and SSD page sizes
+* Provides good balance between space efficiency and I/O granularity
+* Small enough for fine-grained locking, large enough for meaningful payloads
+
+== Block Header Layout
+
+=== Fixed Fields (64 bytes total)
+
+[cols="1,1,2,3"]
+|===
+| Offset | Size | Field | Description
+
+| 0
+| 4
+| `magic`
+| Magic bytes: `FDB\x00` (0x46444200)
+
+| 4
+| 2
+| `version`
+| Block format version (current: 1)
+
+| 6
+| 2
+| `block_type`
+| Block type (see <<block-types>>)
+
+| 8
+| 8
+| `block_id`
+| Unique block identifier (uint64)
+
+| 16
+| 8
+| `sequence`
+| Journal sequence number at creation
+
+| 24
+| 8
+| `created_at`
+| Creation timestamp (Unix microseconds)
+
+| 32
+| 8
+| `modified_at`
+| Last modification timestamp (Unix microseconds)
+
+| 40
+| 4
+| `payload_len`
+| Actual payload length in bytes
+
+| 44
+| 4
+| `checksum`
+| CRC32C of payload
+
+| 48
+| 8
+| `prev_block_id`
+| Previous block in chain (0 if none)
+
+| 56
+| 4
+| `flags`
+| Block flags (see <<block-flags>>)
+
+| 60
+| 4
+| `reserved`
+| Reserved for future use (must be 0)
+|===
+
+=== Payload Area (4032 bytes)
+
+Bytes 64-4095 contain the block-type-specific payload.
+
+[source,text]
+----
+Block Layout (4096 bytes):
+┌─────────────────────────────────────────┐ 0
+│ magic [4]    │ version [2] │ type [2]  │
+├─────────────────────────────────────────┤ 8
+│ block_id [8]                            │
+├─────────────────────────────────────────┤ 16
+│ sequence [8]                            │
+├─────────────────────────────────────────┤ 24
+│ created_at [8]                          │
+├─────────────────────────────────────────┤ 32
+│ modified_at [8]                         │
+├─────────────────────────────────────────┤ 40
+│ payload_len [4]    │ checksum [4]       │
+├─────────────────────────────────────────┤ 48
+│ prev_block_id [8]                       │
+├─────────────────────────────────────────┤ 56
+│ flags [4]          │ reserved [4]       │
+├─────────────────────────────────────────┤ 64
+│                                         │
+│            Payload (4032 bytes)         │
+│                                         │
+└─────────────────────────────────────────┘ 4096
+----
+
+[[block-types]]
+== Block Types
+
+[cols="1,2,3"]
+|===
+| Value | Name | Description
+
+| 0x0000
+| `FREE`
+| Unused/deallocated block
+
+| 0x0001
+| `SUPERBLOCK`
+| Database metadata (exactly one per database)
+
+| 0x0010
+| `COLLECTION_META`
+| Collection definition and schema
+
+| 0x0011
+| `DOCUMENT`
+| Document data
+
+| 0x0012
+| `DOCUMENT_OVERFLOW`
+| Document overflow (large documents)
+
+| 0x0020
+| `EDGE_META`
+| Edge collection definition
+
+| 0x0021
+| `EDGE`
+| Edge data
+
+| 0x0030
+| `INDEX_ROOT`
+| Index root node
+
+| 0x0031
+| `INDEX_INTERNAL`
+| Index internal node
+
+| 0x0032
+| `INDEX_LEAF`
+| Index leaf node
+
+| 0x0040
+| `JOURNAL_SEGMENT`
+| Journal segment (multiple entries per block)
+
+| 0x0050
+| `SCHEMA`
+| Schema definition
+
+| 0x0051
+| `CONSTRAINT`
+| Constraint definition
+
+| 0x0060
+| `MIGRATION`
+| Migration artefact
+
+| 0xFF00-0xFFFF
+| Reserved
+| Reserved for extensions
+|===
+
+[[block-flags]]
+== Block Flags
+
+[cols="1,2,3"]
+|===
+| Bit | Name | Description
+
+| 0
+| `COMPRESSED`
+| Payload is LZ4-compressed
+
+| 1
+| `ENCRYPTED`
+| Payload is encrypted
+
+| 2
+| `CHAINED`
+| More blocks follow (overflow)
+
+| 3
+| `DELETED`
+| Logically deleted (awaiting compaction)
+
+| 4-31
+| Reserved
+| Must be 0
+|===
+
+== Superblock Structure
+
+The superblock (block_id = 0) contains database metadata:
+
+[cols="1,1,3"]
+|===
+| Offset | Size | Field
+
+| 0
+| 16
+| Database UUID
+
+| 16
+| 8
+| Journal head sequence
+
+| 24
+| 8
+| Last checkpoint sequence
+
+| 32
+| 8
+| Total block count
+
+| 40
+| 8
+| Free block count
+
+| 48
+| 8
+| Creation timestamp
+
+| 56
+| 64
+| Database name (UTF-8, null-padded)
+
+| 120
+| 3912
+| Reserved
+|===
+
+== Canonical Rendering
+
+All blocks MUST have a deterministic text representation for audit purposes.
+
+=== Header Rendering
+
+[source,text]
+----
+BLOCK block_id=42 version=1 type=DOCUMENT
+  sequence=1234 created=2026-01-11T12:00:00Z
+  payload_len=256 checksum=0xABCD1234
+  flags=[]
+----
+
+=== Document Block Rendering
+
+[source,text]
+----
+BLOCK block_id=42 version=1 type=DOCUMENT
+  sequence=1234 created=2026-01-11T12:00:00Z
+  payload_len=256 checksum=0xABCD1234
+  flags=[]
+PAYLOAD:
+  collection: "evidence"
+  document_id: "doc_abc123"
+  content: {
+    "claim": "Example claim",
+    "source": "ONS",
+    "prompt_score": 85
+  }
+----
+
+== Integrity
+
+=== Checksum Algorithm
+
+CRC32C (Castagnoli) of the payload bytes (64-4095).
+
+=== Validation Rules
+
+1. Magic bytes must be `FDB\x00`
+2. Version must be recognized (currently: 1)
+3. Block type must be valid
+4. Payload length must be <= 4032
+5. Checksum must match computed CRC32C
+6. Reserved fields must be 0
+
+=== Repair Guidance
+
+When validation fails, Lithoglyph provides structured guidance:
+
+[source,text]
+----
+BLOCK_VALIDATION_FAILED block_id=42
+  error: CHECKSUM_MISMATCH
+  expected: 0xABCD1234
+  actual: 0xDEADBEEF
+  recovery_options:
+    - RESTORE_FROM_JOURNAL: Reconstruct from journal entries
+    - MARK_CORRUPT: Flag block as corrupt, exclude from queries
+    - MANUAL_REPAIR: Export payload for manual inspection
+----
+
+== Versioning
+
+=== Format Version Semantics
+
+* Major version (high byte): Breaking changes
+* Minor version (low byte): Compatible additions
+
+Current version: `0x0001` (1.0)
+
+=== Forward Compatibility
+
+* Unknown block types are preserved but not interpreted
+* Unknown flags are ignored (and preserved)
+* Reserved fields must be zero but are preserved on copy
+
+== Test Vectors
+
+Golden test vectors in `test-vectors/blocks/`:
+
+* `superblock.bin` - Valid superblock
+* `superblock.txt` - Canonical rendering
+* `document_simple.bin` - Simple document block
+* `document_simple.txt` - Canonical rendering
+* `invalid_checksum.bin` - Block with wrong checksum
+* `invalid_magic.bin` - Block with wrong magic bytes
+
+== References
+
+* link:journal.adoc[Journal Format Specification]
+* link:rendering.adoc[Canonical Rendering Rules]

@@ -1,0 +1,8 @@
+INPUT:
+SELECT name, email FROM users WHERE age > 21
+---
+PARSED:
+(select (fields "name" "email") (from "users") (where (> "age" 21)))
+---
+RESULT:
+(result-set (collection "users") (fields "name" "email") (filter (> "age" 21)) (documents []))

@@ -1,0 +1,711 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Lith REST API - OpenAPI 3.1 Specification
+
+openapi: 3.1.0
+info:
+  title: Lith API
+  description: |
+    Narrative-first, reversible, audit-grade database API.
+
+    All operations support provenance tracking via the `X-Provenance-Actor`
+    and `X-Provenance-Rationale` headers.
+  version: 0.0.4
+  license:
+    name: PMPL-1.0-or-later
+    url: https://www.gnu.org/licenses/agpl-3.0.html
+  contact:
+    name: hyperpolymath
+    url: https://github.com/hyperpolymath/lith
+
+servers:
+  - url: http://localhost:8080/v1
+    description: Local development
+  - url: https://api.lith.example.com/v1
+    description: Production
+
+tags:
+  - name: Query
+    description: FDQL query execution
+  - name: Collections
+    description: Collection management
+  - name: Journal
+    description: Audit journal access
+  - name: Normalizer
+    description: Self-normalizing operations
+  - name: Migration
+    description: Schema migration operations
+  - name: Health
+    description: Health and metrics
+
+paths:
+  /query:
+    post:
+      tags: [Query]
+      summary: Execute FDQL query
+      description: |
+        Execute any FDQL statement (SELECT, INSERT, UPDATE, DELETE, etc.)
+        with optional provenance tracking.
+      operationId: executeQuery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+      responses:
+        '200':
+          description: Query executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Invalid FDQL syntax
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Execution error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /collections:
+    get:
+      tags: [Collections]
+      summary: List all collections
+      operationId: listCollections
+      responses:
+        '200':
+          description: List of collections
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CollectionList'
+    post:
+      tags: [Collections]
+      summary: Create a new collection
+      operationId: createCollection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCollectionRequest'
+      responses:
+        '201':
+          description: Collection created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+        '409':
+          description: Collection already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /collections/{name}:
+    get:
+      tags: [Collections]
+      summary: Get collection schema
+      operationId: getCollection
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Collection details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Collection'
+        '404':
+          description: Collection not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Collections]
+      summary: Drop collection
+      operationId: dropCollection
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Collection dropped
+        '404':
+          description: Collection not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /journal:
+    get:
+      tags: [Journal]
+      summary: Query journal entries
+      operationId: getJournal
+      parameters:
+        - name: since
+          in: query
+          description: Sequence number to start from
+          schema:
+            type: integer
+            minimum: 0
+        - name: limit
+          in: query
+          description: Maximum entries to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+        - name: collection
+          in: query
+          description: Filter by collection name
+          schema:
+            type: string
+        - name: actor
+          in: query
+          description: Filter by actor ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Journal entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalResponse'
+
+  /normalize/discover:
+    post:
+      tags: [Normalizer]
+      summary: Discover functional dependencies
+      operationId: discoverDependencies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiscoverRequest'
+      responses:
+        '200':
+          description: Discovered dependencies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiscoverResponse'
+
+  /normalize/analyze:
+    post:
+      tags: [Normalizer]
+      summary: Analyze normal form
+      operationId: analyzeNormalForm
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeRequest'
+      responses:
+        '200':
+          description: Normal form analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeResponse'
+
+  /migrate/start:
+    post:
+      tags: [Migration]
+      summary: Start a migration
+      operationId: startMigration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MigrationStartRequest'
+      responses:
+        '200':
+          description: Migration started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationResponse'
+
+  /migrate/{id}/shadow:
+    post:
+      tags: [Migration]
+      summary: Advance migration to shadow phase
+      operationId: advanceToShadow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Advanced to shadow phase
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationResponse'
+
+  /migrate/{id}/commit:
+    post:
+      tags: [Migration]
+      summary: Commit migration
+      operationId: commitMigration
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Migration committed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationResponse'
+
+  /migrate/{id}/abort:
+    post:
+      tags: [Migration]
+      summary: Abort migration
+      operationId: abortMigration
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Migration aborted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MigrationResponse'
+
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /metrics:
+    get:
+      tags: [Health]
+      summary: Prometheus metrics
+      operationId: getMetrics
+      responses:
+        '200':
+          description: Prometheus metrics
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  schemas:
+    QueryRequest:
+      type: object
+      required: [fdql]
+      properties:
+        fdql:
+          type: string
+          description: FDQL statement to execute
+          example: "SELECT * FROM articles WHERE status = 'published' LIMIT 10"
+        provenance:
+          $ref: '#/components/schemas/Provenance'
+        explain:
+          type: boolean
+          description: Return query plan instead of executing
+          default: false
+        analyze:
+          type: boolean
+          description: Execute and return timing information
+          default: false
+        verbose:
+          type: boolean
+          description: Include verbose output
+          default: false
+
+    QueryResponse:
+      type: object
+      properties:
+        rows:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        rowCount:
+          type: integer
+        journalSeq:
+          type: integer
+          description: Journal sequence number for this operation
+        plan:
+          $ref: '#/components/schemas/QueryPlan'
+        timing:
+          $ref: '#/components/schemas/Timing'
+
+    QueryPlan:
+      type: object
+      properties:
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanStep'
+        estimatedCost:
+          type: number
+        rationale:
+          type: string
+
+    PlanStep:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [scan, filter, project, limit, traverse, insert, update, delete]
+        collection:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    Timing:
+      type: object
+      properties:
+        parseMs:
+          type: number
+        planMs:
+          type: number
+        executeMs:
+          type: number
+        totalMs:
+          type: number
+
+    Provenance:
+      type: object
+      properties:
+        actor:
+          type: string
+          description: Actor identifier (user, system, agent)
+          example: "editor@news.org"
+        rationale:
+          type: string
+          description: Human-readable reason for the operation
+          example: "Daily content review"
+
+    Collection:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [document, edge]
+        schema:
+          $ref: '#/components/schemas/Schema'
+        documentCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        normalForm:
+          type: string
+          enum: [1NF, 2NF, 3NF, BCNF, unknown]
+
+    Schema:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/Field'
+        constraints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Constraint'
+
+    Field:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [string, integer, float, boolean, date, datetime, json, blob]
+        nullable:
+          type: boolean
+          default: true
+
+    Constraint:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [primary_key, unique, foreign_key, check, functional_dependency]
+        fields:
+          type: array
+          items:
+            type: string
+        expression:
+          type: string
+
+    CollectionList:
+      type: object
+      properties:
+        collections:
+          type: array
+          items:
+            $ref: '#/components/schemas/Collection'
+        total:
+          type: integer
+
+    CreateCollectionRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [document, edge]
+          default: document
+        schema:
+          $ref: '#/components/schemas/Schema'
+        provenance:
+          $ref: '#/components/schemas/Provenance'
+
+    JournalEntry:
+      type: object
+      properties:
+        seq:
+          type: integer
+          description: Sequence number
+        timestamp:
+          type: string
+          format: date-time
+        operation:
+          type: string
+          enum: [insert, update, delete, create_collection, drop_collection, migration]
+        collection:
+          type: string
+        documentId:
+          type: string
+        before:
+          type: object
+          additionalProperties: true
+        after:
+          type: object
+          additionalProperties: true
+        provenance:
+          $ref: '#/components/schemas/Provenance'
+        inverse:
+          type: string
+          description: FDQL statement to reverse this operation
+
+    JournalResponse:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/JournalEntry'
+        hasMore:
+          type: boolean
+        nextSeq:
+          type: integer
+
+    DiscoverRequest:
+      type: object
+      required: [collection]
+      properties:
+        collection:
+          type: string
+        sampleSize:
+          type: integer
+          default: 1000
+        confidenceThreshold:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 0.95
+
+    DiscoverResponse:
+      type: object
+      properties:
+        collection:
+          type: string
+        functionalDependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunctionalDependency'
+        candidateKeys:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+
+    FunctionalDependency:
+      type: object
+      properties:
+        determinant:
+          type: array
+          items:
+            type: string
+        dependent:
+          type: string
+        confidence:
+          type: number
+        tier:
+          type: string
+          enum: [high, medium, low]
+
+    AnalyzeRequest:
+      type: object
+      required: [collection]
+      properties:
+        collection:
+          type: string
+
+    AnalyzeResponse:
+      type: object
+      properties:
+        collection:
+          type: string
+        currentForm:
+          type: string
+          enum: [1NF, 2NF, 3NF, BCNF]
+        violations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Violation'
+        recommendations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recommendation'
+
+    Violation:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [partial_dependency, transitive_dependency, bcnf_violation]
+        description:
+          type: string
+        affectedFields:
+          type: array
+          items:
+            type: string
+
+    Recommendation:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [decompose, add_constraint, denormalize]
+        description:
+          type: string
+        targetForm:
+          type: string
+        migrationSteps:
+          type: array
+          items:
+            type: string
+
+    MigrationStartRequest:
+      type: object
+      required: [collection, targetForm]
+      properties:
+        collection:
+          type: string
+        targetForm:
+          type: string
+          enum: [2NF, 3NF, BCNF]
+        provenance:
+          $ref: '#/components/schemas/Provenance'
+
+    MigrationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        collection:
+          type: string
+        phase:
+          type: string
+          enum: [announce, shadow, commit, aborted, complete]
+        startedAt:
+          type: string
+          format: date-time
+        narrative:
+          type: string
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        version:
+          type: string
+        uptime:
+          type: integer
+          description: Uptime in seconds
+        checks:
+          type: object
+          additionalProperties:
+            type: string
+            enum: [pass, fail]
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - bearerAuth: []
+  - apiKey: []

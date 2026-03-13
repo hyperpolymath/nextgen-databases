@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lith-config
+  labels:
+    app: lith-http-api
+data:
+  # Phoenix configuration
+  PHX_SERVER: "true"
+  PORT: "4000"
+
+  # Cache configuration
+  CACHE_ENABLED: "true"
+  CACHE_TTL_SECONDS: "300"
+  CACHE_MAX_ENTRIES: "1000"
+
+  # Index configuration
+  SPATIAL_INDEX_MAX_ENTRIES: "8"
+  TEMPORAL_INDEX_ENABLED: "true"
+
+  # Observability
+  METRICS_ENABLED: "true"
+  METRICS_PORT: "4000"
+  METRICS_PATH: "/metrics"
+
+  # Logging
+  LOG_LEVEL: "info"
+  LOG_FORMAT: "json"
+
+  # Health check
+  HEALTH_CHECK_ENABLED: "true"
+  READINESS_CHECK_ENABLED: "true"
+
+  # Graceful shutdown
+  SHUTDOWN_GRACE_PERIOD_MS: "25000"
+
+  # CORS
+  CORS_ORIGINS: "https://app.lith.example.com,https://dashboard.lith.example.com"
+
+  # Rate limiting (application-level)
+  RATE_LIMIT_ENABLED: "true"
+  RATE_LIMIT_MAX_REQUESTS: "1000"
+  RATE_LIMIT_WINDOW_MS: "60000"

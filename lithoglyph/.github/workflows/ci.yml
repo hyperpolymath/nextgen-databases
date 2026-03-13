@@ -1,0 +1,124 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+#
+# Lithoglyph CI — Build and test all components
+#
+# Runs on push to main and all pull requests.
+# Tests: Zig core, Forth blocks, C FFI integration.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions: read-all
+
+jobs:
+  # ===========================================================================
+  # Job 1: Build and test core-zig
+  # ===========================================================================
+  build-zig:
+    name: Build & Test core-zig
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@7ab2955eb728f5440978d5824358023be3a2802d # v2.2.1
+        with:
+          version: '0.15.2'
+
+      - name: Build core-zig
+        working-directory: core-zig
+        run: zig build
+
+      - name: Run core-zig tests
+        working-directory: core-zig
+        run: zig build test
+
+      - name: Upload Zig build artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: zig-build
+          path: |
+            core-zig/zig-out/lib/
+          retention-days: 1
+
+  # ===========================================================================
+  # Job 2: Forth block tests
+  # ===========================================================================
+  test-forth:
+    name: Forth Block Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Install gforth
+        run: sudo apt-get update && sudo apt-get install -y gforth
+
+      - name: Run Forth block tests
+        working-directory: core-forth/test
+        run: gforth test-blocks.fs -e bye
+
+      - name: Verify Forth source files load
+        working-directory: core-forth/src
+        run: |
+          gforth lithoglyph-blocks.fs -e 'bye'
+          gforth lithoglyph-journal.fs -e 'bye'
+          gforth lithoglyph-model.fs -e 'bye'
+
+  # ===========================================================================
+  # Job 3: C FFI integration tests (depends on Zig build)
+  # ===========================================================================
+  test-ffi:
+    name: C FFI Integration Tests
+    runs-on: ubuntu-latest
+    needs: build-zig
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@7ab2955eb728f5440978d5824358023be3a2802d # v2.2.1
+        with:
+          version: '0.15.2'
+
+      - name: Build Zig libraries
+        working-directory: core-zig
+        run: zig build
+
+      - name: Compile C FFI integration tests
+        working-directory: core-zig
+        run: |
+          gcc -I../generated/abi \
+              -o test-ffi-integration \
+              test-ffi-integration.c \
+              -Lzig-out/lib \
+              -llith_bridge
+
+      - name: Run FFI integration tests
+        working-directory: core-zig
+        run: |
+          LD_LIBRARY_PATH=zig-out/lib ./test-ffi-integration
+
+      - name: Verify ABI exports
+        working-directory: core-zig
+        run: |
+          nm -D zig-out/lib/liblith_bridge.so | grep -q 'fdb_db_open'
+          nm -D zig-out/lib/liblith_bridge.so | grep -q 'fdb_apply'
+          nm -D zig-out/lib/liblith_bridge.so | grep -q 'fdb_version'
+          nm -D zig-out/lib/liblith_bridge.so | grep -q 'fdb_introspect_schema'

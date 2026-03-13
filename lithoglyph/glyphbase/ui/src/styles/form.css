@@ -1,0 +1,352 @@
+/* SPDX-License-Identifier: PMPL-1.0-or-later */
+/* Form View Styles */
+
+/* Form Container */
+.form-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.form-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Form Header */
+.form-header {
+  padding: 2rem 2rem 1rem 2rem;
+  text-align: center;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.form-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.form-description {
+  margin: 0;
+  font-size: 16px;
+  color: #6c757d;
+  line-height: 1.5;
+}
+
+/* Form Body */
+.form-body {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Form Field */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field-error .form-input,
+.form-field-error .form-select {
+  border-color: #dc3545;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.form-required {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* Form Inputs */
+.form-input,
+.form-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: inherit;
+  color: #495057;
+  background: white;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input::placeholder {
+  color: #adb5bd;
+}
+
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23495057' d='M4 6l4 4 4-4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+/* Checkbox */
+.form-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 14px;
+  color: #495057;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.form-checkbox-label:hover {
+  background: #f8f9fa;
+}
+
+.form-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+/* Error Message */
+.form-error-message {
+  font-size: 13px;
+  color: #dc3545;
+  margin-top: -0.25rem;
+}
+
+/* Error Banner */
+.form-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f8d7da;
+  border: 1px solid #f5c2c7;
+  border-radius: 6px;
+  color: #842029;
+  margin-bottom: 1rem;
+}
+
+.form-error-banner-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.form-error-banner-message {
+  flex: 1;
+  font-size: 14px;
+}
+
+.form-error-banner-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #842029;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.form-error-banner-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Submit Button */
+.form-submit-button {
+  padding: 0.875rem 2rem;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.form-submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.form-submit-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.form-submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Success State */
+.form-success {
+  padding: 3rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.form-success-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: white;
+  animation: successPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes successPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.form-success-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.form-success-message {
+  font-size: 16px;
+  color: #6c757d;
+  line-height: 1.5;
+  max-width: 400px;
+}
+
+.form-success-redirect {
+  margin-top: 0.5rem;
+  font-size: 14px;
+  color: #667eea;
+  font-style: italic;
+}
+
+/* Unsupported Field */
+.form-unsupported {
+  padding: 0.75rem;
+  background: #fff3cd;
+  border: 1px solid #ffecb5;
+  border-radius: 6px;
+  color: #664d03;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-view {
+    padding: 1rem;
+  }
+
+  .form-header {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+  }
+
+  .form-title {
+    font-size: 24px;
+  }
+
+  .form-description {
+    font-size: 14px;
+  }
+
+  .form-body {
+    padding: 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .form-input,
+  .form-select {
+    font-size: 16px; /* Prevent iOS zoom on focus */
+  }
+}
+
+@media (max-width: 480px) {
+  .form-view {
+    padding: 0;
+    background: white;
+  }
+
+  .form-container {
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 100vh;
+  }
+
+  .form-header {
+    padding: 1rem;
+  }
+
+  .form-title {
+    font-size: 20px;
+  }
+
+  .form-body {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .form-success {
+    padding: 2rem 1rem;
+  }
+
+  .form-success-icon {
+    width: 64px;
+    height: 64px;
+    font-size: 36px;
+  }
+
+  .form-success-title {
+    font-size: 20px;
+  }
+
+  .form-success-message {
+    font-size: 14px;
+  }
+}

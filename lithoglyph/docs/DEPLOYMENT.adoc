@@ -1,0 +1,1078 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Lith Deployment Guide
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:sectnums:
+
+[.lead]
+How to deploy Lith in development, staging, and production environments.
+
+[NOTE]
+====
+**Project Status: Proof of Concept**
+
+Lith is in active development. This guide describes the intended deployment model. Some features are planned but not yet implemented (marked with 🚧).
+====
+
+toc::[]
+
+== Overview
+
+Lith can be deployed in several configurations:
+
+[cols="1,2,2"]
+|===
+| Mode | Use Case | Components
+
+| **Embedded**
+| Single application, local data
+| Form.Blocks + Form.Model only
+
+| **Standalone**
+| Single server, multiple clients
+| Full stack without clustering
+
+| **Clustered**
+| High availability, horizontal scale
+| Full stack with Elixir control plane
+
+| **Serverless** 🚧
+| Event-driven, auto-scaling
+| Cloud-native with object storage
+|===
+
+== Development Setup
+
+=== Prerequisites
+
+[cols="1,1,2,1"]
+|===
+| Tool | Version | Purpose | Required
+
+| https://github.com/cisco/gforth[Gforth]
+| 0.7.3+
+| Form.Blocks, Form.Model (truth core)
+| Yes
+
+| https://factorcode.org/[Factor]
+| 0.99+
+| Form.Runtime (FQL parser/executor)
+| Yes
+
+| https://ziglang.org/[Zig]
+| 0.11+
+| Form.Bridge (stable ABI)
+| Yes
+
+| https://just.systems/[just]
+| 1.0+
+| Build orchestration
+| Yes
+
+| https://elixir-lang.org/[Elixir]
+| 1.15+
+| Form.ControlPlane (clustering)
+| Optional
+
+| https://www.docker.com/[Docker]
+| 24.0+
+| Container deployment
+| Optional
+
+| https://leanprover.github.io/[Lean 4]
+| 4.0+
+| FQLdt proofs (experimental)
+| Optional
+|===
+
+=== Installation
+
+.Fedora/RHEL
+[source,bash]
+----
+# Core dependencies
+sudo dnf install gforth
+
+# Zig (manual install)
+curl -LO https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz
+tar xf zig-linux-x86_64-0.11.0.tar.xz
+sudo mv zig-linux-x86_64-0.11.0 /opt/zig
+echo 'export PATH=$PATH:/opt/zig' >> ~/.bashrc
+
+# Just
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+
+# Factor (manual install from factorcode.org)
+
+# Optional: Elixir for control plane
+sudo dnf install elixir erlang
+----
+
+.Ubuntu/Debian
+[source,bash]
+----
+sudo apt update
+sudo apt install gforth
+
+# Zig, Just, Factor: see Fedora instructions or use official sources
+
+# Optional: Elixir
+sudo apt install elixir erlang-dev
+----
+
+.macOS
+[source,bash]
+----
+brew install gforth zig just elixir
+# Factor: download from factorcode.org
+----
+
+.NixOS / Nix
+[source,nix]
+----
+# shell.nix
+{ pkgs ? import <nixpkgs> {} }:
+pkgs.mkShell {
+  buildInputs = with pkgs; [
+    gforth
+    zig
+    just
+    factor-lang
+    elixir
+    erlang
+  ];
+}
+----
+
+=== Clone and Verify
+
+[source,bash]
+----
+git clone https://github.com/hyperpolymath/lith.git
+cd lith
+
+# Verify Gforth loads the core
+gforth core-forth/src/lith-blocks.fs -e "cr .\" OK\" cr bye"
+
+# Run tests (when available)
+just test
+----
+
+=== Development Server
+
+[source,bash]
+----
+# Start development server with hot reload
+just dev
+
+# Or manually:
+# 1. Start the Forth core
+gforth core-forth/src/lith-blocks.fs \
+       core-forth/src/lith-journal.fs \
+       core-forth/src/lith-model.fs
+
+# 2. Start the Factor runtime (when available)
+factor -run=lith.runtime
+
+# 3. Optional: Start Elixir control plane
+cd control-plane && mix phx.server
+----
+
+== Standalone Deployment
+
+Single-server deployment for small to medium workloads.
+
+=== Architecture
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────────┐
+│                      Client Applications                     │
+│              (FQL queries via HTTP/gRPC/Zig FFI)            │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│  Form.ControlPlane (Elixir/OTP) - Optional                  │
+│  ├── HTTP/gRPC API endpoints                                │
+│  ├── Connection pooling                                     │
+│  ├── Session management                                     │
+│  └── Metrics collection                                     │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Runtime (Factor)                                      │
+│  ├── FQL parser and planner                                 │
+│  ├── Query execution                                        │
+│  └── Introspection and explain                              │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Bridge (Zig)                                          │
+│  ├── Stable ABI for FFI                                     │
+│  └── Safety governor                                        │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Model (Forth)                                         │
+│  ├── Document collections                                   │
+│  ├── Edge collections                                       │
+│  └── Schema/constraint management                           │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Blocks (Forth)                                        │
+│  ├── 4 KiB block storage                                    │
+│  ├── Append-only journal                                    │
+│  └── Integrity verification                                 │
+├─────────────────────────────────────────────────────────────┤
+│  Storage Layer                                              │
+│  └── Local SSD / NVMe (recommended)                         │
+└─────────────────────────────────────────────────────────────┘
+----
+
+=== Configuration
+
+Lith uses a hierarchical configuration system:
+
+[source,text]
+----
+Priority (highest to lowest):
+1. Environment variables (LITH_*)
+2. Command-line flags
+3. Config file (lith.toml or lith.ncl)
+4. Built-in defaults
+----
+
+==== Configuration File
+
+.lith.toml
+[source,toml]
+----
+[server]
+bind = "0.0.0.0"
+port = 5432
+max_connections = 100
+
+[storage]
+data_dir = "/var/lib/lith/data"
+journal_dir = "/var/lib/lith/journal"
+block_size = 4096  # Do not change after init
+
+[journal]
+sync_mode = "fsync"  # fsync, fdatasync, async
+checkpoint_interval = "5m"
+max_segment_size = "256MB"
+
+[limits]
+max_document_size = "16MB"
+max_query_time = "30s"
+max_result_size = "100MB"
+
+[security]
+require_provenance = true
+min_rationale_length = 10
+
+[logging]
+level = "info"  # trace, debug, info, warn, error
+format = "json"
+output = "/var/log/lith/lith.log"
+
+[metrics]
+enabled = true
+port = 9090
+path = "/metrics"
+----
+
+==== Environment Variables
+
+[cols="2,1,2"]
+|===
+| Variable | Default | Description
+
+| `LITH_DATA_DIR`
+| `./data`
+| Data directory path
+
+| `LITH_JOURNAL_DIR`
+| `./journal`
+| Journal directory path
+
+| `LITH_BIND`
+| `127.0.0.1`
+| Bind address
+
+| `LITH_PORT`
+| `5432`
+| Listen port
+
+| `LITH_LOG_LEVEL`
+| `info`
+| Log verbosity
+
+| `LITH_SYNC_MODE`
+| `fsync`
+| Journal sync mode
+
+| `LITH_MAX_CONNECTIONS`
+| `100`
+| Maximum client connections
+
+| `LITH_REQUIRE_PROVENANCE`
+| `true`
+| Require provenance on mutations
+|===
+
+=== Directory Structure
+
+[source,text]
+----
+/var/lib/lith/
+├── data/
+│   ├── superblock.fdb       # Database metadata
+│   ├── collections/
+│   │   ├── evidence.fdb     # Collection blocks
+│   │   └── claims.fdb
+│   └── edges/
+│       └── supports.fdb     # Edge blocks
+├── journal/
+│   ├── 000001.journal       # Journal segments
+│   ├── 000002.journal
+│   └── checkpoint.meta      # Last checkpoint
+├── schemas/
+│   └── v1/                  # Schema versions
+└── config/
+    └── lith.toml          # Configuration
+----
+
+=== Systemd Service
+
+./etc/systemd/system/lith.service
+[source,ini]
+----
+[Unit]
+Description=Lith Database Server
+Documentation=https://github.com/hyperpolymath/lith
+After=network.target
+
+[Service]
+Type=notify
+User=lith
+Group=lith
+ExecStart=/usr/local/bin/lith serve --config /etc/lith/lith.toml
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5s
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/lith /var/log/lith
+PrivateTmp=true
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target
+----
+
+Enable and start:
+
+[source,bash]
+----
+sudo systemctl daemon-reload
+sudo systemctl enable lith
+sudo systemctl start lith
+sudo systemctl status lith
+----
+
+== Resource Sizing
+
+=== Minimum Requirements
+
+[cols="1,1,2"]
+|===
+| Resource | Minimum | Notes
+
+| CPU
+| 2 cores
+| Single-threaded Forth core + Factor runtime
+
+| RAM
+| 4 GB
+| 2 GB for runtime, 2 GB for OS/buffers
+
+| Storage
+| 20 GB SSD
+| SSD required, HDD not supported
+
+| Network
+| 100 Mbps
+| For client connections
+|===
+
+=== Recommended (Production)
+
+[cols="1,1,2"]
+|===
+| Resource | Recommended | Notes
+
+| CPU
+| 8+ cores
+| Parallelism in control plane
+
+| RAM
+| 32 GB
+| More RAM = larger buffer cache
+
+| Storage
+| 500 GB NVMe
+| Low latency critical for journal
+
+| Network
+| 1 Gbps+
+| For replication and client traffic
+|===
+
+=== Sizing Guidelines
+
+[cols="1,1,1,1"]
+|===
+| Workload | Documents | Daily Writes | Recommended Spec
+
+| Small
+| < 100K
+| < 10K
+| 2 CPU, 4 GB, 50 GB SSD
+
+| Medium
+| 100K - 1M
+| 10K - 100K
+| 4 CPU, 16 GB, 200 GB NVMe
+
+| Large
+| 1M - 10M
+| 100K - 1M
+| 8 CPU, 64 GB, 1 TB NVMe
+
+| Enterprise
+| 10M+
+| 1M+
+| 16+ CPU, 128+ GB, RAID NVMe
+|===
+
+=== Storage Calculations
+
+[source,text]
+----
+Estimated storage per document:
+  Block overhead: 64 bytes (header)
+  Average document: ~500 bytes
+  Journal entry: ~200 bytes
+  Total per document: ~764 bytes
+
+For 1 million documents:
+  Data: ~500 MB
+  Journal: ~200 MB (grows with writes)
+  Indexes: ~100 MB
+  Total: ~800 MB + journal history
+
+Journal retention:
+  Keep all: Unlimited audit trail
+  Keep 90 days: Typical for compliance
+  Keep 7 days: Minimal (not recommended)
+----
+
+== Docker Deployment
+
+=== Docker Image 🚧
+
+[source,dockerfile]
+----
+# Dockerfile
+FROM debian:bookworm-slim AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    gforth \
+    curl \
+    xz-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Zig
+RUN curl -LO https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz \
+    && tar xf zig-linux-x86_64-0.11.0.tar.xz \
+    && mv zig-linux-x86_64-0.11.0 /opt/zig
+
+# Copy source and build
+WORKDIR /app
+COPY . .
+RUN PATH=$PATH:/opt/zig just build
+
+# Runtime image
+FROM debian:bookworm-slim
+
+RUN apt-get update && apt-get install -y gforth && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /app/target/lith /usr/local/bin/
+COPY --from=builder /app/core-forth /opt/lith/core-forth
+
+# Create lith user
+RUN useradd -r -s /bin/false lith \
+    && mkdir -p /var/lib/lith /var/log/lith \
+    && chown -R lith:lith /var/lib/lith /var/log/lith
+
+USER lith
+WORKDIR /var/lib/lith
+
+EXPOSE 5432 9090
+
+VOLUME ["/var/lib/lith"]
+
+ENTRYPOINT ["lith"]
+CMD ["serve"]
+----
+
+=== Docker Compose
+
+.docker-compose.yml
+[source,yaml]
+----
+version: '3.8'
+
+services:
+  lith:
+    image: hyperpolymath/lith:latest
+    container_name: lith
+    ports:
+      - "5432:5432"   # Main port
+      - "9090:9090"   # Metrics
+    volumes:
+      - lith-data:/var/lib/lith
+      - ./lith.toml:/etc/lith/lith.toml:ro
+    environment:
+      - LITH_LOG_LEVEL=info
+      - LITH_SYNC_MODE=fsync
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "lith", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  lith-data:
+    driver: local
+----
+
+Run:
+
+[source,bash]
+----
+docker-compose up -d
+docker-compose logs -f lith
+----
+
+=== Docker Commands
+
+[source,bash]
+----
+# Run standalone
+docker run -d \
+  --name lith \
+  -p 5432:5432 \
+  -v lith-data:/var/lib/lith \
+  hyperpolymath/lith:latest
+
+# Execute FQL query
+docker exec lith lith query 'SELECT * FROM evidence;'
+
+# Backup
+docker exec lith lith backup /backup
+docker cp lith:/backup ./lith-backup-$(date +%Y%m%d)
+
+# View logs
+docker logs -f lith
+
+# Health check
+docker exec lith lith health
+----
+
+== Kubernetes Deployment 🚧
+
+=== Helm Chart
+
+[source,bash]
+----
+# Add Helm repository
+helm repo add hyperpolymath https://charts.hyperpolymath.dev
+helm repo update
+
+# Install Lith
+helm install lith hyperpolymath/lith \
+  --namespace lith \
+  --create-namespace \
+  --set persistence.size=100Gi \
+  --set resources.requests.memory=8Gi
+
+# Upgrade
+helm upgrade lith hyperpolymath/lith \
+  --namespace lith \
+  --set image.tag=0.1.0
+----
+
+=== Kubernetes Manifests
+
+.lith-deployment.yaml
+[source,yaml]
+----
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lith
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lith-data
+  namespace: lith
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd  # Use SSD storage class
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: lith
+  namespace: lith
+spec:
+  serviceName: lith
+  replicas: 1  # Single node for standalone
+  selector:
+    matchLabels:
+      app: lith
+  template:
+    metadata:
+      labels:
+        app: lith
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: lith
+          image: hyperpolymath/lith:latest
+          ports:
+            - containerPort: 5432
+              name: lith
+            - containerPort: 9090
+              name: metrics
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/lith
+            - name: config
+              mountPath: /etc/lith
+          resources:
+            requests:
+              cpu: "2"
+              memory: 8Gi
+            limits:
+              cpu: "4"
+              memory: 16Gi
+          livenessProbe:
+            exec:
+              command: ["lith", "health"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["lith", "health", "--ready"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: lith-data
+        - name: config
+          configMap:
+            name: lith-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lith
+  namespace: lith
+spec:
+  selector:
+    app: lith
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: lith
+    - port: 9090
+      targetPort: 9090
+      name: metrics
+----
+
+== Cloud Provider Guides
+
+=== AWS
+
+==== EC2 Deployment
+
+[source,bash]
+----
+# Recommended instance types
+# - Development: t3.medium (2 vCPU, 4 GB)
+# - Production: r6i.xlarge (4 vCPU, 32 GB)
+# - High-performance: r6i.4xlarge (16 vCPU, 128 GB)
+
+# Use gp3 or io2 EBS volumes for storage
+# Minimum IOPS: 3000 (gp3 default)
+# Recommended: 10000+ IOPS for production
+----
+
+==== EBS Configuration
+
+[source,bash]
+----
+# Create optimized EBS volume
+aws ec2 create-volume \
+  --availability-zone us-east-1a \
+  --size 500 \
+  --volume-type gp3 \
+  --iops 10000 \
+  --throughput 500 \
+  --tag-specifications 'ResourceType=volume,Tags=[{Key=Name,Value=lith-data}]'
+----
+
+==== S3 for Backups
+
+[source,bash]
+----
+# Backup to S3
+lith backup /tmp/backup
+aws s3 sync /tmp/backup s3://my-bucket/lith-backups/$(date +%Y%m%d)/
+
+# Restore from S3
+aws s3 sync s3://my-bucket/lith-backups/20260112/ /tmp/restore
+lith restore /tmp/restore
+----
+
+=== Google Cloud Platform
+
+==== Compute Engine
+
+[source,bash]
+----
+# Recommended machine types
+# - Development: e2-medium (2 vCPU, 4 GB)
+# - Production: n2-highmem-4 (4 vCPU, 32 GB)
+# - High-performance: n2-highmem-16 (16 vCPU, 128 GB)
+
+# Create VM with SSD
+gcloud compute instances create lith-server \
+  --machine-type=n2-highmem-4 \
+  --zone=us-central1-a \
+  --boot-disk-size=50GB \
+  --boot-disk-type=pd-ssd \
+  --create-disk=name=lith-data,size=500GB,type=pd-ssd,auto-delete=no
+----
+
+==== Cloud Storage for Backups
+
+[source,bash]
+----
+# Backup to GCS
+lith backup /tmp/backup
+gsutil -m rsync -r /tmp/backup gs://my-bucket/lith-backups/$(date +%Y%m%d)/
+----
+
+=== Azure
+
+==== Virtual Machines
+
+[source,bash]
+----
+# Recommended VM sizes
+# - Development: Standard_D2s_v3 (2 vCPU, 8 GB)
+# - Production: Standard_E4s_v3 (4 vCPU, 32 GB)
+# - High-performance: Standard_E16s_v3 (16 vCPU, 128 GB)
+
+# Create VM with Premium SSD
+az vm create \
+  --resource-group lith-rg \
+  --name lith-server \
+  --size Standard_E4s_v3 \
+  --image Debian:debian-12:12:latest \
+  --data-disk-sizes-gb 500 \
+  --storage-sku Premium_LRS
+----
+
+== High Availability 🚧
+
+=== Clustered Architecture
+
+[source,text]
+----
+                    ┌─────────────────┐
+                    │  Load Balancer  │
+                    └────────┬────────┘
+                             │
+         ┌───────────────────┼───────────────────┐
+         │                   │                   │
+         ▼                   ▼                   ▼
+┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│  Lith Node 1  │ │  Lith Node 2  │ │  Lith Node 3  │
+│  (Primary)      │ │  (Replica)      │ │  (Replica)      │
+│                 │ │                 │ │                 │
+│  Control Plane  │ │  Control Plane  │ │  Control Plane  │
+│  ─────────────  │ │  ─────────────  │ │  ─────────────  │
+│  Runtime        │ │  Runtime        │ │  Runtime        │
+│  ─────────────  │ │  ─────────────  │ │  ─────────────  │
+│  Storage        │ │  Storage        │ │  Storage        │
+└────────┬────────┘ └────────┬────────┘ └────────┬────────┘
+         │                   │                   │
+         └───────────────────┴───────────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │  Shared Journal │
+                    │  (Raft/Paxos)   │
+                    └─────────────────┘
+----
+
+=== Replication Modes
+
+[cols="1,2,2"]
+|===
+| Mode | Description | Use Case
+
+| **Synchronous**
+| All replicas confirm before commit
+| Maximum durability, highest latency
+
+| **Asynchronous**
+| Primary confirms immediately
+| Lower latency, potential data loss
+
+| **Semi-synchronous**
+| At least one replica confirms
+| Balance of durability and latency
+|===
+
+== Backup and Recovery
+
+=== Backup Strategy
+
+[source,bash]
+----
+# Full backup
+lith backup --full /backup/full-$(date +%Y%m%d)
+
+# Incremental backup (journal segments since last backup)
+lith backup --incremental --since 1000 /backup/incr-$(date +%Y%m%d)
+
+# Continuous backup (stream journal to remote)
+lith backup --stream s3://my-bucket/lith-journal/
+----
+
+=== Backup Schedule
+
+[cols="1,2,2"]
+|===
+| Type | Frequency | Retention
+
+| Full backup
+| Weekly (Sunday 02:00)
+| 4 weeks
+
+| Incremental
+| Daily (02:00)
+| 7 days
+
+| Journal stream
+| Continuous
+| 90 days
+|===
+
+=== Recovery
+
+[source,bash]
+----
+# Restore from full backup
+lith restore /backup/full-20260112
+
+# Restore to point in time
+lith restore /backup/full-20260112 --to-sequence 5000
+
+# Restore to timestamp
+lith restore /backup/full-20260112 --to-time "2026-01-12T10:30:00Z"
+
+# Verify restoration
+lith doctor --verify
+----
+
+== Upgrades
+
+=== Upgrade Process
+
+[source,bash]
+----
+# 1. Check compatibility
+lith doctor --check-upgrade --to-version 0.2.0
+
+# 2. Backup current state
+lith backup --full /backup/pre-upgrade-$(date +%Y%m%d)
+
+# 3. Stop service
+sudo systemctl stop lith
+
+# 4. Install new version
+# (package manager or manual)
+
+# 5. Run migrations if needed
+lith migrate --to-version 0.2.0
+
+# 6. Start service
+sudo systemctl start lith
+
+# 7. Verify
+lith doctor --verify
+lith query 'INTROSPECT VERSION;'
+----
+
+=== Rollback
+
+[source,bash]
+----
+# If upgrade fails
+sudo systemctl stop lith
+
+# Restore previous version binary
+# ...
+
+# Restore from backup
+lith restore /backup/pre-upgrade-20260112
+
+sudo systemctl start lith
+----
+
+== Health Checks
+
+=== CLI Health Check
+
+[source,bash]
+----
+# Basic health
+lith health
+
+# Detailed health
+lith health --verbose
+
+# Output:
+# Lith Health Check
+# ===================
+# Status: HEALTHY
+#
+# Components:
+#   Storage: OK (500 GB free)
+#   Journal: OK (1523 entries, synced)
+#   Runtime: OK (uptime: 5d 12h)
+#   Connections: OK (12/100)
+#
+# Last checkpoint: 2026-01-12T10:00:00Z
+# Journal lag: 0 entries
+----
+
+=== HTTP Health Endpoints
+
+[cols="1,1,2"]
+|===
+| Endpoint | Response | Purpose
+
+| `GET /health`
+| 200 OK
+| Basic liveness
+
+| `GET /health/ready`
+| 200 OK / 503
+| Readiness (can accept queries)
+
+| `GET /health/live`
+| 200 OK / 503
+| Liveness (process running)
+
+| `GET /health/storage`
+| JSON status
+| Storage subsystem health
+
+| `GET /health/journal`
+| JSON status
+| Journal subsystem health
+|===
+
+== Troubleshooting
+
+=== Common Issues
+
+==== "Permission denied" on data directory
+
+[source,bash]
+----
+# Fix ownership
+sudo chown -R lith:lith /var/lib/lith
+
+# Fix permissions
+sudo chmod -R 750 /var/lib/lith
+----
+
+==== "Journal sync failed"
+
+[source,bash]
+----
+# Check disk space
+df -h /var/lib/lith
+
+# Check disk I/O
+iostat -x 1
+
+# Switch to async mode temporarily (data loss risk!)
+LITH_SYNC_MODE=async lith serve
+----
+
+==== "Too many open files"
+
+[source,bash]
+----
+# Check current limit
+ulimit -n
+
+# Increase limit
+sudo bash -c 'echo "lith soft nofile 65536" >> /etc/security/limits.conf'
+sudo bash -c 'echo "lith hard nofile 65536" >> /etc/security/limits.conf'
+
+# For systemd service, add to [Service]:
+# LimitNOFILE=65536
+----
+
+==== "Out of memory"
+
+[source,bash]
+----
+# Check memory usage
+free -h
+ps aux | grep lith
+
+# Reduce buffer cache (in lith.toml)
+# [storage]
+# buffer_cache_size = "1GB"
+----
+
+== See Also
+
+* link:OBSERVABILITY.adoc[Observability Guide] - Monitoring and metrics
+* link:SECURITY-AUTH.adoc[Security & Auth] - Authentication and hardening
+* link:../ARCHITECTURE.adoc[Architecture Guide] - System design
+* link:../VERSIONING.adoc[Versioning Policy] - Upgrade compatibility

@@ -1,0 +1,344 @@
+image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
+image:https://img.shields.io/badge/Powered_by-Idris-purple.svg[Powered by Idris,link="https://www.idris-lang.org/"]
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: 2025 hyperpolymath
+
+= Glyphbase
+:toc:
+:toc-placement: preamble
+:toclevels: 3
+
+[.lead]
+*Carve your data in stone.*
+
+_The open-source Airtable alternative with permanence, powered by formal verification._
+
+== What is Glyphbase?
+
+Glyphbase is a spreadsheet-database hybrid built on link:https://github.com/hyperpolymath/lithoglyph[Lithoglyph]. Unlike traditional spreadsheet tools, every change is carved in stone - tracked with who made it, when, and why - and fully reversible forever.
+
+=== Key Features
+
+[cols="1,2"]
+|===
+| Feature | Description
+
+| *Provenance by default*
+| Every cell change records who, when, and why - not optional
+
+| *Full reversibility*
+| Undo any change, forever, with mathematical proof
+
+| *Cloud-safe*
+| Sync via Dropbox/GDrive without corruption (append-only)
+
+| *Self-hosted*
+| Your data stays on your servers
+
+| *PROMPT scores*
+| Research-grade data quality scoring
+
+| *Multiple views*
+| Grid, Kanban, Calendar, Gallery, Form
+|===
+
+== Quick Start
+
+[source,bash]
+----
+# Clone the repo
+git clone https://github.com/hyperpolymath/glyphbase
+cd glyphbase
+
+# Start the server (requires Gleam and Lithoglyph)
+cd server && gleam run
+
+# Start the UI (requires Deno)
+cd ../ui && deno task dev
+
+# Open in browser
+open http://localhost:3000
+----
+
+== Screenshots
+
+_Coming soon_
+
+== Architecture
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────────┐
+│  Browser UI (ReScript + React)                              │
+│  • rescript-dom-mounter (high-assurance rendering)          │
+│  • Proven library integration (Idris formal verification)   │
+│  Grid | Kanban | Calendar | Gallery | Form Builder          │
+├─────────────────────────────────────────────────────────────┤
+│  Real-time Collaboration (WebSocket + Yjs CRDT)             │
+├─────────────────────────────────────────────────────────────┤
+│  API Server (Gleam on BEAM)                                 │
+│  REST + WebSocket + Automations                             │
+├─────────────────────────────────────────────────────────────┤
+│  Lithoglyph Engine                                          │
+│  Provenance | Reversibility | PROMPT Scores                 │
+├─────────────────────────────────────────────────────────────┤
+│  Formal Verification Layer (Idris2)                         │
+│  Type-level guarantees | Correctness proofs                 │
+├─────────────────────────────────────────────────────────────┤
+│  Storage: Local | Dropbox | GDrive | S3                     │
+└─────────────────────────────────────────────────────────────┘
+----
+
+== Views
+
+=== Grid View
+Spreadsheet-like interface with sorting, filtering, grouping, and column customization.
+
+=== Kanban View
+Drag-and-drop cards between columns, grouped by any select field.
+
+=== Calendar View
+Events displayed on a calendar, driven by date fields.
+
+=== Gallery View
+Cards with images, perfect for visual content.
+
+=== Form View
+Public or private forms for data collection, with automatic provenance.
+
+== Field Types
+
+[cols="1,1,2"]
+|===
+| Type | Icon | Notes
+
+| Text | Aa | Single or multi-line
+| Number | # | Integer or decimal, with units
+| Select | ▼ | Single or multi-select
+| Date | 📅 | Date, datetime, or date range
+| Checkbox | ☑ | Boolean
+| Link | 🔗 | Link to another table (foreign key)
+| Attachment | 📎 | Files, images, documents
+| Formula | fx | Computed from other fields
+| Rollup | Σ | Aggregate linked records
+| Lookup | 👁 | Pull field from linked record
+| URL | 🌐 | Web links
+| Email | ✉ | Email addresses
+| Phone | ☎ | Phone numbers
+| Rating | ⭐ | 1-5 stars
+| Barcode | ▮▮▮ | QR codes, barcodes
+|===
+
+== Lithoglyph Superpowers
+
+These features are unique to Glyphbase because of the Lithoglyph backend:
+
+=== Provenance View
+Click any cell to see its complete history: who changed it, when, and their stated rationale.
+
+=== Time Travel
+View your entire base at any point in history. Compare snapshots.
+
+=== PROMPT Scores
+Rate data quality on six dimensions: Provenance, Replicability, Objectivity, Methodology, Publication, Transparency.
+
+=== Proof Export
+Generate audit-grade documentation with cryptographic proofs of data integrity.
+
+=== DOI Linking
+Link records to canonical sources. DOI-linked records are immutable; edits create "play variants."
+
+== Automations
+
+[cols="1,1"]
+|===
+| Triggers | Actions
+
+| Row created
+| Send webhook
+
+| Field changed
+| Send email
+
+| Form submitted
+| Post to Slack
+
+| Scheduled (cron)
+| Run script
+
+| PROMPT score below threshold
+| Flag for review
+|===
+
+== Comparison
+
+[cols="1,1,1,1,1"]
+|===
+| Feature | Airtable | NocoDB | Baserow | *Glyphbase*
+
+| Self-hosted
+| ❌
+| ✓
+| ✓
+| ✓
+
+| Open source
+| ❌
+| ✓
+| ✓
+| ✓
+
+| Provenance tracking
+| ❌
+| ❌
+| ❌
+| ✓ *Built-in*
+
+| Full undo history
+| Limited
+| Limited
+| Limited
+| ✓ *Forever*
+
+| Cloud sync safe
+| N/A
+| ❌
+| ❌
+| ✓ *Append-only*
+
+| Data quality scores
+| ❌
+| ❌
+| ❌
+| ✓ *PROMPT*
+
+| Offline-first
+| ❌
+| ❌
+| ❌
+| ✓
+
+| Your data ownership
+| ❌
+| ✓
+| ✓
+| ✓
+|===
+
+== Roadmap
+
+=== v0.1.0 - Core Grid ✓ _Complete_
+* [x] Create/delete bases and tables
+* [x] Add/edit/delete rows
+* [x] Core field types (text, number, date, select, checkbox)
+* [x] Sort, filter, hide columns
+* [x] Keyboard navigation
+* [x] Column resizing
+* [x] Search across all cells
+* [x] Undo/redo with full history
+
+=== v0.2.0 - Views ✓ _Complete_
+* [x] Kanban view (drag-and-drop)
+* [x] Calendar view (month/week/day)
+* [x] Gallery view (grid/masonry)
+* [x] Form builder (public forms)
+
+=== v0.3.0 - Backend Integration ✓ _Complete_
+* [x] Idris2 ABI definitions (formal proofs)
+* [x] Zig FFI implementation (C-compatible)
+* [x] NIF builds successfully (504KB shared library)
+* [ ] Wire up Lithoglyph database (backend pending)
+* [ ] Provenance tracking integration (backend pending)
+* [ ] CBOR operation encoding (backend pending)
+
+=== v0.4.0 - Formal Verification ✓ _Complete_
+* [x] rescript-dom-mounter (high-assurance rendering)
+* [x] Proven library integration (Idris2 proofs)
+* [x] Type-level guarantees for cell data integrity
+* [x] Formal proofs for critical operations
+
+=== v0.5.0 - Real-time Collaboration ✓ _Complete - UI Ready_
+* [x] Real-time collaboration (WebSocket + Yjs CRDT)
+* [x] Live cursors and presence indicators
+* [x] Cell comments and @mentions
+* [x] 97/97 modules compiling successfully
+* [x] Production build: 65.66 kB gzipped (exceptional!)
+* [x] Preview server running and tested
+
+=== v0.6.0 - Automations _(Next Priority)_
+* [ ] Trigger/action system
+* [ ] Webhooks
+* [ ] Email notifications
+* [ ] Scheduled tasks
+
+=== v0.5.0 - Lithoglyph Superpowers
+* [ ] Provenance view
+* [ ] Time travel UI
+* [ ] PROMPT scoring
+* [ ] Proof export
+
+== Tech Stack
+
+[cols="1,2"]
+|===
+| Layer | Technology
+
+| UI Framework
+| ReScript + React
+
+| High-Assurance Rendering
+| link:https://github.com/hyperpolymath/rescript-dom-mounter[rescript-dom-mounter]
+
+| Formal Verification
+| link:https://github.com/hyperpolymath/proven[Proven] (Idris2 proofs)
+
+| State Management
+| Jotai
+
+| Grid Component
+| Custom (accessibility-first)
+
+| Real-time
+| WebSocket + Yjs
+
+| Backend
+| Gleam on BEAM
+
+| Database
+| Lithoglyph
+
+| ABI/FFI
+| link:server/ABI-FFI-README.md[Idris2 ABI + Zig FFI] (formal verification)
+
+| Auth
+| Magic link + OIDC
+
+| Deploy
+| Podman / Docker
+|===
+
+== Related Projects
+
+* link:https://github.com/hyperpolymath/lith[Lithoglyph] - The narrative-first database engine
+* link:https://github.com/hyperpolymath/fqldt[GQLdt] - Dependently-typed query language
+* link:https://github.com/hyperpolymath/lith-studio[Lithoglyph Studio] - Admin GUI for Lithoglyph
+* link:https://github.com/hyperpolymath/lith-debugger[Lithoglyph Debugger] - Proof-carrying recovery tool
+* link:https://github.com/hyperpolymath/bofig[BoFIG] - Evidence graph for journalism
+* link:https://github.com/hyperpolymath/zotero-lith[Zotero-Lithoglyph] - Reference manager
+
+== License
+
+PMPL-1.0-or-later
+
+== Contributing
+
+See link:CONTRIBUTING.adoc[CONTRIBUTING.adoc] for guidelines.
+
+== Acknowledgements
+
+Inspired by:
+
+* link:https://airtable.com[Airtable] - The UX gold standard
+* link:https://github.com/nocodb/nocodb[NocoDB] - Open source Airtable alternative
+* link:https://github.com/bram2w/baserow[Baserow] - Self-hosted database
+* link:https://github.com/gristlabs/grist-core[Grist] - Spreadsheet with formulas

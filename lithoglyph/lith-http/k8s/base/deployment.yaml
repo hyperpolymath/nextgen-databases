@@ -1,0 +1,183 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lith-http-api
+  labels:
+    app: lith-http-api
+    version: v1.0.0
+    component: api
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: lith-http-api
+  template:
+    metadata:
+      labels:
+        app: lith-http-api
+        version: v1.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "4000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: lith-api
+
+      # Security context for pod
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
+      # Init container for database setup
+      initContainers:
+      - name: init-db-dir
+        image: busybox:1.36
+        command: ['sh', '-c', 'mkdir -p /data && chown -R 1000:1000 /data']
+        volumeMounts:
+        - name: lith-data
+          mountPath: /data
+        securityContext:
+          runAsUser: 0  # Need root to chown
+
+      containers:
+      - name: lith-http-api
+        image: lith-http-api:latest
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - name: http
+          containerPort: 4000
+          protocol: TCP
+        - name: metrics
+          containerPort: 4000
+          protocol: TCP
+
+        env:
+        - name: PORT
+          value: "4000"
+        - name: MIX_ENV
+          value: "prod"
+        - name: SECRET_KEY_BASE
+          valueFrom:
+            secretKeyRef:
+              name: lith-secrets
+              key: secret-key-base
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: lith-secrets
+              key: jwt-secret
+        - name: DATABASE_PATH
+          value: "/data/lith"
+        - name: ERLANG_COOKIE
+          valueFrom:
+            secretKeyRef:
+              name: lith-secrets
+              key: erlang-cookie
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+
+        # Resource limits
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+
+        # Liveness probe (is container alive?)
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: http
+            httpHeaders:
+            - name: Accept
+              value: application/json
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+
+        # Readiness probe (can accept traffic?)
+        readinessProbe:
+          httpGet:
+            path: /api/v1/ready
+            port: http
+            httpHeaders:
+            - name: Accept
+              value: application/json
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+
+        # Startup probe (for slow starts)
+        startupProbe:
+          httpGet:
+            path: /api/v1/health
+            port: http
+          initialDelaySeconds: 0
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 12  # 60 seconds max
+
+        # Lifecycle hooks
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]  # Grace period for connections
+
+        # Volume mounts
+        volumeMounts:
+        - name: lith-data
+          mountPath: /data
+        - name: tmp
+          mountPath: /tmp
+
+        # Security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+
+      # Volumes
+      volumes:
+      - name: lith-data
+        persistentVolumeClaim:
+          claimName: lith-data
+      - name: tmp
+        emptyDir: {}
+
+      # Graceful shutdown (allow 30s for connections to drain)
+      terminationGracePeriodSeconds: 30
+
+      # DNS policy
+      dnsPolicy: ClusterFirst
+
+      # Restart policy
+      restartPolicy: Always

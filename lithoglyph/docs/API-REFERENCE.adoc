@@ -1,0 +1,1809 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Lith API Reference
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:sectnums:
+
+[.lead]
+Complete API reference for Lith's programmatic interfaces: FQL query language, Zig ABI, HTTP REST API, and client libraries.
+
+toc::[]
+
+== Overview
+
+Lith exposes multiple interface layers for different use cases:
+
+[cols="1,2,1,1"]
+|===
+| Layer | Description | Status | Use Case
+
+| **FQL**
+| High-level narrative query language
+| Specified
+| Interactive queries, scripts
+
+| **Zig ABI**
+| Form.Bridge FFI for language bindings
+| Specified
+| Embedded use, language bindings
+
+| **HTTP/REST**
+| Network API with JSON
+| Planned 🚧
+| Web applications, microservices
+
+| **gRPC**
+| High-performance binary RPC
+| Planned 🚧
+| Low-latency services
+|===
+
+== FQL API
+
+The Lith Query Language (FQL) is the primary interface for interacting with Lith. See link:../spec/fql.adoc[FQL Specification] for the complete grammar.
+
+=== Connection
+
+[source,bash]
+----
+# Interactive shell
+lith shell mydb/
+
+# Execute query from file
+lith query mydb/ -f query.fql
+
+# Execute inline query
+lith query mydb/ -e "SELECT * FROM evidence LIMIT 10"
+
+# Connect to remote server
+lith shell --host lith.example.com --port 5432 --tls
+----
+
+=== Collection Operations
+
+==== CREATE COLLECTION
+
+Create a new document or edge collection.
+
+[source,fql]
+----
+-- Document collection with schema
+CREATE COLLECTION evidence (
+  title STRING NOT NULL,
+  source STRING,
+  content STRING,
+  score PROMPT_SCORE,
+  metadata JSON,
+  created_at TIMESTAMP DEFAULT NOW()
+)
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Initialize evidence storage for case #2024-001"
+};
+
+-- Edge collection (connects documents)
+CREATE EDGE COLLECTION cites (
+  citation_type STRING,
+  page_number INTEGER,
+  confidence PROMPT_SCORE
+)
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Track citation relationships"
+};
+
+-- Collection with constraints
+CREATE COLLECTION users (
+  email STRING NOT NULL UNIQUE,
+  name STRING NOT NULL,
+  role STRING DEFAULT 'viewer',
+  active BOOLEAN DEFAULT TRUE
+)
+WITH CONSTRAINTS {
+  role IN ('viewer', 'editor', 'admin'),
+  email MATCHES '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
+}
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "User management for access control"
+};
+----
+
+**Response:**
+[source,json]
+----
+{
+  "status": "success",
+  "collection": "evidence",
+  "operation": "CREATE_COLLECTION",
+  "journal_sequence": 1001
+}
+----
+
+==== DROP COLLECTION
+
+Remove a collection and all its documents.
+
+[source,fql]
+----
+-- Drop with provenance (soft delete, recoverable)
+DROP COLLECTION old_evidence
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Migrated to new schema, old data archived"
+};
+
+-- Hard drop (irreversible, requires confirmation)
+DROP COLLECTION temp_import HARD
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Temporary import data no longer needed"
+}
+CONFIRM IRREVERSIBLE;
+----
+
+==== ALTER COLLECTION
+
+Modify collection schema or settings.
+
+[source,fql]
+----
+-- Add a new field
+ALTER COLLECTION evidence ADD COLUMN (
+  verified BOOLEAN DEFAULT FALSE
+)
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Add verification tracking per policy update"
+};
+
+-- Add constraint
+ALTER COLLECTION evidence ADD CONSTRAINT (
+  score >= 0 AND score <= 100
+)
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Enforce PROMPT_SCORE range"
+};
+
+-- Rename collection
+ALTER COLLECTION evidence RENAME TO case_evidence
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Disambiguate from other evidence types"
+};
+----
+
+=== Document Operations
+
+==== INSERT
+
+Create new documents with mandatory provenance.
+
+[source,fql]
+----
+-- Single document
+INSERT INTO evidence {
+  title: "Financial Report Q4 2024",
+  source: "SEC Filing",
+  content: "...",
+  score: 85,
+  metadata: {"filing_id": "0001234567-24-000123"}
+}
+WITH PROVENANCE {
+  actor: "user:analyst@example.com",
+  rationale: "Primary source document for investigation #INV-2024-042"
+};
+
+-- Multiple documents
+INSERT INTO evidence [
+  {title: "Document A", source: "Archive", score: 70},
+  {title: "Document B", source: "Archive", score: 65},
+  {title: "Document C", source: "Archive", score: 80}
+]
+WITH PROVENANCE {
+  actor: "service:bulk-ingestion",
+  rationale: "Batch import from national archives request #NA-2024-100"
+};
+
+-- Insert with generated ID returned
+INSERT INTO evidence {
+  title: "New Evidence"
+}
+WITH PROVENANCE {
+  actor: "user:analyst@example.com",
+  rationale: "Initial entry"
+}
+RETURNING _id, _created_at;
+----
+
+**Response:**
+[source,json]
+----
+{
+  "status": "success",
+  "operation": "INSERT",
+  "collection": "evidence",
+  "documents_inserted": 1,
+  "ids": ["doc_abc123xyz"],
+  "journal_sequence": 1002
+}
+----
+
+==== SELECT
+
+Query documents with filtering, projection, and ordering.
+
+[source,fql]
+----
+-- Basic query
+SELECT * FROM evidence;
+
+-- With projection (specific fields)
+SELECT title, source, score FROM evidence;
+
+-- With filtering
+SELECT * FROM evidence
+WHERE score >= 70 AND source = "SEC Filing";
+
+-- With ordering and limit
+SELECT title, score FROM evidence
+WHERE verified = TRUE
+ORDER BY score DESC
+LIMIT 10;
+
+-- With offset for pagination
+SELECT * FROM evidence
+ORDER BY _created_at DESC
+LIMIT 20 OFFSET 40;
+
+-- JSON field access
+SELECT title, metadata.filing_id FROM evidence
+WHERE metadata.category = "financial";
+
+-- Pattern matching
+SELECT * FROM evidence
+WHERE title LIKE "%Report%"
+  AND source IN ("SEC Filing", "Court Record", "FOIA Response");
+
+-- Date filtering
+SELECT * FROM evidence
+WHERE _created_at >= "2024-01-01"
+  AND _created_at < "2025-01-01";
+
+-- Null handling
+SELECT * FROM evidence
+WHERE verified IS NULL
+   OR verified = FALSE;
+----
+
+**Response:**
+[source,json]
+----
+{
+  "status": "success",
+  "operation": "SELECT",
+  "collection": "evidence",
+  "count": 42,
+  "results": [
+    {
+      "_id": "doc_abc123",
+      "title": "Financial Report Q4 2024",
+      "source": "SEC Filing",
+      "score": 85,
+      "_created_at": "2024-06-15T14:30:00Z"
+    }
+  ]
+}
+----
+
+==== UPDATE
+
+Modify existing documents.
+
+[source,fql]
+----
+-- Update single document by ID
+UPDATE evidence
+SET verified = TRUE,
+    score = 90
+WHERE _id = "doc_abc123"
+WITH PROVENANCE {
+  actor: "user:reviewer@example.com",
+  rationale: "Verified against primary source, upgraded confidence"
+};
+
+-- Update multiple documents
+UPDATE evidence
+SET verified = TRUE
+WHERE source = "Court Record" AND verified IS NULL
+WITH PROVENANCE {
+  actor: "user:legal@example.com",
+  rationale: "Batch verification of court records"
+};
+
+-- Increment/modify
+UPDATE evidence
+SET score = score + 5,
+    metadata = JSON_SET(metadata, '$.review_count',
+                        COALESCE(metadata.review_count, 0) + 1)
+WHERE _id = "doc_abc123"
+WITH PROVENANCE {
+  actor: "user:reviewer@example.com",
+  rationale: "Additional corroboration found"
+};
+
+-- Update with RETURNING
+UPDATE evidence
+SET score = 95
+WHERE _id = "doc_abc123"
+WITH PROVENANCE {
+  actor: "user:analyst@example.com",
+  rationale: "Final score after review"
+}
+RETURNING _id, score, _updated_at;
+----
+
+**Response:**
+[source,json]
+----
+{
+  "status": "success",
+  "operation": "UPDATE",
+  "collection": "evidence",
+  "documents_updated": 1,
+  "journal_sequence": 1003
+}
+----
+
+==== DELETE
+
+Remove documents (soft delete by default).
+
+[source,fql]
+----
+-- Soft delete (recoverable)
+DELETE FROM evidence
+WHERE _id = "doc_abc123"
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Duplicate entry, superseded by doc_def456"
+};
+
+-- Bulk soft delete
+DELETE FROM evidence
+WHERE verified = FALSE AND _created_at < "2023-01-01"
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Cleanup unverified legacy data per retention policy"
+};
+
+-- Hard delete (irreversible)
+DELETE FROM evidence
+WHERE _id = "doc_sensitive"
+HARD
+WITH PROVENANCE {
+  actor: "user:dpo@example.com",
+  rationale: "GDPR erasure request #ER-2024-042"
+}
+CONFIRM IRREVERSIBLE;
+----
+
+=== Edge Operations
+
+==== CREATE EDGE
+
+Connect documents with typed relationships.
+
+[source,fql]
+----
+-- Create edge between documents
+CREATE EDGE cites FROM "doc_abc123" TO "doc_def456" {
+  citation_type: "direct_quote",
+  page_number: 42,
+  confidence: 95
+}
+WITH PROVENANCE {
+  actor: "user:analyst@example.com",
+  rationale: "Document A directly quotes Document B on page 42"
+};
+
+-- Create edge from query results
+CREATE EDGE references
+FROM (SELECT _id FROM evidence WHERE source = "SEC Filing")
+TO "doc_regulatory_framework"
+{
+  reference_type: "regulatory_basis"
+}
+WITH PROVENANCE {
+  actor: "service:auto-linker",
+  rationale: "Auto-detected regulatory references"
+};
+----
+
+==== TRAVERSE
+
+Navigate graph relationships.
+
+[source,fql]
+----
+-- Outbound traversal (what does this document cite?)
+SELECT * FROM evidence
+WHERE _id = "doc_abc123"
+TRAVERSE cites OUTBOUND DEPTH 1;
+
+-- Inbound traversal (what cites this document?)
+SELECT * FROM evidence
+WHERE _id = "doc_abc123"
+TRAVERSE cites INBOUND DEPTH 1;
+
+-- Deep traversal (citation chain)
+SELECT * FROM evidence
+WHERE _id = "doc_abc123"
+TRAVERSE cites OUTBOUND DEPTH 5
+WITH PATH;  -- Include traversal path in results
+
+-- Multi-edge traversal
+SELECT * FROM evidence
+WHERE _id = "doc_abc123"
+TRAVERSE (cites, references, contradicts) OUTBOUND DEPTH 3;
+
+-- Filtered traversal
+SELECT * FROM evidence
+WHERE _id = "doc_abc123"
+TRAVERSE cites OUTBOUND DEPTH 3
+WHERE edge.confidence >= 80 AND target.verified = TRUE;
+----
+
+**Response with PATH:**
+[source,json]
+----
+{
+  "status": "success",
+  "results": [
+    {
+      "_id": "doc_xyz789",
+      "title": "Original Source",
+      "_path": [
+        {"from": "doc_abc123", "edge": "cites", "to": "doc_def456"},
+        {"from": "doc_def456", "edge": "cites", "to": "doc_xyz789"}
+      ],
+      "_depth": 2
+    }
+  ]
+}
+----
+
+=== Introspection Operations
+
+==== INTROSPECT SCHEMA
+
+Examine collection schemas.
+
+[source,fql]
+----
+-- All collections
+INTROSPECT SCHEMA;
+
+-- Specific collection
+INTROSPECT SCHEMA evidence;
+
+-- With history
+INTROSPECT SCHEMA evidence WITH HISTORY;
+----
+
+**Response:**
+[source,json]
+----
+{
+  "collection": "evidence",
+  "type": "document",
+  "schema_version": 3,
+  "fields": [
+    {"name": "title", "type": "STRING", "nullable": false},
+    {"name": "source", "type": "STRING", "nullable": true},
+    {"name": "score", "type": "PROMPT_SCORE", "nullable": true},
+    {"name": "verified", "type": "BOOLEAN", "default": false}
+  ],
+  "constraints": [
+    {"type": "RANGE", "field": "score", "min": 0, "max": 100}
+  ],
+  "created_at": "2024-01-15T10:00:00Z",
+  "updated_at": "2024-06-15T14:30:00Z"
+}
+----
+
+==== INTROSPECT CONSTRAINTS
+
+View active constraints.
+
+[source,fql]
+----
+-- All constraints
+INTROSPECT CONSTRAINTS;
+
+-- Specific collection
+INTROSPECT CONSTRAINTS evidence;
+----
+
+**Response:**
+[source,json]
+----
+{
+  "collection": "evidence",
+  "constraints": [
+    {
+      "id": "con_001",
+      "type": "RANGE",
+      "field": "score",
+      "expression": "score >= 0 AND score <= 100",
+      "enforced": true,
+      "rationale": "PROMPT_SCORE must be 0-100"
+    },
+    {
+      "id": "con_002",
+      "type": "NOT_NULL",
+      "field": "title",
+      "enforced": true
+    }
+  ]
+}
+----
+
+==== INTROSPECT JOURNAL
+
+Query the operation journal.
+
+[source,fql]
+----
+-- Recent entries
+INTROSPECT JOURNAL LIMIT 100;
+
+-- Since specific sequence
+INTROSPECT JOURNAL SINCE 1000 LIMIT 50;
+
+-- For specific collection
+INTROSPECT JOURNAL
+WHERE collection = "evidence"
+LIMIT 50;
+
+-- For specific actor
+INTROSPECT JOURNAL
+WHERE actor = "user:analyst@example.com"
+LIMIT 50;
+
+-- Time range
+INTROSPECT JOURNAL
+WHERE timestamp >= "2024-06-01" AND timestamp < "2024-07-01";
+----
+
+**Response:**
+[source,json]
+----
+{
+  "entries": [
+    {
+      "sequence": 1003,
+      "timestamp": "2024-06-15T14:35:00Z",
+      "operation": "UPDATE",
+      "collection": "evidence",
+      "document_id": "doc_abc123",
+      "changes": {
+        "score": {"old": 85, "new": 90},
+        "verified": {"old": null, "new": true}
+      },
+      "provenance": {
+        "actor": "user:reviewer@example.com",
+        "rationale": "Verified against primary source"
+      },
+      "inverse": {
+        "operation": "UPDATE",
+        "changes": {"score": 85, "verified": null}
+      }
+    }
+  ]
+}
+----
+
+==== INTROSPECT HISTORY
+
+View document change history.
+
+[source,fql]
+----
+-- Full history of a document
+INTROSPECT HISTORY "doc_abc123";
+
+-- History with diffs
+INTROSPECT HISTORY "doc_abc123" WITH DIFFS;
+
+-- History for time range
+INTROSPECT HISTORY "doc_abc123"
+WHERE timestamp >= "2024-01-01";
+----
+
+==== EXPLAIN
+
+Show query execution plan.
+
+[source,fql]
+----
+EXPLAIN SELECT * FROM evidence
+WHERE score >= 70 AND source = "SEC Filing"
+ORDER BY score DESC
+LIMIT 10;
+----
+
+**Response:**
+[source,json]
+----
+{
+  "plan": {
+    "type": "LIMIT",
+    "count": 10,
+    "child": {
+      "type": "SORT",
+      "key": "score",
+      "direction": "DESC",
+      "child": {
+        "type": "FILTER",
+        "conditions": [
+          {"field": "score", "op": ">=", "value": 70},
+          {"field": "source", "op": "=", "value": "SEC Filing"}
+        ],
+        "child": {
+          "type": "COLLECTION_SCAN",
+          "collection": "evidence",
+          "estimated_rows": 1000
+        }
+      }
+    }
+  },
+  "estimated_cost": 150,
+  "indexes_used": []
+}
+----
+
+=== Transaction Operations 🚧
+
+[source,fql]
+----
+-- Begin transaction
+BEGIN TRANSACTION;
+
+-- Operations within transaction
+INSERT INTO evidence {...} WITH PROVENANCE {...};
+UPDATE evidence SET ... WHERE ... WITH PROVENANCE {...};
+CREATE EDGE cites ... WITH PROVENANCE {...};
+
+-- Commit
+COMMIT
+WITH PROVENANCE {
+  actor: "user:analyst@example.com",
+  rationale: "Atomic update of evidence and citations"
+};
+
+-- Or rollback
+ROLLBACK
+WITH PROVENANCE {
+  actor: "user:analyst@example.com",
+  rationale: "Discovered error in import data"
+};
+----
+
+=== Undo Operations
+
+[source,fql]
+----
+-- Undo last operation
+UNDO LAST
+WITH PROVENANCE {
+  actor: "user:analyst@example.com",
+  rationale: "Accidental modification"
+};
+
+-- Undo specific journal entry
+UNDO SEQUENCE 1003
+WITH PROVENANCE {
+  actor: "user:admin@example.com",
+  rationale: "Reverting unauthorized change"
+};
+
+-- Undo with preview
+UNDO SEQUENCE 1003 PREVIEW;
+----
+
+=== Data Types
+
+[cols="1,2,2"]
+|===
+| Type | Description | Example
+
+| `STRING`
+| Variable-length text
+| `"Hello, World"`
+
+| `INTEGER`
+| 64-bit signed integer
+| `42`, `-100`
+
+| `FLOAT`
+| 64-bit floating point
+| `3.14159`, `-0.001`
+
+| `BOOLEAN`
+| True/false
+| `TRUE`, `FALSE`
+
+| `TIMESTAMP`
+| ISO 8601 datetime
+| `"2024-06-15T14:30:00Z"`
+
+| `JSON`
+| Arbitrary JSON structure
+| `{"key": "value", "nested": {"a": 1}}`
+
+| `PROMPT_SCORE`
+| 0-100 integer for AI confidence
+| `85`
+
+| `ENCRYPTED`
+| Encrypted at rest
+| (displayed as `[ENCRYPTED]`)
+|===
+
+=== Operators
+
+==== Comparison Operators
+
+[cols="1,2,2"]
+|===
+| Operator | Description | Example
+
+| `=`
+| Equal
+| `score = 85`
+
+| `!=`, `<>`
+| Not equal
+| `status != "deleted"`
+
+| `<`
+| Less than
+| `score < 50`
+
+| `<=`
+| Less than or equal
+| `score <= 100`
+
+| `>`
+| Greater than
+| `score > 70`
+
+| `>=`
+| Greater than or equal
+| `created_at >= "2024-01-01"`
+
+| `IN`
+| In set
+| `source IN ("A", "B", "C")`
+
+| `NOT IN`
+| Not in set
+| `status NOT IN ("deleted", "archived")`
+
+| `BETWEEN`
+| Range (inclusive)
+| `score BETWEEN 60 AND 80`
+
+| `LIKE`
+| Pattern match
+| `title LIKE "%Report%"`
+
+| `IS NULL`
+| Null check
+| `verified IS NULL`
+
+| `IS NOT NULL`
+| Not null check
+| `score IS NOT NULL`
+|===
+
+==== Logical Operators
+
+[cols="1,2,2"]
+|===
+| Operator | Description | Example
+
+| `AND`
+| Logical AND
+| `score > 70 AND verified = TRUE`
+
+| `OR`
+| Logical OR
+| `source = "A" OR source = "B"`
+
+| `NOT`
+| Logical NOT
+| `NOT verified`
+|===
+
+==== JSON Operators
+
+[cols="1,2,2"]
+|===
+| Operator | Description | Example
+
+| `.`
+| Field access
+| `metadata.category`
+
+| `[]`
+| Array access
+| `tags[0]`
+
+| `JSON_SET`
+| Set JSON field
+| `JSON_SET(metadata, '$.count', 1)`
+
+| `JSON_EXTRACT`
+| Extract JSON value
+| `JSON_EXTRACT(metadata, '$.id')`
+|===
+
+== Zig ABI (Form.Bridge)
+
+The Form.Bridge provides a stable C ABI for embedding Lith in other applications and creating language bindings.
+
+=== Type Definitions
+
+[source,zig]
+----
+/// Opaque database handle
+pub const FdbDb = opaque {};
+
+/// Opaque transaction handle
+pub const FdbTxn = opaque {};
+
+/// Opaque query result handle
+pub const FdbResult = opaque {};
+
+/// Status code
+pub const FdbStatus = enum(i32) {
+    ok = 0,
+
+    // Client errors (1xxx)
+    err_not_found = 1001,
+    err_already_exists = 1002,
+    err_constraint_violation = 1003,
+    err_parse_error = 1004,
+    err_invalid_argument = 1005,
+    err_type_mismatch = 1006,
+    err_missing_provenance = 1007,
+    err_permission_denied = 1008,
+
+    // Server errors (2xxx)
+    err_internal = 2001,
+    err_io = 2002,
+    err_journal_corrupted = 2003,
+    err_out_of_memory = 2004,
+    err_timeout = 2005,
+
+    // Transaction errors (3xxx)
+    err_txn_conflict = 3001,
+    err_txn_aborted = 3002,
+    err_txn_not_active = 3003,
+};
+
+/// Provenance structure
+pub const FdbProvenance = extern struct {
+    actor: [*:0]const u8,
+    actor_len: usize,
+    rationale: [*:0]const u8,
+    rationale_len: usize,
+    timestamp: i64,  // Unix timestamp, 0 = auto
+};
+
+/// Query result metadata
+pub const FdbResultMeta = extern struct {
+    status: FdbStatus,
+    count: usize,
+    journal_sequence: u64,
+    error_message: [*:0]const u8,
+    error_message_len: usize,
+};
+----
+
+=== Database Lifecycle
+
+[source,zig]
+----
+/// Open or create a database
+/// Returns: FdbStatus (check before using db_out)
+pub extern fn fdb_open(
+    path: [*:0]const u8,
+    path_len: usize,
+    options: *const FdbOpenOptions,
+    db_out: **FdbDb,
+) callconv(.C) FdbStatus;
+
+/// Open options
+pub const FdbOpenOptions = extern struct {
+    create_if_missing: bool = true,
+    read_only: bool = false,
+    journal_sync: bool = true,  // fsync after each write
+    cache_size_mb: u32 = 64,
+};
+
+/// Close database and free resources
+pub extern fn fdb_close(db: *FdbDb) callconv(.C) FdbStatus;
+
+/// Get database statistics
+pub extern fn fdb_stats(
+    db: *FdbDb,
+    stats_out: *FdbStats,
+) callconv(.C) FdbStatus;
+
+pub const FdbStats = extern struct {
+    collections: u32,
+    documents: u64,
+    edges: u64,
+    journal_entries: u64,
+    storage_bytes: u64,
+    cache_hit_ratio: f32,
+};
+----
+
+=== Query Execution
+
+[source,zig]
+----
+/// Execute FQL query
+pub extern fn fdb_query(
+    db: *FdbDb,
+    fql: [*]const u8,
+    fql_len: usize,
+    provenance: *const FdbProvenance,
+    result_out: **FdbResult,
+) callconv(.C) FdbStatus;
+
+/// Get result metadata
+pub extern fn fdb_result_meta(
+    result: *FdbResult,
+    meta_out: *FdbResultMeta,
+) callconv(.C) FdbStatus;
+
+/// Get result row as JSON
+pub extern fn fdb_result_row(
+    result: *FdbResult,
+    index: usize,
+    json_out: *[*]const u8,
+    json_len_out: *usize,
+) callconv(.C) FdbStatus;
+
+/// Iterate result rows
+pub extern fn fdb_result_next(
+    result: *FdbResult,
+    json_out: *[*]const u8,
+    json_len_out: *usize,
+) callconv(.C) FdbStatus;  // Returns err_not_found when exhausted
+
+/// Free result
+pub extern fn fdb_result_free(result: *FdbResult) callconv(.C) void;
+----
+
+=== Document Operations
+
+[source,zig]
+----
+/// Insert document (JSON format)
+pub extern fn fdb_insert(
+    db: *FdbDb,
+    collection: [*:0]const u8,
+    collection_len: usize,
+    doc_json: [*]const u8,
+    doc_json_len: usize,
+    provenance: *const FdbProvenance,
+    id_out: *[*]const u8,
+    id_len_out: *usize,
+) callconv(.C) FdbStatus;
+
+/// Get document by ID
+pub extern fn fdb_get(
+    db: *FdbDb,
+    collection: [*:0]const u8,
+    collection_len: usize,
+    id: [*:0]const u8,
+    id_len: usize,
+    doc_out: *[*]const u8,
+    doc_len_out: *usize,
+) callconv(.C) FdbStatus;
+
+/// Update document
+pub extern fn fdb_update(
+    db: *FdbDb,
+    collection: [*:0]const u8,
+    collection_len: usize,
+    id: [*:0]const u8,
+    id_len: usize,
+    updates_json: [*]const u8,
+    updates_json_len: usize,
+    provenance: *const FdbProvenance,
+) callconv(.C) FdbStatus;
+
+/// Delete document
+pub extern fn fdb_delete(
+    db: *FdbDb,
+    collection: [*:0]const u8,
+    collection_len: usize,
+    id: [*:0]const u8,
+    id_len: usize,
+    hard: bool,
+    provenance: *const FdbProvenance,
+) callconv(.C) FdbStatus;
+----
+
+=== Transaction Operations
+
+[source,zig]
+----
+/// Begin transaction
+pub extern fn fdb_txn_begin(
+    db: *FdbDb,
+    txn_out: **FdbTxn,
+) callconv(.C) FdbStatus;
+
+/// Execute query within transaction
+pub extern fn fdb_txn_query(
+    txn: *FdbTxn,
+    fql: [*]const u8,
+    fql_len: usize,
+    provenance: *const FdbProvenance,
+    result_out: **FdbResult,
+) callconv(.C) FdbStatus;
+
+/// Commit transaction
+pub extern fn fdb_txn_commit(
+    txn: *FdbTxn,
+    provenance: *const FdbProvenance,
+) callconv(.C) FdbStatus;
+
+/// Rollback transaction
+pub extern fn fdb_txn_rollback(
+    txn: *FdbTxn,
+    provenance: *const FdbProvenance,
+) callconv(.C) FdbStatus;
+----
+
+=== Journal Operations
+
+[source,zig]
+----
+/// Get current journal sequence
+pub extern fn fdb_journal_sequence(
+    db: *FdbDb,
+    seq_out: *u64,
+) callconv(.C) FdbStatus;
+
+/// Read journal entries
+pub extern fn fdb_journal_read(
+    db: *FdbDb,
+    since_sequence: u64,
+    limit: usize,
+    entries_json_out: *[*]const u8,
+    entries_json_len_out: *usize,
+) callconv(.C) FdbStatus;
+
+/// Undo journal entry
+pub extern fn fdb_journal_undo(
+    db: *FdbDb,
+    sequence: u64,
+    provenance: *const FdbProvenance,
+) callconv(.C) FdbStatus;
+----
+
+=== Error Handling
+
+[source,zig]
+----
+/// Get detailed error message for last error
+pub extern fn fdb_error_message(
+    db: *FdbDb,
+    message_out: *[*]const u8,
+    message_len_out: *usize,
+) callconv(.C) void;
+
+/// Get error suggestions
+pub extern fn fdb_error_suggestions(
+    db: *FdbDb,
+    suggestions_json_out: *[*]const u8,
+    suggestions_json_len_out: *usize,
+) callconv(.C) void;
+----
+
+=== Memory Management
+
+[source,zig]
+----
+/// Free string allocated by Lith
+pub extern fn fdb_free_string(ptr: [*]const u8, len: usize) callconv(.C) void;
+
+/// Free JSON allocated by Lith
+pub extern fn fdb_free_json(ptr: [*]const u8, len: usize) callconv(.C) void;
+----
+
+=== Example Usage
+
+[source,zig]
+----
+const std = @import("std");
+const fdb = @cImport(@cInclude("lith.h"));
+
+pub fn main() !void {
+    // Open database
+    var db: *fdb.FdbDb = undefined;
+    const options = fdb.FdbOpenOptions{};
+
+    var status = fdb.fdb_open(
+        "mydb/", 5,
+        &options,
+        &db
+    );
+    if (status != .ok) {
+        std.debug.print("Failed to open database\n", .{});
+        return;
+    }
+    defer _ = fdb.fdb_close(db);
+
+    // Insert document
+    const doc =
+        \\{"title": "Test Document", "score": 85}
+    ;
+    const prov = fdb.FdbProvenance{
+        .actor = "user:test@example.com",
+        .actor_len = 22,
+        .rationale = "Test insert",
+        .rationale_len = 11,
+        .timestamp = 0,  // Auto
+    };
+
+    var id_ptr: [*]const u8 = undefined;
+    var id_len: usize = undefined;
+
+    status = fdb.fdb_insert(
+        db,
+        "evidence", 8,
+        doc.ptr, doc.len,
+        &prov,
+        &id_ptr, &id_len,
+    );
+
+    if (status == .ok) {
+        const id = id_ptr[0..id_len];
+        std.debug.print("Inserted document: {s}\n", .{id});
+        fdb.fdb_free_string(id_ptr, id_len);
+    }
+}
+----
+
+== HTTP REST API 🚧
+
+The HTTP API provides network access to Lith with JSON request/response format.
+
+=== Base URL
+
+[source,text]
+----
+https://lith.example.com/v1
+----
+
+=== Authentication
+
+[source,bash]
+----
+# API Key (header)
+curl -H "X-Lith-API-Key: fdb_sk_live_abc123" \
+  https://lith.example.com/v1/query
+
+# JWT Bearer token
+curl -H "Authorization: Bearer eyJhbG..." \
+  https://lith.example.com/v1/query
+----
+
+=== Endpoints
+
+==== POST /v1/query
+
+Execute FQL query.
+
+**Request:**
+[source,json]
+----
+{
+  "fql": "SELECT * FROM evidence WHERE score >= 70 LIMIT 10",
+  "provenance": {
+    "actor": "user:api-client@example.com",
+    "rationale": "Dashboard refresh"
+  },
+  "options": {
+    "timeout_ms": 30000,
+    "max_results": 1000
+  }
+}
+----
+
+**Response:**
+[source,json]
+----
+{
+  "status": "success",
+  "data": {
+    "operation": "SELECT",
+    "collection": "evidence",
+    "count": 42,
+    "results": [
+      {"_id": "doc_abc123", "title": "...", "score": 85}
+    ]
+  },
+  "meta": {
+    "journal_sequence": 1234,
+    "duration_ms": 45,
+    "request_id": "req_xyz789"
+  }
+}
+----
+
+==== GET /v1/collections
+
+List all collections.
+
+**Response:**
+[source,json]
+----
+{
+  "status": "success",
+  "data": {
+    "collections": [
+      {
+        "name": "evidence",
+        "type": "document",
+        "document_count": 1500,
+        "schema_version": 3
+      },
+      {
+        "name": "cites",
+        "type": "edge",
+        "edge_count": 3200
+      }
+    ]
+  }
+}
+----
+
+==== GET /v1/collections/{name}
+
+Get collection details and schema.
+
+**Response:**
+[source,json]
+----
+{
+  "status": "success",
+  "data": {
+    "name": "evidence",
+    "type": "document",
+    "schema": {
+      "version": 3,
+      "fields": [
+        {"name": "title", "type": "STRING", "nullable": false},
+        {"name": "score", "type": "PROMPT_SCORE", "nullable": true}
+      ]
+    },
+    "constraints": [...],
+    "indexes": [...],
+    "stats": {
+      "document_count": 1500,
+      "storage_bytes": 15728640
+    }
+  }
+}
+----
+
+==== GET /v1/collections/{name}/documents/{id}
+
+Get single document.
+
+**Response:**
+[source,json]
+----
+{
+  "status": "success",
+  "data": {
+    "_id": "doc_abc123",
+    "_created_at": "2024-06-15T14:30:00Z",
+    "_updated_at": "2024-06-15T15:00:00Z",
+    "title": "Financial Report Q4 2024",
+    "score": 85
+  }
+}
+----
+
+==== GET /v1/collections/{name}/documents/{id}/history
+
+Get document history.
+
+**Response:**
+[source,json]
+----
+{
+  "status": "success",
+  "data": {
+    "document_id": "doc_abc123",
+    "history": [
+      {
+        "sequence": 1003,
+        "timestamp": "2024-06-15T15:00:00Z",
+        "operation": "UPDATE",
+        "changes": {"score": {"old": 80, "new": 85}},
+        "provenance": {
+          "actor": "user:reviewer@example.com",
+          "rationale": "Score adjustment after review"
+        }
+      }
+    ]
+  }
+}
+----
+
+==== GET /v1/journal
+
+Read journal entries.
+
+**Query Parameters:**
+- `since` - Start sequence (default: 0)
+- `limit` - Max entries (default: 100, max: 1000)
+- `collection` - Filter by collection
+- `actor` - Filter by actor
+
+**Response:**
+[source,json]
+----
+{
+  "status": "success",
+  "data": {
+    "entries": [...],
+    "next_sequence": 1100,
+    "has_more": true
+  }
+}
+----
+
+==== GET /v1/health
+
+Health check endpoint.
+
+**Response:**
+[source,json]
+----
+{
+  "status": "healthy",
+  "version": "0.1.0",
+  "uptime_seconds": 86400,
+  "checks": {
+    "storage": "ok",
+    "journal": "ok",
+    "cache": "ok"
+  }
+}
+----
+
+==== GET /v1/health/ready
+
+Readiness check (for Kubernetes).
+
+**Response (ready):**
+[source,json]
+----
+{"ready": true}
+----
+
+**Response (not ready):**
+[source,json]
+----
+{
+  "ready": false,
+  "reason": "Journal replay in progress",
+  "progress": 0.75
+}
+----
+
+=== Error Responses
+
+All errors follow a consistent format:
+
+[source,json]
+----
+{
+  "status": "error",
+  "error": {
+    "code": 1003,
+    "type": "CONSTRAINT_VIOLATION",
+    "message": "Value 150 exceeds maximum of 100 for field 'score'",
+    "field": "score",
+    "constraint": "PROMPT_SCORE range",
+    "rationale": "PROMPT_SCORE values must be between 0 and 100 to represent confidence percentages"
+  },
+  "suggestions": [
+    "Use a value between 0 and 100",
+    "If this represents a different scale, consider using INTEGER type"
+  ],
+  "meta": {
+    "request_id": "req_xyz789"
+  }
+}
+----
+
+=== Rate Limiting
+
+Rate limit headers are included in all responses:
+
+[source,text]
+----
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 995
+X-RateLimit-Reset: 1718470800
+----
+
+When rate limited:
+
+[source,json]
+----
+{
+  "status": "error",
+  "error": {
+    "code": 429,
+    "type": "RATE_LIMITED",
+    "message": "Rate limit exceeded",
+    "retry_after_seconds": 60
+  }
+}
+----
+
+=== Pagination
+
+Paginated endpoints use cursor-based pagination:
+
+[source,json]
+----
+{
+  "data": {
+    "results": [...],
+    "pagination": {
+      "cursor": "eyJzZXEiOjEwMDB9",
+      "has_more": true,
+      "total": 5000
+    }
+  }
+}
+----
+
+Use the cursor in subsequent requests:
+
+[source,bash]
+----
+curl "https://lith.example.com/v1/query?cursor=eyJzZXEiOjEwMDB9"
+----
+
+== gRPC API 🚧
+
+High-performance binary RPC for low-latency applications.
+
+=== Service Definition
+
+[source,protobuf]
+----
+syntax = "proto3";
+package lith.v1;
+
+service Lith {
+  // Query operations
+  rpc Query(QueryRequest) returns (QueryResponse);
+  rpc StreamQuery(QueryRequest) returns (stream QueryRow);
+
+  // Document operations
+  rpc Insert(InsertRequest) returns (InsertResponse);
+  rpc Get(GetRequest) returns (GetResponse);
+  rpc Update(UpdateRequest) returns (UpdateResponse);
+  rpc Delete(DeleteRequest) returns (DeleteResponse);
+
+  // Journal operations
+  rpc StreamJournal(JournalRequest) returns (stream JournalEntry);
+
+  // Health
+  rpc Health(HealthRequest) returns (HealthResponse);
+}
+
+message Provenance {
+  string actor = 1;
+  string rationale = 2;
+  int64 timestamp = 3;  // 0 = auto
+}
+
+message QueryRequest {
+  string fql = 1;
+  Provenance provenance = 2;
+  QueryOptions options = 3;
+}
+
+message QueryOptions {
+  int32 timeout_ms = 1;
+  int32 max_results = 2;
+}
+
+message QueryResponse {
+  Status status = 1;
+  repeated bytes rows = 2;  // JSON-encoded rows
+  QueryMeta meta = 3;
+}
+
+message QueryMeta {
+  uint64 journal_sequence = 1;
+  int32 duration_ms = 2;
+  int32 row_count = 3;
+}
+----
+
+== Client Libraries 🚧
+
+Official client libraries are planned for:
+
+[cols="1,2,1"]
+|===
+| Language | Package | Status
+
+| **Zig**
+| Native (Form.Bridge)
+| Available
+
+| **Rust**
+| `lith-rs`
+| Planned
+
+| **Python**
+| `lith`
+| Planned
+
+| **JavaScript/TypeScript**
+| `@lith/client`
+| Planned
+
+| **Go**
+| `github.com/hyperpolymath/lith-go`
+| Planned
+
+| **Java**
+| `com.lith:lith-client`
+| Planned
+|===
+
+=== Rust Example 🚧
+
+[source,rust]
+----
+use lith::{Database, Provenance};
+
+#[tokio::main]
+async fn main() -> Result<(), lith::Error> {
+    let db = Database::open("mydb/")?;
+
+    let result = db.query(
+        "SELECT * FROM evidence WHERE score >= 70",
+        Provenance::new("user:rust-app@example.com", "API query")
+    ).await?;
+
+    for doc in result.documents() {
+        println!("{}: {}", doc.id(), doc.get::<String>("title")?);
+    }
+
+    Ok(())
+}
+----
+
+=== Python Example 🚧
+
+[source,python]
+----
+import lith
+
+db = lith.open("mydb/")
+
+# Query
+results = db.query(
+    "SELECT * FROM evidence WHERE score >= 70",
+    provenance=lith.Provenance(
+        actor="user:python-app@example.com",
+        rationale="Data analysis script"
+    )
+)
+
+for doc in results:
+    print(f"{doc['_id']}: {doc['title']}")
+
+# Insert
+doc_id = db.insert(
+    "evidence",
+    {"title": "New Evidence", "score": 85},
+    provenance=lith.Provenance(
+        actor="user:python-app@example.com",
+        rationale="Automated import"
+    )
+)
+----
+
+=== JavaScript Example 🚧
+
+[source,javascript]
+----
+import { Lith } from '@lith/client';
+
+const db = await Lith.connect('https://lith.example.com', {
+  apiKey: process.env.LITH_API_KEY
+});
+
+// Query
+const results = await db.query(
+  'SELECT * FROM evidence WHERE score >= 70',
+  {
+    actor: 'user:js-app@example.com',
+    rationale: 'Dashboard refresh'
+  }
+);
+
+for (const doc of results) {
+  console.log(`${doc._id}: ${doc.title}`);
+}
+
+// Insert
+const { id } = await db.insert('evidence', {
+  title: 'New Evidence',
+  score: 85
+}, {
+  actor: 'user:js-app@example.com',
+  rationale: 'User submission'
+});
+----
+
+== Status Codes Reference
+
+=== Success Codes
+
+[cols="1,1,2"]
+|===
+| Code | Name | Description
+
+| 0
+| `FDB_OK`
+| Operation completed successfully
+|===
+
+=== Client Errors (1xxx)
+
+[cols="1,1,2"]
+|===
+| Code | Name | Description
+
+| 1001
+| `FDB_ERR_NOT_FOUND`
+| Document, collection, or resource not found
+
+| 1002
+| `FDB_ERR_ALREADY_EXISTS`
+| Resource already exists (duplicate key)
+
+| 1003
+| `FDB_ERR_CONSTRAINT_VIOLATION`
+| Constraint check failed
+
+| 1004
+| `FDB_ERR_PARSE_ERROR`
+| FQL syntax error
+
+| 1005
+| `FDB_ERR_INVALID_ARGUMENT`
+| Invalid parameter value
+
+| 1006
+| `FDB_ERR_TYPE_MISMATCH`
+| Type conversion error
+
+| 1007
+| `FDB_ERR_MISSING_PROVENANCE`
+| Provenance required but not provided
+
+| 1008
+| `FDB_ERR_PERMISSION_DENIED`
+| Insufficient permissions
+
+| 1009
+| `FDB_ERR_COLLECTION_NOT_EMPTY`
+| Cannot drop non-empty collection
+
+| 1010
+| `FDB_ERR_INVALID_EDGE`
+| Edge references non-existent document
+
+| 1011
+| `FDB_ERR_QUERY_TOO_COMPLEX`
+| Query exceeds complexity limits
+
+| 1012
+| `FDB_ERR_RESULT_TOO_LARGE`
+| Result set exceeds size limits
+|===
+
+=== Server Errors (2xxx)
+
+[cols="1,1,2"]
+|===
+| Code | Name | Description
+
+| 2001
+| `FDB_ERR_INTERNAL`
+| Internal server error
+
+| 2002
+| `FDB_ERR_IO`
+| I/O error (disk, network)
+
+| 2003
+| `FDB_ERR_JOURNAL_CORRUPTED`
+| Journal integrity check failed
+
+| 2004
+| `FDB_ERR_OUT_OF_MEMORY`
+| Memory allocation failed
+
+| 2005
+| `FDB_ERR_TIMEOUT`
+| Operation timed out
+
+| 2006
+| `FDB_ERR_STORAGE_FULL`
+| Storage capacity exceeded
+
+| 2007
+| `FDB_ERR_ENCRYPTION`
+| Encryption/decryption failed
+|===
+
+=== Transaction Errors (3xxx)
+
+[cols="1,1,2"]
+|===
+| Code | Name | Description
+
+| 3001
+| `FDB_ERR_TXN_CONFLICT`
+| Transaction conflict (concurrent modification)
+
+| 3002
+| `FDB_ERR_TXN_ABORTED`
+| Transaction was aborted
+
+| 3003
+| `FDB_ERR_TXN_NOT_ACTIVE`
+| No active transaction
+
+| 3004
+| `FDB_ERR_TXN_TOO_LARGE`
+| Transaction exceeds size limits
+|===
+
+== See Also
+
+* link:../spec/fql.adoc[FQL Specification] - Complete FQL grammar
+* link:../ARCHITECTURE.adoc[Architecture Guide] - System design
+* link:SECURITY-AUTH.adoc[Security Guide] - Authentication and authorization
+* link:DEPLOYMENT.adoc[Deployment Guide] - Production deployment

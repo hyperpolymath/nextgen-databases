@@ -1,0 +1,50 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (@hyperpolymath)
+//
+// Lith NIF Integration Test
+
+import lith
+import gleam/io
+import gleam/string
+import gleam/option
+
+pub fn main() {
+  io.println("Testing Lith NIF integration...")
+
+  // Test 1: Initialize Lith
+  case lith.init() {
+    Ok(_) -> io.println("✓ Lith init successful")
+    Error(e) -> {
+      io.println("✗ Lith init failed: " <> string.inspect(e))
+      panic as "Lith init failed"
+    }
+  }
+
+  // Test 2: Create a test database
+  case lith.create("/tmp/test_lith.db", 1000) {
+    Ok(db) -> {
+      io.println("✓ Database created successfully")
+
+      // Test 3: Execute a SELECT query
+      case lith.execute_query(db, "SELECT * FROM evidence", []) {
+        Ok(cursor) -> {
+          io.println("✓ Query executed successfully")
+
+          // Test 4: Fetch results from cursor
+          case lith.cursor_next(cursor) {
+            Ok(option.Some(json_doc)) -> {
+              io.println("✓ Cursor fetch successful")
+              io.println("  Document: " <> json_doc)
+            }
+            Ok(option.None) -> io.println("✓ No results (expected for empty database)")
+            Error(e) -> io.println("✗ Cursor fetch failed: " <> string.inspect(e))
+          }
+        }
+        Error(e) -> io.println("✗ Query execution failed: " <> string.inspect(e))
+      }
+    }
+    Error(e) -> io.println("✗ Database creation failed: " <> string.inspect(e))
+  }
+
+  io.println("\nLith NIF test complete!")
+}

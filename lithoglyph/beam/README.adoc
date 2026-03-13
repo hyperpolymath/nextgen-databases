@@ -1,0 +1,179 @@
+image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: 2025 hyperpolymath
+
+= Lithoglyph BEAM
+:toc:
+:icons: font
+
+BEAM (Erlang/Gleam/Elixir) bindings for https://github.com/hyperpolymath/lith[Lithoglyph] - the narrative-first database.
+
+== Overview
+
+Lithoglyph BEAM provides native bindings to Lithoglyph for the BEAM ecosystem:
+
+* **Gleam** - Type-safe functional interface
+* **Erlang** - Low-level NIF bindings
+* **Elixir** - (Coming soon)
+
+All data is passed as CBOR-encoded binaries for maximum efficiency.
+
+== Installation
+
+=== Gleam
+
+Add to your `gleam.toml`:
+
+[source,toml]
+----
+[dependencies]
+lith_beam = ">= 0.1.0"
+----
+
+=== Erlang (rebar3)
+
+Add to your `rebar.config`:
+
+[source,erlang]
+----
+{deps, [
+    {lith_beam, {git, "https://github.com/hyperpolymath/lith-beam.git", {tag, "v0.1.0"}}}
+]}.
+----
+
+== Quick Start
+
+=== Gleam
+
+[source,gleam]
+----
+import lith_beam/client
+
+pub fn main() {
+  // Connect to database
+  let assert Ok(conn) = client.connect("/path/to/db")
+
+  // Get version
+  let #(major, minor, patch) = client.version()
+  io.println("Lithoglyph v" <> int.to_string(major) <> "." <> int.to_string(minor))
+
+  // Execute in transaction
+  let assert Ok(result) = client.with_transaction(conn, client.ReadWrite, fn(txn) {
+    // Your operations here
+    client.apply_operation(txn, cbor_encoded_op)
+  })
+
+  // Close connection
+  let assert Ok(_) = client.disconnect(conn)
+}
+----
+
+=== Erlang
+
+[source,erlang]
+----
+% Open database
+{ok, Db} = lith_nif:db_open(<<"/path/to/db">>),
+
+% Begin transaction
+{ok, Txn} = lith_nif:txn_begin(Db, read_write),
+
+% Apply operation (CBOR-encoded)
+{ok, ResultCbor, ProvenanceCbor} = lith_nif:apply(Txn, OperationCbor),
+
+% Commit
+ok = lith_nif:txn_commit(Txn),
+
+% Close
+ok = lith_nif:db_close(Db).
+----
+
+== API Reference
+
+=== Gleam API
+
+[cols="1,2"]
+|===
+| Function | Description
+
+| `version()` | Get Lithoglyph version as `#(Int, Int, Int)`
+| `connect(path)` | Open database at path
+| `disconnect(conn)` | Close database connection
+| `begin_transaction(conn, mode)` | Start transaction (ReadOnly or ReadWrite)
+| `commit(txn)` | Commit transaction
+| `abort(txn)` | Abort transaction
+| `apply_operation(txn, cbor)` | Apply CBOR-encoded operation
+| `get_schema(conn)` | Get database schema (CBOR)
+| `get_journal(conn, since)` | Get journal entries since sequence
+| `with_transaction(conn, mode, fn)` | Execute with automatic commit/abort
+|===
+
+=== Erlang NIF API
+
+[cols="1,2"]
+|===
+| Function | Description
+
+| `version/0` | Get version as `{Major, Minor, Patch}`
+| `db_open/1` | Open database (binary path)
+| `db_close/1` | Close database
+| `txn_begin/2` | Begin transaction with mode atom
+| `txn_commit/1` | Commit transaction
+| `txn_abort/1` | Abort transaction
+| `apply/2` | Apply CBOR operation
+| `schema/1` | Get schema
+| `journal/2` | Get journal since sequence
+|===
+
+== Building
+
+=== Prerequisites
+
+* Zig >= 0.11.0
+* Erlang/OTP >= 25.0
+* Lithoglyph library
+
+=== Build NIF
+
+[source,bash]
+----
+cd native
+make LITH_PATH=/path/to/lith
+----
+
+=== Run Tests
+
+[source,bash]
+----
+gleam test
+----
+
+== Architecture
+
+----
+┌─────────────────────────────────────┐
+│  Gleam Application                  │
+│  (lith_beam/client)               │
+├─────────────────────────────────────┤
+│  Erlang NIF Module                  │
+│  (lith_nif.erl)                   │
+├─────────────────────────────────────┤
+│  Zig NIF Implementation             │
+│  (lith_nif.zig)                   │
+├─────────────────────────────────────┤
+│  Lithoglyph C ABI                       │
+│  (bridge.zig)                       │
+├─────────────────────────────────────┤
+│  Lithoglyph Core                        │
+│  (Forth/Factor)                     │
+└─────────────────────────────────────┘
+----
+
+== License
+
+PMPL-1.0-or-later
+
+== Related Projects
+
+* https://github.com/hyperpolymath/lith[Lithoglyph] - The database engine
+* https://github.com/hyperpolymath/formbase[FormBase] - Airtable alternative built on Lithoglyph

@@ -1,0 +1,667 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= GQL: Lithoglyph Query Language
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:sectnums:
+:source-highlighter: rouge
+
+[.lead]
+Specification for GQL (Lithoglyph Query Language) - the narrative-first query language.
+
+**Status**: PROPOSED (resolves Q-GQL-POC-001)
+
+toc::[]
+
+== Overview
+
+GQL is Lithoglyph's query language. It is *not* SQL. Key differences:
+
+[cols="1,2,2"]
+|===
+| Aspect | SQL | GQL
+
+| Philosophy
+| Declarative data retrieval
+| Narrative-first, audit-friendly
+
+| Provenance
+| Not built-in
+| First-class citizen
+
+| Explain
+| Shows execution plan
+| Shows plan + rationale + constraints
+
+| Reversibility
+| N/A
+| Operations carry inverse
+
+| Edges
+| JOINs
+| Explicit edge traversal
+|===
+
+== PoC Subset
+
+The PoC implements a minimal subset sufficient for:
+
+* Document CRUD
+* Edge traversal
+* Schema introspection
+* Provenance output
+* Explain functionality
+
+== Grammar (EBNF)
+
+[source,ebnf]
+----
+(* GQL PoC Grammar *)
+
+query           = statement ";" ;
+
+statement       = insert_stmt
+                | select_stmt
+                | update_stmt
+                | delete_stmt
+                | create_stmt
+                | drop_stmt
+                | explain_stmt
+                | introspect_stmt
+                ;
+
+(* Document Operations *)
+insert_stmt     = "INSERT" "INTO" collection_name
+                  document_body
+                  [ "WITH" "PROVENANCE" provenance_body ] ;
+
+select_stmt     = "SELECT" [ field_list | "*" ]
+                  "FROM" collection_name
+                  [ where_clause ]
+                  [ edge_clause ]
+                  [ limit_clause ]
+                  [ "WITH" "PROVENANCE" ] ;
+
+update_stmt     = "UPDATE" collection_name
+                  "SET" assignment_list
+                  where_clause
+                  [ "WITH" "PROVENANCE" provenance_body ] ;
+
+delete_stmt     = "DELETE" "FROM" collection_name
+                  where_clause
+                  [ "WITH" "PROVENANCE" provenance_body ] ;
+
+(* Schema Operations *)
+create_stmt     = "CREATE" "COLLECTION" collection_name
+                  [ "(" field_defs ")" ]
+                  [ "WITH" "SCHEMA" schema_body ] ;
+
+drop_stmt       = "DROP" "COLLECTION" collection_name
+                  [ "WITH" "PROVENANCE" provenance_body ] ;
+
+(* Edge Operations *)
+edge_clause     = "TRAVERSE" edge_type direction
+                  [ "DEPTH" integer ]
+                  [ where_clause ] ;
+
+direction       = "OUTBOUND" | "INBOUND" | "ANY" ;
+
+(* Introspection *)
+explain_stmt    = "EXPLAIN" statement ;
+
+introspect_stmt = "INTROSPECT" introspect_target ;
+
+introspect_target = "SCHEMA" [ collection_name ]
+                  | "CONSTRAINTS" [ collection_name ]
+                  | "COLLECTIONS"
+                  | "JOURNAL" [ "SINCE" sequence_num ]
+                  ;
+
+(* Primitives *)
+collection_name = identifier ;
+field_list      = identifier ( "," identifier )* ;
+field_defs      = field_def ( "," field_def )* ;
+field_def       = identifier type_name [ constraints ] ;
+type_name       = "STRING" | "INTEGER" | "FLOAT" | "BOOLEAN"
+                | "TIMESTAMP" | "JSON" | "PROMPT_SCORE" ;
+constraints     = constraint ( constraint )* ;
+constraint      = "NOT" "NULL"
+                | "UNIQUE"
+                | "CHECK" "(" expression ")"
+                | "REFERENCES" collection_name
+                ;
+
+where_clause    = "WHERE" expression ;
+expression      = comparison ( ( "AND" | "OR" ) comparison )* ;
+comparison      = field_path operator value ;
+operator        = "=" | "!=" | "<" | ">" | "<=" | ">="
+                | "LIKE" | "IN" | "CONTAINS" ;
+field_path      = identifier ( "." identifier )* ;
+
+assignment_list = assignment ( "," assignment )* ;
+assignment      = identifier "=" value ;
+
+limit_clause    = "LIMIT" integer [ "OFFSET" integer ] ;
+
+document_body   = json_object ;
+provenance_body = json_object ;
+schema_body     = json_object ;
+
+(* JSON embedded in GQL *)
+json_object     = "{" [ json_pair ( "," json_pair )* ] "}" ;
+json_pair       = string ":" json_value ;
+json_value      = string | number | json_object | json_array
+                | "true" | "false" | "null" ;
+json_array      = "[" [ json_value ( "," json_value )* ] "]" ;
+
+(* Tokens *)
+identifier      = letter ( letter | digit | "_" )* ;
+string          = '"' ( escaped_char | [^"\\] )* '"' ;
+integer         = digit+ ;
+number          = integer [ "." digit+ ] [ exponent ] ;
+exponent        = ( "e" | "E" ) [ "+" | "-" ] digit+ ;
+letter          = [a-zA-Z] ;
+digit           = [0-9] ;
+----
+
+== 10 Example Queries with Expected Output
+
+=== Example 1: Insert Document
+
+[source,fql]
+----
+INSERT INTO evidence {
+  "claim": "UK inflation reached 10.1% in July 2022",
+  "source": "ONS",
+  "url": "https://www.ons.gov.uk/...",
+  "prompt_score": 95
+}
+WITH PROVENANCE {
+  "actor": "user_alice",
+  "rationale": "Adding primary source from Office for National Statistics"
+};
+----
+
+**Expected Output:**
+[source,json]
+----
+{
+  "status": "ok",
+  "document_id": "doc_a1b2c3d4",
+  "collection": "evidence",
+  "sequence": 1001,
+  "provenance": {
+    "actor": "user_alice",
+    "timestamp": "2026-01-11T12:00:00.000000Z"
+  }
+}
+----
+
+=== Example 2: Select with Filter
+
+[source,fql]
+----
+SELECT claim, source, prompt_score
+FROM evidence
+WHERE prompt_score >= 80
+LIMIT 10;
+----
+
+**Expected Output:**
+[source,json]
+----
+{
+  "status": "ok",
+  "rows": [
+    {
+      "claim": "UK inflation reached 10.1% in July 2022",
+      "source": "ONS",
+      "prompt_score": 95
+    },
+    {
+      "claim": "Energy prices rose 54% year-over-year",
+      "source": "Ofgem",
+      "prompt_score": 90
+    }
+  ],
+  "count": 2
+}
+----
+
+=== Example 3: Select with Provenance
+
+[source,fql]
+----
+SELECT * FROM evidence
+WHERE claim LIKE "%inflation%"
+WITH PROVENANCE;
+----
+
+**Expected Output:**
+[source,json]
+----
+{
+  "status": "ok",
+  "rows": [
+    {
+      "document_id": "doc_a1b2c3d4",
+      "claim": "UK inflation reached 10.1% in July 2022",
+      "source": "ONS",
+      "prompt_score": 95,
+      "_provenance": {
+        "created_by": "user_alice",
+        "created_at": "2026-01-11T12:00:00Z",
+        "rationale": "Adding primary source from ONS",
+        "journal_sequence": 1001
+      }
+    }
+  ],
+  "count": 1
+}
+----
+
+=== Example 4: Insert Edge
+
+[source,fql]
+----
+INSERT INTO supports {
+  "_from": "evidence/doc_a1b2c3d4",
+  "_to": "claims/claim_xyz",
+  "strength": "strong",
+  "notes": "Direct statistical support"
+}
+WITH PROVENANCE {
+  "actor": "user_alice",
+  "rationale": "Linking ONS data to main claim"
+};
+----
+
+**Expected Output:**
+[source,json]
+----
+{
+  "status": "ok",
+  "edge_id": "supports/edge_001",
+  "from": "evidence/doc_a1b2c3d4",
+  "to": "claims/claim_xyz",
+  "sequence": 1002
+}
+----
+
+=== Example 5: Edge Traversal
+
+[source,fql]
+----
+SELECT * FROM claims
+WHERE _id = "claims/claim_xyz"
+TRAVERSE supports INBOUND DEPTH 2;
+----
+
+**Expected Output:**
+[source,json]
+----
+{
+  "status": "ok",
+  "root": {
+    "_id": "claims/claim_xyz",
+    "text": "UK experienced a cost of living crisis in 2022"
+  },
+  "traversal": [
+    {
+      "depth": 1,
+      "edge": {"type": "supports", "strength": "strong"},
+      "vertex": {
+        "_id": "evidence/doc_a1b2c3d4",
+        "claim": "UK inflation reached 10.1% in July 2022"
+      }
+    },
+    {
+      "depth": 2,
+      "edge": {"type": "supports", "strength": "moderate"},
+      "vertex": {
+        "_id": "evidence/doc_e5f6g7h8",
+        "claim": "Bank of England data confirms inflation trend"
+      }
+    }
+  ]
+}
+----
+
+=== Example 6: Create Collection with Schema
+
+[source,fql]
+----
+CREATE COLLECTION sources (
+  name STRING NOT NULL,
+  url STRING,
+  credibility PROMPT_SCORE,
+  created_at TIMESTAMP
+) WITH SCHEMA {
+  "description": "Known sources for evidence",
+  "constraints": {
+    "name_unique": {"type": "unique", "fields": ["name"]}
+  }
+};
+----
+
+**Expected Output:**
+[source,json]
+----
+{
+  "status": "ok",
+  "collection": "sources",
+  "schema_version": 1,
+  "fields": ["name", "url", "credibility", "created_at"]
+}
+----
+
+=== Example 7: Update with Provenance
+
+[source,fql]
+----
+UPDATE evidence
+SET prompt_score = 98, verified = true
+WHERE _id = "evidence/doc_a1b2c3d4"
+WITH PROVENANCE {
+  "actor": "user_bob",
+  "rationale": "Verified against original ONS publication"
+};
+----
+
+**Expected Output:**
+[source,json]
+----
+{
+  "status": "ok",
+  "modified_count": 1,
+  "sequence": 1003,
+  "provenance": {
+    "actor": "user_bob",
+    "timestamp": "2026-01-11T14:30:00.000000Z",
+    "previous_values": {
+      "prompt_score": 95,
+      "verified": null
+    }
+  }
+}
+----
+
+=== Example 8: Explain Query
+
+[source,fql]
+----
+EXPLAIN SELECT * FROM evidence
+WHERE prompt_score >= 80 AND source = "ONS";
+----
+
+**Expected Output:**
+[source,json]
+----
+{
+  "status": "ok",
+  "plan": {
+    "type": "FILTER",
+    "collection": "evidence",
+    "conditions": [
+      {"field": "prompt_score", "op": ">=", "value": 80},
+      {"field": "source", "op": "=", "value": "ONS"}
+    ],
+    "index_used": null,
+    "estimated_rows": 5,
+    "steps": [
+      {"step": 1, "action": "SCAN", "target": "evidence"},
+      {"step": 2, "action": "FILTER", "condition": "prompt_score >= 80"},
+      {"step": 3, "action": "FILTER", "condition": "source = 'ONS'"},
+      {"step": 4, "action": "PROJECT", "fields": "*"}
+    ]
+  },
+  "rationale": {
+    "why_full_scan": "No index on prompt_score or source fields",
+    "optimization_hint": "Consider creating index on (source, prompt_score)"
+  }
+}
+----
+
+=== Example 9: Introspect Schema
+
+[source,fql]
+----
+INTROSPECT SCHEMA evidence;
+----
+
+**Expected Output:**
+[source,json]
+----
+{
+  "status": "ok",
+  "collection": "evidence",
+  "schema_version": 1,
+  "fields": {
+    "claim": {"type": "STRING", "nullable": true},
+    "source": {"type": "STRING", "nullable": true},
+    "url": {"type": "STRING", "nullable": true},
+    "prompt_score": {"type": "PROMPT_SCORE", "nullable": true, "range": [0, 100]},
+    "verified": {"type": "BOOLEAN", "nullable": true}
+  },
+  "constraints": [],
+  "indexes": [],
+  "provenance": {
+    "created_at": "2026-01-10T10:00:00Z",
+    "created_by": "system",
+    "schema_history": [
+      {"version": 1, "at": "2026-01-10T10:00:00Z", "by": "system"}
+    ]
+  }
+}
+----
+
+=== Example 10: Introspect Journal
+
+[source,fql]
+----
+INTROSPECT JOURNAL SINCE 1000;
+----
+
+**Expected Output:**
+[source,json]
+----
+{
+  "status": "ok",
+  "entries": [
+    {
+      "sequence": 1001,
+      "timestamp": "2026-01-11T12:00:00.000000Z",
+      "op_type": "DOC_INSERT",
+      "collection": "evidence",
+      "actor": "user_alice",
+      "summary": "Inserted document doc_a1b2c3d4"
+    },
+    {
+      "sequence": 1002,
+      "timestamp": "2026-01-11T12:01:00.000000Z",
+      "op_type": "EDGE_INSERT",
+      "collection": "supports",
+      "actor": "user_alice",
+      "summary": "Created edge from evidence/doc_a1b2c3d4 to claims/claim_xyz"
+    },
+    {
+      "sequence": 1003,
+      "timestamp": "2026-01-11T14:30:00.000000Z",
+      "op_type": "DOC_UPDATE",
+      "collection": "evidence",
+      "actor": "user_bob",
+      "summary": "Updated prompt_score, verified on doc_a1b2c3d4"
+    }
+  ],
+  "from_sequence": 1000,
+  "to_sequence": 1003,
+  "count": 3
+}
+----
+
+== Error Responses
+
+All errors follow a standard structure:
+
+[source,json]
+----
+{
+  "status": "error",
+  "code": 1001,
+  "message": "Human-readable error message",
+  "details": {
+    "field": "prompt_score",
+    "constraint": "range",
+    "expected": [0, 100],
+    "actual": 150
+  },
+  "rationale": "PROMPT scores must be between 0 and 100 per the PROMPT framework",
+  "suggestions": [
+    "Use a value between 0 and 100",
+    "If this is intentional, document the rationale"
+  ]
+}
+----
+
+=== Error Codes
+
+[cols="1,2,3"]
+|===
+| Code | Name | Description
+
+| 1001
+| `DOCUMENT_NOT_FOUND`
+| Document does not exist
+
+| 1002
+| `COLLECTION_NOT_FOUND`
+| Collection does not exist
+
+| 1003
+| `CONSTRAINT_VIOLATION`
+| Data violates constraint
+
+| 1004
+| `PARSE_ERROR`
+| GQL syntax error
+
+| 1005
+| `TYPE_MISMATCH`
+| Wrong data type for field
+
+| 1006
+| `PROVENANCE_REQUIRED`
+| Operation requires provenance
+
+| 1007
+| `INVALID_EDGE`
+| Edge references invalid vertices
+
+| 1008
+| `SCHEMA_VIOLATION`
+| Data doesn't match schema
+
+| 2001
+| `INTERNAL_ERROR`
+| Unexpected internal error
+|===
+
+== Type System
+
+=== Built-in Types
+
+[cols="1,2,2"]
+|===
+| Type | Description | Example
+
+| `STRING`
+| UTF-8 text
+| `"Hello, world"`
+
+| `INTEGER`
+| 64-bit signed integer
+| `42`
+
+| `FLOAT`
+| 64-bit IEEE 754
+| `3.14159`
+
+| `BOOLEAN`
+| True or false
+| `true`
+
+| `TIMESTAMP`
+| ISO 8601 with microseconds
+| `"2026-01-11T12:00:00.000000Z"`
+
+| `JSON`
+| Arbitrary JSON
+| `{"nested": {"value": 1}}`
+
+| `PROMPT_SCORE`
+| Integer 0-100 (evidence quality)
+| `85`
+|===
+
+=== PROMPT_SCORE Type
+
+Special type for evidence quality scores. Enforces:
+
+* Value range: 0-100 inclusive
+* Semantic meaning per PROMPT framework dimensions
+
+== Reserved Words
+
+The following are reserved and cannot be used as identifiers:
+
+[source,text]
+----
+AND ANY BOOLEAN CHECK COLLECTION CONSTRAINTS CREATE DELETE DEPTH
+DROP EXPLAIN FALSE FLOAT FROM IN INBOUND INSERT INTEGER INTROSPECT
+JOURNAL JSON LIKE LIMIT NOT NULL OFFSET OR OUTBOUND PROMPT_SCORE
+PROVENANCE REFERENCES SCHEMA SELECT SET SINCE STRING TIMESTAMP
+TRAVERSE TRUE UNIQUE UPDATE WHERE WITH
+----
+
+== Comments
+
+GQL supports single-line and multi-line comments:
+
+[source,fql]
+----
+-- This is a single-line comment
+
+/* This is a
+   multi-line comment */
+
+SELECT * FROM evidence; -- Inline comment
+----
+
+== Future Extensions (Post-PoC)
+
+* `AGGREGATE` clause (COUNT, SUM, AVG, etc.)
+* `GROUP BY` clause
+* Subqueries
+* Transactions (`BEGIN`, `COMMIT`, `ROLLBACK`)
+* User-defined functions
+* Full-text search operators
+* Temporal queries (`AS OF timestamp`)
+
+== Test Vectors
+
+Golden test vectors in `test-vectors/fql/`:
+
+* `parse_insert.fql` + `parse_insert.ast` - Insert parsing
+* `parse_select.fql` + `parse_select.ast` - Select parsing
+* `parse_edge.fql` + `parse_edge.ast` - Edge traversal parsing
+* `execute_insert.fql` + `execute_insert.result` - Insert execution
+* `execute_select.fql` + `execute_select.result` - Select execution
+* `error_constraint.fql` + `error_constraint.result` - Constraint error
+
+== References
+
+* link:blocks.adoc[Block Storage Format]
+* link:journal.adoc[Journal Format]
+* link:encoding.adoc[Blob Encoding]
+* link:fql-philosophy.adoc[GQL Philosophy]

@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: lith-api
+  labels:
+    app: lith-http-api
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: lith-api
+  labels:
+    app: lith-http-api
+rules:
+# Allow reading endpoints for service discovery
+- apiGroups: [""]
+  resources: ["endpoints", "pods"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: lith-api
+  labels:
+    app: lith-http-api
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: lith-api
+subjects:
+- kind: ServiceAccount
+  name: lith-api

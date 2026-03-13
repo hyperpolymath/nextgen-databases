@@ -1,0 +1,660 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Lith Versioning & Stability Policy
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:sectnums:
+
+[.lead]
+API stability guarantees, versioning conventions, and compatibility promises for Lith.
+
+toc::[]
+
+== Overview
+
+Lith takes stability seriously. As a database designed for long-term archives and audit trails, we understand that your data and queries must remain accessible for years or decades. This document describes our versioning scheme, stability guarantees, and migration policies.
+
+[IMPORTANT]
+====
+**Current Status: Pre-1.0 Development**
+
+Lith is currently at version **0.0.1** (conceptual + PoC stage). All APIs, formats, and interfaces are subject to change. Once we reach 1.0, the stability guarantees in this document become binding commitments.
+====
+
+== Version Numbering
+
+Lith follows https://semver.org/[Semantic Versioning 2.0.0]:
+
+----
+MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
+
+Examples:
+  0.1.0          Pre-1.0 development
+  1.0.0          First stable release
+  1.2.3          Stable release with patches
+  2.0.0-alpha.1  Major version pre-release
+  1.5.0+build.42 Build metadata (informational)
+----
+
+=== Version Components
+
+[cols="1,3"]
+|===
+| Component | Meaning
+
+| **MAJOR**
+| Incremented for incompatible API changes. Requires migration effort.
+
+| **MINOR**
+| Incremented for backwards-compatible new features. Safe to upgrade.
+
+| **PATCH**
+| Incremented for backwards-compatible bug fixes. Safe to upgrade.
+
+| **PRERELEASE**
+| Alpha, beta, or release candidate (e.g., `-alpha.1`, `-beta.2`, `-rc.1`)
+
+| **BUILD**
+| Build metadata, ignored for version precedence (e.g., `+git.abc123`)
+|===
+
+=== Pre-1.0 Versioning (Current)
+
+During pre-1.0 development:
+
+* **0.MINOR.PATCH** format
+* MINOR increments may include breaking changes
+* PATCH increments are bug fixes only
+* No stability guarantees, but we document all breaking changes
+* Migration scripts provided when feasible
+
+=== Post-1.0 Versioning (Future)
+
+After 1.0 release:
+
+* Breaking changes **only** in MAJOR versions
+* MINOR versions are always backwards-compatible
+* PATCH versions contain only bug fixes and security patches
+* Deprecation warnings precede removal by at least one MINOR version
+
+== Stability Tiers
+
+Each Lith component is assigned a stability tier that defines its compatibility guarantees.
+
+=== Tier 1: Stable
+
+[cols="1,4"]
+|===
+| Guarantee | No breaking changes within a major version
+
+| Deprecation
+| 6-month warning period before removal
+
+| Migration
+| Automated migration tools provided
+
+| Documentation
+| Complete API documentation maintained
+|===
+
+**Post-1.0 Stable Components:**
+
+* FQL core query syntax
+* Core data types (STRING, INTEGER, FLOAT, BOOLEAN, TIMESTAMP, JSON, PROMPT_SCORE)
+* Provenance model (actor, rationale, timestamp)
+* Document and edge CRUD operations
+* Journal read operations
+* INTROSPECT and EXPLAIN commands
+* Error response format
+
+=== Tier 2: Provisional
+
+[cols="1,4"]
+|===
+| Guarantee | API may change in minor versions with deprecation warnings
+
+| Deprecation
+| 3-month warning period
+
+| Migration
+| Migration guidance documented
+
+| Documentation
+| API documented but marked as provisional
+|===
+
+**Provisional Components (stabilizing):**
+
+* FQL advanced syntax (TRAVERSE depth options, complex WHERE clauses)
+* Constraint definition syntax
+* Schema evolution operations
+* HTTP API endpoints
+* Zig ABI function signatures
+
+=== Tier 3: Experimental
+
+[cols="1,4"]
+|===
+| Guarantee | May change or be removed in any release
+
+| Deprecation
+| No deprecation period required
+
+| Migration
+| Best-effort migration guidance
+
+| Documentation
+| Documented with experimental warnings
+|===
+
+**Experimental Components:**
+
+* FQLdt (dependently-typed queries)
+* Self-normalizing features (Form.Normalizer)
+* Distributed consensus (multi-node)
+* Proof-carrying schema evolution
+* Graph analytics extensions
+
+=== Tier 4: Internal
+
+[cols="1,4"]
+|===
+| Guarantee | Implementation detail, not part of public API
+
+| Deprecation
+| None
+
+| Migration
+| Not applicable
+
+| Documentation
+| Internal documentation only
+|===
+
+**Internal Components:**
+
+* Block header layout (beyond documented format)
+* Journal segment encoding details
+* CRC32C table implementation
+* Memory buffer management
+* Forth word definitions (internal)
+
+== Component Stability Matrix
+
+=== Current Status (v0.x)
+
+[cols="2,1,2,2"]
+|===
+| Component | Tier | Status | Notes
+
+| FQL Core Syntax
+| Provisional
+| Stabilizing
+| Grammar mostly stable, minor changes expected
+
+| FQL Advanced Syntax
+| Experimental
+| Active development
+| TRAVERSE, complex predicates evolving
+
+| Block Format
+| Internal
+| Stable internally
+| 4 KiB blocks, 64-byte headers locked
+
+| Journal Format
+| Internal
+| Stable internally
+| Append-only, sequence-numbered
+
+| Provenance Model
+| Stable
+| Locked
+| actor + rationale required, extensions allowed
+
+| PROMPT_SCORE Type
+| Stable
+| Locked
+| 0-100 integer, semantics defined
+
+| Zig ABI
+| Provisional
+| Stabilizing
+| Function signatures may change
+
+| Error Format
+| Provisional
+| Stabilizing
+| JSON structure mostly stable
+
+| HTTP API
+| Experimental
+| Planned
+| Not yet implemented
+
+| FQLdt
+| Experimental
+| Research
+| Lean 4 integration in progress
+
+| Self-Normalizing
+| Experimental
+| Research
+| FD discovery algorithms being evaluated
+|===
+
+=== Planned 1.0 Status
+
+[cols="2,1,2"]
+|===
+| Component | Target Tier | Criteria for Stability
+
+| FQL Core Syntax
+| Stable
+| Grammar frozen, 100% backwards compatible
+
+| FQL Advanced Syntax
+| Provisional
+| Core features stable, extensions provisional
+
+| Block Format
+| Internal
+| Versioned, migration tools available
+
+| Journal Format
+| Internal
+| Versioned, replay guaranteed
+
+| Provenance Model
+| Stable
+| Schema frozen
+
+| Zig ABI
+| Stable
+| ABI frozen, soname versioned
+
+| Error Format
+| Stable
+| JSON schema frozen
+
+| HTTP API
+| Provisional
+| OpenAPI spec published
+|===
+
+== Format Versioning
+
+Lith uses internal version numbers for on-disk formats to ensure data remains readable across upgrades.
+
+=== Block Format Version
+
+[source,text]
+----
+Block Header Offset 4-5: version (2 bytes)
+
+Current: 0x0001 (v1)
+----
+
+**Version Compatibility:**
+
+[cols="1,1,3"]
+|===
+| Read Version | Write Version | Behavior
+
+| v1 | v1 | Full read/write
+| v2 | v1 | Read-only (upgrade required for writes)
+| v1 | v2 | Automatic upgrade on first write (with backup)
+|===
+
+=== Journal Format Version
+
+[source,text]
+----
+Journal Segment Header: schema_version field
+
+Current: 1
+----
+
+**Journal Replay Guarantee:**
+
+Journals written by any Lith version can be replayed by any later version. This is a **permanent guarantee**—we will never break journal replay.
+
+=== Schema Version
+
+Each collection tracks its schema version:
+
+[source,fql]
+----
+INTROSPECT SCHEMA evidence;
+
+{
+  "collection": "evidence",
+  "schema_version": 3,
+  "created_at": "2024-01-15T...",
+  "migrations": [
+    {"from": 1, "to": 2, "applied": "2024-03-01T..."},
+    {"from": 2, "to": 3, "applied": "2024-06-15T..."}
+  ]
+}
+----
+
+== API Versioning
+
+=== FQL Versioning
+
+FQL syntax is versioned at the dialect level:
+
+[source,fql]
+----
+-- Explicitly request FQL v1 syntax
+#fql-version 1
+
+SELECT * FROM evidence;
+----
+
+Without a version directive, the latest stable version is assumed.
+
+=== Zig ABI Versioning
+
+The Zig ABI uses soname versioning:
+
+[source,text]
+----
+liblith.so.1      # ABI version 1
+liblith.so.1.2.3  # Full version
+----
+
+ABI changes:
+
+* **PATCH**: Bug fixes, no signature changes
+* **MINOR**: New functions added, existing signatures unchanged
+* **MAJOR**: Breaking signature changes
+
+=== HTTP API Versioning
+
+The HTTP API uses URL path versioning:
+
+[source,text]
+----
+POST /v1/query
+GET  /v1/collections
+GET  /v2/collections  (future, with breaking changes)
+----
+
+Multiple API versions may be supported simultaneously.
+
+== Deprecation Policy
+
+=== Deprecation Process
+
+1. **Announcement**: Feature marked deprecated in CHANGELOG and documentation
+2. **Warning Period**: Runtime warnings emitted when deprecated feature is used
+3. **Migration Guide**: Documentation explains how to migrate
+4. **Removal**: Feature removed in next major version (post-1.0)
+
+=== Deprecation Timelines
+
+[cols="1,2,2"]
+|===
+| Tier | Warning Period | Removal
+
+| Stable
+| 6 months minimum
+| Next major version
+
+| Provisional
+| 3 months minimum
+| Next minor version (with major bump)
+
+| Experimental
+| 1 release minimum
+| Any release
+
+| Internal
+| None required
+| Any release
+|===
+
+=== Deprecation Warnings
+
+Deprecated features emit warnings:
+
+[source,json]
+----
+{
+  "status": "success",
+  "warnings": [
+    {
+      "type": "deprecation",
+      "feature": "TRAVERSE without DEPTH",
+      "message": "Implicit DEPTH 1 is deprecated. Specify DEPTH explicitly.",
+      "deprecated_in": "1.2.0",
+      "removal_in": "2.0.0",
+      "migration": "Add 'DEPTH 1' to your TRAVERSE clauses"
+    }
+  ],
+  "result": {...}
+}
+----
+
+== Migration Policy
+
+=== Data Migration
+
+Lith provides migration tools for format changes:
+
+[source,bash]
+----
+# Check if migration is needed
+lith doctor --check-version mydb/
+
+# Backup before migration
+lith backup mydb/ mydb-backup-$(date +%Y%m%d)/
+
+# Run migration
+lith migrate mydb/ --to-version 2
+
+# Verify migration
+lith doctor --verify mydb/
+----
+
+=== Query Migration
+
+For FQL syntax changes:
+
+[source,bash]
+----
+# Check queries for deprecated syntax
+lith lint --queries queries/*.fql
+
+# Auto-fix where possible
+lith lint --fix --queries queries/*.fql
+
+# Generate migration report
+lith lint --report queries/*.fql > migration-report.md
+----
+
+=== Zero-Downtime Migration
+
+For production systems:
+
+1. **Shadow Mode**: New version runs alongside old, receiving replicated writes
+2. **Validation**: Queries verified to produce identical results
+3. **Cutover**: Traffic switched to new version
+4. **Rollback**: Automatic if errors detected
+
+== Release Cadence
+
+=== Pre-1.0 (Current)
+
+* **Milestone releases**: When significant features complete
+* **No fixed schedule**: Quality over cadence
+* **Breaking changes**: Documented in each release
+
+=== Post-1.0 (Planned)
+
+[cols="1,2,2"]
+|===
+| Release Type | Cadence | Contents
+
+| **PATCH**
+| As needed (security: within 48 hours)
+| Bug fixes, security patches
+
+| **MINOR**
+| Quarterly
+| New features, deprecations announced
+
+| **MAJOR**
+| Annual (maximum)
+| Breaking changes, deprecations removed
+|===
+
+=== Long-Term Support (LTS)
+
+Post-1.0, selected releases receive extended support:
+
+[cols="1,2,2"]
+|===
+| Release Type | Support Period | Updates Include
+
+| **Regular**
+| Until next minor release
+| Security + bug fixes
+
+| **LTS**
+| 3 years from release
+| Security + critical bug fixes
+
+| **Extended LTS**
+| 5 years (enterprise)
+| Security fixes only
+|===
+
+== Compatibility Guarantees
+
+=== Forward Compatibility
+
+Data written by older versions can be read by newer versions:
+
+[cols="1,1,1"]
+|===
+| Written By | Read By | Guaranteed
+
+| v1.x | v1.y (y > x) | Yes
+| v1.x | v2.x | Yes
+| v1.x | v3.x | Yes (indefinitely)
+|===
+
+=== Backward Compatibility
+
+Queries written for older versions continue to work:
+
+[cols="1,1,1"]
+|===
+| Query Version | Runtime Version | Guaranteed
+
+| FQL v1 | Lith 1.x | Yes
+| FQL v1 | Lith 2.x | Yes (with version directive)
+| FQL v1 | Lith 3.x | Yes (with version directive)
+|===
+
+=== Journal Replay Guarantee
+
+**Permanent Commitment**: Any journal written by any Lith version can be replayed by any later version. This enables:
+
+* Point-in-time recovery across upgrades
+* Audit trail preservation
+* Long-term archive integrity
+
+== Version Support Matrix
+
+=== Current Versions
+
+[cols="1,1,2,2"]
+|===
+| Version | Status | Released | End of Support
+
+| 0.0.1
+| Development
+| 2024-01
+| N/A (pre-release)
+|===
+
+=== Planned Versions
+
+[cols="1,1,2"]
+|===
+| Version | Target | Milestone
+
+| 0.1.0
+| PoC Complete
+| Single-node CRUD, journal, basic FQL
+
+| 0.5.0
+| Alpha
+| Full FQL, constraints, edges
+
+| 1.0.0
+| Stable
+| Production-ready, stability guarantees active
+|===
+
+== Checking Versions
+
+=== Runtime Version
+
+[source,fql]
+----
+INTROSPECT VERSION;
+
+{
+  "lith": "0.0.1",
+  "fql": "1",
+  "block_format": 1,
+  "journal_format": 1,
+  "zig_abi": "0.1.0"
+}
+----
+
+=== Database Version
+
+[source,fql]
+----
+INTROSPECT DATABASE;
+
+{
+  "path": "/data/mydb",
+  "created_by": "0.0.1",
+  "last_opened_by": "0.0.1",
+  "block_format_version": 1,
+  "journal_entries": 1523,
+  "collections": 5
+}
+----
+
+=== Compatibility Check
+
+[source,bash]
+----
+lith doctor --compatibility mydb/
+
+Lith Compatibility Report
+===========================
+Database created by: 0.0.1
+Current Lith version: 0.1.0
+
+Block format: v1 (compatible)
+Journal format: v1 (compatible)
+Schema versions: all compatible
+
+Status: COMPATIBLE (no migration required)
+----
+
+== See Also
+
+* link:CHANGELOG.md[Changelog] - Release history and breaking changes
+* link:ROADMAP.adoc[Roadmap] - Planned features and versions
+* link:docs/DEPLOYMENT.adoc[Deployment Guide] - Production deployment
+* link:ARCHITECTURE.adoc[Architecture] - Component details

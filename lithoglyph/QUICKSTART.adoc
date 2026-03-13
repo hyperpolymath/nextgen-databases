@@ -1,0 +1,696 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Lith Quickstart
+:toc: macro
+:toc-title: Contents
+:toclevels: 2
+:icons: font
+:source-highlighter: rouge
+
+[.lead]
+Get Lith running and understand its core concepts in 15 minutes.
+
+[NOTE]
+====
+**Project Status: Proof of Concept**
+
+Lith is in active development. The core Forth implementation (Form.Blocks, Form.Model) is functional. The FQL runtime and higher layers are being built. This quickstart demonstrates the intended workflow.
+====
+
+toc::[]
+
+== What is Lith?
+
+Lith is a *narrative-first, reversible, audit-grade database*. Unlike traditional databases that treat history as an afterthought, Lith makes provenance, reversibility, and explainability core features.
+
+[cols="1,2"]
+|===
+| If you need... | Lith provides...
+
+| Audit trails
+| Built-in journal with full operation history
+
+| Data provenance
+| Every mutation records who, when, and why
+
+| Undo/redo
+| Every operation has a defined inverse
+
+| Explainable constraints
+| Rejections include reasons and suggestions
+
+| Graph relationships
+| First-class edges with traversal
+|===
+
+**Target domains**: Investigative journalism, governance/compliance, agentic AI ecosystems, long-term archives.
+
+== Prerequisites
+
+=== Required Tools
+
+[cols="1,1,2"]
+|===
+| Tool | Version | Purpose
+
+| https://github.com/cisco/gforth[Gforth]
+| 0.7.3+
+| Form.Blocks and Form.Model (truth core)
+
+| https://factorcode.org/[Factor]
+| 0.99+
+| Form.Runtime (FQL parser/executor)
+
+| https://ziglang.org/[Zig]
+| 0.11+
+| Form.Bridge (stable ABI for FFI)
+
+| https://just.systems/[just]
+| 1.0+
+| Build orchestration
+|===
+
+=== Installation
+
+.Fedora/RHEL
+[source,bash]
+----
+sudo dnf install gforth
+curl -LO https://ziglang.org/download/0.11.0/zig-linux-x86_64-0.11.0.tar.xz
+tar xf zig-linux-x86_64-0.11.0.tar.xz
+sudo mv zig-linux-x86_64-0.11.0 /opt/zig
+echo 'export PATH=$PATH:/opt/zig' >> ~/.bashrc
+# Factor: download from https://factorcode.org/
+----
+
+.Ubuntu/Debian
+[source,bash]
+----
+sudo apt install gforth
+# Zig and Factor: download from official sites
+----
+
+.macOS
+[source,bash]
+----
+brew install gforth zig just
+# Factor: download from https://factorcode.org/
+----
+
+.Arch Linux
+[source,bash]
+----
+sudo pacman -S gforth zig just
+# Factor: AUR or download from factorcode.org
+----
+
+== Clone and Build
+
+[source,bash]
+----
+git clone https://github.com/hyperpolymath/lithoglyph.git
+cd lith
+
+# Verify Gforth works with our Forth code
+gforth core-forth/src/lithoglyph-blocks.fs -e "cr .\" Form.Blocks loaded successfully\" cr bye"
+----
+
+Expected output:
+----
+Form.Blocks loaded successfully
+----
+
+== Understanding the Architecture
+
+Lith is structured in layers:
+
+[source,text]
+----
+┌─────────────────────────────────────────────────────────────┐
+│  Form.ControlPlane (Elixir/OTP - optional)                  │
+│  Sessions, supervision, cluster coordination                 │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Normalizer (Factor + Lean 4)                          │
+│  FD discovery, type encoding, proof-carrying normalization  │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Runtime (Factor)                                      │
+│  FQL parse/plan/exec, explain, introspection                │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Bridge (Zig)                                          │
+│  Stable ABI (no C dependency), safety governor              │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Model (Forth)                                         │
+│  Documents, edges, schemas, constraints                     │
+├─────────────────────────────────────────────────────────────┤
+│  Form.Blocks (Forth)        ◀── TRUTH CORE                  │
+│  4 KiB blocks, append-only journal, integrity checks        │
+└─────────────────────────────────────────────────────────────┘
+----
+
+The Forth layers (Form.Blocks, Form.Model) own the truth. Higher layers cannot bypass them.
+
+== Core Concepts
+
+=== 1. The Journal (Append-Only Truth)
+
+Every mutation is journaled *before* being considered committed:
+
+[source,text]
+----
+Journal Entry #1
+├── sequence: 1
+├── op_type: COLLECTION_CREATE
+├── timestamp: 2026-01-12T10:00:00Z
+├── actor: "alice"
+├── rationale: "Setting up evidence tracking for Wirecard investigation"
+└── inverse: DROP COLLECTION evidence
+
+Journal Entry #2
+├── sequence: 2
+├── op_type: DOC_INSERT
+├── collection: "evidence"
+├── doc_id: "ev-001"
+├── actor: "alice"
+├── rationale: "Primary source from FT whistleblower"
+└── inverse: DELETE FROM evidence WHERE _id = "ev-001"
+----
+
+This means you can:
+
+* Replay the journal to any point in time
+* Audit who did what and why
+* Undo any operation by applying its inverse
+
+=== 2. Provenance (Who, When, Why)
+
+Every mutation requires provenance:
+
+[source,fql]
+----
+INSERT INTO evidence {
+  "title": "Wirecard Internal Audit Report",
+  "source": "Whistleblower X",
+  "prompt_score": 85,
+  "classification": "confidential"
+}
+WITH PROVENANCE {
+  "actor": "dan.mccrum",
+  "rationale": "Received via secure drop. Cross-referenced with public filings.",
+  "source_type": "primary",
+  "verification_method": "document_hash_verified"
+};
+----
+
+The `actor` and `rationale` fields are required. Additional provenance fields are optional but encouraged.
+
+=== 3. PROMPT Scores (Evidence Quality)
+
+Lith includes a built-in `PROMPT_SCORE` type (0-100) for rating evidence quality:
+
+[cols="1,2"]
+|===
+| Score Range | Meaning
+
+| 90-100 | Primary source, verified, official
+| 70-89 | Secondary source, corroborated
+| 50-69 | Single source, unverified
+| 30-49 | Rumor, speculation, needs verification
+| 0-29 | Dubious, contradicted, discredited
+|===
+
+[source,fql]
+----
+-- Find all high-confidence evidence
+SELECT * FROM evidence WHERE prompt_score >= 80;
+
+-- Find evidence that needs verification
+SELECT * FROM evidence WHERE prompt_score BETWEEN 30 AND 69;
+----
+
+=== 4. Edges (Graph Relationships)
+
+Lith supports edges as first-class citizens:
+
+[source,fql]
+----
+-- Create an edge connecting a claim to its evidence
+INSERT EDGE supports FROM claims/claim-001 TO evidence/ev-042 {
+  "strength": "strong",
+  "relationship": "directly_supports"
+}
+WITH PROVENANCE {
+  "actor": "researcher_bob",
+  "rationale": "Document explicitly confirms the claim"
+};
+----
+
+Traverse edges with FQL:
+
+[source,fql]
+----
+-- Find all evidence supporting a claim
+SELECT e.*
+FROM claims
+WHERE _id = "claim-001"
+TRAVERSE supports OUTBOUND
+DEPTH 1;
+
+-- Find what claims a piece of evidence supports
+SELECT c.*
+FROM evidence
+WHERE _id = "ev-042"
+TRAVERSE supports INBOUND;
+
+-- Find the full evidence chain (multi-hop)
+SELECT *
+FROM claims
+WHERE _id = "claim-001"
+TRAVERSE supports OUTBOUND
+DEPTH 3;
+----
+
+=== 5. Reversibility
+
+Every operation has a defined inverse:
+
+[source,fql]
+----
+-- See what undoing the last operation would do
+EXPLAIN REVERSE LAST;
+
+-- Actually reverse the last operation
+REVERSE LAST WITH PROVENANCE {
+  "actor": "editor_carol",
+  "rationale": "Document was misattributed - correct source is SEC filing"
+};
+
+-- Reverse to a specific journal sequence
+REVERSE TO SEQUENCE 42 WITH PROVENANCE {
+  "actor": "admin_dave",
+  "rationale": "Rolling back corrupted batch import"
+};
+----
+
+Some operations are *irreversible-with-story*: they can't be undone, but the journal still records what happened and why.
+
+=== 6. Explainable Constraints
+
+When constraints fail, Lith explains why:
+
+[source,fql]
+----
+INSERT INTO evidence (source) VALUES ('Anonymous tip');
+----
+
+Error response:
+
+[source,json]
+----
+{
+  "status": "error",
+  "code": "CONSTRAINT_VIOLATION",
+  "constraint": "title_required",
+  "message": "The 'title' field is required for all evidence records",
+  "field": "title",
+  "context": {
+    "collection": "evidence",
+    "schema_version": 1,
+    "constraint_definition": {
+      "type": "not_null",
+      "field": "title",
+      "rationale": "All evidence must be identifiable for audit purposes"
+    }
+  },
+  "suggestions": [
+    "Provide a descriptive title for this evidence",
+    "If the source is anonymous, title could be 'Anonymous tip re: [topic]'",
+    "Use INTROSPECT SCHEMA evidence to see all required fields"
+  ],
+  "journal_sequence": null,
+  "operation_applied": false
+}
+----
+
+== Tutorial: Building an Evidence Database
+
+This tutorial walks through building a simple evidence database for investigative journalism.
+
+=== Step 1: Create Collections
+
+[source,fql]
+----
+-- Evidence collection with quality scoring
+CREATE COLLECTION evidence (
+  title STRING NOT NULL,
+  description STRING,
+  source STRING NOT NULL,
+  source_type STRING CHECK (source_type IN ('primary', 'secondary', 'tertiary')),
+  prompt_score PROMPT_SCORE NOT NULL,
+  url STRING,
+  document_hash STRING,
+  classification STRING CHECK (classification IN ('public', 'confidential', 'restricted')),
+  tags JSON,
+  obtained_date TIMESTAMP
+) WITH SCHEMA {
+  "description": "Evidence artifacts for investigative stories",
+  "constraints": {
+    "title_required": {
+      "type": "not_null",
+      "field": "title",
+      "rationale": "All evidence must be identifiable"
+    },
+    "source_required": {
+      "type": "not_null",
+      "field": "source",
+      "rationale": "Provenance requires knowing the source"
+    },
+    "quality_required": {
+      "type": "not_null",
+      "field": "prompt_score",
+      "rationale": "All evidence must be rated for reliability"
+    }
+  }
+};
+
+-- Claims that evidence supports or refutes
+CREATE COLLECTION claims (
+  statement STRING NOT NULL,
+  subject STRING NOT NULL,
+  status STRING CHECK (status IN ('unverified', 'corroborated', 'disputed', 'refuted', 'confirmed')),
+  confidence FLOAT CHECK (confidence >= 0.0 AND confidence <= 1.0),
+  first_reported TIMESTAMP,
+  public BOOLEAN
+);
+
+-- Sources (people, organizations, documents)
+CREATE COLLECTION sources (
+  name STRING NOT NULL,
+  type STRING CHECK (type IN ('person', 'organization', 'document', 'dataset')),
+  reliability_score PROMPT_SCORE,
+  notes STRING,
+  contact_info JSON
+);
+----
+
+=== Step 2: Insert Evidence
+
+[source,fql]
+----
+-- Primary source with high confidence
+INSERT INTO evidence {
+  "title": "Annual Financial Statement 2023",
+  "description": "Audited financial statements showing revenue discrepancy",
+  "source": "Company SEC Filing",
+  "source_type": "primary",
+  "prompt_score": 95,
+  "url": "https://sec.gov/cgi-bin/browse-edgar?action=getcompany&...",
+  "document_hash": "sha256:abc123...",
+  "classification": "public",
+  "tags": ["financial", "annual-report", "2023"],
+  "obtained_date": "2024-03-15T09:00:00Z"
+}
+WITH PROVENANCE {
+  "actor": "alice.journalist",
+  "rationale": "Official SEC filing, publicly available, verified hash",
+  "verification": "Downloaded directly from SEC EDGAR"
+};
+
+-- Secondary source with medium confidence
+INSERT INTO evidence {
+  "title": "Internal Email Thread: Budget Concerns",
+  "description": "Leaked email chain discussing budget irregularities",
+  "source": "Anonymous whistleblower",
+  "source_type": "secondary",
+  "prompt_score": 65,
+  "classification": "confidential",
+  "tags": ["email", "internal", "budget"],
+  "obtained_date": "2024-04-02T14:30:00Z"
+}
+WITH PROVENANCE {
+  "actor": "bob.researcher",
+  "rationale": "Received via SecureDrop. Headers appear genuine but not independently verified.",
+  "verification": "DKIM signature present, awaiting independent confirmation"
+};
+----
+
+=== Step 3: Create Claims and Link to Evidence
+
+[source,fql]
+----
+-- Create a claim
+INSERT INTO claims {
+  "statement": "Company X overstated 2023 revenue by $2.3 billion",
+  "subject": "Company X",
+  "status": "corroborated",
+  "confidence": 0.85,
+  "first_reported": "2024-04-10T00:00:00Z",
+  "public": false
+}
+WITH PROVENANCE {
+  "actor": "alice.journalist",
+  "rationale": "Claim derived from SEC filing analysis and whistleblower documents"
+};
+
+-- Link evidence to claim with edges
+INSERT EDGE supports FROM claims/claim-001 TO evidence/ev-001 {
+  "strength": "strong",
+  "notes": "SEC filing shows $2.1B discrepancy in Note 7"
+}
+WITH PROVENANCE {
+  "actor": "alice.journalist",
+  "rationale": "Direct numerical evidence from audited financials"
+};
+
+INSERT EDGE supports FROM claims/claim-001 TO evidence/ev-002 {
+  "strength": "moderate",
+  "notes": "Email discusses 'booking revenue early' - circumstantial"
+}
+WITH PROVENANCE {
+  "actor": "bob.researcher",
+  "rationale": "Corroborates but doesn't prove - adds context"
+};
+----
+
+=== Step 4: Query and Analyze
+
+[source,fql]
+----
+-- Find all high-quality evidence
+SELECT title, source, prompt_score
+FROM evidence
+WHERE prompt_score >= 80
+ORDER BY prompt_score DESC;
+
+-- Find all evidence for a specific claim with provenance
+SELECT e.*, _provenance
+FROM claims c
+WHERE c._id = "claim-001"
+TRAVERSE supports OUTBOUND
+WITH PROVENANCE;
+
+-- Explain a query
+EXPLAIN
+SELECT *
+FROM evidence
+WHERE source_type = "primary" AND prompt_score >= 90;
+----
+
+The `EXPLAIN` output shows:
+
+[source,json]
+----
+{
+  "plan": {
+    "type": "SCAN",
+    "collection": "evidence",
+    "filters": [
+      {"field": "source_type", "op": "=", "value": "primary"},
+      {"field": "prompt_score", "op": ">=", "value": 90}
+    ],
+    "estimated_cost": 0.3,
+    "index_used": null
+  },
+  "constraints_checked": ["source_type_valid", "prompt_score_range"],
+  "provenance_included": false,
+  "rationale": "Full collection scan with dual filter. Consider adding index on (source_type, prompt_score) for frequent queries."
+}
+----
+
+=== Step 5: Introspect the Database
+
+[source,fql]
+----
+-- List all collections
+INTROSPECT COLLECTIONS;
+
+-- View schema for evidence collection
+INTROSPECT SCHEMA evidence;
+
+-- View all constraints
+INTROSPECT CONSTRAINTS evidence;
+
+-- View recent journal entries
+INTROSPECT JOURNAL SINCE 0 LIMIT 20;
+
+-- View journal for specific collection
+INTROSPECT JOURNAL
+WHERE collection = "evidence"
+SINCE 0;
+----
+
+=== Step 6: Undo a Mistake
+
+[source,fql]
+----
+-- Oops, we inserted evidence with wrong source
+-- First, see what would be undone
+EXPLAIN REVERSE LAST;
+
+-- Reverse it
+REVERSE LAST WITH PROVENANCE {
+  "actor": "bob.researcher",
+  "rationale": "Source was incorrectly attributed. Correct source is 'Financial Times investigation'"
+};
+
+-- Re-insert with correct information
+INSERT INTO evidence {
+  "title": "Internal Email Thread: Budget Concerns",
+  "source": "Financial Times investigation",
+  "source_type": "secondary",
+  "prompt_score": 75,  -- Upgraded confidence after verification
+  ...
+}
+WITH PROVENANCE {
+  "actor": "bob.researcher",
+  "rationale": "Corrected source attribution. FT independently verified email authenticity."
+};
+----
+
+== Block Storage Details
+
+For those interested in the internals, Lith uses 4 KiB fixed-size blocks:
+
+[source,text]
+----
+Block Header (64 bytes)
+├── magic (4 bytes): "FDB\0" (0x46444200)
+├── version (2 bytes): Format version
+├── block_type (2 bytes): TYPE-DOCUMENT, TYPE-EDGE, etc.
+├── block_id (8 bytes): Unique block identifier
+├── sequence (8 bytes): Journal sequence number
+├── created_at (8 bytes): Timestamp
+├── modified_at (8 bytes): Timestamp
+├── payload_len (4 bytes): Actual payload size
+├── checksum (4 bytes): CRC32C of payload
+├── prev_block_id (8 bytes): For chained blocks
+├── flags (4 bytes): COMPRESSED, ENCRYPTED, CHAINED, DELETED
+└── reserved (4 bytes): Future use
+
+Block Payload (4032 bytes)
+└── [Document/Edge/Schema data]
+----
+
+Block types include:
+
+[cols="1,1,2"]
+|===
+| Type | Code | Purpose
+
+| TYPE-SUPERBLOCK | 0x0001 | Database metadata
+| TYPE-COLLECTION-META | 0x0010 | Collection schema
+| TYPE-DOCUMENT | 0x0011 | Document data
+| TYPE-EDGE | 0x0021 | Edge data
+| TYPE-JOURNAL-SEGMENT | 0x0040 | Journal entries
+| TYPE-SCHEMA | 0x0050 | Schema definitions
+| TYPE-CONSTRAINT | 0x0051 | Constraint definitions
+| TYPE-MIGRATION | 0x0060 | Migration artefacts
+|===
+
+== Next Steps
+
+* link:spec/fql.adoc[FQL Language Reference] - Complete query language specification
+* link:spec/fql-dependent-types.md[FQLdt Specification] - Compile-time verified queries with Lean 4
+* link:ARCHITECTURE.adoc[Architecture Guide] - Deep dive into the layer design
+* link:docs/DEPLOYMENT.adoc[Deployment Guide] - Run Lith in production
+* link:spec/self-normalizing.adoc[Self-Normalizing Spec] - Automatic functional dependency discovery
+
+== Troubleshooting
+
+=== "gforth: command not found"
+
+Install Gforth:
+
+[source,bash]
+----
+# Fedora/RHEL
+sudo dnf install gforth
+
+# Ubuntu/Debian
+sudo apt install gforth
+
+# macOS
+brew install gforth
+
+# Arch Linux
+sudo pacman -S gforth
+----
+
+=== "Error: BLOCKS word redefined"
+
+The Forth code resets the vocabulary to avoid conflicts with Gforth's built-in BLOCKS extension. If you still see conflicts, ensure you're using a clean Gforth session:
+
+[source,bash]
+----
+gforth -e "only forth definitions" core-forth/src/lithoglyph-blocks.fs
+----
+
+=== "Permission denied on journal"
+
+Lith requires write access to the database directory:
+
+[source,bash]
+----
+chmod -R u+w mydb/
+----
+
+=== "Constraint violation on valid data"
+
+Inspect the schema to understand constraints:
+
+[source,fql]
+----
+INTROSPECT SCHEMA evidence;
+INTROSPECT CONSTRAINTS evidence;
+----
+
+The error message includes `suggestions` - read them carefully.
+
+=== "Provenance required"
+
+All mutations require a `WITH PROVENANCE` clause:
+
+[source,fql]
+----
+-- Wrong
+INSERT INTO evidence {...};
+
+-- Correct
+INSERT INTO evidence {...}
+WITH PROVENANCE {
+  "actor": "your_username",
+  "rationale": "Why you're making this change"
+};
+----
+
+== Getting Help
+
+* https://github.com/hyperpolymath/lithoglyph/issues[GitHub Issues] - Report bugs, request features
+* https://github.com/hyperpolymath/lithoglyph/discussions[GitHub Discussions] - Ask questions
+* link:CONTRIBUTING.adoc[Contributing Guide] - Join development
+* link:ROADMAP.adoc[Roadmap] - See what's planned
+
+== Related Projects
+
+* https://github.com/hyperpolymath/fqldt[FQLdt] - Dependently-typed FQL (compile-time verified queries)
+* https://github.com/hyperpolymath/lithoglyph-studio[Lith Studio] - Zero-friction GUI
+* https://github.com/hyperpolymath/lithoglyph-debugger[Lith Debugger] - Proof-carrying debugger
+* https://github.com/hyperpolymath/formbase[FormBase] - Open-source Airtable alternative with provenance

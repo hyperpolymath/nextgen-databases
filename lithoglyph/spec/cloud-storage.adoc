@@ -1,0 +1,646 @@
+= Cloud Storage Safety
+:toc: macro
+:toc-title: Contents
+:toclevels: 3
+:icons: font
+:source-highlighter: rouge
+
+[.lead]
+Lithoglyph is designed from the ground up to be safe on cloud storage services. This specification documents the guarantees, conflict resolution strategies, and recovery mechanisms.
+
+toc::[]
+
+== Overview
+
+Lithoglyph's append-only journal architecture makes it inherently safe for cloud storage, unlike traditional databases that use random-write patterns.
+
+=== The Problem with Traditional Databases
+
+[source,text]
+----
+SQLite/PostgreSQL data file on cloud storage:
+
+     Client A                    Client B
+         │                           │
+    write page 47              write page 47
+    at offset 0x2F00           at offset 0x2F00
+         │                           │
+         └───────────┬───────────────┘
+                     ▼
+              Cloud Storage
+                     │
+                     ▼
+              CORRUPTION ⚠️
+    (both writes hit same bytes, one wins)
+----
+
+Traditional databases assume:
+* Exclusive access to files
+* POSIX file locking works
+* Writes are atomic at block level
+
+Cloud storage violates all of these:
+* Multiple clients may access simultaneously
+* No cross-device file locking
+* Sync granularity is file-level, not block-level
+
+=== Lithoglyph's Solution
+
+[source,text]
+----
+Lithoglyph journal on cloud storage:
+
+     Client A                    Client B
+         │                           │
+    append entry 47            append entry 48
+    (new bytes at EOF)         (new bytes at EOF)
+         │                           │
+         └───────────┬───────────────┘
+                     ▼
+              Cloud Storage
+                     │
+                     ▼
+           BOTH PRESERVED ✓
+    (append-only, no byte conflicts)
+----
+
+Lithoglyph's design guarantees:
+* **Append-only**: New data goes to end of journal, never overwrites
+* **Content-addressed**: Each entry identified by hash, not position
+* **Merkle-verified**: Integrity chain detects any corruption
+* **Journal-first**: Operation not committed until journaled
+
+== Supported Platforms
+
+=== Cloud Storage Services
+
+[cols="1,1,2"]
+|===
+| Service | Support Level | Notes
+
+| Dropbox
+| ✓ Full
+| Best conflict handling, keeps both versions
+
+| Google Drive
+| ✓ Full
+| Good sync performance, version history
+
+| OneDrive
+| ✓ Full
+| Windows integration, version history
+
+| iCloud Drive
+| ✓ Full
+| macOS/iOS integration
+
+| Syncthing
+| ✓ Full
+| Self-hosted, excellent for privacy
+
+| Nextcloud
+| ✓ Full
+| Self-hosted, WebDAV-based
+
+| Box
+| ✓ Full
+| Enterprise features
+
+| pCloud
+| ✓ Full
+| EU-based, good privacy
+
+| MEGA
+| ○ Partial
+| Works but limited conflict handling
+
+| S3/MinIO
+| ○ Partial
+| Requires gateway layer (no native sync)
+|===
+
+=== Local Sync Tools
+
+[cols="1,1,2"]
+|===
+| Tool | Support Level | Notes
+
+| Syncthing
+| ✓ Full
+| P2P sync, no cloud required
+
+| Resilio Sync
+| ✓ Full
+| P2P sync, proprietary
+
+| rsync
+| ○ Partial
+| One-way only, manual conflict resolution
+
+| Unison
+| ✓ Full
+| Bidirectional, good conflict detection
+|===
+
+== Journal Architecture
+
+=== Entry Format
+
+Each journal entry is self-describing and independently verifiable:
+
+[source,forth]
+----
+\ Journal entry structure (Form.Blocks)
+ENTRY-HEADER:
+  magic        4 bytes   \ "FMDB"
+  version      2 bytes   \ Format version
+  entry-type   2 bytes   \ INSERT, UPDATE, DELETE, SCHEMA, etc.
+  timestamp    8 bytes   \ Unix epoch nanoseconds
+  actor-id     32 bytes  \ Who made this change
+  prev-hash    32 bytes  \ Hash of previous entry (Merkle chain)
+  payload-len  4 bytes   \ Length of payload
+
+ENTRY-PAYLOAD:
+  payload      N bytes   \ Operation-specific data
+
+ENTRY-FOOTER:
+  checksum     4 bytes   \ CRC32 of header + payload
+  entry-hash   32 bytes  \ BLAKE3 hash of entire entry
+----
+
+=== Why This Is Cloud-Safe
+
+1. **No overwrites**: Each entry appends new bytes, never modifies existing
+2. **Self-verifying**: Each entry has its own checksum and hash
+3. **Chain integrity**: `prev-hash` links to previous entry
+4. **Deterministic size**: Fixed header, variable payload, fixed footer
+
+=== Segment Files
+
+Large journals are split into segments for efficient sync:
+
+[source,text]
+----
+lith/
+├── journal/
+│   ├── 00000001.journal   # Entries 1-10000
+│   ├── 00000002.journal   # Entries 10001-20000
+│   ├── 00000003.journal   # Entries 20001-30000 (current)
+│   └── HEAD               # Points to current segment
+├── blocks/
+│   ├── collections/       # Collection metadata
+│   ├── documents/         # Document data
+│   └── edges/             # Edge data
+└── meta/
+    ├── schema.fdb         # Current schema
+    └── checkpoints/       # Recovery points
+----
+
+Benefits:
+* Only current segment syncs frequently
+* Older segments rarely change (append-only)
+* Can sync segments in parallel
+* Easier conflict detection (per-segment)
+
+== Conflict Resolution
+
+=== Conflict Types
+
+[cols="1,2,2"]
+|===
+| Type | Scenario | Resolution
+
+| **Concurrent Append**
+| Two clients append entries while offline
+| Both entries preserved, merge on reconnect
+
+| **Divergent History**
+| Client A has entries 1-50, Client B has entries 1-40 + different 41-45
+| Fork detected, user chooses or auto-merge
+
+| **Partial Sync**
+| Entry half-written when sync interrupted
+| Incomplete entry discarded (checksum fails)
+
+| **Clock Skew**
+| Client timestamps differ significantly
+| Use logical clocks (Lamport), not wall time
+|===
+
+=== Concurrent Append (Most Common)
+
+When two clients append while offline:
+
+[source,text]
+----
+Initial state: entries 1-40 (hash: abc123)
+
+     Client A (offline)           Client B (offline)
+            │                            │
+     append entry 41              append entry 41
+     (prev-hash: abc123)          (prev-hash: abc123)
+     (hash: def456)               (hash: ghi789)
+            │                            │
+     append entry 42              append entry 42
+     (prev-hash: def456)          (prev-hash: ghi789)
+            │                            │
+            └───────────┬────────────────┘
+                        ▼
+                  Both go online
+                        │
+                        ▼
+              Conflict detected:
+              Two entries claim prev-hash: abc123
+----
+
+**Resolution strategy**:
+
+[source,text]
+----
+1. Detect fork at entry 41
+2. Create merge entry:
+
+   MERGE-ENTRY:
+     type: MERGE
+     branches: [def456..., ghi789...]
+     strategy: PRESERVE_BOTH | LAST_WRITE_WINS | MANUAL
+
+3. If PRESERVE_BOTH:
+   - Both branches become valid history
+   - Conflicting document edits get conflict markers
+   - User resolves document-level conflicts
+
+4. Journal continues from merge point
+----
+
+=== Divergent History
+
+More complex scenario where histories truly diverged:
+
+[source,text]
+----
+Client A: 1-40, 41a, 42a, 43a  (branch A)
+Client B: 1-40, 41b, 42b       (branch B)
+
+Resolution options:
+
+1. PRESERVE_BOTH (default)
+   - Both branches valid
+   - Documents with conflicts marked
+   - Journal: 1-40, FORK, [41a,42a,43a | 41b,42b], MERGE
+
+2. PREFER_LONGER
+   - Branch A wins (more entries)
+   - Branch B entries archived but not active
+
+3. PREFER_TIMESTAMP
+   - Branch with latest entry wins
+   - Requires trusted clocks (problematic)
+
+4. MANUAL
+   - User presented with diff
+   - Chooses per-document or per-branch
+----
+
+=== Conflict Markers in Documents
+
+When the same document is edited differently:
+
+[source,json]
+----
+{
+  "id": "doc-123",
+  "title": "Report",
+  "content": {
+    "_conflict": true,
+    "_base": "Original content",
+    "_versions": [
+      {
+        "_branch": "A",
+        "_actor": "alice",
+        "_timestamp": "2026-01-11T10:00:00Z",
+        "value": "Alice's edit"
+      },
+      {
+        "_branch": "B",
+        "_actor": "bob",
+        "_timestamp": "2026-01-11T10:05:00Z",
+        "value": "Bob's edit"
+      }
+    ]
+  }
+}
+----
+
+Resolution:
+* Read returns conflict marker
+* Application/user chooses winning version
+* Resolution recorded as new journal entry
+* Conflict metadata preserved for audit
+
+== Partial Sync Recovery
+
+=== Detecting Incomplete Entries
+
+Each entry has a CRC32 checksum and BLAKE3 hash:
+
+[source,forth]
+----
+\ Validate entry on read
+: validate-entry ( addr len -- valid? )
+  dup HEADER-SIZE < if drop false exit then  \ Too short
+
+  \ Check magic number
+  dup @ MAGIC-FMDB <> if drop false exit then
+
+  \ Check CRC32 of header + payload
+  dup entry-crc32 over compute-crc32 <> if drop false exit then
+
+  \ Check BLAKE3 hash
+  dup entry-hash over compute-blake3 <> if drop false exit then
+
+  true ;
+----
+
+=== Recovery Process
+
+[source,text]
+----
+On open:
+
+1. Read journal from start
+2. For each entry:
+   a. Validate checksum
+   b. Validate hash
+   c. Validate prev-hash matches previous entry
+   d. If any fail: mark as recovery point
+
+3. If incomplete entry at end:
+   a. Truncate journal to last valid entry
+   b. Log truncation to separate recovery log
+   c. Continue normally
+
+4. If corruption mid-journal:
+   a. Attempt repair from prev-hash chain
+   b. If unrepairable: recover from last checkpoint
+   c. Alert user to potential data loss
+----
+
+=== Checkpoints
+
+Periodic checkpoints enable faster recovery:
+
+[source,text]
+----
+lith/meta/checkpoints/
+├── cp-00001000.fdb   # State at entry 1000
+├── cp-00002000.fdb   # State at entry 2000
+├── cp-00003000.fdb   # State at entry 3000 (latest)
+└── cp-latest -> cp-00003000.fdb
+----
+
+Checkpoint contains:
+* Full document/edge state at that point
+* Schema at that point
+* Hash of journal entry at checkpoint
+
+Recovery:
+1. Load latest checkpoint
+2. Replay journal entries after checkpoint
+3. Much faster than replaying entire journal
+
+== Multi-Client Scenarios
+
+=== Single User, Multiple Devices
+
+Most common scenario (laptop + desktop + phone):
+
+[source,text]
+----
+Laptop (primary)     Desktop (secondary)     Phone (read-mostly)
+       │                    │                       │
+       ▼                    ▼                       ▼
+   Cloud Storage (Dropbox/iCloud/etc.)
+       │
+       ▼
+   Lithoglyph journal (append-only)
+----
+
+Recommendations:
+* Sync before starting work
+* Sync after finishing work
+* Conflicts rare if working sequentially
+* Phone can be read-only mode
+
+=== Team Collaboration
+
+Multiple users on same database:
+
+[source,text]
+----
+Alice (researcher)   Bob (researcher)    Carol (editor)
+       │                    │                  │
+       ▼                    ▼                  ▼
+   Shared cloud folder (team Dropbox/GDrive)
+       │
+       ▼
+   Lithoglyph journal
+       │
+       ▼
+   Provenance tracking (who changed what)
+----
+
+Key features:
+* Each entry has `actor-id` - who made the change
+* Full audit trail preserved
+* Conflicts show which user made each edit
+* No anonymous edits possible
+
+=== Offline-First Workflow
+
+Lithoglyph is designed for extended offline use:
+
+[source,text]
+----
+1. Journalist travels to remote location
+2. Works offline for 2 weeks
+3. Accumulates 500 journal entries locally
+4. Returns, syncs with team database
+
+Resolution:
+- 500 entries append to shared journal
+- Any conflicts (same doc edited) get markers
+- Provenance preserved (fieldwork actor-id)
+- No data loss
+----
+
+== Implementation Notes
+
+=== File Locking
+
+Lithoglyph does NOT rely on file locking:
+
+[source,text]
+----
+Traditional approach (BROKEN on cloud):
+  1. Acquire file lock
+  2. Write data
+  3. Release lock
+
+Lithoglyph approach (WORKS on cloud):
+  1. Generate entry with unique ID
+  2. Append to journal
+  3. Entry either fully written or not (atomic at entry level)
+  4. No lock needed
+----
+
+=== Sync Frequency
+
+Recommendations by use case:
+
+[cols="1,1,2"]
+|===
+| Use Case | Sync Frequency | Notes
+
+| Personal notes
+| On save + close
+| Conflicts rare
+
+| Team research
+| Every 5 minutes
+| Balance freshness vs. battery
+
+| Real-time collaboration
+| Continuous
+| Consider dedicated sync (not cloud drive)
+
+| Archival
+| Daily
+| Append-only makes this safe
+|===
+
+=== Large Databases
+
+For databases over 1GB:
+
+1. **Segment journals**: 10MB per segment file
+2. **Archive old segments**: Compress segments not recently accessed
+3. **Selective sync**: Only sync active segments + HEAD
+4. **Delta compression**: Journal entries often similar, compress well
+
+== Comparison with Alternatives
+
+[cols="1,1,1,1,1"]
+|===
+| Feature | Lithoglyph | SQLite | CouchDB | Git
+
+| Cloud-safe
+| ✓ Native
+| ✗ Corrupts
+| ✓ Native
+| ✓ With care
+
+| Offline-first
+| ✓
+| ✓
+| ✓
+| ✓
+
+| Conflict resolution
+| ✓ Automatic
+| N/A
+| ✓ Automatic
+| ○ Manual
+
+| Query language
+| ✓ GQL
+| ✓ SQL
+| ○ MapReduce
+| ✗ None
+
+| Provenance
+| ✓ Required
+| ✗ Optional
+| ○ Optional
+| ✓ Built-in
+
+| Reversibility
+| ✓ Proven
+| ○ With WAL
+| ○ With revs
+| ✓ Built-in
+
+| Dependent types
+| ✓ GQL-dt
+| ✗ None
+| ✗ None
+| ✗ None
+|===
+
+== Security Considerations
+
+=== Encryption at Rest
+
+Cloud storage encryption is the user's responsibility:
+
+[cols="1,2"]
+|===
+| Option | Implementation
+
+| Cloud-native
+| Use Dropbox/GDrive encryption (provider has keys)
+
+| Client-side
+| Encrypt journal segments before sync (Cryptomator, gocryptfs)
+
+| Lithoglyph-native
+| Future: built-in encryption with user-held keys
+|===
+
+=== Access Control
+
+Multi-user access control options:
+
+1. **Cloud folder permissions**: Use Dropbox/GDrive sharing
+2. **Journal-level ACL**: Future: encrypted entries per-user
+3. **Read-only sharing**: Share only checkpoint files, not journal
+
+=== Audit Trail
+
+The journal IS the audit trail:
+
+* Every change recorded with actor-id
+* Timestamps (with clock skew caveats)
+* Full history preserved
+* Cannot delete entries (append-only)
+* Provenance pointers in every query result
+
+== Open Questions
+
+[cols="1,2,2"]
+|===
+| ID | Question | Acceptance Criteria
+
+| Q-CLOUD-001
+| Should Lithoglyph have built-in encryption?
+| Design doc for key management
+
+| Q-CLOUD-002
+| Real-time sync protocol (beyond cloud storage)?
+| WebSocket/CRDT design if needed
+
+| Q-CLOUD-003
+| Maximum practical database size for cloud sync?
+| Benchmark with 10GB+ database
+
+| Q-CLOUD-004
+| Checkpoint frequency default?
+| Balance recovery speed vs. storage
+|===
+
+== See Also
+
+* link:../README.adoc[README] - Lithoglyph overview
+* link:../ARCHITECTURE.adoc[ARCHITECTURE] - System architecture
+* link:self-normalizing.adoc[Self-Normalizing] - Schema evolution
+* https://github.com/hyperpolymath/zotero-lith[Zotero-Lithoglyph] - Reference manager using cloud storage

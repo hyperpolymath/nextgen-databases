@@ -1,0 +1,29 @@
+INPUT:
+CREATE COLLECTION bofig_claims (
+  investigation_id STRING NOT NULL,
+  claim_text STRING NOT NULL,
+  claim_type STRING NOT NULL,
+  confidence PROMPT_SCORE NOT NULL,
+  speaker_id STRING,
+  claim_date TIMESTAMP,
+  assertion_date TIMESTAMP,
+  corroboration_count INTEGER DEFAULT 0,
+  contradiction_count INTEGER DEFAULT 0,
+  impeachment_flag STRING DEFAULT 'none',
+  prompt_provenance PROMPT_SCORE,
+  prompt_replicability PROMPT_SCORE,
+  prompt_objectivity PROMPT_SCORE,
+  prompt_methodology PROMPT_SCORE,
+  prompt_publication PROMPT_SCORE,
+  prompt_timeliness PROMPT_SCORE
+)
+WITH PROVENANCE {
+  actor: "system:schema-init",
+  rationale: "Bofig claims collection — factual assertions extracted from evidence"
+}
+---
+PARSED:
+(create-collection "bofig_claims" (fields 16) (provenance (actor "system:schema-init") (rationale "Bofig claims collection — factual assertions extracted from evidence")))
+---
+RESULT:
+(ok (created "bofig_claims") (fields 16))

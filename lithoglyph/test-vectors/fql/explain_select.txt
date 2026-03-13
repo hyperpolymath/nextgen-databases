@@ -1,0 +1,8 @@
+INPUT:
+EXPLAIN SELECT * FROM users WHERE age > 21
+---
+PARSED:
+(explain (select (fields *) (from "users") (where (> "age" 21))))
+---
+RESULT:
+(plan (type "sequential-scan") (collection "users") (filter (> "age" 21)) (estimated-cost "low"))
