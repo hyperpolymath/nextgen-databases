@@ -129,7 +129,7 @@ let filtersAtom: Jotai.atom<array<filterCondition>> = Jotai.atom([])
 // Filter conjunction (AND/OR)
 let filterConjunctionAtom: Jotai.atom<[#And | #Or]> = Jotai.atom(#And)
 
-// Filter (FQL expression) - legacy
+// Filter (GQL expression) - legacy
 let filterAtom: Jotai.atom<option<string>> = Jotai.atom(None)
 
 // Helper to check if a cell value matches a filter condition

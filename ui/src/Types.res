@@ -95,7 +95,7 @@ type viewConfig = {
   viewType: viewType,
   visibleFields: array<string>,
   sortBy: option<(string, [#Asc | #Desc])>,
-  filterBy: option<string>, // FQL filter expression
+  filterBy: option<string>, // GQL filter expression
 }
 
 type base = {

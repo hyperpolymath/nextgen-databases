@@ -21,7 +21,7 @@ export ERTS_INCLUDE_DIR=/usr/lib/erlang/erts-*/include
 
 ### 2. Lithoglyph Functions Not Public
 ```
-error: 'fdb_db_open' is not marked 'pub'
+error: 'lith_db_open' is not marked 'pub'
 ```
 
 The `export` functions in Lithoglyph bridge.zig are C-exported but not Zig-public.
@@ -46,17 +46,17 @@ Instead of importing Lithoglyph as a module, we can link against it as a C libra
 
 ```zig
 // Declare C functions
-extern fn fdb_db_open(
+extern fn lith_db_open(
     path_ptr: [*]const u8,
     path_len: usize,
     opts_ptr: ?[*]const u8,
     opts_len: usize,
-    out_db: *?*FdbDb,
-    out_err: *FdbBlob,
-) FdbStatus;
+    out_db: *?*LithDb,
+    out_err: *LithBlob,
+) LithStatus;
 
 // Use them directly
-const status = fdb_db_open(path.ptr, path.len, null, 0, &out_db, &out_err);
+const status = lith_db_open(path.ptr, path.len, null, 0, &out_db, &out_err);
 ```
 
 Then link:

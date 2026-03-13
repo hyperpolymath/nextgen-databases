@@ -78,12 +78,12 @@ This FFI wraps the Lithoglyph core-zig library (`lithoglyph/lith/database/core-z
 const lithoglyph = @import("lithoglyph");
 
 // Use Lithoglyph types
-const FdbDb = lithoglyph.FdbDb;
-const FdbTxn = lithoglyph.FdbTxn;
-const FdbStatus = lithoglyph.types.FdbStatus;
+const LithDb = lithoglyph.LithDb;
+const LithTxn = lithoglyph.LithTxn;
+const LithStatus = lithoglyph.types.LithStatus;
 
 // Call Lithoglyph functions
-const status = lithoglyph.fdb_db_open(
+const status = lithoglyph.lith_db_open(
     path.ptr,
     path.len,
     null, // options

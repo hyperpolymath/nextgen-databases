@@ -1,96 +1,29 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// Lith NIF - Erlang/BEAM Native Implemented Functions
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
 //
-// Bridges Lith's Zig C ABI to the Erlang runtime via NIFs.
+// Lithoglyph NIF - Erlang/BEAM Native Implemented Functions
+//
+// Bridges Lith's Zig storage engine to the Erlang runtime via NIFs.
+// Uses core_bridge module import (not extern linking) for type safety.
 // All data is passed as CBOR-encoded binaries.
 
 const std = @import("std");
+const core = @import("core_bridge");
 const erl_nif = @cImport({
     @cInclude("erl_nif.h");
 });
 
-// Lith C ABI imports (linked at build time)
-extern fn fdb_version() u32;
-extern fn fdb_db_open(
-    path_ptr: [*]const u8,
-    path_len: usize,
-    opts_ptr: ?[*]const u8,
-    opts_len: usize,
-    out_db: *?*anyopaque,
-    out_err: *FdbBlob,
-) FdbStatus;
-extern fn fdb_db_close(db: ?*anyopaque) FdbStatus;
-extern fn fdb_txn_begin(
-    db: ?*anyopaque,
-    mode: FdbTxnMode,
-    out_txn: *?*anyopaque,
-    out_err: *FdbBlob,
-) FdbStatus;
-extern fn fdb_txn_commit(txn: ?*anyopaque, out_err: *FdbBlob) FdbStatus;
-extern fn fdb_txn_abort(txn: ?*anyopaque) FdbStatus;
-extern fn fdb_apply(
-    txn: ?*anyopaque,
-    op_ptr: [*]const u8,
-    op_len: usize,
-) FdbResult;
-extern fn fdb_render_journal(
-    db: ?*anyopaque,
-    since: u64,
-    opts: FdbRenderOpts,
-    out_text: *FdbBlob,
-    out_err: *FdbBlob,
-) FdbStatus;
-extern fn fdb_introspect_schema(
-    db: ?*anyopaque,
-    out_schema: *FdbBlob,
-    out_err: *FdbBlob,
-) FdbStatus;
-extern fn fdb_blob_free(blob: *FdbBlob) void;
+// Re-export core types for clarity
+const LgBlob = core.LgBlob;
+const LgStatus = core.LgStatus;
+const LgResult = core.LgResult;
+const LgTxnMode = core.LgTxnMode;
+const LgRenderOpts = core.LgRenderOpts;
 
-// Lith types (must match types.zig)
-const FdbBlob = extern struct {
-    data: ?[*]const u8,
-    len: usize,
-    encoding: u8,
-    _padding: [7]u8 = [_]u8{0} ** 7,
-};
-
-const FdbStatus = enum(i32) {
-    ok = 0,
-    err_db_not_found = 1001,
-    err_db_already_open = 1002,
-    err_db_corrupted = 1003,
-    err_txn_not_active = 2001,
-    err_txn_already_committed = 2002,
-    err_doc_not_found = 3001,
-    err_collection_not_found = 4001,
-    err_schema_violation = 5001,
-    err_internal = 9001,
-    err_out_of_memory = 9002,
-    err_invalid_argument = 9003,
-    err_not_implemented = 9004,
-};
-
-const FdbTxnMode = enum(u8) {
-    read_only = 0,
-    read_write = 1,
-};
-
-const FdbRenderOpts = extern struct {
-    include_provenance: bool = true,
-    include_timestamps: bool = true,
-    pretty_print: bool = false,
-    max_depth: u32 = 10,
-    _padding: [3]u8 = [_]u8{0} ** 3,
-};
-
-const FdbResult = extern struct {
-    result_blob: FdbBlob,
-    provenance_blob: FdbBlob,
-    status: FdbStatus,
-    _padding: [4]u8 = [_]u8{0} ** 4,
-    err_blob: FdbBlob,
-};
+// NIF function signature type (matches erl_nif.h expectations)
+const NifEnv = ?*erl_nif.ErlNifEnv;
+const NifTerm = erl_nif.ERL_NIF_TERM;
+const NifArgs = [*c]const NifTerm;
 
 // ============================================================
 // Resource Types for BEAM
@@ -108,18 +41,20 @@ const TxnResource = struct {
     db: *DbResource,
 };
 
-fn db_resource_dtor(_: *erl_nif.ErlNifEnv, obj: *anyopaque) callconv(.C) void {
-    const res: *DbResource = @ptrCast(@alignCast(obj));
+fn db_resource_dtor(_: NifEnv, obj: ?*anyopaque) callconv(.c) void {
+    const res: *DbResource = @ptrCast(@alignCast(obj orelse return));
     if (res.handle) |h| {
-        _ = fdb_db_close(h);
+        // SAFETY: handle was created by lith_db_open which returns *LgDb as *anyopaque
+        _ = core.lith_db_close(@ptrCast(h));
         res.handle = null;
     }
 }
 
-fn txn_resource_dtor(_: *erl_nif.ErlNifEnv, obj: *anyopaque) callconv(.C) void {
-    const res: *TxnResource = @ptrCast(@alignCast(obj));
+fn txn_resource_dtor(_: NifEnv, obj: ?*anyopaque) callconv(.c) void {
+    const res: *TxnResource = @ptrCast(@alignCast(obj orelse return));
     if (res.handle) |h| {
-        _ = fdb_txn_abort(h);
+        // SAFETY: handle was created by lith_txn_begin which returns *LgTxn as *anyopaque
+        _ = core.lith_txn_abort(@ptrCast(h));
         res.handle = null;
     }
 }
@@ -128,7 +63,7 @@ fn txn_resource_dtor(_: *erl_nif.ErlNifEnv, obj: *anyopaque) callconv(.C) void {
 // NIF Helper Functions
 // ============================================================
 
-fn make_atom(env: *erl_nif.ErlNifEnv, name: []const u8) erl_nif.ERL_NIF_TERM {
+fn make_atom(env: NifEnv, name: []const u8) NifTerm {
     var atom: erl_nif.ERL_NIF_TERM = undefined;
     if (erl_nif.enif_make_existing_atom_len(env, name.ptr, name.len, &atom, erl_nif.ERL_NIF_LATIN1) != 0) {
         return atom;
@@ -136,15 +71,15 @@ fn make_atom(env: *erl_nif.ErlNifEnv, name: []const u8) erl_nif.ERL_NIF_TERM {
     return erl_nif.enif_make_atom_len(env, name.ptr, name.len);
 }
 
-fn make_ok(env: *erl_nif.ErlNifEnv, term: erl_nif.ERL_NIF_TERM) erl_nif.ERL_NIF_TERM {
+fn make_ok(env: NifEnv, term: NifTerm) NifTerm {
     return erl_nif.enif_make_tuple2(env, make_atom(env, "ok"), term);
 }
 
-fn make_error(env: *erl_nif.ErlNifEnv, reason: []const u8) erl_nif.ERL_NIF_TERM {
+fn make_error(env: NifEnv, reason: []const u8) NifTerm {
     return erl_nif.enif_make_tuple2(env, make_atom(env, "error"), make_atom(env, reason));
 }
 
-fn make_error_with_message(env: *erl_nif.ErlNifEnv, reason: []const u8, msg: []const u8) erl_nif.ERL_NIF_TERM {
+fn make_error_with_message(env: NifEnv, reason: []const u8, msg: []const u8) NifTerm {
     var bin: erl_nif.ErlNifBinary = undefined;
     if (erl_nif.enif_alloc_binary(msg.len, &bin) == 0) {
         return make_error(env, reason);
@@ -154,8 +89,8 @@ fn make_error_with_message(env: *erl_nif.ErlNifEnv, reason: []const u8, msg: []c
     return erl_nif.enif_make_tuple3(env, make_atom(env, "error"), make_atom(env, reason), msg_term);
 }
 
-fn blob_to_binary(env: *erl_nif.ErlNifEnv, blob: FdbBlob) ?erl_nif.ERL_NIF_TERM {
-    if (blob.data) |data| {
+fn blob_to_binary(env: NifEnv, blob: LgBlob) ?erl_nif.ERL_NIF_TERM {
+    if (blob.ptr) |data| {
         var bin: erl_nif.ErlNifBinary = undefined;
         if (erl_nif.enif_alloc_binary(blob.len, &bin) == 0) {
             return null;
@@ -163,24 +98,20 @@ fn blob_to_binary(env: *erl_nif.ErlNifEnv, blob: FdbBlob) ?erl_nif.ERL_NIF_TERM 
         @memcpy(bin.data[0..blob.len], data[0..blob.len]);
         return erl_nif.enif_make_binary(env, &bin);
     }
-    return erl_nif.enif_make_binary(env, &erl_nif.ErlNifBinary{ .size = 0, .data = null });
+    var empty_bin = erl_nif.ErlNifBinary{ .size = 0, .data = null };
+    return erl_nif.enif_make_binary(env, &empty_bin);
 }
 
-fn status_to_atom(status: FdbStatus) []const u8 {
+fn status_to_atom(status: LgStatus) []const u8 {
     return switch (status) {
         .ok => "ok",
-        .err_db_not_found => "db_not_found",
-        .err_db_already_open => "db_already_open",
-        .err_db_corrupted => "db_corrupted",
+        .err_internal => "internal_error",
+        .err_not_found => "not_found",
+        .err_invalid_argument => "invalid_argument",
+        .err_out_of_memory => "out_of_memory",
+        .err_not_implemented => "not_implemented",
         .err_txn_not_active => "txn_not_active",
         .err_txn_already_committed => "txn_already_committed",
-        .err_doc_not_found => "doc_not_found",
-        .err_collection_not_found => "collection_not_found",
-        .err_schema_violation => "schema_violation",
-        .err_internal => "internal_error",
-        .err_out_of_memory => "out_of_memory",
-        .err_invalid_argument => "invalid_argument",
-        .err_not_implemented => "not_implemented",
     };
 }
 
@@ -189,8 +120,8 @@ fn status_to_atom(status: FdbStatus) []const u8 {
 // ============================================================
 
 /// Get Lith version
-fn nif_version(env: *erl_nif.ErlNifEnv, _: c_int, _: [*]const erl_nif.ERL_NIF_TERM) callconv(.C) erl_nif.ERL_NIF_TERM {
-    const version = fdb_version();
+fn nif_version(env: NifEnv, _: c_int, _: NifArgs) callconv(.c) NifTerm {
+    const version = core.lith_version();
     const major = version / 10000;
     const minor = (version % 10000) / 100;
     const patch = version % 100;
@@ -204,7 +135,7 @@ fn nif_version(env: *erl_nif.ErlNifEnv, _: c_int, _: [*]const erl_nif.ERL_NIF_TE
 }
 
 /// Open a Lith database
-fn nif_db_open(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_NIF_TERM) callconv(.C) erl_nif.ERL_NIF_TERM {
+fn nif_db_open(env: NifEnv, argc: c_int, argv: NifArgs) callconv(.c) NifTerm {
     if (argc != 1) return make_error(env, "badarg");
 
     var path_bin: erl_nif.ErlNifBinary = undefined;
@@ -218,22 +149,22 @@ fn nif_db_open(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_
             return make_error(env, "alloc_failed"),
     ));
 
-    var err_blob: FdbBlob = undefined;
-    const status = fdb_db_open(
+    var err_blob: LgBlob = LgBlob.empty();
+    const status = core.lith_db_open(
         path_bin.data,
         path_bin.size,
         null,
         0,
-        &res.handle,
+        @ptrCast(&res.handle),
         &err_blob,
     );
 
     if (status != .ok) {
         erl_nif.enif_release_resource(res);
-        if (err_blob.data) |_| {
-            const msg = err_blob.data.?[0..err_blob.len];
+        if (err_blob.ptr) |_| {
+            const msg = err_blob.ptr.?[0..err_blob.len];
             var blob_copy = err_blob;
-            defer fdb_blob_free(&blob_copy);
+            defer core.lith_blob_free(&blob_copy);
             return make_error_with_message(env, status_to_atom(status), msg);
         }
         return make_error(env, status_to_atom(status));
@@ -245,7 +176,7 @@ fn nif_db_open(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_
 }
 
 /// Close a Lith database
-fn nif_db_close(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_NIF_TERM) callconv(.C) erl_nif.ERL_NIF_TERM {
+fn nif_db_close(env: NifEnv, argc: c_int, argv: NifArgs) callconv(.c) NifTerm {
     if (argc != 1) return make_error(env, "badarg");
 
     var res: *DbResource = undefined;
@@ -254,7 +185,8 @@ fn nif_db_close(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL
     }
 
     if (res.handle) |h| {
-        const status = fdb_db_close(h);
+        // SAFETY: handle was created by lith_db_open
+        const status = core.lith_db_close(@ptrCast(h));
         res.handle = null;
         if (status != .ok) {
             return make_error(env, status_to_atom(status));
@@ -265,7 +197,7 @@ fn nif_db_close(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL
 }
 
 /// Begin a transaction
-fn nif_txn_begin(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_NIF_TERM) callconv(.C) erl_nif.ERL_NIF_TERM {
+fn nif_txn_begin(env: NifEnv, argc: c_int, argv: NifArgs) callconv(.c) NifTerm {
     if (argc != 2) return make_error(env, "badarg");
 
     var db_res: *DbResource = undefined;
@@ -283,7 +215,7 @@ fn nif_txn_begin(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ER
     if (mode_len == 0) return make_error(env, "badarg");
 
     const mode_str = mode_buf[0 .. @as(usize, @intCast(mode_len)) - 1];
-    const mode: FdbTxnMode = if (std.mem.eql(u8, mode_str, "read_only"))
+    const mode: LgTxnMode = if (std.mem.eql(u8, mode_str, "read_only"))
         .read_only
     else if (std.mem.eql(u8, mode_str, "read_write"))
         .read_write
@@ -298,8 +230,9 @@ fn nif_txn_begin(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ER
 
     txn_res.db = db_res;
 
-    var err_blob: FdbBlob = undefined;
-    const status = fdb_txn_begin(db_res.handle, mode, &txn_res.handle, &err_blob);
+    var err_blob: LgBlob = LgBlob.empty();
+    // SAFETY: db_res.handle was created by lith_db_open; txn_res.handle receives *LgTxn
+    const status = core.lith_txn_begin(@ptrCast(db_res.handle), mode, @ptrCast(&txn_res.handle), &err_blob);
 
     if (status != .ok) {
         erl_nif.enif_release_resource(txn_res);
@@ -312,7 +245,7 @@ fn nif_txn_begin(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ER
 }
 
 /// Commit a transaction
-fn nif_txn_commit(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_NIF_TERM) callconv(.C) erl_nif.ERL_NIF_TERM {
+fn nif_txn_commit(env: NifEnv, argc: c_int, argv: NifArgs) callconv(.c) NifTerm {
     if (argc != 1) return make_error(env, "badarg");
 
     var txn_res: *TxnResource = undefined;
@@ -324,8 +257,9 @@ fn nif_txn_commit(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.E
         return make_error(env, "txn_closed");
     }
 
-    var err_blob: FdbBlob = undefined;
-    const status = fdb_txn_commit(txn_res.handle, &err_blob);
+    var err_blob: LgBlob = LgBlob.empty();
+    // SAFETY: txn_res.handle was created by lith_txn_begin
+    const status = core.lith_txn_commit(@ptrCast(txn_res.handle), &err_blob);
     txn_res.handle = null;
 
     if (status != .ok) {
@@ -336,7 +270,7 @@ fn nif_txn_commit(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.E
 }
 
 /// Abort a transaction
-fn nif_txn_abort(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_NIF_TERM) callconv(.C) erl_nif.ERL_NIF_TERM {
+fn nif_txn_abort(env: NifEnv, argc: c_int, argv: NifArgs) callconv(.c) NifTerm {
     if (argc != 1) return make_error(env, "badarg");
 
     var txn_res: *TxnResource = undefined;
@@ -345,7 +279,8 @@ fn nif_txn_abort(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ER
     }
 
     if (txn_res.handle) |h| {
-        _ = fdb_txn_abort(h);
+        // SAFETY: handle was created by lith_txn_begin
+        _ = core.lith_txn_abort(@ptrCast(h));
         txn_res.handle = null;
     }
 
@@ -353,7 +288,7 @@ fn nif_txn_abort(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ER
 }
 
 /// Apply an operation (CBOR-encoded)
-fn nif_apply(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_NIF_TERM) callconv(.C) erl_nif.ERL_NIF_TERM {
+fn nif_apply(env: NifEnv, argc: c_int, argv: NifArgs) callconv(.c) NifTerm {
     if (argc != 2) return make_error(env, "badarg");
 
     var txn_res: *TxnResource = undefined;
@@ -370,11 +305,12 @@ fn nif_apply(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_NI
         return make_error(env, "badarg");
     }
 
-    const result = fdb_apply(txn_res.handle, op_bin.data, op_bin.size);
+    // SAFETY: txn_res.handle was created by lith_txn_begin
+    const result = core.lith_apply(@ptrCast(txn_res.handle), op_bin.data, op_bin.size);
 
     if (result.status != .ok) {
-        if (result.err_blob.data) |_| {
-            if (blob_to_binary(env, result.err_blob)) |err_term| {
+        if (result.error_blob.ptr) |_| {
+            if (blob_to_binary(env, result.error_blob)) |err_term| {
                 return erl_nif.enif_make_tuple3(
                     env,
                     make_atom(env, "error"),
@@ -387,11 +323,11 @@ fn nif_apply(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_NI
     }
 
     // Build success response with result and provenance
-    const result_term = blob_to_binary(env, result.result_blob) orelse
+    const result_term = blob_to_binary(env, result.data) orelse
         return make_error(env, "encoding_failed");
 
-    if (result.provenance_blob.data != null) {
-        const prov_term = blob_to_binary(env, result.provenance_blob) orelse
+    if (result.provenance.ptr != null) {
+        const prov_term = blob_to_binary(env, result.provenance) orelse
             return make_ok(env, result_term);
 
         return erl_nif.enif_make_tuple3(
@@ -406,7 +342,7 @@ fn nif_apply(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_NI
 }
 
 /// Get schema information
-fn nif_schema(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_NIF_TERM) callconv(.C) erl_nif.ERL_NIF_TERM {
+fn nif_schema(env: NifEnv, argc: c_int, argv: NifArgs) callconv(.c) NifTerm {
     if (argc != 1) return make_error(env, "badarg");
 
     var db_res: *DbResource = undefined;
@@ -418,9 +354,10 @@ fn nif_schema(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_N
         return make_error(env, "db_closed");
     }
 
-    var schema_blob: FdbBlob = undefined;
-    var err_blob: FdbBlob = undefined;
-    const status = fdb_introspect_schema(db_res.handle, &schema_blob, &err_blob);
+    var schema_blob: LgBlob = LgBlob.empty();
+    var err_blob: LgBlob = LgBlob.empty();
+    // SAFETY: db_res.handle was created by lith_db_open
+    const status = core.lith_introspect_schema(@ptrCast(db_res.handle), &schema_blob, &err_blob);
 
     if (status != .ok) {
         return make_error(env, status_to_atom(status));
@@ -433,7 +370,7 @@ fn nif_schema(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_N
 }
 
 /// Get journal entries since a sequence number
-fn nif_journal(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_NIF_TERM) callconv(.C) erl_nif.ERL_NIF_TERM {
+fn nif_journal(env: NifEnv, argc: c_int, argv: NifArgs) callconv(.c) NifTerm {
     if (argc != 2) return make_error(env, "badarg");
 
     var db_res: *DbResource = undefined;
@@ -450,10 +387,11 @@ fn nif_journal(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_
         return make_error(env, "badarg");
     }
 
-    var journal_blob: FdbBlob = undefined;
-    var err_blob: FdbBlob = undefined;
-    const opts = FdbRenderOpts{};
-    const status = fdb_render_journal(db_res.handle, since, opts, &journal_blob, &err_blob);
+    var journal_blob: LgBlob = LgBlob.empty();
+    var err_blob: LgBlob = LgBlob.empty();
+    const opts = LgRenderOpts{ .format = 0, .include_metadata = true };
+    // SAFETY: db_res.handle was created by lith_db_open
+    const status = core.lith_render_journal(@ptrCast(db_res.handle), since, opts, &journal_blob, &err_blob);
 
     if (status != .ok) {
         return make_error(env, status_to_atom(status));
@@ -469,7 +407,7 @@ fn nif_journal(env: *erl_nif.ErlNifEnv, argc: c_int, argv: [*]const erl_nif.ERL_
 // NIF Table and Initialization
 // ============================================================
 
-const nif_funcs = [_]erl_nif.ErlNifFunc{
+var nif_funcs = [_]erl_nif.ErlNifFunc{
     .{ .name = "version", .arity = 0, .fptr = nif_version, .flags = 0 },
     .{ .name = "db_open", .arity = 1, .fptr = nif_db_open, .flags = 0 },
     .{ .name = "db_close", .arity = 1, .fptr = nif_db_close, .flags = 0 },
@@ -481,7 +419,7 @@ const nif_funcs = [_]erl_nif.ErlNifFunc{
     .{ .name = "journal", .arity = 2, .fptr = nif_journal, .flags = 0 },
 };
 
-fn load(env: *erl_nif.ErlNifEnv, _: *?*anyopaque, _: erl_nif.ERL_NIF_TERM) callconv(.C) c_int {
+fn load(env: NifEnv, _: [*c]?*anyopaque, _: erl_nif.ERL_NIF_TERM) callconv(.c) c_int {
     db_resource_type = erl_nif.enif_open_resource_type(
         env,
         null,
@@ -510,7 +448,7 @@ fn load(env: *erl_nif.ErlNifEnv, _: *?*anyopaque, _: erl_nif.ERL_NIF_TERM) callc
 pub export const lith_nif_init = erl_nif.ErlNifEntry{
     .major = erl_nif.ERL_NIF_MAJOR_VERSION,
     .minor = erl_nif.ERL_NIF_MINOR_VERSION,
-    .name = "Elixir.Lith.NIF",
+    .name = "lith_nif",
     .num_of_funcs = nif_funcs.len,
     .funcs = &nif_funcs,
     .load = load,

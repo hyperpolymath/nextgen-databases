@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// FQL (Lith Query Language) builder for type-safe queries
+// GQL (Lith Query Language) builder for type-safe queries
 
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/string
 
-/// FQL query builder
+/// GQL query builder
 pub opaque type Query {
   Query(
     collection: String,
@@ -39,7 +39,7 @@ pub fn select(query: Query, fields: List(String)) -> Query {
   Query(..query, select_fields: fields)
 }
 
-/// Add a where clause (FQL filter expression)
+/// Add a where clause (GQL filter expression)
 pub fn where(query: Query, clause: String) -> Query {
   Query(..query, where_clause: Some(clause))
 }
@@ -59,7 +59,7 @@ pub fn offset(query: Query, count: Int) -> Query {
   Query(..query, offset_count: Some(count))
 }
 
-/// Build the FQL string
+/// Build the GQL string
 pub fn build(query: Query) -> String {
   let select_part = case query.select_fields {
     [] -> "*"
