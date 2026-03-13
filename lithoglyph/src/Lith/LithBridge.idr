@@ -1,5 +1,5 @@
 -- SPDX-License-Identifier: PMPL-1.0-or-later
--- SPDX-FileCopyrightText: 2025 Jonathan D.A. Jewell (@hyperpolymath)
+-- Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 --
 -- LithBridge.idr - Type definitions with proofs for Lith Lith.Bridge ABI
 -- Media-Type: text/x-idris
@@ -25,39 +25,39 @@ import Data.List
 ||| Non-null database handle
 ||| @ ptr The pointer value (guaranteed non-zero)
 public export
-data FdbDb : Type where
-  MkFdbDb : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> FdbDb
+data LithDb : Type where
+  MkLithDb : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> LithDb
 
 ||| Non-null transaction handle
 ||| Transactions are ACID-compliant with rollback via journal inverses
 public export
-data FdbTxn : Type where
-  MkFdbTxn : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> FdbTxn
+data LithTxn : Type where
+  MkLithTxn : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> LithTxn
 
 ||| Non-null cursor handle for query results
 public export
-data FdbCursor : Type where
-  MkFdbCursor : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> FdbCursor
+data LithCursor : Type where
+  MkLithCursor : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> LithCursor
 
 ||| Non-null collection handle
 public export
-data FdbCollection : Type where
-  MkFdbCollection : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> FdbCollection
+data LithCollection : Type where
+  MkLithCollection : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> LithCollection
 
 ||| Non-null schema handle
 public export
-data FdbSchema : Type where
-  MkFdbSchema : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> FdbSchema
+data LithSchema : Type where
+  MkLithSchema : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> LithSchema
 
 ||| Non-null journal handle
 public export
-data FdbJournal : Type where
-  MkFdbJournal : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> FdbJournal
+data LithJournal : Type where
+  MkLithJournal : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> LithJournal
 
 ||| Non-null migration handle
 public export
-data FdbMigration : Type where
-  MkFdbMigration : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> FdbMigration
+data LithMigration : Type where
+  MkLithMigration : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> LithMigration
 
 --------------------------------------------------------------------------------
 -- Status Codes
@@ -65,35 +65,35 @@ data FdbMigration : Type where
 
 ||| Result status codes for FFI operations
 public export
-data FdbStatus : Type where
+data LithStatus : Type where
   ||| Operation succeeded
-  StatusOk : FdbStatus
+  StatusOk : LithStatus
   ||| Invalid argument provided
-  StatusInvalidArg : FdbStatus
+  StatusInvalidArg : LithStatus
   ||| Database file not found
-  StatusNotFound : FdbStatus
+  StatusNotFound : LithStatus
   ||| Permission denied
-  StatusPermissionDenied : FdbStatus
+  StatusPermissionDenied : LithStatus
   ||| Database already exists
-  StatusAlreadyExists : FdbStatus
+  StatusAlreadyExists : LithStatus
   ||| Constraint violation
-  StatusConstraintViolation : FdbStatus
+  StatusConstraintViolation : LithStatus
   ||| Type mismatch
-  StatusTypeMismatch : FdbStatus
+  StatusTypeMismatch : LithStatus
   ||| Out of memory
-  StatusOutOfMemory : FdbStatus
+  StatusOutOfMemory : LithStatus
   ||| I/O error
-  StatusIOError : FdbStatus
+  StatusIOError : LithStatus
   ||| Corruption detected
-  StatusCorruption : FdbStatus
+  StatusCorruption : LithStatus
   ||| Transaction conflict (optimistic concurrency control)
-  StatusConflict : FdbStatus
+  StatusConflict : LithStatus
   ||| Internal error
-  StatusInternalError : FdbStatus
+  StatusInternalError : LithStatus
 
 ||| Convert status to integer for FFI
 public export
-statusToInt : FdbStatus -> Int32
+statusToInt : LithStatus -> Int32
 statusToInt StatusOk = 0
 statusToInt StatusInvalidArg = 1
 statusToInt StatusNotFound = 2
@@ -314,21 +314,21 @@ record Migration where
 
 ||| Result type for FFI operations
 public export
-record FdbResult (a : Type) where
-  constructor MkFdbResult
-  status : FdbStatus
+record LithResult (a : Type) where
+  constructor MkLithResult
+  status : LithStatus
   value : Maybe a
   errorMessage : Maybe String
 
 ||| Smart constructor for success result
 public export
-ok : a -> FdbResult a
-ok v = MkFdbResult StatusOk (Just v) Nothing
+ok : a -> LithResult a
+ok v = MkLithResult StatusOk (Just v) Nothing
 
 ||| Smart constructor for error result
 public export
-err : FdbStatus -> String -> FdbResult a
-err s msg = MkFdbResult s Nothing (Just msg)
+err : LithStatus -> String -> LithResult a
+err s msg = MkLithResult s Nothing (Just msg)
 
 --------------------------------------------------------------------------------
 -- Integration with Proven Library
@@ -371,7 +371,7 @@ validateDbPath path =
   else if isPrefixOf "/" path then Nothing
   else Just path
 
-||| Validate FQL query using inline checks.
+||| Validate GQL query using inline checks.
 ||| Returns Nothing if the query is invalid, or Just the validated query.
 ||| Checks: non-empty, no obvious injection patterns (semicolons, comment
 ||| markers, DROP/DELETE keywords in uppercase).

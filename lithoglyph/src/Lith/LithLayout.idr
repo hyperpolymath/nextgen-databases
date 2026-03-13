@@ -1,5 +1,5 @@
 -- SPDX-License-Identifier: PMPL-1.0-or-later
--- SPDX-FileCopyrightText: 2025 Jonathan D.A. Jewell (@hyperpolymath)
+-- Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 --
 -- LithLayout.idr - Memory layout verification for Lith Lith.Bridge ABI
 -- Media-Type: text/x-idris
@@ -152,10 +152,10 @@ migrationHandleSize p = pointerSize p
 -- Struct Sizes
 --------------------------------------------------------------------------------
 
-||| Size of FdbStatus (i32)
+||| Size of LithStatus (i32)
 public export %inline
-fdbStatusSize : Nat
-fdbStatusSize = 4
+lithStatusSize : Nat
+lithStatusSize = 4
 
 ||| Size of Confidence (f64)
 public export
@@ -228,7 +228,7 @@ abiPointerSizeDiffers = Refl
 
 ||| Proof that status codes are stable (i32 on all platforms)
 public export
-0 statusSizeStable : 4 = 4  -- fdbStatusSize = 4
+0 statusSizeStable : 4 = 4  -- lithStatusSize = 4
 statusSizeStable = Refl
 
 --------------------------------------------------------------------------------

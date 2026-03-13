@@ -1,5 +1,5 @@
 -- SPDX-License-Identifier: PMPL-1.0-or-later
--- SPDX-FileCopyrightText: 2025 Jonathan D.A. Jewell (@hyperpolymath)
+-- Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 --
 -- LithForeign.idr - FFI declarations for Lith Lith.Bridge ABI
 -- Media-Type: text/x-idris
@@ -20,24 +20,24 @@ import Data.String
 --------------------------------------------------------------------------------
 
 ||| Obtain a null pointer (for unused output parameters)
-%foreign "C:fdb_null_ptr,libbridge"
+%foreign "C:lith_null_ptr,libbridge"
 prim__nullPtr : PrimIO AnyPtr
 
 ||| Allocate a pointer-sized output slot on the heap.
 ||| The caller must free with prim__freeSlot after reading.
-%foreign "C:fdb_alloc_slot,libbridge"
+%foreign "C:lith_alloc_slot,libbridge"
 prim__allocSlot : PrimIO AnyPtr
 
 ||| Read a pointer value from an output slot as Bits64.
-%foreign "C:fdb_read_slot,libbridge"
+%foreign "C:lith_read_slot,libbridge"
 prim__readSlot : (slot : AnyPtr) -> PrimIO Bits64
 
 ||| Free an output slot allocated by prim__allocSlot.
-%foreign "C:fdb_free_slot,libbridge"
+%foreign "C:lith_free_slot,libbridge"
 prim__freeSlot : (slot : AnyPtr) -> PrimIO ()
 
 ||| Cast a Bits64 value to an AnyPtr (for passing handles to C).
-%foreign "C:fdb_bits64_to_ptr,libbridge"
+%foreign "C:lith_bits64_to_ptr,libbridge"
 prim__bits64ToPtr : Bits64 -> AnyPtr
 
 --------------------------------------------------------------------------------
@@ -46,11 +46,11 @@ prim__bits64ToPtr : Bits64 -> AnyPtr
 
 ||| Initialize Lith library
 ||| Returns: Status code
-%foreign "C:fdb_init,liblith"
+%foreign "C:lith_init,liblith"
 prim__init : PrimIO Int32
 
 ||| Cleanup Lith library
-%foreign "C:fdb_cleanup,liblith"
+%foreign "C:lith_cleanup,liblith"
 prim__cleanup : PrimIO ()
 
 ||| Open database
@@ -58,13 +58,13 @@ prim__cleanup : PrimIO ()
 ||| @ path_len Path length in bytes
 ||| @ db_out Output parameter for database handle
 ||| Returns: Status code
-%foreign "C:fdb_open,liblith"
+%foreign "C:lith_open,liblith"
 prim__db_open : (path : String) -> (path_len : Bits64) -> (db_out : AnyPtr) -> PrimIO Int32
 
 ||| Close database
 ||| @ db Database handle to close
 ||| Returns: Status code
-%foreign "C:fdb_close,liblith"
+%foreign "C:lith_close,liblith"
 prim__db_close : (db : AnyPtr) -> PrimIO Int32
 
 ||| Create new database file
@@ -73,7 +73,7 @@ prim__db_close : (db : AnyPtr) -> PrimIO Int32
 ||| @ block_count Initial block allocation count
 ||| @ db_out Output parameter for database handle
 ||| Returns: Status code
-%foreign "C:fdb_create,liblith"
+%foreign "C:lith_create,liblith"
 prim__db_create : (path : String) -> (path_len : Bits64) -> (block_count : Bits64) -> (db_out : AnyPtr) -> PrimIO Int32
 
 --------------------------------------------------------------------------------
@@ -84,19 +84,19 @@ prim__db_create : (path : String) -> (path_len : Bits64) -> (block_count : Bits6
 ||| @ db Database handle
 ||| @ txn_out Output parameter for transaction handle
 ||| Returns: Status code
-%foreign "C:fdb_txn_begin,liblith"
+%foreign "C:lith_txn_begin,liblith"
 prim__txn_begin : (db : AnyPtr) -> (txn_out : AnyPtr) -> PrimIO Int32
 
 ||| Commit transaction
 ||| @ txn Transaction handle
 ||| Returns: Status code
-%foreign "C:fdb_txn_commit,liblith"
+%foreign "C:lith_txn_commit,liblith"
 prim__txn_commit : (txn : AnyPtr) -> PrimIO Int32
 
 ||| Rollback transaction (uses journal inverses)
 ||| @ txn Transaction handle
 ||| Returns: Status code
-%foreign "C:fdb_txn_rollback,liblith"
+%foreign "C:lith_txn_rollback,liblith"
 prim__txn_rollback : (txn : AnyPtr) -> PrimIO Int32
 
 --------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ prim__txn_rollback : (txn : AnyPtr) -> PrimIO Int32
 ||| @ schema_json Schema definition (JSON)
 ||| @ schema_len Schema length
 ||| Returns: Status code
-%foreign "C:fdb_collection_create,liblith"
+%foreign "C:lith_collection_create,liblith"
 prim__collection_create : (db : AnyPtr) -> (name : String) -> (name_len : Bits64) -> (schema_json : String) -> (schema_len : Bits64) -> PrimIO Int32
 
 ||| Drop collection
@@ -118,7 +118,7 @@ prim__collection_create : (db : AnyPtr) -> (name : String) -> (name_len : Bits64
 ||| @ name Collection name
 ||| @ name_len Name length
 ||| Returns: Status code
-%foreign "C:fdb_collection_drop,liblith"
+%foreign "C:lith_collection_drop,liblith"
 prim__collection_drop : (db : AnyPtr) -> (name : String) -> (name_len : Bits64) -> PrimIO Int32
 
 ||| Get collection schema
@@ -126,33 +126,33 @@ prim__collection_drop : (db : AnyPtr) -> (name : String) -> (name_len : Bits64) 
 ||| @ name Collection name
 ||| @ schema_out Output parameter for schema handle
 ||| Returns: Status code
-%foreign "C:fdb_collection_schema,liblith"
+%foreign "C:lith_collection_schema,liblith"
 prim__collection_schema : (db : AnyPtr) -> (name : String) -> (schema_out : AnyPtr) -> PrimIO Int32
 
 --------------------------------------------------------------------------------
--- FFI Function Signatures - FQL Query Execution
+-- FFI Function Signatures - GQL Query Execution
 --------------------------------------------------------------------------------
 
-||| Execute FQL query
+||| Execute GQL query
 ||| @ db Database handle
-||| @ query_str FQL query string
+||| @ query_str GQL query string
 ||| @ query_len Query length
 ||| @ provenance_json Provenance metadata (actor, rationale, timestamp)
 ||| @ provenance_len Provenance length
 ||| @ cursor_out Output parameter for cursor handle
 ||| Returns: Status code
-%foreign "C:fdb_query_execute,liblith"
+%foreign "C:lith_query_execute,liblith"
 prim__query_execute : (db : AnyPtr) -> (query_str : String) -> (query_len : Bits64) -> (provenance_json : String) -> (provenance_len : Bits64) -> (cursor_out : AnyPtr) -> PrimIO Int32
 
-||| Explain FQL query (get execution plan)
+||| Explain GQL query (get execution plan)
 ||| @ db Database handle
-||| @ query_str FQL query string
+||| @ query_str GQL query string
 ||| @ query_len Query length
 ||| @ explain_json_out Buffer for JSON explain output
 ||| @ buffer_len Buffer capacity
 ||| @ written_out Bytes written
 ||| Returns: Status code
-%foreign "C:fdb_query_explain,liblith"
+%foreign "C:lith_query_explain,liblith"
 prim__query_explain : (db : AnyPtr) -> (query_str : String) -> (query_len : Bits64) -> (explain_json_out : AnyPtr) -> (buffer_len : Bits64) -> (written_out : AnyPtr) -> PrimIO Int32
 
 ||| Fetch next result from cursor
@@ -161,11 +161,11 @@ prim__query_explain : (db : AnyPtr) -> (query_str : String) -> (query_len : Bits
 ||| @ buffer_len Buffer capacity
 ||| @ written_out Bytes written
 ||| Returns: Status code (StatusOk if row fetched, StatusNotFound if end)
-%foreign "C:fdb_cursor_next,liblith"
+%foreign "C:lith_cursor_next,liblith"
 prim__cursor_next : (cursor : AnyPtr) -> (document_json_out : AnyPtr) -> (buffer_len : Bits64) -> (written_out : AnyPtr) -> PrimIO Int32
 
 ||| Close cursor
-%foreign "C:fdb_cursor_close,liblith"
+%foreign "C:lith_cursor_close,liblith"
 prim__cursor_close : (cursor : AnyPtr) -> PrimIO ()
 
 --------------------------------------------------------------------------------
@@ -176,7 +176,7 @@ prim__cursor_close : (cursor : AnyPtr) -> PrimIO ()
 ||| @ db Database handle
 ||| @ journal_out Output parameter for journal handle
 ||| Returns: Status code
-%foreign "C:fdb_journal_get,liblith"
+%foreign "C:lith_journal_get,liblith"
 prim__journal_get : (db : AnyPtr) -> (journal_out : AnyPtr) -> PrimIO Int32
 
 ||| Read journal entries
@@ -187,14 +187,14 @@ prim__journal_get : (db : AnyPtr) -> (journal_out : AnyPtr) -> PrimIO Int32
 ||| @ buffer_len Buffer capacity
 ||| @ written_out Bytes written
 ||| Returns: Status code
-%foreign "C:fdb_journal_read,liblith"
+%foreign "C:lith_journal_read,liblith"
 prim__journal_read : (journal : AnyPtr) -> (start_seq : Bits64) -> (count : Bits64) -> (entries_json_out : AnyPtr) -> (buffer_len : Bits64) -> (written_out : AnyPtr) -> PrimIO Int32
 
 ||| Replay journal from sequence number (crash recovery)
 ||| @ db Database handle
 ||| @ from_seq Sequence number to replay from
 ||| Returns: Status code
-%foreign "C:fdb_journal_replay,liblith"
+%foreign "C:lith_journal_replay,liblith"
 prim__journal_replay : (db : AnyPtr) -> (from_seq : Bits64) -> PrimIO Int32
 
 --------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ prim__journal_replay : (db : AnyPtr) -> (from_seq : Bits64) -> PrimIO Int32
 ||| @ buffer_len Buffer capacity
 ||| @ written_out Bytes written
 ||| Returns: Status code
-%foreign "C:fdb_normalize_discover,liblith"
+%foreign "C:lith_normalize_discover,liblith"
 prim__normalize_discover : (db : AnyPtr) -> (collection : String) -> (fds_json_out : AnyPtr) -> (buffer_len : Bits64) -> (written_out : AnyPtr) -> PrimIO Int32
 
 ||| Analyze normal form of collection
@@ -216,7 +216,7 @@ prim__normalize_discover : (db : AnyPtr) -> (collection : String) -> (fds_json_o
 ||| @ collection Collection name
 ||| @ normal_form_out Output parameter for normal form level (0-6)
 ||| Returns: Status code
-%foreign "C:fdb_normalize_analyze,liblith"
+%foreign "C:lith_normalize_analyze,liblith"
 prim__normalize_analyze : (db : AnyPtr) -> (collection : String) -> (normal_form_out : AnyPtr) -> PrimIO Int32
 
 ||| Start migration to higher normal form
@@ -227,14 +227,14 @@ prim__normalize_analyze : (db : AnyPtr) -> (collection : String) -> (normal_form
 ||| @ proof_len Proof length
 ||| @ migration_out Output parameter for migration handle
 ||| Returns: Status code
-%foreign "C:fdb_migrate_start,liblith"
+%foreign "C:lith_migrate_start,liblith"
 prim__migrate_start : (db : AnyPtr) -> (collection : String) -> (target_nf : Bits8) -> (proof_blob : AnyPtr) -> (proof_len : Bits64) -> (migration_out : AnyPtr) -> PrimIO Int32
 
 ||| Commit migration (three-phase: Announce → Shadow → Commit)
 ||| @ migration Migration handle
 ||| @ phase Migration phase (0=Announce, 1=Shadow, 2=Commit)
 ||| Returns: Status code
-%foreign "C:fdb_migrate_commit,liblith"
+%foreign "C:lith_migrate_commit,liblith"
 prim__migrate_commit : (migration : AnyPtr) -> (phase : Bits8) -> PrimIO Int32
 
 --------------------------------------------------------------------------------
@@ -248,11 +248,11 @@ prim__migrate_commit : (migration : AnyPtr) -> (phase : Bits8) -> PrimIO Int32
 ||| @ buffer_len Buffer capacity
 ||| @ written_out Bytes written
 ||| Returns: Status code
-%foreign "C:fdb_serialize_cbor,liblith"
+%foreign "C:lith_serialize_cbor,liblith"
 prim__serialize_cbor : (document_json : String) -> (document_len : Bits64) -> (cbor_out : AnyPtr) -> (buffer_len : Bits64) -> (written_out : AnyPtr) -> PrimIO Int32
 
 ||| Deserialize CBOR to JSON
-%foreign "C:fdb_deserialize_cbor,liblith"
+%foreign "C:lith_deserialize_cbor,liblith"
 prim__deserialize_cbor : (cbor_in : AnyPtr) -> (cbor_len : Bits64) -> (json_out : AnyPtr) -> (buffer_len : Bits64) -> (written_out : AnyPtr) -> PrimIO Int32
 
 --------------------------------------------------------------------------------
@@ -265,7 +265,7 @@ prim__deserialize_cbor : (cbor_in : AnyPtr) -> (cbor_len : Bits64) -> (json_out 
 ||| @ buffer_len Buffer capacity (in number of Bits64)
 ||| @ count_out Number of corrupted blocks found
 ||| Returns: Status code
-%foreign "C:fdb_verify_checksums,liblith"
+%foreign "C:lith_verify_checksums,liblith"
 prim__verify_checksums : (db : AnyPtr) -> (corrupted_blocks_out : AnyPtr) -> (buffer_len : Bits64) -> (count_out : AnyPtr) -> PrimIO Int32
 
 ||| Repair database (using journal replay)
@@ -274,16 +274,16 @@ prim__verify_checksums : (db : AnyPtr) -> (corrupted_blocks_out : AnyPtr) -> (bu
 ||| @ buffer_len Buffer capacity
 ||| @ written_out Bytes written
 ||| Returns: Status code
-%foreign "C:fdb_repair,liblith"
+%foreign "C:lith_repair,liblith"
 prim__repair : (db : AnyPtr) -> (repair_report_out : AnyPtr) -> (buffer_len : Bits64) -> (written_out : AnyPtr) -> PrimIO Int32
 
 --------------------------------------------------------------------------------
 -- Status Code Conversion (needed by wrappers below)
 --------------------------------------------------------------------------------
 
-||| Convert status code to FdbStatus
+||| Convert status code to LithStatus
 export
-intToStatus : Int32 -> FdbStatus
+intToStatus : Int32 -> LithStatus
 intToStatus 0 = StatusOk
 intToStatus 1 = StatusInvalidArg
 intToStatus 2 = StatusNotFound
@@ -303,7 +303,7 @@ intToStatus _ = StatusInternalError
 
 ||| Safe initialization (IO effect)
 export
-init : IO (FdbResult ())
+init : IO (LithResult ())
 init = do
   status <- primIO prim__init
   pure $ if status == 0
@@ -317,10 +317,10 @@ cleanup = primIO prim__cleanup
 
 ||| Safe database open.
 ||| Allocates an output slot, calls prim__db_open, reads the resulting
-||| handle, and wraps it in FdbDb with a runtime non-null check.
+||| handle, and wraps it in LithDb with a runtime non-null check.
 export
 covering
-dbOpen : (path : String) -> IO (FdbResult FdbDb)
+dbOpen : (path : String) -> IO (LithResult LithDb)
 dbOpen path = do
   let pathLen = cast {to=Bits64} (length path)
   dbSlot <- primIO prim__allocSlot
@@ -330,7 +330,7 @@ dbOpen path = do
       ptr <- primIO $ prim__readSlot dbSlot
       primIO $ prim__freeSlot dbSlot
       case choose (ptr /= 0) of
-        Left prf => pure $ ok (MkFdbDb ptr)
+        Left prf => pure $ ok (MkLithDb ptr)
         Right _  => pure $ err StatusInternalError
                                "Database open returned null handle"
     else do
@@ -338,20 +338,20 @@ dbOpen path = do
       pure $ err (intToStatus status)
                  ("Failed to open database: " ++ path)
 
-||| Extract the raw Bits64 handle from an FdbDb.
-extractDbPtr : FdbDb -> Bits64
-extractDbPtr (MkFdbDb ptr) = ptr
+||| Extract the raw Bits64 handle from an LithDb.
+extractDbPtr : LithDb -> Bits64
+extractDbPtr (MkLithDb ptr) = ptr
 
-||| Extract the raw Bits64 handle from an FdbTxn.
-extractTxnPtr : FdbTxn -> Bits64
-extractTxnPtr (MkFdbTxn ptr) = ptr
+||| Extract the raw Bits64 handle from an LithTxn.
+extractTxnPtr : LithTxn -> Bits64
+extractTxnPtr (MkLithTxn ptr) = ptr
 
 ||| Safe database close.
-||| Extracts the pointer from FdbDb, converts to AnyPtr, and calls
+||| Extracts the pointer from LithDb, converts to AnyPtr, and calls
 ||| prim__db_close.
 export
 covering
-dbClose : FdbDb -> IO (FdbResult ())
+dbClose : LithDb -> IO (LithResult ())
 dbClose db = do
   let ptr = extractDbPtr db
   status <- primIO $ prim__db_close (prim__bits64ToPtr ptr)
@@ -365,7 +365,7 @@ dbClose db = do
 ||| TODO: Replace validateDbPath call with Proven.SafePath.validatePath.
 export
 covering
-dbCreate : (path : String) -> (blockCount : Nat) -> IO (FdbResult FdbDb)
+dbCreate : (path : String) -> (blockCount : Nat) -> IO (LithResult LithDb)
 dbCreate path blockCount = do
   case validateDbPath path of
     Nothing => pure $ err StatusInvalidArg
@@ -380,7 +380,7 @@ dbCreate path blockCount = do
           ptr <- primIO $ prim__readSlot dbSlot
           primIO $ prim__freeSlot dbSlot
           case choose (ptr /= 0) of
-            Left prf => pure $ ok (MkFdbDb ptr)
+            Left prf => pure $ ok (MkLithDb ptr)
             Right _  => pure $ err StatusInternalError
                                    "Database create returned null handle"
         else do
@@ -390,10 +390,10 @@ dbCreate path blockCount = do
 
 ||| Safe transaction begin.
 ||| Calls prim__txn_begin_bridge with read-write mode (1) and wraps
-||| the resulting handle in FdbTxn.
+||| the resulting handle in LithTxn.
 export
 covering
-txnBegin : FdbDb -> IO (FdbResult FdbTxn)
+txnBegin : LithDb -> IO (LithResult LithTxn)
 txnBegin db = do
   let dbPtr = prim__bits64ToPtr (extractDbPtr db)
   txnSlot <- primIO prim__allocSlot
@@ -406,7 +406,7 @@ txnBegin db = do
       ptr <- primIO $ prim__readSlot txnSlot
       primIO $ prim__freeSlot txnSlot
       case choose (ptr /= 0) of
-        Left prf => pure $ ok (MkFdbTxn ptr)
+        Left prf => pure $ ok (MkLithTxn ptr)
         Right _  => pure $ err StatusInternalError
                                "Transaction begin returned null handle"
     else do
@@ -419,16 +419,16 @@ buildProvenanceJson : ActorId -> Rationale -> String
 buildProvenanceJson actor rat =
   "{\"actor\":\"" ++ actor ++ "\",\"rationale\":\"" ++ rat ++ "\"}"
 
-||| Safe FQL query execution.
+||| Safe GQL query execution.
 ||| Validates the query string inline, builds provenance JSON, and
 ||| calls prim__query_execute.
 export
 covering
-queryExecute : FdbDb -> String -> ActorId -> Rationale -> IO (FdbResult FdbCursor)
+queryExecute : LithDb -> String -> ActorId -> Rationale -> IO (LithResult LithCursor)
 queryExecute db queryStr actorId rationale = do
   case validateFqlQuery queryStr of
     Nothing => pure $ err StatusInvalidArg
-                          ("Invalid FQL query: rejected by validation")
+                          ("Invalid GQL query: rejected by validation")
     Just validQuery => do
       case validateActorId actorId of
         Nothing => pure $ err StatusInvalidArg "Actor ID must not be empty"
@@ -449,13 +449,13 @@ queryExecute db queryStr actorId rationale = do
                   ptr <- primIO $ prim__readSlot cursorSlot
                   primIO $ prim__freeSlot cursorSlot
                   case choose (ptr /= 0) of
-                    Left prf => pure $ ok (MkFdbCursor ptr)
+                    Left prf => pure $ ok (MkLithCursor ptr)
                     Right _  => pure $ err StatusInternalError
                                            "Query returned null cursor"
                 else do
                   primIO $ prim__freeSlot cursorSlot
                   pure $ err (intToStatus status)
-                             "Failed to execute FQL query"
+                             "Failed to execute GQL query"
 
 --------------------------------------------------------------------------------
 -- Integration with Proven Library (see lib/proven/)
@@ -468,7 +468,7 @@ queryExecute db queryStr actorId rationale = do
 ||| to get a SafePath with dependent-type proof instead of Maybe String.
 export
 covering
-dbOpenSafe : String -> IO (FdbResult FdbDb)
+dbOpenSafe : String -> IO (LithResult LithDb)
 dbOpenSafe path = do
   case validateDbPath path of
     Nothing => pure $ err StatusInvalidArg
@@ -483,7 +483,7 @@ dbOpenSafe path = do
 ||| to get a SafeQuery with dependent-type proof instead of Maybe String.
 export
 covering
-queryExecuteSafe : FdbDb -> String -> ActorId -> Rationale -> IO (FdbResult FdbCursor)
+queryExecuteSafe : LithDb -> String -> ActorId -> Rationale -> IO (LithResult LithCursor)
 queryExecuteSafe db queryStr actorId rationale = do
   case validateFqlQuery queryStr of
     Nothing => pure $ err StatusInvalidArg
@@ -499,7 +499,7 @@ queryExecuteSafe db queryStr actorId rationale = do
 ||| to get a ValidJson with dependent-type proof instead of Maybe String.
 export
 covering
-serializeCborSafe : String -> IO (FdbResult (List Bits8))
+serializeCborSafe : String -> IO (LithResult (List Bits8))
 serializeCborSafe jsonDoc = do
   case parseJsonDocument jsonDoc of
     Nothing => pure $ err StatusInvalidArg
@@ -541,7 +541,7 @@ serializeCborSafe jsonDoc = do
 ||| @ out_db Output parameter for database handle
 ||| @ out_err Output parameter for error blob
 ||| Returns: Status code
-%foreign "C:fdb_db_open,libbridge"
+%foreign "C:lith_db_open,libbridge"
 prim__db_open_opts : (path_ptr : AnyPtr) -> (path_len : Bits64)
                   -> (opts_ptr : AnyPtr) -> (opts_len : Bits64)
                   -> (out_db : AnyPtr) -> (out_err : AnyPtr) -> PrimIO Int32
@@ -551,16 +551,16 @@ prim__db_open_opts : (path_ptr : AnyPtr) -> (path_len : Bits64)
 ||| @ mode Transaction mode (0 = read-only, 1 = read-write)
 ||| @ out_txn Output parameter for transaction handle
 ||| @ out_err Output parameter for error blob
-%foreign "C:fdb_txn_begin,libbridge"
+%foreign "C:lith_txn_begin,libbridge"
 prim__txn_begin_bridge : (db : AnyPtr) -> (mode : Int32)
                       -> (out_txn : AnyPtr) -> (out_err : AnyPtr) -> PrimIO Int32
 
 ||| Commit transaction
-%foreign "C:fdb_txn_commit,libbridge"
+%foreign "C:lith_txn_commit,libbridge"
 prim__txn_commit_bridge : (txn : AnyPtr) -> (out_err : AnyPtr) -> PrimIO Int32
 
 ||| Abort transaction (discard buffered operations)
-%foreign "C:fdb_txn_abort,libbridge"
+%foreign "C:lith_txn_abort,libbridge"
 prim__txn_abort : (txn : AnyPtr) -> PrimIO Int32
 
 ||| Apply operation within a transaction (buffered until commit)
@@ -568,7 +568,7 @@ prim__txn_abort : (txn : AnyPtr) -> PrimIO Int32
 ||| @ op_ptr Operation data pointer
 ||| @ op_len Operation data length
 ||| Returns: LgResult struct (data blob, provenance blob, status, error blob)
-%foreign "C:fdb_apply,libbridge"
+%foreign "C:lith_apply,libbridge"
 prim__apply : (txn : AnyPtr) -> (op_ptr : AnyPtr) -> (op_len : Bits64) -> PrimIO AnyPtr
 
 ||| Update an existing block within a transaction
@@ -577,7 +577,7 @@ prim__apply : (txn : AnyPtr) -> (op_ptr : AnyPtr) -> (op_len : Bits64) -> PrimIO
 ||| @ data_ptr New data pointer
 ||| @ data_len New data length
 ||| @ out_err Output parameter for error blob
-%foreign "C:fdb_update_block,libbridge"
+%foreign "C:lith_update_block,libbridge"
 prim__update_block : (txn : AnyPtr) -> (block_id : Bits64)
                   -> (data_ptr : AnyPtr) -> (data_len : Bits64)
                   -> (out_err : AnyPtr) -> PrimIO Int32
@@ -586,7 +586,7 @@ prim__update_block : (txn : AnyPtr) -> (block_id : Bits64)
 ||| @ txn Transaction handle
 ||| @ block_id Block ID to delete
 ||| @ out_err Output parameter for error blob
-%foreign "C:fdb_delete_block,libbridge"
+%foreign "C:lith_delete_block,libbridge"
 prim__delete_block : (txn : AnyPtr) -> (block_id : Bits64)
                   -> (out_err : AnyPtr) -> PrimIO Int32
 
@@ -595,7 +595,7 @@ prim__delete_block : (txn : AnyPtr) -> (block_id : Bits64)
 ||| @ block_type Block type filter (e.g. 0x0011 for documents)
 ||| @ out_data Output parameter for JSON array blob
 ||| @ out_err Output parameter for error blob
-%foreign "C:fdb_read_blocks,libbridge"
+%foreign "C:lith_read_blocks,libbridge"
 prim__read_blocks : (db : AnyPtr) -> (block_type : Bits16)
                  -> (out_data : AnyPtr) -> (out_err : AnyPtr) -> PrimIO Int32
 
@@ -606,51 +606,51 @@ prim__read_blocks : (db : AnyPtr) -> (block_type : Bits16)
 ||| @ opts_metadata Include metadata flag
 ||| @ out_text Output parameter for text blob
 ||| @ out_err Output parameter for error blob
-%foreign "C:fdb_render_block,libbridge"
+%foreign "C:lith_render_block,libbridge"
 prim__render_block : (db : AnyPtr) -> (block_id : Bits64)
                   -> (opts_format : Int32) -> (opts_metadata : Int32)
                   -> (out_text : AnyPtr) -> (out_err : AnyPtr) -> PrimIO Int32
 
 ||| Render journal entries since a sequence number
-%foreign "C:fdb_render_journal,libbridge"
+%foreign "C:lith_render_journal,libbridge"
 prim__render_journal : (db : AnyPtr) -> (since : Bits64)
                     -> (opts_format : Int32) -> (opts_metadata : Int32)
                     -> (out_text : AnyPtr) -> (out_err : AnyPtr) -> PrimIO Int32
 
 ||| Get database schema information
-%foreign "C:fdb_introspect_schema,libbridge"
+%foreign "C:lith_introspect_schema,libbridge"
 prim__introspect_schema : (db : AnyPtr) -> (out_schema : AnyPtr)
                        -> (out_err : AnyPtr) -> PrimIO Int32
 
 ||| Get constraint information
-%foreign "C:fdb_introspect_constraints,libbridge"
+%foreign "C:lith_introspect_constraints,libbridge"
 prim__introspect_constraints : (db : AnyPtr) -> (out_constraints : AnyPtr)
                             -> (out_err : AnyPtr) -> PrimIO Int32
 
 ||| Register a proof verifier for a specific proof type
-%foreign "C:fdb_proof_register_verifier,libbridge"
+%foreign "C:lith_proof_register_verifier,libbridge"
 prim__proof_register_verifier : (type_ptr : AnyPtr) -> (type_len : Bits64)
                              -> (callback : AnyPtr) -> (context : AnyPtr) -> PrimIO Int32
 
 ||| Unregister a proof verifier
-%foreign "C:fdb_proof_unregister_verifier,libbridge"
+%foreign "C:lith_proof_unregister_verifier,libbridge"
 prim__proof_unregister_verifier : (type_ptr : AnyPtr) -> (type_len : Bits64) -> PrimIO Int32
 
 ||| Verify a proof using registered verifiers
-%foreign "C:fdb_proof_verify,libbridge"
+%foreign "C:lith_proof_verify,libbridge"
 prim__proof_verify : (proof_ptr : AnyPtr) -> (proof_len : Bits64)
                   -> (out_valid : AnyPtr) -> (out_err : AnyPtr) -> PrimIO Int32
 
 ||| Initialize built-in proof verifiers (fd-holds, normalization, denormalization)
-%foreign "C:fdb_proof_init_builtins,libbridge"
+%foreign "C:lith_proof_init_builtins,libbridge"
 prim__proof_init_builtins : PrimIO Int32
 
 ||| Free a blob allocated by the bridge
-%foreign "C:fdb_blob_free,libbridge"
+%foreign "C:lith_blob_free,libbridge"
 prim__blob_free : (blob : AnyPtr) -> PrimIO ()
 
 ||| Get Lith version as encoded integer (major * 10000 + minor * 100 + patch)
-%foreign "C:fdb_version,libbridge"
+%foreign "C:lith_version,libbridge"
 prim__version : PrimIO Bits32
 
 --------------------------------------------------------------------------------
@@ -659,7 +659,7 @@ prim__version : PrimIO Bits32
 
 ||| Get error message for status code
 export
-statusMessage : FdbStatus -> String
+statusMessage : LithStatus -> String
 statusMessage StatusOk = "Success"
 statusMessage StatusInvalidArg = "Invalid argument"
 statusMessage StatusNotFound = "Not found"
