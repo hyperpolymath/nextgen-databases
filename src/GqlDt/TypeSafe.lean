@@ -70,7 +70,14 @@ def insertEvidence
           constructor
           · simp [evidenceSchema]
           · simp
-        | succ _ =>
+        | succ n =>
+          -- The list has 2 elements, so n + 2 < 2 is a contradiction.
+          -- List.length doesn't auto-reduce for sigma-typed elements with
+          -- free variables, so we unfold it manually.
+          have hlen : List.length
+            [Sigma.mk TypeExpr.nonEmptyString (TypedValue.nonEmptyString title),
+             Sigma.mk TypeExpr.promptScores (TypedValue.promptScores promptScores)] = 2 := by
+            simp [List.length]
           omega)
 
 -- Type error examples: these won't compile!
