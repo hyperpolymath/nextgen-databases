@@ -1,0 +1,609 @@
+(* ============================================================================
+   FBQLdt (Lith Query Language with Dependent Types) - Formal Grammar
+
+   SPDX-License-Identifier: PMPL-1.0-or-later
+   SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (@hyperpolymath)
+
+   Notation: Extended Backus-Naur Form (EBNF) per ISO/IEC 14977
+
+   Conventions:
+   - Terminals in "double quotes"
+   - Non-terminals in <angle brackets>
+   - Optional: [...]
+   - Repetition (0+): {...}
+   - Repetition (1+): ... , {... , ...}
+   - Alternation: |
+   - Grouping: (...)
+   ============================================================================ *)
+
+(* ============================================================================
+   TOP-LEVEL STRUCTURE
+   ============================================================================ *)
+
+<program> ::= {<statement>}
+
+<statement> ::= <ddl-statement>
+              | <dml-statement>
+              | <query-statement>
+              | <normalization-statement>
+              | <introspection-statement>
+
+(* ============================================================================
+   DDL (Data Definition Language)
+   ============================================================================ *)
+
+<ddl-statement> ::= <create-collection>
+                  | <create-edge-collection>
+                  | <create-constraint>
+                  | <create-navigation-path>
+
+(* --- CREATE COLLECTION --- *)
+
+<create-collection> ::= "CREATE" "COLLECTION" ["IF" "NOT" "EXISTS"]
+                        <identifier>
+                        "(" <column-list> ")"
+                        [<collection-options>]
+
+<column-list> ::= <column-def> {"," <column-def>}
+
+<column-def> ::= <identifier> ":" <type-expr> {<column-constraint>}
+
+<column-constraint> ::= "PRIMARY" "KEY"
+                      | "UNIQUE"
+                      | "NOT" "NULL"
+                      (* Runtime constraints deprecated in favor of type-level *)
+
+<collection-options> ::= "WITH" <option-list>
+
+<option-list> ::= <option> {"," <option>}
+
+<option> ::= "DEPENDENT_TYPES"
+           | "PROVENANCE_TRACKING"
+           | "TARGET_NORMAL_FORM" <normal-form>
+           | "FUNCTIONAL_DEPENDENCIES" "(" <fd-list> ")"
+
+<normal-form> ::= "1NF" | "2NF" | "3NF" | "BCNF" | "4NF" | "5NF"
+
+<fd-list> ::= <functional-dependency> {";" <functional-dependency>}
+
+<functional-dependency> ::= <attr-list> "->" <attr-list>
+
+<attr-list> ::= <identifier> {"," <identifier>}
+
+(* --- CREATE EDGE COLLECTION --- *)
+
+<create-edge-collection> ::= "CREATE" "EDGE_COLLECTION" <identifier>
+                             "(" <column-list> ")"
+                             [<collection-options>]
+
+(* --- CREATE CONSTRAINT --- *)
+
+<create-constraint> ::= "CREATE" "CONSTRAINT" <identifier>
+                        "ON" <identifier> "(" <column-list> ")"
+                        "CHECK" "(" <condition> ")"
+                        ["WITH_PROOF" <proof-block>]
+                        <rationale-clause>
+                        ["APPROVERS" <string-literal>]
+
+(* --- CREATE NAVIGATION PATH --- *)
+
+<create-navigation-path> ::= "CREATE" "NAVIGATION_PATH" <string-literal>
+                             "FOR" "INVESTIGATION" <string-literal>
+                             "AUDIENCE" <string-literal>
+                             "ORDERED_BY" <lambda-expr>
+                             ["AS"] <select-statement>
+                             <rationale-clause>
+                             "CREATED_BY" <string-literal>
+                             ["WITH_PROOF" <proof-block>]
+
+(* ============================================================================
+   TYPE SYSTEM
+   ============================================================================ *)
+
+<type-expr> ::= <primitive-type>
+              | <refined-type>
+              | <dependent-type>
+              | <function-type>
+              | <product-type>
+              | <sum-type>
+              | <quantified-type>
+
+(* --- Primitive Types --- *)
+
+<primitive-type> ::= "Nat"
+                   | "Int"
+                   | "String"
+                   | "Bool"
+                   | "Float"
+                   | "Char"
+                   | "Unit"
+                   | "UUID"
+                   | "Timestamp"
+
+(* --- Refinement Types --- *)
+
+<refined-type> ::= "BoundedNat" <nat-literal> <nat-literal>
+                 | "BoundedInt" <int-literal> <int-literal>
+                 | "BoundedFloat" <float-literal> <float-literal>
+                 | "NonEmptyString"
+                 | "Email"
+                 | "ValidUUID"
+                 | "Confidence"          (* alias: BoundedFloat 0.0 1.0 *)
+                 | "PromptDimension"     (* alias: BoundedNat 0 100 *)
+                 | "Percentage"          (* alias: BoundedFloat 0.0 100.0 *)
+                 | "Rationale"           (* alias: NonEmptyString *)
+                 | "ActorId"             (* alias: NonEmptyString *)
+
+(* --- Dependent Types --- *)
+
+<dependent-type> ::= "Vector" <type-expr> <nat-literal>
+                   | "Tracked" <type-expr>
+                   | "PromptScores"
+                   | "NavigationPath" <lambda-expr>
+                   | "Claim" <confidence-expr>
+                   | "Belief" <confidence-expr> <type-expr>
+                   | "Collection" <type-expr>
+                   | "Edge" <type-expr> <type-expr>
+                   | "ReversibleOp" <type-expr>
+
+(* --- Function Types --- *)
+
+<function-type> ::= <type-expr> "->" <type-expr>
+                  | "(" <param-list> ")" "->" <type-expr>
+
+<param-list> ::= <param-def> {"," <param-def>}
+
+<param-def> ::= <identifier> ":" <type-expr>
+
+(* --- Product Types --- *)
+
+<product-type> ::= <type-expr> "×" <type-expr>
+                 | "(" <type-expr> {"," <type-expr>} ")"
+
+(* --- Sum Types --- *)
+
+<sum-type> ::= <type-expr> "⊕" <type-expr>
+             | "Option" <type-expr>
+             | "Either" <type-expr> <type-expr>
+
+(* --- Quantified Types --- *)
+
+<quantified-type> ::= "∀" "(" <param-def> ")" "," <type-expr>
+                    | "∃" "(" <param-def> ")" "," <type-expr>
+
+(* --- Type Refinement (for queries) --- *)
+
+<type-refinement> ::= "(" <identifier> ":" <type-expr> ["|" <condition>] ")"
+
+(* ============================================================================
+   DML (Data Manipulation Language)
+   ============================================================================ *)
+
+<dml-statement> ::= <insert-statement>
+                  | <update-statement>
+                  | <delete-statement>
+                  | <insert-edge-statement>
+
+(* --- INSERT --- *)
+
+<insert-statement> ::= "INSERT" "INTO" <identifier>
+                       ["(" <column-names> ")"]
+                       "VALUES" "(" <value-list> ")"
+                       <rationale-clause>
+                       [<added-by-clause>]
+                       [<proof-clause>]
+                       [<inverse-clause>]
+
+<column-names> ::= <identifier> {"," <identifier>}
+
+<value-list> ::= <value> {"," <value>}
+
+<value> ::= <literal>
+          | <struct-literal>
+          | <array-literal>
+          | <lambda-expr>
+          | <expr>
+
+<struct-literal> ::= "{" <field-list> "}"
+
+<field-list> ::= <field-assignment> {"," <field-assignment>}
+
+<field-assignment> ::= <identifier> ":" <value>
+
+<array-literal> ::= "[" <value-list> "]"
+
+<rationale-clause> ::= "RATIONALE" <string-literal>
+                     | "REASON" <string-literal>
+
+<added-by-clause> ::= "ADDED_BY" <string-literal>
+
+<proof-clause> ::= "WITH_PROOF" <proof-block>
+
+<proof-block> ::= "{" <proof-list> "}"
+
+<proof-list> ::= <proof-obligation> {"," <proof-obligation>}
+
+<proof-obligation> ::= <identifier> ":" <proof-term>
+
+<proof-term> ::= "by" <tactic-expr>
+               | <lean-proof>
+               | <idris-proof>
+
+<tactic-expr> ::= <identifier> [<tactic-args>]
+                | <tactic-expr> ";" <tactic-expr>
+                | <tactic-expr> "<|>" <tactic-expr>
+                | "first" "|" <tactic-expr> {"|" <tactic-expr>}
+
+<tactic-args> ::= <expr> {<expr>}
+
+<inverse-clause> ::= "WITH_INVERSE" "(" <statement> ")"
+                   | "IRREVERSIBLE" "BECAUSE" <string-literal>
+                     ["WITH_JUSTIFICATION" <justification>]
+
+<justification> ::= <struct-literal>
+
+(* --- INSERT EDGE --- *)
+
+<insert-edge-statement> ::= "INSERT" "EDGE" "INTO" <identifier>
+                            "(" <column-names> ")"
+                            "VALUES" "(" <value-list> ")"
+                            <rationale-clause>
+                            [<added-by-clause>]
+                            [<proof-clause>]
+
+(* --- UPDATE --- *)
+
+<update-statement> ::= "UPDATE" <identifier>
+                       "SET" <assignment-list>
+                       "WHERE" <condition>
+                       <rationale-clause>
+                       [<correction-type-clause>]
+                       [<disclosed-at-clause>]
+                       [<disclosed-by-clause>]
+                       [<proof-clause>]
+                       [<inverse-clause>]
+
+<assignment-list> ::= <assignment> {"," <assignment>}
+
+<assignment> ::= <identifier> "=" <value>
+
+<correction-type-clause> ::= "CORRECTION_TYPE" <string-literal>
+
+<disclosed-at-clause> ::= "DISCLOSED_AT" (<timestamp-literal> | "NOW" "(" ")")
+
+<disclosed-by-clause> ::= "DISCLOSED_BY" <string-literal>
+
+(* --- DELETE --- *)
+
+<delete-statement> ::= "DELETE" "FROM" <identifier>
+                       "WHERE" <condition>
+                       <rationale-clause>
+                       ["IRREVERSIBLE" "BECAUSE" <string-literal>]
+                       [<proof-clause>]
+                       [<inverse-clause>]
+
+(* ============================================================================
+   QUERIES
+   ============================================================================ *)
+
+<query-statement> ::= <select-statement>
+
+<select-statement> ::= "SELECT" <select-list>
+                       "FROM" <from-clause>
+                       [<join-clause>]
+                       [<where-clause>]
+                       [<group-by-clause>]
+                       [<order-by-clause>]
+                       [<limit-clause>]
+                       [<returning-clause>]
+                       [<verify-proofs-clause>]
+
+<select-list> ::= "*"
+                | <select-expr> {"," <select-expr>}
+                | <type-refinement>
+
+<select-expr> ::= <expr> [["AS"] <identifier>]
+
+<from-clause> ::= <table-ref> {"," <table-ref>}
+
+<table-ref> ::= <identifier> [<identifier>]  (* table [alias] *)
+              | "(" <select-statement> ")" <identifier>
+
+<join-clause> ::= {<join>}
+
+<join> ::= ["INNER" | "LEFT" | "RIGHT" | "FULL"] "JOIN" <table-ref>
+           "ON" <condition>
+
+<where-clause> ::= "WHERE" <condition>
+
+<group-by-clause> ::= "GROUP" "BY" <expr-list>
+
+<order-by-clause> ::= "ORDER" "BY" <order-list>
+
+<order-list> ::= <order-item> {"," <order-item>}
+
+<order-item> ::= <expr> ["ASC" | "DESC"]
+
+<limit-clause> ::= "LIMIT" <nat-literal>
+
+<returning-clause> ::= "RETURNING" <type-refinement>
+
+<verify-proofs-clause> ::= "[" "VERIFY_PROOFS" "]"
+
+(* ============================================================================
+   NORMALIZATION COMMANDS
+   ============================================================================ *)
+
+<normalization-statement> ::= <discover-dependencies>
+                            | <check-normal-form>
+                            | <propose-normalization>
+                            | <apply-normalization>
+                            | <denormalize>
+
+<discover-dependencies> ::= "DISCOVER" "DEPENDENCIES"
+                            "FROM" <identifier>
+                            ["SAMPLE" <nat-literal>]
+                            ["CONFIDENCE" <float-literal>]
+                            [<returning-clause>]
+
+<check-normal-form> ::= "CHECK" "NORMAL_FORM" <identifier>
+                        "AGAINST" <normal-form>
+                        [<returning-clause>]
+
+<propose-normalization> ::= "PROPOSE" "NORMALIZATION" <identifier>
+                            "TO" <normal-form>
+                            ["STRATEGY" <normalization-strategy>]
+                            [<returning-clause>]
+
+<normalization-strategy> ::= "PreferPreserving"
+                           | "to3NF"
+                           | "toBCNF"
+                           | "toBCNFPreferPreserving"
+
+<apply-normalization> ::= "APPLY" "NORMALIZATION" <identifier>
+                          <proof-clause>
+                          <rationale-clause>
+
+<denormalize> ::= "DENORMALIZE" <identifier-list>
+                  "INTO" <identifier>
+                  "ON" <identifier>
+
+<identifier-list> ::= <identifier> {"," <identifier>}
+
+(* ============================================================================
+   INTROSPECTION
+   ============================================================================ *)
+
+<introspection-statement> ::= <introspect>
+                            | <rollback-normalization>
+
+<introspect> ::= "INTROSPECT" <identifier> ["." <identifier>] <introspection-target>
+                 [<where-clause>]
+                 [<returning-clause>]
+                 [<verify-proofs-clause>]
+
+<introspection-target> ::= "CORRECTION_HISTORY"
+                         | "PROVENANCE"
+                         | "REASONING"
+
+<rollback-normalization> ::= "ROLLBACK" "NORMALIZATION" <identifier>
+                             <rationale-clause>
+                             <proof-clause>
+
+(* ============================================================================
+   EXPRESSIONS
+   ============================================================================ *)
+
+<expr> ::= <primary-expr>
+         | <unary-expr>
+         | <binary-expr>
+         | <application-expr>
+         | <lambda-expr>
+
+<primary-expr> ::= <literal>
+                 | <identifier>
+                 | "(" <expr> ")"
+                 | <struct-literal>
+                 | <array-literal>
+
+<unary-expr> ::= <unary-op> <expr>
+
+<unary-op> ::= "NOT" | "¬" | "-"
+
+<binary-expr> ::= <expr> <binary-op> <expr>
+
+<binary-op> ::= <arith-op> | <comp-op> | <logical-op>
+
+<arith-op> ::= "+" | "-" | "*" | "/" | "div" | "mod" | "^"
+
+<comp-op> ::= "=" | "<>" | "!=" | "<" | ">" | "<=" | ">="
+            | "∈" | "∉" | "⊆" | "⊇"
+
+<logical-op> ::= "AND" | "&&" | "∧"
+               | "OR" | "||" | "∨"
+               | "→" | "⇒"
+               | "↔" | "⇔"
+
+<application-expr> ::= <expr> <expr>
+
+<lambda-expr> ::= ("λ" | "\\") <param-list> "." <expr>
+
+<expr-list> ::= <expr> {"," <expr>}
+
+(* ============================================================================
+   CONDITIONS (for WHERE clauses)
+   ============================================================================ *)
+
+<condition> ::= <expr> <comp-op> <expr>
+              | <condition> ("AND" | "&&") <condition>
+              | <condition> ("OR" | "||") <condition>
+              | "NOT" <condition>
+              | "(" <condition> ")"
+              | "EXISTS" "(" <select-statement> ")"
+              | <expr> "IN" "(" <select-statement> ")"
+              | <expr> "BETWEEN" <expr> "AND" <expr>
+              | <expr> "LIKE" <string-literal>
+              | <expr> "IS" ["NOT"] "NULL"
+
+(* ============================================================================
+   LITERALS
+   ============================================================================ *)
+
+<literal> ::= <nat-literal>
+            | <int-literal>
+            | <float-literal>
+            | <string-literal>
+            | <bool-literal>
+            | <unit-literal>
+            | <timestamp-literal>
+
+<nat-literal> ::= <digit> {<digit>}
+
+<int-literal> ::= ["-"] <nat-literal>
+
+<float-literal> ::= <int-literal> "." <digit> {<digit>} [<exponent>]
+
+<exponent> ::= ("e" | "E") ["-" | "+"] <nat-literal>
+
+<string-literal> ::= "'" {<char>} "'"
+                   | '"' {<char>} '"'
+
+<bool-literal> ::= "true" | "false"
+
+<unit-literal> ::= "(" ")"
+
+<timestamp-literal> ::= (* ISO 8601 format *)
+                       <string-literal>
+
+<confidence-expr> ::= <float-literal>
+
+(* ============================================================================
+   IDENTIFIERS
+   ============================================================================ *)
+
+<identifier> ::= <letter> {<letter> | <digit> | "_"}
+               | <unicode-identifier>
+
+<unicode-identifier> ::= (* Unicode XID_Start followed by Unicode XID_Continue *)
+                        <xid-start> {<xid-continue>}
+
+<letter> ::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j"
+           | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t"
+           | "u" | "v" | "w" | "x" | "y" | "z"
+           | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J"
+           | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T"
+           | "U" | "V" | "W" | "X" | "Y" | "Z"
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+<char> ::= (* Any Unicode character except quote, or escaped quote *)
+          <unicode-char> | <escape-sequence>
+
+<escape-sequence> ::= "\\" ("n" | "t" | "r" | "\\" | "'" | '"')
+                    | "\\u" <hex-digit> <hex-digit> <hex-digit> <hex-digit>
+
+<hex-digit> ::= <digit> | "A" | "B" | "C" | "D" | "E" | "F"
+                       | "a" | "b" | "c" | "d" | "e" | "f"
+
+(* ============================================================================
+   LEAN 4 / IDRIS 2 PROOF SYNTAX (Embedded)
+   ============================================================================ *)
+
+<lean-proof> ::= (* Lean 4 proof term - implementation-specific *)
+                "⟨" {<lean-token>} "⟩"
+
+<idris-proof> ::= (* Idris 2 proof term - implementation-specific *)
+                 "?proof"
+
+(* ============================================================================
+   COMMENTS
+   ============================================================================ *)
+
+<line-comment> ::= "--" {<any-char-except-newline>}
+
+<block-comment> ::= "/*" {<any-char>} "*/"
+                  | "{-" {<any-char>} "-}"  (* Haskell-style *)
+
+(* ============================================================================
+   WHITESPACE
+   ============================================================================ *)
+
+<whitespace> ::= " " | "\t" | "\n" | "\r"
+
+(* ============================================================================
+   RESERVED KEYWORDS
+   ============================================================================ *)
+
+(* The following identifiers are reserved and cannot be used as user identifiers:
+
+   AND, APPLY, AS, AUDIENCE, BECAUSE, BETWEEN, BY, CHECK, COLLECTION, CONSTRAINT,
+   CREATE, CREATED_BY, DENORMALIZE, DELETE, DEPENDENCIES, DEPENDENT_TYPES, DESC,
+   DISCOVER, DISCLOSED_AT, DISCLOSED_BY, EDGE, EDGE_COLLECTION, EXISTS, FOR,
+   FROM, FULL, FUNCTIONAL_DEPENDENCIES, GROUP, IF, IN, INNER, INSERT, INTO,
+   INTROSPECT, INVESTIGATION, IRREVERSIBLE, IS, JOIN, LEFT, LIKE, LIMIT,
+   NAVIGATION_PATH, NORMALIZATION, NOT, NULL, ON, OR, ORDER, ORDERED_BY, PROPOSE,
+   PROVENANCE_TRACKING, RATIONALE, REASON, RETURNING, RIGHT, ROLLBACK, SAMPLE,
+   SELECT, SET, STRATEGY, TARGET_NORMAL_FORM, TO, UPDATE, VALUES, VERIFY_PROOFS,
+   WHERE, WITH, WITH_INVERSE, WITH_JUSTIFICATION, WITH_PROOF
+
+   Type keywords:
+   ActorId, BoundedFloat, BoundedInt, BoundedNat, Bool, Char, Claim, Collection,
+   Confidence, Edge, Email, Float, Int, Nat, NavigationPath, NonEmptyString,
+   Option, Percentage, PromptDimension, PromptScores, Rationale, ReversibleOp,
+   String, Timestamp, Tracked, UUID, Unit, ValidUUID, Vector
+
+   Logical symbols (alternative syntax):
+   ∀, ∃, λ, ∧, ∨, ¬, →, ⇒, ↔, ⇔, ∈, ∉, ⊆, ⊇, ×, ⊕
+*)
+
+(* ============================================================================
+   OPERATOR PRECEDENCE (Highest to Lowest)
+   ============================================================================ *)
+
+(*
+   Precedence  Operators             Associativity
+   ----------  -------------------   -------------
+   11          . (field access)      left
+   10          function application  left
+   9           ^ (exponentiation)    right
+   8           * / div mod           left
+   7           + - (binary)          left
+   6           :: (cons)             right
+   5           = <> != < > <= >=     non-assoc
+               ∈ ∉ ⊆ ⊇
+   4           NOT ¬                 right
+   3           AND && ∧              left
+   2           OR || ∨               left
+   1           → ⇒ ↔ ⇔               right
+   0           , (comma)             left
+*)
+
+(* ============================================================================
+   NOTES
+   ============================================================================ *)
+
+(*
+   1. Case sensitivity: Keywords are case-insensitive. Identifiers are case-sensitive.
+
+   2. Unicode support: Full Unicode support for identifiers following Unicode Standard
+      Annex #31 (Unicode Identifier and Pattern Syntax). Use XID_Start for first
+      character, XID_Continue for subsequent characters.
+
+   3. Type inference: Type annotations on columns and parameters are mandatory.
+      Type inference is performed within expressions.
+
+   4. Proof erasure: Proof terms are erased at runtime. They exist only for
+      compile-time verification.
+
+   5. Compatibility: Standard FQL is valid FBQLdt when:
+      - Type annotations are inferred (fallback to runtime types)
+      - Proofs are auto-generated or admitted
+      - WITH DEPENDENT_TYPES is implicit
+
+   6. Extension: This grammar extends Lith FQL base grammar. Consult
+      lith/spec/FQL-Grammar.ebnf for base constructs not redefined here.
+*)
+
+(* ============================================================================
+   END OF GRAMMAR
+   ============================================================================ *)

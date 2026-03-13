@@ -1,0 +1,35 @@
+{
+  "name": "gql-dt",
+  "displayName": "GQL-DT (Glyph Query Language with Dependent Types)",
+  "description": "Language support for GQL-DT queries with dependent type checking",
+  "version": "1.0.0",
+  "publisher": "hyperpolymath",
+  "license": "PMPL-1.0-or-later",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "languages": [{
+      "id": "gql-dt",
+      "aliases": ["GQL-DT", "gql-dt", "Glyph Query Language"],
+      "extensions": [".gql", ".gqldt"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "gql-dt",
+      "scopeName": "source.gql-dt",
+      "path": "./syntaxes/gql-dt.tmLanguage.json"
+    }]
+  },
+  "main": "./out/extension.js",
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0"
+  }
+}

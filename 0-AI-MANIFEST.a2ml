@@ -1,0 +1,64 @@
+; SPDX-License-Identifier: PMPL-1.0-or-later
+; SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath)
+;
+; 0-AI-MANIFEST.a2ml — Universal AI entry point for GQL-DT
+; Media-Type: application/a2ml
+
+(manifest
+  (identity
+    (name "GQL-DT")
+    (full-name "Dependently-Typed Glyph Query Language")
+    (version "0.2.0")
+    (repo "https://github.com/hyperpolymath/gql-dt")
+    (license "PMPL-1.0-or-later")
+    (author "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>")
+    (parent-project "lithoglyph")
+    (monorepo-parent "nextgen-databases"))
+
+  (purpose
+    "Compile-time verification of database constraints via dependent types.
+     Lean 4 implementation with Mathlib integration. Provides type-safe
+     query language for Lithoglyph with proofs of query correctness,
+     normalization, and constraint satisfaction.")
+
+  (canonical-locations
+    (ai-instructions "AI.a2ml")
+    (state ".machine_readable/STATE.scm")
+    (meta ".machine_readable/META.scm")
+    (ecosystem ".machine_readable/ECOSYSTEM.scm")
+    (roadmap ".machine_readable/ROADMAP.scm")
+    (build "justfile")
+    (container-build "Containerfile")
+    (container-deploy "selur-compose.yml")
+    (spec "spec/")
+    (lean-entry "src/FqlDt.lean"))
+
+  (tech-stack
+    (primary "Lean 4")
+    (lean-version "v4.15.0")
+    (mathlib-version "v4.15.0")
+    (ffi "Zig")
+    (config "Nickel")
+    (container-runtime "Podman"))
+
+  (architecture
+    (lean4-core
+      (description "Core type system, refinement types, normalization proofs")
+      (location "src/")
+      (entry "src/FqlDt.lean"))
+    (bridge
+      (description "Zig FFI bridge for native query execution")
+      (location "bridge/"))
+    (cli
+      (description "Command-line query tool")
+      (location "cli/"))
+    (vscode-extension
+      (description "VS Code language support")
+      (location "vscode-extension/")))
+
+  (critical-invariants
+    (rule "SCM files ONLY in .machine_readable/ — never root")
+    (rule "No sorry in Lean 4 proofs — hard invariant")
+    (rule "All proofs must be constructive where possible")
+    (rule "Container runtime is Podman — never Docker")
+    (rule "Completion claims require honest audit")))

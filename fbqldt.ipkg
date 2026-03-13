@@ -1,0 +1,26 @@
+-- SPDX-License-Identifier: PMPL-1.0-or-later
+-- Copyright (c) 2026 Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>
+package fbqldt
+
+version = 0.7.5
+authors = "Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"
+license = "PMPL-1.0-or-later"
+brief = "FBQLdt - Dependently-typed query language ABI"
+readme = "README.adoc"
+homepage = "https://github.com/hyperpolymath/fbql-dt"
+sourceloc = "https://github.com/hyperpolymath/fbql-dt"
+bugtracker = "https://github.com/hyperpolymath/fbql-dt/issues"
+
+sourcedir = "src"
+builddir = "build"
+outputdir = "build/exec"
+
+modules = FBQLdt.ABI.Types
+        , FBQLdt.ABI.Layout
+        , FBQLdt.ABI.Foreign
+
+depends = base >= 0.6.0
+        , contrib
+        
+
+opts = "--total"

@@ -1,0 +1,101 @@
+= RSR template repo - see RSR_OUTLINE.adoc in root for general background and specification
+
+== This is your repo - don't forget to rename me!
+
+== ABI/FFI Standards (Hyperpolymath Universal Standard)
+
+**All repos with foreign function interfaces MUST follow this standard:**
+
+* **ABI (Application Binary Interface)** → **Idris2** (`src/abi/*.idr`)
+** Type definitions with dependent type proofs
+** Memory layout verification
+** Platform-specific ABIs with compile-time selection
+** Formal verification of interface correctness
+
+* **FFI (Foreign Function Interface)** → **Zig** (`ffi/zig/src/*.zig`)
+** C-compatible function implementations
+** Zero-cost abstractions
+** Memory-safe by default
+** Cross-compilation support
+
+* **Generated C Headers** → Auto-generated from Idris2 ABI (`generated/abi/*.h`)
+** Bridge between Idris2 and Zig
+** Consumed by any language via C ABI
+
+**Directory Structure:**
+----
+project/
+├── src/abi/          # Idris2 ABI definitions (REQUIRED)
+├── ffi/zig/          # Zig FFI implementation (REQUIRED)
+├── generated/abi/    # Auto-generated C headers
+└── bindings/         # Language-specific wrappers (optional)
+----
+
+**See:** `ABI-FFI-README.md` for complete documentation
+
+== AI CLI standards
+
+- Include `ai-cli-crash-capture/` and `contractiles/` from this template in new repos.
+- Mirror 6SCM files into `.machine_readable/` (NOT `.machine_readable/6scm/`).
+- Before any code generation, check `/var/mnt/eclipse/repos/proven` for the current Idris "unbreakable" library status.
+- If a project uses that Idris library, add an *Idris Inside* badge to the repo.
+- If new bindings are required, add them in `/var/mnt/eclipse/repos/proven` as `idris2-zig-<language>` during the work.
+- If new code suggests additional "unbreakable" Idris modules, add them under `/var/mnt/eclipse/repos/proven` and update binders across all supported languages.
+
+== Standard Dependencies
+
+=== Web Projects
+
+ReScript web projects in the hyperpolymath ecosystem **MUST** use these formally verified components:
+
+[cols="1,2,1"]
+|===
+|Library |Purpose |Status
+
+|link:https://github.com/hyperpolymath/rescript-dom-mounter[rescript-dom-mounter]
+|Formally verified DOM mounting
+|**REQUIRED**
+
+|link:https://github.com/hyperpolymath/rescript-tea[rescript-tea]
+|TEA architecture framework
+|Recommended
+
+|link:https://github.com/hyperpolymath/cadre-tea-router[cadre-tea-router]
+|Proven-safe URL routing
+|Recommended
+
+|link:https://github.com/hyperpolymath/proven[proven]
+|Idris2 formally verified library
+|Core Dependency
+|===
+
+==== Why SafeDOM is Required
+
+Traditional DOM mounting can fail:
+
+[source,javascript]
+----
+// ❌ UNSAFE: Can crash with null pointer
+const el = document.getElementById('app')
+el.innerHTML = html  // 💥
+----
+
+SafeDOM provides **compile-time proofs** that DOM operations cannot fail:
+
+[source,rescript]
+----
+// ✅ PROVEN SAFE: Mathematically guaranteed
+SafeDOM.mountSafe("#app", html,
+  ~onSuccess=el => Console.log("Success"),
+  ~onError=err => Console.error(err))
+----
+
+**Mathematical Guarantees:**
+
+✓ No null pointer dereferences (Idris2 proof)
+✓ No invalid CSS selectors (dependent types)
+✓ No malformed HTML (balanced tag checking)
+✓ Type-safe operations (ReScript + Idris2)
+✓ Zero runtime overhead (proofs erased)
+
+See link:https://github.com/hyperpolymath/rescript-dom-mounter[rescript-dom-mounter documentation] for full details.

@@ -1,0 +1,124 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# GQL-DT Svalinn/Vordr Verified Container Stack
+# Deploy GQL-DT with formal verification and post-quantum crypto
+
+version: "3.8"
+
+x-svalinn-policy: &svalinn-policy
+  policy: strict
+  verify: true
+  attestations:
+    require-sbom: true
+    require-signature: true
+    require-provenance: true
+  crypto:
+    signature-algorithm: dilithium5  # ML-DSA-87 (FIPS 204)
+    hash-algorithm: shake3-512       # FIPS 202
+    key-exchange: kyber-1024          # ML-KEM-1024 (FIPS 203)
+  slsa-level: 3
+
+services:
+  lsp-server:
+    image: gql-dt-lsp:latest
+    build:
+      context: .
+      dockerfile: Containerfile.lsp
+    replicas: 2
+    ports:
+      - "9257:9257"  # LSP protocol port
+    environment:
+      - GQL_DT_MODE=lsp
+      - LOG_LEVEL=info
+    volumes:
+      - lsp-logs:/var/log/gql-dt
+    <<: *svalinn-policy
+    vordr:
+      formal-verification: true
+      proof-system: idris2
+      runtime-checks: true
+    networks:
+      - gql-dt-internal
+
+  query-executor:
+    image: gql-dt-executor:latest
+    build:
+      context: .
+      dockerfile: Containerfile.executor
+    replicas: 1
+    ports:
+      - "9258:9258"  # Query execution API
+    environment:
+      - GQL_DT_MODE=executor
+      - LEAN4_PATH=/opt/lean4
+      - LOG_LEVEL=info
+    volumes:
+      - query-cache:/var/cache/gql-dt
+      - proof-store:/var/lib/gql-dt/proofs
+    <<: *svalinn-policy
+    vordr:
+      formal-verification: true
+      proof-system: lean4
+      runtime-checks: true
+      memory-safety: proven
+    networks:
+      - gql-dt-internal
+      - lithoglyph-backend
+
+  ide-playground:
+    image: gql-dt-ide:latest
+    build:
+      context: .
+      dockerfile: Containerfile.ide
+    replicas: 1
+    ports:
+      - "8080:8080"  # Web IDE
+    environment:
+      - LSP_ENDPOINT=http://lsp-server:9257
+      - EXECUTOR_ENDPOINT=http://query-executor:9258
+    depends_on:
+      - lsp-server
+      - query-executor
+    <<: *svalinn-policy
+    networks:
+      - gql-dt-internal
+
+volumes:
+  lsp-logs:
+    driver: local
+  query-cache:
+    driver: local
+  proof-store:
+    driver: local
+    driver_opts:
+      type: "tmpfs"
+      device: "tmpfs"
+      o: "size=1G,uid=1000"
+
+networks:
+  gql-dt-internal:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+  lithoglyph-backend:
+    external: true
+    name: lithoglyph-network
+
+# Svalinn attestation metadata
+x-svalinn-attestations:
+  sbom-format: "cyclonedx-json"
+  signature-key-type: "dilithium5"
+  provenance-format: "slsa-v1.0"
+  verify-on-pull: true
+  verify-on-run: true
+
+# Vordr runtime verification
+x-vordr-config:
+  enable-formal-proofs: true
+  proof-systems:
+    - idris2
+    - lean4
+  memory-model: "linear-types"
+  concurrency-model: "capability-safe"
+  syscall-policy: "allowlist"
+  network-policy: "deny-by-default"

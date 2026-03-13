@@ -1,0 +1,45 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "GQL-DT",
+  "patterns": [
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#comments" }
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [{
+        "name": "keyword.control.gql-dt",
+        "match": "\\b(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|INTO|VALUES|SET|ORDER|BY|LIMIT|ASC|DESC|AND|OR|NOT|AS|NORMALIZE|WITH|RATIONALE)\\b"
+      }]
+    },
+    "types": {
+      "patterns": [{
+        "name": "storage.type.gql-dt",
+        "match": "\\b(Nat|Int|String|Bool|Float|BoundedNat|BoundedInt|NonEmptyString|Confidence|PromptScores|Tracked)\\b"
+      }]
+    },
+    "strings": {
+      "name": "string.quoted.double.gql-dt",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [{
+        "name": "constant.character.escape.gql-dt",
+        "match": "\\\\."
+      }]
+    },
+    "numbers": {
+      "name": "constant.numeric.gql-dt",
+      "match": "\\b\\d+(\\.\\d+)?\\b"
+    },
+    "comments": {
+      "patterns": [{
+        "name": "comment.line.double-dash.gql-dt",
+        "match": "--.*$"
+      }]
+    }
+  },
+  "scopeName": "source.gql-dt"
+}
