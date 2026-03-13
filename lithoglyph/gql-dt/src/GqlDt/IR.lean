@@ -189,7 +189,7 @@ def generateIR_Insert
   (permissions : PermissionMetadata)
   : IR :=
   -- Extract proof metadata from values
-  let proofs := stmt.values.filterMap fun ⟨t, v⟩ =>
+  let proofs := stmt.values.filterMap fun ⟨t, _v⟩ =>
     match t with
     | .boundedNat min max =>
         some (serializeProof "BoundedNat" s!"value ∈ [{min}, {max}]")
@@ -352,14 +352,14 @@ def validatePermissions (ir : IR) : Except String Unit := do
         if !isTypeAllowed t stmt.permissions.allowedTypes then
           throw s!"Type {t} not allowed by permission profile"
       return ()
-  | .select stmt => return ()  -- SELECT doesn't modify data
+  | .select _stmt => return ()  -- SELECT doesn't modify data
   | .update stmt =>
       for assign in stmt.assignments do
         if !isTypeAllowed assign.value.1 stmt.permissions.allowedTypes then
           throw s!"Type {assign.value.1} not allowed by permission profile"
       return ()
-  | .delete stmt => return ()  -- DELETE doesn't use typed values
-  | .normalize stmt => return ()  -- NORMALIZE is admin-only
+  | .delete _stmt => return ()  -- DELETE doesn't use typed values
+  | .normalize _stmt => return ()  -- NORMALIZE is admin-only
 
 -- ============================================================================
 -- IR Optimization

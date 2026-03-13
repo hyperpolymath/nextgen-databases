@@ -155,11 +155,11 @@ def generateIRFromAST (stmt : Statement) (config : PipelineConfig) : Except Stri
       .error "DELETE → IR conversion not yet implemented"
 
 /-- Stage 5: Validate permissions -/
-def validateIRPermissions (ir : IR) (config : PipelineConfig) : Except String Unit :=
+def validateIRPermissions (ir : IR) (_config : PipelineConfig) : Except String Unit :=
   validatePermissions ir
 
 /-- Stage 6: Serialize IR -/
-noncomputable def serializeIRToBytes (ir : IR) (config : PipelineConfig) : ByteArray :=
+noncomputable def serializeIRToBytes (ir : IR) (_config : PipelineConfig) : ByteArray :=
   serializeIR ir  -- TODO: Use config.serializationFormat
 
 -- ============================================================================
