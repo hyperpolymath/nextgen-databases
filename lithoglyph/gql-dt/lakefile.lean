@@ -38,6 +38,11 @@ lean_exe parser_test where
   srcDir := "test"
   root := `ParserTest
 
+-- Lexer test executable
+lean_exe lexer_test where
+  srcDir := "test"
+  root := `LexerTest
+
 -- GQLdt CLI/REPL (with FFI persistence backend)
 lean_exe gqldt where
   srcDir := "src"
