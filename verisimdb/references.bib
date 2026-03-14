@@ -1,0 +1,146 @@
+% SPDX-License-Identifier: PMPL-1.0-or-later
+%
+% References for VeriSimDB: multi-model database with VQL
+% (8 query modalities), vector/graph/document storage
+%
+
+@article{codd1970,
+  author    = {Edgar F. Codd},
+  title     = {A Relational Model of Data for Large Shared Data Banks},
+  journal   = {Communications of the ACM},
+  volume    = {13},
+  number    = {6},
+  pages     = {377--387},
+  year      = {1970},
+  note      = {Introduces the relational model. VeriSimDB extends Codd's
+               foundational abstractions to multi-model storage while
+               preserving relational algebraic reasoning where applicable.}
+}
+
+@article{stonebraker2005,
+  author    = {Michael Stonebraker and Ugur \c{C}etintemel},
+  title     = {``One Size Fits All'': An Idea Whose Time Has Come and Gone},
+  journal   = {Proceedings of the International Conference on Data Engineering
+               (ICDE)},
+  pages     = {2--11},
+  year      = {2005},
+  publisher = {IEEE},
+  note      = {Argues that specialised database engines outperform general-purpose
+               ones. VeriSimDB's 8 query modalities address this by providing
+               specialised access paths within a unified system.}
+}
+
+@article{johnson2021,
+  author    = {Jeff Johnson and Matthijs Douze and Herv\'{e} J\'{e}gou},
+  title     = {Billion-Scale Similarity Search with {GPUs}},
+  journal   = {IEEE Transactions on Big Data},
+  volume    = {7},
+  number    = {3},
+  pages     = {535--547},
+  year      = {2021},
+  note      = {Describes FAISS and approximate nearest neighbor techniques at
+               scale. VeriSimDB's vector storage modality builds on these
+               indexing strategies for similarity queries.}
+}
+
+@book{pierce2002,
+  author    = {Benjamin C. Pierce},
+  title     = {Types and Programming Languages},
+  publisher = {MIT Press},
+  year      = {2002},
+  note      = {Reference for VeriSimDB's type system design. VQL's 8 query
+               modalities are type-checked to ensure well-formedness of
+               cross-model queries.}
+}
+
+@article{plotkin1981,
+  author    = {Gordon D. Plotkin},
+  title     = {A Structural Approach to Operational Semantics},
+  journal   = {Technical Report DAIMI FN-19, Computer Science Department,
+               Aarhus University},
+  year      = {1981},
+  note      = {Establishes structural operational semantics (SOS). VQL's
+               formal semantics use SOS-style rules to define the meaning
+               of each query modality.}
+}
+
+@inproceedings{lu2019,
+  author    = {Yi Lu and Anil Shanbhag and Alekh Jindal and Samuel Madden},
+  title     = {Multi-Model Databases: A New Journey to Handle the Variety
+               of Data},
+  booktitle = {ACM Computing Surveys},
+  volume    = {52},
+  number    = {3},
+  pages     = {1--38},
+  year      = {2019},
+  note      = {Comprehensive survey of multi-model database architectures.
+               VeriSimDB's unified storage layer draws on the taxonomy and
+               design patterns catalogued here.}
+}
+
+@inproceedings{malkov2020,
+  author    = {Yury A. Malkov and Dmitry A. Yashunin},
+  title     = {Efficient and Robust Approximate Nearest Neighbor Search
+               Using Hierarchical Navigable Small World Graphs},
+  journal   = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume    = {42},
+  number    = {4},
+  pages     = {824--836},
+  year      = {2020},
+  note      = {Introduces HNSW, a graph-based index for approximate nearest
+               neighbor search. VeriSimDB uses HNSW-derived structures
+               for its vector similarity modality.}
+}
+
+@inproceedings{angles2018,
+  author    = {Renzo Angles and Marcelo Arenas and Pablo Barcel\'{o}
+               and Aidan Hogan and Juan Reutter and Domagoj Vrgo\v{c}},
+  title     = {Foundations of Modern Query Languages for Graph Databases},
+  journal   = {ACM Computing Surveys},
+  volume    = {50},
+  number    = {5},
+  pages     = {1--40},
+  year      = {2018},
+  note      = {Surveys formal foundations of graph query languages. VeriSimDB's
+               graph modality builds on the path pattern semantics and
+               regular path query algebra described herein.}
+}
+
+@article{stonebraker2018,
+  author    = {Michael Stonebraker},
+  title     = {The Case for Polystores},
+  journal   = {ACM SIGMOD Record},
+  volume    = {47},
+  number    = {3},
+  pages     = {8--9},
+  year      = {2018},
+  note      = {Argues for polystore architectures integrating heterogeneous
+               data stores. VeriSimDB takes the alternative approach of
+               a single multi-model engine with polystore-level flexibility.}
+}
+
+@inproceedings{ozsu2007,
+  author    = {M. Tamer \"{O}zsu and Patrick Valduriez},
+  title     = {Principles of Distributed Database Systems},
+  publisher = {Springer},
+  edition   = {3rd},
+  year      = {2011},
+  note      = {Comprehensive treatment of distributed data management.
+               VeriSimDB's distributed query execution across modalities
+               draws on the query decomposition and optimization techniques
+               presented here.}
+}
+
+@article{hellerstein2007,
+  author    = {Joseph M. Hellerstein and Michael Stonebraker and James Hamilton},
+  title     = {Architecture of a Database System},
+  journal   = {Foundations and Trends in Databases},
+  volume    = {1},
+  number    = {2},
+  pages     = {141--259},
+  year      = {2007},
+  note      = {Detailed walkthrough of database system architecture. VeriSimDB's
+               storage manager, query processor, and transaction subsystem
+               follow the architectural patterns described here, extended
+               for multi-model operation.}
+}

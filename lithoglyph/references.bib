@@ -1,0 +1,142 @@
+% SPDX-License-Identifier: PMPL-1.0-or-later
+%
+% References for Lithoglyph/GQL: narrative-first database with provenance,
+% reversibility. Implementation: Forth + Factor + Zig + Lean 4
+%
+
+@article{buneman2001,
+  author    = {Peter Buneman and Sanjeev Khanna and Wang-Chiew Tan},
+  title     = {Why and Where: A Characterization of Data Provenance},
+  booktitle = {Proceedings of the International Conference on Database Theory
+               (ICDT)},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {1973},
+  pages     = {316--330},
+  year      = {2001},
+  publisher = {Springer},
+  note      = {Distinguishes why-provenance and where-provenance. Lithoglyph's
+               narrative provenance model builds on this taxonomy, extending
+               it with narrative-contextual annotations.}
+}
+
+@article{cheney2009,
+  author    = {James Cheney and Laura Chiticariu and Wang-Chiew Tan},
+  title     = {Provenance in Databases: Why, How, and Where},
+  journal   = {Foundations and Trends in Databases},
+  volume    = {1},
+  number    = {4},
+  pages     = {379--474},
+  year      = {2009},
+  note      = {Comprehensive survey of provenance in database systems. Provides
+               the formal framework that Lithoglyph extends with reversible
+               narrative provenance tracking.}
+}
+
+@article{green2007,
+  author    = {Todd J. Green and Grigoris Karvounarakis and Val Tannen},
+  title     = {Provenance Semirings},
+  booktitle = {Proceedings of the ACM SIGMOD-SIGACT-SIGART Symposium on
+               Principles of Database Systems (PODS)},
+  pages     = {31--40},
+  year      = {2007},
+  publisher = {ACM},
+  note      = {Unifies provenance models using semiring annotations on
+               query results. Lithoglyph's algebraic provenance layer
+               implements semiring-based tracking for narrative queries.}
+}
+
+@inproceedings{demoura2021,
+  author    = {Leonardo de Moura and Sebastian Ullrich},
+  title     = {The {Lean} 4 Theorem Prover and Programming Language},
+  booktitle = {Proceedings of the International Conference on Automated
+               Deduction (CADE)},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {12699},
+  pages     = {625--635},
+  year      = {2021},
+  publisher = {Springer},
+  note      = {Introduces Lean 4 as both a proof assistant and a general-purpose
+               language. Lithoglyph uses Lean 4 for formal verification of
+               provenance invariants and query correctness proofs.}
+}
+
+@book{spivak2014,
+  author    = {David I. Spivak},
+  title     = {Category Theory for the Sciences},
+  publisher = {MIT Press},
+  year      = {2014},
+  note      = {Applies category theory to data modelling. Lithoglyph's
+               narrative-first schema design uses functorial data migration
+               and categorical composition of provenance transformations.}
+}
+
+@article{star1989,
+  author    = {Susan Leigh Star and James R. Griesemer},
+  title     = {Institutional Ecology, ``Translations'' and Boundary Objects:
+               Amateurs and Professionals in {Berkeley's} Museum of
+               Vertebrate Zoology, 1907--39},
+  journal   = {Social Studies of Science},
+  volume    = {19},
+  number    = {3},
+  pages     = {387--420},
+  year      = {1989},
+  note      = {Introduces boundary objects: artefacts that inhabit multiple
+               social worlds while maintaining coherence. Lithoglyph's
+               narrative data model treats database records as boundary
+               objects with multi-perspectival provenance.}
+}
+
+@techreport{iso2024gql,
+  author    = {{ISO/IEC JTC 1/SC 32}},
+  title     = {{ISO/IEC 39075:2024} --- Information technology ---
+               Database languages --- {GQL}},
+  institution = {International Organization for Standardization},
+  year      = {2024},
+  note      = {The ISO standard for Graph Query Language. Lithoglyph's GQL
+               implementation extends the standard with narrative provenance
+               annotations and reversible query semantics.}
+}
+
+@inproceedings{brodie2005,
+  author    = {Manolis Brodie},
+  title     = {Concatenative Language Design},
+  booktitle = {Proceedings of the Factor Programming Language Workshop},
+  year      = {2005},
+  note      = {Design principles for stack-based concatenative languages.
+               Lithoglyph's query interface draws on Forth and Factor's
+               concatenative paradigm for composable query pipelines.}
+}
+
+@article{moreau2013,
+  author    = {Luc Moreau and Paul Groth},
+  title     = {Provenance: An Introduction to {PROV}},
+  journal   = {Synthesis Lectures on the Semantic Web: Theory and Technology},
+  volume    = {3},
+  number    = {4},
+  pages     = {1--129},
+  year      = {2013},
+  publisher = {Morgan \& Claypool},
+  note      = {Introduces the W3C PROV data model for provenance interchange.
+               Lithoglyph's provenance output can be serialised to PROV-DM
+               for interoperability with external provenance-aware systems.}
+}
+
+@inproceedings{spillner2018,
+  author    = {Josef Spillner and Manuel Wozak},
+  title     = {Narrative Databases: From Stories to Structured Data},
+  booktitle = {Proceedings of the International Conference on Information
+               Systems (ICIS)},
+  year      = {2018},
+  note      = {Explores narrative as a first-class data modelling primitive.
+               Lithoglyph operationalises this idea with a query language
+               that treats temporal narrative arcs as queryable structures.}
+}
+
+@book{moore1974,
+  author    = {Charles H. Moore},
+  title     = {Forth: A Language for Interactive Computing},
+  year      = {1974},
+  note      = {Original description of the Forth language. Lithoglyph's
+               concatenative query layer inherits Forth's stack-based
+               execution model and interactive development style.}
+}

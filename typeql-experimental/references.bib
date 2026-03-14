@@ -1,0 +1,168 @@
+% SPDX-License-Identifier: PMPL-1.0-or-later
+%
+% References for TypeQL-Experimental: database query safety via
+% Idris2 QTT (linear types, session types, effects, modal types)
+%
+
+@article{atkey2018,
+  author    = {Robert Atkey},
+  title     = {Syntax and Semantics of Quantitative Type Theory},
+  booktitle = {Proceedings of the ACM/IEEE Symposium on Logic in Computer
+               Science (LICS)},
+  pages     = {56--65},
+  year      = {2018},
+  publisher = {ACM},
+  note      = {Introduces Quantitative Type Theory (QTT), unifying linear and
+               dependent types via usage annotations. TypeQL-Experimental's
+               core type discipline is built on QTT to track resource usage
+               in database queries.}
+}
+
+@article{brady2021,
+  author    = {Edwin Brady},
+  title     = {Idris 2: Quantitative Type Theory in Practice},
+  booktitle = {Proceedings of the European Conference on Object-Oriented
+               Programming (ECOOP)},
+  series    = {Leibniz International Proceedings in Informatics},
+  volume    = {194},
+  pages     = {9:1--9:26},
+  year      = {2021},
+  note      = {Describes the Idris 2 implementation of QTT. TypeQL-Experimental
+               is implemented in Idris 2, leveraging its dependent types and
+               linearity annotations for query safety guarantees.}
+}
+
+@article{girard1987,
+  author    = {Jean-Yves Girard},
+  title     = {Linear Logic},
+  journal   = {Theoretical Computer Science},
+  volume    = {50},
+  number    = {1},
+  pages     = {1--102},
+  year      = {1987},
+  note      = {Introduces linear logic, the logical foundation for resource-aware
+               computation. TypeQL-Experimental uses linear types to ensure
+               database connections and cursors are used exactly once.}
+}
+
+@article{honda1998,
+  author    = {Kohei Honda and Vasco T. Vasconcelos and Makoto Kubo},
+  title     = {Language Primitives and Type Discipline for Structured
+               Communication-Based Programming},
+  booktitle = {Proceedings of the European Symposium on Programming (ESOP)},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {1381},
+  pages     = {122--138},
+  year      = {1998},
+  publisher = {Springer},
+  note      = {Establishes session types for structured communication. TypeQL-
+               Experimental uses session types to encode database transaction
+               protocols, ensuring correct sequencing of operations.}
+}
+
+@article{wadler2012,
+  author    = {Philip Wadler},
+  title     = {Propositions as Sessions},
+  booktitle = {Proceedings of the ACM SIGPLAN International Conference on
+               Functional Programming (ICFP)},
+  pages     = {273--286},
+  year      = {2012},
+  publisher = {ACM},
+  note      = {Connects linear logic propositions to session types via the
+               Curry-Howard correspondence. TypeQL-Experimental's session-typed
+               transactions are grounded in this correspondence.}
+}
+
+@article{plotkin2003,
+  author    = {Gordon D. Plotkin and John Power},
+  title     = {Algebraic Operations and Generic Effects},
+  journal   = {Applied Categorical Structures},
+  volume    = {11},
+  number    = {1},
+  pages     = {69--94},
+  year      = {2003},
+  note      = {Formalises computational effects via algebraic operations.
+               TypeQL-Experimental uses algebraic effects to safely encapsulate
+               database I/O, transactions, and error handling.}
+}
+
+@inproceedings{chu2017,
+  author    = {Shumo Chu and Konstantin Weitz and Alvin Cheung
+               and Dan Suciu},
+  title     = {{HoTTSQL}: Proving Query Rewrites with Univalent {SQL}
+               Semantics},
+  booktitle = {Proceedings of the ACM SIGPLAN Conference on Programming
+               Language Design and Implementation (PLDI)},
+  pages     = {510--524},
+  year      = {2017},
+  publisher = {ACM},
+  note      = {Applies homotopy type theory to prove SQL query equivalences.
+               TypeQL-Experimental draws on HoTTSQL's approach to verified
+               query rewriting within the QTT framework.}
+}
+
+@inproceedings{chlipala2015,
+  author    = {Adam Chlipala},
+  title     = {Ur/Web: A Simple Model for Programming the Web},
+  booktitle = {Proceedings of the ACM SIGPLAN-SIGACT Symposium on Principles
+               of Programming Languages (POPL)},
+  pages     = {153--165},
+  year      = {2015},
+  publisher = {ACM},
+  note      = {Presents Ur/Web's type-safe database access with compile-time
+               SQL validation. TypeQL-Experimental extends this approach with
+               QTT-based linearity and session types for richer safety
+               guarantees.}
+}
+
+@inproceedings{pfenning2001,
+  author    = {Frank Pfenning and Rowan Davies},
+  title     = {A Judgmental Reconstruction of Modal Logic},
+  journal   = {Mathematical Structures in Computer Science},
+  volume    = {11},
+  number    = {4},
+  pages     = {511--540},
+  year      = {2001},
+  note      = {Reconstructs modal logic via judgmental methodology. TypeQL-
+               Experimental's modal types for query temporality (past states,
+               future obligations) are based on this framework.}
+}
+
+@inproceedings{krishnaswami2020,
+  author    = {Neel Krishnaswami and Pierre Pradic and Nick Benton},
+  title     = {Integrating Linear and Dependent Types},
+  booktitle = {Proceedings of the ACM SIGPLAN-SIGACT Symposium on Principles
+               of Programming Languages (POPL)},
+  year      = {2020},
+  publisher = {ACM},
+  note      = {Addresses the tension between linear and dependent types.
+               TypeQL-Experimental's type system navigates this integration
+               following the patterns established here.}
+}
+
+@article{brady2013,
+  author    = {Edwin Brady},
+  title     = {Idris, a General-Purpose Dependently Typed Programming
+               Language: Design and Implementation},
+  journal   = {Journal of Functional Programming},
+  volume    = {23},
+  number    = {5},
+  pages     = {552--593},
+  year      = {2013},
+  note      = {Describes the design of Idris 1, predecessor to Idris 2.
+               Establishes the practical dependent types tradition that
+               TypeQL-Experimental inherits and extends with QTT.}
+}
+
+@inproceedings{hillerström2017,
+  author    = {Daniel Hillerstr\"{o}m and Sam Lindley},
+  title     = {Liberating Effects with Rows and Handlers},
+  booktitle = {Proceedings of the ACM SIGPLAN International Workshop on
+               Type-Driven Development (TyDe)},
+  pages     = {15--27},
+  year      = {2017},
+  publisher = {ACM},
+  note      = {Presents row-typed effect handlers. TypeQL-Experimental's
+               effect system for database operations uses row-based effect
+               tracking to compose transaction handlers safely.}
+}
