@@ -34,6 +34,7 @@
 //! - [`federation`] — Peer registration and federated cross-instance queries.
 //! - [`error`] — Error types and the crate-level `Result` alias.
 
+#![forbid(unsafe_code)]
 pub mod client;
 pub mod types;
 pub mod octad;

@@ -4,6 +4,7 @@
 //! Multi-dimensional array operations via ndarray and Burn.
 //! Implements Marr's Computational Level: "What transformations apply?"
 
+#![forbid(unsafe_code)]
 use async_trait::async_trait;
 use ndarray::{Array, ArrayD, IxDyn};
 use serde::{Deserialize, Serialize};

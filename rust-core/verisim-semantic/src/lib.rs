@@ -4,6 +4,7 @@
 //! Ontology and type system with CBOR proof serialization.
 //! Implements Marr's Computational Level: "What does this mean?"
 
+#![forbid(unsafe_code)]
 pub mod zkp;
 pub mod zkp_bridge;
 pub mod proven_bridge;

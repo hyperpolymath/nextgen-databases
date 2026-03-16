@@ -17,6 +17,7 @@
 //!   distance computation.  A production deployment would use an R-tree or
 //!   similar spatial index.
 
+#![forbid(unsafe_code)]
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

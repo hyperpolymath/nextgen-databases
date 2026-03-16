@@ -17,6 +17,7 @@
 
 #![allow(unused)] // Infrastructure code with planned future usage
 
+#![forbid(unsafe_code)]
 pub mod conflict;
 pub mod regeneration;
 

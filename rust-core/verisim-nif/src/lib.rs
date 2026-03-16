@@ -27,6 +27,7 @@
 //! VERISIM_TRANSPORT=auto   # NIF if available, HTTP fallback
 //! ```
 
+#![forbid(unsafe_code)]
 use rustler::{Env, Error, NifResult, Term};
 use serde_json::Value;
 use std::sync::OnceLock;
