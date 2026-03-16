@@ -43,8 +43,8 @@
 - **56 tests pass**, 4 ignored (persistence), 0 failures, 0 clippy warnings
 
 ### Author attribution
-- Git commits: `Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>`
-- Cargo.toml authors field: `["Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"]`
+- Git commits: `Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>`
+- Cargo.toml authors field: `["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]`
 
 ---
 
