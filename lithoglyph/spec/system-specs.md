@@ -13,10 +13,10 @@ plane), and Lean 4 (normalizer).
 
 ### Forth Storage Layer
 
-The storage engine uses fixed-size blocks (4 KiB default, configurable at
-init). All writes are append-only: mutations produce new journal entries
-rather than overwriting existing blocks. Block addresses are immutable
-once allocated. Freed blocks are reclaimed only during explicit compaction.
+The storage engine uses fixed-size blocks (4 KiB default, configurable).
+All writes are append-only: mutations produce new journal entries rather
+than overwriting. Block addresses are immutable once allocated. Freed
+blocks are reclaimed only during explicit compaction.
 
 ### Zig Block Allocator
 
@@ -37,9 +37,8 @@ frames are released deterministically when a query completes.
 
 ### Lean 4 Normalizer
 
-The Lean 4 normalizer operates on an in-memory graph representation
-received via serialized messages from the Elixir control plane. It
-performs graph rewriting in pure Lean (no IO monad) and returns the
+The Lean 4 normalizer receives serialized graph representations from
+the Elixir control plane, performs pure graph rewriting, and returns the
 normalized form. Memory is managed by Lean's reference-counted runtime;
 the normalizer process is short-lived per invocation.
 
@@ -72,23 +71,19 @@ query start (snapshot isolation via offset bookmarking).
 
 ### Provenance Effect (Mandatory)
 
-Every mutation carries a provenance record as a mandatory effect. The
-provenance includes: actor identity (session ID + authenticated principal),
-timestamp (monotonic + wall-clock), rationale (client-supplied text or
-`"implicit"` default), and causal predecessor (previous journal offset
-for the affected subgraph). Provenance records are stored inline in the
-journal block, not in a side table. Queries may filter or project on
-provenance fields.
+Every mutation carries a provenance record as a mandatory effect:
+actor identity (session ID + principal), timestamp (monotonic +
+wall-clock), rationale (client-supplied or `"implicit"`), and causal
+predecessor (previous journal offset). Provenance records are stored
+inline in journal blocks. Queries may filter on provenance fields.
 
 ### Reversibility Effect
 
-Every mutation also stores its inverse operation in the journal. For
-node insertion, the inverse is a tombstone marker. For edge creation,
-the inverse is edge removal. For property updates, the inverse stores
-the prior value. Reversal is triggered by issuing a `REVERT` command
-referencing a journal offset range. The reversal itself produces new
-journal entries (with their own provenance), preserving the append-only
-invariant.
+Every mutation stores its inverse operation in the journal (tombstone
+for insertions, removal for edges, prior value for updates). Reversal
+is triggered via `REVERT` referencing a journal offset range. Reversals
+produce new journal entries with their own provenance, preserving the
+append-only invariant.
 
 ### Effect Composition
 
@@ -113,11 +108,10 @@ its imports explicitly. Vocabularies are loaded on demand by the runtime.
 
 ### Elixir OTP Applications
 
-The control plane is structured as an OTP umbrella application with
-child apps: `lithoglyph_session`, `lithoglyph_storage`,
-`lithoglyph_normalizer` (Lean 4 port wrapper), and `lithoglyph_api`
-(external interface). Dependencies between apps are declared in
-`mix.exs` and enforced by the release build.
+The control plane is an OTP umbrella with child apps:
+`lithoglyph_session`, `lithoglyph_storage`, `lithoglyph_normalizer`
+(Lean 4 port wrapper), and `lithoglyph_api`. Dependencies declared
+in `mix.exs` and enforced by the release build.
 
 ### Cross-Language Boundaries
 
