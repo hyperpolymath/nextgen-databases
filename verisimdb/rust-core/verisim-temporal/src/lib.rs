@@ -4,6 +4,7 @@
 //! Time-series and versioning for audit-grade history.
 //! Implements Marr's Computational Level: "What happened when?"
 
+#![forbid(unsafe_code)]
 pub mod diff;
 
 use async_trait::async_trait;

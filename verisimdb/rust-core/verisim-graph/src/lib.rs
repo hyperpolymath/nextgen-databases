@@ -11,6 +11,7 @@
 //!
 //! Implements Marr's Computational Level: "What relationships exist?"
 
+#![forbid(unsafe_code)]
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};

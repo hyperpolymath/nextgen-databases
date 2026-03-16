@@ -4,6 +4,7 @@
 //! Monitors cross-modal consistency degradation and triggers normalization.
 //! This is the "early warning system" for data quality issues.
 
+#![forbid(unsafe_code)]
 use chrono::{DateTime, Utc};
 use prometheus::{Counter, Gauge, Registry};
 use serde::{Deserialize, Serialize};

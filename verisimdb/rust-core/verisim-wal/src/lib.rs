@@ -60,6 +60,7 @@
 // }
 // ```
 
+#![forbid(unsafe_code)]
 pub mod entry;
 pub mod error;
 pub mod reader;

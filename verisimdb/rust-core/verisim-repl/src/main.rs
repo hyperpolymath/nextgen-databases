@@ -12,6 +12,7 @@
 //! - Query timing display
 //! - Persistent command history
 
+#![forbid(unsafe_code)]
 mod client;
 mod completer;
 mod formatter;

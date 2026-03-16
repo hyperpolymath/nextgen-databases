@@ -16,6 +16,7 @@
 //! - **InMemoryProvenanceStore**: Reference implementation backed by a
 //!   `HashMap<String, Vec<ProvenanceRecord>>`.
 
+#![forbid(unsafe_code)]
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};

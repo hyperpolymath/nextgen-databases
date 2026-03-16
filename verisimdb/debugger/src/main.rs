@@ -4,6 +4,7 @@
 //! Status: Alpha development (v0.1.0)
 //! Not yet functional - scaffolding only
 
+#![forbid(unsafe_code)]
 fn main() {
     eprintln!("verisimdb-debugger v0.1.0");
     eprintln!("Status: Alpha development - not yet functional");

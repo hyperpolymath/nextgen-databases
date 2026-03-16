@@ -4,6 +4,7 @@
 //! HNSW-based similarity search for embeddings.
 //! Implements Marr's Computational Level: "What is similar to what?"
 
+#![forbid(unsafe_code)]
 mod hnsw;
 
 pub use hnsw::{HnswConfig, HnswVectorStore};

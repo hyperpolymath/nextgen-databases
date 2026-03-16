@@ -5,6 +5,7 @@
 //! Transforms logical plans into optimized physical execution plans
 //! with per-modality cost estimation and EXPLAIN output.
 
+#![forbid(unsafe_code)]
 pub mod config;
 pub mod cost;
 pub mod error;
