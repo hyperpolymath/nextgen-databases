@@ -4,6 +4,7 @@
 // This NIF connects BEAM (Erlang/Gleam/Elixir) to Lithoglyph via the Lithoglyph C ABI.
 // Uses CBOR-encoded binaries for efficient data transfer.
 
+#![forbid(unsafe_code)]
 use rustler::{Encoder, Env, Error, ResourceArc, Term};
 
 mod atoms {
