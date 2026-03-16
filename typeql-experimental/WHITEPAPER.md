@@ -408,8 +408,8 @@ existing keywords.
 
 ### 6.2 File Extension
 
-TypeQL-Experimental queries use the `.vqlpp` extension (VQL Plus Plus),
-distinguishing them from standard `.vql` files.
+TypeQL-Experimental queries use the `.vqlut` extension (VQL Ultimate Type-Safe),
+distinguishing them from standard `.vql` files. (Previously `.vqlpp` — renamed to align with VQL-UT canonical naming.)
 
 ---
 
