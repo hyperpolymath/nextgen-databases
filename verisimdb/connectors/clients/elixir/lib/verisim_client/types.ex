@@ -130,23 +130,23 @@ defmodule VeriSimClient.Types do
 
   @typedoc "A single directed edge in the graph modality."
   @type graph_edge :: %{
-          source: String.t(),
-          target: String.t(),
-          label: String.t(),
+          required(:source) => String.t(),
+          required(:target) => String.t(),
+          required(:label) => String.t(),
           optional(:properties) => map()
         }
 
   @typedoc "Vector modality input: dense embeddings for similarity search."
   @type octad_vector_input :: %{
-          embedding: [float()],
+          required(:embedding) => [float()],
           optional(:dimensions) => non_neg_integer(),
           optional(:model) => String.t()
         }
 
   @typedoc "Tensor modality input: multi-dimensional numeric data."
   @type octad_tensor_input :: %{
-          data: [float()],
-          shape: [non_neg_integer()],
+          required(:data) => [float()],
+          required(:shape) => [non_neg_integer()],
           optional(:dtype) => String.t()
         }
 
@@ -166,7 +166,7 @@ defmodule VeriSimClient.Types do
 
   @typedoc "Document modality input: unstructured / semi-structured content."
   @type octad_document_input :: %{
-          content: String.t(),
+          required(:content) => String.t(),
           optional(:content_type) => String.t(),
           optional(:language) => String.t(),
           optional(:metadata) => map()
@@ -174,7 +174,7 @@ defmodule VeriSimClient.Types do
 
   @typedoc "Temporal modality input: time-series events and temporal metadata."
   @type octad_temporal_input :: %{
-          timestamp: String.t(),
+          required(:timestamp) => String.t(),
           optional(:duration_ms) => non_neg_integer(),
           optional(:recurrence) => String.t(),
           optional(:timezone) => String.t(),
@@ -183,8 +183,8 @@ defmodule VeriSimClient.Types do
 
   @typedoc "Provenance modality input: lineage and audit trail events."
   @type octad_provenance_input :: %{
-          event_type: String.t(),
-          agent: String.t(),
+          required(:event_type) => String.t(),
+          required(:agent) => String.t(),
           optional(:description) => String.t(),
           optional(:source_ids) => [String.t()],
           optional(:metadata) => map()
@@ -223,9 +223,9 @@ defmodule VeriSimClient.Types do
   """
   @type provenance_event :: %{
           optional(:id) => String.t(),
-          entity_id: String.t(),
-          event_type: String.t(),
-          agent: String.t(),
+          required(:entity_id) => String.t(),
+          required(:event_type) => String.t(),
+          required(:agent) => String.t(),
           optional(:description) => String.t(),
           optional(:timestamp) => String.t(),
           optional(:source_ids) => [String.t()],
@@ -240,8 +240,8 @@ defmodule VeriSimClient.Types do
   A single result from a federated cross-instance query.
   """
   @type federation_result :: %{
-          store_id: String.t(),
-          entity: octad(),
+          required(:store_id) => String.t(),
+          required(:entity) => octad(),
           optional(:score) => float(),
           optional(:latency_ms) => non_neg_integer()
         }
@@ -254,10 +254,10 @@ defmodule VeriSimClient.Types do
   Response from a VQL query execution or explain request.
   """
   @type vql_response :: %{
-          success: boolean(),
-          statement_type: String.t(),
-          row_count: non_neg_integer(),
-          data: term(),
+          required(:success) => boolean(),
+          required(:statement_type) => String.t(),
+          required(:row_count) => non_neg_integer(),
+          required(:data) => term(),
           optional(:message) => String.t()
         }
 
@@ -269,8 +269,8 @@ defmodule VeriSimClient.Types do
   Standard error response body from the VeriSimDB REST API.
   """
   @type error_response :: %{
-          error: String.t(),
-          message: String.t(),
+          required(:error) => String.t(),
+          required(:message) => String.t(),
           optional(:details) => term()
         }
 
