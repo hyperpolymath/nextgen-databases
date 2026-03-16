@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 //
 // VeriSimDB Write-Ahead Log - Entry types
-// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
 // Defines the WAL entry struct and its constituent enums (operation type,
 // modality). Provides binary serialization/deserialization for the on-disk

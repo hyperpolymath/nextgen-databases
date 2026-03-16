@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 //
 // VeriSimDB Write-Ahead Log - Reader for crash recovery
-// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
 // The `WalReader` reads WAL segment files and replays entries in sequence
 // order. It verifies CRC32 checksums on each entry and gracefully handles
