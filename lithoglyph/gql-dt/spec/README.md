@@ -309,7 +309,7 @@ All specification documents are licensed under **PMPL-1.0-or-later** (Palimpsest
 - **Project:** Lithoglyph Query Language with Dependent Types (GQL-DT)
 - **Repository:** https://github.com/hyperpolymath/gql-dt
 - **Organization:** hyperpolymath
-- **Author:** Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>
+- **Author:** Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 
 ---
 

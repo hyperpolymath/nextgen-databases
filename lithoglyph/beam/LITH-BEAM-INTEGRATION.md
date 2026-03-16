@@ -364,7 +364,7 @@ pub fn save_row(conn: lith.Connection, row: Row) -> Result(RowId, Error) {
 - **Zig:** 0.15.2
 - **Gleam:** 1.x
 - **License:** PMPL-1.0-or-later (Palimpsest)
-- **Author:** Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>
+- **Author:** Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 
 ---
 

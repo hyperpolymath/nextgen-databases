@@ -220,7 +220,7 @@ fn main() {
 [package]
 name = "gqldt"
 version = "0.1.0"
-authors = ["Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"]
+authors = ["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]
 edition = "2021"
 license = "PMPL-1.0-or-later"
 
@@ -371,7 +371,7 @@ execute!(insert, database)
 ```toml
 name = "GqlDt"
 uuid = "..." # Generate with UUIDs.uuid4()
-authors = ["Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"]
+authors = ["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]
 version = "0.1.0"
 
 [compat]

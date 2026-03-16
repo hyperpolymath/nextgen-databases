@@ -1,7 +1,7 @@
 # Contributing to VeriSimDB
 
 <!-- SPDX-License-Identifier: PMPL-1.0-or-later -->
-<!-- Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk> -->
+<!-- Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk> -->
 
 Thank you for your interest in contributing to VeriSimDB. This document explains how to get started, our development workflow, and how to submit changes.
 
@@ -184,4 +184,4 @@ By contributing, you agree that your contributions will be licensed under the **
 
 - **Issues**: [GitHub](https://github.com/hyperpolymath/verisimdb/issues) or [GitLab](https://gitlab.com/hyperpolymath/verisimdb/-/issues)
 - **Security**: See [SECURITY.md](SECURITY.md) for vulnerability reporting
-- **Maintainer**: Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>
+- **Maintainer**: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>

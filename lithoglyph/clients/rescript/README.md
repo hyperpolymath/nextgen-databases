@@ -276,4 +276,4 @@ for backwards compatibility but should be considered deprecated.
 
 PMPL-1.0-or-later (Palimpsest License)
 
-Copyright (c) 2026 Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>
+Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>

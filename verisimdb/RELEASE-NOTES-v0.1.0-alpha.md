@@ -350,7 +350,7 @@ See `LICENSE` for full terms.
 ## 🙏 Acknowledgments
 
 **Development:**
-- Jonathan D.A. Jewell (jonathan.jewell@open.ac.uk)
+- Jonathan D.A. Jewell (j.d.a.jewell@open.ac.uk)
 
 **AI Assistance:**
 - Claude Sonnet 4.5 (Anthropic)
