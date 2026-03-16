@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 //
 // VeriSimDB Write-Ahead Log - Segment management
-// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
 // Each WAL segment is a single append-only file named `wal-{sequence:016}.log`.
 // Segments are rotated when they exceed the configured maximum size. Old

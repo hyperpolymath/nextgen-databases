@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 //
 // VeriSimDB Write-Ahead Log (WAL) crate
-// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
 // Provides crash recovery for VeriSimDB by recording all mutations to an
 // append-only log before they are applied to the modality stores. On crash,

@@ -8,7 +8,7 @@ FROM ubuntu:24.04
 
 LABEL org.opencontainers.image.title="GQLdt Development Environment"
 LABEL org.opencontainers.image.description="Lean 4 + Zig for dependently-typed Lith queries"
-LABEL org.opencontainers.image.authors="Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"
+LABEL org.opencontainers.image.authors="Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"
 LABEL org.opencontainers.image.licenses="PMPL-1.0-or-later"
 
 # Install system dependencies
