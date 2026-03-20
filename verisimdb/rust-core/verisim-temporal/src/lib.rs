@@ -5,6 +5,10 @@
 //! Implements Marr's Computational Level: "What happened when?"
 
 #![forbid(unsafe_code)]
+#[cfg(feature = "redb-backend")]
+pub mod persistent;
+#[cfg(feature = "redb-backend")]
+pub use persistent::*;
 pub mod diff;
 
 use async_trait::async_trait;

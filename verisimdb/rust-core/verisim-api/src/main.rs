@@ -61,6 +61,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .and_then(|v| v.parse().ok())
             .unwrap_or(384),
         persistence_dir: persist_dir.clone(),
+        grpc_port: std::env::var("VERISIM_GRPC_PORT")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(50051),
+        max_body_size: std::env::var("VERISIM_MAX_BODY_SIZE")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(10 * 1024 * 1024),
+        request_timeout_secs: std::env::var("VERISIM_TIMEOUT_SECS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(30),
+        max_connections: std::env::var("VERISIM_MAX_CONNECTIONS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(1024),
     };
 
     let storage_mode = if cfg!(feature = "persistent") { "persistent" } else { "in-memory" };

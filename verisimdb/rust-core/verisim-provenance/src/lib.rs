@@ -17,6 +17,10 @@
 //!   `HashMap<String, Vec<ProvenanceRecord>>`.
 
 #![forbid(unsafe_code)]
+#[cfg(feature = "redb-backend")]
+pub mod persistent;
+#[cfg(feature = "redb-backend")]
+pub use persistent::*;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};

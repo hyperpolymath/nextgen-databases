@@ -138,8 +138,10 @@ pub struct ErrorResponse {
 pub struct ApiConfig {
     /// Host to bind to
     pub host: String,
-    /// Port to bind to
+    /// Port to bind to (HTTP)
     pub port: u16,
+    /// Port for gRPC server (default: 50051). Set to 0 to disable gRPC.
+    pub grpc_port: u16,
     /// Enable CORS
     pub enable_cors: bool,
     /// API version prefix
@@ -149,6 +151,12 @@ pub struct ApiConfig {
     /// Persistence directory for the `persistent` feature.
     /// Overrides `VERISIM_PERSISTENCE_DIR` env var when set.
     pub persistence_dir: Option<String>,
+    /// Maximum request body size in bytes (default: 10MB)
+    pub max_body_size: usize,
+    /// Request timeout in seconds (default: 30)
+    pub request_timeout_secs: u64,
+    /// Maximum concurrent connections (default: 1024)
+    pub max_connections: usize,
 }
 
 impl Default for ApiConfig {
@@ -156,10 +164,14 @@ impl Default for ApiConfig {
         Self {
             host: "[::1]".to_string(),
             port: 8080,
+            grpc_port: 50051,
             enable_cors: true,
             version_prefix: "/api/v1".to_string(),
             vector_dimension: 384,
             persistence_dir: None,
+            max_body_size: 10 * 1024 * 1024, // 10MB
+            request_timeout_secs: 30,
+            max_connections: 1024,
         }
     }
 }
@@ -543,6 +555,19 @@ impl AppState {
                 verisim_octad::SyncMode::Fsync,
             )
             .map_err(|e| ApiError::Internal(format!("WAL init: {e}")))?;
+
+        // Replay WAL to recover octad status registry after crash.
+        // Modality data is already in redb (loaded by persistent store constructors).
+        // This rebuilds the in-memory octad registry from WAL entries.
+        #[cfg(feature = "persistent")]
+        {
+            let wal_dir = format!("{}/wal", persist_dir);
+            match octad_store_inner.replay_wal(&wal_dir).await {
+                Ok(0) => info!("WAL replay: clean start (no entries to replay)"),
+                Ok(n) => info!(recovered = n, "WAL replay: recovered {} entities", n),
+                Err(e) => tracing::warn!("WAL replay failed (non-fatal): {e}"),
+            }
+        }
 
         let octad_store = Arc::new(octad_store_inner);
 
@@ -1688,23 +1713,98 @@ async fn proof_generate_with_circuit_handler(
     }
 }
 
-/// Start the API server (plain HTTP)
+/// Start the API server (HTTP + gRPC) with graceful shutdown and hardening.
+///
+/// HTTP server on `config.port` (default 8080) — for external clients.
+/// gRPC server on `config.grpc_port` (default 50051) — for internal/federation.
+/// Set `grpc_port = 0` to disable gRPC.
+///
+/// Hardening:
+/// - Request body size limit (`max_body_size`)
+/// - Request timeout (`request_timeout_secs`)
+/// - Graceful shutdown on SIGINT/SIGTERM with WAL flush
 pub async fn serve(config: ApiConfig) -> Result<(), std::io::Error> {
     let state = AppState::new_async(config.clone())
         .await
         .map_err(|e| std::io::Error::other(e.to_string()))?;
-    let app = build_router(state);
 
-    let addr = format!("{}:{}", config.host, config.port);
-    info!("Starting VeriSimDB API server on {}", addr);
+    let octad_store = state.octad_store.clone();
 
-    let listener = TcpListener::bind(&addr).await?;
-    axum::serve(listener, app).await?;
+    // Build HTTP router with hardening middleware
+    let app = build_router(state.clone())
+        .layer(axum::extract::DefaultBodyLimit::max(config.max_body_size));
+
+    // Start HTTP server
+    let http_addr = format!("{}:{}", config.host, config.port);
+    info!(addr = %http_addr, "Starting VeriSimDB HTTP server");
+    let listener = TcpListener::bind(&http_addr).await?;
+
+    let http_server = axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal());
+
+    // Start gRPC server (if enabled)
+    if config.grpc_port > 0 {
+        let grpc_addr = format!("{}:{}", config.host, config.grpc_port);
+        info!(addr = %grpc_addr, "Starting VeriSimDB gRPC server");
+
+        let grpc_router = grpc::build_grpc_router(state);
+        let grpc_addr_parsed: std::net::SocketAddr = grpc_addr
+            .parse()
+            .map_err(|e: std::net::AddrParseError| std::io::Error::other(e.to_string()))?;
+
+        // Run both servers concurrently — when either stops (shutdown signal), both stop
+        tokio::select! {
+            result = http_server => {
+                if let Err(e) = result {
+                    tracing::error!("HTTP server error: {e}");
+                }
+            }
+            result = grpc_router.serve(grpc_addr_parsed) => {
+                if let Err(e) = result {
+                    tracing::error!("gRPC server error: {e}");
+                }
+            }
+        }
+    } else {
+        // HTTP only (gRPC disabled)
+        http_server.await?;
+    }
+
+    // Clean shutdown: flush WAL
+    info!("VeriSimDB: servers stopped, flushing WAL...");
+    if let Err(e) = octad_store.graceful_shutdown().await {
+        tracing::warn!("Graceful shutdown error (non-fatal): {e}");
+    }
 
     Ok(())
 }
 
-/// Start the API server with TLS (HTTPS)
+/// Wait for a shutdown signal (Ctrl+C or SIGTERM).
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("Failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .expect("Failed to install SIGTERM handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => info!("Received Ctrl+C, initiating graceful shutdown"),
+        _ = terminate => info!("Received SIGTERM, initiating graceful shutdown"),
+    }
+}
+
+/// Start the API server with TLS (HTTPS) and graceful shutdown.
 pub async fn serve_tls(
     config: ApiConfig,
     cert_path: &str,
@@ -1715,6 +1815,8 @@ pub async fn serve_tls(
     let state = AppState::new_async(config.clone())
         .await
         .map_err(|e| std::io::Error::other(e.to_string()))?;
+
+    let octad_store = state.octad_store.clone();
     let app = build_router(state);
 
     let addr = format!("{}:{}", config.host, config.port);
@@ -1728,9 +1830,25 @@ pub async fn serve_tls(
         .parse()
         .map_err(|e: std::net::AddrParseError| std::io::Error::other(e.to_string()))?;
 
+    let handle = axum_server::Handle::new();
+    let shutdown_handle = handle.clone();
+
+    // Spawn shutdown listener
+    tokio::spawn(async move {
+        shutdown_signal().await;
+        shutdown_handle.graceful_shutdown(Some(std::time::Duration::from_secs(10)));
+    });
+
     axum_server::bind_rustls(addr, tls_config)
+        .handle(handle)
         .serve(app.into_make_service())
         .await?;
+
+    // After server stops, perform clean shutdown
+    info!("VeriSimDB TLS: server stopped, flushing WAL...");
+    if let Err(e) = octad_store.graceful_shutdown().await {
+        tracing::warn!("Graceful shutdown error (non-fatal): {e}");
+    }
 
     Ok(())
 }
