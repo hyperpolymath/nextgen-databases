@@ -346,6 +346,29 @@ where
         Ok(recovered)
     }
 
+    /// Perform a graceful shutdown: write a final WAL checkpoint and log metrics.
+    ///
+    /// Call this before process exit to ensure all in-flight operations are
+    /// checkpointed. Persistent modality stores (redb) flush automatically on
+    /// drop, but the WAL needs an explicit final checkpoint to mark the clean
+    /// shutdown boundary.
+    pub async fn graceful_shutdown(&self) -> Result<(), OctadError> {
+        info!("VeriSimDB: graceful shutdown initiated");
+
+        // Write final WAL checkpoint
+        self.wal_checkpoint().await?;
+
+        // Log final state
+        let octads = self.octads.read().await;
+        info!(
+            entity_count = octads.len(),
+            "VeriSimDB: shutdown complete — {} entities checkpointed",
+            octads.len()
+        );
+
+        Ok(())
+    }
+
     /// Access the provenance store for direct queries.
     pub fn provenance_store(&self) -> &Arc<P> {
         &self.provenance

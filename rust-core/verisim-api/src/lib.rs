@@ -1701,23 +1701,68 @@ async fn proof_generate_with_circuit_handler(
     }
 }
 
-/// Start the API server (plain HTTP)
+/// Start the API server (plain HTTP) with graceful shutdown.
+///
+/// On SIGINT (Ctrl+C) or SIGTERM, the server:
+/// 1. Stops accepting new connections
+/// 2. Writes a final WAL checkpoint
+/// 3. Logs shutdown metrics
+/// 4. Exits cleanly
 pub async fn serve(config: ApiConfig) -> Result<(), std::io::Error> {
     let state = AppState::new_async(config.clone())
         .await
         .map_err(|e| std::io::Error::other(e.to_string()))?;
+
+    // Keep a reference to the octad store for shutdown
+    let octad_store = state.octad_store.clone();
+
     let app = build_router(state);
 
     let addr = format!("{}:{}", config.host, config.port);
     info!("Starting VeriSimDB API server on {}", addr);
 
     let listener = TcpListener::bind(&addr).await?;
-    axum::serve(listener, app).await?;
+
+    // Serve with graceful shutdown on Ctrl+C / SIGTERM
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
+
+    // After server stops accepting connections, perform clean shutdown
+    info!("VeriSimDB: server stopped, flushing WAL...");
+    if let Err(e) = octad_store.graceful_shutdown().await {
+        tracing::warn!("Graceful shutdown error (non-fatal): {e}");
+    }
 
     Ok(())
 }
 
-/// Start the API server with TLS (HTTPS)
+/// Wait for a shutdown signal (Ctrl+C or SIGTERM).
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("Failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .expect("Failed to install SIGTERM handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => info!("Received Ctrl+C, initiating graceful shutdown"),
+        _ = terminate => info!("Received SIGTERM, initiating graceful shutdown"),
+    }
+}
+
+/// Start the API server with TLS (HTTPS) and graceful shutdown.
 pub async fn serve_tls(
     config: ApiConfig,
     cert_path: &str,
@@ -1728,6 +1773,8 @@ pub async fn serve_tls(
     let state = AppState::new_async(config.clone())
         .await
         .map_err(|e| std::io::Error::other(e.to_string()))?;
+
+    let octad_store = state.octad_store.clone();
     let app = build_router(state);
 
     let addr = format!("{}:{}", config.host, config.port);
@@ -1741,9 +1788,25 @@ pub async fn serve_tls(
         .parse()
         .map_err(|e: std::net::AddrParseError| std::io::Error::other(e.to_string()))?;
 
+    let handle = axum_server::Handle::new();
+    let shutdown_handle = handle.clone();
+
+    // Spawn shutdown listener
+    tokio::spawn(async move {
+        shutdown_signal().await;
+        shutdown_handle.graceful_shutdown(Some(std::time::Duration::from_secs(10)));
+    });
+
     axum_server::bind_rustls(addr, tls_config)
+        .handle(handle)
         .serve(app.into_make_service())
         .await?;
+
+    // After server stops, perform clean shutdown
+    info!("VeriSimDB TLS: server stopped, flushing WAL...");
+    if let Err(e) = octad_store.graceful_shutdown().await {
+        tracing::warn!("Graceful shutdown error (non-fatal): {e}");
+    }
 
     Ok(())
 }
