@@ -544,6 +544,19 @@ impl AppState {
             )
             .map_err(|e| ApiError::Internal(format!("WAL init: {e}")))?;
 
+        // Replay WAL to recover octad status registry after crash.
+        // Modality data is already in redb (loaded by persistent store constructors).
+        // This rebuilds the in-memory octad registry from WAL entries.
+        #[cfg(feature = "persistent")]
+        {
+            let wal_dir = format!("{}/wal", persist_dir);
+            match octad_store_inner.replay_wal(&wal_dir).await {
+                Ok(0) => info!("WAL replay: clean start (no entries to replay)"),
+                Ok(n) => info!(recovered = n, "WAL replay: recovered {} entities", n),
+                Err(e) => tracing::warn!("WAL replay failed (non-fatal): {e}"),
+            }
+        }
+
         let octad_store = Arc::new(octad_store_inner);
 
         let drift_detector = Arc::new(DriftDetector::new(DriftThresholds::default()));
