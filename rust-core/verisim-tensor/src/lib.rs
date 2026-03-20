@@ -5,6 +5,10 @@
 //! Implements Marr's Computational Level: "What transformations apply?"
 
 #![forbid(unsafe_code)]
+#[cfg(feature = "redb-backend")]
+pub mod persistent;
+#[cfg(feature = "redb-backend")]
+pub use persistent::*;
 use async_trait::async_trait;
 use ndarray::{Array, ArrayD, IxDyn};
 use serde::{Deserialize, Serialize};

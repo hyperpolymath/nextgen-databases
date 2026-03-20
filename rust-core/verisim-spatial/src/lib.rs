@@ -18,6 +18,10 @@
 //!   similar spatial index.
 
 #![forbid(unsafe_code)]
+#[cfg(feature = "redb-backend")]
+pub mod persistent;
+#[cfg(feature = "redb-backend")]
+pub use persistent::*;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

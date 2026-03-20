@@ -5,6 +5,10 @@
 //! Implements Marr's Computational Level: "What does this mean?"
 
 #![forbid(unsafe_code)]
+#[cfg(feature = "redb-backend")]
+pub mod persistent;
+#[cfg(feature = "redb-backend")]
+pub use persistent::*;
 pub mod zkp;
 pub mod zkp_bridge;
 pub mod proven_bridge;
