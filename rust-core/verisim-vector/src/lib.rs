@@ -6,8 +6,12 @@
 
 #![forbid(unsafe_code)]
 mod hnsw;
+#[cfg(feature = "redb-backend")]
+pub mod persistent;
 
 pub use hnsw::{HnswConfig, HnswVectorStore};
+#[cfg(feature = "redb-backend")]
+pub use persistent::RedbVectorStore;
 
 use async_trait::async_trait;
 use ndarray::{Array1, ArrayView1};

@@ -17,10 +17,18 @@ thiserror.workspace = true
 tracing.workspace = true
 async-trait.workspace = true
 tokio.workspace = true
-# bincode removed — not used in crate
-# bincode.workspace = true
+serde_json.workspace = true
+
+# Optional: persistent storage via redb
+verisim-storage = { path = "../verisim-storage", optional = true }
+
+[features]
+default = []
+redb-backend = ["verisim-storage/redb-backend"]
 
 [dev-dependencies]
 proptest.workspace = true
 criterion.workspace = true
+tempfile = "3"
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
