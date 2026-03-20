@@ -2,92 +2,260 @@
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
 // Persistent temporal version store backed by redb via verisim-storage.
-// Stores version history as serialised JSON per entity.
+//
+// Each entity's full version history is stored as a single JSON blob keyed by
+// entity_id.  On open(), all histories are scanned into an in-memory BTreeMap
+// cache for fast reads.  Writes go to redb first (durable), then update the
+// cache.
+//
+// The associated type `Data` is `serde_json::Value`, making this store a
+// universal versioned key-value store.  Higher layers can convert to/from
+// concrete types using serde.
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
 use std::sync::{Arc, RwLock};
 
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use tracing::info;
 use verisim_storage::redb_backend::RedbBackend;
 use verisim_storage::typed::TypedStore;
 
-use crate::{TemporalStore, Version, VersionError};
+use crate::{TemporalError, TemporalStore, TimeRange, Version};
 
-/// Persistent version store: redb for durability, in-memory cache for queries.
-/// Each entity's full version history is stored as a single JSON blob keyed by entity_id.
+/// Type alias matching the InMemory store's internal structure.
+type VersionHistory = HashMap<String, BTreeMap<u64, Version<serde_json::Value>>>;
+
+/// Persistent version store: redb for durability, in-memory BTreeMap cache for
+/// fast reads and range queries.
+///
+/// Each entity's entire version history is stored as a serialized
+/// `BTreeMap<u64, Version<serde_json::Value>>` under the entity_id key.
 pub struct RedbVersionStore {
+    /// Typed store for version histories, keyed by entity_id.
     store: TypedStore<RedbBackend>,
-    cache: Arc<RwLock<HashMap<String, Vec<Version<serde_json::Value>>>>>,
+    /// In-memory cache of all version histories.
+    versions: Arc<RwLock<VersionHistory>>,
 }
 
 impl RedbVersionStore {
-    pub async fn open(path: impl AsRef<Path>) -> Result<Self, VersionError> {
+    /// Open (or create) a persistent version store at the given path.
+    ///
+    /// On open, all existing version histories are scanned from redb into the
+    /// in-memory cache so that reads never hit disk.
+    pub async fn open(path: impl AsRef<Path>) -> Result<Self, TemporalError> {
         let backend = RedbBackend::open(path.as_ref())
-            .map_err(|e| VersionError::StorageError(format!("redb open: {}", e)))?;
+            .map_err(|e| TemporalError::Conflict(format!("redb open: {}", e)))?;
         let store = TypedStore::new(backend, "ver");
 
-        let entries: Vec<(String, Vec<Version<serde_json::Value>>)> = store
+        let entries: Vec<(String, BTreeMap<u64, Version<serde_json::Value>>)> = store
             .scan_prefix("", 1_000_000)
             .await
-            .map_err(|e| VersionError::StorageError(format!("scan: {}", e)))?;
+            .map_err(|e| TemporalError::Conflict(format!("scan: {}", e)))?;
 
-        let mut cache = HashMap::new();
-        for (id, versions) in entries {
-            cache.insert(id, versions);
+        let mut cache: VersionHistory = HashMap::new();
+        for (id, history) in entries {
+            cache.insert(id, history);
         }
 
-        info!(count = cache.len(), "Loaded temporal version store from redb");
-        Ok(Self { store, cache: Arc::new(RwLock::new(cache)) })
+        info!(
+            entities = cache.len(),
+            "Loaded temporal version store from redb"
+        );
+        Ok(Self {
+            store,
+            versions: Arc::new(RwLock::new(cache)),
+        })
     }
 
-    async fn persist_entity(&self, entity_id: &str) -> Result<(), VersionError> {
-        let c = self.cache.read().map_err(|_| VersionError::LockPoisoned)?;
-        if let Some(versions) = c.get(entity_id) {
-            self.store.put(entity_id, versions).await
-                .map_err(|e| VersionError::StorageError(format!("put: {}", e)))?;
+    /// Persist a single entity's version history to redb.
+    async fn persist_entity(&self, entity_id: &str) -> Result<(), TemporalError> {
+        let history = {
+            let cache = self
+                .versions
+                .read()
+                .map_err(|_| TemporalError::LockPoisoned)?;
+            cache.get(entity_id).cloned()
+        };
+        if let Some(history) = history {
+            self.store
+                .put(entity_id, &history)
+                .await
+                .map_err(|e| TemporalError::Conflict(format!("put: {}", e)))?;
         }
         Ok(())
     }
 }
 
-// Note: Generic TemporalStore trait uses type parameter T.
-// For persistent storage, we use serde_json::Value as the universal type.
-// Higher layers can convert to/from concrete types.
 #[async_trait]
 impl TemporalStore for RedbVersionStore {
-    type Item = serde_json::Value;
+    type Data = serde_json::Value;
 
-    async fn put_version(&self, entity_id: &str, version: Version<serde_json::Value>) -> Result<(), VersionError> {
+    async fn append(
+        &self,
+        entity_id: &str,
+        data: Self::Data,
+        author: &str,
+        message: Option<&str>,
+    ) -> Result<u64, TemporalError> {
+        let next_version = {
+            let mut store = self
+                .versions
+                .write()
+                .map_err(|_| TemporalError::LockPoisoned)?;
+            let versions = store.entry(entity_id.to_string()).or_default();
+
+            let next_version = versions.keys().last().map(|v| v + 1).unwrap_or(1);
+            let mut version = Version::new(next_version, data, author);
+            if let Some(msg) = message {
+                version = version.with_message(msg);
+            }
+
+            versions.insert(next_version, version);
+            next_version
+        };
+
+        // Persist to redb after updating cache.
+        self.persist_entity(entity_id).await?;
+        Ok(next_version)
+    }
+
+    async fn latest(
+        &self,
+        entity_id: &str,
+    ) -> Result<Option<Version<Self::Data>>, TemporalError> {
+        let store = self
+            .versions
+            .read()
+            .map_err(|_| TemporalError::LockPoisoned)?;
+        Ok(store
+            .get(entity_id)
+            .and_then(|versions| versions.values().last().cloned()))
+    }
+
+    async fn at_version(
+        &self,
+        entity_id: &str,
+        version: u64,
+    ) -> Result<Option<Version<Self::Data>>, TemporalError> {
+        let store = self
+            .versions
+            .read()
+            .map_err(|_| TemporalError::LockPoisoned)?;
+        Ok(store
+            .get(entity_id)
+            .and_then(|versions| versions.get(&version).cloned()))
+    }
+
+    async fn at_time(
+        &self,
+        entity_id: &str,
+        time: DateTime<Utc>,
+    ) -> Result<Option<Version<Self::Data>>, TemporalError> {
+        let store = self
+            .versions
+            .read()
+            .map_err(|_| TemporalError::LockPoisoned)?;
+        Ok(store.get(entity_id).and_then(|versions| {
+            versions
+                .values()
+                .filter(|v| v.timestamp <= time)
+                .last()
+                .cloned()
+        }))
+    }
+
+    async fn in_range(
+        &self,
+        entity_id: &str,
+        range: &TimeRange,
+    ) -> Result<Vec<Version<Self::Data>>, TemporalError> {
+        let store = self
+            .versions
+            .read()
+            .map_err(|_| TemporalError::LockPoisoned)?;
+        Ok(store
+            .get(entity_id)
+            .map(|versions| {
+                versions
+                    .values()
+                    .filter(|v| range.contains(&v.timestamp))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default())
+    }
+
+    async fn history(
+        &self,
+        entity_id: &str,
+        limit: usize,
+    ) -> Result<Vec<Version<Self::Data>>, TemporalError> {
+        let store = self
+            .versions
+            .read()
+            .map_err(|_| TemporalError::LockPoisoned)?;
+        Ok(store
+            .get(entity_id)
+            .map(|versions| versions.values().rev().take(limit).cloned().collect())
+            .unwrap_or_default())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn test_persistent_temporal_roundtrip() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("temporal.redb");
+
+        // Write data in one session.
         {
-            let mut c = self.cache.write().map_err(|_| VersionError::LockPoisoned)?;
-            c.entry(entity_id.to_string()).or_default().push(version);
+            let store = RedbVersionStore::open(&path).await.unwrap();
+            let v1 = store
+                .append(
+                    "entity-1",
+                    serde_json::json!({"name": "Alice", "version": 1}),
+                    "alice",
+                    Some("initial creation"),
+                )
+                .await
+                .unwrap();
+            assert_eq!(v1, 1);
+
+            let v2 = store
+                .append(
+                    "entity-1",
+                    serde_json::json!({"name": "Alice Updated", "version": 2}),
+                    "bob",
+                    Some("updated name"),
+                )
+                .await
+                .unwrap();
+            assert_eq!(v2, 2);
         }
-        self.persist_entity(entity_id).await
-    }
 
-    async fn get_latest(&self, entity_id: &str) -> Result<Option<Version<serde_json::Value>>, VersionError> {
-        let c = self.cache.read().map_err(|_| VersionError::LockPoisoned)?;
-        Ok(c.get(entity_id).and_then(|v| v.last().cloned()))
-    }
+        // Reopen and verify data survived.
+        {
+            let store = RedbVersionStore::open(&path).await.unwrap();
 
-    async fn get_version(&self, entity_id: &str, version_num: u64) -> Result<Option<Version<serde_json::Value>>, VersionError> {
-        let c = self.cache.read().map_err(|_| VersionError::LockPoisoned)?;
-        Ok(c.get(entity_id)
-            .and_then(|versions| versions.iter().find(|v| v.version == version_num).cloned()))
-    }
+            let latest = store.latest("entity-1").await.unwrap().unwrap();
+            assert_eq!(latest.version, 2);
+            assert_eq!(latest.data["name"], "Alice Updated");
+            assert_eq!(latest.author, "bob");
 
-    async fn get_history(&self, entity_id: &str) -> Result<Vec<Version<serde_json::Value>>, VersionError> {
-        let c = self.cache.read().map_err(|_| VersionError::LockPoisoned)?;
-        Ok(c.get(entity_id).cloned().unwrap_or_default())
-    }
+            let v1 = store.at_version("entity-1", 1).await.unwrap().unwrap();
+            assert_eq!(v1.data["name"], "Alice");
+            assert_eq!(v1.author, "alice");
 
-    async fn delete_history(&self, entity_id: &str) -> Result<(), VersionError> {
-        self.store.delete(entity_id).await
-            .map_err(|e| VersionError::StorageError(format!("delete: {}", e)))?;
-        let mut c = self.cache.write().map_err(|_| VersionError::LockPoisoned)?;
-        c.remove(entity_id);
-        Ok(())
+            let history = store.history("entity-1", 10).await.unwrap();
+            assert_eq!(history.len(), 2);
+            // History is most recent first.
+            assert_eq!(history[0].version, 2);
+            assert_eq!(history[1].version, 1);
+        }
     }
 }

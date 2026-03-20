@@ -90,6 +90,9 @@ impl TensorStore for RedbTensorStore {
             ReduceOp::Min => arr.map_axis(ndarray::Axis(axis), |lane| {
                 lane.iter().copied().fold(f64::INFINITY, f64::min)
             }),
+            ReduceOp::Prod => arr.map_axis(ndarray::Axis(axis), |lane| {
+                lane.iter().copied().product()
+            }),
         };
         Ok(Tensor::from_ndarray(format!("{}_reduced", id), &reduced.into_dyn()))
     }
