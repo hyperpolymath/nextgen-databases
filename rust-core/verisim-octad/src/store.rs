@@ -184,6 +184,168 @@ where
         Ok(())
     }
 
+    /// Replay the write-ahead log to recover state after a crash.
+    ///
+    /// This method should be called once during startup, after the WAL is
+    /// opened and persistent modality stores have loaded their data from redb.
+    ///
+    /// Recovery strategy (octad-level, Option B):
+    ///
+    /// 1. Find the last checkpoint in the WAL.
+    /// 2. Replay all entries after that checkpoint.
+    /// 3. For committed operations (Insert/Update/Delete followed by a
+    ///    Checkpoint with payload b"COMMITTED"): rebuild the octad status
+    ///    registry. The modality data is already in redb.
+    /// 4. For uncommitted operations (no matching Checkpoint): log a warning.
+    ///    The incomplete write may have partially persisted to redb — the data
+    ///    is still consistent per-modality (each redb write is atomic), but the
+    ///    cross-modal operation may be incomplete.
+    /// 5. Write a fresh checkpoint after replay.
+    ///
+    /// Returns the number of entities recovered.
+    pub async fn replay_wal(
+        &self,
+        wal_dir: impl AsRef<std::path::Path>,
+    ) -> Result<usize, OctadError> {
+        use std::collections::HashSet;
+        use verisim_wal::WalReader;
+
+        let reader = match WalReader::open(&wal_dir) {
+            Ok(r) => r,
+            Err(verisim_wal::WalError::DirectoryNotFound(_)) => {
+                info!("No WAL directory found — clean start");
+                return Ok(0);
+            }
+            Err(e) => {
+                return Err(OctadError::ModalityError {
+                    modality: "wal".to_string(),
+                    message: format!("Failed to open WAL reader: {e}"),
+                });
+            }
+        };
+
+        // Find the last checkpoint to determine replay start point
+        let checkpoint_seq = reader.find_last_checkpoint().map_err(|e| {
+            OctadError::ModalityError {
+                modality: "wal".to_string(),
+                message: format!("Failed to find checkpoint: {e}"),
+            }
+        })?;
+
+        let start_seq = checkpoint_seq.unwrap_or(0);
+        info!(start_seq, "Replaying WAL from sequence {}", start_seq);
+
+        // Read all entries from the checkpoint onward
+        let entries: Vec<WalEntry> = reader
+            .replay_from(start_seq)
+            .map_err(|e| OctadError::ModalityError {
+                modality: "wal".to_string(),
+                message: format!("WAL replay_from failed: {e}"),
+            })?
+            .collect();
+
+        if entries.is_empty() {
+            info!("WAL replay: no entries to replay");
+            return Ok(0);
+        }
+
+        // Track which entity_ids have been committed (have a Checkpoint entry)
+        let mut committed_entities: HashSet<String> = HashSet::new();
+        let mut uncommitted_entities: HashSet<String> = HashSet::new();
+        let mut entity_ops: HashMap<String, (WalOperation, Vec<u8>)> = HashMap::new();
+
+        for entry in &entries {
+            match entry.operation {
+                WalOperation::Checkpoint => {
+                    // Checkpoint with payload "COMMITTED" marks the previous op as complete
+                    if entry.payload == b"COMMITTED" {
+                        committed_entities.insert(entry.entity_id.clone());
+                        uncommitted_entities.remove(&entry.entity_id);
+                    }
+                }
+                WalOperation::Insert | WalOperation::Update | WalOperation::Delete => {
+                    entity_ops.insert(
+                        entry.entity_id.clone(),
+                        (entry.operation.clone(), entry.payload.clone()),
+                    );
+                    if !committed_entities.contains(&entry.entity_id) {
+                        uncommitted_entities.insert(entry.entity_id.clone());
+                    }
+                }
+            }
+        }
+
+        // Warn about uncommitted operations
+        for entity_id in &uncommitted_entities {
+            tracing::warn!(
+                entity_id,
+                "WAL replay: uncommitted operation for entity — may be partially persisted"
+            );
+        }
+
+        // Rebuild octad status registry for committed entities
+        let mut octads = self.octads.write().await;
+        let mut recovered = 0usize;
+
+        for entity_id in &committed_entities {
+            if let Some((op, payload)) = entity_ops.get(entity_id) {
+                match op {
+                    WalOperation::Insert | WalOperation::Update => {
+                        // Deserialize the OctadInput to determine which modalities were written
+                        if let Ok(input) = serde_json::from_slice::<OctadInput>(payload) {
+                            let modality_status = ModalityStatus {
+                                graph: input.graph.is_some(),
+                                vector: input.vector.is_some(),
+                                document: input.document.is_some(),
+                                tensor: input.tensor.is_some(),
+                                semantic: input.semantic.is_some(),
+                                temporal: true, // Always written
+                                provenance: input.provenance.is_some(),
+                                spatial: input.spatial.is_some(),
+                            };
+
+                            let id = OctadId::from(entity_id.clone());
+                            let now = Utc::now();
+
+                            // Get existing version or start at 1
+                            let version = octads
+                                .get(entity_id)
+                                .map(|s| s.version + 1)
+                                .unwrap_or(1);
+
+                            octads.insert(
+                                entity_id.clone(),
+                                OctadStatus {
+                                    id,
+                                    created_at: now,
+                                    modified_at: now,
+                                    version,
+                                    modality_status,
+                                },
+                            );
+                            recovered += 1;
+                        } else {
+                            tracing::warn!(entity_id, "WAL replay: failed to deserialize OctadInput");
+                        }
+                    }
+                    WalOperation::Delete => {
+                        octads.remove(entity_id);
+                        recovered += 1;
+                    }
+                    WalOperation::Checkpoint => {} // Already handled above
+                }
+            }
+        }
+
+        info!(recovered, committed = committed_entities.len(), uncommitted = uncommitted_entities.len(), "WAL replay complete");
+
+        // Write a fresh checkpoint to mark recovery complete
+        drop(octads); // Release write lock before checkpoint
+        self.wal_checkpoint().await.ok();
+
+        Ok(recovered)
+    }
+
     /// Access the provenance store for direct queries.
     pub fn provenance_store(&self) -> &Arc<P> {
         &self.provenance
