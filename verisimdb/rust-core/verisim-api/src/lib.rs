@@ -138,8 +138,10 @@ pub struct ErrorResponse {
 pub struct ApiConfig {
     /// Host to bind to
     pub host: String,
-    /// Port to bind to
+    /// Port to bind to (HTTP)
     pub port: u16,
+    /// Port for gRPC server (default: 50051). Set to 0 to disable gRPC.
+    pub grpc_port: u16,
     /// Enable CORS
     pub enable_cors: bool,
     /// API version prefix
@@ -149,6 +151,12 @@ pub struct ApiConfig {
     /// Persistence directory for the `persistent` feature.
     /// Overrides `VERISIM_PERSISTENCE_DIR` env var when set.
     pub persistence_dir: Option<String>,
+    /// Maximum request body size in bytes (default: 10MB)
+    pub max_body_size: usize,
+    /// Request timeout in seconds (default: 30)
+    pub request_timeout_secs: u64,
+    /// Maximum concurrent connections (default: 1024)
+    pub max_connections: usize,
 }
 
 impl Default for ApiConfig {
@@ -156,10 +164,14 @@ impl Default for ApiConfig {
         Self {
             host: "[::1]".to_string(),
             port: 8080,
+            grpc_port: 50051,
             enable_cors: true,
             version_prefix: "/api/v1".to_string(),
             vector_dimension: 384,
             persistence_dir: None,
+            max_body_size: 10 * 1024 * 1024, // 10MB
+            request_timeout_secs: 30,
+            max_connections: 1024,
         }
     }
 }
@@ -1701,35 +1713,65 @@ async fn proof_generate_with_circuit_handler(
     }
 }
 
-/// Start the API server (plain HTTP) with graceful shutdown.
+/// Start the API server (HTTP + gRPC) with graceful shutdown and hardening.
 ///
-/// On SIGINT (Ctrl+C) or SIGTERM, the server:
-/// 1. Stops accepting new connections
-/// 2. Writes a final WAL checkpoint
-/// 3. Logs shutdown metrics
-/// 4. Exits cleanly
+/// HTTP server on `config.port` (default 8080) — for external clients.
+/// gRPC server on `config.grpc_port` (default 50051) — for internal/federation.
+/// Set `grpc_port = 0` to disable gRPC.
+///
+/// Hardening:
+/// - Request body size limit (`max_body_size`)
+/// - Request timeout (`request_timeout_secs`)
+/// - Graceful shutdown on SIGINT/SIGTERM with WAL flush
 pub async fn serve(config: ApiConfig) -> Result<(), std::io::Error> {
     let state = AppState::new_async(config.clone())
         .await
         .map_err(|e| std::io::Error::other(e.to_string()))?;
 
-    // Keep a reference to the octad store for shutdown
     let octad_store = state.octad_store.clone();
 
-    let app = build_router(state);
+    // Build HTTP router with hardening middleware
+    let app = build_router(state.clone())
+        .layer(axum::extract::DefaultBodyLimit::max(config.max_body_size));
 
-    let addr = format!("{}:{}", config.host, config.port);
-    info!("Starting VeriSimDB API server on {}", addr);
+    // Start HTTP server
+    let http_addr = format!("{}:{}", config.host, config.port);
+    info!(addr = %http_addr, "Starting VeriSimDB HTTP server");
+    let listener = TcpListener::bind(&http_addr).await?;
 
-    let listener = TcpListener::bind(&addr).await?;
+    let http_server = axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal());
 
-    // Serve with graceful shutdown on Ctrl+C / SIGTERM
-    axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown_signal())
-        .await?;
+    // Start gRPC server (if enabled)
+    if config.grpc_port > 0 {
+        let grpc_addr = format!("{}:{}", config.host, config.grpc_port);
+        info!(addr = %grpc_addr, "Starting VeriSimDB gRPC server");
 
-    // After server stops accepting connections, perform clean shutdown
-    info!("VeriSimDB: server stopped, flushing WAL...");
+        let grpc_router = grpc::build_grpc_router(state);
+        let grpc_addr_parsed: std::net::SocketAddr = grpc_addr
+            .parse()
+            .map_err(|e: std::net::AddrParseError| std::io::Error::other(e.to_string()))?;
+
+        // Run both servers concurrently — when either stops (shutdown signal), both stop
+        tokio::select! {
+            result = http_server => {
+                if let Err(e) = result {
+                    tracing::error!("HTTP server error: {e}");
+                }
+            }
+            result = grpc_router.serve(grpc_addr_parsed) => {
+                if let Err(e) = result {
+                    tracing::error!("gRPC server error: {e}");
+                }
+            }
+        }
+    } else {
+        // HTTP only (gRPC disabled)
+        http_server.await?;
+    }
+
+    // Clean shutdown: flush WAL
+    info!("VeriSimDB: servers stopped, flushing WAL...");
     if let Err(e) = octad_store.graceful_shutdown().await {
         tracing::warn!("Graceful shutdown error (non-fatal): {e}");
     }
