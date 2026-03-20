@@ -2,34 +2,51 @@
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
 // Persistent provenance store backed by redb via verisim-storage.
+//
+// Each entity's ProvenanceChain is stored as a single JSON blob keyed by
+// entity_id. On open(), all chains are scanned into an in-memory cache
+// protected by a tokio::sync::RwLock (matching the InMemory implementation).
+// Writes go to redb first, then update the cache.
 
 use std::collections::HashMap;
 use std::path::Path;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 
 use async_trait::async_trait;
-use tracing::info;
+use tracing::{debug, info, instrument};
 use verisim_storage::redb_backend::RedbBackend;
 use verisim_storage::typed::TypedStore;
 
-use crate::{ProvenanceChain, ProvenanceError, ProvenanceRecord, ProvenanceStore};
+use crate::{
+    ProvenanceChain, ProvenanceError, ProvenanceEventType, ProvenanceRecord, ProvenanceStore,
+};
 
-/// Persistent provenance store: redb for durability, in-memory cache for queries.
+/// Persistent provenance store: redb for durability, async RwLock cache for
+/// fast reads.
+///
+/// The cache uses `tokio::sync::RwLock` to match the async locking pattern of
+/// `InMemoryProvenanceStore`.
 pub struct RedbProvenanceStore {
+    /// Typed store for provenance chains, keyed by entity_id.
     store: TypedStore<RedbBackend>,
-    cache: Arc<RwLock<HashMap<String, ProvenanceChain>>>,
+    /// In-memory cache of all provenance chains.
+    chains: Arc<tokio::sync::RwLock<HashMap<String, ProvenanceChain>>>,
 }
 
 impl RedbProvenanceStore {
+    /// Open (or create) a persistent provenance store at the given path.
+    ///
+    /// On open, all existing chains are scanned from redb into the in-memory
+    /// cache so that reads never hit disk.
     pub async fn open(path: impl AsRef<Path>) -> Result<Self, ProvenanceError> {
         let backend = RedbBackend::open(path.as_ref())
-            .map_err(|e| ProvenanceError::StorageError(format!("redb open: {}", e)))?;
+            .map_err(|e| ProvenanceError::IoError(format!("redb open: {}", e)))?;
         let store = TypedStore::new(backend, "prov");
 
         let entries: Vec<(String, ProvenanceChain)> = store
             .scan_prefix("", 1_000_000)
             .await
-            .map_err(|e| ProvenanceError::StorageError(format!("scan: {}", e)))?;
+            .map_err(|e| ProvenanceError::IoError(format!("scan: {}", e)))?;
 
         let mut cache = HashMap::new();
         for (id, chain) in entries {
@@ -37,59 +54,102 @@ impl RedbProvenanceStore {
         }
 
         info!(count = cache.len(), "Loaded provenance store from redb");
-        Ok(Self { store, cache: Arc::new(RwLock::new(cache)) })
+        Ok(Self {
+            store,
+            chains: Arc::new(tokio::sync::RwLock::new(cache)),
+        })
     }
 
-    async fn persist_chain(&self, entity_id: &str) -> Result<(), ProvenanceError> {
-        let c = self.cache.read().map_err(|_| ProvenanceError::LockPoisoned)?;
-        if let Some(chain) = c.get(entity_id) {
-            self.store.put(entity_id, chain).await
-                .map_err(|e| ProvenanceError::StorageError(format!("put: {}", e)))?;
-        }
-        Ok(())
+    /// Persist a single entity's chain to redb.
+    async fn persist_chain(
+        &self,
+        entity_id: &str,
+        chain: &ProvenanceChain,
+    ) -> Result<(), ProvenanceError> {
+        self.store
+            .put(entity_id, chain)
+            .await
+            .map_err(|e| ProvenanceError::IoError(format!("put: {}", e)))
     }
 }
 
 #[async_trait]
 impl ProvenanceStore for RedbProvenanceStore {
-    async fn record(&self, record: ProvenanceRecord) -> Result<(), ProvenanceError> {
-        let entity_id = record.entity_id.clone();
-        {
-            let mut c = self.cache.write().map_err(|_| ProvenanceError::LockPoisoned)?;
-            let chain = c.entry(entity_id.clone()).or_insert_with(|| ProvenanceChain {
-                entity_id: entity_id.clone(),
-                records: Vec::new(),
-            });
-            chain.records.push(record);
-        }
-        self.persist_chain(&entity_id).await
+    #[instrument(skip(self))]
+    async fn record_event(
+        &self,
+        entity_id: &str,
+        event_type: ProvenanceEventType,
+        actor: &str,
+        source: Option<String>,
+        description: &str,
+    ) -> Result<ProvenanceRecord, ProvenanceError> {
+        let mut chains = self.chains.write().await;
+        let chain = chains
+            .entry(entity_id.to_string())
+            .or_insert_with(|| ProvenanceChain::new(entity_id));
+
+        chain.append(event_type, actor, source, description);
+        let record = chain.records.last().unwrap().clone();
+
+        // Persist the updated chain to redb.
+        self.persist_chain(entity_id, chain).await?;
+
+        debug!(
+            entity_id = %entity_id,
+            event = %record.event_type,
+            actor = %record.actor,
+            chain_length = chain.len(),
+            "Provenance event recorded (persistent)"
+        );
+        Ok(record)
     }
 
-    async fn get_chain(&self, entity_id: &str) -> Result<Option<ProvenanceChain>, ProvenanceError> {
-        let c = self.cache.read().map_err(|_| ProvenanceError::LockPoisoned)?;
-        Ok(c.get(entity_id).cloned())
+    async fn get_chain(&self, entity_id: &str) -> Result<ProvenanceChain, ProvenanceError> {
+        let chains = self.chains.read().await;
+        chains
+            .get(entity_id)
+            .cloned()
+            .ok_or_else(|| ProvenanceError::NotFound(entity_id.to_string()))
     }
 
     async fn verify_chain(&self, entity_id: &str) -> Result<bool, ProvenanceError> {
-        let c = self.cache.read().map_err(|_| ProvenanceError::LockPoisoned)?;
-        match c.get(entity_id) {
-            Some(chain) => Ok(chain.verify()),
-            None => Err(ProvenanceError::NotFound(entity_id.to_string())),
+        let chains = self.chains.read().await;
+        match chains.get(entity_id) {
+            Some(chain) => {
+                chain.verify()?;
+                Ok(true)
+            }
+            None => Ok(false),
         }
     }
 
-    async fn get_latest(&self, entity_id: &str) -> Result<Option<ProvenanceRecord>, ProvenanceError> {
-        let c = self.cache.read().map_err(|_| ProvenanceError::LockPoisoned)?;
-        Ok(c.get(entity_id).and_then(|chain| chain.records.last().cloned()))
+    async fn get_origin(
+        &self,
+        entity_id: &str,
+    ) -> Result<Option<ProvenanceRecord>, ProvenanceError> {
+        let chains = self.chains.read().await;
+        Ok(chains.get(entity_id).and_then(|c| c.origin().cloned()))
     }
 
-    async fn search_by_actor(&self, actor: &str) -> Result<Vec<ProvenanceRecord>, ProvenanceError> {
-        let c = self.cache.read().map_err(|_| ProvenanceError::LockPoisoned)?;
+    async fn get_latest(
+        &self,
+        entity_id: &str,
+    ) -> Result<Option<ProvenanceRecord>, ProvenanceError> {
+        let chains = self.chains.read().await;
+        Ok(chains.get(entity_id).and_then(|c| c.latest().cloned()))
+    }
+
+    async fn search_by_actor(
+        &self,
+        actor: &str,
+    ) -> Result<Vec<(String, ProvenanceRecord)>, ProvenanceError> {
+        let chains = self.chains.read().await;
         let mut results = Vec::new();
-        for chain in c.values() {
+        for (entity_id, chain) in chains.iter() {
             for record in &chain.records {
                 if record.actor == actor {
-                    results.push(record.clone());
+                    results.push((entity_id.clone(), record.clone()));
                 }
             }
         }
@@ -97,10 +157,14 @@ impl ProvenanceStore for RedbProvenanceStore {
     }
 
     async fn delete_chain(&self, entity_id: &str) -> Result<(), ProvenanceError> {
-        self.store.delete(entity_id).await
-            .map_err(|e| ProvenanceError::StorageError(format!("delete: {}", e)))?;
-        let mut c = self.cache.write().map_err(|_| ProvenanceError::LockPoisoned)?;
-        c.remove(entity_id);
+        // Delete from redb first.
+        self.store
+            .delete(entity_id)
+            .await
+            .map_err(|e| ProvenanceError::IoError(format!("delete: {}", e)))?;
+        // Then remove from cache.
+        let mut chains = self.chains.write().await;
+        chains.remove(entity_id);
         Ok(())
     }
 }
@@ -114,17 +178,99 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("prov.redb");
 
+        // Write data in one session.
         {
             let store = RedbProvenanceStore::open(&path).await.unwrap();
-            let record = ProvenanceRecord::new("e1", "create", "user1");
-            store.record(record).await.unwrap();
+            store
+                .record_event(
+                    "entity-1",
+                    ProvenanceEventType::Created,
+                    "alice",
+                    Some("https://source.example.com".to_string()),
+                    "Initial creation",
+                )
+                .await
+                .unwrap();
+            store
+                .record_event(
+                    "entity-1",
+                    ProvenanceEventType::Modified,
+                    "bob",
+                    None,
+                    "Updated vector embedding",
+                )
+                .await
+                .unwrap();
         }
 
+        // Reopen and verify data survived.
         {
             let store = RedbProvenanceStore::open(&path).await.unwrap();
-            let chain = store.get_chain("e1").await.unwrap().unwrap();
-            assert_eq!(chain.records.len(), 1);
-            assert_eq!(chain.records[0].actor, "user1");
+
+            let chain = store.get_chain("entity-1").await.unwrap();
+            assert_eq!(chain.len(), 2);
+            assert!(chain.verify().is_ok());
+
+            let origin = store.get_origin("entity-1").await.unwrap().unwrap();
+            assert_eq!(origin.actor, "alice");
+            assert_eq!(origin.event_type, ProvenanceEventType::Created);
+
+            let latest = store.get_latest("entity-1").await.unwrap().unwrap();
+            assert_eq!(latest.actor, "bob");
+            assert_eq!(latest.event_type, ProvenanceEventType::Modified);
+
+            // Verify chain integrity
+            assert!(store.verify_chain("entity-1").await.unwrap());
+
+            // Non-existent entity returns false, not error
+            assert!(!store.verify_chain("no-such-entity").await.unwrap());
         }
+    }
+
+    #[tokio::test]
+    async fn test_persistent_provenance_search_by_actor() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("prov-search.redb");
+
+        let store = RedbProvenanceStore::open(&path).await.unwrap();
+        store
+            .record_event("e1", ProvenanceEventType::Created, "alice", None, "Created e1")
+            .await
+            .unwrap();
+        store
+            .record_event("e2", ProvenanceEventType::Created, "bob", None, "Created e2")
+            .await
+            .unwrap();
+        store
+            .record_event(
+                "e3",
+                ProvenanceEventType::Imported,
+                "alice",
+                None,
+                "Imported e3",
+            )
+            .await
+            .unwrap();
+
+        let alice_records = store.search_by_actor("alice").await.unwrap();
+        assert_eq!(alice_records.len(), 2);
+
+        let bob_records = store.search_by_actor("bob").await.unwrap();
+        assert_eq!(bob_records.len(), 1);
+    }
+
+    #[tokio::test]
+    async fn test_persistent_provenance_delete_chain() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("prov-delete.redb");
+
+        let store = RedbProvenanceStore::open(&path).await.unwrap();
+        store
+            .record_event("e1", ProvenanceEventType::Created, "alice", None, "Created")
+            .await
+            .unwrap();
+
+        store.delete_chain("e1").await.unwrap();
+        assert!(store.get_chain("e1").await.is_err());
     }
 }
