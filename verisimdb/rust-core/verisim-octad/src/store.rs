@@ -224,20 +224,15 @@ where
             }
         };
 
-        // Find the last checkpoint to determine replay start point
-        let checkpoint_seq = reader.find_last_checkpoint().map_err(|e| {
-            OctadError::ModalityError {
-                modality: "wal".to_string(),
-                message: format!("Failed to find checkpoint: {e}"),
-            }
-        })?;
+        // Replay ALL WAL entries to rebuild the complete octad registry.
+        // We replay from sequence 0 because per-entity "COMMITTED" markers
+        // are not global checkpoints — each entity has its own commit marker.
+        // A global checkpoint (from graceful_shutdown) would allow starting
+        // from a later point, but for correctness we always replay everything.
+        info!("Replaying WAL from beginning");
 
-        let start_seq = checkpoint_seq.unwrap_or(0);
-        info!(start_seq, "Replaying WAL from sequence {}", start_seq);
-
-        // Read all entries from the checkpoint onward
         let entries: Vec<WalEntry> = reader
-            .replay_from(start_seq)
+            .replay_all()
             .map_err(|e| OctadError::ModalityError {
                 modality: "wal".to_string(),
                 message: format!("WAL replay_from failed: {e}"),
