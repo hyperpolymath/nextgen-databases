@@ -86,29 +86,89 @@ Located at `boj-server/cartridges/database-mcp/`:
 | `vql-ut-horror-stories`  | Interactive education — what each safety level prevents
 |===
 
-== VQL Safety Levels (VQL-UT)
+== Universal Safety Pipeline (TypeLL → Query Languages)
 
-VeriSimDB's query language has a 10-level type-safe query pipeline:
+All query languages share the same 10-level safety model, originating in TypeLL.
+VQL-UT is the reference implementation. KQL and GQL map their constructs to the
+same levels — no separate "-UT" or "-DT" repos needed.
 
-[cols="^1,<3,<5", options="header"]
+[source]
+----
+TypeLL (type theory core — defines the 10 levels)
+   │
+   ├──→ VQL-UT  (reference implementation, VeriSimDB)
+   ├──→ KQL     (applies same levels, QuandleDB)
+   └──→ GQL     (applies same levels, LithoGlyph)
+----
+
+=== The Two-Tier Model (All Query Languages)
+
+Each query language has the same two tiers:
+
+1. **The language** (VQL / KQL / GQL) — what users write
+2. **The safety pipeline** — TypeLL's 10 levels applied progressively behind the
+   language. Simple queries exit early at L1-L2. Proof-carrying queries go to L9-L10.
+
+There is no "VQL-DT", "KQL-DT", or "GQL-DT" as separate products. Dependent type
+features are part of the safety pipeline at the appropriate levels.
+
+=== The 10 Safety Levels
+
+[cols="^1,<3,<5,<3,<3", options="header"]
 |===
-| Level | Name | What It Prevents
+| Level | Name | What It Prevents | KQL Mapping | GQL Mapping
 
-| L1  | Construction Safety    | SQL/query injection
-| L2  | Schema Pinning         | Schema drift between query and database
-| L3  | Resource Linearity     | Connection/cursor leaks
-| L4  | Session Protocols      | State machine violations (query before connect)
+| L1  | Construction Safety    | Query injection
+| Pipeline parsing
+| Graph traversal parsing
+
+| L2  | Schema Pinning         | Schema drift
+| Dependent projection
+| Collection dependent types
+
+| L3  | Resource Linearity     | Connection leaks
+| Skein.jl connections
+| Graph cursor management
+
+| L4  | Session Protocols      | State violations
+| Query sessions
+| Traversal sessions
+
 | L5  | Effect Tracking        | Unaudited side effects
-| L6  | Scope Isolation        | Namespace boundary violations
-| L7  | Information Flow       | Data lineage tracking failures
-| L8  | Quantitative Bounds    | Resource exhaustion (unbounded queries)
-| L9  | Proof Attachment       | Missing evidence for sensitive operations
-| L10 | Cross-Cutting          | Composition bugs across query boundaries
+| Future (read-only now)
+| Mutation auditing
+
+| L6  | Scope Isolation        | Namespace violations
+| Knot table boundaries
+| Collection boundaries
+
+| L7  | Information Flow       | Lineage failures
+| Invariant provenance
+| Graph provenance tracking
+
+| L8  | Quantitative Bounds    | Resource exhaustion
+| Stratum-bounded eval
+| Bounded traversal depth
+
+| L9  | Proof Attachment       | Missing evidence
+| Confidence-indexed results
+| Dependent type proofs
+
+| L10 | Cross-Cutting          | Composition bugs
+| Pipeline composition
+| Cross-collection joins
 |===
+
+=== Per-Database Safety Documentation
+
+* **VQL:** `verisimdb/docs/vql-vs-vql-dt.adoc` — full spec with architecture diagram
+* **KQL:** `quandledb/docs/kql-safety-model.adoc` — KQL-specific mappings + Idris2 proofs
+* **GQL:** `lithoglyph/docs/gql-safety-model.adoc` — GQL-specific mappings + dependent types
 
 == Not Yet Integrated
 
 * **NQC** — Gleam-based Nested Query Calculus. Working implementation in `nqc/src/nqc.gleam`
   with Erlang FFI. Needs a `db_execute_nqc()` FFI function and database-mcp registration.
+  Safety pipeline mapping not yet designed.
 * **TypeQL-Experimental** — Idris2 ABI definitions exist at `typeql-experimental/src/abi/`.
   Parser is stub-phase. Needs compiler work before integration.
