@@ -1,0 +1,141 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= GQL Safety Model — Two-Tier Architecture
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+GQL (Graph Query Language) follows the same two-tier model as VQL:
+
+[cols="1,2,3", options="header"]
+|===
+| Tier | What | How
+
+| **GQL**
+| The query language
+| Graph queries with dependent types (`CREATE COLLECTION ... WITH DEPENDENT_TYPES`).
+  What users write.
+
+| **GQL Safety Pipeline**
+| Progressive type safety
+| Applies TypeLL's 10 levels behind GQL automatically. Simple queries exit early.
+  Proof-carrying queries activate L9-L10.
+|===
+
+== Relationship to VQL-UT
+
+The 10 safety levels originate in **TypeLL** (the core type theory). VQL-UT is
+the reference implementation for database queries. GQL maps its own constructs
+to the same 10 levels — it does not have a separate "-UT" repo.
+
+[source]
+----
+TypeLL (type theory core — defines the 10 levels)
+   │
+   ├──→ VQL-UT  (reference implementation, VeriSimDB)
+   ├──→ KQL     (applies same levels, QuandleDB)
+   └──→ GQL     (applies same levels, LithoGlyph)
+----
+
+== GQL Safety Levels
+
+[cols="^1,<3,<5", options="header"]
+|===
+| Level | Name | GQL Mapping
+
+| L1  | Construction Safety    | Query injection prevention (safe graph traversal parsing)
+| L2  | Schema Pinning         | Collection schema checked with dependent types (`BoundedNat`, `NonEmptyString`)
+| L3  | Resource Linearity     | Graph traversal cursor/connection leak prevention
+| L4  | Session Protocols      | Query session state machine (connect → traverse → close)
+| L5  | Effect Tracking        | Side-effect auditing for graph mutations
+| L6  | Scope Isolation        | Collection namespace boundaries
+| L7  | Information Flow       | Graph data lineage and provenance tracking
+| L8  | Quantitative Bounds    | Bounded traversal depth (prevent infinite graph walks)
+| L9  | Proof Attachment       | Dependent type proofs on collection schemas
+| L10 | Cross-Cutting          | Composition safety across graph joins and federation
+|===
+
+== GQL-Specific Type Features
+
+GQL has dependent types built into its collection definitions:
+
+[cols="<3,^1,<4", options="header"]
+|===
+| Feature | Level | Description
+
+| Bounded Numeric Types
+| L2, L8
+| `BoundedNat min max` — numeric fields with compile-time range proofs.
+  Prevents out-of-range values at the type level.
+
+| Required/Optional Strings
+| L2
+| `NonEmptyString` vs `Option String` — required fields cannot be null/empty
+  at the type level.
+
+| Confidence Types
+| L9
+| `Confidence` type for prompt-scored fields with dependent bounds.
+
+| Provenance Tracking
+| L7
+| `WITH PROVENANCE_TRACKING` on collections — graph lineage at the schema level.
+
+| Dependent Collection Schemas
+| L2, L9
+| `CREATE COLLECTION ... WITH DEPENDENT_TYPES` — schema fields carry type-level
+  constraints verified by Idris2 ABI (`src/Lith/`).
+|===
+
+== GQL-DT Preview
+
+The LithoGlyph Studio includes a GQL-DT preview panel (`studio/lib/bs/src/GqldtPreview.res`)
+that generates dependent-type-annotated GQL from collection definitions. This component
+visualises how L2 and L9 safety levels apply to a given schema.
+
+=== Historical Note
+
+"GQL-DT" was the original name for GQL's dependent type features. It is not a separate
+product — it describes how GQL uses dependent types within the safety pipeline, primarily
+at levels L2 and L9. The `GqldtPreview` component name is retained for compatibility but
+represents "GQL safety preview" rather than a separate execution mode.
+
+== Implementation Status
+
+[cols="^1,<3,^1", options="header"]
+|===
+| Level | Status | Notes
+
+| L1-L2 | Implemented | Collection schemas with dependent types (ReScript + Factor + Zig)
+| L3-L4 | Designed | Multi-backend connections (Factor core, Forth core, Zig core)
+| L5-L7 | Partial | Provenance tracking specified, mutations audited
+| L8    | Designed | Bounded traversal depth for graph walks
+| L9    | Partial | GqldtPreview generates dependent type annotations
+| L10   | Designed | Cross-collection composition safety
+|===
+
+== Implementation Stack
+
+LithoGlyph has three core implementations:
+
+[cols="<2,<2,<4", options="header"]
+|===
+| Core | Language | Purpose
+
+| `core-factor/` | Factor | GQL engine with C API bridge (`gql-c-api/`)
+| `core-forth/`  | Forth  | Minimal GQL engine
+| `core-zig/`    | Zig    | FFI-compatible GQL engine (Idris2 ABI at `src/Lith/`)
+|===
+
+The Idris2 ABI definitions in `src/Lith/` (LithBridge, LithForeign, LithLayout) provide
+the formal type proofs that underpin levels L2 and L9.
+
+== Reference
+
+* `studio/lib/bs/src/GqldtPreview.res` — GQL dependent type preview component
+* `src/Lith/` — Idris2 ABI definitions (LithBridge, LithForeign, LithLayout)
+* `ARCHITECTURE.adoc` — Full system architecture
+* https://github.com/hyperpolymath/vql-ut[VQL-UT] — Reference implementation of the 10-level safety pipeline
