@@ -1,0 +1,114 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Nextgen Databases — Query Languages & Integration Status
+:toc:
+:toclevels: 2
+
+Last verified: 2026-03-21
+
+== Overview
+
+This monorepo contains 5 database engines, each with its own query language.
+Three are registered in the BoJ Server `database-mcp` cartridge with connection
+management, query execution, and PanLL dashboard panels.
+
+== Database & Query Language Matrix
+
+[cols="<2,<2,^1,^1,<3", options="header"]
+|===
+| Database | Query Language | BoJ ID | Status | Key Components
+
+| **VeriSimDB**
+| VQL (Verified Query Language)
+| 1
+| Mature
+| 10 ReScript modules: Parser, TypeChecker, BiDir, Subtyping, ProofObligation, Circuit, Explain, Context, Error, Types
+
+| **LithoGlyph**
+| GQL (Graph Query Language)
+| 6
+| Beta
+| Graph algebra in `src/Lith/`, GQL execution via database-mcp
+
+| **QuandleDB**
+| KQL (Knot Query Language)
+| 5
+| Early
+| Connector-based architecture, minimal source
+
+| **NQC**
+| NQC (Nested Query Calculus)
+| —
+| Alpha
+| Pure Gleam implementation with Erlang FFI, not yet in database-mcp
+
+| **TypeQL-Exp.**
+| TypeQL (Type-Safe QL)
+| —
+| Stub
+| Parser skeleton, Idris2 ABI definitions, spec only
+|===
+
+== BoJ Server Integration
+
+=== database-mcp Cartridge
+
+Located at `boj-server/cartridges/database-mcp/`:
+
+**Adapter:** `adapter/database_adapter.v` (V-lang)
+
+**FFI functions (C ABI via Zig):**
+
+* `db_connect(backend_id) → slot`
+* `db_connect_verisimdb(url) → slot`
+* `db_connect_quandledb(url) → slot`
+* `db_connect_lithoglyph(url) → slot`
+* `db_connect_sqlite(path) → slot`
+* `db_disconnect(slot) → result`
+* `db_execute_sql(slot, query) → result` — PostgreSQL, SQLite
+* `db_execute_vql(slot, query) → result` — VeriSimDB
+* `db_execute_kql(slot, query) → result` — QuandleDB
+* `db_execute_gql(slot, query) → result` — LithoGlyph
+* `db_begin_query(slot) / db_end_query(slot)` — Transaction boundaries
+* `db_state(slot)` — Connection state (disconnected/connected/querying/error)
+
+=== PanLL Dashboard Panels
+
+[cols="<3,<5", options="header"]
+|===
+| Panel | Purpose
+
+| `db-status`              | Connection pool health across all backends
+| `db-connections`         | Active connections, QPS metrics
+| `db-verisimdb`           | Octad counts, proof counts, modality status
+| `vql-ut-safety-dashboard` | 10-level safety pipeline visualisation
+| `vql-ut-query-editor`    | Live type-checking with Idris2 kernel (TypeLL)
+| `vql-ut-proof-explorer`  | Obligation tracking and proof certificates
+| `vql-ut-horror-stories`  | Interactive education — what each safety level prevents
+|===
+
+== VQL Safety Levels (VQL-UT)
+
+VeriSimDB's query language has a 10-level type-safe query pipeline:
+
+[cols="^1,<3,<5", options="header"]
+|===
+| Level | Name | What It Prevents
+
+| L1  | Construction Safety    | SQL/query injection
+| L2  | Schema Pinning         | Schema drift between query and database
+| L3  | Resource Linearity     | Connection/cursor leaks
+| L4  | Session Protocols      | State machine violations (query before connect)
+| L5  | Effect Tracking        | Unaudited side effects
+| L6  | Scope Isolation        | Namespace boundary violations
+| L7  | Information Flow       | Data lineage tracking failures
+| L8  | Quantitative Bounds    | Resource exhaustion (unbounded queries)
+| L9  | Proof Attachment       | Missing evidence for sensitive operations
+| L10 | Cross-Cutting          | Composition bugs across query boundaries
+|===
+
+== Not Yet Integrated
+
+* **NQC** — Gleam-based Nested Query Calculus. Working implementation in `nqc/src/nqc.gleam`
+  with Erlang FFI. Needs a `db_execute_nqc()` FFI function and database-mcp registration.
+* **TypeQL-Experimental** — Idris2 ABI definitions exist at `typeql-experimental/src/abi/`.
+  Parser is stub-phase. Needs compiler work before integration.
