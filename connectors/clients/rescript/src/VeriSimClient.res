@@ -24,6 +24,9 @@
 /** Read the response body as a UTF-8 string. */
 @send external textBody: VeriSimTypes.fetchResponse => promise<string> = "text"
 
+/** External binding to btoa for Base64 encoding (available in browser and Deno). */
+@val external btoa: string => string = "btoa"
+
 // --------------------------------------------------------------------------
 // Authentication types
 // --------------------------------------------------------------------------
@@ -83,9 +86,6 @@ let authHeaders = (client: t): Dict.t<string> => {
   }
   headers
 }
-
-/** External binding to btoa for Base64 encoding (available in browser and Deno). */
-@val external btoa: string => string = "btoa"
 
 /** Perform a GET request to the given path on the client's base URL. */
 let doGet = async (client: t, path: string): VeriSimTypes.fetchResponse => {

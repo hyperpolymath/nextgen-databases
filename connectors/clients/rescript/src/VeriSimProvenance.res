@@ -7,6 +7,12 @@
 // linked sequence of events recording every mutation applied to it. This module
 // provides functions to query chains, record new events, and verify integrity.
 
+/// JSON boundary cast — used at the HTTP response boundary where we trust
+/// the VeriSimDB server's JSON schema matches our ReScript types.
+/// This replaces Obj.magic with an explicit, auditable cast point.
+external fromJson: JSON.t => 'a = "%identity"
+external toJson: 'a => JSON.t = "%identity"
+
 /** Retrieve the complete provenance chain for a hexad.
  *
  * The chain is returned in chronological order (oldest first) and includes
@@ -24,7 +30,7 @@ let getChain = async (
     let resp = await VeriSimClient.doGet(client, `/api/v1/hexads/${hexadId}/provenance`)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -49,11 +55,14 @@ let recordEvent = async (
   input: VeriSimTypes.provenanceEventInput,
 ): result<VeriSimTypes.provenanceEvent, VeriSimError.t> => {
   try {
-    let body = input->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(input) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, `/api/v1/hexads/${hexadId}/provenance`, body)
     if resp.status == 201 {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -84,7 +93,7 @@ let verify = async (
     )
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      let chain: VeriSimTypes.provenanceChain = json->Obj.magic
+      let chain: VeriSimTypes.provenanceChain = json->fromJson
       Ok(chain.verified)
     } else {
       Error(VeriSimError.fromStatus(resp.status))

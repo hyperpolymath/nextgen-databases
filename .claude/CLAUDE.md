@@ -1,5 +1,37 @@
 # CLAUDE.md - VeriSimDB AI Assistant Instructions
 
+## CRITICAL: Instance Policy (Read First)
+
+**This repository is SOURCE CODE and EXAMPLE DATA. It is NOT a database instance.**
+
+If you are integrating VeriSimDB into another project (IDApTIK, Burble, etc.):
+
+1. **NEVER** store application data in this repo's VeriSimDB instance
+2. **NEVER** point application code at `localhost:8080` expecting a shared server
+3. **ALWAYS** create a dedicated VeriSimDB instance in the consuming project
+4. **ALWAYS** use a unique port per project (not 8080)
+5. **ALWAYS** copy the client SDK (`connectors/clients/<lang>/`) into your project
+
+**Correct pattern:**
+```
+your-project/
+├── containers/
+│   └── verisimdb.Containerfile    ← YOUR instance
+├── src/verisimdb/
+│   └── VeriSimClient.res          ← Copied SDK files
+└── podman-compose.yml             ← YOUR port + volume
+```
+
+**Port assignments:**
+| Project | Port | Volume |
+|---------|------|--------|
+| VeriSimDB dev/test | 8080 | (in-memory, ephemeral) |
+| IDApTIK | 8090 | idaptik-verisimdb-data |
+| Burble | 8091 | burble-verisimdb-data |
+| Hypatia | 8092 | hypatia-verisimdb-data |
+
+The `examples/` directory contains example/demo data only. Never treat it as live storage.
+
 ## Project Overview
 
 VeriSimDB (Veridical Simulacrum Database) is a cross-system entity consistency engine with drift detection, self-normalisation, and formally verified queries. Each entity exists simultaneously across 8 modalities — the octad (Graph, Vector, Tensor, Semantic, Document, Temporal, Provenance, Spatial) — with drift detection and automatic consistency maintenance. Operates as standalone database OR heterogeneous federation coordinator over existing databases.

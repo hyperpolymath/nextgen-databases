@@ -7,6 +7,12 @@
 // sharing and synchronising hexad data across peers. This module provides functions
 // to register and manage peers and to execute cross-node queries.
 
+/// JSON boundary cast — used at the HTTP response boundary where we trust
+/// the VeriSimDB server's JSON schema matches our ReScript types.
+/// This replaces Obj.magic with an explicit, auditable cast point.
+external fromJson: JSON.t => 'a = "%identity"
+external toJson: 'a => JSON.t = "%identity"
+
 /** Peer registration input. */
 type peerRegistration = {
   name: string,
@@ -33,11 +39,14 @@ let registerPeer = async (
   input: peerRegistration,
 ): result<VeriSimTypes.federationPeer, VeriSimError.t> => {
   try {
-    let body = input->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(input) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, "/api/v1/federation/peers", body)
     if resp.status == 201 {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -58,7 +67,7 @@ let listPeers = async (
     let resp = await VeriSimClient.doGet(client, "/api/v1/federation/peers")
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -80,11 +89,14 @@ let federatedQuery = async (
   input: federatedQueryRequest,
 ): result<VeriSimTypes.federatedQueryResult, VeriSimError.t> => {
   try {
-    let body = input->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(input) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, "/api/v1/federation/query", body)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }

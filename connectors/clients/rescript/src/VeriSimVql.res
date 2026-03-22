@@ -7,6 +7,12 @@
 // graph traversals, vector similarity, spatial filters, and temporal constraints
 // in a single statement. This module provides execution and explain functions.
 
+/// JSON boundary cast — used at the HTTP response boundary where we trust
+/// the VeriSimDB server's JSON schema matches our ReScript types.
+/// This replaces Obj.magic with an explicit, auditable cast point.
+external fromJson: JSON.t => 'a = "%identity"
+external toJson: 'a => JSON.t = "%identity"
+
 /** VQL request payload for executing or explaining a query. */
 type vqlRequest = {
   query: string,
@@ -27,11 +33,14 @@ let execute = async (
 ): result<VeriSimTypes.vqlResult, VeriSimError.t> => {
   try {
     let req: vqlRequest = {query, params}
-    let body = req->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(req) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, "/api/v1/vql/execute", body)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -54,11 +63,14 @@ let explain = async (
 ): result<VeriSimTypes.vqlExplanation, VeriSimError.t> => {
   try {
     let req: vqlRequest = {query, params}
-    let body = req->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(req) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, "/api/v1/vql/explain", body)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
