@@ -1,0 +1,141 @@
+{
+  "$schema": "https://gossamer.dev/schemas/config/v1",
+  "productName": "VeriSimDB Admin",
+  "version": "0.1.0",
+  "identifier": "com.hyperpolymath.verisimdb-admin",
+  "build": {
+    "frontendDist": "../public",
+    "devUrl": "http://localhost:8200/",
+    "beforeDevCommand": "deno task dev",
+    "beforeBuildCommand": "deno task build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "VeriSimDB Admin",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 1000,
+        "minHeight": 700,
+        "maxWidth": null,
+        "maxHeight": null,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": false,
+        "center": true,
+        "alwaysOnTop": false,
+        "visible": true,
+        "url": "/"
+      }
+    ],
+    "security": {
+      "csp": null,
+      "capabilities": [
+        "network",
+        "filesystem",
+        "clipboard"
+      ],
+      "capabilityTokens": {
+        "enabled": true,
+        "issuer": "gossamer-runtime",
+        "ttl": 3600
+      },
+      "sandbox": {
+        "enabled": true,
+        "allowExec": false,
+        "allowNetwork": true,
+        "allowFilesystem": true
+      }
+    },
+    "ipc": {
+      "protocol": "json",
+      "bridgeInjection": true,
+      "maxMessageSize": 16777216,
+      "timeout": 30000
+    },
+    "tray": {
+      "enabled": false,
+      "icon": null,
+      "tooltip": null,
+      "menuOnLeftClick": true
+    }
+  },
+  "plugins": {},
+  "bundle": {
+    "active": true,
+    "targets": [
+      "deb",
+      "appimage"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": [],
+    "copyright": "Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)",
+    "license": "PMPL-1.0-or-later",
+    "shortDescription": "Admin panel for VeriSimDB cross-modal entity database",
+    "longDescription": "Gossamer-native admin panel for VeriSimDB. Provides VQL console, octad browser, entity detail with full modality view, drift detection indicators, and telemetry dashboard. Second app built natively for the Gossamer webview shell.",
+    "linux": {
+      "desktopEntry": true,
+      "category": "Development",
+      "section": "database",
+      "depends": [],
+      "appimage": {
+        "bundleMediaFramework": false
+      }
+    },
+    "macos": {
+      "bundleIdentifier": "com.hyperpolymath.verisimdb-admin",
+      "minimumSystemVersion": "11.0",
+      "frameworks": [],
+      "entitlements": null,
+      "signingIdentity": null,
+      "notarization": {
+        "enabled": false,
+        "teamId": null
+      }
+    },
+    "windows": {
+      "webview2": "embed",
+      "certificateThumbprint": null,
+      "wix": {
+        "language": "en-US"
+      },
+      "nsis": {
+        "displayLanguageSelector": false,
+        "installerIcon": null
+      }
+    },
+    "mobile": {
+      "ios": {
+        "minimumVersion": "14.0",
+        "deviceFamily": [
+          "iphone",
+          "ipad"
+        ],
+        "capabilities": [],
+        "frameworks": [],
+        "entitlements": {}
+      },
+      "android": {
+        "minimumSdk": 24,
+        "targetSdk": 34,
+        "permissions": [],
+        "features": []
+      }
+    }
+  },
+  "ephapax": {
+    "modules": [],
+    "region": "admin",
+    "linearVerification": true,
+    "regionBoundary": "strict",
+    "preload": []
+  }
+}
