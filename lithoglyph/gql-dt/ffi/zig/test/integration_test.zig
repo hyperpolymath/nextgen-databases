@@ -1,182 +1,233 @@
-// {{PROJECT}} Integration Tests
 // SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: 2025-2026 Jonathan D.A. Jewell (@hyperpolymath)
 //
-// These tests verify that the Zig FFI correctly implements the Idris2 ABI
+// GQL-DT Integration Tests
+//
+// These tests verify that the Zig FFI correctly implements the Idris2 ABI.
+// They exercise the exported C-ABI functions end-to-end.
 
 const std = @import("std");
 const testing = std.testing;
 
 // Import FFI functions
-extern fn {{project}}_init() ?*opaque {};
-extern fn {{project}}_free(?*opaque {}) void;
-extern fn {{project}}_process(?*opaque {}, u32) c_int;
-extern fn {{project}}_get_string(?*opaque {}) ?[*:0]const u8;
-extern fn {{project}}_free_string(?[*:0]const u8) void;
-extern fn {{project}}_last_error() ?[*:0]const u8;
-extern fn {{project}}_version() [*:0]const u8;
-extern fn {{project}}_is_initialized(?*opaque {}) u32;
+extern fn gqldt_init() callconv(.c) i32;
+extern fn gqldt_cleanup() callconv(.c) void;
+extern fn gqldt_db_open(path: [*:0]const u8, path_len: u64, db_out: *?*anyopaque) callconv(.c) i32;
+extern fn gqldt_db_close(db: *anyopaque) callconv(.c) i32;
+extern fn gqldt_parse(query_str: [*:0]const u8, query_len: u64, query_out: *?*anyopaque) callconv(.c) i32;
+extern fn gqldt_parse_inferred(query_str: [*:0]const u8, query_len: u64, schema: *anyopaque, query_out: *?*anyopaque) callconv(.c) i32;
+extern fn gqldt_typecheck(query: *anyopaque, schema: *anyopaque) callconv(.c) i32;
+extern fn gqldt_execute(db: *anyopaque, query: *anyopaque, result_out: *?*anyopaque) callconv(.c) i32;
+extern fn gqldt_get_schema(db: *anyopaque, collection_name: [*:0]const u8, schema_out: *?*anyopaque) callconv(.c) i32;
+extern fn gqldt_query_free(query: *anyopaque) callconv(.c) void;
+extern fn gqldt_schema_free(schema: *anyopaque) callconv(.c) void;
+extern fn gqldt_result_free(result: *anyopaque) callconv(.c) void;
+extern fn gqldt_serialize_cbor(query: *anyopaque, buffer: [*]u8, buffer_len: u64, written_out: *u64) callconv(.c) i32;
+extern fn gqldt_serialize_json(query: *anyopaque, buffer: [*]u8, buffer_len: u64, written_out: *u64) callconv(.c) i32;
+extern fn gqldt_deserialize_cbor(buffer: [*]const u8, buffer_len: u64, query_out: *?*anyopaque) callconv(.c) i32;
+extern fn gqldt_validate_permissions(query: *anyopaque, user_id: [*:0]const u8, permissions: *const anyopaque) callconv(.c) i32;
+extern fn gqldt_version() callconv(.c) [*:0]const u8;
+extern fn gqldt_alloc_slot() callconv(.c) ?*anyopaque;
+extern fn gqldt_read_slot(slot: *anyopaque) callconv(.c) u64;
+extern fn gqldt_free_slot(slot: *anyopaque) callconv(.c) void;
+extern fn gqldt_bits64_to_ptr(value: u64) callconv(.c) ?*anyopaque;
 
 //==============================================================================
 // Lifecycle Tests
 //==============================================================================
 
-test "create and destroy handle" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    try testing.expect(handle != null);
+test "init and cleanup" {
+    const status = gqldt_init();
+    try testing.expectEqual(@as(i32, 0), status);
+    gqldt_cleanup();
 }
 
-test "handle is initialized" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    const initialized = {{project}}_is_initialized(handle);
-    try testing.expectEqual(@as(u32, 1), initialized);
-}
-
-test "null handle is not initialized" {
-    const initialized = {{project}}_is_initialized(null);
-    try testing.expectEqual(@as(u32, 0), initialized);
+test "double init is idempotent" {
+    _ = gqldt_init();
+    const status = gqldt_init();
+    try testing.expectEqual(@as(i32, 0), status);
+    gqldt_cleanup();
 }
 
 //==============================================================================
-// Operation Tests
+// Database Operations
 //==============================================================================
 
-test "process with valid handle" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
+test "db_open and db_close" {
+    _ = gqldt_init();
+    defer gqldt_cleanup();
 
-    const result = {{project}}_process(handle, 42);
-    try testing.expectEqual(@as(c_int, 0), result); // 0 = ok
+    var db: ?*anyopaque = null;
+    const open_status = gqldt_db_open("test.db", 7, &db);
+    try testing.expectEqual(@as(i32, 0), open_status);
+    try testing.expect(db != null);
+
+    const close_status = gqldt_db_close(db.?);
+    try testing.expectEqual(@as(i32, 0), close_status);
 }
 
-test "process with null handle returns error" {
-    const result = {{project}}_process(null, 42);
-    try testing.expectEqual(@as(c_int, 4), result); // 4 = null_pointer
+test "db_open rejects empty path" {
+    _ = gqldt_init();
+    defer gqldt_cleanup();
+
+    var db: ?*anyopaque = null;
+    const status = gqldt_db_open("", 0, &db);
+    try testing.expectEqual(@as(i32, 1), status); // invalid_arg
 }
 
-//==============================================================================
-// String Tests
-//==============================================================================
+test "db_open rejects oversized path" {
+    _ = gqldt_init();
+    defer gqldt_cleanup();
 
-test "get string result" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    const str = {{project}}_get_string(handle);
-    defer if (str) |s| {{project}}_free_string(s);
-
-    try testing.expect(str != null);
-}
-
-test "get string with null handle" {
-    const str = {{project}}_get_string(null);
-    try testing.expect(str == null);
-}
-
-//==============================================================================
-// Error Handling Tests
-//==============================================================================
-
-test "last error after null handle operation" {
-    _ = {{project}}_process(null, 0);
-
-    const err = {{project}}_last_error();
-    try testing.expect(err != null);
-
-    if (err) |e| {
-        const err_str = std.mem.span(e);
-        try testing.expect(err_str.len > 0);
-    }
-}
-
-test "no error after successful operation" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    _ = {{project}}_process(handle, 0);
-
-    // Error should be cleared after successful operation
-    // (This depends on implementation)
+    var db: ?*anyopaque = null;
+    const status = gqldt_db_open("x", 5000, &db);
+    try testing.expectEqual(@as(i32, 1), status); // invalid_arg
 }
 
 //==============================================================================
-// Version Tests
+// Query Parsing
 //==============================================================================
 
-test "version string is not empty" {
-    const ver = {{project}}_version();
+test "parse valid query" {
+    _ = gqldt_init();
+    defer gqldt_cleanup();
+
+    var query: ?*anyopaque = null;
+    const status = gqldt_parse("MATCH (n:Person) RETURN n", 25, &query);
+    try testing.expectEqual(@as(i32, 0), status);
+    try testing.expect(query != null);
+
+    gqldt_query_free(query.?);
+}
+
+test "parse rejects empty query" {
+    _ = gqldt_init();
+    defer gqldt_cleanup();
+
+    var query: ?*anyopaque = null;
+    const status = gqldt_parse("", 0, &query);
+    try testing.expectEqual(@as(i32, 1), status); // invalid_arg
+}
+
+//==============================================================================
+// Type Checking and Execution
+//==============================================================================
+
+test "full pipeline: open -> schema -> parse -> typecheck -> execute" {
+    _ = gqldt_init();
+    defer gqldt_cleanup();
+
+    // Open database.
+    var db: ?*anyopaque = null;
+    _ = gqldt_db_open("pipeline.db", 11, &db);
+    defer gqldt_db_close(db.?);
+
+    // Get schema.
+    var schema: ?*anyopaque = null;
+    _ = gqldt_get_schema(db.?, "nodes", &schema);
+    defer gqldt_schema_free(schema.?);
+
+    // Parse query.
+    var query: ?*anyopaque = null;
+    _ = gqldt_parse("MATCH (n) RETURN n", 18, &query);
+    defer gqldt_query_free(query.?);
+
+    // Type-check.
+    const tc_status = gqldt_typecheck(query.?, schema.?);
+    try testing.expectEqual(@as(i32, 0), tc_status);
+
+    // Execute.
+    var result: ?*anyopaque = null;
+    const exec_status = gqldt_execute(db.?, query.?, &result);
+    try testing.expectEqual(@as(i32, 0), exec_status);
+    try testing.expect(result != null);
+
+    gqldt_result_free(result.?);
+}
+
+test "execute without typecheck fails" {
+    _ = gqldt_init();
+    defer gqldt_cleanup();
+
+    var db: ?*anyopaque = null;
+    _ = gqldt_db_open("test.db", 7, &db);
+    defer gqldt_db_close(db.?);
+
+    var query: ?*anyopaque = null;
+    _ = gqldt_parse("MATCH (n) RETURN n", 18, &query);
+    defer gqldt_query_free(query.?);
+
+    var result: ?*anyopaque = null;
+    const status = gqldt_execute(db.?, query.?, &result);
+    try testing.expectEqual(@as(i32, 2), status); // type_mismatch
+}
+
+//==============================================================================
+// Serialization
+//==============================================================================
+
+test "serialize to CBOR and back" {
+    _ = gqldt_init();
+    defer gqldt_cleanup();
+
+    var query: ?*anyopaque = null;
+    _ = gqldt_parse("RETURN 42", 9, &query);
+    defer gqldt_query_free(query.?);
+
+    var cbor_buf: [1024]u8 = undefined;
+    var written: u64 = 0;
+    const ser_status = gqldt_serialize_cbor(query.?, &cbor_buf, 1024, &written);
+    try testing.expectEqual(@as(i32, 0), ser_status);
+    try testing.expect(written > 0);
+
+    var query2: ?*anyopaque = null;
+    const deser_status = gqldt_deserialize_cbor(&cbor_buf, written, &query2);
+    try testing.expectEqual(@as(i32, 0), deser_status);
+    try testing.expect(query2 != null);
+
+    gqldt_query_free(query2.?);
+}
+
+test "serialize to JSON" {
+    _ = gqldt_init();
+    defer gqldt_cleanup();
+
+    var query: ?*anyopaque = null;
+    _ = gqldt_parse("RETURN 1", 8, &query);
+    defer gqldt_query_free(query.?);
+
+    var json_buf: [1024]u8 = undefined;
+    var written: u64 = 0;
+    const status = gqldt_serialize_json(query.?, &json_buf, 1024, &written);
+    try testing.expectEqual(@as(i32, 0), status);
+
+    const json_str = json_buf[0..@intCast(written)];
+    try testing.expectEqualStrings("{\"query\":\"RETURN 1\"}", json_str);
+}
+
+//==============================================================================
+// Slot Allocation Helpers
+//==============================================================================
+
+test "alloc_slot and free_slot" {
+    const slot = gqldt_alloc_slot() orelse return error.SlotAllocFailed;
+    const value = gqldt_read_slot(slot);
+    try testing.expectEqual(@as(u64, 0), value); // initially zero
+    gqldt_free_slot(slot);
+}
+
+test "bits64_to_ptr null returns null" {
+    const ptr = gqldt_bits64_to_ptr(0);
+    try testing.expect(ptr == null);
+}
+
+//==============================================================================
+// Version
+//==============================================================================
+
+test "version string is semantic version" {
+    const ver = gqldt_version();
     const ver_str = std.mem.span(ver);
-
     try testing.expect(ver_str.len > 0);
-}
-
-test "version string is semantic version format" {
-    const ver = {{project}}_version();
-    const ver_str = std.mem.span(ver);
-
-    // Should be in format X.Y.Z
     try testing.expect(std.mem.count(u8, ver_str, ".") >= 1);
-}
-
-//==============================================================================
-// Memory Safety Tests
-//==============================================================================
-
-test "multiple handles are independent" {
-    const h1 = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(h1);
-
-    const h2 = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(h2);
-
-    try testing.expect(h1 != h2);
-
-    // Operations on h1 should not affect h2
-    _ = {{project}}_process(h1, 1);
-    _ = {{project}}_process(h2, 2);
-}
-
-test "double free is safe" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-
-    {{project}}_free(handle);
-    {{project}}_free(handle); // Should not crash
-}
-
-test "free null is safe" {
-    {{project}}_free(null); // Should not crash
-}
-
-//==============================================================================
-// Thread Safety Tests (if applicable)
-//==============================================================================
-
-test "concurrent operations" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    const ThreadContext = struct {
-        h: *opaque {},
-        id: u32,
-    };
-
-    const thread_fn = struct {
-        fn run(ctx: ThreadContext) void {
-            _ = {{project}}_process(ctx.h, ctx.id);
-        }
-    }.run;
-
-    var threads: [4]std.Thread = undefined;
-    for (&threads, 0..) |*thread, i| {
-        thread.* = try std.Thread.spawn(.{}, thread_fn, .{
-            ThreadContext{ .h = handle, .id = @intCast(i) },
-        });
-    }
-
-    for (threads) |thread| {
-        thread.join();
-    }
 }
