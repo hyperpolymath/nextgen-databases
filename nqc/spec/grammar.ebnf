@@ -1,0 +1,222 @@
+(* SPDX-License-Identifier: PMPL-1.0-or-later *)
+(* @taxonomy: spec/grammar *)
+(*
+ * grammar.ebnf — Canonical EBNF grammar for the NextGen Query Client (NQC).
+ *
+ * NQC operates at two levels:
+ *   1. Meta-command layer — backslash-prefixed commands for REPL control
+ *   2. Query passthrough layer — forwards raw query text to the active database
+ *
+ * The query languages themselves (VQL, GQL, KQL) are defined by their
+ * respective database specifications. NQC only parses meta-commands; all
+ * other input is treated as opaque query text, stripped of trailing
+ * semicolons, and forwarded verbatim.
+ *
+ * Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)
+ *)
+
+(* ======================================================================== *)
+(* Top-level input                                                           *)
+(* ======================================================================== *)
+
+input = empty_line
+      | meta_command
+      | query_text ;
+
+empty_line = { whitespace } ;
+
+(* ======================================================================== *)
+(* Meta-commands — REPL control via backslash prefix                         *)
+(* ======================================================================== *)
+
+meta_command = "\\" , command_name , [ whitespace , command_argument ] ;
+
+command_name = "quit" | "q"
+             | "help" | "h" | "?"
+             | "connect"
+             | "db"
+             | "databases" | "dbs"
+             | "dt"
+             | "format"
+             | "timing"
+             | "status"
+             | "keywords" ;
+
+command_argument = argument_text ;
+
+(* --- Individual command argument specifications --- *)
+
+(* \connect accepts host:port or just host *)
+connect_argument = host_address , [ ":" , port_number ] ;
+
+(* \db accepts a database identifier or alias *)
+db_argument = database_id ;
+
+(* \format accepts a format name *)
+format_argument = "table" | "json" | "csv" ;
+
+(* \quit, \help, \timing, \status, \keywords, \databases take no arguments *)
+
+(* ======================================================================== *)
+(* Query passthrough — opaque text forwarded to the active database          *)
+(* ======================================================================== *)
+
+(* Any non-empty input that does not start with "\" is treated as a query.
+ * Trailing semicolons are stripped before forwarding. The query text is
+ * sent verbatim to the database's execute endpoint as:
+ *   POST {execute_path} with body {"query": "<query_text>"}
+ *)
+
+query_text = non_backslash_char , { any_char } ;
+
+(* After stripping, the query is normalised: *)
+normalised_query = stripped_query ;
+stripped_query = query_text - trailing_semicolons ;
+trailing_semicolons = { ";" } ;
+
+(* ======================================================================== *)
+(* Database profile specification                                            *)
+(* ======================================================================== *)
+
+(* A database profile defines connection parameters for a query backend.
+ * Profiles are registered in the profile registry and selected via the
+ * interactive menu or --db CLI flag. *)
+
+database_profile = "{" ,
+  "id" , ":" , database_id , "," ,
+  "display_name" , ":" , string_literal , "," ,
+  "language_name" , ":" , string_literal , "," ,
+  "description" , ":" , string_literal , "," ,
+  "aliases" , ":" , "[" , { database_id , "," } , "]" , "," ,
+  "default_host" , ":" , host_address , "," ,
+  "default_port" , ":" , port_number , "," ,
+  "execute_path" , ":" , url_path , "," ,
+  "health_path" , ":" , url_path , "," ,
+  "prompt" , ":" , string_literal , "," ,
+  "supports_dt" , ":" , boolean , "," ,
+  "keywords" , ":" , "[" , { string_literal , "," } , "]" ,
+"}" ;
+
+(* ======================================================================== *)
+(* HTTP protocol specification                                               *)
+(* ======================================================================== *)
+
+(* All databases use the same HTTP protocol pattern. *)
+
+(* Query execution: *)
+execute_request = "POST" , execute_url , json_body ;
+execute_url = base_url , url_path ;
+json_body = '{"query":"' , query_text , '"}' ;
+
+(* Health check: *)
+health_request = "GET" , health_url ;
+health_url = base_url , url_path ;
+
+(* Base URL construction: *)
+base_url = "http://" , host_address , ":" , port_number ;
+
+(* ======================================================================== *)
+(* Response format specification                                             *)
+(* ======================================================================== *)
+
+(* NQC supports three output formats for query results. *)
+
+output_format = "table" | "json" | "csv" ;
+
+(* VQL-style response shape (also accepted by table/CSV formatters): *)
+vql_response = '{"success":' , boolean , ',"data":' , json_array ,
+               ',"row_count":' , integer , '}' ;
+
+(* Generic response — any valid JSON is accepted. *)
+generic_response = json_value ;
+
+(* Table format: auto-detects columns from first row of data array. *)
+table_output = table_header , newline , table_separator , newline ,
+               { table_row , newline } ,
+               "(" , integer , " rows)" ;
+table_header = column_name , { " | " , column_name } ;
+table_separator = column_dash , { "+" , column_dash } ;
+table_row = cell_value , { " | " , cell_value } ;
+column_dash = "-" , { "-" } ;
+
+(* CSV format: RFC 4180 compliant. *)
+csv_output = csv_header , newline , { csv_row , newline } ;
+csv_header = csv_field , { "," , csv_field } ;
+csv_row = csv_field , { "," , csv_field } ;
+csv_field = unquoted_field | quoted_field ;
+unquoted_field = { csv_safe_char } ;
+quoted_field = '"' , { csv_char | '""' } , '"' ;
+
+(* JSON format: pretty-printed JSON encoding of the response. *)
+json_output = json_value ;
+
+(* ======================================================================== *)
+(* CLI argument specification                                                *)
+(* ======================================================================== *)
+
+(* NQC accepts these command-line arguments: *)
+cli_invocation = "nqc" , { cli_option } ;
+
+cli_option = "--db" , database_id
+           | "--host" , host_address
+           | "--port" , port_number
+           | "--format" , output_format
+           | "--dt"
+           | "--help" | "-h" ;
+
+(* When no arguments are given, NQC enters interactive database selection. *)
+
+(* ======================================================================== *)
+(* Terminal definitions                                                       *)
+(* ======================================================================== *)
+
+database_id = letter , { letter | digit | "-" | "_" } ;
+host_address = hostname | ipv4_address ;
+hostname = label , { "." , label } ;
+label = letter_or_digit , { letter_or_digit | "-" } ;
+ipv4_address = octet , "." , octet , "." , octet , "." , octet ;
+octet = digit , [ digit , [ digit ] ] ;
+port_number = digit , { digit } ;
+url_path = "/" , { url_segment , "/" } , [ url_segment ] ;
+url_segment = { letter | digit | "-" | "_" | "." } ;
+
+string_literal = '"' , { any_char - '"' | '\\"' } , '"' ;
+boolean = "true" | "false" ;
+integer = [ "-" ] , digit , { digit } ;
+
+json_value = json_object | json_array | json_string | json_number
+           | "true" | "false" | "null" ;
+json_object = "{" , [ json_pair , { "," , json_pair } ] , "}" ;
+json_pair = json_string , ":" , json_value ;
+json_array = "[" , [ json_value , { "," , json_value } ] , "]" ;
+json_string = '"' , { json_char } , '"' ;
+json_number = [ "-" ] , digit , { digit } , [ "." , digit , { digit } ] ;
+json_char = any_char - '"' - "\\" | "\\" , escape_char ;
+escape_char = '"' | "\\" | "/" | "b" | "f" | "n" | "r" | "t"
+            | "u" , hex_digit , hex_digit , hex_digit , hex_digit ;
+
+column_name = { printable_char - "|" } ;
+cell_value = { printable_char - "|" } ;
+csv_safe_char = printable_char - "," - '"' - newline_char ;
+csv_char = any_char - '"' ;
+argument_text = { any_char - newline_char } ;
+
+letter = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i"
+       | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r"
+       | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+       | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I"
+       | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R"
+       | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" ;
+
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+hex_digit = digit | "a" | "b" | "c" | "d" | "e" | "f"
+          | "A" | "B" | "C" | "D" | "E" | "F" ;
+
+letter_or_digit = letter | digit ;
+non_backslash_char = any_char - "\\" ;
+printable_char = ? any visible character ? ;
+whitespace = " " | "\t" ;
+newline = "\n" ;
+newline_char = "\n" | "\r" ;
+any_char = ? any Unicode character ? ;

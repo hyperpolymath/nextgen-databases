@@ -26,6 +26,9 @@ import argv
 import nqc/database.{type DatabaseProfile}
 import nqc/client
 import nqc/formatter
+import nqc/history.{type History}
+import nqc/cache.{type Cache}
+import nqc/highlight
 
 /// REPL session state.
 type Session {
@@ -38,23 +41,30 @@ type Session {
     show_timing: Bool,
     /// Whether the REPL should exit.
     should_exit: Bool,
+    /// Query history (persisted across sessions).
+    history: History,
+    /// Query result cache (session-scoped).
+    cache: Cache,
   )
 }
 
 /// Entry point — parse CLI arguments and start the REPL.
 pub fn main() {
   let args = argv.load().arguments
+  let hist = history.load()
 
-  case parse_args(args) {
+  case parse_args(args, hist) {
     Ok(session) -> {
       print_banner(session)
-      repl_loop(session)
+      let final = repl_loop(session)
+      history.save(final.history)
     }
     Error("interactive") -> {
-      case interactive_select() {
+      case interactive_select(hist) {
         Ok(session) -> {
           print_banner(session)
-          repl_loop(session)
+          let final = repl_loop(session)
+          history.save(final.history)
         }
         Error(_) -> {
           io.println("\nGoodbye.")
@@ -77,7 +87,7 @@ pub fn main() {
 // ---------------------------------------------------------------------------
 
 /// Parse CLI arguments into a Session.
-fn parse_args(args: List(String)) -> Result(Session, String) {
+fn parse_args(args: List(String), hist: History) -> Result(Session, String) {
   let db_flag = find_flag_value(args, "--db")
   let host = find_flag_value(args, "--host")
   let port = find_flag_value(args, "--port")
@@ -114,6 +124,8 @@ fn parse_args(args: List(String)) -> Result(Session, String) {
         format: fmt,
         show_timing: False,
         should_exit: False,
+        history: hist,
+        cache: cache.empty(),
       ))
     }
     Error(_) -> {
@@ -133,7 +145,7 @@ fn parse_args(args: List(String)) -> Result(Session, String) {
 }
 
 /// Find the value following a flag in the argument list.
-fn find_flag_value(
+pub fn find_flag_value(
   args: List(String),
   flag: String,
 ) -> Result(String, Nil) {
@@ -149,11 +161,12 @@ fn find_flag_value(
 // ---------------------------------------------------------------------------
 
 /// Main REPL loop — reads lines, dispatches commands, displays results.
-fn repl_loop(session: Session) -> Nil {
+/// Returns the final session state (for history persistence).
+fn repl_loop(session: Session) -> Session {
   case session.should_exit {
     True -> {
       io.println("Goodbye.")
-      Nil
+      session
     }
     False -> {
       let prompt = session.conn.profile.prompt
@@ -166,7 +179,7 @@ fn repl_loop(session: Session) -> Nil {
         Error(_) -> {
           // EOF (Ctrl-D)
           io.println("\nGoodbye.")
-          Nil
+          session
         }
       }
     }
@@ -187,7 +200,7 @@ fn handle_input(session: Session, input: String) -> Session {
 }
 
 /// Strip trailing semicolons from a query.
-fn strip_trailing_semicolons(s: String) -> String {
+pub fn strip_trailing_semicolons(s: String) -> String {
   case string.ends_with(s, ";") {
     True -> strip_trailing_semicolons(string.drop_end(s, 1))
     False -> s
@@ -195,31 +208,49 @@ fn strip_trailing_semicolons(s: String) -> String {
 }
 
 /// Execute a query and display the result.
+/// Uses the cache for read queries, bypasses for mutations.
 fn execute_and_display(session: Session, query: String) -> Session {
   case query {
     "" -> session
     _ -> {
-      let start = now_ms()
-      case client.execute(session.conn, query) {
-        Ok(value) -> {
-          let output = formatter.format_result(value, session.format)
+      // Add to history.
+      let new_history = history.add(session.history, query)
+      let db_id = session.conn.profile.id
+
+      // Check cache first.
+      case cache.get(session.cache, db_id, query) {
+        Ok(cached_value) -> {
+          let output = formatter.format_result(cached_value, session.format)
           io.println(output)
-
-          case session.show_timing {
-            True -> {
-              let elapsed = now_ms() - start
-              io.println(
-                "Time: " <> int.to_string(elapsed) <> "ms",
-              )
-            }
-            False -> Nil
-          }
-
-          session
+          io.println("(cached)")
+          Session(..session, history: new_history)
         }
-        Error(err) -> {
-          io.println("Error: " <> client.error_to_string(err))
-          session
+        Error(_) -> {
+          let start = now_ms()
+          case client.execute(session.conn, query) {
+            Ok(value) -> {
+              let output = formatter.format_result(value, session.format)
+              io.println(output)
+
+              case session.show_timing {
+                True -> {
+                  let elapsed = now_ms() - start
+                  io.println(
+                    "Time: " <> int.to_string(elapsed) <> "ms",
+                  )
+                }
+                False -> Nil
+              }
+
+              // Cache the result.
+              let new_cache = cache.put(session.cache, db_id, query, value)
+              Session(..session, history: new_history, cache: new_cache)
+            }
+            Error(err) -> {
+              io.println("Error: " <> client.error_to_string(err))
+              Session(..session, history: new_history)
+            }
+          }
         }
       }
     }
@@ -415,13 +446,59 @@ fn handle_meta_command(session: Session, line: String) -> Session {
       io.println(
         session.conn.profile.language_name <> " keywords:",
       )
-      io.println(string.join(session.conn.profile.keywords, ", "))
+      io.println(highlight.highlight_keyword_list(session.conn.profile.keywords))
       session
     }
 
     "\\databases" | "\\dbs" -> {
       print_database_list()
       session
+    }
+
+    "\\history" -> {
+      let count = case arg {
+        "" -> 10
+        n -> result.unwrap(int.parse(n), 10)
+      }
+      let recent = history.recent(session.history, count)
+      io.println("")
+      io.println("  Recent queries (newest first):")
+      io.println("")
+      print_history_entries(recent, 1)
+      io.println("")
+      session
+    }
+
+    "\\clearcache" -> {
+      let new_cache = cache.clear(session.cache)
+      io.println("Query cache cleared.")
+      Session(..session, cache: new_cache)
+    }
+
+    "\\search" -> {
+      case arg {
+        "" -> {
+          io.println("Usage: \\search <text>")
+          session
+        }
+        needle -> {
+          let matches = history.search(session.history, needle)
+          case matches {
+            [] -> {
+              io.println("No matching queries found.")
+              session
+            }
+            _ -> {
+              io.println("")
+              io.println("  Matching queries:")
+              io.println("")
+              print_history_entries(matches, 1)
+              io.println("")
+              session
+            }
+          }
+        }
+      }
     }
 
     _ -> {
@@ -442,7 +519,7 @@ fn handle_meta_command(session: Session, line: String) -> Session {
 /// Present an interactive menu for choosing which database to connect to.
 /// Shown when NQC is launched with no arguments. Lists ALL registered
 /// databases — built-in and custom.
-fn interactive_select() -> Result(Session, Nil) {
+fn interactive_select(hist: History) -> Result(Session, Nil) {
   let profiles = database.all_profiles()
   let count = list.length(profiles)
 
@@ -456,7 +533,7 @@ fn interactive_select() -> Result(Session, Nil) {
   print_profile_menu(profiles, 1)
 
   io.println("")
-  select_database_loop(profiles, count)
+  select_database_loop(profiles, count, hist)
 }
 
 /// Print the numbered profile menu.
@@ -489,6 +566,7 @@ fn print_profile_menu(profiles: List(DatabaseProfile), n: Int) -> Nil {
 fn select_database_loop(
   profiles: List(DatabaseProfile),
   count: Int,
+  hist: History,
 ) -> Result(Session, Nil) {
   let prompt_text =
     "  Enter number (1-" <> int.to_string(count) <> ") or database ID: "
@@ -504,10 +582,10 @@ fn select_database_loop(
             Ok(n) if n >= 1 && n <= count -> {
               case list_at(profiles, n - 1) {
                 Ok(profile) ->
-                  Ok(make_session_from_profile(profile))
+                  Ok(make_session_from_profile(profile, hist))
                 Error(_) -> {
                   io.println("  Invalid number.")
-                  select_database_loop(profiles, count)
+                  select_database_loop(profiles, count, hist)
                 }
               }
             }
@@ -515,12 +593,12 @@ fn select_database_loop(
               // Try as a database ID or alias.
               case database.find_profile(trimmed) {
                 Ok(profile) ->
-                  Ok(make_session_from_profile(profile))
+                  Ok(make_session_from_profile(profile, hist))
                 Error(_) -> {
                   io.println(
                     "  Unknown database. Enter a number or ID (q to quit).",
                   )
-                  select_database_loop(profiles, count)
+                  select_database_loop(profiles, count, hist)
                 }
               }
             }
@@ -534,7 +612,7 @@ fn select_database_loop(
 }
 
 /// Get the nth element from a list (0-indexed).
-fn list_at(items: List(a), index: Int) -> Result(a, Nil) {
+pub fn list_at(items: List(a), index: Int) -> Result(a, Nil) {
   case items, index {
     [], _ -> Error(Nil)
     [item, ..], 0 -> Ok(item)
@@ -543,13 +621,32 @@ fn list_at(items: List(a), index: Int) -> Result(a, Nil) {
 }
 
 /// Create a default session from a database profile.
-fn make_session_from_profile(profile: DatabaseProfile) -> Session {
+fn make_session_from_profile(profile: DatabaseProfile, hist: History) -> Session {
   Session(
     conn: database.connection_from_profile(profile),
     format: formatter.Table,
     show_timing: False,
     should_exit: False,
+    history: hist,
+    cache: cache.empty(),
   )
+}
+
+/// Print numbered history entries.
+fn print_history_entries(entries: List(String), n: Int) -> Nil {
+  case entries {
+    [] -> Nil
+    [entry, ..rest] -> {
+      let preview = case string.length(entry) > 72 {
+        True -> string.slice(entry, 0, 69) <> "..."
+        False -> entry
+      }
+      io.println(
+        "    " <> int.to_string(n) <> ". " <> preview,
+      )
+      print_history_entries(rest, n + 1)
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -609,6 +706,9 @@ fn print_help(profile: DatabaseProfile) -> Nil {
   io.println("  \\timing               Toggle query timing display")
   io.println("  \\status               Show server health")
   io.println("  \\keywords             List " <> lang <> " keywords")
+  io.println("  \\history [n]          Show last n queries (default 10)")
+  io.println("  \\search <text>        Search query history")
+  io.println("  \\clearcache           Clear the query result cache")
   io.println("  \\help                 Show this help")
   io.println("  \\quit / \\q            Exit")
   io.println("")
@@ -680,7 +780,7 @@ fn print_usage() -> Nil {
 }
 
 /// Format name for display.
-fn format_to_string(format: formatter.OutputFormat) -> String {
+pub fn format_to_string(format: formatter.OutputFormat) -> String {
   case format {
     formatter.Table -> "table"
     formatter.Json -> "json"

@@ -149,7 +149,7 @@ fn format_csv(value: Dynamic) -> String {
 }
 
 /// Escape a value for CSV output.
-fn csv_escape(s: String) -> String {
+pub fn csv_escape(s: String) -> String {
   case
     string.contains(s, ",")
     || string.contains(s, "\"")

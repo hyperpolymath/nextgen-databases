@@ -156,53 +156,16 @@ pub fn all_profiles() -> List(DatabaseProfile) {
   list.append(builtin_profiles(), custom_profiles())
 }
 
-/// Custom database profiles. Edit this function to register your own databases.
-///
-/// Any database that accepts HTTP POST with {"query": "..."} and returns JSON
-/// can be added here. Examples are provided as comments below.
+/// Custom database profiles. Returns an empty list by default.
+/// Use database.load_all_profiles() to include file-loaded profiles.
 pub fn custom_profiles() -> List(DatabaseProfile) {
-  [
-    // --- Uncomment or add your own profiles below ---
-    //
-    // DatabaseProfile(
-    //   id: "sql",
-    //   display_name: "PostgreSQL",
-    //   language_name: "SQL",
-    //   description: "PostgreSQL via PostgREST or pg-gateway",
-    //   aliases: ["postgres", "postgresql", "pg"],
-    //   default_host: "localhost",
-    //   default_port: 3000,
-    //   execute_path: "/rpc/query",
-    //   health_path: "/",
-    //   prompt: "sql> ",
-    //   supports_dt: False,
-    //   keywords: [
-    //     "SELECT", "FROM", "WHERE", "INSERT", "INTO", "VALUES",
-    //     "UPDATE", "SET", "DELETE", "JOIN", "LEFT", "RIGHT", "INNER",
-    //     "GROUP", "BY", "ORDER", "HAVING", "LIMIT", "OFFSET",
-    //     "CREATE", "ALTER", "DROP", "TABLE", "INDEX", "VIEW",
-    //     "BEGIN", "COMMIT", "ROLLBACK", "EXPLAIN", "ANALYZE",
-    //   ],
-    // ),
-    //
-    // DatabaseProfile(
-    //   id: "mongo",
-    //   display_name: "MongoDB",
-    //   language_name: "MQL",
-    //   description: "MongoDB via Data API",
-    //   aliases: ["mongodb"],
-    //   default_host: "localhost",
-    //   default_port: 27017,
-    //   execute_path: "/api/v1/action/find",
-    //   health_path: "/api/v1",
-    //   prompt: "mql> ",
-    //   supports_dt: False,
-    //   keywords: [
-    //     "find", "insertOne", "insertMany", "updateOne", "updateMany",
-    //     "deleteOne", "deleteMany", "aggregate", "count", "distinct",
-    //   ],
-    // ),
-  ]
+  []
+}
+
+/// Load all profiles — builtins plus any from nqc-profiles.json.
+/// This is the preferred entry point for the REPL (avoids import cycle).
+pub fn load_all_profiles(file_profiles: List(DatabaseProfile)) -> List(DatabaseProfile) {
+  list.append(builtin_profiles(), file_profiles)
 }
 
 // ---------------------------------------------------------------------------
