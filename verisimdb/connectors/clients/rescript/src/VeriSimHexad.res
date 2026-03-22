@@ -7,6 +7,12 @@
 // operations for VeriSimDB hexad entities. All functions are async and
 // communicate with the VeriSimDB REST API via VeriSimClient's HTTP helpers.
 
+/// JSON boundary cast — used at the HTTP response boundary where we trust
+/// the VeriSimDB server's JSON schema matches our ReScript types.
+/// This replaces Obj.magic with an explicit, auditable cast point.
+external fromJson: JSON.t => 'a = "%identity"
+external toJson: 'a => JSON.t = "%identity"
+
 /** Create a new hexad on the VeriSimDB server.
  *
  * @param client The authenticated client configuration.
@@ -18,11 +24,14 @@ let create = async (
   input: VeriSimTypes.hexadInput,
 ): result<VeriSimTypes.hexad, VeriSimError.t> => {
   try {
-    let body = input->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(input) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, "/api/v1/hexads", body)
     if resp.status == 201 {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -45,7 +54,7 @@ let get = async (
     let resp = await VeriSimClient.doGet(client, `/api/v1/hexads/${id}`)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -69,11 +78,14 @@ let update = async (
   input: VeriSimTypes.hexadInput,
 ): result<VeriSimTypes.hexad, VeriSimError.t> => {
   try {
-    let body = input->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(input) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPut(client, `/api/v1/hexads/${id}`, body)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -125,7 +137,7 @@ let list = async (
     )
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }

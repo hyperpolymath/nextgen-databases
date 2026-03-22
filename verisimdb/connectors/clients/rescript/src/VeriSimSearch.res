@@ -7,6 +7,12 @@
 // including full-text search, vector similarity search, spatial radius and
 // bounding-box queries, nearest-neighbour lookups, and relationship traversal.
 
+/// JSON boundary cast — used at the HTTP response boundary where we trust
+/// the VeriSimDB server's JSON schema matches our ReScript types.
+/// This replaces Obj.magic with an explicit, auditable cast point.
+external fromJson: JSON.t => 'a = "%identity"
+external toJson: 'a => JSON.t = "%identity"
+
 // --------------------------------------------------------------------------
 // Search parameter types
 // --------------------------------------------------------------------------
@@ -74,11 +80,14 @@ let text = async (
   params: textSearchParams,
 ): result<array<VeriSimTypes.searchResult>, VeriSimError.t> => {
   try {
-    let body = params->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(params) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, "/api/v1/search/text", body)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -98,11 +107,14 @@ let vector = async (
   params: vectorSearchParams,
 ): result<array<VeriSimTypes.searchResult>, VeriSimError.t> => {
   try {
-    let body = params->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(params) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, "/api/v1/search/vector", body)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -122,11 +134,14 @@ let spatialRadius = async (
   params: spatialRadiusParams,
 ): result<array<VeriSimTypes.searchResult>, VeriSimError.t> => {
   try {
-    let body = params->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(params) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, "/api/v1/search/spatial/radius", body)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -146,11 +161,14 @@ let spatialBounds = async (
   params: spatialBoundsParams,
 ): result<array<VeriSimTypes.searchResult>, VeriSimError.t> => {
   try {
-    let body = params->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(params) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, "/api/v1/search/spatial/bounds", body)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -170,11 +188,14 @@ let nearest = async (
   params: nearestParams,
 ): result<array<VeriSimTypes.searchResult>, VeriSimError.t> => {
   try {
-    let body = params->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(params) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, "/api/v1/search/nearest", body)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -194,11 +215,14 @@ let related = async (
   params: relatedParams,
 ): result<array<VeriSimTypes.searchResult>, VeriSimError.t> => {
   try {
-    let body = params->Obj.magic->JSON.stringify->JSON.parseExn
+    let body = switch JSON.stringifyAny(params) {
+    | Some(s) => JSON.parseExn(s)
+    | None => JSON.parseExn("{}")
+    }
     let resp = await VeriSimClient.doPost(client, "/api/v1/search/related", body)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }

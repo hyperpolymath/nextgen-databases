@@ -8,6 +8,12 @@
 // query drift scores, check drift status classifications, and trigger
 // re-normalisation of drifted hexads.
 
+/// JSON boundary cast — used at the HTTP response boundary where we trust
+/// the VeriSimDB server's JSON schema matches our ReScript types.
+/// This replaces Obj.magic with an explicit, auditable cast point.
+external fromJson: JSON.t => 'a = "%identity"
+external toJson: 'a => JSON.t = "%identity"
+
 /** Retrieve the current drift score for a specific hexad.
  *
  * The drift score is a floating-point value between 0.0 (no drift) and
@@ -25,7 +31,7 @@ let getScore = async (
     let resp = await VeriSimClient.doGet(client, `/api/v1/hexads/${hexadId}/drift`)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -51,7 +57,7 @@ let status = async (
     let resp = await VeriSimClient.doGet(client, `/api/v1/hexads/${hexadId}/drift/status`)
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }
@@ -82,7 +88,7 @@ let normalize = async (
     )
     if resp.ok {
       let json = await VeriSimClient.jsonBody(resp)
-      Ok(json->Obj.magic)
+      Ok(json->fromJson)
     } else {
       Error(VeriSimError.fromStatus(resp.status))
     }

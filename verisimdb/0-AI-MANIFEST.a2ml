@@ -80,7 +80,43 @@
     (rule "Container runtime is Podman — never Docker")
     (rule "VQL is the query language — never raw SQL")
     (rule "Octad entities must maintain 8-modality consistency")
-    (rule "Drift thresholds gate all automatic normalization"))
+    (rule "Drift thresholds gate all automatic normalization")
+
+    ;; INSTANCE POLICY — MOST IMPORTANT RULE FOR CONSUMERS
+    (rule "NEVER store application data in this repository's VeriSimDB instance")
+    (rule "NEVER point application code at localhost:8080 expecting a shared VeriSimDB")
+    (rule "Each consuming project MUST run its OWN dedicated VeriSimDB instance")
+    (rule "Each instance MUST have its own port, data directory, and container volume")
+    (rule "Copy the client SDK files into your project — do NOT import from this repo")
+    (rule "This repo contains ONLY source code and EXAMPLE data — not live application data"))
+
+  ;; ═══════════════════════════════════════════════════════════════════
+  ;; DEPLOYMENT MODEL — READ THIS BEFORE INTEGRATING
+  ;; ═══════════════════════════════════════════════════════════════════
+  ;;
+  ;; This repository is the VeriSimDB SOURCE CODE and EXAMPLE DATA.
+  ;; It is NOT a shared database instance. It is NOT a data store.
+  ;;
+  ;; If your project needs VeriSimDB:
+  ;;   1. Copy the client SDK (connectors/clients/<lang>/) into your project
+  ;;   2. Add a VeriSimDB Containerfile to YOUR project's container stack
+  ;;   3. Choose a UNIQUE port for your instance (not 8080)
+  ;;   4. Create a DEDICATED data volume for your instance
+  ;;   5. Configure YOUR client to point at YOUR instance
+  ;;
+  ;; Example per-project instance setup:
+  ;;   IDApTIK (game saves)    → port 8090, volume idaptik-verisimdb-data
+  ;;   Burble (voice audit)    → port 8091, volume burble-verisimdb-data
+  ;;   Hypatia (scan results)  → port 8092, volume hypatia-verisimdb-data
+  ;;
+  ;; The examples/ directory contains EXAMPLE data for testing and demos.
+  ;; Do NOT treat it as a database. Do NOT store application data here.
+  ;; ═══════════════════════════════════════════════════════════════════
+  (deployment-model
+    (type "source-code-and-examples-only")
+    (not "shared-database-instance")
+    (not "central-data-store")
+    (consumer-pattern "copy-sdk-run-own-instance"))
 
   (container-ecosystem
     (selur "container/compose.toml — deployment orchestration")
