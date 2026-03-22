@@ -8,11 +8,14 @@
 //// cluster, sharing and synchronising octad data across peers. This module
 //// provides functions to register and manage peers and to execute cross-node
 //// queries.
+////
+//// JSON decoding uses the shared codec module for type-safe deserialization.
 
 import gleam/dict.{type Dict}
-import gleam/int
 import gleam/json
+import gleam/list
 import verisimdb_client.{type Client}
+import verisimdb_client/codec
 import verisimdb_client/error.{type VeriSimError}
 import verisimdb_client/types.{
   type FederatedQueryResult, type FederationPeer,
@@ -48,20 +51,16 @@ pub fn register_peer(
   client: Client,
   input: PeerRegistration,
 ) -> Result(FederationPeer, VeriSimError) {
-  let meta_pairs =
-    input.metadata
-    |> dict.to_list
-    |> encode_string_pairs
   let body =
     json.to_string(json.object([
       #("name", json.string(input.name)),
       #("url", json.string(input.url)),
-      #("metadata", json.object(meta_pairs)),
+      #("metadata", codec.encode_string_dict(input.metadata)),
     ]))
   case verisimdb_client.do_post(client, "/api/v1/federation/peers", body) {
     Ok(resp) ->
       case resp.status {
-        201 -> decode_federation_peer(resp.body)
+        201 -> codec.decode_federation_peer(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -80,7 +79,7 @@ pub fn list_peers(
   case verisimdb_client.do_get(client, "/api/v1/federation/peers") {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_federation_peers(resp.body)
+        200 -> codec.decode_federation_peers(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -103,7 +102,7 @@ pub fn federated_query(
   let param_pairs =
     input.params
     |> dict.to_list
-    |> encode_string_pairs
+    |> list.map(fn(pair) { #(pair.0, json.string(pair.1)) })
   let body =
     json.to_string(json.object([
       #("query", json.string(input.query)),
@@ -114,56 +113,9 @@ pub fn federated_query(
   case verisimdb_client.do_post(client, "/api/v1/federation/query", body) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_federated_query_result(resp.body)
+        200 -> codec.decode_federated_query_result(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
   }
-}
-
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
-
-/// Encode string key-value pairs as JSON object fields.
-fn encode_string_pairs(
-  pairs: List(#(String, String)),
-) -> List(#(String, json.Json)) {
-  case pairs {
-    [] -> []
-    [#(k, v), ..rest] -> [
-      #(k, json.string(v)),
-      ..encode_string_pairs(rest)
-    ]
-  }
-}
-
-/// Decode a FederationPeer from a JSON response body.
-/// TODO: Implement full JSON decoding.
-fn decode_federation_peer(
-  body: String,
-) -> Result(FederationPeer, VeriSimError) {
-  Error(error.SerializationError(
-    "FederationPeer JSON decoding not yet implemented (scaffold)",
-  ))
-}
-
-/// Decode a list of FederationPeer from a JSON response body.
-/// TODO: Implement full JSON decoding.
-fn decode_federation_peers(
-  body: String,
-) -> Result(List(FederationPeer), VeriSimError) {
-  Error(error.SerializationError(
-    "FederationPeer list JSON decoding not yet implemented (scaffold)",
-  ))
-}
-
-/// Decode a FederatedQueryResult from a JSON response body.
-/// TODO: Implement full JSON decoding.
-fn decode_federated_query_result(
-  body: String,
-) -> Result(FederatedQueryResult, VeriSimError) {
-  Error(error.SerializationError(
-    "FederatedQueryResult JSON decoding not yet implemented (scaffold)",
-  ))
 }

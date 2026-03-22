@@ -7,12 +7,13 @@
 //// This module provides multi-modal search capabilities against VeriSimDB,
 //// including full-text search, vector similarity search, spatial radius and
 //// bounding-box queries, nearest-neighbour lookups, and relationship traversal.
+////
+//// JSON decoding uses the shared codec module for type-safe deserialization.
 
-import gleam/float
-import gleam/int
 import gleam/json
 import gleam/option.{type Option}
 import verisimdb_client.{type Client}
+import verisimdb_client/codec
 import verisimdb_client/error.{type VeriSimError}
 import verisimdb_client/types.{type Modality, type SearchResult}
 
@@ -94,7 +95,7 @@ pub fn text(
   case verisimdb_client.do_post(client, "/api/v1/search/text", body) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_search_results(resp.body)
+        200 -> codec.decode_search_results(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -118,7 +119,7 @@ pub fn vector(
   case verisimdb_client.do_post(client, "/api/v1/search/vector", body) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_search_results(resp.body)
+        200 -> codec.decode_search_results(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -142,7 +143,7 @@ pub fn spatial_radius(
   case verisimdb_client.do_post(client, "/api/v1/search/spatial/radius", body) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_search_results(resp.body)
+        200 -> codec.decode_search_results(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -167,7 +168,7 @@ pub fn spatial_bounds(
   case verisimdb_client.do_post(client, "/api/v1/search/spatial/bounds", body) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_search_results(resp.body)
+        200 -> codec.decode_search_results(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -190,7 +191,7 @@ pub fn nearest(
   case verisimdb_client.do_post(client, "/api/v1/search/nearest", body) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_search_results(resp.body)
+        200 -> codec.decode_search_results(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -217,23 +218,9 @@ pub fn related(
   case verisimdb_client.do_post(client, "/api/v1/search/related", body) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_search_results(resp.body)
+        200 -> codec.decode_search_results(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
   }
-}
-
-// ---------------------------------------------------------------------------
-// Internal JSON decoding helpers (stub)
-// ---------------------------------------------------------------------------
-
-/// Decode search results from a JSON response body.
-/// TODO: Implement full JSON decoding with gleam_json decoders.
-fn decode_search_results(
-  body: String,
-) -> Result(List(SearchResult), VeriSimError) {
-  Error(error.SerializationError(
-    "SearchResult JSON decoding not yet implemented (scaffold)",
-  ))
 }

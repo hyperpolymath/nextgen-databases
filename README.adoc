@@ -443,6 +443,12 @@ verisimdb/
 └── .machine_readable/         # STATE.scm, META.scm, ECOSYSTEM.scm
 ----
 
+=== Client SDK Notes
+
+VeriSimDB ships six client SDKs in `connectors/clients/` (Rust, V, Elixir, ReScript, Julia, Gleam). Consumer projects should copy the relevant SDK into their own codebase rather than depending on this repo directly.
+
+**Burble** uses the **Elixir client** (`connectors/clients/elixir/`), which runs natively alongside Burble's Elixir control plane. The Gleam client is available for projects targeting the BEAM via Gleam, but Burble does not use it.
+
 == Use Cases
 
 === Data Quality at Scale
