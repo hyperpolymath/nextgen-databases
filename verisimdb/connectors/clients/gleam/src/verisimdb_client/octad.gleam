@@ -7,11 +7,19 @@
 //// This module provides create, read, update, delete, and paginated list
 //// operations for VeriSimDB octad entities. All functions communicate with
 //// the VeriSimDB REST API via the main client module's HTTP helpers.
+////
+//// JSON encoding serializes all 8 modality data fields when present.
+//// JSON decoding uses gleam/dynamic/decode for type-safe deserialization.
 
+import gleam/dict
+import gleam/dynamic/decode
 import gleam/int
 import gleam/json
+import gleam/list
+import gleam/option.{type Option, None, Some}
 import gleam/result
 import verisimdb_client.{type Client}
+import verisimdb_client/codec
 import verisimdb_client/error.{type VeriSimError}
 import verisimdb_client/types.{type Octad, type OctadInput, type PaginatedResponse}
 
@@ -26,11 +34,11 @@ pub fn create(
   client: Client,
   input: OctadInput,
 ) -> Result(Octad, VeriSimError) {
-  let body = encode_octad_input(input)
+  let body = codec.encode_octad_input(input)
   case verisimdb_client.do_post(client, "/api/v1/octads", body) {
     Ok(resp) ->
       case resp.status {
-        201 -> decode_octad(resp.body)
+        201 -> codec.decode_octad(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -48,7 +56,7 @@ pub fn get(client: Client, id: String) -> Result(Octad, VeriSimError) {
   case verisimdb_client.do_get(client, "/api/v1/octads/" <> id) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_octad(resp.body)
+        200 -> codec.decode_octad(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -69,11 +77,11 @@ pub fn update(
   id: String,
   input: OctadInput,
 ) -> Result(Octad, VeriSimError) {
-  let body = encode_octad_input(input)
+  let body = codec.encode_octad_input(input)
   case verisimdb_client.do_put(client, "/api/v1/octads/" <> id, body) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_octad(resp.body)
+        200 -> codec.decode_octad(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -120,56 +128,9 @@ pub fn list(
   case verisimdb_client.do_get(client, path) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_paginated_response(resp.body)
+        200 -> codec.decode_paginated_response(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Internal JSON encoding/decoding helpers (stubs for scaffold)
-// ---------------------------------------------------------------------------
-
-/// Encode a OctadInput to a JSON string.
-/// TODO: Implement full JSON encoding with gleam_json.
-fn encode_octad_input(input: OctadInput) -> String {
-  // Scaffold: produces a minimal JSON representation.
-  // Full implementation would encode all modality data fields.
-  let modality_strings =
-    input.modalities
-    |> list_map_to_json_strings(types.modality_to_string)
-  json.to_string(json.object([
-    #("modalities", json.array(modality_strings, json.string)),
-  ]))
-}
-
-/// Decode a Octad from a JSON response body.
-/// TODO: Implement full JSON decoding with gleam_json.
-fn decode_octad(body: String) -> Result(Octad, VeriSimError) {
-  // Scaffold: returns a placeholder error indicating decoding is not yet implemented.
-  Error(error.SerializationError(
-    "Octad JSON decoding not yet implemented (scaffold)",
-  ))
-}
-
-/// Decode a PaginatedResponse from a JSON response body.
-/// TODO: Implement full JSON decoding with gleam_json.
-fn decode_paginated_response(
-  body: String,
-) -> Result(PaginatedResponse, VeriSimError) {
-  Error(error.SerializationError(
-    "PaginatedResponse JSON decoding not yet implemented (scaffold)",
-  ))
-}
-
-/// Map a list of items through a function, collecting results as strings.
-fn list_map_to_json_strings(
-  items: List(a),
-  f: fn(a) -> String,
-) -> List(String) {
-  case items {
-    [] -> []
-    [first, ..rest] -> [f(first), ..list_map_to_json_strings(rest, f)]
   }
 }

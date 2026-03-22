@@ -7,10 +7,14 @@
 //// VQL is VeriSimDB's native query language for multi-modal queries that span
 //// graph traversals, vector similarity, spatial filters, and temporal constraints
 //// in a single statement. This module provides execution and explain functions.
+////
+//// JSON decoding uses the shared codec module for type-safe deserialization.
 
 import gleam/dict.{type Dict}
 import gleam/json
+import gleam/list
 import verisimdb_client.{type Client}
+import verisimdb_client/codec
 import verisimdb_client/error.{type VeriSimError}
 import verisimdb_client/types.{type VqlExplanation, type VqlResult}
 
@@ -35,7 +39,7 @@ pub fn execute(
   let param_pairs =
     params
     |> dict.to_list
-    |> encode_string_pairs
+    |> list.map(fn(pair) { #(pair.0, json.string(pair.1)) })
   let body =
     json.to_string(json.object([
       #("query", json.string(query)),
@@ -44,7 +48,7 @@ pub fn execute(
   case verisimdb_client.do_post(client, "/api/v1/vql/execute", body) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_vql_result(resp.body)
+        200 -> codec.decode_vql_result(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -67,7 +71,7 @@ pub fn explain(
   let param_pairs =
     params
     |> dict.to_list
-    |> encode_string_pairs
+    |> list.map(fn(pair) { #(pair.0, json.string(pair.1)) })
   let body =
     json.to_string(json.object([
       #("query", json.string(query)),
@@ -76,44 +80,9 @@ pub fn explain(
   case verisimdb_client.do_post(client, "/api/v1/vql/explain", body) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_vql_explanation(resp.body)
+        200 -> codec.decode_vql_explanation(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
   }
-}
-
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
-
-/// Encode string key-value pairs as JSON object fields.
-fn encode_string_pairs(
-  pairs: List(#(String, String)),
-) -> List(#(String, json.Json)) {
-  case pairs {
-    [] -> []
-    [#(k, v), ..rest] -> [
-      #(k, json.string(v)),
-      ..encode_string_pairs(rest)
-    ]
-  }
-}
-
-/// Decode a VqlResult from a JSON response body.
-/// TODO: Implement full JSON decoding with gleam_json decoders.
-fn decode_vql_result(body: String) -> Result(VqlResult, VeriSimError) {
-  Error(error.SerializationError(
-    "VqlResult JSON decoding not yet implemented (scaffold)",
-  ))
-}
-
-/// Decode a VqlExplanation from a JSON response body.
-/// TODO: Implement full JSON decoding with gleam_json decoders.
-fn decode_vql_explanation(
-  body: String,
-) -> Result(VqlExplanation, VeriSimError) {
-  Error(error.SerializationError(
-    "VqlExplanation JSON decoding not yet implemented (scaffold)",
-  ))
 }

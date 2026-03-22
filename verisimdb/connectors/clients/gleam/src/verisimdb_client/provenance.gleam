@@ -8,10 +8,11 @@
 //// linked sequence of events recording every mutation applied to it. This
 //// module provides functions to query chains, record new events, and verify
 //// chain integrity.
+////
+//// JSON encoding/decoding uses the shared codec module.
 
-import gleam/dict
-import gleam/json
 import verisimdb_client.{type Client}
+import verisimdb_client/codec
 import verisimdb_client/error.{type VeriSimError}
 import verisimdb_client/types.{
   type ProvenanceChain, type ProvenanceEvent, type ProvenanceEventInput,
@@ -35,7 +36,7 @@ pub fn get_chain(
   case verisimdb_client.do_get(client, path) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_provenance_chain(resp.body)
+        200 -> codec.decode_provenance_chain(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -59,20 +60,11 @@ pub fn record_event(
   input: ProvenanceEventInput,
 ) -> Result(ProvenanceEvent, VeriSimError) {
   let path = "/api/v1/octads/" <> octad_id <> "/provenance"
-  let detail_pairs =
-    input.details
-    |> dict.to_list
-    |> encode_string_pairs
-  let body =
-    json.to_string(json.object([
-      #("event_type", json.string(input.event_type)),
-      #("actor", json.string(input.actor)),
-      #("details", json.object(detail_pairs)),
-    ]))
+  let body = codec.encode_provenance_event_input(input)
   case verisimdb_client.do_post(client, path, body) {
     Ok(resp) ->
       case resp.status {
-        201 -> decode_provenance_event(resp.body)
+        201 -> codec.decode_provenance_event(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -96,51 +88,13 @@ pub fn verify(
     Ok(resp) ->
       case resp.status {
         200 -> {
-          // TODO: Parse the chain and return chain.verified
-          // Scaffold returns placeholder
-          Error(error.SerializationError(
-            "Provenance verify decoding not yet implemented (scaffold)",
-          ))
+          case codec.decode_provenance_chain(resp.body) {
+            Ok(chain) -> Ok(chain.verified)
+            Error(err) -> Error(err)
+          }
         }
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
   }
-}
-
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
-
-/// Encode a list of string key-value pairs as JSON object fields.
-fn encode_string_pairs(
-  pairs: List(#(String, String)),
-) -> List(#(String, json.Json)) {
-  case pairs {
-    [] -> []
-    [#(k, v), ..rest] -> [
-      #(k, json.string(v)),
-      ..encode_string_pairs(rest)
-    ]
-  }
-}
-
-/// Decode a ProvenanceChain from a JSON response body.
-/// TODO: Implement full JSON decoding.
-fn decode_provenance_chain(
-  body: String,
-) -> Result(ProvenanceChain, VeriSimError) {
-  Error(error.SerializationError(
-    "ProvenanceChain JSON decoding not yet implemented (scaffold)",
-  ))
-}
-
-/// Decode a ProvenanceEvent from a JSON response body.
-/// TODO: Implement full JSON decoding.
-fn decode_provenance_event(
-  body: String,
-) -> Result(ProvenanceEvent, VeriSimError) {
-  Error(error.SerializationError(
-    "ProvenanceEvent JSON decoding not yet implemented (scaffold)",
-  ))
 }

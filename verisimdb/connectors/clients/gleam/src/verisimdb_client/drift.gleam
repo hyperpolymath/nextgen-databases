@@ -8,8 +8,11 @@
 //// have diverged from a baseline state (0.0 = no drift, 1.0 = maximum drift).
 //// This module provides functions to query drift scores, check classified
 //// status, and trigger re-normalisation.
+////
+//// JSON decoding uses the shared codec module for type-safe deserialization.
 
 import verisimdb_client.{type Client}
+import verisimdb_client/codec
 import verisimdb_client/error.{type VeriSimError}
 import verisimdb_client/types.{type DriftScore, type DriftStatusReport}
 
@@ -31,7 +34,7 @@ pub fn get_score(
   case verisimdb_client.do_get(client, path) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_drift_score(resp.body)
+        200 -> codec.decode_drift_score(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -56,7 +59,7 @@ pub fn status(
   case verisimdb_client.do_get(client, path) {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_drift_status_report(resp.body)
+        200 -> codec.decode_drift_status_report(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
@@ -81,31 +84,9 @@ pub fn normalize(
   case verisimdb_client.do_post(client, path, "{}") {
     Ok(resp) ->
       case resp.status {
-        200 -> decode_drift_score(resp.body)
+        200 -> codec.decode_drift_score(resp.body)
         status -> Error(error.from_status(status))
       }
     Error(err) -> Error(err)
   }
-}
-
-// ---------------------------------------------------------------------------
-// Internal JSON decoding helpers (stubs)
-// ---------------------------------------------------------------------------
-
-/// Decode a DriftScore from a JSON response body.
-/// TODO: Implement full JSON decoding with gleam_json decoders.
-fn decode_drift_score(body: String) -> Result(DriftScore, VeriSimError) {
-  Error(error.SerializationError(
-    "DriftScore JSON decoding not yet implemented (scaffold)",
-  ))
-}
-
-/// Decode a DriftStatusReport from a JSON response body.
-/// TODO: Implement full JSON decoding with gleam_json decoders.
-fn decode_drift_status_report(
-  body: String,
-) -> Result(DriftStatusReport, VeriSimError) {
-  Error(error.SerializationError(
-    "DriftStatusReport JSON decoding not yet implemented (scaffold)",
-  ))
 }
