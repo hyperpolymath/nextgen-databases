@@ -171,6 +171,11 @@ read, write, and query VeriSimDB octad entities.  Each SDK wraps the REST API
 (and optionally gRPC for streaming) with connection pooling, retry logic,
 serialisation, and type-safe octad construction.
 
+NOTE: **Burble** uses VeriSimDB via the **Elixir client** (`Burble.Store` GenServer
+wrapping `VeriSimClient`), not the Gleam SDK. The Gleam SDK is a separate effort
+for Gleam-native applications. Codec stubs in the Gleam client do not affect
+Burble or any other Elixir-based consumer.
+
 [cols="1,2,1"]
 |===
 | SDK | Language / Runtime | Status
