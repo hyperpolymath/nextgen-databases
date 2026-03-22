@@ -1,0 +1,97 @@
+{
+  "$schema": "panll-harness/v2",
+  "service_id": "verisimdb-admin",
+  "default_endpoint": "verisimdb://admin",
+  "runtime_endpoints": {
+    "gossamer": "gossamer://verisimdb-admin/bridge"
+  },
+  "health_check": {
+    "path": "/health",
+    "interval_ms": 30000,
+    "timeout_ms": 10000,
+    "unhealthy_threshold": 3
+  },
+  "data_sources": {
+    "verisimdb://admin/health": {
+      "path": "/invoke/verisimdb_check_health",
+      "method": "GET",
+      "returns": "HealthStatus",
+      "description": "VeriSimDB Rust core health check"
+    },
+    "verisimdb://admin/vql": {
+      "path": "/invoke/verisimdb_query_vql",
+      "method": "POST",
+      "body": { "query": "{vql_query}" },
+      "returns": "VqlResult",
+      "description": "Execute a VQL query against the database"
+    },
+    "verisimdb://admin/octads": {
+      "path": "/invoke/verisimdb_list_octads",
+      "method": "GET",
+      "returns": "OctadList",
+      "description": "Paginated list of octad entity summaries"
+    },
+    "verisimdb://admin/octads/{id}": {
+      "path": "/invoke/verisimdb_get_entity",
+      "method": "GET",
+      "returns": "OctadSnapshot",
+      "description": "Full 8-modality octad entity detail"
+    },
+    "verisimdb://admin/octads/create": {
+      "path": "/invoke/verisimdb_create_octad",
+      "method": "POST",
+      "body": { "entity": "{entity_json}" },
+      "returns": "OctadSnapshot",
+      "description": "Create a new octad entity"
+    },
+    "verisimdb://admin/octads/{id}/delete": {
+      "path": "/invoke/verisimdb_delete_octad",
+      "method": "DELETE",
+      "returns": "DeleteResult",
+      "description": "Delete an octad entity"
+    },
+    "verisimdb://admin/drift/{id}": {
+      "path": "/invoke/verisimdb_get_drift",
+      "method": "GET",
+      "returns": "DriftInfo",
+      "description": "Per-modality drift scores for an entity"
+    },
+    "verisimdb://admin/normalise/{id}": {
+      "path": "/invoke/verisimdb_trigger_normalise",
+      "method": "POST",
+      "returns": "NormaliseResult",
+      "description": "Trigger self-normalisation for a drifted entity"
+    },
+    "verisimdb://admin/telemetry": {
+      "path": "/invoke/verisimdb_get_telemetry",
+      "method": "GET",
+      "returns": "TelemetryReport",
+      "description": "Aggregate telemetry from the Elixir orchestration layer"
+    },
+    "verisimdb://admin/orch-status": {
+      "path": "/invoke/verisimdb_get_orch_status",
+      "method": "GET",
+      "returns": "OrchestrationStatus",
+      "description": "Elixir orchestration layer status (consensus, federation)"
+    }
+  },
+  "panels": [],
+  "capabilities": [
+    "network",
+    "filesystem",
+    "clipboard"
+  ],
+  "clade": "infrastructure/database",
+  "integrations": {
+    "verisimdb-rust-core": {
+      "role": "admin-interface",
+      "protocol": "gossamer-ipc",
+      "description": "Gossamer-native admin panel for VeriSimDB Rust core (port 8080)"
+    },
+    "verisimdb-elixir-orch": {
+      "role": "admin-interface",
+      "protocol": "gossamer-ipc",
+      "description": "Gossamer-native admin panel for VeriSimDB Elixir orchestration (port 4080)"
+    }
+  }
+}

@@ -304,7 +304,7 @@ let make = (~collections: array<Collection.t>) => {
 
   let handleDiscoverFDs = () => {
     setDiscoveryState(_ => Discovering)
-    // TODO: Call Tauri command to discover FDs
+    // TODO: Call backend command to discover FDs
     let _ = setTimeout(() => {
       setDiscoveryState(_ =>
         Discovered([
@@ -332,7 +332,7 @@ let make = (~collections: array<Collection.t>) => {
   }
 
   let handleApplyProposal = () => {
-    // TODO: Call Tauri command to apply normalization
+    // TODO: Call backend command to apply normalization
     Console.log("Applying normalization proposal")
   }
 

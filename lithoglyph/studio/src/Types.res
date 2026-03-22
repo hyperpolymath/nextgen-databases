@@ -36,12 +36,13 @@ module Collection = {
   }
 }
 
-// Tauri command bindings
+// Backend command bindings — delegates to RuntimeBridge for Gossamer/Tauri detection
 module Tauri = {
   type invokeResult<'a>
 
-  @module("@tauri-apps/api/core")
-  external invoke: (string, 'a) => promise<'b> = "invoke"
+  /// Use RuntimeBridge.invoke for runtime-agnostic backend calls.
+  /// Kept as `Tauri` module name for backward compatibility with existing call sites.
+  let invoke = RuntimeBridge.invoke
 }
 
 // Validation state for GQLdt preview

@@ -324,7 +324,7 @@ let make = (~collections: array<Collection.t>) => {
 
   let handleRunQuery = _ => {
     setResults(_ => QueryResults.Loading)
-    // TODO: Call Tauri command to execute query
+    // TODO: Call backend command to execute query
     // For now, simulate with placeholder
     let _ = setTimeout(() => {
       setResults(_ => QueryResults.Success([]))

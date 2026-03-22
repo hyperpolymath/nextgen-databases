@@ -279,7 +279,7 @@ let make = (~collections: array<Collection.t>) => {
     ReactEvent.Form.preventDefault(evt)
     if allFieldsValid && provenance.source != "" && provenance.rationale != "" {
       setSubmission(_ => Submitting)
-      // TODO: Call Tauri command to insert document
+      // TODO: Call backend command to insert document
       let _ = setTimeout(() => {
         setSubmission(_ => Success("Document inserted successfully with provenance tracking"))
         setDocument(_ => Document.empty())

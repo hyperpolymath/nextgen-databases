@@ -9,14 +9,14 @@ module Tauri = Types.Tauri
 module ServiceStatus = Types.ServiceStatus
 module AppInfo = Types.AppInfo
 
-// Validation result from Rust backend
+// Validation result from backend
 type validationResult = {
   valid: bool,
   errors: array<string>,
   proofs_generated: array<string>,
 }
 
-// Check service status from Tauri backend
+// Check service status from backend
 let checkServiceStatus = async (): option<ServiceStatus.t> => {
   try {
     let result = await Tauri.invoke("check_service_status", ())

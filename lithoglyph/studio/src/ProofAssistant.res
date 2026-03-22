@@ -277,7 +277,7 @@ let make = () => {
 
   let handleApplyFix = (code: string) => {
     Console.log2("Applying fix:", code)
-    // TODO: Call Tauri command to apply fix
+    // TODO: Call backend command to apply fix
   }
 
   <section className="proof-assistant">

@@ -5,13 +5,16 @@
   "tasks": {
     "dev": "cargo tauri dev",
     "build": "cargo tauri build",
+    "gossamer:dev": "gossamer dev",
+    "gossamer:build": "gossamer build",
     "rescript": "^12.0.0",
     "rescript:build": "npx rescript build",
-    "bundle": "deno run -A npm:esbuild src/main.tsx --bundle --outfile=dist/app.js --format=esm --external:@tauri-apps/api",
+    "bundle": "deno run -A npm:esbuild src/main.tsx --bundle --outfile=dist/app.js --format=esm --external:@tauri-apps/api --external:@gossamer/api",
     "fmt": "deno fmt src/"
   },
   "imports": {
     "@tauri-apps/api": "npm:@tauri-apps/api@^2",
+    "@gossamer/api": "npm:@gossamer/api@^0.1",
     "react": "npm:react@^18",
     "react-dom": "npm:react-dom@^18",
     "rescript": "^12.0.0",
