@@ -36,14 +36,17 @@ module Collection = {
   }
 }
 
-// Backend command bindings — delegates to RuntimeBridge for Gossamer/Tauri detection
-module Tauri = {
+// Backend command bindings — delegates to RuntimeBridge for Gossamer dispatch
+module Backend = {
   type invokeResult<'a>
 
-  /// Use RuntimeBridge.invoke for runtime-agnostic backend calls.
-  /// Kept as `Tauri` module name for backward compatibility with existing call sites.
+  /// Use RuntimeBridge.invoke for Gossamer backend calls.
   let invoke = RuntimeBridge.invoke
 }
+
+/// Backward-compatible alias — call sites may still reference `Tauri.invoke`.
+/// All calls route through RuntimeBridge to the Gossamer backend.
+module Tauri = Backend
 
 // Validation state for GQLdt preview
 type validationState =

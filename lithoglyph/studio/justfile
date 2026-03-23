@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
-# Lith Studio - Build commands
+# Lith Studio - Build commands (Gossamer backend)
 
 # Default recipe
 default:
@@ -9,7 +9,7 @@ default:
 setup:
     @echo "Setting up Lith Studio..."
     deno cache src/main.tsx
-    cd src-tauri && cargo build
+    cargo build
     just rescript-build
 
 # Build ReScript files
@@ -28,12 +28,12 @@ bundle:
 # Development mode with hot reload
 dev:
     just bundle
-    cargo tauri dev
+    cargo run
 
 # Build for production
 build:
     just bundle
-    cargo tauri build
+    cargo build --release
 
 # Type check Lean 4 proofs
 check-proofs:
@@ -42,14 +42,14 @@ check-proofs:
 # Format code
 fmt:
     deno fmt src/*.tsx
-    cd src-tauri && cargo fmt
+    cargo fmt
 
 # Lint
 lint:
-    cd src-tauri && cargo clippy
+    cargo clippy
 
 # Clean build artifacts
 clean:
     rm -rf dist/app.js
     rm -rf src/*.res.js
-    cd src-tauri && cargo clean
+    cargo clean

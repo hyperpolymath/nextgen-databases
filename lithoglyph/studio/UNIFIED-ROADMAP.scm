@@ -35,7 +35,7 @@
         (version "0.1.0")
         (completion 45)
         (role "Zero-friction GUI")
-        (tech "ReScript + Tauri 2.0 + Rust"))
+        (tech "ReScript + Gossamer + Rust"))
       (lith-debugger
         (version "0.1.0")
         (completion 55)
@@ -86,7 +86,7 @@
       (focus "Studio and Debugger completion")
 
       (studio-tasks
-        (task "Verify ReScript/Tauri build pipeline" priority: critical status: pending)
+        (task "Verify ReScript/Gossamer build pipeline" priority: critical status: pending)
         (task "Wire ReScript UI to GQLdt code generation" priority: high status: pending)
         (task "Connect to Lith HTTP API" priority: high status: blocked)
         (task "Test schema creation → query → results flow" priority: medium status: pending))

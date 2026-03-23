@@ -14,7 +14,7 @@ Multi-language stack in dependency order:
 7. **Lean 4** (gql-dt/) — Dependently-typed Glyph Query Language
 8. **Zig + Rust** (beam/) — BEAM NIFs for Elixir/Erlang integration
 9. **Elixir** (lith-http/) — Phoenix HTTP API, control plane
-10. **Rust + Web** (studio/) — Tauri desktop GUI (mock data, early stage)
+10. **Rust + Web** (studio/) — Gossamer desktop GUI (mock data, early stage)
 11. **Zig** (api/) — REST + gRPC API (BROKEN — needs Zig 0.15.2 migration)
 
 Subprojects with own `.machine_readable/`: gql-dt/, glyphbase/, lith-http/
@@ -109,7 +109,7 @@ cd lith-http && mix deps.get && mix compile && mix test
 # GQL-DT (Lean 4)
 cd gql-dt && lake build
 
-# Studio (Tauri — mostly mock data)
+# Studio (Gossamer — mostly mock data)
 cd studio && cargo build
 ```
 
@@ -135,7 +135,7 @@ just build-all # everything in dependency order
 | gql-dt | PASS | claims 100% | Needs honest audit |
 | glyphbase | ? | ? | Needs honest audit |
 | api (Zig) | BROKEN | N/A | 83 old std.http.Server call sites |
-| studio | PASS | N/A | 11 commands return mock data |
+| studio | PASS | N/A | 11 Gossamer commands return mock data |
 
 ## Patterns and Anti-Patterns
 

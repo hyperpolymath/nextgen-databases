@@ -1,18 +1,22 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-//! Lith Studio - Zero-friction interface for Lith with GQLdt
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+//
+//! Lith Studio — Gossamer backend
 //!
-//! This is the Tauri backend that bridges the ReScript UI to Lith.
-
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+//! Zero-friction interface for Lith with GQLdt. This is the Gossamer backend
+//! that bridges the ReScript UI to Lith. All 11 commands (migrated from Tauri)
+//! are registered as Gossamer IPC handlers with identical JSON contracts.
 
 #![forbid(unsafe_code)]
+
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 // ============================================================================
 // Service Status Types
 // ============================================================================
 
-/// Status of external service dependencies
+/// Status of external service dependencies.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServiceStatus {
     pub lithoglyph: ServiceInfo,
@@ -21,7 +25,7 @@ pub struct ServiceStatus {
     pub features: FeatureAvailability,
 }
 
-/// Information about a specific service
+/// Information about a specific service.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServiceInfo {
     pub name: String,
@@ -31,7 +35,7 @@ pub struct ServiceInfo {
     pub blocking_milestone: Option<String>,
 }
 
-/// Which features are currently available
+/// Which features are currently available.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FeatureAvailability {
     pub schema_builder: bool,
@@ -47,7 +51,7 @@ pub struct FeatureAvailability {
 // Schema Types
 // ============================================================================
 
-/// Schema field definition from the UI
+/// Schema field definition from the UI.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FieldDef {
     pub name: String,
@@ -57,14 +61,14 @@ pub struct FieldDef {
     pub required: bool,
 }
 
-/// Collection definition from the UI
+/// Collection definition from the UI.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CollectionDef {
     pub name: String,
     pub fields: Vec<FieldDef>,
 }
 
-/// Validation result
+/// Validation result.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ValidationResult {
     pub valid: bool,
@@ -76,7 +80,7 @@ pub struct ValidationResult {
 // Query Types
 // ============================================================================
 
-/// Query filter
+/// Query filter.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QueryFilter {
     pub field: String,
@@ -84,7 +88,7 @@ pub struct QueryFilter {
     pub value: String,
 }
 
-/// Query definition
+/// Query definition.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QueryDef {
     pub collection: String,
@@ -93,13 +97,13 @@ pub struct QueryDef {
     pub include_provenance: bool,
 }
 
-/// Query result row
+/// Query result row.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct QueryRow {
-    pub data: std::collections::HashMap<String, String>,
+    pub data: HashMap<String, String>,
 }
 
-/// Query execution result
+/// Query execution result.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct QueryResult {
     pub rows: Vec<QueryRow>,
@@ -111,15 +115,15 @@ pub struct QueryResult {
 // Data Entry Types
 // ============================================================================
 
-/// Document with provenance
+/// Document with provenance.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DocumentWithProvenance {
     pub collection: String,
-    pub data: std::collections::HashMap<String, String>,
+    pub data: HashMap<String, String>,
     pub provenance: ProvenanceInfo,
 }
 
-/// Provenance metadata
+/// Provenance metadata.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProvenanceInfo {
     pub source: String,
@@ -127,7 +131,7 @@ pub struct ProvenanceInfo {
     pub confidence: i32,
 }
 
-/// Insert result
+/// Insert result.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct InsertResult {
     pub success: bool,
@@ -140,7 +144,7 @@ pub struct InsertResult {
 // Normalization Types
 // ============================================================================
 
-/// Functional dependency
+/// Functional dependency.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FunctionalDependency {
     pub determinant: Vec<String>,
@@ -149,7 +153,7 @@ pub struct FunctionalDependency {
     pub discovered: bool,
 }
 
-/// Normal form level
+/// Normal form level.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum NormalForm {
     First,
@@ -160,7 +164,7 @@ pub enum NormalForm {
     Fifth,
 }
 
-/// Normalization proposal
+/// Normalization proposal.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NormalizationProposal {
     pub id: String,
@@ -173,7 +177,7 @@ pub struct NormalizationProposal {
     pub preserves_fds: bool,
 }
 
-/// Proposed table change
+/// Proposed table change.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TableChange {
     pub name: String,
@@ -181,7 +185,7 @@ pub struct TableChange {
     pub reason: String,
 }
 
-/// FD discovery result
+/// FD discovery result.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DiscoveryResult {
     pub fds: Vec<FunctionalDependency>,
@@ -193,7 +197,7 @@ pub struct DiscoveryResult {
 // Proof Types
 // ============================================================================
 
-/// Proof obligation
+/// Proof obligation.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProofObligation {
     pub id: String,
@@ -204,7 +208,7 @@ pub struct ProofObligation {
     pub explanation: String,
 }
 
-/// Constraint violation
+/// Constraint violation.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ConstraintViolation {
     pub field: String,
@@ -215,7 +219,7 @@ pub struct ConstraintViolation {
     pub suggested_fixes: Vec<SuggestedFix>,
 }
 
-/// Suggested fix for a violation
+/// Suggested fix for a violation.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SuggestedFix {
     pub description: String,
@@ -223,13 +227,30 @@ pub struct SuggestedFix {
     pub confidence: i32,
 }
 
+/// Application information.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AppInfo {
+    pub name: String,
+    pub version: String,
+    pub description: String,
+    pub license: String,
+    pub repository: String,
+}
+
 // ============================================================================
-// Tauri Commands - Schema
+// Command Handlers — Schema
 // ============================================================================
 
-/// Generate GQLdt code from a visual collection definition
-#[tauri::command]
-fn generate_gqldt(collection: CollectionDef) -> Result<String, String> {
+/// Generate GQLdt code from a visual collection definition.
+///
+/// Expects JSON: `{ "collection": { "name": "...", "fields": [...] } }`
+/// Returns: GQLdt source code string.
+fn handle_generate_gqldt(payload: serde_json::Value) -> Result<serde_json::Value, String> {
+    let collection: CollectionDef = serde_json::from_value(
+        payload.get("collection").cloned().unwrap_or(payload.clone()),
+    )
+    .map_err(|e| format!("invalid collection definition: {e}"))?;
+
     let mut gql = format!(
         "CREATE COLLECTION {} (\n  id : UUID",
         collection.name
@@ -261,12 +282,19 @@ fn generate_gqldt(collection: CollectionDef) -> Result<String, String> {
 
     gql.push_str("\n) WITH DEPENDENT_TYPES, PROVENANCE_TRACKING;");
 
-    Ok(gql)
+    Ok(serde_json::Value::String(gql))
 }
 
-/// Validate GQLdt code using Lean 4 type checker
-#[tauri::command]
-fn validate_gqldt(code: String) -> Result<ValidationResult, String> {
+/// Validate GQLdt code using Lean 4 type checker.
+///
+/// Expects JSON: `{ "code": "..." }`
+/// Returns: ValidationResult.
+fn handle_validate_gqldt(payload: serde_json::Value) -> Result<serde_json::Value, String> {
+    let code = payload
+        .get("code")
+        .and_then(|v| v.as_str())
+        .unwrap_or("");
+
     // TODO: Call Lean 4 via subprocess or FFI
     // For now, return a placeholder
     let proofs = if code.contains("BoundedNat") {
@@ -275,137 +303,189 @@ fn validate_gqldt(code: String) -> Result<ValidationResult, String> {
         vec![]
     };
 
-    Ok(ValidationResult {
+    let result = ValidationResult {
         valid: true,
         errors: vec![],
         proofs_generated: proofs,
-    })
+    };
+
+    serde_json::to_value(&result).map_err(|e| e.to_string())
 }
 
 // ============================================================================
-// Tauri Commands - Query
+// Command Handlers — Query
 // ============================================================================
 
-/// Execute a query
-#[tauri::command]
-fn execute_query(_query: QueryDef) -> Result<QueryResult, String> {
+/// Execute a query.
+///
+/// Expects JSON: `{ "query": { "collection": "...", "filters": [...], ... } }`
+/// Returns: QueryResult.
+fn handle_execute_query(_payload: serde_json::Value) -> Result<serde_json::Value, String> {
     // TODO: Connect to Lith and execute query
-    // For now, return placeholder
-    Ok(QueryResult {
+    let result = QueryResult {
         rows: vec![],
         total: 0,
         execution_time_ms: 5,
-    })
+    };
+
+    serde_json::to_value(&result).map_err(|e| e.to_string())
 }
 
-/// Explain a query plan
-#[tauri::command]
-fn explain_query(query: QueryDef) -> Result<String, String> {
-    // TODO: Generate query explanation
-    Ok(format!(
+/// Explain a query plan.
+///
+/// Expects JSON: `{ "query": { "collection": "...", "filters": [...], ... } }`
+/// Returns: Explanation string.
+fn handle_explain_query(payload: serde_json::Value) -> Result<serde_json::Value, String> {
+    let query: QueryDef = serde_json::from_value(
+        payload.get("query").cloned().unwrap_or(payload.clone()),
+    )
+    .map_err(|e| format!("invalid query definition: {e}"))?;
+
+    let explanation = format!(
         "EXPLAIN for {} with {} filters",
         query.collection,
         query.filters.len()
-    ))
+    );
+
+    Ok(serde_json::Value::String(explanation))
 }
 
 // ============================================================================
-// Tauri Commands - Data Entry
+// Command Handlers — Data Entry
 // ============================================================================
 
-/// Insert a document with provenance
-#[tauri::command]
-fn insert_document(_doc: DocumentWithProvenance) -> Result<InsertResult, String> {
+/// Insert a document with provenance.
+///
+/// Expects JSON: `{ "doc": { "collection": "...", "data": {...}, "provenance": {...} } }`
+/// Returns: InsertResult.
+fn handle_insert_document(_payload: serde_json::Value) -> Result<serde_json::Value, String> {
     // TODO: Connect to Lith and insert
-    // For now, return placeholder
     let doc_id = format!("doc_{}", uuid::Uuid::new_v4());
 
-    Ok(InsertResult {
+    let result = InsertResult {
         success: true,
         document_id: Some(doc_id),
         message: "Document inserted with provenance tracking".to_string(),
         proofs: vec!["constraints_satisfied".to_string()],
-    })
+    };
+
+    serde_json::to_value(&result).map_err(|e| e.to_string())
 }
 
-/// Validate a document against schema constraints
-#[tauri::command]
-fn validate_document(
-    _collection: String,
-    _data: std::collections::HashMap<String, String>,
-) -> Result<Vec<ConstraintViolation>, String> {
+/// Validate a document against schema constraints.
+///
+/// Expects JSON: `{ "collection": "...", "data": {...} }`
+/// Returns: Array of ConstraintViolation (empty = valid).
+fn handle_validate_document(_payload: serde_json::Value) -> Result<serde_json::Value, String> {
     // TODO: Validate against actual schema
-    // For now, return empty (no violations)
-    Ok(vec![])
+    let violations: Vec<ConstraintViolation> = vec![];
+    serde_json::to_value(&violations).map_err(|e| e.to_string())
 }
 
 // ============================================================================
-// Tauri Commands - Normalization
+// Command Handlers — Normalization
 // ============================================================================
 
-/// Discover functional dependencies from data
-#[tauri::command]
-fn discover_fds(
-    _collection: String,
-    _confidence_threshold: f64,
-) -> Result<DiscoveryResult, String> {
+/// Discover functional dependencies from data.
+///
+/// Expects JSON: `{ "collection": "...", "confidence_threshold": 0.8 }`
+/// Returns: DiscoveryResult.
+fn handle_discover_fds(_payload: serde_json::Value) -> Result<serde_json::Value, String> {
     // TODO: Connect to Form.Normalizer and discover FDs
-    // For now, return placeholder with example FDs
-    let fds = vec![
-        FunctionalDependency {
-            determinant: vec!["id".to_string()],
-            dependent: vec!["name".to_string(), "email".to_string()],
-            confidence: 1.0,
-            discovered: true,
-        },
-    ];
+    let fds = vec![FunctionalDependency {
+        determinant: vec!["id".to_string()],
+        dependent: vec!["name".to_string(), "email".to_string()],
+        confidence: 1.0,
+        discovered: true,
+    }];
 
-    Ok(DiscoveryResult {
+    let result = DiscoveryResult {
         fds,
         current_nf: "2NF".to_string(),
         proposals: vec![],
-    })
+    };
+
+    serde_json::to_value(&result).map_err(|e| e.to_string())
 }
 
-/// Apply a normalization proposal
-#[tauri::command]
-fn apply_normalization(_proposal_id: String) -> Result<bool, String> {
+/// Apply a normalization proposal.
+///
+/// Expects JSON: `{ "proposal_id": "..." }`
+/// Returns: boolean success.
+fn handle_apply_normalization(_payload: serde_json::Value) -> Result<serde_json::Value, String> {
     // TODO: Apply normalization with rollback support
-    Ok(true)
+    Ok(serde_json::Value::Bool(true))
 }
 
 // ============================================================================
-// Tauri Commands - Proofs
+// Command Handlers — Proofs
 // ============================================================================
 
-/// Get proof obligations for a schema
-#[tauri::command]
-fn get_proof_obligations(_collection: String) -> Result<Vec<ProofObligation>, String> {
+/// Get proof obligations for a schema.
+///
+/// Expects JSON: `{ "collection": "..." }`
+/// Returns: Array of ProofObligation.
+fn handle_get_proof_obligations(
+    _payload: serde_json::Value,
+) -> Result<serde_json::Value, String> {
     // TODO: Get actual proof obligations from Lean 4
-    Ok(vec![])
+    let obligations: Vec<ProofObligation> = vec![];
+    serde_json::to_value(&obligations).map_err(|e| e.to_string())
 }
 
-/// Apply a proof tactic
-#[tauri::command]
-fn apply_tactic(_obligation_id: String, _tactic: String) -> Result<bool, String> {
+/// Apply a proof tactic.
+///
+/// Expects JSON: `{ "obligation_id": "...", "tactic": "..." }`
+/// Returns: boolean success.
+fn handle_apply_tactic(_payload: serde_json::Value) -> Result<serde_json::Value, String> {
     // TODO: Apply tactic via Lean 4
-    Ok(true)
+    Ok(serde_json::Value::Bool(true))
 }
 
 // ============================================================================
-// Tauri Commands - Service Status
+// Command Handlers — Service Status
 // ============================================================================
 
-/// Check availability of backend services
-#[tauri::command]
-fn check_service_status() -> ServiceStatus {
-    // Check Lith availability
-    let lithoglyph = check_lithoglyph_status();
+/// Check Lith HTTP API availability.
+fn check_lithoglyph_status() -> ServiceInfo {
+    // TODO: Actually ping Lith when M11 is released
+    ServiceInfo {
+        name: "Lith".to_string(),
+        available: false,
+        version: None,
+        message: "Lith HTTP API not yet available. \
+                  Query execution, data entry, and normalization features \
+                  will be enabled when Lith M11 is released."
+            .to_string(),
+        blocking_milestone: Some("Lith M11".to_string()),
+    }
+}
 
-    // Check GQLdt availability
+/// Check GQLdt/Lean 4 availability.
+fn check_gqldt_status() -> ServiceInfo {
+    // TODO: Check for Lean 4 binary and GQLdt package
+    ServiceInfo {
+        name: "GQLdt (Lean 4)".to_string(),
+        available: false,
+        version: None,
+        message: "GQLdt type checker not yet integrated. \
+                  Type validation and proof generation will be enabled \
+                  when GQLdt M5 (Zig FFI) is released."
+            .to_string(),
+        blocking_milestone: Some("GQLdt M5".to_string()),
+    }
+}
+
+/// Check availability of backend services.
+///
+/// Expects JSON: `{}` (no arguments)
+/// Returns: ServiceStatus.
+fn handle_check_service_status(
+    _payload: serde_json::Value,
+) -> Result<serde_json::Value, String> {
+    let lithoglyph = check_lithoglyph_status();
     let gqldt = check_gqldt_status();
 
-    // Determine which features are available
     let features = FeatureAvailability {
         // Schema builder works offline (generates GQLdt code locally)
         schema_builder: true,
@@ -425,92 +505,67 @@ fn check_service_status() -> ServiceStatus {
 
     let overall_ready = lithoglyph.available && gqldt.available;
 
-    ServiceStatus {
+    let status = ServiceStatus {
         lithoglyph,
         gqldt,
         overall_ready,
         features,
-    }
+    };
+
+    serde_json::to_value(&status).map_err(|e| e.to_string())
 }
 
-/// Check Lith HTTP API availability
-fn check_lithoglyph_status() -> ServiceInfo {
-    // TODO: Actually ping Lith when M11 is released
-    // For now, return unavailable with informative message
-    ServiceInfo {
-        name: "Lith".to_string(),
-        available: false,
-        version: None,
-        message: "Lith HTTP API not yet available. \
-                  Query execution, data entry, and normalization features \
-                  will be enabled when Lith M11 is released.".to_string(),
-        blocking_milestone: Some("Lith M11".to_string()),
-    }
-}
-
-/// Check GQLdt/Lean 4 availability
-fn check_gqldt_status() -> ServiceInfo {
-    // TODO: Check for Lean 4 binary and GQLdt package
-    // For now, return unavailable with informative message
-    ServiceInfo {
-        name: "GQLdt (Lean 4)".to_string(),
-        available: false,
-        version: None,
-        message: "GQLdt type checker not yet integrated. \
-                  Type validation and proof generation will be enabled \
-                  when GQLdt M5 (Zig FFI) is released.".to_string(),
-        blocking_milestone: Some("GQLdt M5".to_string()),
-    }
-}
-
-/// Get app version and build info
-#[tauri::command]
-fn get_app_info() -> AppInfo {
-    AppInfo {
+/// Get app version and build info.
+///
+/// Expects JSON: `{}` (no arguments)
+/// Returns: AppInfo.
+fn handle_get_app_info(_payload: serde_json::Value) -> Result<serde_json::Value, String> {
+    let info = AppInfo {
         name: "Lith Studio".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
         description: "Zero-friction interface for Lith with dependently-typed GQL".to_string(),
         license: "PMPL-1.0-or-later".to_string(),
         repository: "https://github.com/hyperpolymath/lithoglyph-studio".to_string(),
-    }
-}
+    };
 
-/// Application information
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AppInfo {
-    pub name: String,
-    pub version: String,
-    pub description: String,
-    pub license: String,
-    pub repository: String,
+    serde_json::to_value(&info).map_err(|e| e.to_string())
 }
 
 // ============================================================================
-// Main
+// Main — Gossamer application entry point
 // ============================================================================
 
-fn main() {
-    tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![
-            // Service status
-            check_service_status,
-            get_app_info,
-            // Schema
-            generate_gqldt,
-            validate_gqldt,
-            // Query
-            execute_query,
-            explain_query,
-            // Data entry
-            insert_document,
-            validate_document,
-            // Normalization
-            discover_fds,
-            apply_normalization,
-            // Proofs
-            get_proof_obligations,
-            apply_tactic,
-        ])
-        .run(tauri::generate_context!())
-        .expect("error while running Lith Studio");
+fn main() -> Result<(), gossamer_rs::Error> {
+    let mut app = gossamer_rs::App::new("Lith Studio", 1200, 800)?;
+
+    // Service status commands
+    app.command("check_service_status", handle_check_service_status);
+    app.command("get_app_info", handle_get_app_info);
+
+    // Schema commands
+    app.command("generate_gqldt", handle_generate_gqldt);
+    app.command("validate_gqldt", handle_validate_gqldt);
+
+    // Query commands
+    app.command("execute_query", handle_execute_query);
+    app.command("explain_query", handle_explain_query);
+
+    // Data entry commands
+    app.command("insert_document", handle_insert_document);
+    app.command("validate_document", handle_validate_document);
+
+    // Normalization commands
+    app.command("discover_fds", handle_discover_fds);
+    app.command("apply_normalization", handle_apply_normalization);
+
+    // Proof commands
+    app.command("get_proof_obligations", handle_get_proof_obligations);
+    app.command("apply_tactic", handle_apply_tactic);
+
+    // Load the frontend from dist/
+    app.navigate("dist/index.html")?;
+
+    // Run the event loop (blocks until window is closed)
+    app.run();
+    Ok(())
 }

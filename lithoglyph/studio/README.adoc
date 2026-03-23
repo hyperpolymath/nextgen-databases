@@ -77,7 +77,7 @@ Lith Studio provides a visual interface:
 ----
 ┌─────────────────────────────────────────────────────────────┐
 │  Lith Studio (This Project)                               │
-│  ├── Tauri 2.0 (Rust) - Cross-platform desktop app          │
+│  ├── Gossamer (Rust) - Cross-platform desktop app             │
 │  ├── ReScript UI - Type-safe reactive interface             │
 │  └── Visual builders for schemas, queries, data entry,      │
 │      and schema normalization                               │
@@ -174,8 +174,8 @@ See https://github.com/hyperpolymath/lithoglyph/blob/main/spec/self-normalizing.
 | Component | Technology | Rationale
 
 | Desktop App
-| Tauri 2.0
-| Cross-platform (Mac, Windows, Linux), Rust backend
+| Gossamer
+| Cross-platform (Mac, Windows, Linux), Rust backend via gossamer-rs
 
 | Frontend UI
 | ReScript
@@ -212,9 +212,9 @@ See https://github.com/hyperpolymath/lithoglyph/blob/main/spec/self-normalizing.
 | 18+ (for npm/npx)
 | https://nodejs.org/ or `asdf install nodejs 20.10.0`
 
-| Tauri CLI
-| 2.x
-| `cargo install tauri-cli`
+| Gossamer
+| 0.1+
+| Built from `gossamer/bindings/rust` (path dependency)
 |===
 
 ==== Linux-Specific Dependencies
@@ -258,10 +258,10 @@ npx rescript build
 npx esbuild src/App.res.js --bundle --outfile=dist/app.js
 
 # Development mode (hot reload)
-cd src-tauri && cargo tauri dev
+cargo run
 
 # Build for production
-cd src-tauri && cargo tauri build
+cargo build --release
 ----
 
 === Quick Start (TL;DR)
@@ -270,25 +270,19 @@ cd src-tauri && cargo tauri build
 ----
 npm install && npx rescript build && \
 npx esbuild src/App.res.js --bundle --outfile=dist/app.js && \
-cd src-tauri && cargo tauri dev
+cargo run
 ----
 
 === Build Outputs
 
-After `cargo tauri build`:
+After `cargo build --release`:
 
 [cols="1,2"]
 |===
 | Format | Location
 
 | Binary
-| `src-tauri/target/release/lithoglyph-studio`
-
-| Debian package
-| `src-tauri/target/release/bundle/deb/Lith Studio_*.deb`
-
-| RPM package
-| `src-tauri/target/release/bundle/rpm/Lith Studio-*.rpm`
+| `target/release/lithoglyph-studio`
 |===
 
 === Project Structure
@@ -296,13 +290,11 @@ After `cargo tauri build`:
 [source,text]
 ----
 lithoglyph-studio/
-├── src-tauri/              # Rust backend (Tauri 2.0)
-│   ├── src/
-│   │   └── main.rs         # Entry point + all Tauri commands
-│   ├── icons/              # App icons (indigo theme)
-│   ├── Cargo.toml          # Rust dependencies
-│   └── tauri.conf.json     # Tauri configuration
-├── src/                    # ReScript frontend
+├── Cargo.toml              # Rust dependencies (gossamer-rs path dep)
+├── gossamer.conf.json      # Gossamer configuration
+├── src/                    # ReScript frontend + Gossamer backend
+│   ├── backend/
+│   │   └── main.rs         # Entry point + all Gossamer command handlers
 │   ├── App.res             # Main app with navigation
 │   ├── Types.res           # Shared type definitions
 │   ├── SchemaBuilder.res   # Collection creator UI

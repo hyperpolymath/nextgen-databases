@@ -5,7 +5,7 @@
 module FieldType = Types.FieldType
 module Field = Types.Field
 module Collection = Types.Collection
-module Tauri = Types.Tauri
+module Backend = Types.Backend
 module ServiceStatus = Types.ServiceStatus
 module AppInfo = Types.AppInfo
 
@@ -19,7 +19,7 @@ type validationResult = {
 // Check service status from backend
 let checkServiceStatus = async (): option<ServiceStatus.t> => {
   try {
-    let result = await Tauri.invoke("check_service_status", ())
+    let result = await Backend.invoke("check_service_status", ())
     Some(result)
   } catch {
   | _ => None
@@ -46,7 +46,7 @@ let generateGqldt = async (collection: Collection.t): result<string, string> => 
         }
       }),
     }
-    let result = await Tauri.invoke("generate_gqldt", {"collection": payload})
+    let result = await Backend.invoke("generate_gqldt", {"collection": payload})
     Ok(result)
   } catch {
   | JsExn(e) => Error(JsExn.message(e)->Option.getOr("Unknown error"))
@@ -56,7 +56,7 @@ let generateGqldt = async (collection: Collection.t): result<string, string> => 
 // Validate GQLdt code
 let validateGqldt = async (code: string): result<validationResult, string> => {
   try {
-    let result = await Tauri.invoke("validate_gqldt", {"code": code})
+    let result = await Backend.invoke("validate_gqldt", {"code": code})
     Ok(result)
   } catch {
   | JsExn(e) => Error(JsExn.message(e)->Option.getOr("Unknown error"))
