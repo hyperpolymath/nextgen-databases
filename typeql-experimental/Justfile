@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# typeql-experimental — Build recipes for VQL-dt++ experimental type system
+
+# Default recipe: type-check all Idris2 modules
+default: check
+
+# Type-check the Idris2 kernel (formal specification + proofs)
+check:
+    idris2 --typecheck typeql-experimental.ipkg
+
+# Build the Idris2 kernel (produces TTCs)
+build:
+    idris2 --build typeql-experimental.ipkg
+
+# Build the ReScript parser
+build-parser:
+    cd src/parser && npx rescript-legacy
+
+# Run Idris2 type-level tests
+test-idris2:
+    idris2 --typecheck typeql-experimental.ipkg
+    @echo "All Idris2 modules type-check successfully."
+
+# Run ReScript parser tests
+test-parser:
+    cd src/parser && npx rescript-legacy
+    @echo "ReScript parser builds successfully."
+
+# Run all tests
+test: test-idris2 test-parser
+
+# Verify no banned patterns in Idris2 code
+audit:
+    @echo "Checking for banned patterns..."
+    @! grep -rn "believe_me\|assert_total\|assert_smaller\|unsafePerformIO" src/abi/ \
+        && echo "PASS: No banned patterns found." \
+        || (echo "FAIL: Banned patterns detected!" && exit 1)
+
+# Clean build artefacts
+clean:
+    rm -rf build/
+    rm -rf src/parser/lib/
+
+# Full verification pipeline
+verify: audit check build-parser
+    @echo "All verification checks passed."
