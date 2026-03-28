@@ -32,9 +32,13 @@ const PORT_MAP = {
   kql: 8082,
 };
 
-// CORS headers added to every proxied response
+// CORS headers added to every proxied response.
+// Wildcard origin is intentional: this is a localhost-only dev proxy bridging
+// the browser to database engines on different ports.  For non-dev deployments,
+// set ALLOWED_ORIGINS to a comma-separated list of permitted origins.
+const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGINS") || "*";
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Access-Control-Max-Age": "86400",
