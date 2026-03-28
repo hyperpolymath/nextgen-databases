@@ -155,6 +155,22 @@ fn manifest() -> serde_json::Value {
                 "endpoint": "/api/v1/vql/execute",
                 "requires_auth": false,
                 "panel_compatible": true
+            },
+            "feedback": {
+                "type": "feedback",
+                "description": "Groove-routed feedback receiver — stores feedback targeted at VeriSimDB",
+                "protocol": "http",
+                "endpoint": "/.well-known/groove/feedback",
+                "requires_auth": false,
+                "panel_compatible": false
+            },
+            "health-mesh": {
+                "type": "health-mesh",
+                "description": "Inter-service health mesh — monitors peer status via groove probing",
+                "protocol": "http",
+                "endpoint": "/.well-known/groove/mesh",
+                "requires_auth": false,
+                "panel_compatible": true
             }
         },
         "consumes": ["integrity", "scanning"],
@@ -427,15 +443,294 @@ async fn groove_status_handler(State(groove): State<GrooveState>) -> impl IntoRe
     }))
 }
 
+// --- Health Mesh ---
+
+/// Cached health state of groove peers, updated by the mesh monitor.
+#[derive(Debug, Clone, Serialize)]
+pub struct PeerHealth {
+    /// Peer's self-reported service ID.
+    pub service_id: String,
+    /// Port the peer was discovered on.
+    pub port: u16,
+    /// "up", "degraded", or "down".
+    pub status: String,
+    /// Unix timestamp (milliseconds) of last successful probe.
+    pub last_seen_ms: u64,
+}
+
+/// Shared mesh state: list of peer health entries.
+#[derive(Debug, Clone)]
+pub struct MeshState {
+    peers: Arc<Mutex<Vec<PeerHealth>>>,
+    last_probe_ms: Arc<Mutex<u64>>,
+}
+
+impl MeshState {
+    /// Create an empty mesh state.
+    pub fn new() -> Self {
+        Self {
+            peers: Arc::new(Mutex::new(Vec::new())),
+            last_probe_ms: Arc::new(Mutex::new(0)),
+        }
+    }
+}
+
+impl Default for MeshState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Known ports to probe for groove peers (excluding our own port).
+const MESH_PROBE_PORTS: &[u16] = &[6473, 8000, 8081, 8091, 8092];
+
+/// Probe all known groove peers and update the mesh state.
+///
+/// Called periodically by the mesh monitor background task.
+fn probe_mesh_peers(mesh: &MeshState) {
+    let now_ms = unix_now_ms();
+    let mut results = Vec::new();
+
+    for &port in MESH_PROBE_PORTS {
+        let addr_str = format!("127.0.0.1:{}", port);
+        let addr: std::net::SocketAddr = match addr_str.parse() {
+            Ok(a) => a,
+            Err(_) => continue,
+        };
+
+        match std::net::TcpStream::connect_timeout(&addr, std::time::Duration::from_millis(500)) {
+            Ok(mut stream) => {
+                use std::io::{Read, Write};
+                stream.set_read_timeout(Some(std::time::Duration::from_millis(500))).ok();
+                stream.set_write_timeout(Some(std::time::Duration::from_millis(500))).ok();
+
+                let request = format!(
+                    "GET /.well-known/groove/status HTTP/1.0\r\nHost: {}\r\nConnection: close\r\n\r\n",
+                    addr_str
+                );
+
+                if stream.write_all(request.as_bytes()).is_ok() {
+                    let mut buf = vec![0u8; 4096];
+                    let service_id = match stream.read(&mut buf) {
+                        Ok(n) if n > 0 => {
+                            let resp = String::from_utf8_lossy(&buf[..n]);
+                            extract_service_id(&resp)
+                        }
+                        _ => "unknown".to_string(),
+                    };
+                    results.push(PeerHealth {
+                        service_id,
+                        port,
+                        status: "up".to_string(),
+                        last_seen_ms: now_ms,
+                    });
+                }
+            }
+            Err(_) => {
+                // Peer unreachable — don't include in results.
+            }
+        }
+    }
+
+    if let Ok(mut peers) = mesh.peers.lock() {
+        *peers = results;
+    }
+    if let Ok(mut ts) = mesh.last_probe_ms.lock() {
+        *ts = now_ms;
+    }
+}
+
+/// Extract service_id from a groove status HTTP response body.
+fn extract_service_id(response: &str) -> String {
+    // Find body after headers.
+    let body = if let Some(idx) = response.find("\r\n\r\n") {
+        &response[idx + 4..]
+    } else {
+        response
+    };
+
+    if let Ok(v) = serde_json::from_str::<serde_json::Value>(body) {
+        if let Some(id) = v.get("service").and_then(|s| s.as_str()) {
+            return id.to_string();
+        }
+        if let Some(id) = v.get("service_id").and_then(|s| s.as_str()) {
+            return id.to_string();
+        }
+    }
+
+    "unknown".to_string()
+}
+
+/// Spawn the mesh health monitor as a background tokio task.
+///
+/// Probes peers every 30 seconds. The MeshState is shared with the
+/// HTTP handler via Arc.
+pub fn spawn_mesh_monitor(mesh: MeshState) {
+    tokio::spawn(async move {
+        loop {
+            // Run probe on a blocking thread to avoid blocking the async runtime.
+            let mesh_clone = mesh.clone();
+            let _ = tokio::task::spawn_blocking(move || {
+                probe_mesh_peers(&mesh_clone);
+            })
+            .await;
+
+            tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+        }
+    });
+}
+
+/// GET /.well-known/groove/mesh — Return the cached mesh health view.
+async fn groove_mesh_handler(State(mesh): State<MeshState>) -> impl IntoResponse {
+    let peers = mesh.peers.lock().unwrap_or_else(|e| e.into_inner()).clone();
+    let last_probe = *mesh.last_probe_ms.lock().unwrap_or_else(|e| e.into_inner());
+
+    Json(serde_json::json!({
+        "service_id": "verisimdb",
+        "timestamp_ms": unix_now_ms(),
+        "last_probe_ms": last_probe,
+        "peer_count": peers.len(),
+        "peers": peers,
+    }))
+}
+
+// --- Feedback ---
+
+/// Shared feedback store: timestamped feedback entries.
+#[derive(Debug, Clone)]
+pub struct FeedbackStore {
+    entries: Arc<Mutex<Vec<FeedbackEntry>>>,
+}
+
+/// A single feedback entry received via the Groove mesh.
+#[derive(Debug, Clone, Serialize)]
+pub struct FeedbackEntry {
+    pub id: String,
+    pub timestamp_ms: u64,
+    pub source_service: String,
+    pub target_service: String,
+    pub category: String,
+    pub message: String,
+    pub metadata: serde_json::Value,
+}
+
+/// Maximum stored feedback entries.
+const MAX_FEEDBACK_ENTRIES: usize = 10_000;
+
+impl FeedbackStore {
+    /// Create an empty feedback store.
+    pub fn new() -> Self {
+        Self {
+            entries: Arc::new(Mutex::new(Vec::new())),
+        }
+    }
+}
+
+impl Default for FeedbackStore {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Body for POST /.well-known/groove/feedback.
+#[derive(Debug, Deserialize)]
+pub struct FeedbackRequest {
+    #[serde(default = "default_feedback_type")]
+    pub r#type: String,
+    #[serde(default = "default_verisimdb")]
+    pub target_service: String,
+    #[serde(default = "default_other")]
+    pub category: String,
+    #[serde(default)]
+    pub message: String,
+    #[serde(default)]
+    pub metadata: serde_json::Value,
+    #[serde(default = "default_unknown")]
+    pub source_service: String,
+}
+
+fn default_feedback_type() -> String { "feedback".to_string() }
+fn default_verisimdb() -> String { "verisimdb".to_string() }
+fn default_other() -> String { "other".to_string() }
+fn default_unknown() -> String { "unknown".to_string() }
+
+/// POST /.well-known/groove/feedback — Receive feedback from the Groove mesh.
+async fn groove_feedback_handler(
+    State(store): State<FeedbackStore>,
+    Json(req): Json<FeedbackRequest>,
+) -> impl IntoResponse {
+    let valid_categories = ["bug", "feature", "ux", "performance", "other"];
+    if !valid_categories.contains(&req.category.as_str()) {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({
+                "ok": false,
+                "error": format!("invalid category: {}", req.category),
+            })),
+        );
+    }
+
+    let now_ms = unix_now_ms();
+    let id = format!("groove-feedback-{now_ms}");
+
+    let entry = FeedbackEntry {
+        id: id.clone(),
+        timestamp_ms: now_ms,
+        source_service: req.source_service,
+        target_service: req.target_service.clone(),
+        category: req.category,
+        message: req.message,
+        metadata: req.metadata,
+    };
+
+    {
+        let mut entries = store.entries.lock().expect("feedback lock poisoned");
+        entries.push(entry);
+        if entries.len() > MAX_FEEDBACK_ENTRIES {
+            entries.remove(0);
+        }
+    }
+
+    info!(id = %id, "Groove feedback accepted");
+
+    (
+        StatusCode::OK,
+        Json(serde_json::json!({
+            "ok": true,
+            "routed_to": req.target_service,
+            "id": id,
+        })),
+    )
+}
+
+/// GET /.well-known/groove/feedback — List stored feedback entries.
+async fn groove_feedback_list_handler(
+    State(store): State<FeedbackStore>,
+) -> impl IntoResponse {
+    let entries = store.entries.lock().unwrap_or_else(|e| e.into_inner()).clone();
+    Json(serde_json::json!({
+        "count": entries.len(),
+        "entries": entries,
+    }))
+}
+
 /// Build the groove sub-router.
 ///
 /// Mounted at `/.well-known/groove` in the main application router.
 /// Uses its own `GrooveState` (not `AppState`) to keep the connection
 /// tracker lightweight and independent of the database layer.
+///
+/// Includes health mesh monitoring and feedback-o-tron endpoints.
 pub fn groove_router() -> Router {
     let groove_state = GrooveState::new();
+    let mesh_state = MeshState::new();
+    let feedback_store = FeedbackStore::new();
 
-    Router::new()
+    // Spawn the background mesh monitor task.
+    spawn_mesh_monitor(mesh_state.clone());
+
+    // Connection lifecycle sub-router (uses GrooveState).
+    let connection_router = Router::new()
         .route(
             "/.well-known/groove",
             get(groove_manifest_handler),
@@ -456,7 +751,27 @@ pub fn groove_router() -> Router {
             "/.well-known/groove/status",
             get(groove_status_handler),
         )
-        .with_state(groove_state)
+        .with_state(groove_state);
+
+    // Health mesh sub-router (uses MeshState).
+    let mesh_router = Router::new()
+        .route(
+            "/.well-known/groove/mesh",
+            get(groove_mesh_handler),
+        )
+        .with_state(mesh_state);
+
+    // Feedback sub-router (uses FeedbackStore).
+    let feedback_router = Router::new()
+        .route(
+            "/.well-known/groove/feedback",
+            get(groove_feedback_list_handler).post(groove_feedback_handler),
+        )
+        .with_state(feedback_store);
+
+    connection_router
+        .merge(mesh_router)
+        .merge(feedback_router)
 }
 
 // --- Helpers ---
