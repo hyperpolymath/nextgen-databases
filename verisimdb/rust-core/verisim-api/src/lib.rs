@@ -8,6 +8,7 @@
 pub mod auth;
 pub mod federation;
 pub mod graphql;
+pub mod groove;
 pub mod grpc;
 pub mod rbac;
 pub mod transaction;
@@ -679,6 +680,9 @@ pub fn build_router(state: AppState) -> Router {
         .merge(graphql::graphql_router(state))
         // Federation endpoints (separate state)
         .merge(federation_routes)
+        // Groove Protocol connection lifecycle (separate state — lightweight,
+        // independent of the database layer). Per spec section 4.
+        .merge(groove::groove_router())
 }
 
 /// Health check handler — verifies drift detector status and reports degraded when critical
