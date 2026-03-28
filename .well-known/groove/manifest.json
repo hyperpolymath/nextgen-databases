@@ -1,0 +1,39 @@
+{
+  "groove_version": "1",
+  "service_id": "verisimdb",
+  "service_version": "0.1.0",
+  "capabilities": {
+    "octad-storage": {
+      "type": "octad-storage",
+      "description": "Cross-modal entity consistency via octad structures",
+      "protocol": "http",
+      "endpoint": "/octads",
+      "requires_auth": false,
+      "panel_compatible": true
+    },
+    "drift-detection": {
+      "type": "drift-detection",
+      "description": "Detect entity drift across temporal versions",
+      "protocol": "http",
+      "endpoint": "/api/drift",
+      "requires_auth": false,
+      "panel_compatible": true
+    },
+    "temporal-versioning": {
+      "type": "temporal-versioning",
+      "description": "Temporal versioning with audit trail",
+      "protocol": "http",
+      "endpoint": "/audit",
+      "requires_auth": false,
+      "panel_compatible": true
+    }
+  },
+  "consumes": ["scanning"],
+  "endpoints": {
+    "health": "/health",
+    "groove": "/.well-known/groove",
+    "grpc": "grpc://localhost:50051"
+  },
+  "health": "/health",
+  "applicability": ["individual", "team", "massive-open"]
+}
