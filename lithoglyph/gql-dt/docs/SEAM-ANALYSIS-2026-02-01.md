@@ -305,7 +305,7 @@ def fail {α : Type} (msg : String) : Parser α :=
 
 **Test Commands:**
 ```bash
-cd /var/home/hyper/Documents/hyperpolymath-repos/gql-dt
+cd /var$HOME/Documents/hyperpolymath-repos/gql-dt
 lake clean
 lake build
 ```

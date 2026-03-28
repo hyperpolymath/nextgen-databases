@@ -33,7 +33,7 @@ defmodule VeriSim.Hypatia.ScanIngesterTest do
   defp sample_scan do
     %{
       "assail_report" => %{
-        "program_path" => "/var/mnt/eclipse/repos/protocol-squisher",
+        "program_path" => "/var$REPOS_DIR/protocol-squisher",
         "language" => "rust",
         "frameworks" => ["WebServer"],
         "weak_points" => [

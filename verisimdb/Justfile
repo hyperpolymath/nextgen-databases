@@ -120,10 +120,10 @@ container-sign:
 
 # Run panic-attack static analysis
 panic-scan:
-    @if [ -x "/var/mnt/eclipse/repos/panic-attacker/target/release/panic-attack" ]; then \
-        /var/mnt/eclipse/repos/panic-attacker/target/release/panic-attack assail . --verbose; \
+    @if [ -x "/var$REPOS_DIR/panic-attacker/target/release/panic-attack" ]; then \
+        /var$REPOS_DIR/panic-attacker/target/release/panic-attack assail . --verbose; \
     else \
-        echo "panic-attack not built — run 'cd /var/mnt/eclipse/repos/panic-attacker && cargo build --release'"; \
+        echo "panic-attack not built — run 'cd /var$REPOS_DIR/panic-attacker && cargo build --release'"; \
     fi
 
 # Run hypatia neurosymbolic scan

@@ -13,7 +13,7 @@ pub fn build(b: *std.Build) void {
         "ERTS_INCLUDE_DIR"
     ) catch blk: {
         // Try to find via asdf
-        const home = std.process.getEnvVarOwned(b.allocator, "HOME") catch "/home/hyper";
+        const home = std.process.getEnvVarOwned(b.allocator, "HOME") catch "$HOME";
         break :blk b.pathJoin(&.{home, ".asdf/installs/erlang/28.3.1/erts-16.2/include"});
     };
 

@@ -1,17 +1,17 @@
 rescript = 1
-g_finger := /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/rescript-tea/lib/ocaml/install.stamp
-g_finger := /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@anthropics/cadre-router/lib/ocaml/install.stamp
-g_finger := /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@rescript/core/lib/ocaml/install.stamp
-g_finger := /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@rescript/react/lib/ocaml/install.stamp
+g_finger := /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/rescript-tea/lib/ocaml/install.stamp
+g_finger := /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/@anthropics/cadre-router/lib/ocaml/install.stamp
+g_finger := /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/@rescript/core/lib/ocaml/install.stamp
+g_finger := /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/@rescript/react/lib/ocaml/install.stamp
 rule astj
-  command = /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/.deno/@rescript+linux-x64@12.1.0/node_modules/@rescript/linux-x64/bin/bsc.exe -runtime-path /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/.deno/@rescript+runtime@12.1.0/node_modules/@rescript/runtime -w +A-48-42 -bs-jsx 4 -open RescriptCore -absname -bs-ast -o $out $i
+  command = /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/.deno/@rescript+linux-x64@12.1.0/node_modules/@rescript/linux-x64/bin/bsc.exe -runtime-path /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/.deno/@rescript+runtime@12.1.0/node_modules/@rescript/runtime -w +A-48-42 -bs-jsx 4 -open RescriptCore -absname -bs-ast -o $out $i
 o src/Api.ast : astj ../../src/Api.res
 rule deps
-  command = /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/.deno/@rescript+linux-x64@12.1.0/node_modules/@rescript/linux-x64/bin/bsb_helper.exe -hash 2c7d72303cea30ff840546d6374c8c15 $in
+  command = /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/.deno/@rescript+linux-x64@12.1.0/node_modules/@rescript/linux-x64/bin/bsb_helper.exe -hash 2c7d72303cea30ff840546d6374c8c15 $in
   restat = 1
 o src/Api.d : deps src/Api.ast
 rule mij
-  command = /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/.deno/@rescript+linux-x64@12.1.0/node_modules/@rescript/linux-x64/bin/bsc.exe -runtime-path /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/.deno/@rescript+runtime@12.1.0/node_modules/@rescript/runtime -I src/Pages -I src/Components -I src -I /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/rescript-tea/lib/ocaml -I /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@anthropics/cadre-router/lib/ocaml -I /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@rescript/core/lib/ocaml -I /var/mnt/eclipse/repos/nextgen-databases/nqc/web/node_modules/@rescript/react/lib/ocaml -open RescriptCore -w +A-48-42 -bs-package-name nqc-web -bs-package-output esmodule:$in_d:.res.mjs $i
+  command = /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/.deno/@rescript+linux-x64@12.1.0/node_modules/@rescript/linux-x64/bin/bsc.exe -runtime-path /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/.deno/@rescript+runtime@12.1.0/node_modules/@rescript/runtime -I src/Pages -I src/Components -I src -I /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/rescript-tea/lib/ocaml -I /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/@anthropics/cadre-router/lib/ocaml -I /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/@rescript/core/lib/ocaml -I /var$REPOS_DIR/nextgen-databases/nqc/web/node_modules/@rescript/react/lib/ocaml -open RescriptCore -w +A-48-42 -bs-package-name nqc-web -bs-package-output esmodule:$in_d:.res.mjs $i
   dyndep = 1
   restat = 1
 o src/Api.cmj src/Api.cmi ../../src/Api.res.mjs : mij src/Api.ast

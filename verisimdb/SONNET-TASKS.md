@@ -1,7 +1,7 @@
 # SONNET-TASKS.md — VeriSimDB (Round 2)
 
 **Date:** 2026-02-12
-**Repo:** `/var/mnt/eclipse/repos/verisimdb/`
+**Repo:** `/var$REPOS_DIR/verisimdb/`
 **Written by:** Opus (for Sonnet to execute)
 **Previous round:** All 13 tasks from Round 1 completed successfully
 **Honest completion before these tasks:** ~78%
@@ -12,7 +12,7 @@
 ## Ground Rules
 
 ### Languages
-- **Rust** — all crates under `rust-core/`. Edition 2021. Workspace root is `/var/mnt/eclipse/repos/verisimdb/Cargo.toml`.
+- **Rust** — all crates under `rust-core/`. Edition 2021. Workspace root is `/var$REPOS_DIR/verisimdb/Cargo.toml`.
 - **Elixir** — files under `elixir-orchestration/` and `lib/`. Mix project is `elixir-orchestration/mix.exs`.
 - **ReScript** — files under `src/vql/`. Do NOT touch the parser (`VQLParser.res`); it works.
 
@@ -53,10 +53,10 @@
 **Priority:** HIGH — unlocks 4 ignored integration tests
 
 ### Files to modify
-- `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-vector/src/lib.rs`
-- `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-tensor/src/lib.rs`
-- `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-semantic/src/lib.rs`
-- `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-temporal/src/lib.rs`
+- `/var$REPOS_DIR/verisimdb/rust-core/verisim-vector/src/lib.rs`
+- `/var$REPOS_DIR/verisimdb/rust-core/verisim-tensor/src/lib.rs`
+- `/var$REPOS_DIR/verisimdb/rust-core/verisim-semantic/src/lib.rs`
+- `/var$REPOS_DIR/verisimdb/rust-core/verisim-temporal/src/lib.rs`
 
 ### Problem
 Four stores lack persistence: `BruteForceVectorStore`, `InMemoryTensorStore`, `InMemorySemanticStore`, `InMemoryVersionStore<T>`. Integration tests for these are `#[ignore]`'d.
@@ -265,7 +265,7 @@ SerializationError(String),
 
 ### After implementing all four stores
 
-Remove the `#[ignore]` annotations from the 4 persistence tests in `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-octad/tests/integration_tests.rs` and update them:
+Remove the `#[ignore]` annotations from the 4 persistence tests in `/var$REPOS_DIR/verisimdb/rust-core/verisim-octad/tests/integration_tests.rs` and update them:
 
 **test_vector_persistence** (line ~218):
 ```rust
@@ -397,7 +397,7 @@ async fn test_temporal_persistence() {
 
 ### Verification
 ```bash
-cd /var/mnt/eclipse/repos/verisimdb
+cd /var$REPOS_DIR/verisimdb
 
 # Each store individually
 cargo test -p verisim-vector
@@ -421,7 +421,7 @@ cargo clippy --workspace
 **Priority:** MEDIUM — panics are never acceptable in library code
 
 ### Files
-- `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-temporal/src/diff.rs`
+- `/var$REPOS_DIR/verisimdb/rust-core/verisim-temporal/src/diff.rs`
 
 ### Problem
 Line 99: `(None, None) => panic!("Cannot compare two None values")` — calling `compare_values(None, None)` panics instead of returning a meaningful result.
@@ -473,7 +473,7 @@ cargo test -p verisim-temporal
 **Priority:** LOW — improves API ergonomics
 
 ### Files
-- `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-octad/src/lib.rs`
+- `/var$REPOS_DIR/verisimdb/rust-core/verisim-octad/src/lib.rs`
 
 ### Problem
 The builder has `with_types(Vec<&str>)` and `with_relationships(Vec<(&str, &str)>)`, but no singular convenience methods. The integration tests originally used `.with_semantic()` and `.with_relationship()` (singular), which is a more natural API for adding one item.
@@ -522,7 +522,7 @@ cargo clippy -p verisim-octad
 **Priority:** MEDIUM — enables the Elixir drift monitor to query Rust core
 
 ### Files
-- `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-api/src/lib.rs`
+- `/var$REPOS_DIR/verisimdb/rust-core/verisim-api/src/lib.rs`
 
 ### Problem
 The Elixir drift monitor (`drift_monitor.ex:222`) has a TODO: "Query Rust core when get_drift_summary HTTP endpoint is ready." The Rust API has `/api/drift/status` but no `/api/drift/summary` endpoint that returns per-entity drift scores.
@@ -596,7 +596,7 @@ cargo build -p verisim-api
 **Priority:** LOW — currently works with hardcoded defaults
 
 ### Files
-- `/var/mnt/eclipse/repos/verisimdb/elixir-orchestration/lib/verisim/query/query_cache.ex`
+- `/var$REPOS_DIR/verisimdb/elixir-orchestration/lib/verisim/query/query_cache.ex`
 
 ### Problem
 Line 574: `# TODO: Make this configurable` — the `get_config()` function returns hardcoded `@default_config`. Cache TTL, max size, and eviction policy should be configurable at runtime.
@@ -645,7 +645,7 @@ initial_state = %{
 
 ### Verification
 ```bash
-cd /var/mnt/eclipse/repos/verisimdb/elixir-orchestration
+cd /var$REPOS_DIR/verisimdb/elixir-orchestration
 mix compile
 # No warnings
 ```
@@ -657,7 +657,7 @@ mix compile
 **Priority:** MEDIUM — normalizer only handles 2 of 6 drift types
 
 ### Files
-- `/var/mnt/eclipse/repos/verisimdb/rust-core/verisim-normalizer/src/lib.rs`
+- `/var$REPOS_DIR/verisimdb/rust-core/verisim-normalizer/src/lib.rs`
 
 ### Problem
 The normalizer has strategies for `SemanticVectorDrift` and `GraphDocumentDrift` only. It has no strategies for:
@@ -882,7 +882,7 @@ cargo test -p verisim-normalizer
 **Priority:** DO THIS LAST — after all other tasks
 
 ### Files
-- `/var/mnt/eclipse/repos/verisimdb/.machine_readable/STATE.scm`
+- `/var$REPOS_DIR/verisimdb/.machine_readable/STATE.scm`
 
 ### What to do
 
@@ -917,7 +917,7 @@ After completing Tasks 1-6, update:
 
 ### Verification
 ```bash
-grep "overall-completion" /var/mnt/eclipse/repos/verisimdb/.machine_readable/STATE.scm
+grep "overall-completion" /var$REPOS_DIR/verisimdb/.machine_readable/STATE.scm
 # Must show 85 (not 75 or 100)
 ```
 
@@ -928,7 +928,7 @@ grep "overall-completion" /var/mnt/eclipse/repos/verisimdb/.machine_readable/STA
 After completing ALL 7 tasks:
 
 ```bash
-cd /var/mnt/eclipse/repos/verisimdb
+cd /var$REPOS_DIR/verisimdb
 
 # 1. Full workspace compiles
 cargo build --workspace

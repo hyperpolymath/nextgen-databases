@@ -238,7 +238,7 @@ All phases are independent except Phase 4 depends on Phase 3 (bridge must exist 
 ## If Machine Crashes — Recovery Steps
 
 ```bash
-cd /var/mnt/eclipse/repos/verisimdb
+cd /var$REPOS_DIR/verisimdb
 
 # 1. Verify Phase 1 is intact
 cargo build -p verisim-planner && cargo test -p verisim-planner

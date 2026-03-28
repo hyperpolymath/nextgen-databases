@@ -8,9 +8,9 @@
 ## What Changed
 
 ### Repository
-- **Old:** `/var/mnt/eclipse/repos/lith`
-- **New:** `/var/mnt/eclipse/repos/lith`
-- **Symlink:** `~/Documents/hyperpolymath-repos/lith` → `/var/mnt/eclipse/repos/lith`
+- **Old:** `/var$REPOS_DIR/lith`
+- **New:** `/var$REPOS_DIR/lith`
+- **Symlink:** `~/Documents/hyperpolymath-repos/lith` → `/var$REPOS_DIR/lith`
 
 ### Text Replacements (Throughout Codebase)
 - `Lith` → `Lith`

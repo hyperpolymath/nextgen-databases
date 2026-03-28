@@ -112,7 +112,7 @@ Keep "form" only where it literally means HTML/data forms (not the database).
 
 ## Proven Library Integration
 
-The real Proven library exists at `/var/mnt/eclipse/repos/proven/` with 104+ modules
+The real Proven library exists at `/var$REPOS_DIR/proven/` with 104+ modules
 (SafePath, SafeJson, SafeSQL, SafeSchema, SafeBuffer, SafePolicy, etc.) and 89
 language bindings. Lithoglyph should import from this external repo, NOT bundle a copy.
 
