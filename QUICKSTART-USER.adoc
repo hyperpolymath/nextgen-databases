@@ -1,0 +1,185 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+//
+// QUICKSTART-USER.adoc — Get VeriSimDB running from zero
+= VeriSimDB Quickstart
+:toc: macro
+:icons: font
+
+toc::[]
+
+== What is VeriSimDB?
+
+VeriSimDB is an 8-modality database engine. Every entity is stored
+simultaneously across Graph, Vector, Tensor, Semantic, Document,
+Temporal, Provenance, and Spatial representations (the "octad").
+Drift between modalities is detected and self-healed automatically.
+
+The Rust core provides the modality stores. An Elixir/OTP layer
+orchestrates coordination, fault tolerance, and the HTTP API.
+
+== Prerequisites
+
+You need these tools installed before building VeriSimDB.
+
+[cols="1,1,2"]
+|===
+| Tool | Version | Install (Fedora)
+
+| Rust (nightly)
+| 1.85+
+| `asdf install rust nightly` or `rustup install nightly`
+
+| Elixir
+| 1.17+
+| `asdf install elixir 1.17.3-otp-27`
+
+| Erlang/OTP
+| 27+
+| `asdf install erlang 27.2`
+
+| Zig
+| 0.14+
+| `asdf install zig 0.14.0`
+
+| Idris2 _(optional, ABI layer)_
+| 0.7+
+| `asdf install idris2 0.7.0`
+
+| Podman _(optional, containers)_
+| 4+
+| `sudo dnf install podman podman-compose`
+
+| just
+| 1.0+
+| `cargo install just`
+
+| openssl-devel
+| --
+| `sudo dnf install openssl-devel`
+
+| pkg-config
+| --
+| `sudo dnf install pkg-config`
+|===
+
+TIP: Run `just doctor` to verify all prerequisites are present.
+
+== Clone and Build
+
+[source,bash]
+----
+cd ~/Documents/hyperpolymath-repos
+# Already cloned if you have the nextgen-databases monorepo:
+# cd nextgen-databases/verisimdb
+# OR standalone:
+git clone https://github.com/hyperpolymath/verisimdb
+cd verisimdb
+----
+
+=== Build Rust Core (release)
+
+[source,bash]
+----
+just build
+----
+
+This runs `cargo build --release` with `OPENSSL_NO_VENDOR=1`.
+
+=== Build Elixir Layer
+
+[source,bash]
+----
+just build-elixir
+----
+
+Fetches Mix dependencies and compiles the OTP supervision tree.
+
+=== Build Everything
+
+[source,bash]
+----
+just build-all
+----
+
+== First Run
+
+=== Option A: Rust API Server (standalone)
+
+[source,bash]
+----
+just serve
+----
+
+Opens `http://localhost:8080`. The Rust API server provides direct
+access to the modality stores.
+
+=== Option B: Elixir OTP Orchestrator
+
+[source,bash]
+----
+just serve-otp
+----
+
+Starts the full OTP supervision tree with entity servers, drift
+monitoring, and query routing.
+
+=== Option C: Container (Podman)
+
+[source,bash]
+----
+just container-build
+just container-run
+----
+
+Runs VeriSimDB in a Chainguard-based container on port 8080.
+
+== Verify It Works
+
+[source,bash]
+----
+# Health check
+curl http://localhost:8080/health
+
+# Create an octad entity (example)
+curl -X POST http://localhost:8080/api/v1/entities \
+  -H "Content-Type: application/json" \
+  -d '{"document": {"title": "Test", "body": "Hello"}, "types": ["test"]}'
+----
+
+== Run Tests
+
+[source,bash]
+----
+just test          # Rust unit tests
+just test-elixir   # Elixir unit tests
+just test-all      # Both
+----
+
+== Key Recipes
+
+[source,bash]
+----
+just              # List all recipes
+just build        # Build Rust core (release)
+just build-all    # Build Rust + Elixir
+just serve        # Start API server (dev)
+just test-all     # Run all tests
+just lint         # Clippy lints
+just fmt          # Format Rust code
+just doctor       # Check prerequisites
+just tour         # Guided walkthrough
+just help-me      # What to do when stuck
+----
+
+== Instance Policy
+
+This repo is *source code and examples only*. If you are integrating
+VeriSimDB into another project, you MUST create your own instance:
+
+1. Copy the client SDK from `connectors/clients/<lang>/`
+2. Add a Containerfile to YOUR project
+3. Choose a unique port (not 8080)
+4. Create a dedicated data volume
+
+See `.claude/CLAUDE.md` for port assignments per project.
