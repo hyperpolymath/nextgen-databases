@@ -38,6 +38,10 @@ pub use store::{OctadSnapshot, InMemoryOctadStore};
 pub mod query_octad;
 pub use query_octad::{QueryOctadBuilder, QueryExecution};
 
+// Optional RAM promotion for acceleration (disabled by default)
+pub mod ram_promotion;
+pub use ram_promotion::{PromotionManager, Modality, PromotionDecision, PromotionEvent};
+
 // ACID transaction manager for cross-modality atomicity
 pub mod transaction;
 pub use transaction::{IsolationLevel, LockType, TransactionManager, TransactionError, TransactionState};
