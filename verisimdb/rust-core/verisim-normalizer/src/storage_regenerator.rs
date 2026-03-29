@@ -301,8 +301,11 @@ impl ModalityRegenerator for StorageRegenerator {
                     graph.edges.len()
                 );
                 let input = OctadInput {
-                    title: Some("[regenerated from graph]".to_string()),
-                    body: Some(body.clone()),
+                    document: Some(OctadDocumentInput {
+                        title: "[regenerated from graph]".to_string(),
+                        body: body.clone(),
+                        fields: HashMap::new(),
+                    }),
                     ..Default::default()
                 };
                 self.write_back(octad, input).await?;
@@ -319,7 +322,10 @@ impl ModalityRegenerator for StorageRegenerator {
                     .ok_or_else(|| NormalizerError::MissingModality("Graph".into()))?;
                 let types = graph.types.clone();
                 let input = OctadInput {
-                    types: Some(types.clone()),
+                    semantic: Some(OctadSemanticInput {
+                        types: types.clone(),
+                        properties: HashMap::new(),
+                    }),
                     ..Default::default()
                 };
                 self.write_back(octad, input).await?;
@@ -412,7 +418,10 @@ impl ModalityRegenerator for StorageRegenerator {
                 }
 
                 let input = OctadInput {
-                    embedding: Some(merged),
+                    vector: Some(OctadVectorInput {
+                        embedding: merged,
+                        model: Some("fnv1a-trigram-384-merged".to_string()),
+                    }),
                     ..Default::default()
                 };
                 self.write_back(octad, input).await?;
@@ -453,7 +462,10 @@ impl ModalityRegenerator for StorageRegenerator {
                 all_types.dedup();
 
                 let input = OctadInput {
-                    types: Some(all_types.clone()),
+                    semantic: Some(OctadSemanticInput {
+                        types: all_types.clone(),
+                        properties: HashMap::new(),
+                    }),
                     ..Default::default()
                 };
                 self.write_back(octad, input).await?;
