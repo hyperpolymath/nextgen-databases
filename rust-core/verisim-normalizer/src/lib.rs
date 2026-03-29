@@ -20,6 +20,7 @@
 #![forbid(unsafe_code)]
 pub mod conflict;
 pub mod regeneration;
+pub mod storage_regenerator;
 
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
@@ -46,6 +47,15 @@ pub enum NormalizerError {
 
     #[error("Channel error: {0}")]
     ChannelError(String),
+
+    #[error("Missing modality: {0}")]
+    MissingModality(String),
+
+    #[error("Storage error: {0}")]
+    StorageError(String),
+
+    #[error("No viable source: {0}")]
+    NoViableSource(String),
 }
 
 /// Result of a normalization operation
