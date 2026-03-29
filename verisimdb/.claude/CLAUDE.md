@@ -207,6 +207,16 @@ When drift exceeds thresholds, the normalizer:
 3. Validates consistency
 4. Updates all modalities atomically
 
+**StorageRegenerator** (production): Real OctadStore-backed implementation in `rust-core/verisim-normalizer/src/storage_regenerator.rs`. Replaces the dry-run SummaryRegenerator. Implements:
+- Document->Vector: FNV-1a trigram hashing to 384-dim embedding
+- Document->Semantic: keyword extraction as type annotations
+- Document/Semantic/Graph cross-regeneration (6 source->target pairs)
+- Weighted merge for Vector/Semantic targets
+- Cosine similarity drift measurement (Vector), Jaccard index (Semantic)
+- 68 normalizer tests pass (7 StorageRegenerator-specific)
+
+**NormalizerError variants:** NormalizationFailed, StrategyNotFound, OctadError, ChannelError, MissingModality, StorageError, NoViableSource
+
 ## Code Patterns
 
 ### Creating a Octad (Rust)
