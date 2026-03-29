@@ -34,7 +34,8 @@ use verisim_octad::{
     OctadSemanticInput, OctadStore, OctadVectorInput, SemanticAnnotation,
 };
 
-use crate::regeneration::{Modality, ModalityRegenerator, NormalizerError};
+use crate::NormalizerError;
+use crate::regeneration::{Modality, ModalityRegenerator};
 
 /// A regenerator that reads and writes real modality data via an OctadStore.
 ///
@@ -127,11 +128,13 @@ impl StorageRegenerator {
     /// Build a semantic annotation from keywords.
     fn keywords_to_semantic(keywords: &[String]) -> SemanticAnnotation {
         SemanticAnnotation {
+            entity_id: String::new(),
             types: keywords
                 .iter()
                 .map(|k| format!("keyword:{}", k))
                 .collect(),
-            proof_blob: None,
+            properties: HashMap::new(),
+            provenance: Default::default(),
         }
     }
 
@@ -265,13 +268,9 @@ impl ModalityRegenerator for StorageRegenerator {
                     .as_ref()
                     .ok_or_else(|| NormalizerError::MissingModality("Semantic".into()))?;
                 let body = format!(
-                    "Types: {}\nProof: {}",
+                    "Types: {}\nProvenance: {:?}",
                     semantic.types.join(", "),
-                    if semantic.proof_blob.is_some() {
-                        "present"
-                    } else {
-                        "none"
-                    }
+                    semantic.provenance,
                 );
                 let input = OctadInput {
                     document: Some(OctadDocumentInput {
@@ -295,10 +294,9 @@ impl ModalityRegenerator for StorageRegenerator {
                     .as_ref()
                     .ok_or_else(|| NormalizerError::MissingModality("Graph".into()))?;
                 let body = format!(
-                    "Node: {} ({})\nEdges: {}",
-                    graph.id,
-                    graph.types.join(", "),
-                    graph.edges.len()
+                    "Node: {} ({})",
+                    graph.iri,
+                    graph.local_name,
                 );
                 let input = OctadInput {
                     document: Some(OctadDocumentInput {
@@ -310,9 +308,8 @@ impl ModalityRegenerator for StorageRegenerator {
                 };
                 self.write_back(octad, input).await?;
                 Ok(format!(
-                    "Regenerated Document (len={}) from Graph ({} edges)",
+                    "Regenerated Document (len={}) from Graph",
                     body.len(),
-                    graph.edges.len()
                 ))
             }
             (Modality::Graph, Modality::Semantic) => {
@@ -320,7 +317,8 @@ impl ModalityRegenerator for StorageRegenerator {
                     .graph_node
                     .as_ref()
                     .ok_or_else(|| NormalizerError::MissingModality("Graph".into()))?;
-                let types = graph.types.clone();
+                // GraphNode has no types field; extract a type from the IRI
+                let types = vec![format!("graph:{}", graph.iri)];
                 let input = OctadInput {
                     semantic: Some(OctadSemanticInput {
                         types: types.clone(),
@@ -385,15 +383,7 @@ impl ModalityRegenerator for StorageRegenerator {
                             .graph_node
                             .as_ref()
                             .map(|g| {
-                                format!(
-                                    "{} {}",
-                                    g.types.join(" "),
-                                    g.edges
-                                        .iter()
-                                        .map(|e| format!("{} {}", e.predicate, e.target))
-                                        .collect::<Vec<_>>()
-                                        .join(" ")
-                                )
+                                format!("{} {}", g.iri, g.local_name)
                             }),
                         _ => None,
                     };
@@ -447,7 +437,7 @@ impl ModalityRegenerator for StorageRegenerator {
                         }
                         Modality::Graph => {
                             if let Some(g) = &octad.graph_node {
-                                all_types.extend(g.types.clone());
+                                all_types.push(format!("graph:{}", g.iri));
                             }
                         }
                         Modality::Semantic => {
@@ -511,8 +501,8 @@ impl ModalityRegenerator for StorageRegenerator {
                 if let (Some(text), Some(stored)) =
                     (Self::document_text(octad), octad.embedding.as_ref())
                 {
-                    let expected = Self::text_to_embedding(&text, stored.len());
-                    let sim = Self::cosine_similarity(&expected, stored);
+                    let expected = Self::text_to_embedding(&text, stored.vector.len());
+                    let sim = Self::cosine_similarity(&expected, &stored.vector);
                     // Drift = 1.0 - similarity (0.0 = identical, 1.0 = orthogonal)
                     Ok((1.0 - sim).max(0.0))
                 } else {
@@ -558,13 +548,9 @@ impl ModalityRegenerator for StorageRegenerator {
                 }
             }
             Modality::Graph => {
-                // Check graph consistency: node should exist with edges
-                if let Some(graph) = &octad.graph_node {
-                    if graph.edges.is_empty() && octad.document.is_some() {
-                        Ok(0.4) // Has document but no edges — mild drift
-                    } else {
-                        Ok(0.0) // Graph present with edges
-                    }
+                // Check graph consistency: node should exist
+                if octad.graph_node.is_some() {
+                    Ok(0.0) // Graph node present
                 } else {
                     Ok(0.8) // Missing graph
                 }
@@ -604,7 +590,7 @@ impl ModalityRegenerator for StorageRegenerator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use verisim_octad::{Document, GraphEdge, GraphNode, OctadStatus, SemanticAnnotation};
+    use verisim_octad::SemanticAnnotation;
 
     #[test]
     fn test_text_to_embedding_deterministic() {
