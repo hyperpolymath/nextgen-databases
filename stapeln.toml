@@ -1,0 +1,525 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath)
+#
+# stapeln.toml — Layer-based container build for nextgen-databases monorepo
+#
+# stapeln builds containers as composable layers (German: "to stack").
+# Each layer is independently cacheable, verifiable, and signable.
+#
+# Services:
+#   verisimdb      — 8-core multimodal database (Rust + Elixir OTP)
+#   lithoglyph     — Narrative-first reversible database (Zig core + Elixir HTTP)
+#   quandledb      — Knot-theory database (Julia + Skein.jl)
+#   nqc            — Unified query REPL for all databases (Gleam/BEAM)
+#   typeql-exp     — TypeQL experimental parser (Idris2 + ReScript + Deno)
+
+[metadata]
+name = "nextgen-databases"
+version = "0.1.0"
+description = "Next-Gen Databases monorepo — VeriSimDB, Lithoglyph, QuandleDB, NQC, TypeQL"
+author = "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"
+license = "PMPL-1.0-or-later"
+registry = "ghcr.io/hyperpolymath"
+
+[build]
+context = "."
+runtime = "podman"
+
+# ═══════════════════════════════════════════════════════════════
+# Shared Base Layers
+# ═══════════════════════════════════════════════════════════════
+
+[layers.base]
+description = "Chainguard Wolfi minimal base"
+from = "cgr.dev/chainguard/wolfi-base:latest"
+cache = true
+verify = true
+
+[layers.base-static]
+description = "Chainguard static base for minimal Zig/C binaries"
+from = "cgr.dev/chainguard/static:latest"
+cache = true
+verify = true
+
+# ═══════════════════════════════════════════════════════════════
+# VeriSimDB — 8-core multimodal database
+# Rust core (verisim-api) + Elixir OTP orchestration
+# Port: 8080
+# ═══════════════════════════════════════════════════════════════
+
+[layers.verisimdb-rust-toolchain]
+description = "Rust compiler and build dependencies for VeriSimDB"
+extends = "base"
+packages = ["rust", "pkgconf", "build-base", "protoc", "clang-19"]
+env = { LIBCLANG_PATH = "/usr/lib", PROTOC = "/usr/bin/protoc" }
+cache = true
+
+[layers.verisimdb-rust-deps]
+description = "Cargo dependency fetch and compile (no source)"
+extends = "verisimdb-rust-toolchain"
+workdir = "/build/verisimdb"
+commands = [
+    "cargo fetch --locked",
+    "cargo build --release --workspace --lib 2>/dev/null || true",
+]
+cache-key = "verisimdb/Cargo.lock"
+cache = true
+
+[layers.verisimdb-rust-build]
+description = "VeriSimDB Rust core compilation"
+extends = "verisimdb-rust-deps"
+commands = ["cargo build --release -p verisim-api"]
+artifacts = [
+    { src = "target/release/verisim-api", dst = "/app/verisim-api" },
+]
+
+[layers.verisimdb-elixir-toolchain]
+description = "Elixir/OTP 27 runtime and build tools"
+extends = "base"
+packages = ["erl27-elixir-1.18", "erlang-27", "erlang-27-dev", "git", "build-base"]
+cache = true
+
+[layers.verisimdb-elixir-deps]
+description = "Mix dependency fetch and compile for VeriSimDB orchestration"
+extends = "verisimdb-elixir-toolchain"
+workdir = "/build/verisimdb/elixir-orchestration"
+env = { MIX_ENV = "prod" }
+commands = [
+    "mix local.hex --force",
+    "mix local.rebar --force",
+    "mix deps.get --only prod",
+    "mix compile",
+]
+cache-key = "verisimdb/elixir-orchestration/mix.lock"
+cache = true
+
+[layers.verisimdb-elixir-build]
+description = "Elixir OTP release build for VeriSimDB"
+extends = "verisimdb-elixir-deps"
+commands = ["mix release verisim"]
+artifacts = [
+    { src = "_build/prod/rel/verisim", dst = "/app/verisimdb-elixir/" },
+]
+
+[layers.verisimdb-runtime]
+description = "VeriSimDB minimal runtime — Rust binary + Elixir release"
+from = "cgr.dev/chainguard/wolfi-base:latest"
+packages = ["ca-certificates", "curl", "libstdc++", "ncurses"]
+copy-from = [
+    { layer = "verisimdb-rust-build", src = "/app/verisim-api", dst = "/app/verisim-api" },
+    { layer = "verisimdb-elixir-build", src = "/app/verisimdb-elixir/", dst = "/app/verisimdb-elixir/" },
+]
+entrypoint = ["/app/verisim-api"]
+user = "verisim"
+expose = [8080]
+
+# ═══════════════════════════════════════════════════════════════
+# Lithoglyph — Narrative-first reversible database
+# Zig core (bridge + demo-server) + Elixir HTTP (lith-http)
+# Core port: 8080 (Zig API), HTTP port: 4000 (Elixir Phoenix)
+# ═══════════════════════════════════════════════════════════════
+
+[layers.lithoglyph-zig-toolchain]
+description = "Zig 0.15 compiler for Lithoglyph core bridge"
+extends = "base"
+packages = ["curl", "xz", "tar", "glibc-dev"]
+commands = [
+    "curl -L https://ziglang.org/download/0.15.2/zig-linux-x86_64-0.15.2.tar.xz | tar -xJ -C /usr/local",
+    "ln -s /usr/local/zig-linux-x86_64-0.15.2/zig /usr/local/bin/zig",
+]
+cache = true
+
+[layers.lithoglyph-zig-build]
+description = "Lithoglyph core-zig bridge and demo-server compilation"
+extends = "lithoglyph-zig-toolchain"
+workdir = "/build/lithoglyph"
+commands = [
+    "cd core-zig && zig build -Doptimize=ReleaseFast",
+    "cd core-zig && zig build-lib src/bridge.zig -dynamic -lc -O ReleaseFast",
+    "zig build-exe demo-server.zig -lc -O ReleaseFast",
+]
+artifacts = [
+    { src = "/build/lithoglyph/demo-server", dst = "/app/lithoglyph-server" },
+    { src = "/build/lithoglyph/core-zig/libbridge.so", dst = "/app/libbridge.so" },
+]
+
+[layers.lithoglyph-rust-nif]
+description = "Lithoglyph Rust NIF for BEAM integration"
+extends = "verisimdb-rust-toolchain"
+workdir = "/build/lithoglyph/lith-http/native_rust"
+commands = ["cargo build --release"]
+artifacts = [
+    { src = "target/release/liblith_nif.so", dst = "/app/priv/native/liblith_nif.so" },
+]
+
+[layers.lithoglyph-elixir-deps]
+description = "Mix dependency fetch and compile for lith-http"
+extends = "verisimdb-elixir-toolchain"
+workdir = "/build/lithoglyph/lith-http"
+env = { MIX_ENV = "prod" }
+commands = [
+    "mix local.hex --force",
+    "mix local.rebar --force",
+    "mix deps.get --only prod",
+    "mix deps.compile",
+]
+cache-key = "lithoglyph/lith-http/mix.lock"
+cache = true
+
+[layers.lithoglyph-elixir-build]
+description = "Lithoglyph Elixir HTTP release (Phoenix)"
+extends = "lithoglyph-elixir-deps"
+copy-from = [
+    { layer = "lithoglyph-rust-nif", src = "/app/priv/native/liblith_nif.so", dst = "priv/native/liblith_nif.so" },
+]
+commands = [
+    "mix compile",
+    "mix release lith_http",
+]
+artifacts = [
+    { src = "_build/prod/rel/lith_http", dst = "/app/lithoglyph-http/" },
+]
+
+[layers.lithoglyph-core-runtime]
+description = "Lithoglyph Zig core — minimal static binary"
+from = "cgr.dev/chainguard/static:latest"
+copy-from = [
+    { layer = "lithoglyph-zig-build", src = "/app/lithoglyph-server", dst = "/app/lithoglyph-server" },
+    { layer = "lithoglyph-zig-build", src = "/app/libbridge.so", dst = "/app/libbridge.so" },
+]
+env = { LD_LIBRARY_PATH = "/app" }
+entrypoint = ["/app/lithoglyph-server"]
+expose = [8080]
+
+[layers.lithoglyph-http-runtime]
+description = "Lithoglyph Elixir HTTP API — Phoenix release with Rust NIF"
+from = "cgr.dev/chainguard/wolfi-base:latest"
+packages = ["ca-certificates", "libstdc++", "ncurses", "bash", "wget"]
+copy-from = [
+    { layer = "lithoglyph-elixir-build", src = "/app/lithoglyph-http/", dst = "/app/lithoglyph-http/" },
+]
+entrypoint = ["/app/lithoglyph-http/bin/lith_http"]
+user = "lith"
+expose = [4000]
+
+# ═══════════════════════════════════════════════════════════════
+# QuandleDB — Knot-theory database
+# Julia server (HTTP.jl + Skein.jl) + ReScript frontend
+# Port: 8082
+# ═══════════════════════════════════════════════════════════════
+
+[layers.quandledb-julia-toolchain]
+description = "Julia 1.10+ runtime for QuandleDB server"
+extends = "base"
+packages = ["curl", "ca-certificates", "glibc-dev", "build-base"]
+commands = [
+    "curl -fsSL https://julialang-s3.julialang.org/bin/linux/x64/1.10/julia-1.10.7-linux-x86_64.tar.gz | tar -xz -C /usr/local",
+    "ln -s /usr/local/julia-1.10.7/bin/julia /usr/local/bin/julia",
+]
+cache = true
+
+[layers.quandledb-deps]
+description = "Julia package instantiation for QuandleDB"
+extends = "quandledb-julia-toolchain"
+workdir = "/build/quandledb/server"
+commands = [
+    "julia --project=. -e 'using Pkg; Pkg.instantiate()'",
+]
+cache-key = "quandledb/server/Project.toml"
+cache = true
+
+[layers.quandledb-frontend-build]
+description = "QuandleDB ReScript frontend build via Deno"
+extends = "base"
+packages = ["deno", "ca-certificates"]
+workdir = "/build/quandledb/frontend"
+commands = [
+    "deno task build",
+]
+artifacts = [
+    { src = "/build/quandledb/frontend/dist/", dst = "/app/quandledb-public/" },
+]
+cache = true
+
+[layers.quandledb-runtime]
+description = "QuandleDB runtime — Julia server with pre-compiled deps"
+from = "cgr.dev/chainguard/wolfi-base:latest"
+packages = ["ca-certificates", "curl", "glibc"]
+copy-from = [
+    { layer = "quandledb-deps", src = "/usr/local/julia-1.10.7/", dst = "/usr/local/julia-1.10.7/" },
+    { layer = "quandledb-deps", src = "/build/quandledb/", dst = "/app/quandledb/" },
+    { layer = "quandledb-frontend-build", src = "/app/quandledb-public/", dst = "/app/quandledb/public/" },
+]
+commands = [
+    "ln -s /usr/local/julia-1.10.7/bin/julia /usr/local/bin/julia",
+]
+entrypoint = ["julia", "--project=/app/quandledb/server", "/app/quandledb/server/serve.jl", "/app/quandledb/data/knots.db", "--port", "8082", "--static", "/app/quandledb/public/"]
+user = "quandledb"
+expose = [8082]
+
+# ═══════════════════════════════════════════════════════════════
+# NQC — Normal-form Query Client (unified REPL)
+# Gleam on BEAM — connects to VeriSimDB, Lithoglyph, QuandleDB
+# Port: 8083
+# ═══════════════════════════════════════════════════════════════
+
+[layers.nqc-gleam-toolchain]
+description = "Gleam compiler + Erlang runtime for NQC"
+extends = "base"
+packages = ["erlang-27", "erlang-27-dev", "build-base", "curl", "ca-certificates"]
+commands = [
+    "curl -fsSL https://github.com/gleam-lang/gleam/releases/latest/download/gleam-v1.8.0-x86_64-unknown-linux-musl.tar.gz | tar -xz -C /usr/local/bin",
+]
+cache = true
+
+[layers.nqc-build]
+description = "NQC Gleam build targeting BEAM"
+extends = "nqc-gleam-toolchain"
+workdir = "/build/nqc"
+commands = [
+    "gleam deps download",
+    "gleam build",
+    "gleam export erlang-shipment",
+]
+cache-key = "nqc/gleam.toml"
+artifacts = [
+    { src = "/build/nqc/build/erlang-shipment/", dst = "/app/nqc/" },
+]
+
+[layers.nqc-runtime]
+description = "NQC minimal BEAM runtime — query REPL for all nextgen databases"
+from = "cgr.dev/chainguard/wolfi-base:latest"
+packages = ["erlang-27", "ca-certificates", "curl"]
+copy-from = [
+    { layer = "nqc-build", src = "/app/nqc/", dst = "/app/nqc/" },
+]
+entrypoint = ["/app/nqc/entrypoint.sh"]
+user = "nqc"
+expose = [8083]
+
+# ═══════════════════════════════════════════════════════════════
+# TypeQL Experimental — Dependently-typed query parser
+# Idris2 type-checker + ReScript parser + Deno runtime
+# Port: 8084
+# ═══════════════════════════════════════════════════════════════
+
+[layers.typeql-idris2-toolchain]
+description = "Idris2 compiler for TypeQL dependent type checking"
+extends = "base"
+packages = ["build-base", "gmp-dev", "curl", "ca-certificates"]
+commands = [
+    "curl -fsSL https://www.idris-lang.org/idris2-src/idris2-0.8.0.tgz | tar -xz -C /usr/local",
+]
+cache = true
+
+[layers.typeql-build]
+description = "TypeQL experimental build — Idris2 type-check + ReScript parse + Deno bundle"
+extends = "base"
+packages = ["deno", "ca-certificates"]
+workdir = "/build/typeql-experimental"
+commands = [
+    "deno task build",
+]
+artifacts = [
+    { src = "/build/typeql-experimental/build/", dst = "/app/typeql/" },
+]
+
+[layers.typeql-runtime]
+description = "TypeQL experimental — Deno-based query type-checker service"
+from = "cgr.dev/chainguard/wolfi-base:latest"
+packages = ["deno", "ca-certificates"]
+copy-from = [
+    { layer = "typeql-build", src = "/app/typeql/", dst = "/app/typeql/" },
+]
+entrypoint = ["deno", "run", "--allow-net", "--allow-read", "/app/typeql/main.js"]
+user = "typeql"
+expose = [8084]
+
+# ═══════════════════════════════════════════════════════════════
+# Security — Shared across all services
+# ═══════════════════════════════════════════════════════════════
+
+[security]
+non-root = true
+read-only-root = false
+no-new-privileges = true
+cap-drop = ["ALL"]
+seccomp-profile = "default"
+
+[security.signing]
+algorithm = "ML-DSA-87"
+provider = "cerro-torre"
+
+[security.sbom]
+format = "spdx-json"
+output = "sbom.spdx.json"
+include-deps = true
+
+[security.attestation]
+slsa-level = 3
+provenance = true
+reproducible = true
+
+# ═══════════════════════════════════════════════════════════════
+# Verification — vordr + svalinn
+# ═══════════════════════════════════════════════════════════════
+
+[verify]
+vordr = true
+svalinn = true
+scan-on-build = true
+fail-on = ["critical", "high"]
+
+# ═══════════════════════════════════════════════════════════════
+# Build Targets
+# ═══════════════════════════════════════════════════════════════
+
+# -- VeriSimDB targets --
+
+[targets.verisimdb-development]
+layers = ["base", "verisimdb-rust-toolchain", "verisimdb-rust-build", "verisimdb-elixir-toolchain", "verisimdb-elixir-build"]
+env = { RUST_LOG = "debug", MIX_ENV = "dev" }
+
+[targets.verisimdb-production]
+layers = ["verisimdb-runtime"]
+env = { RUST_LOG = "info", MIX_ENV = "prod" }
+
+[targets.verisimdb-test]
+layers = ["base", "verisimdb-rust-toolchain", "verisimdb-rust-build", "verisimdb-elixir-toolchain", "verisimdb-elixir-build"]
+commands = ["cargo test --workspace", "cd elixir-orchestration && mix test"]
+env = { RUST_LOG = "debug", MIX_ENV = "test" }
+
+# -- Lithoglyph targets --
+
+[targets.lithoglyph-core-development]
+layers = ["base", "lithoglyph-zig-toolchain", "lithoglyph-zig-build"]
+env = { LITH_LOG = "debug" }
+
+[targets.lithoglyph-core-production]
+layers = ["lithoglyph-core-runtime"]
+env = { LITH_LOG = "info" }
+
+[targets.lithoglyph-http-development]
+layers = ["base", "verisimdb-elixir-toolchain", "lithoglyph-rust-nif", "lithoglyph-elixir-build"]
+env = { MIX_ENV = "dev", PORT = "4000" }
+
+[targets.lithoglyph-http-production]
+layers = ["lithoglyph-http-runtime"]
+env = { MIX_ENV = "prod", PORT = "4000", RELEASE_DISTRIBUTION = "none" }
+
+[targets.lithoglyph-core-test]
+layers = ["base", "lithoglyph-zig-toolchain", "lithoglyph-zig-build"]
+commands = ["cd core-zig && zig build test", "cd ffi/zig && zig build test"]
+env = { LITH_LOG = "debug" }
+
+[targets.lithoglyph-http-test]
+layers = ["base", "verisimdb-elixir-toolchain", "lithoglyph-rust-nif", "lithoglyph-elixir-build"]
+commands = ["cd lith-http && mix test"]
+env = { MIX_ENV = "test" }
+
+# -- QuandleDB targets --
+
+[targets.quandledb-development]
+layers = ["base", "quandledb-julia-toolchain", "quandledb-deps"]
+env = { JULIA_DEBUG = "Main" }
+
+[targets.quandledb-production]
+layers = ["quandledb-runtime"]
+env = { JULIA_NUM_THREADS = "auto" }
+
+[targets.quandledb-test]
+layers = ["base", "quandledb-julia-toolchain", "quandledb-deps"]
+commands = ["julia --project=server -e 'using Pkg; Pkg.test()'"]
+env = { JULIA_DEBUG = "Main" }
+
+# -- NQC targets --
+
+[targets.nqc-development]
+layers = ["base", "nqc-gleam-toolchain", "nqc-build"]
+env = { NQC_LOG = "debug" }
+
+[targets.nqc-production]
+layers = ["nqc-runtime"]
+env = { NQC_LOG = "info" }
+
+[targets.nqc-test]
+layers = ["base", "nqc-gleam-toolchain", "nqc-build"]
+commands = ["gleam test"]
+env = { NQC_LOG = "debug" }
+
+# -- TypeQL Experimental targets --
+
+[targets.typeql-development]
+layers = ["base", "typeql-idris2-toolchain", "typeql-build"]
+env = { TYPEQL_LOG = "debug" }
+
+[targets.typeql-production]
+layers = ["typeql-runtime"]
+env = { TYPEQL_LOG = "info" }
+
+[targets.typeql-test]
+layers = ["base", "typeql-build"]
+commands = ["deno test test/"]
+env = { TYPEQL_LOG = "debug" }
+
+# -- Full stack --
+
+[targets.all-development]
+layers = [
+    "base",
+    "verisimdb-rust-toolchain", "verisimdb-rust-build",
+    "verisimdb-elixir-toolchain", "verisimdb-elixir-build",
+    "lithoglyph-zig-toolchain", "lithoglyph-zig-build",
+    "lithoglyph-rust-nif", "lithoglyph-elixir-build",
+    "quandledb-julia-toolchain", "quandledb-deps",
+    "nqc-gleam-toolchain", "nqc-build",
+    "typeql-build",
+]
+env = { RUST_LOG = "debug", MIX_ENV = "dev", LITH_LOG = "debug" }
+
+[targets.all-production]
+layers = [
+    "verisimdb-runtime",
+    "lithoglyph-core-runtime",
+    "lithoglyph-http-runtime",
+    "quandledb-runtime",
+    "nqc-runtime",
+    "typeql-runtime",
+]
+env = { RUST_LOG = "info", MIX_ENV = "prod", LITH_LOG = "info" }
+
+# ═══════════════════════════════════════════════════════════════
+# Service Composition (selur-compose integration)
+# ═══════════════════════════════════════════════════════════════
+# Port map:
+#   VeriSimDB API        — 8080
+#   VeriSimDB OTP        — (internal, connects to 8080)
+#   Lithoglyph Zig Core  — 8081
+#   Lithoglyph HTTP      — 4000
+#   QuandleDB            — 8082
+#   NQC REPL             — 8083
+#   TypeQL Experimental  — 8084
+#   Svalinn Gateway      — 8443 (TLS)
+
+[compose]
+services = [
+    "verisimdb-api",
+    "verisimdb-otp",
+    "lithoglyph-core",
+    "lithoglyph-http",
+    "quandledb",
+    "nqc",
+    "typeql-exp",
+    "svalinn",
+    "vordr",
+]
+
+[compose.networks]
+internal = { driver = "bridge", internal = true }
+external = { driver = "bridge" }
+
+[compose.volumes]
+verisimdb-data = { driver = "local" }
+lithoglyph-data = { driver = "local" }
+quandledb-data = { driver = "local" }
+svalinn-tls = { driver = "local" }
