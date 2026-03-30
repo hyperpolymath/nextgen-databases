@@ -142,7 +142,7 @@ defmodule VeriSim.Query.VQLExecutor do
     ~w(GRAPH VECTOR TENSOR SEMANTIC DOCUMENT TEMPORAL PROVENANCE SPATIAL)
     |> Enum.filter(&String.contains?(upper, &1))
     |> Enum.map(&String.downcase/1)
-    |> Enum.map(&String.to_atom/1)
+    |> Enum.map(&String.to_existing_atom/1)
   end
 
   # ===========================================================================
