@@ -86,7 +86,7 @@ defmodule LithHttp.TemporalIndex do
     if map_size(state.indexes) >= @max_indexes do
       {:reply, {:error, :max_indexes_reached}, state}
     else
-      # create_table_name_atom/2 is the ONLY path that calls String.to_atom/1,
+      # create_table_name_atom/2 is the ONLY path that calls String.to_existing_atom/1,
       # and it is guarded by the @max_indexes check above.
       tbl = create_table_name_atom(db_id, series_id)
 
@@ -229,9 +229,9 @@ defmodule LithHttp.TemporalIndex do
 
   # Create a new atom for an ETS table name. Only called from create_index/2
   # after verifying the index count is below @max_indexes.
-  # This is the ONLY place where String.to_atom/1 is permitted.
+  # This is the ONLY place where String.to_existing_atom/1 is permitted.
   defp create_table_name_atom(db_id, series_id) do
-    table_name_string(db_id, series_id) |> String.to_atom()
+    table_name_string(db_id, series_id) |> String.to_existing_atom()
   end
 
   # Look up an existing table name atom. Used by all operations except create_index.
