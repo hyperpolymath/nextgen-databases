@@ -32,7 +32,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use tracing::{debug, info, warn};
 
-use verisim_octad::Octad;
+use verisim_octad::{Octad, OctadStore};
 
 use crate::NormalizerError;
 
@@ -577,6 +577,22 @@ impl RegenerationEngine {
     /// Create an engine with all defaults.
     pub fn with_defaults() -> Self {
         Self::new(RegenerationConfig::default())
+    }
+
+    /// Create an engine backed by a real OctadStore.
+    ///
+    /// Uses [`StorageRegenerator`] instead of the dry-run [`SummaryRegenerator`],
+    /// so regeneration operations read and write actual modality data.
+    pub fn with_store(config: RegenerationConfig, store: Arc<dyn OctadStore>) -> Self {
+        let regenerator = Arc::new(
+            crate::storage_regenerator::StorageRegenerator::new(store),
+        );
+        Self::with_regenerator(config, regenerator)
+    }
+
+    /// Create an engine with default config, backed by a real OctadStore.
+    pub fn with_store_defaults(store: Arc<dyn OctadStore>) -> Self {
+        Self::with_store(RegenerationConfig::default(), store)
     }
 
     /// Access the underlying configuration.
