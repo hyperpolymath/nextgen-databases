@@ -411,7 +411,14 @@ let replicateHexad = async (
           Error("Source store returned " ++ Belt.Int.toString(Fetch.Response.status(response)))
         }
       } catch {
-      | exn => Error("Failed to fetch from source: " ++ Js.Exn.message(Obj.magic(exn))->Belt.Option.getWithDefault("unknown"))
+      | exn => {
+          // Type-safe exception message extraction (no Obj.magic)
+          let msg = switch Exn.asJsExn(exn) {
+          | Some(jsExn) => Js.Exn.message(jsExn)->Belt.Option.getWithDefault("unknown")
+          | None => Exn.message(exn)->Option.getOr("unknown")
+          }
+          Error("Failed to fetch from source: " ++ msg)
+        }
       }
 
       switch fetchResult {
