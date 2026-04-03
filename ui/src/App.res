@@ -2,6 +2,10 @@
 
 open Types
 
+// Type-safe DOM event listener bindings (eliminates Obj.magic)
+@val external addKeydownListener: (string, Dom.keyboardEvent => unit) => unit = "document.addEventListener"
+@val external removeKeydownListener: (string, Dom.keyboardEvent => unit) => unit = "document.removeEventListener"
+
 // Demo data for development
 let demoTable: table = {
   id: "tbl_demo",
@@ -905,15 +909,12 @@ let make = () => {
       }
     }
 
-    let handleKeyDownAny: Dom.event => unit = event => {
-      handleKeyDown(Obj.magic(event))
-    }
-
-    %raw(`document.addEventListener("keydown", handleKeyDownAny)`)
+    // Type-safe keydown listener via external binding (no Obj.magic)
+    addKeydownListener("keydown", handleKeyDown)
 
     Some(
       () => {
-        %raw(`document.removeEventListener("keydown", handleKeyDownAny)`)
+        removeKeydownListener("keydown", handleKeyDown)
       },
     )
   })

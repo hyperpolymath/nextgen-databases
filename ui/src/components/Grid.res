@@ -3,6 +3,11 @@
 
 open Types
 
+// Type-safe DOM FFI bindings (eliminates Obj.magic)
+@send external focus: Dom.element => unit = "focus"
+@send external select: Dom.element => unit = "select"
+@get external clientX: Dom.mouseEvent => int = "clientX"
+
 // Helper to convert cellValue to editable string
 let cellValueToString = (value: cellValue): string => {
   switch value {
@@ -62,9 +67,9 @@ module EditableInput = {
     React.useEffect0(() => {
       switch inputRef.current->Nullable.toOption {
       | Some(el) => {
-          let domEl = el->Obj.magic
-          domEl["focus"]()
-          domEl["select"]()
+          // Type-safe DOM calls via external bindings (no Obj.magic)
+          el->focus
+          el->select
         }
       | None => ()
       }
@@ -357,7 +362,8 @@ module HeaderCell = {
     React.useEffect1(() => {
       if isResizing {
         let handleMouseMove = (e: Dom.mouseEvent) => {
-          let clientX = e->Obj.magic->Dict.get("clientX")->Option.getOr(0.0)->Float.toInt
+          // Type-safe clientX via external binding (no Obj.magic)
+          let clientX = e->clientX
           let delta = clientX - startXRef.current
           let calculatedWidth = startWidthRef.current + delta
           let newWidth = if calculatedWidth < 50 {
