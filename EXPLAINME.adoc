@@ -1,24 +1,238 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = Next-Gen Databases — Show Me The Receipts
 :toc:
+:toclevels: 3
 :icons: font
+:author: Jonathan D.A. Jewell
 
-The README makes claims. This file backs them up.
+The README makes claims. This file backs them up with architectural context,
+code paths for the primary database, and honest priority rankings so an
+external reviewer can distinguish active engineering from research exploration.
+
+IMPORTANT: This is a *parent tracking repository* — no implementation code
+lives here. All databases are in subdirectories (`verisimdb/`, `quandledb/`,
+`lithoglyph/`) which are also mirrored as standalone canonical repos.
+
+== Claim 1: "Coordinated effort to build specialised databases, each with its own query language, storage engine, and web interface"
 
 [quote, README]
 ____
-This repository serves as the central tracking hub for the Next-Gen Databases initiative — a coordinated effort to build specialised database applications across different domains, each with its own query language, storage engine, and web interface.
+This repository serves as the central tracking hub for the Next-Gen Databases
+initiative — a coordinated effort to build specialised database applications
+across different domains, each with its own query language, storage engine,
+and web interface.
 ____
+
+=== How it works
+
+The architecture shared across all three databases follows a layered stack:
+
+[source]
+----
+  Query Language (DSL)
+       ↓
+  Database Engine (storage, indexing, computation)
+       ↓
+  HTTP API Server (JSON endpoints)
+       ↓
+  Web Frontend (ReScript SPA)
+----
+
+Each layer is domain-specific. VeriSimDB uses VQL over a Rust/Elixir engine.
+QuandleDB uses KQL over a Julia (Skein.jl) engine. LithoGlyph uses GQL over
+a Forth/Factor/Zig engine with Idris2 proofs.
+
+=== The primary path: VeriSimDB drift detection
+
+VeriSimDB is the primary engineering focus. Each entity exists across up to
+8 simultaneous representations (the *octad*): Graph, Vector, Tensor, Semantic,
+Document, Temporal, Provenance, Spatial.
+
+The drift detection demo entry point is:
+
+[source,bash]
+----
+cd verisimdb/elixir-orchestration && mix run ../demos/drift-detection/run_demo.exs
+----
+
+This demo creates 1000 entities, corrupts 50, and verifies that the drift
+detector identifies all 50 with zero false positives (in the sample output).
+The Elixir orchestration layer (`verisimdb/elixir-orchestration/`) coordinates
+the Rust core (`verisimdb/src/`) and the VQL parser (`verisimdb/src/vql/`).
+
+The ABI layer at `verisimdb/src/abi/` (Idris2: `Types.idr`, `Layout.idr`,
+`Foreign.idr`) provides machine-checked memory layout proofs for the C-ABI
+bridge between Rust and Elixir. The capability registry at
+`verisimdb/src/registry/` tracks which modalities are active per entity.
+
+=== Honest caveat
+
+VeriSimDB is at beta. The drift detection loop works (demo is live). The VQL
+query language is approximately 40% complete — basic entity CRUD and
+cross-modal consistency queries work; advanced dependent-type queries (VQL-DT)
+are planned. The "formally verified queries" claim in the README refers to
+the Idris2 ABI proofs, not end-to-end query verification (which is roadmap).
+
+== Claim 2: "VeriSimDB detects drift before it causes damage; QuandleDB and LithoGlyph cover specialist domains"
+
+[quote, README]
+____
+Project priorities: VeriSimDB is the primary database engineering project.
+LithoGlyph is working towards production for specialist use in journalism and
+narrative arts. QuandleDB is a research exploration — a thought experiment made
+concrete.
+____
+
+=== Priority breakdown
+
+[cols="1,1,3"]
+|===
+| Database | Priority | Honest Status
+
+| *VeriSimDB*
+| PRIMARY — active development
+| Beta. Drift detection, octad entity model, Elixir orchestration, VQL parser
+(~40% complete), Idris2 ABI proofs. Deployed with per-project instances
+(per VeriSimDB policy: one instance per consumer repo, never shared).
+
+| *LithoGlyph*
+| Secondary — on backburner
+| Active development paused while VeriSimDB matures. Architecture is defined:
+Forth storage engine, Zig bridge, Factor for GQL, Idris2 proofs, Lean 4
+normaliser. The reversibility design (GQL operations have machine-checked
+inverses) will benefit from MAA Framework lessons.
+
+| *QuandleDB*
+| Exploratory — research only
+| Not intended as a production tool. Wraps Skein.jl (Julia knot database)
+as a web app. 36 knots from the Rolfsen table, Jones polynomial display.
+Thought experiment in applying knot theory to database design.
+|===
+
+=== How VeriSimDB's cross-modal consistency actually works
+
+When an entity's vector embedding is stored, VeriSimDB also records a
+content hash of the source document used to generate it. On each read
+(configurable: also on write), the engine recomputes the content hash,
+compares it to the stored hash, and flags divergence as `VectorDocumentDrift`.
+If the spatial coordinates stored for an entity no longer appear in its text
+representation, that is `SpatialSemanticDrift`. The drift type taxonomy in
+`verisimdb/src/` determines the repair strategy: re-embed, re-index, or
+escalate to human review.
+
+=== Honest caveat on QuandleDB
+
+The README is explicit: QuandleDB is not production-ready. An external
+reviewer should not treat it as evidence of a production knot-theory database.
+It is a proof-of-concept that knot-theoretic invariants can be stored and
+queried as first-class database attributes. If you need a production database,
+use VeriSimDB.
+
+== Dogfooded Across The Account
+
+[cols="1,2,2"]
+|===
+| Technology | Role in Next-Gen Databases | Also Used In
+
+| *Rust* (VeriSimDB core)
+| Storage engine, VQL parser, drift detection algorithms
+| ephapax, gitbot-fleet, protocol-squisher
+
+| *Elixir* (VeriSimDB orchestration)
+| Distributed coordination, Phoenix API, BEAM fault tolerance
+| burble (voice platform), gossamer (service discovery target)
+
+| *ReScript* (all frontends)
+| VQL query UI, QuandleDB frontend, planned LithoGlyph frontend
+| idaptik, panll, gossamer-powered SPAs
+
+| *Idris2 ABI* (VeriSimDB + planned LithoGlyph)
+| Machine-checked memory layout proofs for cross-language FFI
+| Gossamer, Groove, Stapeln — every repo with Idris2 ABI layer
+
+| *Zig FFI* (LithoGlyph bridge, VeriSimDB FFI)
+| C-compatible bridge between storage engine and query layer
+| game-server-admin, Stapeln, Gossamer
+
+| *Julia* (Skein.jl, QuandleDB engine)
+| Knot invariant computation; Julia batch scripting convention
+| developer-ecosystem, data processing scripts
+
+| *VeriSimDB itself*
+| Per-project instances deployed across every significant hyperpolymath
+repo for cross-modal entity consistency
+| Mandatory everywhere per VeriSimDB policy
+
+| *Stapeln containers*
+| `stapeln.toml` for all three databases
+| All containerised services in the account
+
+| *Hypatia scanning*
+| `.hypatia/` CI workflows
+| Every RSR repo in the account
+|===
 
 == File Map
 
-[cols="1,2"]
+[cols="1,3"]
 |===
-| Path | What's There
+| Path | What It Proves
 
-| `test(s)/` | Test suite
+| `verisimdb/`
+| Primary database. `src/` — Rust core (storage, drift detection, VQL parser).
+`src/abi/` — Idris2 ABI proofs (Types.idr, Layout.idr, Foreign.idr).
+`src/registry/` — modality capability registry.
+`src/vql/` — VQL query language parser and evaluator.
+`elixir-orchestration/` — Elixir/Phoenix distributed coordinator.
+`api/` — JSON HTTP API surface.
+`demos/` — drift-detection demo (the live proof that octad consistency works).
+`connectors/` — adapters for PostgreSQL, ArangoDB, Elasticsearch federation.
+`debugger/` — query debugger and drift inspector.
+`admin/` — admin tooling.
+
+| `verisimdb/src/abi/`
+| Machine-checked proofs of memory layout correctness for the Rust/Elixir
+ABI boundary. Types.idr, Layout.idr, Foreign.idr.
+
+| `quandledb/`
+| Knot-theory database (exploratory). `frontend/` — ReScript web app.
+`public/` — static assets. `docs/` — design documents. Wraps the external
+Skein.jl library rather than implementing knot algorithms directly.
+
+| `lithoglyph/`
+| Narrative-first reversible database (backburner). Architecture defined:
+Forth storage, Zig bridge, Factor GQL, Idris2 proofs, Lean 4 normaliser.
+Current state: skeleton structure and architectural documentation.
+
+| `nqc/`
+| NQC — experimental TypeQL-adjacent query language research, tracked here
+as part of the database query language ecosystem.
+
+| `typeql-experimental/`
+| Experimental TypeQL integration work.
+
+| `tests/`
+| Cross-database integration tests.
+
+| `.machine_readable/`
+| A2ML checkpoint files. Canonical AI session state.
+
+| `TOPOLOGY.md`
+| Visual architecture map and completion dashboard for all three databases.
+
+| `TOOLING-STATUS.adoc`
+| Current tooling readiness — which query languages have parsers, which have
+evaluators, which are stub-only.
+
+| `stapeln.toml`
+| Stapeln container configuration (notably large: 19K — covers multi-database
+deployment configurations).
 |===
 
 == Questions?
 
-Open an issue or reach out directly — happy to explain anything in more detail.
+For the primary project, start with `verisimdb/README.adoc` and run the drift
+detection demo. For the full ecosystem picture, see `TOPOLOGY.md`. For
+LithoGlyph architecture intent (even though implementation is on backburner),
+see `lithoglyph/ARCHITECTURE.adoc`.
