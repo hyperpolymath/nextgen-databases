@@ -1,0 +1,41 @@
+{
+  "groove_version": "1",
+  "service_id": "lithoglyph",
+  "service_version": "0.1.0",
+  "mode": "active",
+  "capabilities": {
+    "narrative-storage": {
+      "type": "data-storage",
+      "description": "Narrative-first, reversible, audit-grade database core for journalism, storytelling, and media workflows — schemas and migrations as permanent narrative artefacts carved in Forth",
+      "protocol": "http",
+      "endpoint": "/api",
+      "requires_auth": false,
+      "panel_compatible": true
+    },
+    "graphql-query": {
+      "type": "data-storage",
+      "description": "GraphQL interface for Lith queries, mutations, and subscriptions (SDL-based)",
+      "protocol": "http",
+      "endpoint": "/graphql",
+      "requires_auth": false,
+      "panel_compatible": true
+    },
+    "grpc-interface": {
+      "type": "data-storage",
+      "description": "gRPC interface for Lith operations over HTTP/2 using Protocol Buffers",
+      "protocol": "http",
+      "endpoint": "/grpc",
+      "requires_auth": false,
+      "panel_compatible": false
+    }
+  },
+  "consumes": [],
+  "endpoints": {
+    "health": "/health"
+  },
+  "health": "/health",
+  "ports": {
+    "http": 8080
+  },
+  "applicability": ["individual", "team"]
+}
