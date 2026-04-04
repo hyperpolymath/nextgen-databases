@@ -3,11 +3,11 @@
 import * as Api from "./Api.res.mjs";
 import * as Msg from "./Msg.res.mjs";
 import * as Route from "./Route.res.mjs";
-import * as Tea_Cmd from "rescript-tea/src/Tea_Cmd.res.mjs";
-import * as Tea_Url from "@anthropics/cadre-router/src/tea/Tea_Url.res.mjs";
+import * as Tea_Cmd from "/node_modules/rescript-tea/src/Tea_Cmd.res.mjs";
+import * as Tea_Url from "/node_modules/@anthropics/cadre-router/src/tea/Tea_Url.res.mjs";
 import * as Database from "./Database.res.mjs";
-import * as Tea_Http from "rescript-tea/src/Tea_Http.res.mjs";
-import * as Tea_Navigation from "@anthropics/cadre-router/src/tea/Tea_Navigation.res.mjs";
+import * as Tea_Http from "/node_modules/rescript-tea/src/Tea_Http.res.mjs";
+import * as Tea_Navigation from "/node_modules/@anthropics/cadre-router/src/tea/Tea_Navigation.res.mjs";
 
 function navigateTo(model, path) {
   let url = Tea_Url.parse(path);

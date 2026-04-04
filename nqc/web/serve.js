@@ -15,6 +15,10 @@
  */
 
 const DEV_PORT = 8000;
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, max-age=0",
+  "Pragma": "no-cache",
+};
 
 // MIME types for common web assets
 const MIME_TYPES = {
@@ -68,7 +72,10 @@ async function handler(request) {
     const data = await tryReadFile(filePath);
     if (data) {
       return new Response(data, {
-        headers: { "Content-Type": getMimeType(pathname) },
+        headers: {
+          "Content-Type": getMimeType(pathname),
+          ...NO_CACHE_HEADERS,
+        },
       });
     }
   }
@@ -80,7 +87,10 @@ async function handler(request) {
   const indexData = await tryReadFile(indexPath);
   if (indexData) {
     return new Response(indexData, {
-      headers: { "Content-Type": "text/html; charset=utf-8" },
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        ...NO_CACHE_HEADERS,
+      },
     });
   }
 

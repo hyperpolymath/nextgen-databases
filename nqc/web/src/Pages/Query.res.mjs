@@ -2,7 +2,7 @@
 
 import * as Editor from "../Components/Editor.res.mjs";
 import * as Results from "../Components/Results.res.mjs";
-import * as JsxRuntime from "react/jsx-runtime";
+import * as JsxRuntime from "/vendor/esm/react-jsx-runtime.mjs";
 
 function make(model, dispatch) {
   let db = model.activeDb;

@@ -6,9 +6,9 @@ import * as View from "./View.res.mjs";
 import * as Model from "./Model.res.mjs";
 import * as Route from "./Route.res.mjs";
 import * as Update from "./Update.res.mjs";
-import * as Tea_App from "rescript-tea/src/Tea_App.res.mjs";
-import * as Tea_Cmd from "rescript-tea/src/Tea_Cmd.res.mjs";
-import * as Tea_Url from "@anthropics/cadre-router/src/tea/Tea_Url.res.mjs";
+import * as Tea_App from "/node_modules/rescript-tea/src/Tea_App.res.mjs";
+import * as Tea_Cmd from "/node_modules/rescript-tea/src/Tea_Cmd.res.mjs";
+import * as Tea_Url from "/node_modules/@anthropics/cadre-router/src/tea/Tea_Url.res.mjs";
 import * as Database from "./Database.res.mjs";
 
 let BrowserLocation = {};

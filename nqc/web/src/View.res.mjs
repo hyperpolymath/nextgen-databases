@@ -3,7 +3,7 @@
 import * as Query from "./Pages/Query.res.mjs";
 import * as Header from "./Components/Header.res.mjs";
 import * as Picker from "./Pages/Picker.res.mjs";
-import * as JsxRuntime from "react/jsx-runtime";
+import * as JsxRuntime from "/vendor/esm/react-jsx-runtime.mjs";
 
 function make(model, dispatch) {
   let match = model.route;

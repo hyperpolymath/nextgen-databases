@@ -14,12 +14,12 @@ deno install
 echo "==> Linking local ReScript packages into node_modules..."
 
 # rescript-tea (TEA framework)
-TEA_PKG="../../developer-ecosystem/rescript-ecosystem/packages/web/tea"
+TEA_PKG="../../../developer-ecosystem/rescript-ecosystem/packages/web/tea"
 mkdir -p node_modules
 ln -sfn "$(realpath "$TEA_PKG")" node_modules/rescript-tea
 
 # cadre-router (URL routing)
-ROUTER_PKG="../../developer-ecosystem/rescript-ecosystem/cadre-router"
+ROUTER_PKG="../../../developer-ecosystem/rescript-ecosystem/cadre-router"
 mkdir -p node_modules/@anthropics
 ln -sfn "$(realpath "$ROUTER_PKG")" node_modules/@anthropics/cadre-router
 

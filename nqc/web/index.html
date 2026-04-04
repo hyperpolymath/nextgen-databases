@@ -473,10 +473,75 @@
       color: var(--accent-purple);
       border: 1px solid var(--accent-purple);
     }
+
+    /* Boot fallback (shown only if app JS fails before mount) */
+    .nqc-boot {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+    }
+    .nqc-boot__panel {
+      width: min(900px, 95vw);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      padding: 20px;
+    }
+    .nqc-boot__title {
+      color: var(--accent-blue);
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+    .nqc-boot__msg {
+      color: var(--text-secondary);
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="module" src="./src/Index.res.mjs"></script>
+  <div id="root">
+    <div class="nqc-boot">
+      <div class="nqc-boot__panel">
+        <div class="nqc-boot__title">NQC is starting...</div>
+        <div id="nqc-boot-msg" class="nqc-boot__msg">Loading frontend modules.</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const msgEl = document.getElementById("nqc-boot-msg");
+      if (!msgEl) return;
+      const setMsg = (text) => { msgEl.textContent = text; };
+      window.addEventListener("error", (event) => {
+        setMsg("Frontend load error:\\n" + (event && event.message ? event.message : "Unknown error"));
+      });
+      window.addEventListener("unhandledrejection", (event) => {
+        const reason = event && event.reason ? (event.reason.message || String(event.reason)) : "Unknown rejection";
+        setMsg("Frontend promise rejection:\\n" + reason);
+      });
+    })();
+  </script>
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "/vendor/esm/react.mjs",
+        "react/jsx-runtime": "/vendor/esm/react-jsx-runtime.mjs",
+        "react-dom/client": "/vendor/esm/react-dom-client.mjs",
+        "@rescript/core/": "/node_modules/@rescript/core/",
+        "@rescript/runtime/": "/node_modules/@rescript/runtime/",
+        "rescript/": "/node_modules/rescript/",
+        "rescript-tea/": "/node_modules/rescript-tea/",
+        "@anthropics/cadre-router/": "/node_modules/@anthropics/cadre-router/"
+      }
+    }
+  </script>
+  <script type="module" src="./src/Index.res.mjs?v=20260403"></script>
 </body>
 </html>
