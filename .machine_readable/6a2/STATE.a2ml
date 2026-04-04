@@ -1,14 +1,56 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # STATE.a2ml — Project state checkpoint
 # Converted from STATE.scm on 2026-03-15
+# Updated: 2026-04-04 — CRG C blitz
 
 [metadata]
 project = "nextgen-databases"
 version = "0.1.0"
-last-updated = "2026-03-15"
+last-updated = "2026-04-04"
 status = "active"
 
 [project-context]
 name = "nextgen-databases"
-completion-percentage = 0
-phase = "In development"
+completion-percentage = 35
+phase = "CRG C — Testing & Benchmarking blitz"
+
+[current-position]
+milestone = "CRG C test coverage"
+last-session = "2026-04-04"
+last-action = "Added E2E, P2P property, security, concurrency tests and throughput benchmarks"
+
+[test-coverage]
+unit-tests = "~40 (Elixir consensus + federation adapters)"
+integration-tests = "~12 (federation adapter integration)"
+e2e-tests = "18 (e2e_verisimdb_test.exs — lifecycle, VQL, schema, error handling)"
+p2p-property-tests = "5 properties + 1 unit (kraft_property_test.exs)"
+aspect-security = "10 tests (aspect/security_test.exs)"
+aspect-concurrency = "14 tests (aspect/concurrency_test.exs)"
+smoke-tests = "Gleam smoke test for lithoglyph BEAM (lith_beam_smoke_test.gleam)"
+benchmarks = "2 Rust files (modality_benchmarks.rs + throughput_benchmarks.rs)"
+total-new-tests = "43 new tests + 5 properties (2026-04-04)"
+
+[test-status]
+mix-test-failures = "6 pre-existing (VQLTypeChecker binary_to_existing_atom crash, KRaft remove_server timeout)"
+new-test-failures = "0"
+cargo-bench-compile = "PASS (throughput_benchmarks.rs — no errors, no warnings in bench file)"
+gleam-smoke = "Written; requires compiled lith_nif.so to run connection/lifecycle tests"
+
+[blockers]
+- "VQLTypeChecker calls :erlang.binary_to_existing_atom for unknown proof types → ArgumentError (P1 hardening gap)"
+- "VQL parser does not strip null bytes from entity IDs (C-string truncation risk at FFI, P1)"
+- "Integration test (tests/integration_test.rs) uses old API — does not compile (pre-existing)"
+- "modality_benchmarks.rs uses old API — does not compile (pre-existing)"
+
+[route-to-mvp]
+next = "Fix VQLTypeChecker binary_to_existing_atom crash (P1 hardening)"
+then = "Fix null-byte entity ID sanitisation in VQL parser"
+then = "Update integration_test.rs to current API"
+then = "Add real fuzz harness (replace placeholder.txt)"
+then = "Complete remaining E2E scenarios (federation, node failure/recovery)"
+
+[critical-next-actions]
+1 = "Run full mix test suite to confirm 6-failure baseline is stable"
+2 = "Fix VQLTypeChecker to use String.to_existing_atom with rescue guard (P1)"
+3 = "Add null-byte sanitisation in VQLBridge built-in parser (P1)"
+4 = "Update integration_test.rs to use ConcreteOctadStore from verisim-api"
