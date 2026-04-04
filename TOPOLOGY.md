@@ -1,6 +1,6 @@
 <!-- SPDX-License-Identifier: PMPL-1.0-or-later -->
 <!-- TOPOLOGY.md — Project architecture map and completion dashboard -->
-<!-- Last updated: 2026-02-19 -->
+<!-- Last updated: 2026-04-04 -->
 
 # Next-Gen Databases — Project Topology
 
@@ -50,6 +50,7 @@
                         │          REPO INFRASTRUCTURE            │
                         │  Parent Tracking Only .machine_readable/│
                         │  No Local Code        0-AI-MANIFEST.a2ml│
+                        │  Groove Discovery     nqc/.well-known/  │
                         └─────────────────────────────────────────┘
 ```
 
