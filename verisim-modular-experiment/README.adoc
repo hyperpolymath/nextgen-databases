@@ -1,0 +1,66 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= verisim-modular-experiment
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc:
+:sectnums:
+
+*Status:* experimental — research repo, NOT a replacement for VeriSimDB.
+
+== The question
+
+VeriSimDB's value is _consonance_: VCL (formerly VQL) states and verifies
+constraints across the octad as an integrated substrate. The octad works well
+as a monolith for hyperpolymath's own use, but may be too heavy for external
+adopters who already have existing databases and only need some of what
+VeriSim provides.
+
+This experiment asks:
+
+[quote]
+What is the minimum set of shapes and invariants such that VCL can still
+state and verify consonance claims about a federation that swaps out
+non-core shapes for external databases?
+
+== Hypothesis
+
+A slim *VerisimCore* (identity + provenance + VCL runtime + consonance
+prover) can be extracted from the octad, with the remaining shapes exposed
+via a *federation contract protocol* that preserves VCL's type/constraint
+guarantees across typed boundaries.
+
+== Non-goals
+
+* *Not* a replacement for VeriSimDB. Canonical octad stays the paved road.
+* *Not* a "verisim-lite" audit wrapper. If the experiment collapses to that,
+  we learn the octad is indivisible (a valuable negative result).
+* *Not* shipping to production — this is a research artefact.
+
+== Research questions
+
+. Which of the octad's eight shapes are load-bearing for consonance, and
+  which are storage-flavoured concerns that could be federated out?
+. What contracts must a federated shape honour for VCL to type-check across
+  the boundary?
+. Can VCL's constraint composition be stated over a federation without
+  weakening the consonance guarantees of the core?
+. What is the reduced-guarantee story for federations that omit shapes the
+  core would normally require?
+
+== First client (dogfood)
+
+`KRLAdapter.jl` — per existing memory, already earmarked as a slim-core
+candidate. Needs identity + provenance, does not need the full octad. Good
+fit for exercising the minimal core and the federation contract.
+
+== Relationship to main VeriSimDB
+
+* Main `verisimdb/` remains canonical, maximal, octad-as-unit. No
+  fragmentation of the existing code.
+* This experiment is read-only with respect to main verisimdb's sources.
+* Findings that strengthen the monolith (e.g. clearer articulation of why
+  each shape is load-bearing) should be folded back into main verisimdb's
+  documentation regardless of whether the modular version ships.
+
+== License
+
+PMPL-1.0-or-later.

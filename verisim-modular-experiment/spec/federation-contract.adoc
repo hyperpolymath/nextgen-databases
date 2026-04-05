@@ -1,0 +1,156 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Federation Contract Specification
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc: left
+:sectnums:
+
+*Phase 2 artefact.* Prose companion to `src/abi/FederationContract.idr`.
+States the contract a Federable shape must honour for VerisimCore to
+compose VCL consonance claims over a federation.
+
+== VerisimCore: the identity core
+
+Per Phase 1 (`docs/CORE-CANDIDATES.adoc`), **VerisimCore** implements
+exactly three store-level-required modalities:
+
+* **Semantic** (φ(S)) — VCL's proof substrate. CBOR-encoded type URIs
+  and proof blobs. PROOF INTEGRITY and PROOF CONSISTENCY bind to it.
+* **Temporal** (φ(P)) — Merkle-tree version history. Required for
+  Identity Persistence (inv:persist), the enrichment primitive
+  (def:enrichment), attestation freshness (thm:attestation), and
+  last-writer-wins total order over federation writes.
+* **Provenance** (φ(R)) — SHA-256 hash chain of signed events. Required
+  for the enrichment primitive and as the federation-trust substrate.
+
+Per-entity `⊥` in Core modalities is permitted (def:octad). Store-level
+omission is not.
+
+== Federable shapes
+
+**Federable** = `{Vector, Tensor, Document, Spatial}`.
+**Conditional** = `{Graph}` (Federable iff cross-entity consonance
+claims are absent from the federation's intended workload).
+
+Core shapes (Semantic, Temporal, Provenance) **cannot** be federated.
+The `IsFederable` type-level predicate in `FederationContract.idr`
+has no constructors for Core shapes, so the Idris2 type system refuses
+to compile a federation that attempts to place a Core shape in the
+Federable slot.
+
+== The five contract clauses
+
+=== Clause 1 — Aggregate-drift weight renormalisation
+
+*Formal basis:* def:agg-drift requires `Σ w_{m1,m2} = 1` over all 28
+modality pairs.
+
+*Obligation:* when a Federable shape is absent from the federation, the
+pair-weights over *remaining* present pairs must renormalise to 1 before
+aggregate-drift is computed. If renormalisation is omitted, the claim
+"aggregate drift < θ" silently has different semantics between a full
+octad and a reduced store.
+
+*Ownership:* Core's federation manager renormalises using the
+`renormalise` function in `FederationContract.idr`. Federable peers do
+not renormalise; they only expose per-pair drift contributions.
+
+=== Clause 2 — Drift-signal projection surface
+
+*Formal basis:* def:pairwise-drift, §4.3 (Modality-Pair Distance Functions).
+
+*Obligation:* a Federable peer must expose drift-signal *projections*,
+not just query results. For each pair `(sh, other)` where `sh` is the
+peer's shape and `other` is any shape (Core or Federable), the peer
+provides a scalar drift contribution.
+
+*Interface:* `DriftProjector m sh` with `driftAgainst : OctadId -> Shape
+-> m (Either String Double)`.
+
+*Rationale:* this is how Core computes aggregate drift without
+transferring entire Federable values. A Vector peer exposes cosine drift
+against Core's Document (or its hash) without shipping raw embeddings.
+
+=== Clause 3 — Attestation-signature surface
+
+*Formal basis:* thm:attestation.
+
+*Obligation:* every Federable peer signs responses with an Ed25519
+signature over the response payload + a current Temporal timestamp.
+The peer declares a freshness window; attestations older than the
+window are rejected by Core.
+
+*Interface:* `PeerAttestation` record + `isFresh` predicate in
+`FederationContract.idr`.
+
+*Rationale:* without signed attestations, peer data is unverifiable and
+federation degrades to trust-me-bro. The freshness window prevents
+replay of stale attestations.
+
+=== Clause 4 — Coherence-constraint surface
+
+*Formal basis:* def:coherence.
+
+*Obligation:* if a coherence constraint `c : Σ_m1 × Σ_m2 -> {0, 1}` is
+declared between Core shape `m1` and Federable shape `m2`, the peer
+owning `m2` must expose enough of its data for Core to evaluate `c`.
+
+*Interface:* `CoherenceProjector m sh` with `coherenceProj : OctadId ->
+(coreShape : Shape) -> m (Either String (List Bits8))`.
+
+*Example:* the G↔S coherence constraint ("Graph edges match Semantic
+type assertions") requires a Graph peer to expose its typed edge set so
+Core's Semantic side can compute Jaccard distance (def:drift-metrics,
+Graph-Semantic drift).
+
+=== Clause 5 — Conflict-resolution contract (Temporal LWW)
+
+*Formal basis:* §7, Conflict Resolution in Federation.
+
+*Obligation:* Federable peers accept Core's Temporal ordering as
+authoritative for LWW conflict resolution on their shape's data. When
+Core issues a write with Temporal timestamp `t`, the peer compares `t`
+against its local last-write timestamp for the octad and accepts iff
+`t` is strictly greater.
+
+*Interface:* `LWWAcceptor m sh` with `applyLWW : OctadId -> Timestamp
+-> List Bits8 -> m (Either String ())`.
+
+*Rationale:* LWW requires a total order on writes. Temporal is
+Core-provided; Federable peers must not maintain their own conflicting
+total order.
+
+== Non-interference theorem (to be proved in Phase 3)
+
+*Statement:* federating shape E1 does not silently weaken VCL claims
+about any other shape E2 or about Core, provided E1 honours clauses 1–5.
+
+*Informal argument sketch:*
+
+. Clause 1 ensures aggregate-drift semantics are preserved across
+  arbitrary present/absent shape configurations.
+. Clause 3 ensures E1's data is attestable — Core can distinguish
+  forged from authentic data.
+. Clause 5 ensures E1's writes do not conflict with E2's writes in
+  ways that violate Identity Persistence.
+. Clauses 2 and 4 ensure Core can evaluate any drift or coherence
+  claim crossing E1's boundary without weakening.
+
+A machine-checkable non-interference proof is Phase 3 work.
+
+== Open obligations (Phase 3+)
+
+. **Total order check in `isFresh`.** Current implementation uses
+  integer subtraction on `epochNanos`; needs formal lemma that
+  `epochNanos` values form a well-order.
+. **Renormalisation preserves threshold semantics.** Prove that if
+  aggregate drift with full weights is below θ, aggregate drift with
+  renormalised weights is also below θ (or formalise the drift-threshold
+  adjustment).
+. **Coherence-projector byte payload decoding.** The
+  `CoherenceProjector` interface returns opaque `List Bits8`. Core must
+  have a matching decoder keyed on `(peerShape, coreShape)`. This is
+  a coupling point between peer and Core implementations.
+. **Byzantine peer handling.** `LWWAcceptor` assumes a cooperative peer.
+  A Byzantine peer could accept Core's LWW ordering for its own records
+  but serve stale/forged reads elsewhere. Clause 3 (attestation)
+  partially mitigates but does not eliminate this.

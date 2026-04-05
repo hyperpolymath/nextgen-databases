@@ -1,0 +1,230 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Plan — verisim-modular-experiment
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc:
+:sectnums:
+
+*Type:* research plan (not feature plan). Phases have decision gates that
+can terminate the experiment with a positive or negative result. A
+negative result (octad-is-indivisible) is an acceptable outcome and
+strengthens the main verisimdb documentation.
+
+*Cadence:* light. User has many other active projects. Run in background
+between higher-priority work. No ship deadline.
+
+== Scope boundaries
+
+[cols="1,3",options="header"]
+|===
+|In scope |Out of scope
+
+|Articulating the identity core vs. federable shapes |Refactoring main `verisimdb/`
+|Federation contract Idris2 ABI design |Production implementation
+|One reference federated shape + one dogfood client |Full parity with octad
+|Honest degradation documentation |Maintaining both monolith + modular long-term
+|VCL consonance-preservation proofs |New VCL features
+|===
+
+== Phases and decision gates
+
+=== Phase 0 — Octad archaeology
+
+*Goal:* inventory the octad's shapes and their current VCL-visible contracts.
+No code written.
+
+*Activities:*
+
+* Read main `verisimdb/` sources to enumerate the eight shapes
+* For each shape, document:
+  - What invariants does VeriSim *enforce* about it?
+  - What does VeriSim merely *expose* about it to VCL?
+  - Which VCL constraints cross this shape's boundary?
+
+*Artifact:* `docs/OCTAD-SHAPES.adoc` — inventory with per-shape contract surface.
+
+*Decision gate:* none. This phase is descriptive.
+
+*Dependency:* needs read access to main verisimdb sources (already have).
+
+---
+
+=== Phase 1 — Core identification
+
+*Goal:* produce a candidate `Core ⊆ Octad` split with justifications.
+
+*Activities:*
+
+* Apply the _closure test_ per shape: is this invariant VeriSim-enforced
+  (core candidate) or can it be externally honoured + checked (federable
+  candidate)?
+* For each federable candidate, sketch the degradation story (what
+  VCL claims weaken if this shape is omitted from a federation?)
+* Stress-test with adversarial cases: can VCL compose claims across the
+  proposed `Core/Federable` boundary?
+
+*Artifact:* `docs/CORE-CANDIDATES.adoc` — split with justification per
+shape + degradation table.
+
+*Decision gates:*
+
+* **Trivial core (|Core| ≤ 1)** → experiment collapses to "VeriSim is an
+  audit wrapper". *Negative result, stop.*
+* **Full octad (|Core| = 8)** → octad is indivisible. *Negative result,
+  stop and write up.*
+* **Non-trivial split (2 ≤ |Core| ≤ 6)** → proceed to Phase 2.
+
+---
+
+=== Phase 2 — Federation contract design
+
+*Goal:* state the typed contract a federable shape must honour, in Idris2,
+such that VCL's consonance claims over a federation are sound.
+
+*Activities:*
+
+* Draft `src/abi/FederationContract.idr` — the ABI honoured by any
+  federated shape
+* Prove contract composability: federating shape A + shape B under the
+  contract does not weaken claims about A or B or Core (non-interference)
+* Document the reduced-guarantee story formally
+
+*Artifacts:*
+
+* `src/abi/FederationContract.idr`
+* `spec/federation-contract.adoc` — prose + type-level statement
+* `PROOF-NEEDS.md` updated with discharged obligations
+
+*Decision gate:*
+
+* **Contract unstateable in Idris2 without losing guarantees** →
+  indivisibility confirmed by a different route. *Negative result, stop.*
+* **Contract states cleanly + non-interference proved** → proceed to
+  Phase 3.
+
+---
+
+=== Phase 3 — Reference core + one federated shape
+
+*Goal:* working reference implementation of VerisimCore with exactly one
+shape federated through the contract.
+
+*Choice of federated shape:* probably *temporal* — well-understood ordering
+semantics, easy to expose invariants externally, common in real systems.
+
+*Activities:*
+
+* Implement minimal VerisimCore (identity + provenance + VCL runtime +
+  consonance prover)
+* Implement federation adapter for temporal shape via Zig FFI
+* Write VCL test cases that exercise claims crossing Core/temporal boundary
+* Verify consonance is preserved vs. equivalent full-octad run
+
+*Artifacts:*
+
+* Reference implementation (language TBD — Julia for Core? Zig for FFI?
+  Decide in Phase 2 as contract crystallises)
+* Integration tests
+* Benchmark comparison vs. full octad for shared claims
+
+*Decision gate:*
+
+* **VCL composes correctly across boundary, tests pass** → proceed to
+  Phase 4.
+* **VCL claims fail to compose, or require weakening** → revisit Phase 1/2
+  split or declare indivisibility.
+
+---
+
+=== Phase 4 — Dogfood on KRLAdapter.jl
+
+*Goal:* validate that a real client can be satisfied by VerisimCore +
+federation, not by the full octad.
+
+*Activities:*
+
+* Wire `KRLAdapter.jl` against VerisimCore (already earmarked for this per
+  `vcl-rename.md` memory)
+* Verify it can do what it needs with only identity + provenance (+
+  temporal via federation?)
+* Document what it *cannot* do that the full octad would enable
+* Decide: is the reduced capability acceptable for this client?
+
+*Artifacts:*
+
+* Working `KRLAdapter.jl` ↔ VerisimCore integration
+* Degradation report for this client
+
+*Decision gate:*
+
+* **KRLAdapter.jl satisfied** → positive result, proceed to Phase 5.
+* **KRLAdapter.jl needs more than Core provides** → either revisit the
+  Core split (maybe too slim) or declare "this client needs the octad"
+  (useful finding either way).
+
+---
+
+=== Phase 5 — Write-up
+
+*Goal:* capture findings so the work isn't lost.
+
+*If positive result:*
+
+* Publish federation contract spec
+* Write adoption guide: "when to use VerisimCore vs. full octad"
+* Propose whether modular VerisimCore ships as a real product, stays
+  experimental, or informs a refactor of main verisimdb
+
+*If negative result:*
+
+* Formal indivisibility argument → fold into main `verisimdb/` docs as
+  justification for the octad
+* Document which shapes are most "federation-resistant" and why
+
+*Artifact:* `docs/FINDINGS.adoc` with conclusions + recommendations.
+
+== Risks and off-ramps
+
+[cols="2,3",options="header"]
+|===
+|Risk |Mitigation
+
+|Scope creep into reimplementing VeriSim
+|Phase gates. Minimum viable Core only. Zero production concerns.
+
+|VCL's internal structure makes the split impossible to state
+|That *is* the result. Negative results are acceptable outcomes.
+
+|Federation contract requires bidirectional trust we can't provide
+|Document as a constraint on which external DBs can federate.
+
+|Competes for attention with higher-priority work
+|Light cadence. No deadline. Park between phases if needed.
+
+|Findings don't translate back to main verisimdb
+|Phase 5 has explicit fold-back artifact for negative case.
+|===
+
+== Dependencies
+
+* *Main `verisimdb/`* — read-only reference for Phase 0–1. No modifications.
+* *VCL spec* — need current spec for Phase 1 (check `verisimdb/` + memory files).
+* *KRLAdapter.jl* — Phase 4 client. Kept at Verisim-interface-slot per memory.
+* *Idris2 toolchain* — Phase 2 onward.
+* *Zig toolchain* — Phase 3 onward.
+* *Dedicated VeriSimDB instance* — if experiment needs one, allocate a new
+  port (8097 is next free per `feedback_verisimdb_policy.md`). Decide in
+  Phase 3.
+
+== Working conventions
+
+* Each phase gets a dated session log in `docs/sessions/`
+* Decision gates are recorded in `PROOF-NEEDS.md` as discharged or refuted
+  obligations
+* Folded-back findings to main verisimdb are tracked in `docs/FOLDBACK.adoc`
+* VCL is the current name (not VQL)
+* No fragmenting main verisimdb until after Phase 5
+
+== Next action
+
+Phase 0, activity 1: read main `verisimdb/` sources and enumerate the
+octad's eight shapes.

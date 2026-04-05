@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Foldback to Main VerisimDB
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc:
+
+Findings from this experiment that fold back into main `verisimdb/` repo
+regardless of the experiment's ultimate outcome. Tracked here for audit
+trail; applied items are marked.
+
+== Doc drift: 6 → 8 modalities (APPLIED 2026-04-05)
+
+*Finding:* `deployment-modes.adoc` and `federation-readiness.adoc` both
+refer to "six modalities" / "six modality stores (Graph, Vector, Tensor,
+Semantic, Document, Temporal)". Authoritative source (CLAUDE.md, TeX
+data model, `rust-core/` crate layout) confirms **eight**:
+Graph, Vector, Tensor, Semantic, Document, Temporal, **Provenance**, **Spatial**.
+
+*Applied:* see `git log` in verisimdb for fix commit.
+
+*Files affected:*
+
+* `docs/deployment-modes.adoc` — "six modalities" wording
+* `docs/federation-readiness.adoc` — "six modality stores" + normalizer regeneration bullet list (6 → 8)
+
+== Undocumented soundness requirement: aggregate-drift weight renormalisation (NOT YET APPLIED)
+
+*Finding:* Def. `def:agg-drift` requires `Σ w_{m1,m2} = 1` across 28 pairs.
+Per-octad absence is handled soundly by `d(⊥,·)=0` convention, but
+aggregate-drift claims (e.g., `PROOF CONSISTENCY` thresholds) silently
+change semantics between an octad with full shapes vs. an octad with
+some shapes absent, unless weights are explicitly renormalised over
+the present shapes.
+
+*Suggested action:* add a paragraph in the TeX §4.2 (Formal Drift
+Metrics) documenting the renormalisation obligation, or prove that the
+current aggregate-drift formulation is sound without renormalisation
+(e.g., by treating absent pairs as contributing their weight to a
+"no-drift" term).
+
+== Normalizer regeneration strategies need 8, not 6 (NOT YET APPLIED)
+
+*Finding:* `federation-readiness.adoc` section "Normalizer Regeneration
+Strategies Are Stubs" lists 6 regeneration strategies (Graph, Vector,
+Tensor, Semantic, Document, Temporal). Real count is 8 — needs entries
+for Provenance (re-construct hash chain from transformation history)
+and Spatial (re-extract coordinates from document + graph geographic
+references).
+
+*Suggested action:* add the two missing entries, specify their
+regeneration sources (which authoritative modalities they can be
+regenerated from).
+
+== Federation contract formalisation (from Phase 2 — pending experiment completion)
+
+If Phase 2 produces a validated federation-contract Idris2 ABI, this
+would be a candidate for adoption by the main federation executor
+(`VeriSim.FederationExecutor`, currently stub) and resolver
+(`VeriSim.FederationResolver.query_peer/3`, currently unimplemented).
+
+Not a foldback yet — pending experiment Phase 2–4 results.

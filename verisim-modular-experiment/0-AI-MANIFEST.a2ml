@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# 0-AI-MANIFEST.a2ml — verisim-modular-experiment
+# Universal entry point for AI agents (Claude, Gemini, OpenAI, etc.)
+
+repository:
+  name: verisim-modular-experiment
+  status: experimental
+  purpose: |
+    Research experiment asking whether VeriSimDB's octad can be decomposed
+    into a slim identity core + federation contract protocol without
+    weakening VCL's consonance guarantees. NOT a replacement for VeriSimDB.
+  parent-monorepo: nextgen-databases
+  siblings:
+    - verisimdb (canonical, paved-road)
+    - typeql-experimental (sibling experiment)
+
+critical-invariants:
+  - "Main verisimdb/ is read-only from this experiment's perspective."
+  - "Do NOT weaken VCL's consonance guarantees in pursuit of modularity —
+     either preserve them via federation contract, or document the
+     degradation honestly."
+  - "A negative result (octad is indivisible) is an acceptable outcome."
+  - "Follow hyperpolymath standards: Idris2 ABI, Zig FFI, PMPL-1.0-or-later."
+
+canonical-locations:
+  design-docs: docs/
+  spec: spec/
+  proof-obligations: PROOF-NEEDS.md
+
+lifecycle:
+  on-enter:
+    - Read README.adoc
+    - Read docs/DESIGN-2026-04-05-core-and-federation.adoc
+    - Read PROOF-NEEDS.md
+  on-exit:
+    - Update DESIGN log if conclusions changed
+    - Update PROOF-NEEDS.md if obligations discharged or added
+
+references:
+  - memory: vcl-rename.md (user's modularity thought, 2026-04-05)
+  - memory: feedback_verisimdb_policy.md (maximise-first philosophy)
+  - conversation: 2026-04-05 Claude Code session

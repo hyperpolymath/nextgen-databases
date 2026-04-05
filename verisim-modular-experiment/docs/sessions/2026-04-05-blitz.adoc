@@ -1,0 +1,83 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Session Log — 2026-04-05 Blitz (Phase 0 + Phase 1)
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+
+*Context:* experiment repo created this session following a conversation
+about modularising VeriSim. User chose Path B ("can any shape be truly
+absent?") and blitz pace.
+
+== Phases closed
+
+* **Phase 0 — Octad archaeology:** COMPLETED.
+* **Phase 1 — Core identification:** COMPLETED.
+
+== Key findings
+
+=== Path B is live — a non-trivial Core exists
+
+After reading `arcvix-octad-data-model.tex` (formal data model) and
+`rust-core/verisim-octad/src/query_octad.rs`, classification resolved:
+
+* **Core** = `{Semantic, Temporal, Provenance}` (size 3)
+* **Federable** = `{Vector, Tensor, Document, Spatial}` (size 4)
+* **Conditional** = `{Graph}` (required iff cross-entity consonance claims in scope)
+
+=== New distinction: per-octad vs store-level absence
+
+The formal model already permits per-octad `φ(m) = ⊥` unconditionally.
+**Store-level absence** is the novel axis the experiment opens — whether
+a store can omit a modality entirely, not just have it be `⊥` per entity.
+
+Temporal and Provenance are store-level-required because the enrichment
+primitive (def:enrichment) writes to both on every mutation, and Identity
+Persistence (inv:persist) depends on Temporal.
+
+=== Path B vs existing architecture
+
+Two orthogonal axes identified:
+
+* *Location axis* (existing): standalone / federated / hybrid — where does each shape live?
+* *Presence axis* (this experiment): which shapes exist at all in a federation?
+
+These compose. A federation can be "hybrid on location axis, reduced on presence axis."
+
+=== 5 federation-contract clauses identified
+
+Backbone of Phase 2's Idris2 ABI:
+
+. Aggregate-drift weight renormalisation (undocumented soundness requirement)
+. Drift-signal projection surface
+. Attestation-signature surface (Ed25519, freshness window)
+. Coherence-constraint surface
+. Conflict-resolution contract (Temporal LWW total order)
+
+=== Foldback items for main verisimdb
+
+* `docs/deployment-modes.adoc` says "six modalities" — should be eight.
+* `docs/federation-readiness.adoc` says "six modality stores (Graph, Vector, Tensor, Semantic, Document, Temporal)" — missing Provenance + Spatial.
+* Normalizer regeneration strategies documented for 6, need 8.
+* Aggregate-drift weight renormalisation is an undocumented soundness requirement.
+
+== Artefacts produced this session
+
+* `README.adoc` — experiment framing
+* `PLAN.adoc` — 5-phase research plan with decision gates
+* `PROOF-NEEDS.md` — central + 4 subordinate obligations
+* `0-AI-MANIFEST.a2ml` — AI agent entry point
+* `docs/DESIGN-2026-04-05-core-and-federation.adoc` — origin and motivation
+* `docs/OCTAD-SHAPES.adoc` — Phase 0 inventory + Path A/B framing
+* `docs/CORE-CANDIDATES.adoc` — Phase 1 closure test + resolved classification
+
+== Tasks status
+
+* #1 Phase 0 — completed
+* #2 Phase 1 — completed
+* #3 Phase 2 — pending (next)
+* #4 Phase 3 — pending
+* #5 Phase 4 — pending
+* #6 Phase 5 — pending
+
+== Next actions
+
+. Foldback doc-drift fix to main verisimdb (6→8 shapes).
+. Begin Phase 2: draft `src/abi/FederationContract.idr` with the 5 clauses.

@@ -1,0 +1,113 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= DESIGN 2026-04-05: Identity Core + Federation Contract
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc:
+:sectnums:
+
+== Origin
+
+Conversation 2026-04-05 with Claude. User observation: the octad system is
+probably the best single thing the user could have, but it may not suit
+everyone. Question posed: does modularising VeriSim defeat its point, or
+could it be the basis for a new experiment repo?
+
+Conclusion: legitimate research question, separate experiment repo is the
+right vehicle, main VeriSimDB stays as-is.
+
+== The core design tension
+
+=== What modularity threatens
+
+VCL's type/constraint framework makes the guarantees it makes because the
+octad is an integrated substrate. If arbitrary external databases can be
+swapped in under VeriSim branding, one of two things happens:
+
+. VCL silently weakens. Now it's an audit wrapper over someone else's
+  database, not a consonance engine. *Failure mode.*
+. The federation contract is formalised rigorously enough that each
+  federated shape's typed boundary extends VCL's reach without loss.
+  *Success mode — but requires real work.*
+
+=== What modularity enables
+
+. *Articulation of the identity core.* Currently the octad is asserted as
+  the unit. Extracting a minimal core forces the question of which shapes
+  are load-bearing for consonance vs. storage-flavoured.
+. *Adoption ramp.* Slim core bolts onto existing stacks; users pull in
+  further shapes as they discover they need them.
+. *Federation is already the deployment reality.* Per-project instances,
+  per-port isolation, RAM disks. The experiment asks whether that
+  federation pattern should be reflected in VeriSim's own boundaries.
+. *VCL rename is the hint.* Constraint language composes over multiple
+  substrates in a way that a query language does not.
+
+== Working definitions (placeholder — to be refined)
+
+*Identity core* :: The minimal subset of shapes + VCL runtime such that
+consonance claims about the core itself are still verifiable without
+reference to federated shapes.
+
+*Federation contract* :: The typed protocol a non-core shape must honour
+for VCL to state constraints that span the boundary. Includes: schema
+exposure, provenance hooks, temporal ordering guarantees (if applicable),
+consonance-relevant invariants.
+
+*Reduced-guarantee story* :: The documented degradation of VCL's claims
+when a federation omits shapes the paved-road octad would normally include.
+
+== Candidate core shapes (to be validated)
+
+Strawman — needs proving:
+
+* Identity (who/what, stable references)
+* Provenance (audit trail, consonance evidence)
+* VCL runtime (constraint evaluator)
+* Consonance prover
+
+Candidate federable shapes (to be validated):
+
+* Temporal
+* Graph / relational
+* Document / blob
+* Metric / timeseries
+
+This split is a *hypothesis to test*, not a commitment.
+
+== Methodology
+
+. Enumerate the octad's shapes with their current VCL-visible contracts.
+. For each shape, ask: does consonance-as-verified-property require this
+  shape's invariants to be enforced by VeriSim, or only exposed by it?
+. Shapes whose invariants must be VeriSim-enforced are core candidates.
+. Shapes whose invariants can be externally honoured + checked are
+  federation candidates.
+. Draft the federation contract protocol as an Idris2 ABI (per
+  hyperpolymath standard) and validate it against KRLAdapter.jl's needs.
+
+== Open questions
+
+* Does provenance *require* temporal to be core, or can temporal be
+  federated with ordering guarantees exposed via contract?
+* Is identity truly core, or could it be federated against an external
+  identity authority (OIDC, DID, etc.) with a contract?
+* What happens to consonance claims that currently cross shape boundaries
+  when those boundaries become federation contracts? (Probably the hardest
+  question.)
+
+== Success criteria for the experiment
+
+Positive result :: A coherent identity-core specification + federation
+contract protocol exists, with a working KRLAdapter.jl integration, and
+the reduced-guarantee story is clearly documented.
+
+Negative result (also valuable) :: We prove the octad is indivisible
+w.r.t. VCL's guarantees. The experiment becomes formal justification of
+the monolith and strengthens the main verisimdb docs.
+
+== Next actions
+
+* [ ] Enumerate octad shapes + current VCL contracts (needs reference to
+  main verisimdb sources)
+* [ ] Draft candidate core/federable split with justification per shape
+* [ ] Sketch federation contract Idris2 ABI
+* [ ] Validate against KRLAdapter.jl's actual needs

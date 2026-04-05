@@ -1,0 +1,217 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Octad Shapes — Inventory and Current Contracts
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc: left
+:sectnums:
+
+*Phase 0 artefact.* Inventory of the octad's 8 shapes, their current
+VCL-visible contracts, and the existing deployment-mode architecture
+in main verisimdb/.
+
+*Status:* first draft from archaeology 2026-04-05. Stubs remain where
+deeper reading of challenges-*.adoc, arcvix-octad-data-model.tex, and
+per-crate sources is required.
+
+== The Eight Shapes
+
+Confirmed from `verisimdb/.claude/CLAUDE.md` (authoritative) and
+`rust-core/` crate layout:
+
+[cols="1,1,2,2",options="header"]
+|===
+|# |Shape |Impl backing |Purpose
+
+|1 |Graph |Oxigraph (RDF + property graph) |Triples, relationships, citations
+|2 |Vector |HNSW similarity search |Embedding-space nearest-neighbour
+|3 |Tensor |ndarray / Burn |Multi-dim representations (research use active)
+|4 |Semantic |CBOR proof blobs |Type annotations, RDF triples, proof witnesses
+|5 |Document |Tantivy full-text |Searchable text content
+|6 |Temporal |Versioning / time-series |Version history, time-series
+|7 |Provenance |Hash-chain + actor search |Origin, lineage, transformation chain, actor trail
+|8 |Spatial |R-tree index |Geospatial: coordinates, geometries, proximity
+|===
+
+Each octad entity has a stable ID with synchronised representations
+across all eight shapes.
+
+== Doc Drift (IMPORTANT)
+
+`deployment-modes.adoc` and `federation-readiness.adoc` in main verisimdb
+both state **six modalities** (Graph, Vector, Tensor, Semantic, Document,
+Temporal). CLAUDE.md and the crate layout confirm **eight** (adding
+Provenance + Spatial).
+
+**Foldback action (Phase 5 candidate, but noted for immediate fix):**
+update both docs to say eight shapes. Normalizer regeneration strategies
+documented for "six" must also grow to eight.
+
+== Existing Deployment-Mode Architecture
+
+Main verisimdb already supports three deployment modes
+(`docs/deployment-modes.adoc`):
+
+[cols="1,3",options="header"]
+|===
+|Mode |Architecture
+
+|**Standalone** |All shapes local on one instance. Full ACID, no federation overhead.
+|**Federated Coordinator** |Only the "tiny core" runs locally — ReScript registry + Elixir orchestrator (<5k LOC claimed). All shape stores are remote peers. Modalities supplied by external institutions.
+|**Hybrid** |Some shapes local (e.g. Graph+Vector for performance), others federated (e.g. Document archived externally).
+|===
+
+**Key architectural fact:** in the existing design, the "core" is the
+*coordination layer* (registry + orchestrator). It is **not** a subset of
+the octad's shapes. Any shape can be local or federated, independently.
+
+== Relationship to the Experiment's Framing
+
+=== User's framing (2026-04-05 conversation)
+
+> "figure out a way to make verisim modular itself, so one would think
+> about what the identity of what you have is, decide what should be part
+> of the identity core and what databases you want in federation"
+
+This framing treats the *Core* as a **subset of shapes** — some shapes
+are identity-core, others federate out.
+
+=== Existing framing in main verisimdb
+
+The *Core* is the **coordinator** (registry + orchestrator). Shapes are
+orthogonal axes that can each be local-or-remote independently.
+
+=== Are these the same question?
+
+**No — they are complementary questions.** Evidence:
+
+* Existing framing answers *where does each shape live?* (deployment axis)
+* User's framing asks *which shapes does VCL's consonance guarantee
+  structurally require to be present at all?* (guarantee axis)
+* A shape being remote (federation) is different from a shape being
+  absent (reduced guarantee).
+
+The existing design assumes all 8 shapes are always present; federation
+distributes their *location*, not their *presence*. The user's question
+asks: what if some shapes are not present at all in the federation?
+
+This is a **genuinely new axis** not addressed by current deployment modes.
+
+== Current Federation Status (from federation-readiness.adoc)
+
+**Works today:**
+
+* Peer registration API (`POST/GET/DELETE /api/federation/peers`)
+* VCL parser accepts `FROM FEDERATION <name>` and `DRIFT POLICY <name>`
+* Hypatia FileExecutor simulates federation via local flat files
+
+**Stubs / missing:**
+
+* `VeriSim.FederationExecutor` always returns `{:ok, []}` — no decomposition, dispatch, or merging.
+* `VeriSim.FederationResolver.query_peer/3` returns `{:error, :not_implemented}`.
+* Normalizer regeneration strategies return hardcoded `[regenerated]` for all shapes (documented for six, but reality is eight).
+* No Raft consensus for cross-instance writes.
+* No drift auto-trigger; drift must be invoked manually.
+* VCL-DT PROOF clauses parse but don't produce real proofs (federation or otherwise).
+
+**Implication for experiment:** a sizeable portion of federation is
+designed-but-unimplemented. The experiment can proceed on paper/type
+level without waiting for these stubs to fill, but any *runtime*
+validation (Phase 3 onward) needs at least the local-federation-simulation
+stage working.
+
+== Per-Shape VCL Contract (STUB — Phase 0 continuation)
+
+For each shape, record:
+
+* What invariants does VeriSim enforce about it locally?
+* What VCL constraints cross its boundary?
+* What would a federated instance of this shape need to expose for VCL
+  consonance to remain sound?
+
+[cols="1,2,2,2",options="header"]
+|===
+|Shape |Enforces (local) |VCL cross-boundary |Federation contract surface (TBD)
+
+|Graph        |(TBD) |`SELECT GRAPH ... WHERE (h)-[:REL]->(t)` |(TBD)
+|Vector       |(TBD) |similarity / nearest-neighbour in VCL |(TBD)
+|Tensor       |(TBD) |(TBD) |(TBD)
+|Semantic     |CBOR proof blobs, type annotations |`PROOF CONSISTENCY`, `PROOF INTEGRITY` |(TBD)
+|Document     |(TBD) |full-text match clauses |(TBD)
+|Temporal     |(TBD) |version/time clauses |(TBD)
+|Provenance   |Hash-chain integrity, actor search |`PROOF PROVENANCE` |(TBD)
+|Spatial      |R-tree index, radius/bounds/nearest |proximity clauses |(TBD)
+|===
+
+**Next reading list** to fill this table:
+
+* `docs/challenges-federated.adoc` (926 lines)
+* `docs/challenges-hybrid.adoc` (782 lines)
+* `docs/challenges-standalone.adoc` (439 lines)
+* `arcvix-octad-data-model.tex` (1626 lines) — formal data model
+* `rust-core/verisim-octad/src/` (query_octad.rs, store.rs, transaction.rs)
+* `rust-core/verisim-semantic/`, `rust-core/verisim-provenance/` for
+  shape-specific proof handling
+
+== Drift Detection Invariants
+
+From CLAUDE.md, drift is measured along these axes:
+
+* `semantic_vector_drift` — embedding mismatches semantic content
+* `graph_document_drift` — graph structure mismatches document
+* `temporal_consistency_drift` — version history issues
+* `tensor_drift` — tensor representation diverged
+* `schema_drift` — type constraint violations
+* `quality_drift` — aggregate quality signal
+
+**Implication for experiment:** drift is inherently *cross-shape*. Every
+drift axis involves at least two shapes. If the experiment's Core subset
+omits a shape that participates in drift detection, the corresponding
+drift axis becomes either:
+
+* unobservable (Core can't detect it), or
+* requires the federated shape to expose enough for Core to compute the
+  drift score remotely.
+
+This tightens the federation contract: federated shapes must expose not
+just query results, but drift-signal-contributing projections.
+
+== Sharpened Research Questions
+
+Reformulated in light of existing architecture:
+
+1. **Are any of the 8 shapes structurally optional?** I.e. is there a
+   coherent VerisimCore where some shapes are fully absent (not just
+   federated) without collapsing VCL's consonance claims into triviality?
+
+2. **What does the federation contract need to expose?**
+   * Query response (already designed)
+   * Drift-signal projections (newly identified)
+   * Consonance proof witnesses (for PROOF clauses across federation)
+   * Schema + provenance attestation (so the coordinator can trust the peer)
+
+3. **Does the user's "identity core" idea collapse to a stricter version
+   of the existing federated-coordinator mode?** Plausibly yes: if all
+   8 shapes must always be present (locally or via federation), then the
+   "identity core" is just the coordinator, and the user's framing reduces
+   to "choose hybrid deployment carefully". The experiment's value would
+   then shift to: formalising the federation contract the existing
+   architecture assumes but doesn't state.
+
+4. **Alternative: is there a coherent notion of "shape absence" under
+   which VCL claims compose?** If yes, that is the genuinely new
+   architectural axis the experiment would open up.
+
+== Recommendation for Phase 1
+
+Before applying the closure test per shape, answer Research Question 3
+above: **does the user's framing reduce to stricter federation, or does
+it introduce genuine shape-absence?**
+
+* If *reduces to stricter federation*: Phase 1 becomes "formalise the
+  federation contract the existing architecture assumes", and the
+  experiment is more documentation+type-formalisation than
+  architectural-novelty.
+* If *genuine shape-absence*: Phase 1 proceeds as originally planned,
+  identifying which shapes can be omitted entirely.
+
+Either answer is useful. The first is higher-probability; the second is
+higher-payoff.

@@ -1,0 +1,248 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Core Candidates — Path B Shape-Absence Analysis
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc: left
+:sectnums:
+
+*Phase 1 artefact, Path B.* For each of the 8 shapes, apply the closure
+test: **if this shape is entirely absent (not merely federated), do VCL
+consonance claims over the remaining shapes still compose soundly?**
+
+*Preliminary result:* Path B is viable. A non-trivial Core exists.
+
+*Resolved result (2026-04-05, after TeX data-model reading):* see
+§"Resolved Classification" below. Preliminary verdicts per shape remain
+for record; resolved section supersedes for Phase 2.
+
+== Method
+
+For each shape, check:
+
+. **Drift participation.** Does any drift axis structurally require this shape?
+. **VCL proof dependency.** Does any PROOF clause require this shape? (Per CLAUDE.md: INTEGRITY/CONSISTENCY need Semantic, PROVENANCE needs Provenance, etc.)
+. **Federation-trust role.** Without this shape, can the coordinator verify claims from a peer?
+. **Degradation story.** What VCL queries and claims vacuously fail vs. become unsound vs. remain sound?
+
+A shape is **structurally required** if its absence makes VCL claims *unsound* (not just unavailable). A shape is **structurally optional** if its absence merely restricts which queries can run, without weakening the guarantees of the remaining claims.
+
+== Per-Shape Verdicts (Preliminary)
+
+=== Graph — AMBIGUOUS
+
+* **Drift involvement:** `graph_document_drift` axis.
+* **Unique role:** the only shape expressing *relationships between entities* (citations, lineage-via-edges, traversals).
+* **Without it:** cross-entity VCL traversals (`(h)-[:CITES]->(t)`) impossible. Federation becomes a collection of isolated entity-stores, not a graph of entities.
+* **Provenance subsumption question:** Provenance also tracks transformation chains (edge-like). Could Provenance carry the lineage-edge burden if Graph is omitted? **Only if Graph is used solely for lineage.** If Graph expresses domain-relationships beyond provenance, Provenance cannot subsume it.
+* **Verdict:** likely required in any federation that claims "cross-entity consonance." Marked AMBIGUOUS pending Phase 0 continuation (reading query_octad.rs + challenges-*.adoc).
+
+=== Vector — OPTIONAL
+
+* **Drift involvement:** `semantic_vector_drift` (becomes vacuous if Vector absent, not unsound).
+* **Unique role:** similarity-space queries, nearest-neighbour.
+* **Without it:** similarity queries disappear. VCL claims over the remaining 7 shapes remain sound.
+* **Verdict:** STRUCTURALLY OPTIONAL. Degradation story: no similarity search.
+
+=== Tensor — OPTIONAL
+
+* **Drift involvement:** `tensor_drift` (vacuous if absent).
+* **Unique role:** multi-dim representations. CLAUDE.md: "active research into novel applications (details forthcoming)."
+* **Without it:** tensor queries disappear, no other consequence.
+* **Verdict:** STRUCTURALLY OPTIONAL. User's own characterisation ("active research") marks this as least load-bearing.
+
+=== Semantic — REQUIRED
+
+* **Drift involvement:** `semantic_vector_drift`, `schema_drift`.
+* **VCL proof dependency:** PROOF INTEGRITY needs Semantic; PROOF CONSISTENCY needs Semantic (per CLAUDE.md modality compatibility validation).
+* **Unique role:** type annotations, proof blobs, RDF triples — the substrate VCL operates over.
+* **Without it:** PROOF INTEGRITY and PROOF CONSISTENCY unsound (not merely unavailable). Schema-level consonance claims collapse.
+* **Verdict:** STRUCTURALLY REQUIRED. Semantic is core to VCL's proof apparatus.
+
+=== Document — OPTIONAL
+
+* **Drift involvement:** `graph_document_drift` (vacuous if Document absent).
+* **Unique role:** full-text searchable content.
+* **Without it:** full-text queries disappear. Entity identity does not depend on document text.
+* **Normalizer caveat:** federation-readiness.adoc lists Document among the regeneration sources. If absent, some normalization paths unavailable — but normalization policies can route around missing shapes.
+* **Verdict:** STRUCTURALLY OPTIONAL. Degradation story: no full-text search, normalizer policies must avoid Document-sourced regeneration.
+
+=== Temporal — AMBIGUOUS (leaning REQUIRED)
+
+* **Drift involvement:** `temporal_consistency_drift`.
+* **VCL proof dependency:** PROOF FRESHNESS needs Temporal.
+* **Unique role:** version history, time-series.
+* **The pivotal question:** is VCL consonance inherently time-parameterised? Drift detection presupposes time ("drift accumulates"). If "consonant at time T" is the natural form of a VCL claim, Temporal is required.
+* **Counter-argument:** many entity systems work purely with current-state. A stateless VCL consonance claim ("entity X is consonant across present representations") is coherent without Temporal.
+* **Verdict:** AMBIGUOUS. Resolution depends on VCL's formal semantics (needs Phase 0 continuation: read arcvix-octad-data-model.tex for the time-parameterisation of consonance).
+
+=== Provenance — REQUIRED
+
+* **Drift involvement:** none listed.
+* **VCL proof dependency:** PROOF PROVENANCE needs Provenance (per CLAUDE.md).
+* **Unique role:** hash-chain integrity, actor trail, origin + transformation tracking.
+* **Federation-trust role:** **this is the critical one.** Without Provenance, the coordinator cannot cryptographically verify claims from a federated peer. Federation degrades to "trust me bro." Hash-chain integrity is what makes a federated shape's data attestable.
+* **Without it:** federation is unsound by construction. The coordinator cannot distinguish correct peer data from forged peer data.
+* **Verdict:** STRUCTURALLY REQUIRED. Provenance is the shape that makes federation-trust possible.
+
+=== Spatial — OPTIONAL
+
+* **Drift involvement:** none listed.
+* **Unique role:** R-tree, geospatial queries.
+* **Without it:** geospatial queries disappear, no other consequence.
+* **Verdict:** STRUCTURALLY OPTIONAL.
+
+== Summary Table
+
+[cols="1,1,2,2",options="header"]
+|===
+|Shape |Verdict |Why |Degradation if absent
+
+|Graph       |AMBIGUOUS →REQUIRED likely |Only shape for cross-entity relationships |No traversals; federation collapses to isolated stores
+|Vector      |OPTIONAL  |Similarity only; drift axis becomes vacuous |No similarity search
+|Tensor      |OPTIONAL  |Research shape, user-declared least load-bearing |No tensor queries
+|Semantic    |REQUIRED  |PROOF INTEGRITY+CONSISTENCY unsound without it |VCL proof apparatus collapses
+|Document    |OPTIONAL  |Full-text only; entity identity independent |No full-text search
+|Temporal    |AMBIGUOUS |Depends on VCL time-parameterisation |No FRESHNESS; drift axis vacuous
+|Provenance  |REQUIRED  |Federation-trust attestation |Federation unsound; peer data unverifiable
+|Spatial     |OPTIONAL  |Geospatial only; standalone shape |No geospatial queries
+|===
+
+== Candidate Core
+
+**Minimal Core (strict interpretation):** `{Semantic, Provenance}` — size 2.
+
+**Probable Core (resolving ambiguities conservatively):** `{Semantic, Provenance, Graph, Temporal}` — size 4.
+
+**Federable set:** `{Vector, Tensor, Document, Spatial}` — size 4.
+
+== Decision Gate Check (Phase 1)
+
+Per PLAN.adoc Phase 1 decision gates:
+
+* |Core| = 1: STOP (trivial)
+* |Core| = 8: STOP (indivisible, negative result)
+* 2 ≤ |Core| ≤ 6: PROCEED
+
+**|Core| ∈ {2, 4}** depending on how ambiguities resolve. **Gate: PROCEED to Phase 2.**
+
+Path B is live. A non-trivial Core exists and the experiment has architectural novelty to deliver.
+
+== Adversarial Stress-Test (TODO — completes Phase 1)
+
+Before committing to Phase 2 (Idris2 contract design), stress-test the classification:
+
+. **Compose claims across Core/Federable boundary.** Example: `PROOF CONSISTENCY` over a query that spans Semantic (Core) + Vector (Federable). Does the claim remain sound if Vector is federated? If Vector is absent?
+. **Drift-signal projection.** `semantic_vector_drift` needs both. If Vector is Federable, what must the Vector peer expose for Core to compute the drift score? (Probably: signed projections, not raw embeddings.)
+. **Resolve Graph.** Read query_octad.rs, challenges-*.adoc. Is Graph used for domain-relationships beyond provenance lineage?
+. **Resolve Temporal.** Read arcvix-octad-data-model.tex. Is VCL consonance time-parameterised?
+. **Counter-example hunt.** Find a VCL claim that is *sound* in the full octad but becomes *unsound* (not merely unavailable) when a shape classified as OPTIONAL is removed. If such a claim exists, the shape is actually REQUIRED.
+
+== Resolved Classification (2026-04-05)
+
+After reading `arcvix-octad-data-model.tex` (formal data model) and
+`rust-core/verisim-octad/src/query_octad.rs`, ambiguities resolve.
+
+=== Key formal-model findings
+
+**Finding 1: Per-octad absence is already first-class.**
+Def. `def:octad`: `φ(m) ∈ Σ_m ∪ {⊥}`. Any modality may be `⊥` per entity.
+"Its identity persists regardless."
+
+**Finding 2: Absence preserves drift soundness by construction.**
+Def. `def:pairwise-drift`: `d(⊥, ·) = d(·, ⊥) = 0` by convention. Drift
+axes involving absent shapes become vacuous, not unsound.
+
+**Finding 3: Temporal is structurally required at STORE level.**
+* Invariant `inv:persist` (Identity Persistence): "the temporal modality
+  φ(P) records the full history of all mutations."
+* Def. `def:enrichment` (the fundamental write primitive): "Every
+  enrichment appends a record to φ'(P) and φ'(R)."
+* Thm. `thm:attestation` depends on time-bounded freshness windows.
+* Federation conflict resolution uses Temporal as "total order on writes"
+  (last-writer-wins).
+
+**Finding 4: Graph is CONDITIONAL, not ambiguous.**
+Coherence constraint: "The graph modality φ(G) must contain exactly the
+relations declared in the semantic modality φ(S)." This binds only when
+both present. Graph is structurally required only for *cross-entity*
+consonance claims (citations, lineage-via-edges). Single-entity claims
+work without it.
+
+=== New distinction: per-octad vs store-level absence
+
+The formal model permits per-octad `⊥` unconditionally. But **store-level
+absence** is stricter — a store can omit a modality entirely only if the
+store-level invariants (Identity Persistence, enrichment primitive) do
+not depend on it.
+
+This vocabulary matters for the experiment:
+
+* *Per-octad absence:* already handled by existing architecture.
+* *Store-level absence:* the novel axis this experiment opens.
+
+=== Resolved table
+
+[cols="1,1,3",options="header"]
+|===
+|Shape |Verdict |Grounding
+
+|Semantic     |CORE         |VCL proof substrate; coherence-constraint target for Graph (def:coherence)
+|Temporal     |CORE         |Identity Persistence invariant; enrichment primitive; attestation freshness; LWW total order
+|Provenance   |CORE         |Enrichment primitive; hash-chain = federation-trust substrate; attestation signatures
+|Graph        |CONDITIONAL  |Required for cross-entity claims; optional per-entity and for per-entity-federations
+|Vector       |FEDERABLE    |Drift convention d(⊥,·)=0 handles absence
+|Tensor       |FEDERABLE    |Drift convention handles absence; user-declared least load-bearing
+|Document     |FEDERABLE    |Drift convention handles absence; normalizer policies must route around it
+|Spatial      |FEDERABLE    |Drift convention handles absence; already shown as ⊥-example in def:octad prose
+|===
+
+=== Core, Federable, Conditional sets
+
+* **Core** = `{S, P, R}` — Semantic, Temporal, Provenance. Size 3.
+* **Federable** = `{V, T, D, X}` — Vector, Tensor, Document, Spatial. Size 4.
+* **Conditional** = `{G}` — Graph, required iff cross-entity claims present. Size 1.
+
+Minimal VerisimCore implements `{S, P, R}` plus optionally `{G}`.
+
+=== Decision gate re-check
+
+|Core| = 3. Non-trivial, not full octad. **Gate: PROCEED to Phase 2.**
+
+=== Counter-example hunt result
+
+No counter-example found that breaks the classification. One subtle
+soundness-preservation requirement surfaced:
+
+**Aggregate-drift weight renormalisation.** Def. `def:agg-drift` requires
+`Σ w_{m1,m2} = 1` across 28 pairs. If a shape is absent, the sum over
+*remaining* pairs must be explicitly renormalised to 1, or the claim
+"aggregate drift < θ" silently has different semantics between full
+octad and reduced store. This is a **required clause of the federation
+contract**, not a shape-classification change.
+
+Additional Federation-Contract clauses surfaced:
+
+. **Drift-signal projection.** Each Federable shape's peer must expose
+  enough for Core to compute drift scores it participates in.
+. **Attestation-signature surface.** Federable peers must expose
+  Ed25519-signed attestations (per `thm:attestation`) within configured
+  freshness window.
+. **Coherence-constraint surface.** When a Core↔Federable coherence
+  constraint is declared (e.g., G↔S), the Federable peer must expose
+  enough for Core to evaluate the constraint.
+. **Conflict-resolution contract.** LWW requires Temporal as total order
+  (Core-provided); Federable peers must accept Core's temporal ordering
+  as authoritative for conflict resolution of their shape's data.
+
+These five clauses form the backbone of `FederationContract.idr` in
+Phase 2.
+
+== Phase 2 Preview
+
+If stress-test confirms the preliminary verdicts, Phase 2 designs:
+
+* `src/abi/VerisimCore.idr` — the core's type interface (Semantic + Provenance + {Graph?, Temporal?} depending on ambiguity resolution)
+* `src/abi/FederationContract.idr` — what a Federable shape must expose to bind to Core
+* `src/abi/DriftProjection.idr` — the drift-signal contributions each Federable shape must provide
+* `src/abi/ProvenanceAttestation.idr` — how Provenance (Core) verifies Federable peer data
+
+Zig FFI scaffolding follows once the Idris2 ABI stabilises.
