@@ -9,6 +9,19 @@ export QuandleRelation, QuandlePresentation
 export extract_presentation, canonicalize_presentation, canonical_presentation_blob
 export quandle_descriptor
 
+"""
+    QuandleRelation
+
+A single crossing relation in the fundamental quandle. At a positive crossing,
+the right quandle action gives `lhs ▷ rhs = out`; at a negative crossing,
+this is inverted (`is_inverse = true`).
+
+# Fields
+- `lhs::Int`: left-hand-side generator index (the arc being acted on)
+- `rhs::Int`: acting generator index (the over-strand arc)
+- `out::Int`: result generator index (the arc after the crossing)
+- `is_inverse::Bool`: `true` for negative crossings (inverse action)
+"""
 struct QuandleRelation
     lhs::Int
     rhs::Int
@@ -16,6 +29,19 @@ struct QuandleRelation
     is_inverse::Bool
 end
 
+"""
+    QuandlePresentation
+
+Fundamental-quandle presentation of a knot diagram: `generator_count` generators
+(one per arc) plus a list of relations (one per crossing).
+
+# Fields
+- `generator_count::Int`: number of generators (equals number of distinct arcs
+  after union-find collapsing at each crossing)
+- `relations::Vector{QuandleRelation}`: one relation per crossing
+
+Two presentations with equal `canonical_presentation_blob` are isomorphic quandles.
+"""
 struct QuandlePresentation
     generator_count::Int
     relations::Vector{QuandleRelation}
@@ -104,6 +130,16 @@ function extract_presentation(pd::KnotTheory.PlanarDiagram)::QuandlePresentation
     QuandlePresentation(generator_count, relations)
 end
 
+"""
+    canonicalize_presentation(p::QuandlePresentation) -> QuandlePresentation
+
+Relabel generators in `p` to canonical form: generators receive fresh ids
+`1, 2, 3, ...` in the order they first appear in sorted relations.
+
+Two presentations produce the same canonical form iff they represent the
+same presentation up to generator renaming. This is the basis for
+`canonical_presentation_blob`'s fingerprint.
+"""
 function canonicalize_presentation(p::QuandlePresentation)::QuandlePresentation
     sorted_rel = sort(p.relations, by = r -> (r.lhs, r.rhs, r.out, r.is_inverse ? 1 : 0))
 
@@ -134,6 +170,17 @@ function canonicalize_presentation(p::QuandlePresentation)::QuandlePresentation
     QuandlePresentation(p.generator_count, canon_rel)
 end
 
+"""
+    canonical_presentation_blob(p::QuandlePresentation) -> String
+
+Serialise `p` to a canonical text blob after applying `canonicalize_presentation`.
+Format: `qpres-v1|g=<generator_count>|r=<rel>;<rel>;...` where each `<rel>` is
+`lhs,rhs,out,sign` with `sign ∈ {-1, 1}`.
+
+Two presentations with the same blob are isomorphic as quandles (up to
+generator renaming). This blob is the input to SHA-256 fingerprinting in
+`quandle_descriptor`.
+"""
 function canonical_presentation_blob(p::QuandlePresentation)::String
     c = canonicalize_presentation(p)
     rel_tokens = String[]
