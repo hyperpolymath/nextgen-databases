@@ -22,7 +22,7 @@ Graph, Vector, Tensor, Semantic, Document, Temporal, **Provenance**, **Spatial**
 * `docs/deployment-modes.adoc` — "six modalities" wording
 * `docs/federation-readiness.adoc` — "six modality stores" + normalizer regeneration bullet list (6 → 8)
 
-== Undocumented soundness requirement: aggregate-drift weight renormalisation (NOT YET APPLIED)
+== Undocumented soundness requirement: aggregate-drift weight renormalisation (APPLIED 2026-04-05)
 
 *Finding:* Def. `def:agg-drift` requires `Σ w_{m1,m2} = 1` across 28 pairs.
 Per-octad absence is handled soundly by `d(⊥,·)=0` convention, but
@@ -31,11 +31,16 @@ change semantics between an octad with full shapes vs. an octad with
 some shapes absent, unless weights are explicitly renormalised over
 the present shapes.
 
-*Suggested action:* add a paragraph in the TeX §4.2 (Formal Drift
-Metrics) documenting the renormalisation obligation, or prove that the
-current aggregate-drift formulation is sound without renormalisation
-(e.g., by treating absent pairs as contributing their weight to a
-"no-drift" term).
+*Applied:* Remark `rem:agg-drift-renorm` added to
+`arcvix-octad-data-model.tex` §4.2 immediately after the
+`def:agg-drift` definition, introducing per-federation weight
+renormalisation `ŵ_{m1,m2} = w_{m1,m2} / Σ w_{m'1,m'2}` over
+`{m'1,m'2} ⊆ modset'`. Notes equivalence with the "no-drift term"
+formulation when combined with the existing `d(·,⊥)=0` convention.
+
+*Files affected:*
+
+* `arcvix-octad-data-model.tex` — new `\begin{remark}` block at §4.2
 
 == Normalizer regeneration strategies need 8, not 6 (NOT YET APPLIED)
 
