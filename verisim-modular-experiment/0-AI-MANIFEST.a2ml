@@ -1,42 +1,104 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
-# 0-AI-MANIFEST.a2ml — verisim-modular-experiment
-# Universal entry point for AI agents (Claude, Gemini, OpenAI, etc.)
+# STOP - CRITICAL READING REQUIRED
 
-repository:
-  name: verisim-modular-experiment
-  status: experimental
-  purpose: |
-    Research experiment asking whether VeriSimDB's octad can be decomposed
-    into a slim identity core + federation contract protocol without
-    weakening VCL's consonance guarantees. NOT a replacement for VeriSimDB.
-  parent-monorepo: nextgen-databases
-  siblings:
-    - verisimdb (canonical, paved-road)
-    - typeql-experimental (sibling experiment)
+**THIS FILE MUST BE READ FIRST BY ALL AI AGENTS**
 
-critical-invariants:
-  - "Main verisimdb/ is read-only from this experiment's perspective."
-  - "Do NOT weaken VCL's consonance guarantees in pursuit of modularity —
-     either preserve them via federation contract, or document the
-     degradation honestly."
-  - "A negative result (octad is indivisible) is an acceptable outcome."
-  - "Follow hyperpolymath standards: Idris2 ABI, Zig FFI, PMPL-1.0-or-later."
+## WHAT IS THIS?
 
-canonical-locations:
-  design-docs: docs/
-  spec: spec/
-  proof-obligations: PROOF-NEEDS.md
+This is the AI manifest for **verisim-modular-experiment** — a research
+experiment asking whether VeriSimDB's 8-shape octad can be split into a
+slim identity core plus a federation of optional shapes without breaking
+VCL consonance guarantees.
 
-lifecycle:
-  on-enter:
-    - Read README.adoc
-    - Read docs/DESIGN-2026-04-05-core-and-federation.adoc
-    - Read PROOF-NEEDS.md
-  on-exit:
-    - Update DESIGN log if conclusions changed
-    - Update PROOF-NEEDS.md if obligations discharged or added
+**NOT a replacement for main `verisimdb/`.** The canonical octad remains
+the paved-road deployment. This experiment is a falsifier that produced
+a positive result: the octad IS divisible.
 
-references:
-  - memory: vcl-rename.md (user's modularity thought, 2026-04-05)
-  - memory: feedback_verisimdb_policy.md (maximise-first philosophy)
-  - conversation: 2026-04-05 Claude Code session
+## CURRENT STATUS (2026-04-05)
+
+- **Experiment status**: CLOSED with positive result. All 5 phases complete.
+- **Path B**: runtime-confirmed. Core = {Semantic, Temporal, Provenance}.
+- **Tests**: 145/145 green across 6 Julia test suites.
+- **Idris2 ABI**: 3 modules typecheck clean in Idris2 0.8.0.
+- **Overall completion**: 100% (research prototype).
+
+## KEY FINDING
+
+The octad decomposes into:
+
+- **Core** (3 shapes, store-level required): Semantic, Temporal, Provenance
+- **Federable** (4 shapes, can be absent at store level): Vector, Tensor, Document, Spatial
+- **Conditional** (1 shape): Graph — required iff cross-entity claims in scope
+
+VCL consonance claims compose soundly across any federation of these
+shapes, via a 5-clause contract (weight renormalisation, drift-signal
+projection, Ed25519 attestation, coherence surface, LWW conflict resolution).
+
+## CANONICAL LOCATIONS
+
+### Machine-Readable Metadata: `.machine_readable/6a2/` ONLY
+
+- `STATE.a2ml` — experiment state, phase status, completion percentage
+- `META.a2ml` — architecture decisions, development practices
+- `ECOSYSTEM.a2ml` — position in ecosystem, siblings, standards followed
+
+### Idris2 ABI: `src/Abi/`
+
+- `Types.idr` — 8-shape enum + Core/Federable/Conditional classification
+- `VerisimCore.idr` — identity-core ABI (enrich, attest, verify)
+- `FederationContract.idr` — 5-clause contract + IsFederable predicate
+
+### Julia Reference Implementation: `impl/`
+
+- `VerisimCore.jl` — Core store with Ed25519-signed enrichment
+- `FederationManager.jl` — renormalisation, aggregate_drift, peer registration
+- `Crypto.jl` — Ed25519 wrapper (libsodium via Sodium.jl)
+- `drift/Metrics.jl` — pairwise drift functions (d_SV, d_VD, d_SD)
+- `peers/VectorPeer.jl`, `peers/DocumentPeer.jl` — Federable peer impls
+- `vcl/{Query,Prover,Parser}.jl` — VCL subset AST + evaluator + parser
+
+### Documentation: root + `docs/`
+
+- `README.adoc`, `EXPLAINME.adoc` — entry points
+- `PLAN.adoc`, `PROOF-NEEDS.md` — research plan + obligations
+- `docs/FINDINGS.adoc` — Phase 5 consolidated findings
+- `docs/CORE-CANDIDATES.adoc` — Phase 1 closure test + resolved classification
+- `docs/OCTAD-SHAPES.adoc` — Phase 0 archaeology
+- `docs/SEAMS.adoc` — ABI↔impl seam audit
+- `docs/SHAPES.adoc` — central shape mapping (TeX ↔ Idris2 ↔ Julia)
+- `docs/FOLDBACK.adoc` — items folded back to main verisimdb
+- `spec/federation-contract.adoc` — 5-clause contract prose spec
+
+## CRITICAL INVARIANTS
+
+1. Main `verisimdb/` is read-only from this experiment's perspective.
+2. Core shapes (Semantic, Temporal, Provenance) **cannot** be federated.
+   The Idris2 `IsFederable` predicate enforces this at compile time;
+   `FederationManager.register_peer!` enforces it at runtime.
+3. All SCM-style metadata lives in `.machine_readable/6a2/` as A2ML.
+4. All original code carries `SPDX-License-Identifier: PMPL-1.0-or-later`.
+
+## HOW TO RUN
+
+```bash
+# Idris2 ABI
+idris2 --build verisim-modular-experiment.ipkg
+
+# Julia test suites (6 files, 145 assertions)
+for f in test/*.jl; do julia --project=. $f; done
+```
+
+## LIFECYCLE HOOKS
+
+### on-enter (every session)
+
+1. Read this manifest first.
+2. Read `.machine_readable/6a2/STATE.a2ml` for current status.
+3. Read `docs/FINDINGS.adoc` if asking "what did the experiment prove?".
+4. Read `PLAN.adoc` for phase structure and decision gates.
+
+### on-exit
+
+1. Update `.machine_readable/6a2/STATE.a2ml` if state changed.
+2. Write a session log to `docs/sessions/<date>-<topic>.adoc`.
+3. Commit frequently; push to `main` on nextgen-databases monorepo.

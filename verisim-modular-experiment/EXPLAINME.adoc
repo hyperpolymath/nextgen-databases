@@ -122,11 +122,20 @@ All three immediate follow-ups now complete:
   PROOF INTEGRITY, PROOF CONSISTENCY WITH DRIFT < θ (with OVER scope),
   PROOF FRESHNESS. 32 assertions.
 
-Remaining:
+All 5 phases + 3 deferred items complete. **Experiment closed, Path B confirmed.**
 
-* **Phase 4 dogfood** — wire `KRLAdapter.jl` against this VerisimCore.
-* **Phase 5 writeup** — findings document, adoption guide, main-verisimdb foldback.
-* **Optional Zig FFI port** — production readiness if Path B ships.
+* ✓ **Phase 4 dogfood** — `examples/krladapter_integration.jl` +
+  `test/test_krladapter_integration.jl` (19 assertions). KRLAdapter.jl
+  client satisfied by Core alone — no Federable peers required.
+* ✓ **Phase 5 findings** — `docs/FINDINGS.adoc` with classification,
+  degradation routes, adoption guide, foldback tracking, and the
+  productisation recommendation.
+
+Open post-experiment work (not blocking):
+
+* Promote `impl/` to shippable `verisim-core` sibling package.
+* Zig FFI port of VerisimCore per hyperpolymath standard.
+* Formal Idris2-type-level non-interference proof at arbitrary N.
 
 == What if the result had been negative?
 

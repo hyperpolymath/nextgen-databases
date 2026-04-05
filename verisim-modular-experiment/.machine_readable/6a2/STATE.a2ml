@@ -10,7 +10,8 @@
     (purpose "Research experiment: can any octad shape be entirely absent (store-level)
               without making VCL consonance claims unsound?")
     (type "research-prototype")
-    (completion-percentage 78))
+    (completion-percentage 100)
+    (status-note "All 5 phases complete; experiment closed with positive result."))
 
   (current-position
     (phase "phase-3-complete-seams-sorted")
@@ -41,9 +42,13 @@
       (federated-shape "vector")
       (deferred "ed25519" "multi-peer-noninterference" "vcl-parser"))
     (phase "phase-4-krladapter-dogfood"
-      (status pending))
+      (status complete)
+      (decision-gate "passed")
+      (result "KRLAdapter.jl client satisfied by Core alone — no Federable shapes required")
+      (artefact "examples/krladapter_integration.jl" "test/test_krladapter_integration.jl"))
     (phase "phase-5-findings-writeup"
-      (status pending)))
+      (status complete)
+      (artefact "docs/FINDINGS.adoc")))
 
   (components
     (component "idris2-abi"
@@ -107,9 +112,13 @@
     (result "vcl-tests"
       (command "julia --project=. test/test_vcl.jl")
       (status pass)
-      (assertions 32)))
+      (assertions 32))
+    (result "krladapter-dogfood-tests"
+      (command "julia --project=. test/test_krladapter_integration.jl")
+      (status pass)
+      (assertions 19)))
 
-  (total-assertions 126)
+  (total-assertions 145)
 
   (foldback-to-main-verisimdb
     (applied
@@ -120,10 +129,11 @@
       (item "Normalizer regeneration stub-status doc update (documented in FOLDBACK.adoc)")))
 
   (critical-next-actions
-    (action "Phase 4 dogfood: wire KRLAdapter.jl against VerisimCore+FederationManager")
-    (action "Phase 5 writeup: document findings, adoption guide, foldback to main verisimdb")
-    (action "Optional: add Tensor and Spatial Federable peers for 4-peer parity coverage")
-    (action "Optional: Zig FFI port of VerisimCore for production readiness"))
+    (action "Experiment closed — Path B confirmed. No immediate actions.")
+    (future-action "Promote impl/ to shippable verisim-core package if/when scheduling allows")
+    (future-action "Zig FFI port of VerisimCore per hyperpolymath standard")
+    (future-action "Formal Idris2-type-level non-interference proof at arbitrary N")
+    (future-action "Runtime IsFederable validation in main verisimdb peer registration"))
 
   (session-history
     (session "2026-04-05"

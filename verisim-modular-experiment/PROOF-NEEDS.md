@@ -68,9 +68,25 @@ next Phase 3 follow-up.
 
 ## Remaining obligations
 
-- [ ] Non-interference with N ≥ 2 simultaneous Federable peers.
-- [ ] Formal (Idris2 type-level) proof of non-interference. Currently
-      discharged at runtime only.
-- [ ] Byzantine-peer resistance (requires real Ed25519, not placeholder).
+- [x] Non-interference with N ≥ 2 simultaneous Federable peers.
+      **DISCHARGED runtime:** `test_noninterference.jl` (15 assertions)
+      with Vector + Document peers. Independent keypairs, isolated LWW
+      writes, 3-way parity over (S,V)/(S,D)/(V,D).
+- [x] Byzantine-peer resistance baseline — real Ed25519 via libsodium.
+      `test_seams.jl` round-trip + tamper rejection.
+- [ ] Formal (Idris2 type-level) proof of non-interference at arbitrary N.
+      Discharged at runtime only.
+- [ ] Byzantine-peer resistance beyond Clause 3 (e.g., peers that accept
+      LWW order but serve stale reads).
 - [ ] Conditional-shape gating (Graph): runtime check that Graph is
       registered only when cross-entity-claim workload is in scope.
+
+## Phase 4 + 5 closure
+
+- [x] **Phase 4 dogfood:** `test_krladapter_integration.jl` (19 assertions).
+      KRLAdapter.jl client fully satisfied by Core alone — no Federable
+      shapes required. See `examples/krladapter_integration.jl` +
+      `docs/FINDINGS.adoc`.
+- [x] **Phase 5 findings writeup:** `docs/FINDINGS.adoc` with
+      classification, contract, degradation routes, adoption guide,
+      foldback log, and productisation recommendation.

@@ -1,0 +1,231 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Findings — verisim-modular-experiment
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc: left
+:sectnums:
+
+*Phase 5 artefact.* Consolidated findings from Phases 0–4.
+
+== Result: Path B confirmed
+
+**The octad is divisible.** A non-trivial VerisimCore exists and VCL
+consonance claims compose soundly across a federation that omits
+non-Core shapes at store level.
+
+This is the positive outcome of the central obligation stated in
+`PROOF-NEEDS.md`:
+
+> There exists a subset Core ⊆ Octad and a federation contract F
+> such that, for every federation S = Core ⊎ {external shapes
+> honouring F}, VCL's consonance judgements on S are sound.
+
+**Grounded in 145 test assertions across 6 suites, all green.**
+
+== The classification
+
+[cols="1,1,3",options="header"]
+|===
+|Set |Size |Shapes and grounding
+
+|Core
+|3
+|{Semantic, Temporal, Provenance}. Required at store level by
+`inv:persist` (Identity Persistence), `def:enrichment` (the write
+primitive writes to Temporal + Provenance atomically), `thm:attestation`
+(attestation freshness window).
+
+|Federable
+|4
+|{Vector, Tensor, Document, Spatial}. Admit store-level absence via
+`d(⊥,·)=0` (def:pairwise-drift). Their absence makes drift axes vacuous,
+not unsound.
+
+|Conditional
+|1
+|{Graph}. Required iff cross-entity consonance claims (citations,
+lineage-via-edges) are in scope. Optional for per-entity workloads.
+|===
+
+=== Why these three are Core
+
+* **Semantic (S)** — VCL's proof substrate. PROOF INTEGRITY and
+  PROOF CONSISTENCY bind to type assertions + proof blobs in S.
+* **Temporal (P)** — Identity Persistence invariant (every mutation
+  records to φ(P)); enrichment primitive; attestation freshness clock;
+  last-writer-wins total order over federation writes.
+* **Provenance (R)** — Enrichment primitive co-write; SHA-256 hash
+  chain makes federation-trust cryptographically enforceable; without
+  it federation collapses to trust-me-bro.
+
+=== Why these four are Federable
+
+Each enables a query class (similarity, multi-dim, full-text, geospatial)
+but does not participate in structural soundness guarantees. The formal
+model's `d(⊥,·)=0` convention plus weight renormalisation (new
+remark `rem:agg-drift-renorm` added to TeX §4.2) keep aggregate-drift
+claims coherent under arbitrary Federable-set presence.
+
+== The 5-clause federation contract
+
+Any Federable peer must honour:
+
+[cols="1,3",options="header"]
+|===
+|Clause |What it guarantees
+
+|1. Weight renormalisation
+|Core's federation manager rebalances aggregate-drift weights to Σ=1 over present pairs when shapes are absent. Claim thresholds preserve meaning.
+
+|2. Drift-signal projection
+|Peers expose per-pair drift *contributions* (scalar), not raw shape values. Core computes aggregate drift without transferring full Federable data.
+
+|3. Attestation signatures
+|Every peer response Ed25519-signed with freshness-window timestamp. Stale or forged peer data is rejected at Core.
+
+|4. Coherence-constraint surface
+|When a coherence constraint `c(m1, m2)` crosses Core/Federable boundary (e.g., G↔S), peer exposes the projection Core needs to evaluate `c`.
+
+|5. Conflict-resolution (LWW)
+|Peers accept Core's Temporal ordering as authoritative for last-writer-wins conflict resolution on their shape's data.
+|===
+
+Specified in `src/Abi/FederationContract.idr` (typechecked in Idris2 0.8.0)
+and `spec/federation-contract.adoc`. Julia reference implementation in
+`impl/` (VerisimCore, FederationManager, VectorPeer, DocumentPeer).
+
+== Degradation story
+
+Two independent soundness routes let VCL claims reduce gracefully:
+
+=== Route A: weight renormalisation
+
+If a claim's scope omits Federable shapes, Clause 1 renormalises
+weights over remaining pairs to Σ=1. Threshold semantics preserved:
+`aggregate_drift < θ` means the same thing whether evaluated over full
+or reduced scope.
+
+=== Route B: absent-pair convention
+
+If weights over absent pairs stay in the mix, `d(⊥,·)=0` makes those
+pairs contribute zero. Aggregate drift is still well-defined, just at a
+different denominator. Claim threshold-comparison semantics shift —
+mitigated by route A when threshold-sensitive.
+
+=== When Graph is absent
+
+Cross-entity claims (citations, lineage) become unavailable. Per-entity
+claims remain sound. Workloads that never make cross-entity claims can
+safely omit Graph.
+
+== Adoption guide: when to use VerisimCore vs. full octad
+
+[cols="3,1,2",options="header"]
+|===
+|Scenario |Recommended |Reason
+
+|High-throughput identity + audit trail, no similarity/full-text/geospatial
+|**VerisimCore only**
+|3-shape Core is smaller, faster, simpler. KRLAdapter.jl is this pattern (Phase 4 dogfood confirms).
+
+|Research dataset with embeddings + text
+|**VerisimCore + Vector + Document peers**
+|2 Federable peers. Clauses 1-5 handle drift over (S,V), (S,D), (V,D).
+
+|Citation graph / knowledge graph
+|**VerisimCore + Graph (Conditional promoted)**
+|Graph needed for cross-entity claims. Plus any Federable shapes the workload demands.
+
+|Multi-institutional geospatial dataset
+|**VerisimCore + Spatial + Document peers, federated across institutions**
+|Each institution hosts its own peer, Core coordinates via federation.
+
+|Greenfield project wanting everything
+|**Full octad (main verisimdb)**
+|Paved-road deployment, full cross-modal drift detection, canonical docs and tooling.
+|===
+
+**Heuristic:** start with VerisimCore, add Federable peers as workloads
+demand their query classes. Every Federable shape pays its own
+integration cost; only add what you need.
+
+== What was discharged
+
+[cols="3,1",options="header"]
+|===
+|Obligation (from PROOF-NEEDS.md) |Status
+
+|Central: exists Core + contract F s.t. VCL claims sound
+|Discharged runtime (single-peer + 2-peer tested).
+
+|Subordinate 1: Core closure
+|Discharged runtime (test_verisim_core.jl: 25).
+
+|Subordinate 2: Federation soundness
+|Discharged runtime (test_federation_parity.jl: 24, parity with monolithic).
+
+|Subordinate 3: Degradation honesty
+|Discharged (two documented routes + tested, both green).
+
+|Subordinate 4: Non-interference
+|Discharged runtime at N=2 peers (test_noninterference.jl: 15).
+
+|Phase 4 dogfood (KRLAdapter.jl)
+|Discharged: client satisfied by Core alone (test_krladapter_integration.jl: 19).
+|===
+
+== What remains open
+
+* **Formal (Idris2-type-level) proof** of non-interference at arbitrary N. Discharged at runtime only.
+* **Byzantine-peer resistance** beyond Clause 3 attestation — e.g. peers that accept Core's LWW order but serve stale reads.
+* **Zig FFI port** of VerisimCore for production readiness (per hyperpolymath standard).
+* **Conditional-shape gating**: runtime check that Graph is registered only when cross-entity-claim workload is declared.
+* **VCL-DT PROOF over federation** in main verisimdb (pre-existing gap; the experiment's contract spec provides a blueprint).
+
+== Foldback to main verisimdb
+
+See `docs/FOLDBACK.adoc` for the tracking log. Summary:
+
+[cols="3,1",options="header"]
+|===
+|Item |Status
+
+|`docs/deployment-modes.adoc`: 6→8 modalities wording
+|APPLIED (commit in verisimdb).
+
+|`docs/federation-readiness.adoc`: 6→8 modalities + 2 normalizer strategies
+|APPLIED.
+
+|`arcvix-octad-data-model.tex`: `rem:agg-drift-renorm` at §4.2
+|APPLIED.
+
+|`docs/federation-readiness.adoc`: 5 new readiness matrix rows reflecting the experiment
+|APPLIED.
+
+|Normalizer regeneration stubs for Provenance + Spatial
+|PENDING (code-level, not doc-level).
+
+|Federation executor / resolver stub implementations
+|PENDING (pre-existing gaps, not experiment-sourced).
+
+|Adopt Idris2 ABI into verisim-api peer registration
+|FUTURE (if Path B ships to production).
+|===
+
+== Recommendation
+
+**Productise VerisimCore as a sibling to main verisimdb**, not as a
+replacement. Two deployments co-exist:
+
+* **verisimdb** — paved-road canonical octad, full cross-modal drift
+  detection, heavy integration effort, all queries available.
+* **verisim-core** — slim identity-core + federation contract, light
+  integration effort, restricted queries, escape hatch for clients that
+  can't adopt the full octad.
+
+KRLAdapter.jl demonstrates the slim-core path works end-to-end. Other
+clients that match its profile (identity + audit trail, no similarity
+search) can adopt VerisimCore immediately once it's productised.
+
+This experiment is done. Path B is live. Time to promote `impl/` out
+of the research prototype and into a shippable `verisim-core` package,
+whenever scheduling allows.
