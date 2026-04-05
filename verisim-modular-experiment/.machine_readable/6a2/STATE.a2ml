@@ -1,0 +1,110 @@
+;; SPDX-License-Identifier: PMPL-1.0-or-later
+(state
+  (metadata
+    (version "0.1.0")
+    (last-updated "2026-04-05")
+    (status active))
+
+  (project-context
+    (name "verisim-modular-experiment")
+    (purpose "Research experiment: can any octad shape be entirely absent (store-level)
+              without making VCL consonance claims unsound?")
+    (type "research-prototype")
+    (completion-percentage 55))
+
+  (current-position
+    (phase "phase-3-complete-seams-sorted")
+    (summary "Phase 0-3 complete. Core={Semantic,Temporal,Provenance}, Federable={V,T,D,X},
+              Graph conditional. Idris2 ABI typechecks in v0.8.0. Julia reference impl
+              runs 70/70 assertions green across three suites. Federated aggregate-drift
+              numerically equals monolithic aggregate-drift for same data. Path B
+              runtime-confirmed. Seam audit completed and fixes applied."))
+
+  (phases
+    (phase "phase-0-octad-archaeology"
+      (status complete)
+      (artefact "docs/OCTAD-SHAPES.adoc"))
+    (phase "phase-1-core-identification"
+      (status complete)
+      (decision-gate "passed")
+      (result "Core={S,T,R} Federable={V,T,D,X} Conditional={G}")
+      (artefact "docs/CORE-CANDIDATES.adoc"))
+    (phase "phase-2-federation-contract"
+      (status complete)
+      (artefact "src/Abi/FederationContract.idr" "spec/federation-contract.adoc")
+      (verified "idris2 --build"))
+    (phase "phase-3-reference-impl"
+      (status complete)
+      (decision-gate "passed")
+      (result "70/70 assertions green, federated=monolithic parity confirmed")
+      (language "julia")
+      (federated-shape "vector")
+      (deferred "ed25519" "multi-peer-noninterference" "vcl-parser"))
+    (phase "phase-4-krladapter-dogfood"
+      (status pending))
+    (phase "phase-5-findings-writeup"
+      (status pending)))
+
+  (components
+    (component "idris2-abi"
+      (status complete)
+      (description "3 modules: Types, VerisimCore, FederationContract. Typechecks clean.")
+      (completion 100))
+    (component "julia-core"
+      (status complete)
+      (description "VerisimCore.jl: enrich!, attest, verify_attest, Identity Persistence.")
+      (completion 100))
+    (component "julia-federation"
+      (status complete)
+      (description "FederationManager.jl: renormalise, aggregate_drift, PeerAttestation.")
+      (completion 100))
+    (component "julia-vector-peer"
+      (status complete)
+      (description "First Federable peer: DriftProjector, CoherenceProjector, LWWAcceptor.")
+      (completion 100))
+    (component "julia-crypto-ed25519"
+      (status in-progress)
+      (description "Replacing placeholder SHA-256 with real Ed25519 via libsodium.")
+      (completion 50))
+    (component "documentation"
+      (status complete)
+      (description "README, PLAN, PROOF-NEEDS, DESIGN, OCTAD-SHAPES, CORE-CANDIDATES,
+                    FOLDBACK, SEAMS, PHASE-3-IMPL-PLAN, federation-contract spec, AI manifest.")
+      (completion 90)))
+
+  (verified-results
+    (result "idris2-typecheck"
+      (command "idris2 --build verisim-modular-experiment.ipkg")
+      (status pass))
+    (result "verisim-core-tests"
+      (command "julia --project=. test/test_verisim_core.jl")
+      (status pass)
+      (assertions 25))
+    (result "federation-parity-tests"
+      (command "julia --project=. test/test_federation_parity.jl")
+      (status pass)
+      (assertions 24))
+    (result "seam-tests"
+      (command "julia --project=. test/test_seams.jl")
+      (status pass)
+      (assertions 21)))
+
+  (foldback-to-main-verisimdb
+    (applied
+      (item "docs/deployment-modes.adoc: 6→8 modalities")
+      (item "docs/federation-readiness.adoc: 6→8 modalities + normalizer strategies")
+      (item "arcvix-octad-data-model.tex: rem:agg-drift-renorm added to §4.2"))
+    (pending
+      (item "Normalizer regeneration stub-status doc update (documented in FOLDBACK.adoc)")))
+
+  (critical-next-actions
+    (action "Finish Ed25519 wiring (impl/Crypto.jl written, needs VerisimCore/VectorPeer update)")
+    (action "Add second Federable peer (Document) for multi-peer non-interference test")
+    (action "Write minimal VCL parser/evaluator exercising FROM FEDERATION syntax")
+    (action "Update this STATE.a2ml after each"))
+
+  (session-history
+    (session "2026-04-05"
+      (focus "Full experiment scaffold → Phase 3 runtime validation")
+      (phases-closed "0" "1" "2" "3")
+      (highlight "Path B confirmed: non-trivial Core exists"))))

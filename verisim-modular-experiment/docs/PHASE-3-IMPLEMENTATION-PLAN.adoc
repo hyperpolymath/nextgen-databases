@@ -1,0 +1,185 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Phase 3 Implementation Plan
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc:
+:sectnums:
+
+*Status:* scaffold. Phase 3 is research-prototype-grade, not production.
+
+== Language choice: Julia (research prototype)
+
+The hyperpolymath ABI/FFI standard is Idris2-ABI + Zig-FFI. This
+experiment follows the standard **at the ABI level** (`src/Abi/*.idr`
+done, typechecks in Phase 2). But for the Phase 3 *reference
+implementation*, Julia is the right choice:
+
+[cols="1,3",options="header"]
+|===
+|Reason |Rationale
+
+|**Dogfood alignment** |Phase 4's dogfood client is `KRLAdapter.jl` — a Julia package. A Julia Phase 3 implementation can feed directly into Phase 4 without a language bridge layer.
+|**Prototype velocity** |Julia's interactive REPL, dynamic dispatch, and ndarray ergonomics make Vector/Document/drift prototyping fast. Research experiments pay for iteration speed over runtime speed.
+|**Parity with existing verisimdb test-harness** |Existing verisimdb already has Julia client bindings in `connectors/clients/julia/`. Reusing their octad types gives us a proving-ground data surface.
+|**Zig port as Phase 5 follow-up** |If Path B proves out at Phase 4, a canonical Zig FFI re-implementation is appropriate. If Path B collapses, the Julia prototype is discarded — no wasted Zig effort.
+|===
+
+**Non-goal:** production-grade Julia code. Phase 3 is a falsifier, not a
+product.
+
+== Directory structure
+
+```
+verisim-modular-experiment/
+├── src/Abi/                      # Idris2 ABI (done)
+├── impl/
+│   ├── VerisimCore.jl            # Core: {Semantic, Temporal, Provenance}
+│   ├── FederationManager.jl      # Clauses 1 & 3 (renormalisation, attestation)
+│   ├── peers/
+│   │   └── VectorPeer.jl         # First Federable shape peer
+│   ├── vcl/
+│   │   ├── Parser.jl             # VCL subset parser (enough for tests)
+│   │   ├── Evaluator.jl          # VCL evaluator, honours federation
+│   │   └── ConsonanceProver.jl   # PROOF CONSISTENCY, INTEGRITY, etc.
+│   └── drift/
+│       └── Metrics.jl            # Pairwise drift functions from TeX §4.3
+├── test/
+│   ├── federation_parity.jl      # Core result == full-octad result
+│   ├── contract_clauses.jl       # Per-clause tests (1-5)
+│   └── vcl_cases.jl              # VCL query cases exercising boundary
+└── Project.toml                  # Julia package definition
+```
+
+== Module responsibilities
+
+=== VerisimCore.jl
+
+In-memory Core store. Implements:
+
+* `OctadId`, `Timestamp`, `Signature`, `SemanticBlob`,
+  `TemporalHistory`, `ProvenanceChain`, `CoreOctad` — mirroring Idris2
+  `Abi.VerisimCore`.
+* `get_core(store, id) :: Maybe{CoreOctad}`
+* `enrich!(store, id, shape, payload, actor)` — the atomic write
+  primitive, writes to both Temporal and Provenance per def:enrichment.
+* `attest(store, id)` — signed attestation.
+* `verify_attest(octad, sig, t)` — signature + freshness window check.
+
+Backing store: `Dict{OctadId, CoreOctad}` (in-memory, ephemeral).
+Signatures: Ed25519 via `Nettle.jl` or `MbedTLS.jl` (decide once we start).
+
+=== FederationManager.jl
+
+Orthogonal-to-shape clauses (1 and 3):
+
+* `renormalise(present::Vector{Shape}, weights::DriftWeights)` — Clause 1.
+* `PeerAttestation`, `is_fresh(now, peer_attest)` — Clause 3 helpers.
+* `register_peer!(mgr, peer)`, `query_peer(mgr, shape, octad_id, op)` — dispatch.
+
+Holds `Dict{Shape, FederablePeer}` of registered peers.
+
+=== peers/VectorPeer.jl
+
+Implements `FederableShape` for Vector via the three per-shape interfaces:
+
+* `DriftProjector`: `drift_against(peer, octad_id, other)` computes
+  cosine drift for (V, D) and (V, T), returns Double in [0,1].
+* `CoherenceProjector`: `coherence_proj(peer, octad_id, core_shape)`
+  exposes opaque byte projection.
+* `LWWAcceptor`: `apply_lww!(peer, octad_id, core_ts, payload)` accepts
+  writes iff `core_ts > local_last_write_ts`.
+
+Backing store: `Dict{OctadId, Vector{Float32}}` (embeddings only) +
+`Dict{OctadId, Timestamp}` (local LWW stamps).
+
+=== vcl/Parser.jl + vcl/Evaluator.jl
+
+A *minimum* VCL subset — enough to state and test federation-relevant
+claims. Targets:
+
+* `SELECT <shapes> FROM FEDERATION <name>` — already parses in main
+  verisimdb; Julia parser just needs to handle the subset.
+* `PROOF CONSISTENCY` over mixed Core+Federable shapes.
+* `PROOF INTEGRITY` (Core-only, sanity baseline).
+* `DRIFT < θ` aggregate-drift claims.
+
+Evaluator routes each shape's data access through either
+`VerisimCore` (for Core shapes) or `FederationManager` (for Federable).
+
+=== vcl/ConsonanceProver.jl
+
+Evaluates PROOF clauses. For PROOF CONSISTENCY:
+
+1. Collect pairwise drift scores across all pairs (m1, m2) in query scope.
+2. Renormalise weights via `FederationManager.renormalise`.
+3. Compute aggregate drift.
+4. Return `true` iff aggregate drift < threshold.
+
+=== drift/Metrics.jl
+
+Direct translations of TeX §4.3 formulas:
+
+* `d_{V,D}` — cosine distance between embedding and document re-embedding.
+* `d_{G,S}` — Jaccard distance over typed edge/type-assertion sets.
+* `d_{T,V}` — projection distance.
+* `d_{D,X}` — haversine-based geographic drift.
+* Absent-pair convention: `d(⊥, ·) = d(·, ⊥) = 0`.
+
+== Test strategy
+
+=== federation_parity.jl — the critical test
+
+Construct the same octad twice:
+
+. **Full-octad run:** populate all 8 shapes on a single Core store
+  (non-federated). Evaluate `PROOF CONSISTENCY` at threshold θ.
+. **Reduced-federation run:** populate {S, P, R} on Core + Vector on
+  VectorPeer. Other shapes absent. Evaluate the same PROOF CONSISTENCY
+  claim (the claim itself restricts to the present shapes).
+
+**Expected:** results agree for claims whose shape-scope is the
+intersection of the two runs. For claims scoped to shapes absent in
+run 2, run 2 returns "vacuously satisfied" (drift = 0 by convention).
+
+**If they disagree:** Path B has a soundness bug; Phase 3's decision
+gate fails and we revisit the contract.
+
+=== contract_clauses.jl
+
+One test per clause:
+
+* **Clause 1:** renormalise weights, verify Σ = 1 after drop.
+* **Clause 2:** DriftProjector returns expected cosine for known vectors.
+* **Clause 3:** stale attestation (older than freshness window) rejected.
+* **Clause 4:** coherence projector returns byte-exact expected payload.
+* **Clause 5:** older Core-timestamp write rejected; newer accepted.
+
+=== vcl_cases.jl
+
+VCL query integration tests. Minimum set:
+
+* `PROOF INTEGRITY` on Core-only octad — baseline, should pass.
+* `PROOF CONSISTENCY WITH DRIFT < 0.1` over (S, V) — exercises
+  Core→Federable crossing.
+* `PROOF CONSISTENCY WITH DRIFT < 0.1` over (S, V, D) with D absent —
+  exercises renormalisation + vacuous drift.
+* `PROOF FRESHNESS WITHIN 1h` — Core-only, temporal sanity.
+
+== Decision gate (from PLAN.adoc)
+
+* **All tests pass + parity holds** → Path B confirmed at runtime,
+  proceed to Phase 4 (KRLAdapter.jl dogfood).
+* **Parity fails** → Path B has a flaw; revisit Phase 1 classification
+  or Phase 2 contract.
+
+== Open questions for this session
+
+Before writing any Julia, decide:
+
+. **Ed25519 impl choice:** `Nettle.jl` vs `MbedTLS.jl` vs `Sodium.jl`.
+. **Embedding dimension:** fixed (e.g., 384) or configurable?
+. **Parser generator:** hand-written recursive descent, or use
+  `Lerche.jl`/`PEG.jl`?
+. **Test harness:** plain `Test.jl` stdlib vs `TestItems.jl`?
+
+None are blockers — pick defaults (Nettle, 384, hand-written, Test.jl)
+and iterate. Noted here for the record.

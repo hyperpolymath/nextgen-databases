@@ -108,23 +108,34 @@ such that VCL's consonance claims over a federation are sound.
 *Goal:* working reference implementation of VerisimCore with exactly one
 shape federated through the contract.
 
-*Choice of federated shape:* probably *temporal* — well-understood ordering
-semantics, easy to expose invariants externally, common in real systems.
+*Choice of federated shape:* **Vector**. Corrects prior plan wording —
+Temporal is Core (Phase 1 resolved), cannot be federated. Vector chosen
+because:
+
+* Vector-Document drift is the first pairwise drift metric formalised
+  in the TeX (§4.3, d_{V,D}).
+* HNSW is well-bounded with a clean algebraic drift definition (cosine).
+* Similarity queries are the most common non-trivial query class that
+  would flow through the federation contract.
 
 *Activities:*
 
-* Implement minimal VerisimCore (identity + provenance + VCL runtime +
-  consonance prover)
-* Implement federation adapter for temporal shape via Zig FFI
-* Write VCL test cases that exercise claims crossing Core/temporal boundary
-* Verify consonance is preserved vs. equivalent full-octad run
+* Implement minimal VerisimCore with {Semantic, Temporal, Provenance}.
+* Implement federation adapter for Vector shape honouring all 5
+  contract clauses (renormalisation, drift projection, attestation,
+  coherence, LWW).
+* Write VCL test cases exercising claims crossing Core/Vector boundary.
+* Verify consonance preserved vs. equivalent full-octad run on same data.
+* Discharge non-interference proof (deferred from Phase 2).
 
 *Artifacts:*
 
-* Reference implementation (language TBD — Julia for Core? Zig for FFI?
-  Decide in Phase 2 as contract crystallises)
+* Reference implementation in **Julia** (research-prototype choice —
+  see rationale in `docs/PHASE-3-IMPLEMENTATION-PLAN.adoc`)
 * Integration tests
 * Benchmark comparison vs. full octad for shared claims
+* If Path B proves out at Phase 4, a Zig FFI port is a Phase 5
+  follow-up, not a Phase 3 requirement.
 
 *Decision gate:*
 
@@ -132,6 +143,18 @@ semantics, easy to expose invariants externally, common in real systems.
   Phase 4.
 * **VCL claims fail to compose, or require weakening** → revisit Phase 1/2
   split or declare indivisibility.
+
+*Outcome (2026-04-05):* **Decision gate PASSED.** 70 assertions green
+across `test_verisim_core.jl` (25), `test_federation_parity.jl` (24),
+`test_seams.jl` (21). Federated aggregate-drift numerically equals
+monolithic aggregate-drift for the same octad data over a
+{Semantic, Vector} federation. Path B is runtime-confirmed.
+
+*Deferred from Phase 3 (addressed ahead of Phase 4 dogfood):*
+
+* **Ed25519 cryptography** — placeholder SHA-256 in VerisimCore + VectorPeer. Not load-bearing for parity correctness; swap is ~20 lines.
+* **Non-interference theorem for N ≥ 2 simultaneous peers** — Phase 3 tests one Federable peer. Multi-peer non-interference scenario needed.
+* **Full VCL parser/evaluator/ConsonanceProver** — parity was proved directly at the drift-computation layer; syntax layer is surface convenience.
 
 ---
 

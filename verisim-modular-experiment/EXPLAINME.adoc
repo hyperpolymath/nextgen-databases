@@ -1,0 +1,123 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= EXPLAINME — verisim-modular-experiment
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc: left
+
+This document explains, in plain terms, what this repo is and what question it answers.
+
+== What is this?
+
+A research experiment asking one question: *can VeriSimDB's eight-shape octad be split
+into a slim identity core plus a federation of optional shapes, without breaking
+VCL's consonance guarantees?*
+
+This is NOT a replacement for VeriSimDB. Main `verisimdb/` remains canonical. This
+experiment is a falsifier — either it proves the octad is divisible (producing a
+useful `VerisimCore` abstraction) or it proves the octad is indivisible (producing
+a formal justification of the monolith). Either outcome is acceptable.
+
+== What question did it answer?
+
+**Answer: the octad IS divisible.** A non-trivial identity core exists:
+
+[cols="1,1,2",options="header"]
+|===
+|Classification |Shapes |Why
+
+|Core (3 shapes)
+|Semantic, Temporal, Provenance
+|Store-level required. Semantic carries VCL's proof substrate. Temporal is required
+ by the Identity Persistence invariant and the enrichment primitive. Provenance is
+ the federation-trust substrate (hash-chain attestation).
+
+|Federable (4 shapes)
+|Vector, Tensor, Document, Spatial
+|Absent shapes yield drift=0 by the `d(⊥,·)=0` convention in the formal model.
+ Their absence makes query classes unavailable, not unsound.
+
+|Conditional (1 shape)
+|Graph
+|Required only for cross-entity consonance claims (citations, lineage-edges).
+ Omittable for per-entity workloads.
+|===
+
+Path B — the shape-absence hypothesis — is runtime-confirmed. 70 test assertions
+green. Federated aggregate-drift numerically equals monolithic aggregate-drift over
+the same data.
+
+== How do I run it?
+
+```bash
+# Idris2 ABI — typechecks 3 modules
+idris2 --build verisim-modular-experiment.ipkg
+
+# Julia reference implementation — 70 assertions across 3 suites
+julia --project=. test/test_verisim_core.jl
+julia --project=. test/test_federation_parity.jl
+julia --project=. test/test_seams.jl
+```
+
+Requirements: Julia 1.12+, Idris2 0.8.0, libsodium (auto-fetched via Sodium.jl).
+
+== Where is everything?
+
+[cols="1,3",options="header"]
+|===
+|Path |Contents
+
+|`README.adoc`
+|Entry point: the research question + scope + relationship to main verisimdb.
+
+|`PLAN.adoc`
+|5-phase research plan with decision gates (Phase 0-3 closed, 4-5 pending).
+
+|`PROOF-NEEDS.md`
+|Central + subordinate proof obligations, and what's discharged.
+
+|`src/Abi/`
+|Idris2 ABI definitions — `Types.idr`, `VerisimCore.idr`, `FederationContract.idr`.
+
+|`impl/`
+|Julia reference implementation — `VerisimCore.jl`, `FederationManager.jl`,
+ `peers/VectorPeer.jl`, `drift/Metrics.jl`, `Crypto.jl`.
+
+|`test/`
+|Julia test suites — Core-only, federation-parity, seam-audit-fixes.
+
+|`spec/federation-contract.adoc`
+|Prose spec for the 5-clause federation contract.
+
+|`docs/`
+|Design notes, per-phase artefacts, session logs, seam audit, foldback log.
+
+|`.machine_readable/6a2/`
+|A2ML files: STATE, META, ECOSYSTEM (structured project metadata).
+
+|`0-AI-MANIFEST.a2ml`
+|Entry point for AI agents working in this repo.
+|===
+
+== The five federation-contract clauses
+
+Any Federable peer must honour these for VCL claims to compose soundly:
+
+. **Aggregate-drift weight renormalisation** — when a shape is absent, pair weights renormalise to sum=1 over present pairs.
+. **Drift-signal projection** — peer exposes per-pair drift contributions, not just query results.
+. **Attestation signatures** — every peer response is Ed25519-signed with a freshness window.
+. **Coherence-constraint surface** — peer exposes projections for cross-shape coherence evaluation.
+. **Conflict-resolution contract** — peer accepts Core's Temporal as authoritative LWW order.
+
+See `spec/federation-contract.adoc` for details.
+
+== What's deferred past Phase 3?
+
+* **Ed25519 placeholder → real** — code in `impl/Crypto.jl`, wiring into VerisimCore in progress.
+* **Multi-peer non-interference** — Phase 3 tested one peer; need N≥2.
+* **VCL parser/evaluator surface** — parity was proved at the drift layer; syntax layer is convenience.
+
+== What if the result had been negative?
+
+If Path B had failed — if no non-trivial Core existed — the experiment would have
+produced a formal indivisibility argument folded back into main verisimdb's
+documentation as justification for the octad-as-unit. That outcome would have been
+equally valuable, just different.

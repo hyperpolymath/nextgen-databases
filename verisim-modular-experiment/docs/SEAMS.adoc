@@ -1,0 +1,151 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= ABI/Impl Seam Audit
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc:
+:sectnums:
+
+*Audit date:* 2026-04-05 (end of Phase 3).
+*Scope:* alignment between Idris2 ABI (`src/Abi/*.idr`) and Julia
+reference impl (`impl/*.jl`).
+
+== High-priority seams (fixed)
+
+=== Seam #1: `PeerAttestation` representation mismatch
+
+*Before:* Idris2 has a `record PeerAttestation` with 4 fields
+(publicKeyId, latestAttest, attestTimestamp, freshnessWindow).
+Julia had `peer_attestation_info` returning a *NamedTuple*.
+
+*Fix:* introduced `PeerAttestation` struct in Julia (in
+`FederationManager.jl`) mirroring the Idris2 record. `VectorPeer`'s
+`peer_attestation_info` now returns a `PeerAttestation`.
+
+=== Seam #2: `isFresh` signature mismatch
+
+*Before:* Idris2 `isFresh : Timestamp -> PeerAttestation -> Bool`.
+Julia `is_fresh(now_ts, attest_ts, freshness_window_ns)` — 3 primitive args.
+
+*Fix:* Julia `is_fresh` now takes `(now_ts::Timestamp, attest::PeerAttestation)`,
+matching the Idris2 signature. Primitive-argument overload removed; tests
+updated.
+
+== Medium-priority seams (documented, no code change needed)
+
+=== Seam #3: `enrich` payload type
+
+*Idris2:* `enrich : OctadId -> Shape -> (payload : List Bits8) -> String -> m (Either String ())`.
+Generic opaque bytes for any Core shape.
+
+*Julia:* `enrich!(store, id, shape_tag::Symbol, payload::SemanticBlob, actor)` —
+typed `SemanticBlob` payload, errors for any `shape_tag != :semantic`.
+
+*Verdict:* consistent at runtime — Idris2 ABI says "any Core shape
+accepted, payload is shape-dependent bytes", Julia currently only
+wires Semantic and surfaces the shape-restriction via a runtime
+error. When Provenance and Temporal become directly-enrichable (they
+are currently managed internally by `enrich!`), Julia will grow
+shape-specific payload types.
+
+*Action:* track under Phase 3+ follow-up. Not load-bearing for the
+parity result.
+
+=== Seam #4: `driftAgainst` transport
+
+*Idris2:* `driftAgainst : OctadId -> (other : Shape) -> m (Either String Double)` —
+peer is told the other shape but NOT given its value. In networked
+federation the peer would either pull from Core or Core would push
+the value in-band via a separate transport.
+
+*Julia:* `drift_against(peer, octad_id, other_shape, other_value)` —
+peer receives `other_value` inline.
+
+*Verdict:* the Idris2 ABI deliberately abstracts over transport. The
+Julia "pass value inline" pattern is ONE valid in-process transport
+implementation. The ABI does not commit to a transport; it commits
+only to the semantic contract (peer computes d_{sh,other} for an
+octad).
+
+*Action:* Idris2 docstring updated to clarify this explicitly.
+
+== Low-priority seams (language-idiom, no fix needed)
+
+=== Seam #5: naming convention
+
+Idris2 uses camelCase (`getCore`, `epochNanos`, `keyId`); Julia uses
+snake_case (`get_core`, `epoch_nanos`, `key_id`). Language-native
+conventions; no reconciliation needed.
+
+=== Seam #6: Shape enum representation
+
+Idris2: `data Shape = G_Graph | V_Vector | ...` (algebraic data type).
+Julia: `Symbol` (`:graph`, `:vector`) (string-interned atoms).
+
+Canonical mapping:
+  `G_Graph ↔ :graph`,        `V_Vector ↔ :vector`,
+  `T_Tensor ↔ :tensor`,      `S_Semantic ↔ :semantic`,
+  `D_Document ↔ :document`,  `P_Temporal ↔ :temporal`,
+  `R_Provenance ↔ :provenance`, `X_Spatial ↔ :spatial`.
+
+Idris2's `data Shape` gives compile-time exhaustiveness; Julia's
+`Symbol` gives runtime open-set flexibility (at cost of runtime
+validation). Trade-off acceptable for research scaffold.
+
+=== Seam #7: IsFederable type-level predicate
+
+Idris2 has `data IsFederable : Shape -> Type` with no constructors
+for Core shapes, giving compile-time rejection of Core-shape
+federation. Julia has no corresponding mechanism (runtime language).
+
+*Runtime equivalent in Julia:* `register_peer!` could validate the
+shape against a Core/Federable set. Currently unimplemented — any
+shape can be registered with `Manager`, which would silently allow
+Core shapes to be registered as Federable peers.
+
+*Action:* add runtime validation to `register_peer!`. Tracked as
+Phase 3 follow-up.
+
+=== Seam #8: `Main.Metrics.drift` cross-module reference
+
+Research-scaffold flat-include layout means `FederationManager.jl`
+and `VectorPeer.jl` reach `Metrics` via `Main.Metrics` rather than
+`using Metrics`. Documented in code comments at the reference sites.
+
+*Action:* none. Resolving this would require promoting the project
+to a proper Julia package (`src/` layout), which is Phase 4+ work
+if the experiment moves toward dogfood.
+
+=== Seam #9: `FederableShape` interface
+
+Idris2 declares a combined `FederableShape` interface bundling
+DriftProjector + CoherenceProjector + LWWAcceptor + metadata. Julia
+duck-types each method on the peer struct without an explicit
+bundling. `VectorPeer` satisfies the contract by providing all five
+methods; no interface declaration is required by Julia.
+
+*Action:* none. Julia idiom.
+
+== Discharged obligations
+
+From `PROOF-NEEDS.md` central obligation, phrased as:
+
+> Claim: There exists Core ⊆ Octad and federation contract F such
+> that VCL's consonance judgements are sound.
+
+**Runtime-discharged (Phase 3 parity test):** for the single-shape
+federation with Vector, aggregate-drift over {Core, Vector} equals
+aggregate-drift over a monolithic store with the same data. 24/24
+assertions in `test_federation_parity.jl`.
+
+**NOT discharged yet:**
+
+* Non-interference over *multiple* simultaneous Federable peers
+  (Phase 3 tests only one peer).
+* Formal (machine-checked) proof at the Idris2 type level.
+* Byzantine-peer resistance (Clause 3 placeholder crypto).
+
+== Follow-up items for Phase 3 closure
+
+- [ ] Add runtime shape-validation to `Manager.register_peer!`
+      (Seam #7 runtime equivalent).
+- [ ] Document the 8 shape/symbol mapping in a central `SHAPES.adoc`.
+- [ ] Re-run Idris2 build after clarifying `driftAgainst` docstring.

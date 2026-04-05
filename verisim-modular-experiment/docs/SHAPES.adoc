@@ -1,0 +1,99 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Shapes — Central Mapping and Classification
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc:
+:sectnums:
+
+*Canonical reference for the 8 octad shapes and their representations
+across the Idris2 ABI, Julia impl, and TeX formal model.*
+
+Addresses Seam #6 from `docs/SEAMS.adoc` (Shape enum representation).
+
+== The eight shapes
+
+[cols="1,1,1,1,2",options="header"]
+|===
+|TeX letter |Idris2 constructor |Julia symbol |Classification |Backing tech
+
+|`G` |`G_Graph`       |`:graph`       |Conditional |Oxigraph (RDF + property graph)
+|`V` |`V_Vector`      |`:vector`      |Federable   |HNSW (similarity search)
+|`T` |`T_Tensor`      |`:tensor`      |Federable   |ndarray / Burn
+|`S` |`S_Semantic`    |`:semantic`    |**Core**    |CBOR (type URIs + proof blobs)
+|`D` |`D_Document`    |`:document`    |Federable   |Tantivy (full-text)
+|`P` |`P_Temporal`    |`:temporal`    |**Core**    |Merkle-tree version history
+|`R` |`R_Provenance`  |`:provenance`  |**Core**    |SHA-256 hash chain
+|`X` |`X_Spatial`     |`:spatial`     |Federable   |R-tree (geospatial)
+|===
+
+**Note the TeX letter/meaning mismatch:** TeX uses `P` for Temporal (not
+Provenance) and `R` for Provenance. The Idris2 constructors preserve
+this (`P_Temporal`, `R_Provenance`).
+
+== Classification rules
+
+=== Core (3 shapes)
+
+Must be implemented by every VerisimCore store. Absence breaks VCL
+soundness.
+
+* **Semantic (S)** — VCL's proof substrate. `PROOF INTEGRITY` and
+  `PROOF CONSISTENCY` bind here (per CLAUDE.md modality compatibility).
+* **Temporal (P)** — required by Identity Persistence invariant
+  (inv:persist) and the enrichment primitive (def:enrichment). Provides
+  LWW total order on writes and the freshness clock for attestations.
+* **Provenance (R)** — co-written with Temporal by every enrichment.
+  Hash-chain attestation is the substrate that makes federation trust
+  possible; without it federation is trust-me-bro.
+
+=== Federable (4 shapes)
+
+May be provided by external peers OR entirely absent at store level.
+Absence makes related drift axes vacuous (`d(⊥,·)=0` convention).
+
+* **Vector (V)** — similarity queries.
+* **Tensor (T)** — multi-dim representations. User-declared research shape.
+* **Document (D)** — full-text search.
+* **Spatial (X)** — geospatial queries. TeX uses X as ⊥-example prose.
+
+=== Conditional (1 shape)
+
+Federable **only if** the federation's workload excludes cross-entity
+consonance claims. Required if claims reference relationships between
+entities.
+
+* **Graph (G)** — required for citations, lineage-via-edges, traversals.
+  Optional for per-entity workloads.
+
+== Invariants referenced
+
+These TeX invariants drive the classification:
+
+* `def:octad` — `φ(m) ∈ Σ_m ∪ {⊥}`. Per-octad absence is always allowed.
+* `def:pairwise-drift` — `d(⊥, ·) = d(·, ⊥) = 0`. Absence is sound.
+* `inv:persist` — Identity Persistence: mutations record into Temporal.
+* `def:enrichment` — Write primitive: writes to Temporal AND Provenance.
+* `thm:attestation` — Attestation soundness: signature + freshness window.
+* `rem:agg-drift-renorm` (added 2026-04-05) — weight renormalisation obligation.
+
+== Checking a new peer's shape registration
+
+Runtime validation (Julia, `FederationManager.register_peer!`):
+
+[source,julia]
+----
+shape in CORE_SHAPES  && error("Core shapes cannot be federated")
+shape in FEDERABLE_SHAPES || shape in CONDITIONAL_SHAPES  # permitted
+----
+
+Compile-time validation (Idris2, `FederationContract.IsFederable`):
+
+[source,idris]
+----
+data IsFederable : Shape -> Type where
+  FederableVector   : IsFederable V_Vector
+  FederableTensor   : IsFederable T_Tensor
+  FederableDocument : IsFederable D_Document
+  FederableSpatial  : IsFederable X_Spatial
+  ConditionalGraph  : IsFederable G_Graph
+  -- No constructors for Core shapes ⇒ compile-time rejection.
+----

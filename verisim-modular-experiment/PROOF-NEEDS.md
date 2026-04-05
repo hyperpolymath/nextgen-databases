@@ -36,6 +36,41 @@ which holds.
 - VCL's existing proof apparatus for consonance claims
 - Zig FFI at the external-shape boundary
 
-## Status
+## Status (updated 2026-04-05)
 
-Empty. No obligations discharged yet — this is a research scaffold.
+**Central obligation — positive direction:** runtime-discharged for the
+minimal case. Core = {Semantic, Temporal, Provenance} + one Federable
+peer (Vector) honouring all 5 contract clauses gives aggregate-drift
+numerically equal to the monolithic full-octad computation on the same
+data (24/24 parity assertions).
+
+**Subordinate obligation 1 (Core closure):** partially discharged.
+VerisimCore smoke tests (25/25) show that Core-only operation —
+enrichment, attestation, verification, Identity Persistence — is
+sound without any federated shapes. Consonance claims over Core-only
+shapes (i.e. not crossing boundaries) are verifiable.
+
+**Subordinate obligation 2 (Federation soundness):** runtime-discharged
+for single-peer case. Federated drift equals monolithic drift. See
+`docs/SEAMS.adoc` for the ABI↔impl alignment that this rests on.
+
+**Subordinate obligation 3 (Degradation honesty):** structurally satisfied.
+Two independent soundness routes documented:
+  (a) Clause 1 renormalisation → threshold-preserving reduction.
+  (b) Absent-pair convention `d(⊥,·)=0` → vacuous-drift reduction.
+Both tested and green.
+
+**Subordinate obligation 4 (Non-interference):** NOT YET DISCHARGED.
+Phase 3 tests only one Federable peer. Multi-peer non-interference
+requires ≥2 registered peers + a scenario where federating one shape
+could (in principle) weaken claims about the other. Scheduled as
+next Phase 3 follow-up.
+
+## Remaining obligations
+
+- [ ] Non-interference with N ≥ 2 simultaneous Federable peers.
+- [ ] Formal (Idris2 type-level) proof of non-interference. Currently
+      discharged at runtime only.
+- [ ] Byzantine-peer resistance (requires real Ed25519, not placeholder).
+- [ ] Conditional-shape gating (Graph): runtime check that Graph is
+      registered only when cross-entity-claim workload is in scope.

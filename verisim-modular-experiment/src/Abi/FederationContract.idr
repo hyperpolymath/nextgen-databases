@@ -54,6 +54,16 @@ renormalise present (MkDriftWeights ws) =
 |||
 ||| Example: Vector peer exposes a cosine-projection against a Core-held
 ||| document embedding, returning just the scalar drift contribution.
+|||
+||| **Transport abstraction.** This ABI commits to the semantic contract
+||| only — the peer computes d_{sh, other} for an octad — and abstracts
+||| over *how* the peer obtains the other shape's value. Valid transport
+||| implementations include:
+|||   * Peer pulls from Core via a separate endpoint.
+|||   * Core pushes `otherValue` in-band (an inline-value variant; this
+|||     is the pattern used by the Julia reference impl).
+|||   * Both sides precompute drift snapshots at attestation time.
+||| The transport is implementation-selected; the contract is identical.
 public export
 interface DriftProjector (m : Type -> Type) (sh : Shape) where
   ||| Compute d_{sh, other}(octad.sh, octad.other) where 'other' is a

@@ -1,0 +1,75 @@
+;; SPDX-License-Identifier: PMPL-1.0-or-later
+(ecosystem
+  (version "1.0.0")
+  (last-updated "2026-04-05")
+
+  (name "verisim-modular-experiment")
+  (type "research-experiment")
+  (purpose "Test whether a non-trivial VerisimCore (identity-core subset of the octad)
+            exists such that VCL consonance claims compose soundly over federations
+            that omit non-core shapes entirely at store level.")
+
+  (position-in-ecosystem
+    (parent "nextgen-databases"
+      (relationship "sub-project")
+      (description "Lives within the nextgen-databases monorepo; no own .git."))
+    (siblings
+      (sibling "verisimdb"
+        (relationship "parent-architecture")
+        (description "Canonical paved-road octad. Experiment is read-only w.r.t. its sources.
+                      Foldback items (doc drift, soundness remarks) track in docs/FOLDBACK.adoc."))
+      (sibling "typeql-experimental"
+        (relationship "sibling-experiment")
+        (description "Experimental sister project exploring VCL type-theoretic extensions.
+                      Same experiment-repo pattern (deno.json / ipkg / machine_readable).")))
+    (description "Opens an architectural question neither verisimdb nor typeql-experimental
+                  asks: the presence axis for modality shapes. Independent falsifier."))
+
+  (related-projects
+    (project "verisimdb"
+      (relationship "reference")
+      (description "Authoritative formal data model (arcvix-octad-data-model.tex)
+                    and 8-shape octad implementation in rust-core/.")
+      (artefacts-used "arcvix-octad-data-model.tex"
+                      "rust-core/verisim-octad/src/query_octad.rs"
+                      "docs/federation-readiness.adoc"
+                      "docs/deployment-modes.adoc"
+                      "CLAUDE.md (octad modality list)"))
+
+    (project "krladapter-jl"
+      (relationship "intended-phase-4-dogfood")
+      (description "Julia package earmarked as first dogfood client for VerisimCore.
+                    Current upstream keeps a VeriSim interface slot open (per vcl-rename
+                    memory). Phase 4 wires KRLAdapter.jl against VerisimCore + federation.")
+      (artefacts-used "(planned: KRLAdapter.jl VeriSim interface slot)"))
+
+    (project "idris2-ecosystem"
+      (relationship "abi-toolchain")
+      (description "Idris2 v0.8.0 used for ABI specification per hyperpolymath standard.")
+      (artefacts-used "idris2 compiler")))
+
+  (standards-followed
+    (standard "hyperpolymath-abi-ffi-standard"
+      (description "Idris2 ABI + (intended) Zig FFI per ~/Documents/hyperpolymath-repos/rsr-template-repo")
+      (conformance "partial — Idris2 ABI done, Zig FFI deferred past Phase 4"))
+    (standard "a2ml-machine-readable"
+      (description "This .machine_readable/6a2/*.a2ml directory")
+      (conformance "complete — STATE, META, ECOSYSTEM all present"))
+    (standard "pmpl-1.0-license"
+      (description "All original code uses SPDX-License-Identifier: PMPL-1.0-or-later")
+      (conformance "complete — all files headered")))
+
+  (deliverables
+    (deliverable "idris2-abi"
+      (description "3-module typechecked ABI: Types, VerisimCore, FederationContract")
+      (status "complete"))
+    (deliverable "julia-reference-impl"
+      (description "Core + Vector peer + federation manager; 70 test assertions green")
+      (status "complete"))
+    (deliverable "path-b-validation"
+      (description "Runtime-confirmed: Core={S,T,R} admits sound federation with
+                    one Federable peer (Vector) on the parity test")
+      (status "complete"))
+    (deliverable "full-nondivisibility-decision"
+      (description "Multi-peer N≥2 non-interference + formal proof + VCL surface")
+      (status "pending (Phase 3 follow-ups + Phase 4)"))))
