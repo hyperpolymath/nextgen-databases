@@ -1,0 +1,10 @@
+;; SPDX-License-Identifier: PMPL-1.0-or-later
+(state (metadata (version "0.1.0") (last-updated "2026-02-13") (status active))
+  (project-context (name "quandledb") (purpose "Knot-theory database application wrapping Skein.jl") (completion-percentage 40))
+  (components
+    (component "server" (language "Julia") (status "implemented") (description "HTTP API server wrapping Skein.jl"))
+    (component "frontend" (language "ReScript") (status "implemented") (description "TEA web interface"))
+    (component "kql" (language "Julia") (status "planned") (description "Knot Query Language")))
+  (blockers
+    (blocker "Frontend needs Deno + ReScript build toolchain installed")
+    (blocker "Server requires Skein.jl database file")))

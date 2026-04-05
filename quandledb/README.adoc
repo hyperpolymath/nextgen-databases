@@ -1,0 +1,139 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= QuandleDB
+Jonathan Jewell (hyperpolymath)
+:toc: left
+:toc-title: Contents
+:doctype: article
+:icons: font
+
+link:../../tangle/docs/krl_map.html[→ KRL architecture map (HTML)]
+
+== What it is
+
+QuandleDB is the semantic identity layer of the KRL stack.
+
+A _quandle_ is an algebraic structure tailor-made for knot theory:
+it satisfies exactly the axioms that correspond to Reidemeister moves,
+making it a canonical invariant under isotopy. Two knots with different
+fundamental quandles are provably distinct.
+
+QuandleDB extracts quandle presentations from `TangleIR` objects,
+computes canonical fingerprints, counts colourings into finite quandles,
+and integrates with Skein.jl to make these fingerprints queryable.
+
+== Why quandles
+
+Most invariants (Jones, Alexander) are computable but cannot always
+distinguish knots. Quandles are:
+
+* *Complete* for many knot families (the fundamental quandle is a complete
+  invariant for prime alternating knots under appropriate conditions)
+* *Algebraically rich* — coloring counts into finite quandles give a family
+  of integer invariants that are fast to compute and highly discriminating
+* *Categorical* — the fundamental quandle functor Q: Tang → Quand commutes
+  with the octadic structure (it is a morphism of octadic systems)
+
+In Verisim terms: quandles provide the _observation_ and _equivalence_ layers
+of the octad for the tangle category.
+
+== Architecture position
+
+----
+TangleIR
+  ↓  quandle_presentation(ir)
+QuandlePresentation
+  ↓  quandle_fingerprint(qp)
+String (canonical hash)
+  ↓  stored in Skein.jl invariants table
+Indexed and queryable
+----
+
+QuandleDB does *not* own persistence. It computes. Skein.jl stores.
+
+== Key concepts
+
+=== Fundamental quandle
+
+For a knot diagram with arcs $a_1, \ldots, a_n$ and crossings,
+the fundamental quandle has:
+
+* One generator per arc
+* One relation per crossing: at a positive crossing, $a \triangleright b = c$
+  (the right quandle action: arc $a$ acts on arc $b$ to give arc $c$)
+
+This presentation is invariant under Reidemeister moves by construction.
+
+=== Quandle fingerprint
+
+A canonical, normalised hash of the quandle presentation:
+
+. Relabel generators to canonical form (sorted, lexicographic)
+. Sort relations
+. Hash the result (BLAKE3)
+
+Two presentations with the same fingerprint are isomorphic quandles.
+
+=== Colouring count
+
+For a finite quandle $Q$, the number of quandle homomorphisms from the
+fundamental quandle into $Q$ is a knot invariant. Different finite quandles
+yield different invariants; together they form a powerful fingerprint family.
+
+== API
+
+[source,julia]
+----
+using QuandleDB
+
+# extract presentation from compiled tangle
+qp = quandle_presentation(ir::TangleIR)::QuandlePresentation
+
+# canonical fingerprint
+fp = quandle_fingerprint(qp::QuandlePresentation)::String
+
+# colouring count into a target finite quandle
+n = colouring_count(qp::QuandlePresentation, q::FiniteQuandle)::Int
+
+# Skein integration (caches result in invariants table)
+cache_quandle!(db::SkeinDB, id::UUID)
+get_quandle_fingerprint(db::SkeinDB, id::UUID)::Union{String,Nothing}
+----
+
+== Formal statement
+
+The fundamental quandle defines a functor:
+
+----
+Q : Tang → Quand
+----
+
+which assigns to each tangle its quandle presentation and is invariant
+under Reidemeister moves. It therefore factors through the isotopy quotient:
+
+----
+Q : Tang/∼ → Quand
+----
+
+In Verisim terms: Q is an _observation functor_ in the octadic sense —
+an invariant-valued map from morphisms to an algebraic category that
+respects the transformation system (Reidemeister moves).
+
+This places QuandleDB precisely at the *Equivalence* and *Invariant*
+slots of the Verisim octad.
+
+== Status
+
+* Quandle presentation extraction: in progress
+* Canonical fingerprinting: designed, not yet implemented
+* Colouring count: planned
+* Skein.jl integration: planned
+* Tests: trefoil, figure-eight, unknot as validation targets
+
+== Related
+
+* link:../skein-jl/README.adoc[Skein.jl] — stores quandle fingerprints and makes them queryable
+* link:../tangle-pl/README.adoc[KRL / Tangle PL] — produces TangleIR that QuandleDB consumes
+* link:../julia-knot/README.adoc[JuliaKnot.jl] — computes other invariants alongside quandle data
+* link:../nextgen-databases/README.adoc[Next-generation databases]

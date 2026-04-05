@@ -1,0 +1,117 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= KQL Safety Model — Two-Tier Architecture
+:toc: left
+:toclevels: 3
+:sectnums:
+
+== Overview
+
+KQL (Knot Query Language) follows the same two-tier model as VQL:
+
+[cols="1,2,3", options="header"]
+|===
+| Tier | What | How
+
+| **KQL**
+| The query language
+| Pipeline syntax (`from knots \| where ... \| return ...`), parsed and executed.
+  What users write.
+
+| **KQL Safety Pipeline**
+| Progressive type safety
+| Applies TypeLL's 10 levels behind KQL automatically. Simple queries exit early.
+  Proof-carrying queries (with `PROOF` clause) activate L9-L10.
+|===
+
+== Relationship to VQL-UT
+
+The 10 safety levels originate in **TypeLL** (the core type theory). VQL-UT is
+the reference implementation for database queries. KQL maps its own constructs
+to the same 10 levels — it does not have a separate "-UT" repo.
+
+[source]
+----
+TypeLL (type theory core — defines the 10 levels)
+   │
+   ├──→ VQL-UT  (reference implementation, VeriSimDB)
+   ├──→ KQL     (applies same levels, QuandleDB)
+   └──→ GQL     (applies same levels, LithoGlyph)
+----
+
+== KQL Safety Levels
+
+[cols="^1,<3,<5", options="header"]
+|===
+| Level | Name | KQL Mapping
+
+| L1  | Construction Safety    | Pipeline injection prevention (safe `from`/`where`/`return` parsing)
+| L2  | Schema Pinning         | Knot record schema checked against database (dependent projection)
+| L3  | Resource Linearity     | Connection/cursor leak prevention for Skein.jl backend
+| L4  | Session Protocols      | Query session state machine (connect → query → close)
+| L5  | Effect Tracking        | Side-effect auditing for mutations (future: write support)
+| L6  | Scope Isolation        | Namespace boundaries between knot tables
+| L7  | Information Flow       | Knot data lineage (provenance of computational invariants)
+| L8  | Quantitative Bounds    | Bounded evaluation (stratum-bounded, proving termination)
+| L9  | Proof Attachment       | Confidence-indexed results with Idris2 proofs
+| L10 | Cross-Cutting          | Composition safety across pipeline stages
+|===
+
+== KQL-Specific Type Features
+
+KQL has four dependent type features that map naturally to the safety levels:
+
+[cols="<3,^1,<4", options="header"]
+|===
+| Feature | Level | Description
+
+| Dependent Projection (pipeline type refinement)
+| L2, L10
+| Return type computed from field list. `Π(τ, fields) = τ'`. Idris2 proof: `Project` witnesses.
+
+| Confidence-Indexed Results
+| L9
+| Equivalence results carry confidence level as part of the type.
+  `ResultSet[ConfidenceIdx n τ]` where `n` is the confidence bound.
+
+| Invariant-Dependent Records
+| L9
+| Available fields depend on which invariants were requested.
+  Requesting `jones_polynomial` changes the result type.
+
+| Stratum-Bounded Evaluation
+| L8
+| Evaluation strategy indexed by invariant strata count.
+  Proves termination via decreasing stratum index.
+|===
+
+== Historical Note: KQL-DT
+
+The dependent type features documented in `spec/dependent-type-variants.md` were
+originally called "KQL-DT". This is not a separate product or execution mode — it is
+the description of how KQL's type system uses dependent types, now folded into the
+safety pipeline at levels L2, L8, L9, and L10.
+
+All references to "KQL-DT" should be read as "KQL's dependent type features within
+the safety pipeline".
+
+== Implementation Status
+
+[cols="^1,<3,^1", options="header"]
+|===
+| Level | Status | Notes
+
+| L1-L2 | Designed | Pipeline parser validates syntax and schema
+| L3-L4 | Designed | Julia HTTP server manages connections
+| L5-L7 | Spec only | Read-only for now (no mutations)
+| L8    | Designed | Stratum-bounded evaluation specified with Idris2 proofs
+| L9    | Designed | Confidence-indexed + invariant-dependent types specified
+| L10   | Designed | Dependent projection specified with Idris2 proofs
+|===
+
+== Reference
+
+* `spec/dependent-type-variants.md` — Full Idris2 proof specifications for KQL's dependent types
+* `docs/design/KQL-SQL-LANDSCAPE-RESEARCH-2026-02-22.md` — KQL design research
+* https://github.com/hyperpolymath/vql-ut[VQL-UT] — Reference implementation of the 10-level safety pipeline

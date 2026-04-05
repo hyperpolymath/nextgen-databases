@@ -1,161 +1,80 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
-= Next-Gen Databases
-:author: Jonathan D.A. Jewell
-:email: j.d.a.jewell@open.ac.uk
-:revdate: 2026-02-13
-:toc:
+= Next-Generation Databases
+Jonathan Jewell (hyperpolymath)
+:toc: left
+:toc-title: Contents
+:doctype: article
 :icons: font
 
-*Parent repository for tracking and coordinating database application development*
-
-**IMPORTANT:** This is a **PARENT REPOSITORY ONLY** — it contains documentation and tracking but NO implementation code.
+link:../tangle/docs/krl_map.html[→ KRL architecture map (HTML)]
 
 == Overview
 
-This repository serves as the central tracking hub for the Next-Gen Databases initiative — a coordinated effort to build specialised database applications across different domains, each with its own query language, storage engine, and web interface.
+This category contains database systems built on mathematical foundations
+that go beyond the relational and document models.
+The common thread is _semantic identity_: each system represents objects in
+a way that captures structural and algebraic meaning, not just data fields.
 
-**All database implementations are in their respective canonical repositories.**
+== Projects
 
-== Database Portfolio
+=== QuandleDB
+Algebraic database using quandle structure as the semantic identity layer.
+Quandles provide a canonical fingerprint for equivalence classes under
+transformation, grounded in knot-theoretic coloring invariants.
 
-[cols="1,2,2,2,1"]
-|===
-| Database | Description | Technology | Query Language | Status
+Primary role in the KRL stack: semantic equivalence search and fingerprinting.
 
-| *VeriSimDB*
-| Cross-system entity consistency engine — 8 modalities (octad), drift detection, self-normalisation, formally verified queries. **Primary database project.** Operates as standalone database OR federation coordinator over existing databases (PostgreSQL, ArangoDB, Elasticsearch).
-| Rust (core) + ReScript (VQL parser) + Elixir (orchestration)
-| VQL (VeriSim Query Language) + VQL-DT (dependent types)
-| Active — beta
+link:../quandle-db/README.adoc[→ QuandleDB documentation]
 
-| *QuandleDB*
-| Knot-theory database — stores knots as Gauss codes, computes invariants (Jones polynomial, genus, Seifert circles), queries by topological properties. **Exploratory/research project**: a thought experiment in applying knot theory to database design, not yet intended as a production tool.
-| Julia (Skein.jl engine) + ReScript frontend
-| KQL (Knot Query Language) — in development
-| Exploratory
+=== Skein.jl
+Persistence, indexing, and query layer for topological objects (tangles, knots, links).
+Stores canonical `TangleIR` objects, caches invariants, indexes by algebraic fingerprint,
+and maintains a rewrite-step graph for provenance and simplification tracking.
 
-| *LithoGlyph*
-| Narrative-first, reversible, audit-grade database core for journalism, narrative arts, and media/comms. Working towards production but **secondary priority** to VeriSimDB. Long-term vision: intimate integration with portfolio tools (bofig, etc.) for journalism and PR applications.
-| Forth (storage) + Zig (bridge) + Factor (FQL) + Idris2 (proofs) + Lean 4 (normalizer)
-| GQL (Glyph Query Language) — planned
-| Active — on backburner
+Primary role in the KRL stack: the database engine.
 
-| *Glyphbase*
-| Web interface for LithoGlyph — browser-based search, visualisation, and annotation of glyph specimens
-| ReScript frontend + LithoGlyph API
-| (via LithoGlyph)
-| Planned
+link:../skein-jl/README.adoc[→ Skein.jl documentation]
 
-|===
+=== VeriSimDB / VanguardDB
+Self-normalising multimodal database with formal verification properties.
+Rust core, Elixir/OTP orchestration, Podman deployment.
 
-[NOTE]
-====
-**Project priorities:** VeriSimDB is the primary database engineering project, receiving active development focus. LithoGlyph is working towards production for specialist use in journalism and narrative arts, but is secondary priority while VeriSimDB matures. QuandleDB is a research exploration into knot theory's applications in database design — valuable for the mathematical insights but not positioned as a production tool at this stage.
+link:../verisimdb/README.adoc[→ VeriSimDB documentation]
 
-Lessons learned from VeriSimDB development (drift detection, formal verification, federation) will directly improve LithoGlyph when development focus returns to it.
-====
+=== Lithoglyph / Glyphbase / GQL
+Narrative-first database for documentary journalism.
+Dependent types extension; GQL (Glyph Query Language) front-end.
+Glyphbase is the web interface layer over Lithoglyph.
 
-== Architecture
+link:../lithoglyph/README.adoc[→ Lithoglyph documentation]
 
-Each database in the portfolio follows a layered architecture:
+== Common Principles
 
-----
-  Query Language (DSL)
-       ↓
-  Database Engine (storage, indexing, computation)
-       ↓
-  HTTP API Server (JSON endpoints)
-       ↓
-  Web Frontend (ReScript SPA)
-----
+* Mathematical objects as primary storage units, not rows
+* Structural and semantic fingerprinting for identity and deduplication
+* Equivalence as a first-class database concept, not a post-query computation
+* Invariant caches as indexed columns, not application-layer lookups
+* Provenance and rewrite history stored alongside objects
 
-=== Common Patterns
+== Relationship to Next-Generation Languages
 
-* *Engines* are domain-specific libraries (Julia, Rust, Elixir)
-* *APIs* expose JSON endpoints wrapping engine queries
-* *Frontends* are ReScript + React SPAs with TEA-style state management
-* *Query languages* are typed DSLs parsed with ReScript or domain-native parsers
-* *Databases* use SQLite or custom storage depending on domain needs
+The databases in this category are designed to be driven by the languages
+in `nextgen-languages`. In particular:
 
-== Satellite Repositories
+* *KRL* (Knot Resolution Language) is the surface language for QuandleDB and Skein.jl
+* *Eclexia* is the language for resource-constraint databases
+* *Phronesis* is the language for multi-agent ethical constraint systems
 
-[cols="1,1,2,1"]
-|===
-| Project | Repository | Description | Status
-
-| QuandleDB
-| link:https://github.com/hyperpolymath/quandledb[quandledb]
-| Knot-theory database wrapping Skein.jl
-| Active
-
-| Skein.jl
-| link:https://github.com/hyperpolymath/Skein.jl[Skein.jl]
-| Knot database engine (Julia library)
-| Active
-
-| VeriSimDB
-| link:https://github.com/hyperpolymath/verisimdb[verisimdb]
-| Multimodal verification database
-| Active
-
-| VeriSimDB Data
-| link:https://github.com/hyperpolymath/verisimdb-data[verisimdb-data]
-| Scan data ingestion pipeline
-| Active
-
-| Lithoglyph
-| link:https://github.com/hyperpolymath/lithoglyph[lithoglyph]
-| Glyph and inscription database
-| Active
-
-| Glyphbase
-| link:https://github.com/hyperpolymath/glyphbase[glyphbase]
-| Web frontend for Lithoglyph
-| Active
-
-|===
-
-== Query Language Ecosystem
-
-The database portfolio contributes three query languages to the link:https://github.com/hyperpolymath/nextgen-languages[nextgen-languages] portfolio:
+== Status
 
 [cols="1,1,2"]
 |===
-| Language | Database | Status
+|Project |Status |Notes
 
-| *KQL* (Knot Query Language)
-| QuandleDB
-| In development
-
-| *VQL* (Verification Query Language)
-| VeriSimDB
-| ~40% complete
-
-| *FBQL-DT* (FormDB Query Language)
-| FormDB
-| ~50% complete
-
+|QuandleDB |Active — early stage |Quandle extraction and fingerprinting in progress
+|Skein.jl |Active — refactoring |Migrating to TangleIR as primary stored type
+|VeriSimDB |Active — design phase |Rust core skeleton in place
+|Lithoglyph |Specified |GQL grammar defined; implementation pending
 |===
-
-== Documentation
-
-* `.machine_readable/STATE.scm` — Project state and progress
-* `.machine_readable/META.scm` — Architecture decisions
-* `.machine_readable/ECOSYSTEM.scm` — Ecosystem relationships
-
-== Contributing
-
-Each database welcomes contributions. See individual satellite repositories for project-specific contribution guidelines.
-
-== License
-
-PMPL-1.0-or-later (Palimpsest Licence)
-
-Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)
-
-
-== Architecture
-
-See link:TOPOLOGY.md[TOPOLOGY.md] for a visual architecture map and completion dashboard.
