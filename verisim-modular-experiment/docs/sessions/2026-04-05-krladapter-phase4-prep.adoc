@@ -1,0 +1,153 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= Session 2026-04-05 — KRLAdapter.jl Phase 4 prep (from other claude)
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc:
+:sectnums:
+
+*Author of this note:* Claude Opus 4.6 session on KRL stack recovery,
+2026-04-05. *For:* any future claude working on verisim-modular-experiment
+Phase 4 (KRLAdapter.jl dogfood). *Purpose:* document KRLAdapter.jl's
+current state so Phase 4 has a concrete target.
+
+== KRLAdapter.jl — summary as of 2026-04-05
+
+*Location:* `/var/mnt/eclipse/repos/KRLAdapter.jl/`
+*GitHub:* `https://github.com/hyperpolymath/KRLAdapter.jl`
+*UUID:* `28b5845d-d150-4ffa-a60e-3b762afb26c8`
+*License:* MPL-2.0 (Julia ecosystem consistency; PMPL preferred)
+*Status:* Created greenfield 2026-04-05. CRG grade D. 51 tests passing.
+*Dependencies:* `KnotTheory` 1.x, `Skein` 0.3.x — community libs, read-only.
+
+== What KRLAdapter.jl owns
+
+=== TangleIR (src/ir.jl)
+
+The canonical IR defined *here*, not in the community libs:
+
+[source,julia]
+----
+struct TangleIR
+    id::UUID                       # fresh uuid4 per IR instance
+    ports_in::Vector{Port}         # open tangle boundary — empty for closed diagrams
+    ports_out::Vector{Port}
+    crossings::Vector{CrossingIR}  # sign ∈ {-1, +1}, arcs::NTuple{4,Int}
+    components::Vector{Vector{Int}}
+    metadata::TangleMetadata       # name, source_text, tags, provenance, extra
+end
+----
+
+Provenance values: `:user | :derived | :rewritten | :imported`.
+
+=== Current adapters
+
+* `src/adapters/knottheory.jl` — `pd_to_ir`, `ir_to_pd`, `alexander`, `jones`,
+  `determinant`, `signature`, `simplify` + convenience `trefoil_ir`/`figure_eight_ir`/`unknot_ir`.
+* `src/adapters/skein.jl` — `store_ir!`, `fetch_ir`, `query_ir`.
+
+=== No Verisim adapter yet
+
+This is the Phase 4 slot. Currently empty. The KRLAdapter.jl README and the
+project's memory file (`feedback_krl_adapter_boundary.md`) note that a slim
+VerisimCore interface should remain open rather than committing to the full
+octad engine.
+
+== What KRLAdapter.jl would need from VerisimCore
+
+Based on current KRLAdapter.jl usage patterns and the Path B split
+(Core = {Semantic, Provenance, Temporal}), KRLAdapter.jl's needs appear to
+map cleanly:
+
+[cols="2,3,1",options="header"]
+|===
+|VerisimCore shape |KRLAdapter.jl usage |Load-bearing?
+
+|*Provenance*
+|`TangleMetadata.provenance` ∈ `{user, derived, rewritten, imported}` — every
+derived IR carries a `parent_id` pointer and operation tag. Rewrite-graph
+traceability is intrinsic to what the adapter does.
+|YES
+
+|*Semantic*
+|`TangleMetadata.tags::Vector{String}` + `metadata.extra::Dict{Symbol,Any}`
+— free-form semantic annotations attached to IRs. Skein persists these as
+metadata rows keyed `krl_*` and `tag_N`.
+|YES (for any non-trivial query semantics)
+
+|*Temporal*
+|Every `TangleIR` has a `UUID` (content-independent identity, first-seen at
+construction time). Skein records have `created_at`/`updated_at` timestamps.
+LWW conflict-resolution semantics would be needed if two sessions wrote
+the same IR name concurrently.
+|PROBABLY (depends on multi-session story)
+|===
+
+*Federable shapes KRLAdapter.jl likely does NOT need:* Vector (no similarity
+queries over IRs at this stage), Tensor (no multi-dim representations),
+Spatial (no geometric embedding), Document (IRs are structured, not
+document-blob-ish), Graph (rewrite provenance is linear per-IR, not
+cross-entity).
+
+*Preliminary Phase 4 hypothesis:* KRLAdapter.jl is a clean Core-only client.
+Good candidate for the experiment's positive result.
+
+== Integration hook points (when Phase 4 arrives)
+
+Existing Skein-adapter metadata already encodes Verisim-relevant info with
+a `krl_*` prefix for easy discrimination:
+
+* `krl_ir_uuid` — the TangleIR's `id::UUID`
+* `krl_provenance` — `user|derived|rewritten|imported`
+* `krl_source_text` — original KRL source (if available)
+* `tag_0`, `tag_1`, … — user-supplied semantic tags
+
+To wire VerisimCore in, the most natural extension point is a new
+`src/adapters/verisim.jl` with:
+
+[source,julia]
+----
+# Hypothetical shape — not yet implemented
+store_ir_verisim!(core::VerisimCore, ir::TangleIR; name, tags) -> UUID
+fetch_ir_verisim(core::VerisimCore, id::UUID) -> TangleIR
+query_ir_verisim(core::VerisimCore; predicates...) -> Vector{UUID}
+prove_consonance(core::VerisimCore, ir1::TangleIR, ir2::TangleIR) -> ConsonanceVerdict
+----
+
+The `prove_consonance` entry is the VCL-shaped one — stating claims about
+whether two IRs should be treated as equivalent given their provenance +
+tag semantics + temporal ordering.
+
+== Suggested Phase 4 test scenarios
+
+. *Round-trip UUID preservation* — already tested against Skein, reuse pattern against VerisimCore.
+. *Rewrite-graph traversal* — derive `trefoil → simplify → simplified-trefoil`,
+  verify `parent_id` chains recoverable from VerisimCore.
+. *Cross-session consonance* — two synthetic sessions derive the same IR
+  independently; VCL should see this as consonant, not conflicting.
+. *Consonance with a federated Vector shape* — add Jones-polynomial
+  similarity search via federation, verify claims compose.
+. *Degradation case* — omit Semantic: what VCL claims weaken? Expected
+  answer: tag-based queries become unsound, provenance claims stay sound.
+
+== Non-interference concern for KRLAdapter.jl
+
+If VerisimCore federates Vector (for Jones-polynomial similarity search),
+KRLAdapter.jl's existing `determinant`/`signature` integer invariants
+are Semantic-layer facts, not Vector-layer facts. Phase 2's
+non-interference proof obligation should verify that federating Vector
+does not weaken claims about these Semantic-layer invariants.
+
+== Do not modify
+
+* `KnotTheory.jl` — read-only community lib
+* `Skein.jl` — read-only community lib
+* `KRLAdapter.jl` itself — can be modified, but the `:verisim_core` extra
+  in `TangleMetadata.extra` is the intended extension slot, not new
+  breaking fields in TangleIR.
+
+== References
+
+* KRLAdapter.jl README: `/var/mnt/eclipse/repos/KRLAdapter.jl/README.adoc`
+* KRLAdapter.jl READINESS: `/var/mnt/eclipse/repos/KRLAdapter.jl/READINESS.md`
+* memory: `feedback_krl_adapter_boundary.md`
+* memory: `vcl-rename.md` (notes KRLAdapter as Verisim-interface slot)
+* Session context: KRL stack recovery 2026-04-05 — see KRLAdapter.jl git log.
