@@ -1,0 +1,143 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= VerisimCore.jl
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc: left
+:sectnums:
+
+**Slim identity-core sibling to main verisimdb/.**
+
+A 3-shape Core = {Semantic, Temporal, Provenance} plus a 5-clause
+federation contract for optional peers. For clients that need identity
++ audit trail without the full 8-shape octad.
+
+== When to use this vs. full verisimdb
+
+[cols="3,1,2",options="header"]
+|===
+|Scenario |Choose |Why
+
+|Identity + audit trail, no similarity/full-text/geospatial
+|**VerisimCore**
+|3-shape Core is smaller, faster, simpler. Satisfies clients like KRLAdapter.jl.
+
+|Embeddings + text data
+|**VerisimCore + Vector + Document peers**
+|2 Federable peers. Clauses 1-5 handle cross-shape drift.
+
+|Full multi-modal drift detection across 8 shapes
+|**verisimdb** (the full octad)
+|Paved-road deployment, canonical tooling.
+|===
+
+Rule of thumb: start with VerisimCore, add Federable peers as workloads
+demand them. Every Federable shape pays its integration cost; only add
+what you need.
+
+== Provenance
+
+Promoted from `verisim-modular-experiment/impl/` after the experiment
+confirmed **Path B** (the octad is divisible). See that sibling's
+`docs/FINDINGS.adoc` for the full research record — 145 assertions,
+Idris2 ABI, 6 test suites, 5 phases, decision gates.
+
+== Quick start
+
+[source,julia]
+----
+using VerisimCore
+
+# 1. Stand up a Core store (generates Ed25519 keypair).
+store = Store()
+
+# 2. Enrich: writes to Semantic + Temporal + Provenance atomically.
+id = OctadId(fill(0x42, 16))
+blob = SemanticBlob(["http://example.org/#entity"], UInt8[1, 2, 3])
+enrich!(store, id, :semantic, blob, "alice")
+
+# 3. Verify integrity.
+result = prove(ProofIntegrity(id), store, Manager())
+# => VerdictPass("1 enrichment(s), hash chain intact, latest signature valid")
+
+# 4. Attest + verify.
+oc, sig, t = attest(store, id)
+@assert verify_attest(store, oc, sig, t)
+
+# 5. Add a Federable peer (Vector).
+peer = VectorPeer()
+put_embedding!(peer, id, hash_embedding(blob.proof_bytes, 384))
+mgr = Manager()
+register_peer!(mgr, :vector, peer)
+# Core shapes are rejected:
+#   register_peer!(mgr, :semantic, peer)  # throws
+
+# 6. PROOF CONSISTENCY over (S, V) with a drift threshold.
+weights = DriftWeights((:semantic, :vector) => 1.0)
+clause = ProofConsistency(id, [:semantic, :vector], 10.0, weights)
+prove(clause, store, mgr)
+----
+
+== The 5-clause federation contract
+
+Any Federable peer must honour:
+
+. **Weight renormalisation** — `renormalise(present_shapes, weights)` gives Σ=1 over pairs in scope.
+. **Drift-signal projection** — peer exposes per-pair drift contributions; Core computes aggregates.
+. **Attestation signatures** — Ed25519 signed, freshness-windowed; stale/forged data rejected.
+. **Coherence-constraint surface** — peer exposes projections for cross-shape coherence.
+. **Conflict-resolution (LWW)** — peer accepts Core's Temporal as authoritative total order on writes.
+
+See `docs/CONTRACT.adoc` for details.
+
+== The 8 shapes
+
+[cols="1,1,2",options="header"]
+|===
+|Shape |Classification |Notes
+
+|Semantic    |**Core**       |VCL proof substrate (CBOR type URIs + proofs)
+|Temporal    |**Core**       |Merkle-tree version history; LWW total order
+|Provenance  |**Core**       |SHA-256 hash chain; Ed25519 attestation
+|Graph       |Conditional    |Required iff cross-entity claims in scope
+|Vector      |Federable      |Similarity search / embeddings
+|Tensor      |Federable      |Multi-dim representations
+|Document    |Federable      |Full-text content
+|Spatial     |Federable      |Geospatial / R-tree
+|===
+
+Core shapes *cannot* be federated (`register_peer!` enforces at
+runtime; Idris2 `IsFederable` enforces at compile time in the
+experiment's ABI).
+
+== Tests
+
+[source,bash]
+----
+julia --project=. -e 'using Pkg; Pkg.test("VerisimCore")'
+----
+
+55 assertions covering: core lifecycle, Ed25519 round-trip, attestation,
+federation parity (single peer + two peers), register_peer! runtime
+validation, weight renormalisation, VCL PROOF subset, parser
+round-trips, multi-peer non-interference.
+
+== Dependencies
+
+* Julia 1.10+
+* libsodium (auto-fetched via Sodium.jl)
+* SHA (stdlib), Printf (stdlib)
+
+No dependencies on main verisimdb. VerisimCore is standalone.
+
+== Status
+
+v0.1.0 — promoted from research prototype after Path B runtime
+confirmation. Production readiness requires:
+
+* Zig FFI port per hyperpolymath standard
+* Formal non-interference proof at arbitrary N (currently runtime-only)
+* Persistence layer (current impl is in-memory ephemeral)
+* mTLS / network transport for federation peers
+
+== License
+
+PMPL-1.0-or-later.

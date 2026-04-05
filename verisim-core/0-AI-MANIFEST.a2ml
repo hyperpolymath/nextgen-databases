@@ -1,0 +1,70 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# STOP - CRITICAL READING REQUIRED
+
+**THIS FILE MUST BE READ FIRST BY ALL AI AGENTS**
+
+## WHAT IS THIS?
+
+**VerisimCore.jl** — a shippable Julia package providing the slim
+identity-core of VeriSimDB. Promoted from the research prototype in
+`verisim-modular-experiment/impl/` after Path B was runtime-confirmed
+(145 assertions). This is NOT the full verisimdb octad — it's the
+minimum substrate (Core = {Semantic, Temporal, Provenance}) plus a
+federation contract for optional peers.
+
+## WHEN TO ADOPT
+
+Clients that need identity + audit trail only, without
+similarity/full-text/geospatial queries. Example satisfied client:
+KRLAdapter.jl (knot-theory stack).
+
+For comprehensive 8-shape multimodal use, use main `verisimdb/` instead.
+
+## STRUCTURE
+
+- `src/VerisimCore.jl` — umbrella module; re-exports from submodules
+- `src/Core.jl` — identity-core primitives (Store, enrich!, attest)
+- `src/Crypto.jl` — Ed25519 (libsodium via Sodium.jl)
+- `src/Federation.jl` — Manager, DriftWeights, aggregate_drift
+- `src/drift/Metrics.jl` — pairwise drift functions
+- `src/peers/{VectorPeer,DocumentPeer}.jl` — example Federable peers
+- `src/vcl/{Query,Prover,Parser}.jl` — VCL PROOF subset
+- `test/runtests.jl` — 55 assertions
+
+## CRITICAL INVARIANTS
+
+1. Core shapes (Semantic, Temporal, Provenance) CANNOT be federated.
+   `register_peer!` rejects them at runtime.
+2. `enrich!` writes to both Temporal AND Provenance atomically
+   (def:enrichment from verisimdb's TeX data model).
+3. All signatures are real Ed25519 via libsodium. No placeholder crypto.
+4. All source files carry `SPDX-License-Identifier: PMPL-1.0-or-later`.
+
+## HOW TO RUN TESTS
+
+```bash
+julia --project=. -e 'using Pkg; Pkg.test("VerisimCore")'
+```
+
+## RELATIONSHIP TO SIBLINGS
+
+- `../verisimdb/` — canonical paved-road octad (8 shapes). Main.
+- `../verisim-modular-experiment/` — research prototype this was
+  promoted from. Contains the Idris2 ABI (typechecks clean), the
+  145-assertion proof suite, 6 test files, 5 phases, decision gates,
+  and the Phase 5 findings document.
+- `../typeql-experimental/` — sibling experimental package.
+
+## LIFECYCLE HOOKS
+
+### on-enter
+
+1. Read this manifest first.
+2. Read `.machine_readable/6a2/STATE.a2ml` for current status.
+3. Read `README.adoc` for quick start.
+4. If digging deep: read the experiment's `docs/FINDINGS.adoc`.
+
+### on-exit
+
+1. Update `.machine_readable/6a2/STATE.a2ml` if state changed.
+2. Run `Pkg.test("VerisimCore")` before committing code changes.

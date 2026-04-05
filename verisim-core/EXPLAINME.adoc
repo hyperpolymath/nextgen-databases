@@ -1,0 +1,87 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= EXPLAINME — VerisimCore.jl
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc: left
+
+== What is this?
+
+A Julia package implementing the slim identity-core of VeriSimDB:
+3 required shapes (Semantic, Temporal, Provenance) plus a federation
+contract for optional peers. Think of it as "VeriSimDB Lite" — the
+minimum substrate that preserves VCL's consonance guarantees.
+
+== Why does it exist?
+
+Main `verisimdb/` is a comprehensive 8-shape multimodal database.
+Many clients don't need all 8 shapes — they need identity + audit
+trail only. VerisimCore lets them have that without integrating the
+full octad.
+
+This was proven by the sibling research experiment
+`verisim-modular-experiment/`:
+
+* The octad decomposes into Core (3) + Federable (4) + Conditional (1).
+* VCL's aggregate-drift computation over the Core gives results
+  numerically identical to the monolithic full-octad computation on
+  the same data (145 test assertions).
+* A real client (KRLAdapter.jl) is satisfied by Core alone.
+
+== How does it fit in the ecosystem?
+
+[cols="1,3",options="header"]
+|===
+|Sibling |Relationship
+
+|main `verisimdb/` |Canonical paved-road octad. VerisimCore is a slim escape hatch, not a replacement.
+|`verisim-modular-experiment/` |Research prototype this package was promoted from. Contains the Idris2 ABI, 145-assertion proof, and Phase 5 findings.
+|`typeql-experimental/` |Sibling experimental package in `nextgen-databases` exploring VCL type-theoretic extensions.
+|`KRLAdapter.jl` |First demonstrated client — knot-theory stack integration verified in `verisim-modular-experiment/examples/krladapter_integration.jl`.
+|===
+
+== What do I do with it?
+
+1. **Read `README.adoc`** for quick start + rule of thumb.
+2. **Look at `test/runtests.jl`** for working code exercising every
+   public surface.
+3. **Read the experiment's `docs/FINDINGS.adoc`** if you want the full
+   research record — why these 3 shapes, why this 5-clause contract,
+   what the decision gates proved.
+4. **Adopt VerisimCore** if your workload matches identity + audit
+   trail (no similarity/full-text/geospatial). If you need more, adopt
+   one Federable peer at a time.
+
+== Module map
+
+[cols="2,3",options="header"]
+|===
+|Module |Responsibility
+
+|`VerisimCore.Core`         |Store, enrich!, attest, verify_attest. The identity-core primitives.
+|`VerisimCore.Crypto`       |Ed25519 wrapper (libsodium via Sodium.jl).
+|`VerisimCore.Metrics`      |Pairwise drift functions (d_SV, d_VD, d_SD).
+|`VerisimCore.Federation`   |DriftWeights, Manager, renormalise, aggregate_drift, PeerAttestation.
+|`VerisimCore.VectorPeers`  |Example Federable peer (Vector shape).
+|`VerisimCore.DocumentPeers`|Example Federable peer (Document shape).
+|`VerisimCore.VCLQuery`     |PROOF clause AST.
+|`VerisimCore.VCLProver`    |Evaluator routing to Core + Federation.
+|`VerisimCore.VCLParser`    |String parser for a minimum VCL subset.
+|===
+
+All public identifiers are re-exported at the top level, so
+`using VerisimCore` makes them available directly.
+
+== What's NOT in here
+
+* No full-text index (Document peer stores raw bytes; no search).
+* No HNSW / similarity index (Vector peer stores raw Float32 arrays).
+* No persistence (store is in-memory Dict).
+* No network transport (all peers are in-process Julia structs).
+* No Zig FFI (pure Julia).
+* No normalizer regeneration strategies (read-only drift measurement).
+
+These are main `verisimdb/`'s job. VerisimCore intentionally stays
+slim.
+
+== License
+
+PMPL-1.0-or-later. See `LICENSE`.
