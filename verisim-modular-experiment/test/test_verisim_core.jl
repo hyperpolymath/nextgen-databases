@@ -12,7 +12,9 @@
 
 using Test
 
+include(joinpath(@__DIR__, "..", "impl", "Crypto.jl"))
 include(joinpath(@__DIR__, "..", "impl", "VerisimCore.jl"))
+using .Crypto
 using .VerisimCore
 
 # Helper: make a synthetic 16-byte OctadId.

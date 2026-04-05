@@ -21,17 +21,17 @@ module VectorPeerMod
 using SHA
 
 export VectorPeer,
-       put_embedding!, get_embedding,
+       put_embedding!, get_embedding, public_key,
        drift_against, coherence_proj, apply_lww!,
-       peer_shape, peer_attestation_info
+       peer_shape, peer_attestation_info, verify_peer_attestation
 
 """
-Federable Vector peer. Holds its own Ed25519-style key for attestations.
+Federable Vector peer. Holds its own Ed25519 keypair for attestations.
 """
 struct VectorPeer
     embeddings::Dict{Any, Vector{Float32}}          # key: OctadId
     lww_stamps::Dict{Any, Any}                       # key: OctadId, val: Timestamp
-    key_id::Vector{UInt8}
+    keypair::Any                                     # Main.Crypto.Ed25519KeyPair
     freshness_window_ns::Int64
     dim::Int
 end
@@ -40,10 +40,13 @@ VectorPeer(; dim::Int = 384,
              freshness_window_ns::Int64 = Int64(60_000_000_000)) = VectorPeer(
     Dict{Any, Vector{Float32}}(),
     Dict{Any, Any}(),
-    collect(codeunits("vector-peer-test-key")),
+    Main.Crypto.generate_keypair(),
     freshness_window_ns,
     dim,
 )
+
+"Peer's 32-byte public key, usable as its identity."
+public_key(peer::VectorPeer) = copy(peer.keypair.pk)
 
 peer_shape(::VectorPeer) = :vector
 
@@ -144,28 +147,38 @@ end
 # -----------------------------------------------------------------------
 
 """
-    peer_attestation_info(peer, now_ts, make_signature) -> PeerAttestation
+    peer_attestation_info(peer, now_ts) -> PeerAttestation
 
-Return the peer's attestation metadata. Caller supplies `make_signature`
-(a function `(key_id, payload) -> VerisimCore.Signature`) to sign the
-state summary, avoiding a direct dependency on VerisimCore's signing
-implementation.
-
-Returns a `Main.FederationManager.PeerAttestation` (mirroring the
-Idris2 `PeerAttestation` record).
+Return the peer's attestation metadata (mirrors Idris2 `PeerAttestation`
+record). Signs a state summary of the peer's current embedding keys
+plus the current timestamp with the peer's own Ed25519 keypair.
 """
-function peer_attestation_info(peer::VectorPeer, now_ts, make_signature)
-    # Signing target: peer's key_id || current state summary.
+function peer_attestation_info(peer::VectorPeer, now_ts)
+    # Signing target: current state summary.
     state_summary = sha256(vcat(
         reduce(vcat, (collect(codeunits(string(k))) for k in keys(peer.embeddings)); init = UInt8[]),
         reinterpret(UInt8, [now_ts.epoch_nanos]),
     ))
-    sig = make_signature(peer.key_id, state_summary)
+    sig_bytes = Main.Crypto.sign_detached(peer.keypair, state_summary)
+    sig = Main.VerisimCore.Signature(public_key(peer), sig_bytes)
     Main.FederationManager.PeerAttestation(
-        peer.key_id,
+        public_key(peer),
         sig,
         now_ts,
         peer.freshness_window_ns,
+    )
+end
+
+"""
+    verify_peer_attestation(peer_attest, state_summary) -> Bool
+
+Verify a peer attestation's signature over a given state summary.
+"""
+function verify_peer_attestation(peer_attest, state_summary::Vector{UInt8})::Bool
+    Main.Crypto.verify_detached(
+        peer_attest.public_key_id,
+        peer_attest.latest_attest.sig_bytes,
+        state_summary,
     )
 end
 

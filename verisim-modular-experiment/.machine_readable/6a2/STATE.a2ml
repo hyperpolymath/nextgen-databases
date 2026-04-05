@@ -10,7 +10,7 @@
     (purpose "Research experiment: can any octad shape be entirely absent (store-level)
               without making VCL consonance claims unsound?")
     (type "research-prototype")
-    (completion-percentage 55))
+    (completion-percentage 78))
 
   (current-position
     (phase "phase-3-complete-seams-sorted")
@@ -63,9 +63,21 @@
       (description "First Federable peer: DriftProjector, CoherenceProjector, LWWAcceptor.")
       (completion 100))
     (component "julia-crypto-ed25519"
-      (status in-progress)
-      (description "Replacing placeholder SHA-256 with real Ed25519 via libsodium.")
-      (completion 50))
+      (status complete)
+      (description "Real Ed25519 via Sodium.jl/libsodium. Signatures over provenance
+                    entries and attestations. 7 round-trip assertions in test_seams.jl.")
+      (completion 100))
+    (component "document-peer"
+      (status complete)
+      (description "Second Federable peer. Exercises multi-peer non-interference:
+                    drift pairs (S,V), (S,D), (V,D); independent Ed25519 keys.")
+      (completion 100))
+    (component "vcl-subset"
+      (status complete)
+      (description "VCLQuery AST, VCLProver evaluator, VCLParser string parser.
+                    Supports PROOF INTEGRITY, CONSISTENCY with DRIFT < θ, FRESHNESS.
+                    32 assertions in test_vcl.jl.")
+      (completion 100))
     (component "documentation"
       (status complete)
       (description "README, PLAN, PROOF-NEEDS, DESIGN, OCTAD-SHAPES, CORE-CANDIDATES,
@@ -87,7 +99,17 @@
     (result "seam-tests"
       (command "julia --project=. test/test_seams.jl")
       (status pass)
-      (assertions 21)))
+      (assertions 30))
+    (result "non-interference-tests"
+      (command "julia --project=. test/test_noninterference.jl")
+      (status pass)
+      (assertions 15))
+    (result "vcl-tests"
+      (command "julia --project=. test/test_vcl.jl")
+      (status pass)
+      (assertions 32)))
+
+  (total-assertions 126)
 
   (foldback-to-main-verisimdb
     (applied
@@ -98,10 +120,10 @@
       (item "Normalizer regeneration stub-status doc update (documented in FOLDBACK.adoc)")))
 
   (critical-next-actions
-    (action "Finish Ed25519 wiring (impl/Crypto.jl written, needs VerisimCore/VectorPeer update)")
-    (action "Add second Federable peer (Document) for multi-peer non-interference test")
-    (action "Write minimal VCL parser/evaluator exercising FROM FEDERATION syntax")
-    (action "Update this STATE.a2ml after each"))
+    (action "Phase 4 dogfood: wire KRLAdapter.jl against VerisimCore+FederationManager")
+    (action "Phase 5 writeup: document findings, adoption guide, foldback to main verisimdb")
+    (action "Optional: add Tensor and Spatial Federable peers for 4-peer parity coverage")
+    (action "Optional: Zig FFI port of VerisimCore for production readiness"))
 
   (session-history
     (session "2026-04-05"

@@ -17,12 +17,14 @@
 
 using Test
 
-# Ordering matters: Metrics is used by VectorPeer and FederationManager.
+# Ordering matters: Crypto/Metrics used by VerisimCore/VectorPeer/FederationManager.
+include(joinpath(@__DIR__, "..", "impl", "Crypto.jl"))
 include(joinpath(@__DIR__, "..", "impl", "drift", "Metrics.jl"))
 include(joinpath(@__DIR__, "..", "impl", "VerisimCore.jl"))
 include(joinpath(@__DIR__, "..", "impl", "peers", "VectorPeer.jl"))
 include(joinpath(@__DIR__, "..", "impl", "FederationManager.jl"))
 
+using .Crypto
 using .VerisimCore
 using .Metrics
 using .VectorPeerMod

@@ -111,9 +111,22 @@ See `spec/federation-contract.adoc` for details.
 
 == What's deferred past Phase 3?
 
-* **Ed25519 placeholder → real** — code in `impl/Crypto.jl`, wiring into VerisimCore in progress.
-* **Multi-peer non-interference** — Phase 3 tested one peer; need N≥2.
-* **VCL parser/evaluator surface** — parity was proved at the drift layer; syntax layer is convenience.
+All three immediate follow-ups now complete:
+
+* ✓ **Ed25519** — real Ed25519 via libsodium (Sodium.jl). `impl/Crypto.jl` +
+  VerisimCore/VectorPeer/DocumentPeer all signed with real keypairs.
+* ✓ **Multi-peer non-interference** — `impl/peers/DocumentPeer.jl` registered
+  alongside VectorPeer. 15 assertions confirm drift pairs (S,V), (S,D), (V,D)
+  compose; each peer has an independent Ed25519 keypair.
+* ✓ **VCL parser/evaluator** — `impl/vcl/{Query,Prover,Parser}.jl`. Supports
+  PROOF INTEGRITY, PROOF CONSISTENCY WITH DRIFT < θ (with OVER scope),
+  PROOF FRESHNESS. 32 assertions.
+
+Remaining:
+
+* **Phase 4 dogfood** — wire `KRLAdapter.jl` against this VerisimCore.
+* **Phase 5 writeup** — findings document, adoption guide, main-verisimdb foldback.
+* **Optional Zig FFI port** — production readiness if Path B ships.
 
 == What if the result had been negative?
 

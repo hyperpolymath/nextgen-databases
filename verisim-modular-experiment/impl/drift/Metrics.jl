@@ -14,7 +14,7 @@ module Metrics
 
 using SHA
 
-export cosine_distance, hash_embedding, d_SV, drift
+export cosine_distance, hash_embedding, d_SV, d_VD, d_SD, drift
 
 # -----------------------------------------------------------------------
 # Primitive drift functions
@@ -98,6 +98,49 @@ function d_SV(type_uris::Vector{String},
 end
 
 # -----------------------------------------------------------------------
+# Pairwise drift — Vector × Document (d_VD, TeX §4.3)
+# -----------------------------------------------------------------------
+
+"""
+    d_VD(vector_embedding, document_bytes) -> Float64
+
+Vector-Document drift (TeX §4.3, d_{V,D}): cosine distance between
+stored embedding and the embedding that *would* be computed from the
+current document content. A drift value near 0 indicates the embedding
+is fresh; near 1 indicates the document has changed since the
+embedding was computed.
+"""
+function d_VD(vector_embedding::Vector{Float32},
+              document_bytes::Vector{UInt8})::Float64
+    ref = hash_embedding(document_bytes, length(vector_embedding))
+    cosine_distance(ref, vector_embedding)
+end
+
+# -----------------------------------------------------------------------
+# Pairwise drift — Semantic × Document (d_SD)
+# -----------------------------------------------------------------------
+
+"""
+    d_SD(semantic_type_uris, semantic_proof, document_bytes) -> Float64
+
+Semantic-Document drift. Research-prototype definition: cosine distance
+between hash-derived embeddings of the Semantic blob and the Document
+bytes. Plays the role TeX §4.3 leaves implicit for this pair.
+"""
+function d_SD(type_uris::Vector{String},
+              proof_bytes::Vector{UInt8},
+              document_bytes::Vector{UInt8})::Float64
+    semantic_bytes = vcat(
+        collect(codeunits(join(type_uris, ","))),
+        proof_bytes,
+    )
+    dim = 384
+    s_ref = hash_embedding(semantic_bytes, dim)
+    d_ref = hash_embedding(document_bytes, dim)
+    cosine_distance(s_ref, d_ref)
+end
+
+# -----------------------------------------------------------------------
 # Drift dispatcher — absent-pair convention
 # -----------------------------------------------------------------------
 
@@ -117,20 +160,26 @@ function drift(shape1::Symbol, val1,
     # Absent-pair convention: d(⊥, ·) = d(·, ⊥) = 0.
     (val1 === nothing || val2 === nothing) && return 0.0
 
-    # Normalise pair order so (A,B) and (B,A) dispatch the same way.
-    if (shape1, shape2) == (:vector, :semantic)
-        shape1, shape2 = :semantic, :vector
-        val1, val2 = val2, val1
+    # Normalise pair order — canonicalise so (A,B) and (B,A) dispatch the
+    # same way. Priority order: :semantic < :vector < :document.
+    canonical_order = Dict(:semantic => 1, :vector => 2, :document => 3)
+    if haskey(canonical_order, shape1) && haskey(canonical_order, shape2)
+        if canonical_order[shape1] > canonical_order[shape2]
+            shape1, shape2 = shape2, shape1
+            val1, val2 = val2, val1
+        end
     end
 
     if shape1 == :semantic && shape2 == :vector
-        # val1 is a SemanticBlob-like (has .type_uris, .proof_bytes fields
-        # via duck-typing); val2 is a Vector{Float32}.
         return d_SV(val1.type_uris, val1.proof_bytes, val2)
+    elseif shape1 == :vector && shape2 == :document
+        return d_VD(val1, val2)
+    elseif shape1 == :semantic && shape2 == :document
+        return d_SD(val1.type_uris, val1.proof_bytes, val2)
     end
 
-    error("drift: pair ($shape1, $shape2) not implemented in Phase 3 " *
-          "(only :semantic × :vector is wired). Add it to drift/Metrics.jl.")
+    error("drift: pair ($shape1, $shape2) not implemented. " *
+          "Wired pairs: (S,V), (V,D), (S,D). Add to drift/Metrics.jl.")
 end
 
 end # module

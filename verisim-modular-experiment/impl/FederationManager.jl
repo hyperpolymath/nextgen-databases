@@ -199,10 +199,12 @@ end
 # Duck-typed peer value retrieval. Each peer type provides a `_peer_value`
 # specialisation at the call site via method dispatch or via this path.
 function _peer_value(peer, octad_id)
-    # Try method-based lookup; fall back to Dict access on .embeddings
-    # for VectorPeer compatibility.
+    # Duck-typed peer storage access. Each peer type carries its shape's
+    # values in a named Dict field; we check the known ones.
     if hasfield(typeof(peer), :embeddings)
         return get(peer.embeddings, octad_id, nothing)
+    elseif hasfield(typeof(peer), :documents)
+        return get(peer.documents, octad_id, nothing)
     end
     error("FederationManager: don't know how to extract value from peer type $(typeof(peer))")
 end

@@ -15,10 +15,14 @@ module VerisimCore
 
 using SHA
 
+# Crypto module is loaded by the including script before VerisimCore
+# (flat-include scaffold). Reached via Main namespace.
+
 export OctadId, Timestamp, Signature, SemanticBlob,
        ProvenanceEntry, ProvenanceChain, TemporalHistory,
        CoreOctad, Store,
-       get_core, enrich!, attest, verify_attest, now_ts
+       get_core, enrich!, attest, verify_attest, now_ts,
+       ed25519_sign, ed25519_verify
 
 # -----------------------------------------------------------------------
 # Primitive types (mirror Idris2 ABI)
@@ -52,12 +56,14 @@ Base.:(==)(a::Timestamp, b::Timestamp) = a.epoch_nanos == b.epoch_nanos
 now_ts() = Timestamp(Int64(time_ns()))
 
 """
-Signature placeholder. TODO(Phase 3 defaults validation): replace with
-Ed25519 via Nettle.jl or similar. For scaffold, using SHA-256 as a
-stand-in 'signature' (signer_id || payload). This is NOT cryptographic
-signing — it is a placeholder so the ABI shapes compile and test paths
-work. Cryptographic fidelity is not required for Phase 3's correctness
-experiment; it IS required before any production consideration.
+Ed25519 detached signature. Matches Idris2 ABI
+`Signature { keyId, sigBytes }`. In this implementation `key_id` holds
+the signer's Ed25519 **public key** (32 bytes); pubkeys are both
+compact and self-identifying, so no separate key_id registry is
+needed.
+
+- `key_id`   : 32 bytes (Ed25519 public key)
+- `sig_bytes`: 64 bytes (Ed25519 detached signature)
 """
 struct Signature
     key_id::Vector{UInt8}
@@ -108,18 +114,18 @@ end
 # Store
 # -----------------------------------------------------------------------
 
-"In-memory ephemeral Core store. Dict-backed, no persistence."
+"In-memory ephemeral Core store. Dict-backed, no persistence. Holds
+a fresh Ed25519 keypair for signing attestations and provenance entries."
 struct Store
     octads::Dict{OctadId, CoreOctad}
-    # For placeholder signing — real impl would hold an Ed25519 keypair
-    signing_key_id::Vector{UInt8}
+    keypair::Any                     # Main.Crypto.Ed25519KeyPair (duck-typed to avoid load order)
     # Attestation freshness window, in nanoseconds (default: 60s)
     freshness_window_ns::Int64
 end
 
 Store(; freshness_window_ns::Int64 = Int64(60_000_000_000)) = Store(
     Dict{OctadId, CoreOctad}(),
-    collect(codeunits("verisim-core-test-key")),
+    Main.Crypto.generate_keypair(),
     freshness_window_ns,
 )
 
@@ -196,8 +202,8 @@ function enrich!(store::Store,
     )
     this_hash = sha256(to_hash)
 
-    # Placeholder signature — see Signature docstring.
-    sig = placeholder_sign(store.signing_key_id, this_hash)
+    # Real Ed25519 signature over this_hash.
+    sig = ed25519_sign(store.keypair, this_hash)
 
     push!(octad.provenance.entries, ProvenanceEntry(
         prev, this_hash, actor, t, sig,
@@ -215,27 +221,25 @@ function bytes2hex_summary(blob::SemanticBlob)::Vector{UInt8}
 end
 
 """
-    placeholder_sign(key_id, payload) -> Signature
+    ed25519_sign(keypair, payload) -> Signature
 
-Placeholder for Ed25519 signing. Current impl: SHA-256 of
-(key_id || payload). NOT cryptographically sound. See Signature docstring.
+Produce an Ed25519 detached signature over `payload`. Returns a
+Signature whose `key_id` field carries the public key (32 bytes) and
+`sig_bytes` carries the 64-byte signature.
 """
-function placeholder_sign(key_id::Vector{UInt8},
-                          payload::Vector{UInt8})::Signature
-    sig = sha256(vcat(key_id, payload))
-    Signature(key_id, sig)
+function ed25519_sign(keypair, payload::Vector{UInt8})::Signature
+    sig_bytes = Main.Crypto.sign_detached(keypair, payload)
+    Signature(copy(keypair.pk), sig_bytes)
 end
 
 """
-    placeholder_verify(sig, payload) -> Bool
+    ed25519_verify(sig, payload) -> Bool
 
-Placeholder verification matching placeholder_sign. Recomputes the
-expected SHA-256 and compares. This provides the ABI shape; real
-Ed25519 verification is a Phase 4+ task.
+Verify an Ed25519 signature. Uses `sig.key_id` as the public key.
+Returns true iff the signature is valid for the given payload.
 """
-function placeholder_verify(sig::Signature, payload::Vector{UInt8})::Bool
-    expected = sha256(vcat(sig.key_id, payload))
-    expected == sig.sig_bytes
+function ed25519_verify(sig::Signature, payload::Vector{UInt8})::Bool
+    Main.Crypto.verify_detached(sig.key_id, sig.sig_bytes, payload)
 end
 
 # -----------------------------------------------------------------------
@@ -256,7 +260,7 @@ function attest(store::Store, id::OctadId)
     # Sign a digest of (id || t || semantic summary).
     sem_summary = octad.semantic === nothing ? UInt8[] : bytes2hex_summary(octad.semantic)
     payload = vcat(octad.id.bytes, reinterpret(UInt8, [t.epoch_nanos]), sem_summary)
-    sig = placeholder_sign(store.signing_key_id, payload)
+    sig = ed25519_sign(store.keypair, payload)
     (octad, sig, t)
 end
 
@@ -280,7 +284,7 @@ function verify_attest(store::Store,
     # Recompute expected payload and verify.
     sem_summary = octad.semantic === nothing ? UInt8[] : bytes2hex_summary(octad.semantic)
     payload = vcat(octad.id.bytes, reinterpret(UInt8, [t.epoch_nanos]), sem_summary)
-    placeholder_verify(sig, payload)
+    ed25519_verify(sig, payload)
 end
 
 end # module

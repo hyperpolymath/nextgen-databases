@@ -11,8 +11,13 @@ absent?") and blitz pace.
 * **Phase 0 — Octad archaeology:** COMPLETED.
 * **Phase 1 — Core identification:** COMPLETED.
 * **Phase 2 — Federation contract (Idris2 ABI):** COMPLETED — typechecks clean in Idris2 0.8.0.
-* **Phase 3 — Reference core + Vector federation (Julia):** decision gate PASSED — 70/70 assertions green. Deferred: Ed25519, multi-peer non-interference, VCL parser.
+* **Phase 3 — Reference core + Vector federation (Julia):** decision gate PASSED — 70/70 assertions green.
 * **Seam audit:** COMPLETED — `docs/SEAMS.adoc`. High+medium priority seams fixed; low-priority documented as language-idiom.
+* **Ed25519 wiring:** COMPLETED — real libsodium-backed signing via `impl/Crypto.jl`. Store and peers hold Ed25519 keypairs; signatures verified end-to-end.
+* **Multi-peer non-interference:** COMPLETED — `impl/peers/DocumentPeer.jl` as second Federable peer. 15 assertions confirm drift pairs (S,V), (S,D), (V,D) compose, independent keys, LWW isolation.
+* **VCL subset:** COMPLETED — `impl/vcl/{Query,Prover,Parser}.jl`. 32 assertions covering PROOF INTEGRITY, CONSISTENCY with DRIFT, FRESHNESS, parser round-trips, tamper detection.
+
+**Grand total: 126 assertions green across 5 test suites.**
 
 == Key findings
 
