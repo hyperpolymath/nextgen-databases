@@ -1,0 +1,129 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= EXPLAINME — QuandleDB
+Jonathan Jewell (hyperpolymath)
+:toc:
+
+== One-line summary
+
+Semantic fingerprint layer of the KRL stack — extracts quandle presentations
+from knot diagrams, computes canonical hashes, and indexes them for
+equivalence search, built as a polyglot stack (Julia + Idris2 + Zig + V + Elixir).
+
+== Honest scope
+
+This project *does* the following:
+
+* Julia HTTP server wrapping Skein.jl + KnotTheory.jl for knot storage/query
+* `QuandleSemantic` Julia module extracting quandle presentations from
+  `PlanarDiagram` and producing canonical fingerprints
+* Maintains a separate SQLite sidecar index (`quandle_semantic_index`)
+  specifically for semantic queries, keeping raw-diagram storage in Skein
+* Idris2 ABI type layer for the semantic API
+* Zig FFI layer for the semantic API (C-compatible)
+* V-lang API wrappers
+* Elixir BEAM NIF bindings
+
+This project *does NOT* do the following:
+
+* Compute invariants (Jones, Alexander, etc. — that's KnotTheory.jl's job)
+* Store raw diagrams (that's Skein.jl's job)
+* Parse KRL or any knot-specific query language
+* Implement Reidemeister moves
+
+== Why it exists
+
+Quandle presentations are a complete invariant for many knot families under
+isotopy: two knots with different fundamental quandles are provably distinct.
+Unlike polynomial invariants (Jones, Alexander) which can fail to discriminate,
+quandle-based fingerprints provide semantic identity — *equivalence search*
+rather than just *property lookup*.
+
+Structurally: Skein stores raw diagrams; KnotTheory computes polynomial
+invariants; QuandleDB computes algebraic fingerprints derived from the
+fundamental quandle. Each layer enforces its own boundary.
+
+== The polyglot architecture
+
+[cols="1,2,2",options="header"]
+|===
+|Layer |Language |Purpose
+
+|ABI |Idris2 |Dependently-typed interface definitions + layout proofs
+|FFI |Zig |C-compatible implementation of semantic API
+|API |V |Typed API triples
+|Service |Julia |`server/serve.jl` HTTP server with quandle sidecar
+|Compute |Julia |`server/quandle_semantic.jl` presentation extraction + hashing
+|Client |Elixir/BEAM |NIFs for BEAM-ecosystem consumers
+|===
+
+This matches the hyperpolymath estate standard (Idris2 ABI + Zig FFI +
+V API triples + Julia/Elixir service layer).
+
+== Invariants (not to be violated)
+
+1. *Raw diagrams live in Skein.* QuandleDB's sidecar SQLite is for semantic
+   fingerprints only. Do not duplicate Skein's `knots` table here.
+2. *Quandle computation is deterministic.* Identical input diagrams must
+   produce identical fingerprints, regardless of platform or run.
+3. *ABI layer never leaks Julia types.* Idris2/Zig/V see only C-compatible
+   structures.
+4. *Never modify KnotTheory.jl or Skein.jl.* They're community libraries
+   consumed by this project, not targets for modification.
+
+== Boundaries
+
+[cols="2,2",options="header"]
+|===
+|Concern | Where it belongs
+
+|Crossings, PD codes, Reidemeister moves
+|KnotTheory.jl
+
+|Raw diagram storage + invariant cache (Jones, Alexander, determinant)
+|Skein.jl
+
+|Quandle presentation extraction from PlanarDiagram
+|`server/quandle_semantic.jl` (here)
+
+|Canonical quandle fingerprint hashing
+|`server/quandle_semantic.jl` (here)
+
+|Coloring counts into finite quandles
+|`server/quandle_semantic.jl` (here, planned)
+
+|TangleIR definition + adapters
+|`../../KRLAdapter.jl`
+
+|KRL query language
+|`../../krl/` (forthcoming)
+|===
+
+== Evidence this works today
+
+* 21 tests passing (9 quandle extraction + 12 semantic index integration)
+* `panic-attack assail` 0 findings
+* Idris2 ABI types defined
+* BEAM NIFs build and load
+
+== Known gaps (honest)
+
+* CRG grade D — tests present but thin coverage, no per-layer READMEs
+* No full-stack integration test spanning Idris2 → Zig → V → Julia → BEAM
+* No benchmark suite
+* No fuzz harness
+* `TEST-NEEDS.md` and `PROOF-NEEDS.md` just added as scaffolding; content is thin
+* Colouring count implementation not yet wired
+* No OpenAPI / contract spec for HTTP endpoints
+
+See `READINESS.md` for the path from D to C.
+
+== Related
+
+* link:README.adoc[README.adoc] — public overview
+* link:READINESS.md[READINESS.md] — CRG grade D assessment + path to C
+* `../../Skein.jl/` — knot persistence layer
+* `../../KnotTheory.jl/` — combinatorial engine
+* `../../KRLAdapter.jl/` — TangleIR adapter package
+* `../../krl/` — KRL surface language (scaffolded)
