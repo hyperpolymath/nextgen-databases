@@ -1,19 +1,48 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
+#
+# OPTIONAL: BoJ Server Build Trigger
+# This workflow notifies a BoJ Server instance when code is pushed.
+# It is a no-op if BOJ_SERVER_URL is not set or the server is unreachable.
+# To enable: set BOJ_SERVER_URL as a repository secret or variable.
+# To disable: delete this file or leave BOJ_SERVER_URL unset.
 name: BoJ Server Build Trigger
+
 on:
   push:
     branches: [main, master]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   trigger-boj:
     runs-on: ubuntu-latest
+    if: ${{ vars.BOJ_SERVER_URL != '' || secrets.BOJ_SERVER_URL != '' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
       - name: Trigger BoJ Server (Casket/ssg-mcp)
+        env:
+          BOJ_URL: ${{ secrets.BOJ_SERVER_URL || vars.BOJ_SERVER_URL }}
+          REPO_NAME: ${{ github.repository }}
+          BRANCH_NAME: ${{ github.ref_name }}
         run: |
-          # Send a secure trigger to boj-server to build this repository
-          curl -X POST "http://boj-server.local:7700/cartridges/ssg-mcp/invoke"             -H "Content-Type: application/json"             -d "{\"repo\": \"${{ github.repository }}\", \"branch\": \"${{ github.ref_name }}\", \"engine\": \"casket\\"}"}
-        continue-on-error: true
-permissions:
-  contents: read
+          set -euo pipefail
+
+          if [ -z "$BOJ_URL" ]; then
+            echo "BOJ_SERVER_URL not configured - skipping"
+            exit 0
+          fi
+
+          payload="$(jq -cn \
+            --arg repo "$REPO_NAME" \
+            --arg branch "$BRANCH_NAME" \
+            --arg engine "casket" \
+            '{repo:$repo, branch:$branch, engine:$engine}')"
+
+          curl -sf -X POST "${BOJ_URL}/cartridges/ssg-mcp/invoke" \
+            -H "Content-Type: application/json" \
+            --data "$payload" \
+            || echo "BoJ server unreachable - skipping (non-fatal)"

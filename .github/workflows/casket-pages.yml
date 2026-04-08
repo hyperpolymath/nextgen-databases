@@ -49,6 +49,10 @@ jobs:
 
       - name: Prepare site source
         shell: bash
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
+          REPO_FULL_NAME: ${{ github.repository }}
+          BRANCH_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
           rm -rf .site-src _site
@@ -58,14 +62,14 @@ jobs:
           else
             mkdir -p .site-src
             TODAY="$(date +%Y-%m-%d)"
-            REPO_NAME="${{ github.event.repository.name }}"
-            REPO_URL="https://github.com/${{ github.repository }}"
+            REPO_NAME="${REPO_NAME}"
+            REPO_URL="https://github.com/${REPO_FULL_NAME}"
             README_URL=""
 
             if [ -f README.md ]; then
-              README_URL="${REPO_URL}/blob/${{ github.ref_name }}/README.md"
+              README_URL="${REPO_URL}/blob/${BRANCH_NAME}/README.md"
             elif [ -f README.adoc ]; then
-              README_URL="${REPO_URL}/blob/${{ github.ref_name }}/README.adoc"
+              README_URL="${REPO_URL}/blob/${BRANCH_NAME}/README.adoc"
             fi
 
             {
@@ -78,12 +82,12 @@ jobs:
               echo
               echo "Static documentation site for ${REPO_NAME}."
               echo
-              echo "- Source repository: [${{ github.repository }}](${REPO_URL})"
+              echo "- Source repository: [${REPO_FULL_NAME}](${REPO_URL})"
               if [ -n "${README_URL}" ]; then
                 echo "- README: [project README](${README_URL})"
               fi
               if [ -d docs ]; then
-                echo "- Docs directory: [docs/](${REPO_URL}/tree/${{ github.ref_name }}/docs)"
+                echo "- Docs directory: [docs/](${REPO_URL}/tree/${BRANCH_NAME}/docs)"
               fi
               echo
               echo "Project-specific site content can be added later under site/."

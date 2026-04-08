@@ -46,16 +46,13 @@ oxigraph = "0.4"
 hnsw_rs = "0.3"
 ndarray = "0.16"
 
-# Tensor modality
-burn = "0.20"
-
 # Semantic modality
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 ciborium = "0.2"  # CBOR for proof blobs
 
 # Document modality (LZ4 compression — pure Rust via lz4_flex, no zstd C library)
-tantivy = { version = "0.25", default-features = false, features = ["mmap", "lz4-compression"] }
+tantivy = { version = "0.26", default-features = false, features = ["mmap", "lz4-compression"] }
 
 # Temporal modality
 chrono = { version = "0.4", features = ["serde"] }
@@ -125,11 +122,5 @@ lto = true
 codegen-units = 1
 panic = "abort"
 
-# NOTE: lru 0.12.5 has RUSTSEC-2026-0002 (IterMut Stacked Borrows, LOW severity)
-# Transitive dependency of tantivy 0.25.0 and ratatui 0.29.0
-# Waiting for upstream fix. Not directly patchable without forking dependencies.
-
-# NOTE: quinn-proto 0.11.14 (Dependabot alert — build-time only, NOT runtime)
-# Chain: burn 0.20 → cubecl-cpu → tracel-llvm-bundler (build dep) → reqwest 0.12 → quinn → quinn-proto
-# This is a build-time dependency for LLVM artifact download, not in any production code path.
-# Waiting for burn 0.21 stable release. reqwest bumped to 0.13 for direct deps.
+# NOTE: lru 0.12.5 had RUSTSEC-2026-0002 (IterMut Stacked Borrows, LOW severity)
+# Mitigation: tantivy upgraded to 0.26, which depends on lru 0.16.3.
