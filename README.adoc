@@ -1,80 +1,115 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
-// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
-
-= Next-Generation Databases
-Jonathan Jewell (hyperpolymath)
-:toc: left
-:toc-title: Contents
-:doctype: article
-:icons: font
-
-link:../tangle/docs/krl_map.html[→ KRL architecture map (HTML)]
+= Next-Generation Databases — Research Overview
 
 == Overview
 
-This category contains database systems built on mathematical foundations
-that go beyond the relational and document models.
-The common thread is _semantic identity_: each system represents objects in
-a way that captures structural and algebraic meaning, not just data fields.
+This repository contains experimental database systems built on mathematical foundations that go beyond traditional relational or document models.
+
+The shared goal is:
+
+*to treat semantic identity as primary, rather than raw data equality.*
+
+These systems store and operate on structured objects where identity is determined by equivalence under transformation.
+
+== Core Idea
+
+Traditional databases treat identity as:
+
+* equality of rows
+* equality of documents
+* equality of keys
+
+In contrast, these systems treat identity as:
+
+*equivalence classes of structured objects.*
+
+This enables:
+
+* deduplication based on structure, not representation
+* queries over equivalence classes
+* indexing by invariants rather than raw values
+* explicit tracking of transformation history
 
 == Projects
 
 === QuandleDB
-Algebraic database using quandle structure as the semantic identity layer.
-Quandles provide a canonical fingerprint for equivalence classes under
-transformation, grounded in knot-theoretic coloring invariants.
 
-Primary role in the KRL stack: semantic equivalence search and fingerprinting.
+An algebraic database using *quandle structures* as a semantic identity layer.
 
-link:../quandle-db/README.adoc[→ QuandleDB documentation]
+* Objects are indexed by algebraic invariants derived from their structure
+* Designed for equivalence detection under transformation (e.g. knot isotopy)
+
+Status: early-stage; core extraction and fingerprinting in progress.
+
+---
 
 === Skein.jl
-Persistence, indexing, and query layer for topological objects (tangles, knots, links).
-Stores canonical `TangleIR` objects, caches invariants, indexes by algebraic fingerprint,
-and maintains a rewrite-step graph for provenance and simplification tracking.
 
-Primary role in the KRL stack: the database engine.
+A persistence and indexing layer for topological objects.
 
-link:../skein-jl/README.adoc[→ Skein.jl documentation]
+* Stores canonical representations (e.g. TangleIR)
+* Maintains invariant caches
+* Tracks rewrite history and provenance
+
+Status: active, undergoing refactoring.
+
+---
 
 === VeriSimDB / VanguardDB
-Self-normalising multimodal database with formal verification properties.
-Rust core, Elixir/OTP orchestration, Podman deployment.
 
-link:../verisimdb/README.adoc[→ VeriSimDB documentation]
+A self-normalising multimodal database with formal verification goals.
+
+* Rust core with Elixir/OTP orchestration
+* Focus on correctness and reliability guarantees
+
+Status: design phase.
+
+---
 
 === Lithoglyph / Glyphbase / GQL
-Narrative-first database for documentary journalism.
-Dependent types extension; GQL (Glyph Query Language) front-end.
-Glyphbase is the web interface layer over Lithoglyph.
 
-link:../lithoglyph/README.adoc[→ Lithoglyph documentation]
+A narrative-first database system aimed at documentary and structured storytelling.
+
+* GQL (Glyph Query Language) provides the query layer
+* Dependent-type extensions planned
+
+Status: specified.
 
 == Common Principles
 
-* Mathematical objects as primary storage units, not rows
-* Structural and semantic fingerprinting for identity and deduplication
-* Equivalence as a first-class database concept, not a post-query computation
-* Invariant caches as indexed columns, not application-layer lookups
-* Provenance and rewrite history stored alongside objects
+Across these systems:
 
-== Relationship to Next-Generation Languages
+* Structured objects are primary, not rows or documents
+* Equivalence is a first-class concept
+* Invariants are used for indexing and identity
+* Provenance and transformation history are explicitly stored
+* Query systems operate over equivalence classes
 
-The databases in this category are designed to be driven by the languages
-in `nextgen-languages`. In particular:
+== Relationship to Languages
 
-* *KRL* (Knot Resolution Language) is the surface language for QuandleDB and Skein.jl
-* *Eclexia* is the language for resource-constraint databases
-* *Phronesis* is the language for multi-agent ethical constraint systems
+These databases are designed to pair with languages in `nextgen-languages`:
+
+* KRL → QuandleDB / Skein (topological objects)
+* Other languages → domain-specific storage and verification systems
+
+The broader goal is a unified ecosystem where:
+
+* languages define construction and transformation
+* databases define identity and retrieval
 
 == Status
 
-[cols="1,1,2"]
-|===
-|Project |Status |Notes
+This repository represents ongoing research work.
 
-|QuandleDB |Active — early stage |Quandle extraction and fingerprinting in progress
-|Skein.jl |Active — refactoring |Migrating to TangleIR as primary stored type
-|VeriSimDB |Active — design phase |Rust core skeleton in place
-|Lithoglyph |Specified |GQL grammar defined; implementation pending
-|===
+Components vary in maturity:
+
+* some systems are partially implemented
+* others are specified but not yet built
+* formal obligations are documented but not fully discharged
+
+See proof and specification documents for current guarantees and gaps.
+
+== Suggested Entry Points
+
+* QuandleDB proof obligations — mathematical and systems requirements for equivalence
+* Skein.jl documentation — persistence and indexing design
+* KRL integration — example of language ↔ database interaction
