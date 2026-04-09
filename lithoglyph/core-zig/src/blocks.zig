@@ -8,6 +8,7 @@
 
 const std = @import("std");
 const builtin = @import("builtin");
+const crypto = @import("crypto.zig");
 
 // ============================================================
 // Constants (must match Forth specification)
@@ -230,6 +231,28 @@ pub const Block = struct {
         try block.validate();
 
         return block;
+    }
+
+    /// Encrypt block payload using AES-256-GCM
+    /// Requires 32-byte encryption key
+    pub fn encrypt(self: *Block, key: [crypto.AES256_KEY_SIZE]u8) !void {
+        try crypto.encryptBlockPayload(self, key);
+    }
+
+    /// Decrypt block payload using AES-256-GCM
+    /// Requires 32-byte encryption key
+    pub fn decrypt(self: *Block, key: [crypto.AES256_KEY_SIZE]u8) !void {
+        try crypto.decryptBlockPayload(self, key);
+    }
+
+    /// Check if block payload is encrypted
+    pub fn isEncrypted(self: *const Block) bool {
+        return self.header.encrypted;
+    }
+
+    /// Derive encryption key from master key
+    pub fn deriveKey(master_key: []const u8, block_type: BlockType, block_id: u64) ![crypto.AES256_KEY_SIZE]u8 {
+        return crypto.deriveBlockKey(master_key, block_type, block_id);
     }
 };
 
