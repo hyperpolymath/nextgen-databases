@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# nqc.launcher.a2ml — per-app launcher config for NQC.
+#
+# NQC lives inside the nextgen-databases monorepo. The launched binary
+# is a pre-installed external tool at ~/.bin/nqc; the repo path is the
+# source tree inside the monorepo.
+
+[project]
+name         = "nqc"
+display      = "NQC"
+description  = "Non-Quantum Computing — hyperpolymath database client"
+categories   = ["Development", "Database"]
+version      = "1.0.0"
+license      = "PMPL-1.0-or-later"
+
+[repo]
+path = "/var/mnt/eclipse/repos/nextgen-databases/nqc"
+
+[runtime]
+kind    = "process"
+command = ["/home/hyper/.bin/nqc", "--gui"]
+pid-file = "/tmp/nqc.pid"
+log-file = "/tmp/nqc.log"
+
+[icon]
+source = "{repo-dir}/assets/icon-256.png"
