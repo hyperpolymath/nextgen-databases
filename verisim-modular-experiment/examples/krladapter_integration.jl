@@ -23,6 +23,7 @@ include(joinpath(@__DIR__, "..", "impl", "FederationManager.jl"))
 # Tropical modules must be loaded before VCLProver (Prover dispatches to them)
 include(joinpath(@__DIR__, "..", "impl", "tropical", "TropicalMatrix.jl"))
 include(joinpath(@__DIR__, "..", "impl", "tropical", "TangleGraph.jl"))
+include(joinpath(@__DIR__, "..", "impl", "tropical", "TropicalDeterminant.jl"))
 include(joinpath(@__DIR__, "..", "impl", "vcl", "Query.jl"))
 include(joinpath(@__DIR__, "..", "impl", "vcl", "Prover.jl"))
 
@@ -32,6 +33,7 @@ using .Metrics
 using .FederationManager
 using .TropicalMatrix
 using .TangleGraph
+using .TropicalDeterminant
 using .VCLQuery
 using .VCLProver
 # KnotTheory must be loaded as a package so TangleGraph._rii_neighbors

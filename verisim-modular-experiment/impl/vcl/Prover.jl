@@ -194,4 +194,81 @@ function prove(clause::Main.VCLQuery.ProofConsonance, store, manager)
     end
 end
 
+
+# -----------------------------------------------------------------------
+# PROOF OPTIMAL_ASSIGNMENT — tropical determinant assignment check
+# -----------------------------------------------------------------------
+
+function prove(clause::Main.VCLQuery.ProofOptimalAssignment, store, manager)
+    # Fetch the octad holding the cost matrix
+    octad = Main.VerisimCore.get_core(store, clause.octad_id)
+    octad === nothing && return Main.VCLQuery.VerdictFail(
+        "octad not found in Core store")
+
+    # Require Semantic shape (cost matrix is stored as proof_bytes)
+    octad.semantic === nothing && return Main.VCLQuery.VerdictFail(
+        "octad has no Semantic shape — cannot extract cost matrix")
+
+    n = clause.n
+    n < 1 && return Main.VCLQuery.VerdictFail(
+        "matrix dimension must be ≥ 1 (got $(n))")
+    n > 8 && return Main.VCLQuery.VerdictFail(
+        "matrix dimension $(n) > 8: brute-force determinant not supported " *
+        "(Hungarian algorithm not yet wired)")
+
+    # Decode n×n Tropical cost matrix from the semantic blob
+    cost_matrix = _decode_cost_matrix(octad.semantic.proof_bytes, n)
+    cost_matrix === nothing && return Main.VCLQuery.VerdictFail(
+        "could not decode $(n)×$(n) Tropical cost matrix from Semantic blob")
+
+    # Compute optimal assignment via tropical determinant
+    #
+    # Formal guarantee: optimal_assignment_bound theorem (Tropical_Determinants.thy)
+    #   tropm_det n A ≤ B  ↔  ∃ π. π permutes {..<n} ∧ perm_weightm n A π ≤ B
+    TDet = Main.TropicalDeterminant
+    result = TDet.optimal_assignment(n, cost_matrix)
+
+    if !result.is_finite
+        return Main.VCLQuery.VerdictFail(
+            "no finite-cost perfect matching exists (det = PosInf)")
+    end
+
+    # Check the bound: trop_add(cost, bound) = cost means cost ≤ bound in min-plus
+    TM    = Main.TropicalMatrix
+    bound = clause.bound
+    within = TM.trop_add(result.cost, bound) == result.cost ||
+             result.cost == bound
+
+    if within
+        perm_str = join(result.permutation, "→")
+        return Main.VCLQuery.VerdictPass(
+            "optimal assignment cost $(result.cost.val) ≤ bound " *
+            "[permutation: $(perm_str); " *
+            "backed by Tropical_Determinants.thy::optimal_assignment_bound]")
+    else
+        return Main.VCLQuery.VerdictFail(
+            "optimal assignment cost $(result.cost.val) exceeds bound " *
+            "($(bound)) [tropical determinant]")
+    end
+end
+
+# Decode a flat sequence of nat values from proof_bytes into an n×n
+# Tropical matrix.  Expected encoding: n² little-endian uint32 values;
+# 0xFFFFFFFF encodes PosInf (∞).
+function _decode_cost_matrix(proof_bytes::AbstractVector{UInt8}, n::Int)
+    TM = Main.TropicalMatrix
+    expected = n * n * 4   # n² × 4 bytes
+    length(proof_bytes) < expected && return nothing
+    A = Matrix{TM.Tropical}(undef, n, n)
+    for row in 1:n, col in 1:n
+        offset = ((row - 1) * n + (col - 1)) * 4 + 1
+        raw = UInt32(proof_bytes[offset]) |
+              (UInt32(proof_bytes[offset+1]) << 8) |
+              (UInt32(proof_bytes[offset+2]) << 16) |
+              (UInt32(proof_bytes[offset+3]) << 24)
+        A[row, col] = raw == 0xFFFFFFFF ? TM.TROP_ZERO : TM.Tropical(Float64(raw))
+    end
+    return A
+end
+
 end # module

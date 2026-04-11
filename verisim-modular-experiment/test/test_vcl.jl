@@ -17,6 +17,10 @@ include(joinpath(@__DIR__, "..", "impl", "drift", "Metrics.jl"))
 include(joinpath(@__DIR__, "..", "impl", "VerisimCore.jl"))
 include(joinpath(@__DIR__, "..", "impl", "peers", "VectorPeer.jl"))
 include(joinpath(@__DIR__, "..", "impl", "FederationManager.jl"))
+# Tropical modules must be loaded before VCLProver
+include(joinpath(@__DIR__, "..", "impl", "tropical", "TropicalMatrix.jl"))
+include(joinpath(@__DIR__, "..", "impl", "tropical", "TangleGraph.jl"))
+include(joinpath(@__DIR__, "..", "impl", "tropical", "TropicalDeterminant.jl"))
 include(joinpath(@__DIR__, "..", "impl", "vcl", "Query.jl"))
 include(joinpath(@__DIR__, "..", "impl", "vcl", "Prover.jl"))
 include(joinpath(@__DIR__, "..", "impl", "vcl", "Parser.jl"))
@@ -26,6 +30,9 @@ using .VerisimCore
 using .Metrics
 using .VectorPeerMod
 using .FederationManager
+using .TropicalMatrix
+using .TangleGraph
+using .TropicalDeterminant
 using .VCLQuery
 using .VCLProver
 using .VCLParser
@@ -206,6 +213,115 @@ make_emb(tag, dim=384) = hash_embedding(collect(codeunits("embedding-$tag")), di
         q = parse_vcl("PROOF INTEGRITY FOR $id_hex")
         v = prove(q, store, Manager())
         @test v isa VerdictPass
+    end
+
+end
+
+# -----------------------------------------------------------------------
+# ProofOptimalAssignment — tropical determinant assignment check
+# -----------------------------------------------------------------------
+
+@testset "PROOF OPTIMAL_ASSIGNMENT — tropical determinant" begin
+
+    # Helper: encode an n×n matrix of nat costs as a proof_bytes blob
+    # (little-endian uint32; 0xFFFFFFFF = PosInf)
+    function encode_cost_matrix(costs::Matrix{UInt32})::Vector{UInt8}
+        n = size(costs, 1)
+        bytes = UInt8[]
+        for row in 1:n, col in 1:n
+            v = costs[row, col]
+            push!(bytes, v & 0xFF, (v >> 8) & 0xFF, (v >> 16) & 0xFF, (v >> 24) & 0xFF)
+        end
+        return bytes
+    end
+
+    @testset "1×1 matrix: identity assignment" begin
+        # Single agent, single task, cost 5.
+        store = Store()
+        id    = OctadId(fill(0xA1, 16))
+        mat   = UInt32[5;;]   # 1×1 matrix with cost 5
+        blob  = SemanticBlob(["http://verisim.test/#assignment"],
+                             encode_cost_matrix(mat))
+        enrich!(store, id, :semantic, blob, "test")
+
+        # bound = Tropical(10): 5 ≤ 10 → PASS
+        clause = ProofOptimalAssignment(id, 1, Tropical(10.0))
+        v = prove(clause, store, Manager())
+        @test v isa VerdictPass
+
+        # bound = Tropical(3): 5 > 3 → FAIL
+        clause2 = ProofOptimalAssignment(id, 1, Tropical(3.0))
+        v2 = prove(clause2, store, Manager())
+        @test v2 isa VerdictFail
+    end
+
+    @testset "2×2 matrix: optimal assignment chosen" begin
+        # Cost matrix:  [1  4]   Optimal: id     → 1+6=7
+        #               [3  6]            swap  → 4+3=7
+        # Both have cost 7; det = 7.
+        store = Store()
+        id    = OctadId(fill(0xA2, 16))
+        mat   = UInt32[1 4; 3 6]
+        blob  = SemanticBlob(["http://verisim.test/#assignment2x2"],
+                             encode_cost_matrix(mat))
+        enrich!(store, id, :semantic, blob, "test")
+
+        # Optimal cost is min(1+6, 4+3) = min(7,7) = 7
+        clause = ProofOptimalAssignment(id, 2, Tropical(7.0))
+        v = prove(clause, store, Manager())
+        @test v isa VerdictPass
+
+        # bound = 6: cost 7 > 6 → FAIL
+        clause2 = ProofOptimalAssignment(id, 2, Tropical(6.0))
+        v2 = prove(clause2, store, Manager())
+        @test v2 isa VerdictFail
+    end
+
+    @testset "2×2 matrix: non-symmetric costs pick diagonal" begin
+        # Cost matrix:  [1  100]   Optimal: id → 1+2=3
+        #               [100  2]             swap → 100+100=200
+        store = Store()
+        id    = OctadId(fill(0xA3, 16))
+        mat   = UInt32[1 100; 100 2]
+        blob  = SemanticBlob(["http://verisim.test/#assignment2x2b"],
+                             encode_cost_matrix(mat))
+        enrich!(store, id, :semantic, blob, "test")
+
+        clause = ProofOptimalAssignment(id, 2, Tropical(3.0))
+        v = prove(clause, store, Manager())
+        @test v isa VerdictPass
+    end
+
+    @testset "octad not found → VerdictFail" begin
+        store  = Store()
+        id     = OctadId(fill(0xFF, 16))
+        clause = ProofOptimalAssignment(id, 2, Tropical(10.0))
+        v = prove(clause, store, Manager())
+        @test v isa VerdictFail
+        @test occursin("not found", v.reason)
+    end
+
+    @testset "no Semantic shape → VerdictFail" begin
+        store = Store()
+        id    = OctadId(fill(0xA4, 16))
+        # Enrich with temporal only (no semantic)
+        leaf = TemporalLeaf(Timestamp(1_000_000_000), "sha256:abc")
+        enrich!(store, id, :temporal, TemporalTrail([leaf]), "test")
+        clause = ProofOptimalAssignment(id, 2, Tropical(10.0))
+        v = prove(clause, store, Manager())
+        @test v isa VerdictFail
+        @test occursin("Semantic", v.reason)
+    end
+
+    @testset "n > 8 → VerdictFail (not supported)" begin
+        store = Store()
+        id    = OctadId(fill(0xA5, 16))
+        blob  = SemanticBlob(["http://verisim.test/#big"], UInt8[])
+        enrich!(store, id, :semantic, blob, "test")
+        clause = ProofOptimalAssignment(id, 9, Tropical(100.0))
+        v = prove(clause, store, Manager())
+        @test v isa VerdictFail
+        @test occursin("Hungarian", v.reason)
     end
 
 end

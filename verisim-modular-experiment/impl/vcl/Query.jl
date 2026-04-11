@@ -15,7 +15,7 @@
 module VCLQuery
 
 export ProofClause, ProofIntegrity, ProofConsistency, ProofFreshness,
-       ProofConsonance,
+       ProofConsonance, ProofOptimalAssignment,
        ProofVerdict, VerdictPass, VerdictFail
 
 # -----------------------------------------------------------------------
@@ -85,6 +85,32 @@ struct ProofConsonance <: ProofClause
     depth::Int
 end
 ProofConsonance(a, b) = ProofConsonance(a, b, 2)
+
+"""
+PROOF OPTIMAL_ASSIGNMENT FOR <id> WITHIN <bound>
+
+Asks: does there exist a perfect matching in the cost matrix stored in the
+octad's Semantic blob with total cost ≤ bound (in the min-plus tropical
+semiring)?
+
+Uses the tropical determinant (min over all permutations of assignment
+cost products) to decide the optimal assignment problem.  The bound is a
+`Tropical` value from TropicalMatrix.jl.
+
+Formal backing:
+  `optimal_assignment_bound` theorem — Tropical_Determinants.thy
+  See docs/TROPICAL-BRIDGE.adoc for the Isabelle ↔ Julia correspondence.
+
+Fields:
+  octad_id  — OctadId of the octad holding the n×n cost matrix (Semantic blob)
+  n         — matrix dimension (number of agents = number of tasks)
+  bound     — claimed optimal cost ≤ bound (Tropical value)
+"""
+struct ProofOptimalAssignment <: ProofClause
+    octad_id::Any          # OctadId (duck-typed)
+    n::Int                 # matrix dimension
+    bound::Any             # Tropical value from TropicalMatrix.jl
+end
 
 # -----------------------------------------------------------------------
 # Results

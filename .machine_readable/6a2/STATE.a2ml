@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # STATE.a2ml — Project state checkpoint
 # Converted from STATE.scm on 2026-03-15
-# Updated: 2026-04-11 — bellman_ford sorry CLOSED; all Isabelle sorries gone
+# Updated: 2026-04-11 — bellman_ford CLOSED; Tropical_Determinants.thy + ProofOptimalAssignment DONE
 
 [metadata]
 project = "nextgen-databases"
@@ -11,24 +11,23 @@ status = "active"
 
 [project-context]
 name = "nextgen-databases"
-completion-percentage = 50
-phase = "Phase 5 — Tropical Consonance + KRL Integration"
+completion-percentage = 55
+phase = "Phase 5 — Tropical Consonance + KRL Integration (P2 DONE)"
 
 [current-position]
 milestone = "verisim-modular-experiment tropical bridge v0.2 + bellman_ford proved"
 last-session = "2026-04-11"
-last-action = "VQL→VCL rename (303 files); P1 hardening: VCLTypeChecker ArgumentError fixed, null-byte sanitisation added to VCLBridge tokenizer"
+last-action = "P2: Tropical_Determinants.thy (sorry-free), TropicalDeterminant.jl, ProofOptimalAssignment VCL clause + 6 tests"
 
 [tropical-bridge]
 status = "v0.2 — RI + RII live, RIII stub (KnotTheory.jl r3_simplify is no-op)"
 isabelle-sorry-tropical-matrices = "NONE — all closed (bellman_ford CLOSED 2026-04-11)"
-isabelle-sorry-other = "cycle_shortcutting CLOSED; floyd_warshall CLOSED; tropm_mat_pow_eq_sum_walks CLOSED"
-julia-mirror = "TropicalMatrix.jl + TangleGraph.jl (verisim-modular-experiment/impl/tropical/)"
-vcl-clauses = "ProofIntegrity, ProofConsistency, ProofFreshness, ProofConsonance — all live"
+isabelle-sorry-other = "cycle_shortcutting CLOSED; floyd_warshall CLOSED; tropm_mat_pow_eq_sum_walks CLOSED; Tropical_Determinants CLOSED 2026-04-11"
+julia-mirror = "TropicalMatrix.jl + TangleGraph.jl + TropicalDeterminant.jl (verisim-modular-experiment/impl/tropical/)"
+vcl-clauses = "ProofIntegrity, ProofConsistency, ProofFreshness, ProofConsonance, ProofOptimalAssignment — all live"
 
 [pending-tropical]
-1 = "Add Tropical_Determinants.thy + ProofOptimalAssignment VCL clause"
-2 = "Wire _riii_neighbors when KnotTheory.jl gains live r3_simplify"
+1 = "Wire _riii_neighbors when KnotTheory.jl gains live r3_simplify"
 
 [test-coverage]
 unit-tests = "~40 (Elixir consensus + federation adapters)"
@@ -52,10 +51,9 @@ gleam-smoke = "Written; requires compiled lith_nif.so to run connection/lifecycl
 - "modality_benchmarks.rs uses old API — does not compile (pre-existing)"
 
 [route-to-mvp]
-next = "Add Tropical_Determinants.thy + ProofOptimalAssignment VCL clause"
-then = "Update integration_test.rs to current API"
+next = "Update integration_test.rs to current API"
 then = "Update modality_benchmarks.rs to current API"
 
 [critical-next-actions]
-1 = "Tropical_Determinants.thy new file — permanent = optimal assignment"
-2 = "Update integration_test.rs to current API"
+1 = "Update integration_test.rs to current API"
+2 = "Update modality_benchmarks.rs to current API"

@@ -13,7 +13,7 @@ session = "tropical bridge v0.2 — bellman_ford sorry CLOSED"
 name = "Verisim Modular Experiment"
 purpose = """Research experiment + tropical bridge: ProofConsonance VCL clause,
 tropical min-plus matrix power (Bellman-Ford), RI+RII Reidemeister moves via KnotTheory.jl."""
-completion-percentage = 85
+completion-percentage = 90
 
 [position]
 phase = "phase-5-tropical-consonance"   # design | implementation | testing | maintenance | archived
@@ -25,15 +25,17 @@ phase-1-core-identification = "complete"
 phase-2-federation-contract = "complete"
 phase-3-reference-impl      = "complete"
 phase-4-krladapter-dogfood  = "complete"
-phase-5-tropical-consonance = "in-progress (RI+RII live; bellman_ford CLOSED; Tropical_Determinants pending)"
+phase-5-tropical-consonance = "complete (RI+RII live; bellman_ford CLOSED; Tropical_Determinants.thy + ProofOptimalAssignment DONE 2026-04-11)"
 
 [tropical-status]
-TropicalMatrix-jl  = "live — min-plus semiring, bellman_ford_matrix"
-TangleGraph-jl-v02 = "live — RI (exact) + RII (KnotTheory.jl r2_simplify)"
-TangleGraph-jl-rii = "wired — _rii_neighbors calls Main.KnotTheory.r2_simplify"
-TangleGraph-jl-riii = "stub — r3_simplify is no-op in KnotTheory.jl v1.0.1"
-Prover-jl          = "live — prove(ProofConsonance, ...)"
-TROPICAL-BRIDGE    = "docs/TROPICAL-BRIDGE.adoc updated to v0.2"
+TropicalMatrix-jl        = "live — min-plus semiring, bellman_ford_matrix"
+TangleGraph-jl-v02       = "live — RI (exact) + RII (KnotTheory.jl r2_simplify)"
+TangleGraph-jl-rii       = "wired — _rii_neighbors calls Main.KnotTheory.r2_simplify"
+TangleGraph-jl-riii      = "stub — r3_simplify is no-op in KnotTheory.jl v1.0.1"
+TropicalDeterminant-jl   = "live — tropm_det, optimal_assignment, is_within_bound (brute-force n≤8)"
+Prover-jl                = "live — prove(ProofConsonance, ...); prove(ProofOptimalAssignment, ...)"
+TROPICAL-BRIDGE          = "docs/TROPICAL-BRIDGE.adoc updated to v0.2"
+Tropical-Determinants-thy = "DONE — perm_weightm, tropm_det, tropm_det_le_perm, tropm_det_1x1, tropm_det_2x2, optimal_assignment, optimal_assignment_bound (0 sorries)"
 
 [blockers-and-issues]
 issues = [
@@ -42,7 +44,6 @@ issues = [
 
 [critical-next-actions]
 actions = [
-  "Add Tropical_Determinants.thy + ProofOptimalAssignment VCL clause",
   "Wire _riii_neighbors when KnotTheory.jl gains live r3_simplify",
   "Promote impl/ to shippable verisim-core package",
   "Zig FFI port of VerisimCore per hyperpolymath standard",
