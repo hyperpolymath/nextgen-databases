@@ -5,15 +5,15 @@
 [metadata]
 project = "verisim-modular-experiment"
 version = "0.1.0"
-last-updated = "2026-04-13"
+last-updated = "2026-04-14"
 status = "active"
-session = "tropical bridge v0.3 — RIII live (KnotTheory.jl r3_simplify + _riii_neighbors wired)"
+session = "CLI consumer DONE — Zig binary + vcl_server.jl + VCLProtocol.idr ABI"
 
 [project-context]
 name = "Verisim Modular Experiment"
 purpose = """Research experiment + tropical bridge: ProofConsonance VCL clause,
 tropical min-plus matrix power (Bellman-Ford), RI+RII Reidemeister moves via KnotTheory.jl."""
-completion-percentage = 95
+completion-percentage = 100
 
 [position]
 phase = "phase-5-tropical-consonance"   # design | implementation | testing | maintenance | archived
@@ -41,10 +41,13 @@ Tropical-Determinants-thy = "DONE — perm_weightm, tropm_det, tropm_det_le_perm
 issues = []
 
 [critical-next-actions]
-actions = [
-  "Promote impl/ to shippable verisim-core package",
-  "Zig FFI port of VerisimCore per hyperpolymath standard (consumer target TBD)",
-]
+actions = []
+
+[completed-actions]
+# 2026-04-13
+promote-package = "impl/ promoted to Verisim.jl package (Project.toml, src/Verisim.jl, test/runtests.jl)"
+zig-cli-consumer = "ffi/zig/src/verisim_cli.zig — subprocess architecture, 4/4 tests green, pushed"
+vcl-protocol-abi = "src/Abi/VCLProtocol.idr — Idris2 formal ABI for stdio wire protocol"
 
 [maintenance-status]
 last-run-utc = "2026-04-11T00:00:00Z"
