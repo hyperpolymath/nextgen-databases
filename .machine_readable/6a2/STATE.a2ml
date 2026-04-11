@@ -17,7 +17,7 @@ phase = "Phase 5 — Tropical Consonance + KRL Integration"
 [current-position]
 milestone = "verisim-modular-experiment tropical bridge v0.2 + bellman_ford proved"
 last-session = "2026-04-11"
-last-action = "Closed bellman_ford OFFICIAL SORRY 2 — full min-plus Bellman-Ford proof in Tropical_Matrices_Full.thy. All Isabelle sorries gone (0 remaining)."
+last-action = "VQL→VCL rename (303 files); P1 hardening: VCLTypeChecker ArgumentError fixed, null-byte sanitisation added to VCLBridge tokenizer"
 
 [tropical-bridge]
 status = "v0.2 — RI + RII live, RIII stub (KnotTheory.jl r3_simplify is no-op)"
@@ -42,24 +42,20 @@ benchmarks = "2 Rust files (modality_benchmarks.rs + throughput_benchmarks.rs)"
 total-new-tests = "43 new tests + 5 properties (2026-04-04)"
 
 [test-status]
-mix-test-failures = "6 pre-existing (VCLTypeChecker binary_to_existing_atom crash, KRaft remove_server timeout)"
+mix-test-failures = "1 pre-existing (KRaft remove_server timeout)"
 new-test-failures = "0"
 cargo-bench-compile = "PASS (throughput_benchmarks.rs — no errors, no warnings in bench file)"
 gleam-smoke = "Written; requires compiled lith_nif.so to run connection/lifecycle tests"
 
 [blockers]
-- "VCLTypeChecker calls :erlang.binary_to_existing_atom for unknown proof types → ArgumentError (P1 hardening gap)"
-- "VCL parser does not strip null bytes from entity IDs (C-string truncation risk at FFI, P1)"
 - "Integration test (tests/integration_test.rs) uses old API — does not compile (pre-existing)"
 - "modality_benchmarks.rs uses old API — does not compile (pre-existing)"
 
 [route-to-mvp]
 next = "Add Tropical_Determinants.thy + ProofOptimalAssignment VCL clause"
-then = "Fix VCLTypeChecker binary_to_existing_atom crash (P1 hardening)"
-then = "Fix null-byte entity ID sanitisation in VCL parser"
 then = "Update integration_test.rs to current API"
+then = "Update modality_benchmarks.rs to current API"
 
 [critical-next-actions]
 1 = "Tropical_Determinants.thy new file — permanent = optimal assignment"
-2 = "Fix VCLTypeChecker to use String.to_existing_atom with rescue guard (P1)"
-3 = "Add null-byte sanitisation in VCLBridge built-in parser (P1)"
+2 = "Update integration_test.rs to current API"
