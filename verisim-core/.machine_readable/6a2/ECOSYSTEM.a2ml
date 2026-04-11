@@ -1,35 +1,21 @@
-;; SPDX-License-Identifier: PMPL-1.0-or-later
-(ecosystem
-  (version "1.0.0")
-  (last-updated "2026-04-05")
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# ECOSYSTEM.a2ml — Verisim Core ecosystem position
+[metadata]
+version = "1.0.0"
+last-updated = "2026-04-05"
 
-  (name "VerisimCore.jl")
-  (type "julia-package")
-  (purpose "Shippable slim identity-core of VeriSimDB for clients that need
-            identity + audit trail without the full 8-shape octad.")
+[project]
+name = "Verisim Core"
+purpose = "Shippable slim identity-core of VeriSimDB for clients that need
+            identity + audit trail without the full 8-shape octad."
+role = "julia-package"
 
-  (position-in-ecosystem
-    (parent "nextgen-databases")
-    (siblings
-      (sibling "verisimdb"
-        (relationship "reference-implementation")
-        (description "Canonical paved-road 8-shape octad. VerisimCore is a slim
-                      escape hatch; clients choose one or the other."))
-      (sibling "verisim-modular-experiment"
-        (relationship "parent-experiment")
-        (description "Research prototype this package was promoted from.
-                      Contains Idris2 ABI, 145-assertion proof, Phase 5 findings."))
-      (sibling "typeql-experimental"
-        (relationship "sibling-experiment"))))
+[position-in-ecosystem]
+category = ""
 
-  (consumers
-    (consumer "KRLAdapter.jl"
-      (relationship "demonstrated-client")
-      (description "Knot-theory stack. Phase 4 dogfood confirmed that TangleIR
-                    lifecycle is satisfied by Core alone — no Federable peers needed.")
-      (location "/var/mnt/eclipse/repos/KRLAdapter.jl")))
-
-  (standards-followed
-    (standard "pmpl-1.0-license")
-    (standard "a2ml-machine-readable")
-    (standard "julia-package-layout" (description "src/ + test/runtests.jl + Project.toml"))))
+[related-projects]
+projects = [
+  # No related projects recorded
+]

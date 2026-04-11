@@ -1,60 +1,44 @@
-;; SPDX-License-Identifier: PMPL-1.0-or-later
-(state
-  (metadata
-    (version "0.1.0")
-    (last-updated "2026-04-05")
-    (status active))
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# STATE.a2ml — Verisim Core project state
+[metadata]
+project = "verisim-core"
+version = "0.1.0"
+last-updated = "2026-04-05"
+status = "active"
+session = "converted from scheme — 2026-04-11"
 
-  (project-context
-    (name "VerisimCore.jl")
-    (purpose "Shippable Julia package: slim identity-core of VeriSimDB (3 shapes
-              + federation contract for optional peers).")
-    (type "julia-package")
-    (promoted-from "nextgen-databases/verisim-modular-experiment/impl/")
-    (completion-percentage 85))
+[project-context]
+name = "Verisim Core"
+purpose = """src/Core.jl — Store, enrich!, attest, verify_attest, Ed25519-signed provenance."""
+completion-percentage = 85
 
-  (components
-    (component "core-module"
-      (status complete)
-      (description "src/Core.jl — Store, enrich!, attest, verify_attest, Ed25519-signed provenance.")
-      (completion 100))
-    (component "crypto-module"
-      (status complete)
-      (description "src/Crypto.jl — Ed25519 via libsodium (Sodium.jl).")
-      (completion 100))
-    (component "federation-module"
-      (status complete)
-      (description "src/Federation.jl — Manager, DriftWeights, renormalise, aggregate_drift.")
-      (completion 100))
-    (component "peer-modules"
-      (status complete)
-      (description "src/peers/{VectorPeer,DocumentPeer}.jl — example Federable peers.")
-      (completion 100))
-    (component "vcl-subset"
-      (status complete)
-      (description "src/vcl/{Query,Prover,Parser}.jl — PROOF INTEGRITY/CONSISTENCY/FRESHNESS.")
-      (completion 100))
-    (component "test-suite"
-      (status complete)
-      (description "test/runtests.jl — 55 assertions covering all public surfaces.")
-      (completion 100))
-    (component "production-readiness"
-      (status pending)
-      (description "Persistence layer, network transport, Zig FFI port.")
-      (completion 0)))
+[position]
+phase = "initial"   # design | implementation | testing | maintenance | archived
+maturity = "experimental"  # experimental | alpha | beta | production | lts
 
-  (verified-results
-    (result "package-tests"
-      (command "julia --project=. -e 'using Pkg; Pkg.test(\"VerisimCore\")'")
-      (status pass)
-      (assertions 55)))
+[route-to-mvp]
+milestones = [
+  # No milestones recorded
+]
 
-  (critical-next-actions
-    (action "Register to Julia General registry (if publishing publicly)")
-    (action "Add persistence layer (file-backed or redb-backed)")
-    (action "Add network transport for federation peers (mTLS)")
-    (action "Zig FFI port per hyperpolymath standard"))
+[blockers-and-issues]
+issues = [
+  # No blockers recorded
+]
 
-  (ecosystem-position
-    (parent-monorepo "nextgen-databases")
-    (siblings "verisimdb" "verisim-modular-experiment" "typeql-experimental")))
+[critical-next-actions]
+actions = [
+  "Register to Julia General registry (if publishing publicly)",
+  "Add persistence layer (file-backed or redb-backed)",
+  "Add network transport for federation peers (mTLS)",
+  "Zig FFI port per hyperpolymath standard",
+  "nextgen-databases",
+  "verisim-modular-experiment",
+  "typeql-experimental",
+]
+
+[maintenance-status]
+last-run-utc = "2026-04-05T00:00:00Z"
+last-result = "unknown"  # unknown | pass | warn | fail
