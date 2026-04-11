@@ -20,12 +20,12 @@
 | V4 | Raft consensus safety | L4 | No log divergence after commit |
 | V5 | Transaction atomicity | TLA | All-or-nothing across 8 modalities |
 
-### P1 — High (require Lean4/Agda/Isabelle — not I2)
+### P1 — High
 
 | # | Component | Prover | Notes |
 |---|-----------|--------|-------|
 | V6 | WAL integrity | L4 | CRC, replay idempotence, segment ordering |
-| V7 | Provenance chain immutability | Ag | Hash chain, monotonic timestamps |
+| **V7** | **Provenance chain immutability** | **Ag** | **DONE 2026-04-11** — `verisimdb/verification/proofs/agda/ProvenanceChain.agda` |
 | V8 | Drift metric correctness | Iz | Detection algorithm numerical bounds |
 
 ### P2 — Standard (I2 actionable)
