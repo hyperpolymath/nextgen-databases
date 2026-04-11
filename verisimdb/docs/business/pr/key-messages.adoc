@@ -42,7 +42,7 @@ before downstream systems consume contradictory data.
    temporal, provenance, and spatial in one entity
 3. *Self-normalisation* -- Automatic repair of drifted representations with
    configurable resolution strategies
-4. *Proof-carrying queries (VCL-DT)* -- Optional dependent-type verification
+4. *Proof-carrying queries (VCL-UT)* -- Optional dependent-type verification
    of query correctness using Idris2
 5. *Heterogeneous federation* -- Unified querying across PostgreSQL, ArangoDB,
    Elasticsearch, and Neo4j without data migration
@@ -66,12 +66,12 @@ alertable condition -- not an invisible failure mode.
   reloading, and battle-tested concurrency. Rust provides near-C performance with
   memory safety.
 
-* *VCL (Verisimilitude Query Language)*: Purpose-built query language for
+* *VCL (VeriSim Consonance Language)*: Purpose-built query language for
   cross-modal operations. Familiar to SQL users but supports modality-specific
   operations (graph traversals, vector similarity, tensor ops, temporal
   time-travel, spatial containment) in a unified syntax.
 
-* *VCL-DT*: Optional dependent-type layer using Idris2. Proves query type
+* *VCL-UT*: Optional dependent-type layer using Idris2. Proves query type
   correctness, semantic compatibility of cross-modal joins, and threshold
   validity at compile time. Entirely opt-in -- plain VCL works without it.
 
@@ -188,7 +188,7 @@ continuously and repairs it automatically.
 VeriSimDB formalises the concept of cross-modal drift in multimodal data systems
 and provides an operational system for detecting, quantifying, and repairing
 representational divergence across 8 data modalities. The query language includes
-an optional dependent-type verification layer (VCL-DT) that provides compile-time
+an optional dependent-type verification layer (VCL-UT) that provides compile-time
 proofs of query correctness.
 
 === Supporting Points
@@ -199,7 +199,7 @@ proofs of query correctness.
   consistency.
 
 * *Formal semantics*: VCL has published formal semantics (denotational and
-  operational). VCL-DT extends these with dependent-type judgements formalised in
+  operational). VCL-UT extends these with dependent-type judgements formalised in
   Idris2, providing machine-checkable proofs of query properties.
 
 * *Reproducibility*: The entire system is open source. Experiments can be
@@ -296,7 +296,7 @@ community edition. There is no "enterprise edition" that gates features.
 * Rust community (r/rust, Rust Users Forum) -- core engine, storage
 * BEAM community (Erlang/Elixir conferences, Code BEAM) -- fault tolerance
 * Database community (r/database, HN, Lobsters) -- novel architecture
-* Formal methods community (Idris2 Discourse, TYPES mailing list) -- VCL-DT
+* Formal methods community (Idris2 Discourse, TYPES mailing list) -- VCL-UT
 
 === Use These Phrases
 

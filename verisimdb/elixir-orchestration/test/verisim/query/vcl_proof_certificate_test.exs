@@ -2,7 +2,7 @@
 
 defmodule VeriSim.Query.VCLProofCertificateTest do
   @moduledoc """
-  Tests for VCL-DT proof certificate generation and verification.
+  Tests for VCL-UT proof certificate generation and verification.
 
   Verifies that:
   1. Certificates are generated with correct structure and SHA-256 hash

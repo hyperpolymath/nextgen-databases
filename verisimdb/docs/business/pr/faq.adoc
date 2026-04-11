@@ -124,7 +124,7 @@ has no drift detection, no temporal versioning, no provenance tracking, no forma
 query verification, and no federation.
 
 VeriSimDB supports 8 modalities with cross-modal drift detection and formal query
-proofs (VCL-DT). The fundamental difference is architectural: Weaviate treats
+proofs (VCL-UT). The fundamental difference is architectural: Weaviate treats
 vectors and objects as complementary storage; VeriSimDB treats all modalities as
 representations of a single entity that must remain consistent.
 
@@ -172,7 +172,7 @@ commercial use, while VeriSimDB's PMPL license is permissive.
 
 === What is VCL?
 
-VCL (Verisimilitude Query Language) is VeriSimDB's purpose-built query language
+VCL (VeriSim Consonance Language) is VeriSimDB's purpose-built query language
 for cross-modal operations. VCL allows queries to span multiple modalities in
 a single expression, include coherence scores in result sets, and filter by
 drift thresholds.
@@ -181,10 +181,10 @@ VCL is designed to be familiar to SQL users while supporting modality-specific
 operations (graph traversals, vector similarity, tensor operations, temporal
 time-travel, spatial containment, etc.) in a unified syntax.
 
-=== What are dependent-type proofs (VCL-DT)?
+=== What are dependent-type proofs (VCL-UT)?
 
-VCL-DT is an optional extension to VCL that adds dependent-type verification.
-When enabled, VCL-DT uses the Idris2 type system to prove properties of queries
+VCL-UT is an optional extension to VCL that adds dependent-type verification.
+When enabled, VCL-UT uses the Idris2 type system to prove properties of queries
 at compile time:
 
 * *Type correctness:* Ensure that query expressions are well-typed across
@@ -194,8 +194,8 @@ at compile time:
   meaningful
 * *Threshold validity:* Prove that coherence thresholds are within valid ranges
 
-VCL-DT is entirely optional. Teams can use plain VCL for standard operations and
-adopt VCL-DT incrementally when they want formal guarantees.
+VCL-UT is entirely optional. Teams can use plain VCL for standard operations and
+adopt VCL-UT incrementally when they want formal guarantees.
 
 === How does federation work?
 
@@ -288,7 +288,7 @@ The roadmap includes:
 
 * *Short-term (0-6 months):* Community building, documentation improvements,
   federation connector hardening, performance benchmarking
-* *Medium-term (6-18 months):* Container images, managed service pilot, VCL-DT
+* *Medium-term (6-18 months):* Container images, managed service pilot, VCL-UT
   tooling, additional federation connectors
 * *Long-term (18-36 months):* Enterprise features (RBAC, audit logging),
   OEM licensing framework, academic paper publications

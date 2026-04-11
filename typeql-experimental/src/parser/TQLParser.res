@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 //
-// TQLParser.res — Parser for VCL-dt++ extended syntax
+// TQLParser.res — Parser for VCL-UT extended syntax
 //
-// Implements parser combinators for the six new VCL-dt++ clauses:
+// Implements parser combinators for the six new VCL-UT clauses:
 // 1. CONSUME AFTER n USE       — Linear types
 // 2. WITH SESSION protocol     — Session types
 // 3. EFFECTS { e1, e2, ... }   — Effect systems

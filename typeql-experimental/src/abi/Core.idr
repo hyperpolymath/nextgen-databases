@@ -1,7 +1,7 @@
 -- SPDX-License-Identifier: PMPL-1.0-or-later
 -- Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 --
--- Core.idr — Foundation types for VCL-dt++ type system kernel
+-- Core.idr — Foundation types for VCL-UT type system kernel
 --
 -- Defines the shared vocabulary used by all six extensions:
 -- modalities, usage quantities, effect labels, hexad references,
@@ -195,7 +195,7 @@ Show ProofKind where
 -- Error Types
 -- ============================================================================
 
-||| Errors that can arise during type checking of VCL-dt++ queries.
+||| Errors that can arise during type checking of VCL-UT queries.
 public export
 data TQLError : Type where
   LinearityViolation  : String -> TQLError

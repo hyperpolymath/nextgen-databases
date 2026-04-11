@@ -431,7 +431,7 @@ function parseQuery(query, action) {
 // ---------------------------------------------------------------------------
 
 /**
- * Type-check a parsed VCL-DT AST.
+ * Type-check a parsed VCL-UT AST.
  *
  * If compiled ReScript is available, delegates to VCLBidir.synthesizeQuery
  * for full bidirectional type inference. Otherwise, extracts proof obligations

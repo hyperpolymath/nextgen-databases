@@ -1,7 +1,7 @@
 -- SPDX-License-Identifier: PMPL-1.0-or-later
 -- Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 --
--- Proofs.idr — Cross-cutting proofs for VCL-dt++ type system
+-- Proofs.idr — Cross-cutting proofs for VCL-UT type system
 --
 -- This module contains proofs that demonstrate properties across multiple
 -- extensions: linearity preservation under composition, effect monotonicity,

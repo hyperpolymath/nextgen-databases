@@ -119,7 +119,7 @@ let lint = (query: string, ~vclDt: bool=false): array<diagnostic> => {
     })
   }
 
-  // VCL-DT specific: PROOF required for all semantic access
+  // VCL-UT specific: PROOF required for all semantic access
   if vclDt && isSelect && has("SEMANTIC") && !has("PROOF") {
     // Already covered by VCL003 with Error severity
     ignore()

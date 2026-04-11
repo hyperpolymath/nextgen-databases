@@ -30,7 +30,7 @@
 //! - [`search`] — Text, vector, graph-relational, and spatial search operations.
 //! - [`drift`] — Drift score retrieval and normalization triggers.
 //! - [`provenance`] — Immutable provenance chain management.
-//! - [`vcl`] — VeriSim Query Language execution and explain plans.
+//! - [`vcl`] — VeriSim Consonance Language execution and explain plans.
 //! - [`federation`] — Peer registration and federated cross-instance queries.
 //! - [`error`] — Error types and the crate-level `Result` alias.
 

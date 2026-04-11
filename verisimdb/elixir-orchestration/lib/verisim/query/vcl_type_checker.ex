@@ -2,10 +2,10 @@
 
 defmodule VeriSim.Query.VCLTypeChecker do
   @moduledoc """
-  Elixir-native VCL-DT type checker.
+  Elixir-native VCL-UT type checker.
 
   Provides lightweight type checking for VCL queries with PROOF clauses when the
-  ReScript subprocess (VCLBidir) is unavailable. This ensures that VCL-DT queries
+  ReScript subprocess (VCLBidir) is unavailable. This ensures that VCL-UT queries
   are always type-checked before execution — never silently downgraded to slipstream.
 
   ## Design
@@ -107,7 +107,7 @@ defmodule VeriSim.Query.VCLTypeChecker do
   # ---------------------------------------------------------------------------
 
   @doc """
-  Type-check a VCL-DT query AST.
+  Type-check a VCL-UT query AST.
 
   Validates proof types, modality compatibility, and composition rules.
   Returns structured proof obligations ready for the executor.
@@ -191,7 +191,7 @@ defmodule VeriSim.Query.VCLTypeChecker do
   defp validate_modalities(_modalities), do: :ok
 
   defp validate_proof_specs([]) do
-    {:error, {:missing_proof, "VCL-DT query requires at least one PROOF specification"}}
+    {:error, {:missing_proof, "VCL-UT query requires at least one PROOF specification"}}
   end
   defp validate_proof_specs(specs) do
     Enum.reduce_while(specs, :ok, fn spec, _acc ->

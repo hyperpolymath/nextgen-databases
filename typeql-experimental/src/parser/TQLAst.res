@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 //
-// TQLAst.res — Extended AST types for VCL-dt++ (TypeQL-experimental)
+// TQLAst.res — Extended AST types for VCL-UT (TypeQL-experimental)
 //
 // Defines the AST nodes for the six new extension clauses that augment
 // standard VCL queries. These types mirror the Idris2 kernel types but
@@ -196,7 +196,7 @@ type usageLimit = {
 // Extension Annotations (all optional)
 // ============================================================================
 
-// Collected extension annotations from a VCL-dt++ query.
+// Collected extension annotations from a VCL-UT query.
 // Each field is None if the corresponding clause was not present.
 type extensionAnnotations = {
   consumeAfter: option<usageSpec>,
@@ -236,7 +236,7 @@ type baseQuery = {
   offset: option<int>,
 }
 
-// A VCL-dt++ extended query = base VCL query + extension annotations.
+// A VCL-UT extended query = base VCL query + extension annotations.
 type extendedQuery = {
   base: baseQuery,
   extensions: extensionAnnotations,

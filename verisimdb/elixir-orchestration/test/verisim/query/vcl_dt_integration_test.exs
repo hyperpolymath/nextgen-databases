@@ -2,9 +2,9 @@
 
 defmodule VeriSim.Query.VCLDTIntegrationTest do
   @moduledoc """
-  VCL-DT (dependent type) integration tests.
+  VCL-UT (dependent type) integration tests.
 
-  Exercises the full VCL-DT pipeline: parse → type-check → execute → verify
+  Exercises the full VCL-UT pipeline: parse → type-check → execute → verify
   proofs → bundle ProvedResult. Tests verify both the happy path (proofs pass
   when data exists) and the error paths (proofs fail correctly).
 
@@ -14,7 +14,7 @@ defmodule VeriSim.Query.VCLDTIntegrationTest do
      the correct Rust endpoint and returns a structured artifact or error
   2. **Multi-proof composition** — multiple proofs in a single query
   3. **Invalid proof rejection** — tampered or malformed data fails verification
-  4. **Proof downgrade rejection** — VCL-DT cannot silently become slipstream
+  4. **Proof downgrade rejection** — VCL-UT cannot silently become slipstream
   5. **ProvedResult structure** — data + proof_certificate with all required fields
   6. **Fallback type extraction** — when type checker unavailable, obligations
      are extracted from the AST directly with correct structure
@@ -183,8 +183,8 @@ defmodule VeriSim.Query.VCLDTIntegrationTest do
   # ===========================================================================
 
   describe "proof downgrade rejection" do
-    test "VCL-DT query with PROOF clause cannot silently become slipstream" do
-      # A query with PROOF must go through the VCL-DT path and either
+    test "VCL-UT query with PROOF clause cannot silently become slipstream" do
+      # A query with PROOF must go through the VCL-UT path and either
       # return a ProvedResult or fail with a proof-related error.
       query = "SELECT GRAPH.* FROM HEXAD 'entity-001' PROOF EXISTENCE(entity-001)"
 
@@ -195,7 +195,7 @@ defmodule VeriSim.Query.VCLDTIntegrationTest do
           # Must have a proof_certificate — NOT bare data
           assert Map.has_key?(proved_result, :proof_certificate) or
                    Map.has_key?(proved_result, "proof_certificate"),
-            "VCL-DT result must include proof_certificate, got: #{inspect(Map.keys(proved_result))}"
+            "VCL-UT result must include proof_certificate, got: #{inspect(Map.keys(proved_result))}"
 
         {:error, _} ->
           # Proof verification error is acceptable (Rust core unavailable)
@@ -240,8 +240,8 @@ defmodule VeriSim.Query.VCLDTIntegrationTest do
   # ===========================================================================
 
   describe "ProvedResult structure" do
-    test "VCL-DT result has expected shape with proof_certificate" do
-      # Build a well-formed AST that will go through the VCL-DT path
+    test "VCL-UT result has expected shape with proof_certificate" do
+      # Build a well-formed AST that will go through the VCL-UT path
       ast = %{
         modalities: [:graph],
         source: {:octad, "entity-001"},
@@ -372,11 +372,11 @@ defmodule VeriSim.Query.VCLDTIntegrationTest do
   end
 
   # ===========================================================================
-  # 7. Explain plan for VCL-DT queries
+  # 7. Explain plan for VCL-UT queries
   # ===========================================================================
 
-  describe "VCL-DT explain plan" do
-    test "explain: true on a VCL-DT query returns plan without executing proofs" do
+  describe "VCL-UT explain plan" do
+    test "explain: true on a VCL-UT query returns plan without executing proofs" do
       query = "SELECT GRAPH.* FROM HEXAD 'entity-001' PROOF EXISTENCE(entity-001)"
       ast = H.parse!(query)
 

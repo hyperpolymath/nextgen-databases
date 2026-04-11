@@ -205,7 +205,7 @@ defmodule VeriSim.TelemetryTest do
       assert drift.most_drifted == :semantic
     end
 
-    test "proof_type_usage/0 tracks VCL-DT adoption" do
+    test "proof_type_usage/0 tracks VCL-UT adoption" do
       Collector.increment_map(:proof_type_usage, "EXISTENCE", 3)
       Collector.increment_map(:proof_type_usage, "INTEGRITY", 2)
 

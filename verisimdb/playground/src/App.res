@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // VCL Playground — main application entry point.
-// Wires up the editor, VCL-DT toggle, linter, formatter, and query executor.
+// Wires up the editor, VCL-UT toggle, linter, formatter, and query executor.
 // Tries the real verisim-api backend first, falls back to demo mode.
 
 // === DOM helpers ===
@@ -33,13 +33,13 @@ let rec init = () => {
   // === Check backend connectivity ===
   checkBackend(statusConnection)->ignore
 
-  // === VCL-DT Toggle ===
+  // === VCL-UT Toggle ===
   let updateMode = () => {
     if vclDtMode.contents {
       toggle["classList"]["add"]("active")->ignore
       modeBadge["className"] = "mode-badge vcl-dt"
-      modeBadge["textContent"] = "VCL-DT"
-      statusMode["textContent"] = "Mode: VCL-DT (Dependent Types)"
+      modeBadge["textContent"] = "VCL-UT"
+      statusMode["textContent"] = "Mode: VCL-UT (Dependent Types)"
       statusBar["classList"]["add"]("vcl-dt")->ignore
     } else {
       toggle["classList"]["remove"]("active")->ignore

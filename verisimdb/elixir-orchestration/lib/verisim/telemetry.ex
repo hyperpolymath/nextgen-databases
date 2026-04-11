@@ -7,7 +7,7 @@ defmodule VeriSim.Telemetry do
   Defines telemetry events, metric collectors, and supervises the opt-in
   product telemetry collector. The collector aggregates counters and
   distributions for query patterns, modality usage, drift frequency,
-  federation health, and VCL-DT proof adoption.
+  federation health, and VCL-UT proof adoption.
 
   ## Opt-in telemetry
 

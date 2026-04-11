@@ -25,7 +25,7 @@ Modern data systems increasingly store entities across multiple representation t
 This polyglot persistence pattern creates consistency challenges that existing solutions cannot detect: when one representation of an entity is updated, others may silently diverge, producing _cross-modal drift_ invisible to any single store.
 We present VeriSimDB, a multimodal database engine that maintains entities simultaneously across eight modalities (the "octad": Graph, Vector, Tensor, Semantic, Document, Temporal, Provenance, Spatial) and employs cross-modal drift detection to identify and repair representational divergence.
 Our approach introduces a drift scoring algorithm based on cosine distance between modality embeddings, with adaptive thresholds that account for natural representational variance.
-We describe VCL-DT, a query language extension that supports proof-carrying queries with 11 formally verified proof types, enabling clients to request cryptographic certificates attesting to the consistency, provenance, and integrity of query results.
+We describe VCL-UT, a query language extension that supports proof-carrying queries with 11 formally verified proof types, enabling clients to request cryptographic certificates attesting to the consistency, provenance, and integrity of query results.
 We evaluate VeriSimDB on a suite of 510 Rust and 152 Elixir tests encompassing synthetic drift injection, federation coordination, and proof verification scenarios.
 Results show that VeriSimDB detects semantic-vector drift with precision exceeding 0.95 and recall of 0.91, and repairs 94% of detected divergences automatically through its self-normalisation engine.
 Federation overhead for cross-instance queries remains below 12ms per additional peer for modality-specific queries.
@@ -63,7 +63,7 @@ This paper makes four contributions:
 
 3. **Self-Normalisation** -- an authority-ranked repair engine that identifies the most authoritative modality for a drifted entity and regenerates divergent representations, with five configurable strategies ranging from fully automatic to human-in-the-loop.
 
-4. **VCL-DT** -- a dependent-type extension to the VeriSim Query Language (VCL) that supports 11 proof types, enabling clients to request and verify formal certificates of data consistency, integrity, and provenance.
+4. **VCL-UT** -- a dependent-type extension to the VeriSim Consonance Language (VCL) that supports 11 proof types, enabling clients to request and verify formal certificates of data consistency, integrity, and provenance.
 
 
 // ============================================================================
@@ -97,7 +97,7 @@ A system can be perfectly consistent in the ACID sense (all replicas agree on th
 Proof-carrying data has been explored in the context of authenticated data structures <<tamassia2003>>, where Merkle trees and hash chains provide integrity certificates.
 CertikOS and seL4 demonstrate that formal verification can be applied to systems software, but database systems have largely resisted formal methods due to the complexity of query optimisation and storage management.
 
-VCL-DT draws inspiration from proof-carrying code <<necula1997>> and dependent type systems in languages such as Idris 2 <<brady2021>> and Lean 4 <<demoura2021>>, adapting these ideas to the database query context.
+VCL-UT draws inspiration from proof-carrying code <<necula1997>> and dependent type systems in languages such as Idris 2 <<brady2021>> and Lean 4 <<demoura2021>>, adapting these ideas to the database query context.
 
 === Marr's Three Levels of Analysis
 
@@ -369,14 +369,14 @@ Normalisation results are recorded as telemetry events including the entity ID, 
 
 
 // ============================================================================
-// 6. VCL AND VCL-DT
+// 6. VCL AND VCL-UT
 // ============================================================================
 
-== VCL and VCL-DT
+== VCL and VCL-UT
 
 === VCL Syntax and Semantics
 
-The VeriSim Query Language (VCL) is the native query interface for VeriSimDB.
+The VeriSim Consonance Language (VCL) is the native query interface for VeriSimDB.
 Its grammar is specified in ISO/IEC 14977 EBNF notation <<iso14977>> and supports `SELECT`, `INSERT`, `UPDATE`, and `DELETE` operations across octad entities.
 
 A VCL query comprises:
@@ -406,12 +406,12 @@ Key differences include: no table schemas (entities are schema-flexible with typ
 
 === The PROOF Clause and 11 Proof Types
 
-VCL-DT (VCL with Dependent Types) is activated by the presence of a `PROOF` clause.
+VCL-UT (VCL with Dependent Types) is activated by the presence of a `PROOF` clause.
 When a query includes `PROOF`, the query router directs it through the formal verification pipeline rather than the standard (slipstream) execution path.
 
 The `PROOF` clause takes the form `PROOF <TYPE>(<Contract>)` and supports 11 proof types:
 
-.VCL-DT proof types
+.VCL-UT proof types
 [cols="1,3",options="header"]
 |===
 | Proof Type | Guarantee
@@ -462,7 +462,7 @@ PROOF INTEGRITY(DataIntegrityContract)
 
 === Proof Obligation Generation and Certificate Verification
 
-When a VCL-DT query is executed, the proof pipeline generates a _proof obligation_ for each requested proof type.
+When a VCL-UT query is executed, the proof pipeline generates a _proof obligation_ for each requested proof type.
 The obligation specifies:
 
 * The entity (or entities) to verify.
@@ -477,7 +477,7 @@ Clients can independently verify proof certificates without querying VeriSimDB, 
 
 === Composition Strategies
 
-VCL-DT supports three composition strategies for multi-proof queries:
+VCL-UT supports three composition strategies for multi-proof queries:
 
 1. **Conjunction (AND)** -- All proofs must succeed for the query to return results. Failure of any proof aborts the query with a proof failure diagnostic.
 
@@ -558,7 +558,7 @@ The Elixir layer coordinates distributed operations using OTP's battle-tested su
 
 - **VeriSim.EntityServer**: A GenServer per entity, managing the entity's lifecycle and serialising concurrent updates. Entity servers are distributed across the cluster using Horde (a distributed DynamicSupervisor).
 - **VeriSim.DriftMonitor**: A GenServer that sweeps entities on a configurable interval, dispatching drift computation to the Rust core and queuing normalisation tasks.
-- **VeriSim.QueryRouter**: Routes VCL queries to the appropriate execution pipeline (slipstream vs VCL-DT) and handles federation decomposition.
+- **VeriSim.QueryRouter**: Routes VCL queries to the appropriate execution pipeline (slipstream vs VCL-UT) and handles federation decomposition.
 - **VeriSim.SchemaRegistry**: Manages entity type schemas and proof contracts, coordinating with the Semantic modality store.
 - **VeriSim.Consensus**: A KRaft-inspired (Kafka Raft) consensus implementation for metadata replication in clustered deployments.
 
@@ -685,12 +685,12 @@ The mean normalisation latency was 23ms for single-modality repairs and 87ms for
 | 5.7
 | 18.9
 
-| VCL-DT with INTEGRITY proof
+| VCL-UT with INTEGRITY proof
 | 8.3
 | 27.4
 |===
 
-VCL-DT queries incur approximately 2-3x the latency of slipstream queries due to proof generation and certificate construction.
+VCL-UT queries incur approximately 2-3x the latency of slipstream queries due to proof generation and certificate construction.
 
 === Federation Overhead
 
@@ -756,7 +756,7 @@ VeriSimDB's INTEGRITY proof type draws on this work, extending it from single-st
 
 **Formal methods in databases.**
 Amazon's use of TLA+ for DynamoDB <<newcombe2015>> demonstrates that formal methods can improve database reliability, but TLA+ is used for protocol verification, not query-level proofs.
-VCL-DT is, to our knowledge, the first query language to support proof-carrying results with dependent-type semantics.
+VCL-UT is, to our knowledge, the first query language to support proof-carrying results with dependent-type semantics.
 
 
 // ============================================================================
@@ -765,9 +765,9 @@ VCL-DT is, to our knowledge, the first query language to support proof-carrying 
 
 == Future Work
 
-**Lean 4 integration for VCL-DT type checking.**
-The current VCL-DT type checker is implemented in Elixir with a bridge to the Rust ZKP module.
-We plan to integrate Lean 4 as an external proof assistant, enabling VCL-DT contracts to be expressed as Lean theorems and verified by Lean's kernel.
+**Lean 4 integration for VCL-UT type checking.**
+The current VCL-UT type checker is implemented in Elixir with a bridge to the Rust ZKP module.
+We plan to integrate Lean 4 as an external proof assistant, enabling VCL-UT contracts to be expressed as Lean theorems and verified by Lean's kernel.
 This would provide the highest level of formal assurance for proof certificates.
 
 **GraphRAG application integration.**
@@ -805,7 +805,7 @@ The octad model provides a principled foundation for multimodal entity managemen
 Cross-modal drift detection transforms consistency from an invisible hope into a measurable, actionable metric.
 Self-normalisation automates the most tedious and error-prone aspect of multi-system data management: keeping representations in agreement.
 
-VCL-DT extends this consistency guarantee to the query interface, enabling clients to not merely _hope_ that their data is consistent but to _prove_ it with cryptographic certificates.
+VCL-UT extends this consistency guarantee to the query interface, enabling clients to not merely _hope_ that their data is consistent but to _prove_ it with cryptographic certificates.
 The 11 proof types cover a range of assurance levels from basic existence checking to zero-knowledge proofs, allowing clients to select the appropriate level of verification for their use case.
 
 Federation extends these guarantees across organisational boundaries, enabling multi-institutional data sharing with configurable drift policies that balance consistency against latency and autonomy.

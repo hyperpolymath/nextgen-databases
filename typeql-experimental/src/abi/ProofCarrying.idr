@@ -136,7 +136,7 @@ proofCount (AndProved mp _) = S (proofCount mp)
 -- Query Result with Proofs
 -- ============================================================================
 
-||| A VCL-dt++ query result with attached proofs.
+||| A VCL-UT query result with attached proofs.
 ||| Wraps Core.QueryResult with zero or more theorems.
 public export
 ProvedQueryResult : Type

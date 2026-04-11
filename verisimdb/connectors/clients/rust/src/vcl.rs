@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
-//! VeriSim Query Language (VCL) execution.
+//! VeriSim Consonance Language (VCL) execution.
 //!
 //! VCL is VeriSimDB's native query language, supporting SQL-like syntax extended
 //! with multi-modal operations (vector similarity, graph traversal, spatial

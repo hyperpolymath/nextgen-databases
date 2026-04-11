@@ -3,7 +3,7 @@
 -- 08-proof-existence.vcl
 -- Proof-carrying query: verify entity existence across all modalities
 --
--- VCL-DT (Dependent Type) extends VCL with PROOF clauses that attach
+-- VCL-UT (Dependent Type) extends VCL with PROOF clauses that attach
 -- machine-checkable proof certificates to query results. This is
 -- VeriSimDB's distinguishing feature: not just returning data, but
 -- returning data with formal guarantees.

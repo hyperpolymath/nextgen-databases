@@ -137,7 +137,7 @@ Configurable by admin, overridable by user, defaults to global.
 ### 3.4 ZKP Integration (PLONK)
 **Criticality: HIGH** | Effort: Large
 
-Real zero-knowledge proof verification for VCL-DT PROOF clause.
+Real zero-knowledge proof verification for VCL-UT PROOF clause.
 Scheme: PLONK (see contractiles/trust/Trustfile for rationale).
 
 - `ark-plonk` integration in verisim-semantic

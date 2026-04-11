@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 //
-// TQLLexer_test.res — Dedicated lexer-level unit tests for VCL-dt++ parser
+// TQLLexer_test.res — Dedicated lexer-level unit tests for VCL-UT parser
 //
 // Tests the low-level parser combinators (string matching, keyword recognition,
 // identifier parsing, integer parsing, string literal parsing) and the
@@ -111,7 +111,7 @@ let testKeywordCombinator = (): unit => {
   assertParseOk("keyword with trailing newline", keyword("SELECT"), "SELECT\n")
   assertParseOk("keyword no trailing ws", keyword("SELECT"), "SELECT")
 
-  // VCL-dt++ specific keywords
+  // VCL-UT specific keywords
   assertParseOk("CONSUME keyword", keyword("CONSUME"), "CONSUME")
   assertParseOk("AFTER keyword", keyword("AFTER"), "AFTER")
   assertParseOk("USE keyword", keyword("USE"), "USE")
@@ -594,7 +594,7 @@ let testTokenOrdering = (): unit => {
 // ============================================================================
 
 let () = {
-  Js.Console.log("=== VCL-dt++ Lexer / Token Unit Tests ===")
+  Js.Console.log("=== VCL-UT Lexer / Token Unit Tests ===")
   testStringCombinator()
   testKeywordCombinator()
   testIdentifier()

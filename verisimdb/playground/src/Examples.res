@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Example VCL queries for the playground.
-// Covers all 8 octad modalities, real backend queries, and VCL-DT proof types.
+// Covers all 8 octad modalities, real backend queries, and VCL-UT proof types.
 
 type example = {
   label: string,
@@ -70,34 +70,34 @@ let examples = [
     query: "SELECT GRAPH\nFROM FEDERATION STORE 'remote-cluster-1'\nHEXAD\nWHERE region = 'eu-west'\nLIMIT 25",
     vclDt: false,
   },
-  // --- VCL-DT examples ---
+  // --- VCL-UT examples ---
   {
-    label: "Proof of existence (VCL-DT)",
+    label: "Proof of existence (VCL-UT)",
     query: "SELECT SEMANTIC\nFROM HEXAD\nPROOF EXISTENCE\nTHRESHOLD 0.95\nWHERE type = 'Certificate'\nLIMIT 10",
     vclDt: true,
   },
   {
-    label: "Integrity proof (VCL-DT)",
+    label: "Integrity proof (VCL-UT)",
     query: "SELECT SEMANTIC, DOCUMENT\nFROM HEXAD\nPROOF INTEGRITY\nTHRESHOLD 0.99\nWHERE classification = 'audit-trail'\nLIMIT 5",
     vclDt: true,
   },
   {
-    label: "Consistency check (VCL-DT)",
+    label: "Consistency check (VCL-UT)",
     query: "SELECT GRAPH, SEMANTIC\nFROM HEXAD\nPROOF CONSISTENCY\nTHRESHOLD 0.9\nWHERE DRIFT THRESHOLD 0.1\nLIMIT 20",
     vclDt: true,
   },
   {
-    label: "Provenance proof (VCL-DT)",
+    label: "Provenance proof (VCL-UT)",
     query: "SELECT PROVENANCE, SEMANTIC\nFROM HEXAD\nPROOF PROVENANCE\nTHRESHOLD 0.95\nWHERE source = 'verified-origin'\nLIMIT 10",
     vclDt: true,
   },
   {
-    label: "Freshness proof (VCL-DT)",
+    label: "Freshness proof (VCL-UT)",
     query: "SELECT TEMPORAL, SEMANTIC\nFROM HEXAD\nPROOF FRESHNESS\nTHRESHOLD 0.99\nWHERE age_ms < 86400000\nLIMIT 10",
     vclDt: true,
   },
   {
-    label: "Multi-proof composition (VCL-DT)",
+    label: "Multi-proof composition (VCL-UT)",
     query: "SELECT SEMANTIC, PROVENANCE, TEMPORAL\nFROM HEXAD\nPROOF EXISTENCE AND INTEGRITY AND FRESHNESS\nTHRESHOLD 0.95\nWHERE type = 'critical-entity'\nLIMIT 5",
     vclDt: true,
   },

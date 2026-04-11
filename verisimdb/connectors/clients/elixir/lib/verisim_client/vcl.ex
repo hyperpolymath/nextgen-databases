@@ -3,7 +3,7 @@
 
 defmodule VeriSimClient.Vcl do
   @moduledoc """
-  VeriSim Query Language (VCL) execution for VeriSimDB.
+  VeriSim Consonance Language (VCL) execution for VeriSimDB.
 
   VCL is VeriSimDB's native query language, supporting SQL-like syntax extended
   with multi-modal operations (vector similarity, graph traversal, spatial

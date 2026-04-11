@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
-= VeriSim Query Language (VCL) Specification
+= VeriSim Consonance Language (VCL) Specification
 :author: Jonathan D.A. Jewell
 :email: j.d.a.jewell@open.ac.uk
 :revnumber: 2.0
@@ -19,14 +19,35 @@
 
 == Introduction
 
+=== Name and Terminology
+
+[NOTE]
+====
+**VCL = VeriSim Consonance Language.**
+
+The word _consonance_ is deliberate: it means agreement and harmony between
+parts. VeriSimDB maintains a single entity across eight modalities simultaneously
+(the octad — Graph, Vector, Tensor, Semantic, Document, Temporal, Provenance,
+Spatial). Those eight representations must stay in consonance with each other.
+The query language takes its name from that guarantee.
+
+**VCL-UT = VCL Usage-Tracked types** — the type-theoretic extension tier, housed
+in `typeql-experimental/`. The "UT" abbreviation expands to _Usage-Tracked_
+because these extensions track resource consumption (linear consumption counts,
+session state, side-effects, usage limits). File extension: `.vclut`.
+
+Prior name **VCL** (VeriSim Consonance Language) is retired. Prior extension name
+**VCL-UT** is retired. Use VCL and VCL-UT exclusively.
+====
+
 === Purpose and Scope
 
-The VeriSim Query Language (VCL) is the native query interface for VeriSimDB, a cross-system entity consistency engine with drift detection, self-normalisation, and formally verified queries. This document is the **normative language specification** for VCL version 2.0.
+The VeriSim Consonance Language (VCL) is the native query interface for VeriSimDB, a cross-system entity consistency engine with drift detection, self-normalisation, and formally verified queries. This document is the **normative language specification** for VCL version 2.0.
 
 VCL is not SQL. It is a domain-specific language for querying and mutating **octad entities** — data objects that exist simultaneously across up to eight modalities (Graph, Vector, Tensor, Semantic, Document, Temporal, Provenance, Spatial). VCL provides:
 
 * **Multi-modal querying** — SELECT across any combination of eight modalities in a single statement.
-* **Dual-path execution** — Slipstream (fast, unverified) and VCL-DT (formally verified with ZKP proofs).
+* **Dual-path execution** — Slipstream (fast, unverified) and VCL-UT (formally verified with ZKP proofs).
 * **Federation** — Query across distributed VeriSimDB instances with configurable drift policies.
 * **Cross-modal conditions** — Filter on relationships _between_ modalities (drift, consistency, existence).
 * **Write path** — INSERT, UPDATE, DELETE with optional proof verification.
@@ -82,7 +103,7 @@ VCL operates in two execution modes, determined by the presence or absence of a 
 
 [cols="1,1,1"]
 |===
-| Property | Slipstream (no PROOF) | VCL-DT (with PROOF)
+| Property | Slipstream (no PROOF) | VCL-UT (with PROOF)
 
 | Parse
 | Same parser, same AST
@@ -130,7 +151,7 @@ Both modes use the same parser and produce the same AST. They diverge at the **q
                          ┌────▼────┐          ┌─────▼─────┐
                          │   NO    │          │    YES    │
                     ┌────▼────┐         ┌─────▼─────┐
-                    │Slipstream│         │  VCL-DT    │
+                    │Slipstream│         │  VCL-UT    │
                     │  Path    │         │  Path      │
                     └────┬────┘         └─────┬─────┘
                          │                     │
@@ -160,7 +181,7 @@ Both modes use the same parser and produce the same AST. They diverge at the **q
 A VCL implementation MAY support one or both execution paths:
 
 * **Level 1 — Slipstream**: Parse, validate, execute queries without proof obligations. All SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT, OFFSET, and mutation statements MUST be supported.
-* **Level 2 — Full (Slipstream + VCL-DT)**: All Level 1 features plus PROOF clause parsing, dependent type checking, proof generation, and proof certificate bundling.
+* **Level 2 — Full (Slipstream + VCL-UT)**: All Level 1 features plus PROOF clause parsing, dependent type checking, proof generation, and proof certificate bundling.
 
 VeriSimDB's current implementation is Level 1 complete with Level 2 partially implemented (parser and type checker complete; runtime proof generation planned).
 
@@ -481,7 +502,7 @@ When drift exceeds configurable thresholds, the **self-normalizer** identifies t
 
 == Type System
 
-VCL has a rich type system that operates in two modes depending on the execution path. The slipstream path uses simple types for basic validation. The VCL-DT path adds dependent types, refinement types, and proof types for formal verification.
+VCL has a rich type system that operates in two modes depending on the execution path. The slipstream path uses simple types for basic validation. The VCL-UT path adds dependent types, refinement types, and proof types for formal verification.
 
 === Type Language
 
@@ -533,7 +554,7 @@ type rec vclType =
 
 `[.implemented]` All simple type checking in `VCLBidir.res`.
 
-=== Dependent Types (VCL-DT Path)
+=== Dependent Types (VCL-UT Path)
 
 When a `PROOF` clause is present, the type checker activates dependent type checking:
 
@@ -1197,7 +1218,7 @@ LIMIT 50
 
 === PROOF Clause
 
-The PROOF clause activates the VCL-DT execution path and specifies proof obligations.
+The PROOF clause activates the VCL-UT execution path and specifies proof obligations.
 
 .Grammar
 ----
@@ -1590,7 +1611,7 @@ CUSTOM     → user_circuit         (custom circuit from contract definition)
 
 === Proof Certificates
 
-When a VCL-DT query succeeds, the result includes a **proof certificate**:
+When a VCL-UT query succeeds, the result includes a **proof certificate**:
 
 [source,json]
 ----
@@ -1953,7 +1974,7 @@ This section provides an honest assessment of what is implemented, partially imp
 |===
 | Feature | Timeline
 
-| VCL-DT runtime (Lean type checker wired to execution)
+| VCL-UT runtime (Lean type checker wired to execution)
 | Next milestone
 
 | ZKP proof generation (proven-library / sanctify)
@@ -1991,7 +2012,7 @@ This is the normative grammar for VCL 2.0, reproduced from `vcl-grammar.ebnf` (I
 
 [source,ebnf]
 ----
-(* VeriSim Query Language (VCL) Grammar *)
+(* VeriSim Consonance Language (VCL) Grammar *)
 (* Version: 2.0 — Dependent types, cross-modal correlation, write path *)
 
 (* 1. TOP-LEVEL STRUCTURE *)
@@ -2739,7 +2760,7 @@ This specification is the authoritative reference for VCL language behaviour. Th
 | Dual-path routing architecture, ReScript/Elixir/Rust stack, metadata storage, audit trail, drift detection, API endpoint, performance comparison. 708 lines.
 
 | link:vcl-vs-vcl-dt.adoc[`vcl-vs-vcl-dt.adoc`]
-| Detailed comparison of Slipstream vs VCL-DT execution paths, six proof types, performance implications, honest implementation status. 282 lines.
+| Detailed comparison of Slipstream vs VCL-UT execution paths, six proof types, performance implications, honest implementation status. 282 lines.
 
 | link:vcl-vs-sql.adoc[`vcl-vs-sql.adoc`]
 | Comparative guide between VCL and SQL for developers familiar with relational databases. 241 lines. Note: pre-dates v2.0 GROUP BY/ORDER BY/mutation additions.
@@ -2789,23 +2810,23 @@ For transparency, these inconsistencies exist between the pre-v2.0 documents:
 This specification resolves all three inconsistencies in favour of the implemented grammar and source code.
 
 // ============================================================================
-// APPENDIX E: VCL-dt++ EXTENSIONS (TYPELL INTEGRATION)
+// APPENDIX E: VCL-UT EXTENSIONS (TYPELL INTEGRATION)
 // ============================================================================
 
 [appendix]
-== VCL-dt++ Extensions (Typell Integration)
+== VCL-UT Extensions (Typell Integration)
 
-VCL-dt++ extends VCL v3.0 with six optional clauses that provide maximal type-theoretic strictness. These extensions are consumed by the **Typell verification kernel** (the formal verification substrate for PanLL) and are specified normatively in the grammar delta file:
+VCL-UT extends VCL v3.0 with six optional clauses that provide maximal type-theoretic strictness. These extensions are consumed by the **Typell verification kernel** (the formal verification substrate for PanLL) and are specified normatively in the grammar delta file:
 
 * link:../../typeql-experimental/docs/vcl-dtpp-grammar.ebnf[`vcl-dtpp-grammar.ebnf`] — EBNF grammar delta (199 lines)
 
 All six clauses are optional and composable in any combination. They append after the standard query structure with no keyword conflicts against VCL v3.0's 60+ reserved keywords.
 
-=== VCL-dt vs VCL-dt++ Feature Comparison
+=== VCL-UT vs VCL-UT Feature Comparison
 
 [cols="2,1,1,2"]
 |===
-| Feature | VCL-dt | VCL-dt++ | Typell Kernel Mapping
+| Feature | VCL-UT | VCL-UT | Typell Kernel Mapping
 
 | Dependent types (Pi, Sigma)
 | ✅
@@ -2855,7 +2876,7 @@ All six clauses are optional and composable in any combination. They append afte
 
 === Individual Feature Syntax Examples
 
-Each dt++ clause is shown in isolation to demonstrate independent usage.
+Each VCL-UT clause is shown in isolation to demonstrate independent usage.
 
 ==== Linear Types — CONSUME AFTER
 
@@ -2999,15 +3020,15 @@ SELECT GRAPH.*, DOCUMENT.* FROM HEXAD 'entity-001'
 
 === Typell Integration
 
-VCL-dt++ queries are verified by the Typell kernel via JSON-RPC:
+VCL-UT queries are verified by the Typell kernel via JSON-RPC:
 
 [source]
 ----
-typell.check(query, "vcl-dt++") → TypeResult
+typell.check(query, "vcl-ut") → TypeResult
 ----
 
 The kernel returns: types, proof obligations, linear tracking, session protocol compliance, effect analysis, modal scope verification, and proof certificates. See the link:../../typell/docs/design/DESIGN-2026-03-01-typell-vision.md[Typell Vision Document] for the full verification protocol specification.
 
 === Status
 
-`[.planned]` All six VCL-dt++ clauses. Grammar formally specified. Implementation pending Typell kernel (Phase 3+).
+`[.planned]` All six VCL-UT clauses. Grammar formally specified. Implementation pending Typell kernel (Phase 3+).

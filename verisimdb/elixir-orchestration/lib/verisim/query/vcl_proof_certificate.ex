@@ -2,7 +2,7 @@
 
 defmodule VeriSim.Query.VCLProofCertificate do
   @moduledoc """
-  VCL-DT proof certificate generation and verification.
+  VCL-UT proof certificate generation and verification.
 
   After the VCL type checker validates a query's proof obligations and the
   executor verifies the proofs at runtime, this module produces independently
@@ -125,7 +125,7 @@ defmodule VeriSim.Query.VCLProofCertificate do
   @doc """
   Generate certificates for a batch of obligation/witness pairs.
 
-  Useful when a VCL-DT query has multiple PROOF clauses (e.g.,
+  Useful when a VCL-UT query has multiple PROOF clauses (e.g.,
   `PROOF EXISTENCE(x) AND PROVENANCE(x)`).
 
   ## Parameters

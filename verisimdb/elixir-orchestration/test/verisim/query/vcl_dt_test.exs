@@ -2,7 +2,7 @@
 
 defmodule VeriSim.Query.VCLDTTest do
   @moduledoc """
-  VCL-DT (dependent type) integration tests.
+  VCL-UT (dependent type) integration tests.
 
   Tests the proof verification pipeline: type checking → execution → proof
   verification → ProvedResult bundling.
@@ -44,10 +44,10 @@ defmodule VeriSim.Query.VCLDTTest do
   end
 
   # ===========================================================================
-  # VCL-DT query execution (PROOF clause)
+  # VCL-UT query execution (PROOF clause)
   # ===========================================================================
 
-  describe "VCL-DT execution path" do
+  describe "VCL-UT execution path" do
     test "parse_statement handles PROOF clause in AST" do
       # The built-in parser should handle PROOF clauses
       result =
@@ -66,7 +66,7 @@ defmodule VeriSim.Query.VCLDTTest do
     end
 
     test "execute_string with PROOF returns error when Rust unavailable" do
-      # VCL-DT queries MUST fail if proofs cannot be verified —
+      # VCL-UT queries MUST fail if proofs cannot be verified —
       # they should NOT silently return unproven data.
       result =
         try do
@@ -232,8 +232,8 @@ defmodule VeriSim.Query.VCLDTTest do
   # ===========================================================================
 
   describe "ProvedResult structure" do
-    test "VCL-DT queries should produce proved results with certificate" do
-      # This test documents the expected shape of VCL-DT results.
+    test "VCL-UT queries should produce proved results with certificate" do
+      # This test documents the expected shape of VCL-UT results.
       # In production (with Rust running), the result should be:
       # %{
       #   data: [...],

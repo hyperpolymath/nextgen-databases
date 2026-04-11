@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 //
-// TQLParser_test.res — Parser tests for VCL-dt++ extension clauses
+// TQLParser_test.res — Parser tests for VCL-UT extension clauses
 //
 // Tests each of the six extension clause parsers individually and
 // in combination.
@@ -208,7 +208,7 @@ let testValidation = (): unit => {
 // ============================================================================
 
 let () = {
-  Js.Console.log("=== VCL-dt++ Parser Tests ===")
+  Js.Console.log("=== VCL-UT Parser Tests ===")
   testConsumeAfter()
   testWithSession()
   testEffects()

@@ -1,14 +1,29 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-= typeql-experimental (VCL-dt++)
+= typeql-experimental (VCL-UT)
 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 :description: Experimental type-theoretic extensions to VCL
 :toc: macro
 :icons: font
 
+[NOTE]
+====
+**Naming.** This module is the **VCL-UT** extension tier.
+
+* *VCL* = VeriSim Consonance Language — the base query/type language.
+  _Consonance_ = cross-modal harmony; VeriSimDB keeps eight modality representations
+  in agreement with each other.
+* *VCL-UT* = VCL with Usage-Tracked types.
+  _Usage-Tracked_ = these extensions track resource consumption: linear consumption
+  counts, session state, side-effects, and usage limits.
+  File extension: `.vclut`.
+
+Prior names *VCL-UT* and *VCL-UT* are retired. Use **VCL-UT** exclusively.
+====
+
 == Overview
 
 **typeql-experimental** explores six advanced type-theoretic extensions to the
-VeriSim Query Language (VCL), building on the VCL-dt dependent type system
+VeriSim Consonance Language (VCL), building on the VCL-UT dependent type system
 (~35% wired in VeriSimDB). Rather than bolting these onto the production
 codebase, this is a standalone exploration space within the `nextgen-databases`
 monorepo.
@@ -130,7 +145,7 @@ grep -rn 'believe_me\|assert_total\|assert_smaller' src/abi/
 == Grammar
 
 The query language extends VCL v3.0 with six new optional clauses appended
-after the standard query. See `docs/vcl-dtpp-grammar.ebnf` for the delta
+after the standard query. See `docs/vcl-ut-grammar.ebnf` for the delta
 grammar. No keyword conflicts — all new clause keywords are disjoint from
 VCL's 60+ reserved keywords.
 

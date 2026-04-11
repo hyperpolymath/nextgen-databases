@@ -12,7 +12,7 @@
 
 ## Abstract
 
-TypeQL-Experimental (VCL-dt++) explores the application of Quantitative Type
+TypeQL-Experimental (VCL-UT) explores the application of Quantitative Type
 Theory (QTT) to database query languages, demonstrating that six categories of
 runtime database errors—connection leaks, protocol violations, effect misuse,
 scope leakage, missing postcondition guarantees, and resource over-consumption—
@@ -78,7 +78,7 @@ a native feature of the language, not an encoding.
 
 ### 1.3 Contributions
 
-1. **Six type-theoretic extensions** to VCL (VeriSim Query Language) that
+1. **Six type-theoretic extensions** to VCL (VeriSim Consonance Language) that
    eliminate the six bug categories above at compile time (Section 3).
 
 2. **A dual-language architecture** where Idris2 proves properties and ReScript
@@ -96,7 +96,7 @@ a native feature of the language, not an encoding.
 
 ### 2.1 VCL v3.0
 
-VeriSim Query Language (VCL) is the query language for VeriSimDB, a multi-modal
+VeriSim Consonance Language (VCL) is the query language for VeriSimDB, a multi-modal
 database with eight query modalities (GRAPH, DOCUMENT, VECTOR, TIME_SERIES,
 SPATIAL, STATISTICAL, SEMANTIC, RELATIONAL). VCL supports cross-modal queries
 via HEXAD references (content-addressed UUIDs).

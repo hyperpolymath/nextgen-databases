@@ -145,7 +145,7 @@ combineSub {xs = _ :: _} (SubCons elem subRest) subYs = SubCons elem (combineSub
 -- Query with Declared Effects
 -- ============================================================================
 
-||| A VCL-dt++ query with declared effects. The declared effect set is
+||| A VCL-UT query with declared effects. The declared effect set is
 ||| part of the type, enabling static verification of effect compliance.
 public export
 record EffectfulQuery (declared : EffectSet) where

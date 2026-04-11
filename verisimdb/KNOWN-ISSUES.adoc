@@ -48,11 +48,11 @@ VeriSimDB is a working system with real implementations in its core modality sto
 
 **Original issue:** Drift detection had to be triggered manually. No scheduled or event-driven trigger existed.
 
-=== 5. VCL-DT Not Connected to VCL PROOF Runtime — ✅ RESOLVED
+=== 5. VCL-UT Not Connected to VCL PROOF Runtime — ✅ RESOLVED
 
 **Location:** `elixir-orchestration/lib/verisim/query/vcl_type_checker.ex`, `vcl_executor.ex`, `vcl_bridge.ex`
 
-**Resolved:** 2026-02-28. VCL-DT proof pipeline is now fully wired end-to-end with a three-tier type checking strategy:
+**Resolved:** 2026-02-28. VCL-UT proof pipeline is now fully wired end-to-end with a three-tier type checking strategy:
 
 1. **ReScript bidirectional type checker** (VCLBidir.res, 852 lines) — full formal system with subtyping, invoked via VCLBridge.typecheck/2 when Deno subprocess available
 2. **Elixir-native type checker** (VCLTypeChecker, 320 lines) — validates proof types, modality compatibility, composition rules; generates structured obligations with witness fields and circuit names. Used when ReScript subprocess unavailable.
@@ -76,7 +76,7 @@ Additionally:
 
 **Impact:** Privacy-preserving proofs (where a query result can be verified without revealing the underlying data) are not available. This affects multi-tenant federation and compliance scenarios where data must remain private but provenance must be verifiable.
 
-**Resolution:** Implement sanctify integration after VCL-DT (issue 5) is resolved, since ZKP proof generation depends on the dependent type checking pipeline being functional.
+**Resolution:** Implement sanctify integration after VCL-UT (issue 5) is resolved, since ZKP proof generation depends on the dependent type checking pipeline being functional.
 
 === 7. ReScript Registry 60% Complete — ✅ RESOLVED
 
@@ -213,11 +213,11 @@ Added `rescript.json` for build configuration.
 
 **Original issue:** The `CUSTOM` proof type used a hardcoded circuit configuration with no DSL, compiler, or registry.
 
-=== 21. VCL-DT Not Connected to VCL PROOF Runtime — ✅ RESOLVED
+=== 21. VCL-UT Not Connected to VCL PROOF Runtime — ✅ RESOLVED
 
 **Location:** `elixir-orchestration/lib/verisim/query/vcl_type_checker.ex`
 
-**Resolved:** 2026-02-28. Superseded by issue #5 resolution. The VCL-DT pipeline is now wired with an Elixir-native type checker that validates proof types, modality compatibility, and composition rules without requiring the ReScript subprocess or a Lean checker. The Lean formal verification path remains aspirational (no Lean files were ever created); the practical implementation uses the ReScript bidirectional type checker (852 lines) backed by an Elixir fallback (320 lines).
+**Resolved:** 2026-02-28. Superseded by issue #5 resolution. The VCL-UT pipeline is now wired with an Elixir-native type checker that validates proof types, modality compatibility, and composition rules without requiring the ReScript subprocess or a Lean checker. The Lean formal verification path remains aspirational (no Lean files were ever created); the practical implementation uses the ReScript bidirectional type checker (852 lines) backed by an Elixir fallback (320 lines).
 
 **Note:** Formal verification via Lean/Idris2 would be a future enhancement for mathematical proof certificates. The current system provides structural type checking and real cryptographic proofs (SHA-256 commitments, Merkle proofs, R1CS circuit verification) via the Rust ZKP bridge.
 

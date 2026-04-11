@@ -8,7 +8,7 @@
 
 == Introduction
 
-VCL (VeriSim Query Language) is the query language for VeriSimDB, a 6-core multimodal database. While VCL borrows familiar keywords from SQL (`SELECT`, `FROM`, `WHERE`, `LIMIT`, `OFFSET`), it serves a fundamentally different purpose.
+VCL (VeriSim Consonance Language) is the query language for VeriSimDB, a 6-core multimodal database. While VCL borrows familiar keywords from SQL (`SELECT`, `FROM`, `WHERE`, `LIMIT`, `OFFSET`), it serves a fundamentally different purpose.
 
 VCL is **read-only**. It does not support `INSERT`, `UPDATE`, or `DELETE` statements. All mutations go through the Octad API (Rust core or Elixir orchestration layer). This is a deliberate design choice: VeriSimDB treats writes as coordinated multi-modal operations that must maintain consistency across all six modality stores (Graph, Vector, Tensor, Semantic, Document, Temporal). A simple `INSERT` statement cannot express the cross-modal invariants that a Octad write requires.
 
@@ -97,7 +97,7 @@ VCL is intentionally minimal. The following SQL features have no VCL equivalent:
 |VCL Feature |Description
 
 |`PROOF` clause
-|Requests a verifiable proof certificate alongside query results. Six proof types cover existence, integrity, consistency, provenance, freshness, and authorization guarantees. Enables dependent-type verification via the VCL-DT path.
+|Requests a verifiable proof certificate alongside query results. Six proof types cover existence, integrity, consistency, provenance, freshness, and authorization guarantees. Enables dependent-type verification via the VCL-UT path.
 
 |Multimodal `SELECT`
 |Select specific modalities (`GRAPH`, `VECTOR`, `TENSOR`, `SEMANTIC`, `DOCUMENT`, `TEMPORAL`) or all (`*`). No SQL equivalent for querying fundamentally different data representations of the same entity.
@@ -206,7 +206,7 @@ LIMIT 10
 
 === Verified Query (No SQL Equivalent)
 
-**VCL-DT (dependent type path):**
+**VCL-UT (dependent type path):**
 [source,vcl]
 ----
 SELECT *

@@ -31,7 +31,7 @@ defmodule VeriSim.Telemetry.Collector do
   | normalise_success_count | counter | normaliser |
   | federation_query_count | counter | federation resolver |
   | federation_peer_errors | counter map | federation resolver |
-  | proof_type_usage | counter map | VCL-DT executor |
+  | proof_type_usage | counter map | VCL-UT executor |
   | entity_created_count | counter | entity server |
   | entity_deleted_count | counter | entity server |
   """
