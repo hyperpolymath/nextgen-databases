@@ -10,6 +10,7 @@ pub mod federation;
 pub mod graphql;
 pub mod groove;
 pub mod grpc;
+pub mod proof_attempts;
 pub mod rbac;
 pub mod transaction;
 pub mod vql;
@@ -670,6 +671,19 @@ pub fn build_router(state: AppState) -> Router {
         .route("/spatial/search/nearest", post(spatial_nearest_handler))
         // VQL text query endpoint (used by verisim-repl)
         .route("/vql/execute", post(vql::vql_execute_handler))
+        // Proof-attempts pipeline (ClickHouse-backed, versioned under /api/v1/)
+        .route(
+            "/api/v1/proof_attempts",
+            get(proof_attempts::list_proof_attempts).post(proof_attempts::insert_proof_attempt),
+        )
+        .route(
+            "/api/v1/proof_attempts/strategy",
+            get(proof_attempts::strategy),
+        )
+        .route(
+            "/api/v1/proof_attempts/certificates",
+            get(proof_attempts::certificates),
+        )
         // Authentication middleware layer
         .layer(axum_middleware::from_fn_with_state(
             auth_state,
