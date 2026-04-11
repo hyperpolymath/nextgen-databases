@@ -1,6 +1,6 @@
 # PROOF-NEEDS.md — nextgen-databases
 
-## Current State (Updated 2026-04-11)
+## Current State (Updated 2026-04-11 — V3/V4 L4 DONE)
 
 - **VeriSimDB ABI**: `verisimdb/src/abi/` — `Types.idr`, `Layout.idr`, `Foreign.idr` (873 LOC, genuine domain ABI)
 - **Lithoglyph ABI**: `lithoglyph/` — `BofigEntities.idr`, `GQLdt/ABI/Foreign.idr`
@@ -16,8 +16,8 @@
 |---|-----------|--------|-------|
 | V1 | Octad coherence invariant | I2 | 8 modalities mutually consistent post-operation |
 | V2 | VQL type inference soundness | Cq/L4 | Bidirectional inference correct |
-| V3 | VQL subtyping transitivity + decidability | L4 | |
-| V4 | Raft consensus safety | L4 | No log divergence after commit |
+| **V3** | **VQL subtyping transitivity + decidability** | **L4** | **DONE 2026-04-11** — `verisimdb/verification/proofs/lean4/VCLSubtyping.lean` |
+| **V4** | **Raft consensus safety** | **L4** | **DONE 2026-04-11** — `verisimdb/verification/proofs/lean4/RaftSafety.lean` (single-node; distributed in TLA+) |
 | V5 | Transaction atomicity | TLA | All-or-nothing across 8 modalities |
 
 ### P1 — High

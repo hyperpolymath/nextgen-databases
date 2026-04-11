@@ -6,4 +6,4 @@ package verisimdb_proofs where
   name := "verisimdb_proofs"
 
 lean_lib VeriSimDBProofs where
-  roots := #[`VCLSubtyping]
+  roots := #[`VCLSubtyping, `RaftSafety]
