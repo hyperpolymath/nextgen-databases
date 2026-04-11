@@ -1,39 +1,67 @@
-;; SPDX-License-Identifier: PMPL-1.0-or-later
-;; STATE.scm - Project state for rsr-template-repo
-;; Media-Type: application/vnd.state+scm
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# STATE.a2ml — VeriSimDB project state
 
-(state
-  (metadata
-    (version "0.0.1")
-    (schema-version "1.0")
-    (created "2026-01-03")
-    (updated "2026-01-03")
-    (project "rsr-template-repo")
-    (repo "github.com/hyperpolymath/rsr-template-repo"))
+[metadata]
+project = "verisimdb"
+version = "0.1.0"
+last-updated = "2026-04-11"
+status = "active"
+session = "proof_attempts REST API + tantivy 0.26 fix — 2026-04-11"
 
-  (project-context
-    (name "rsr-template-repo")
-    (tagline "")
-    (tech-stack ()))
+[project-context]
+name = "VeriSimDB"
+purpose = """
+Cross-system entity consistency engine with drift detection,
+self-normalisation, and formally verified queries. Octad entities
+(8 synchronized modalities). Also hosts the proof_attempts pipeline:
+ClickHouse-backed proof attempt log consumed by Hypatia and echidnabot.
+"""
+completion-percentage = 68
 
-  (current-position
-    (phase "initial")
-    (overall-completion 0)
-    (components ())
-    (working-features ()))
+[position]
+phase = "implementation"   # design | implementation | testing | maintenance | archived
+maturity = "alpha"         # experimental | alpha | beta | production | lts
 
-  (route-to-mvp
-    (milestones ()))
+[route-to-mvp]
+milestones = [
+  { id = "M1", title = "8-modality octad store (Rust core)", status = "done" },
+  { id = "M2", title = "Elixir OTP orchestration layer", status = "done" },
+  { id = "M3", title = "VQL/VCL query parser + executor", status = "done" },
+  { id = "M4", title = "Drift detection + self-normalisation", status = "done" },
+  { id = "M5", title = "Federation adapters (7 backends)", status = "done" },
+  { id = "M6", title = "proof_attempts REST API (GET/POST/strategy/certificates)", status = "done" },
+  { id = "M7", title = "Persistent deployment (Fly.io or Stapeln)", status = "planned" },
+  { id = "M8", title = "VQL federation executor (multi-store)", status = "planned" },
+]
 
-  (blockers-and-issues
-    (critical)
-    (high)
-    (medium)
-    (low))
+[blockers-and-issues]
+issues = [
+  { id = "B1", description = "VERISIM_CLICKHOUSE_URL not documented in README/DEPLOYMENT.adoc", severity = "low" },
+  { id = "B2", description = "proof_attempts GET endpoint returns full rows — large responses for limit>5000", severity = "low" },
+  { id = "B3", description = "No authentication on /api/v1/proof_attempts POST — internal-only assumption", severity = "medium" },
+]
 
-  (critical-next-actions
-    (immediate)
-    (this-week)
-    (this-month))
+[critical-next-actions]
+actions = [
+  "Document VERISIM_CLICKHOUSE_URL in DEPLOYMENT.adoc",
+  "Add pagination (offset param) to GET /api/v1/proof_attempts",
+  "Consider rate-limiting the proof_attempts POST endpoint",
+]
 
-  (session-history ()))
+[session-history]
+# 2026-04-11: Added three proof_attempts routes under /api/v1/:
+#               GET  ?limit=N         — list rows for Julia retraining (ClickHouse SELECT)
+#               POST                  — insert attempt row (ClickHouse INSERT JSONEachRow)
+#               GET  /strategy?class= — recommendations from mv_proven_certificates
+#               GET  /certificates?class= — PROVEN/pending cert status
+#             Fixed tantivy 0.26 API break in verisim-document: TopDocs::with_limit(n)
+#             now requires .order_by_score() — Collector no longer impl'd on TopDocs directly.
+#             Verified: strategy endpoint returns correct data from 1233 ClickHouse rows.
+# 2026-04-05: VQL→VCL rename estate-wide. Tropical bridge wired.
+# 2026-04-03: Proof certificate pipeline (PROVEN/SANCTIFY). 11 VQL proof types.
+
+[maintenance-status]
+last-run-utc = "2026-04-11T17:06:00Z"
+last-result = "pass"
