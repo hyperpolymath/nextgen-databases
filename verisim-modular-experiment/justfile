@@ -20,3 +20,20 @@ repl:
 # Check package integrity
 check:
     julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.status()'
+
+# Build the Zig CLI (debug)
+cli-build:
+    cd ffi/zig && zig build
+
+# Build the Zig CLI (release, with safety checks)
+cli-build-release:
+    cd ffi/zig && zig build -Doptimize=ReleaseSafe
+
+# Run Zig CLI unit tests (verdict parser + protocol invariants)
+cli-test:
+    cd ffi/zig && zig build test --summary all
+
+# Run a VCL query through the full CLI → Julia pipeline
+# Usage: just cli-query "PROOF INTEGRITY FOR abababababababababababababababababab"
+cli-query QUERY:
+    echo '{{QUERY}}' | VERISIM_PACKAGE_PATH=. ffi/zig/zig-out/bin/verisim
