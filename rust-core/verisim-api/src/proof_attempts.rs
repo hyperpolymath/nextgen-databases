@@ -4,33 +4,36 @@
 //!
 //! Three REST endpoints that bridge the proof-attempts pipeline to ClickHouse:
 //!
-//! | Method | Path                                   | Purpose                           |
-//! |--------|----------------------------------------|-----------------------------------|
-//! | POST   | /proof_attempts                        | Insert a single attempt row       |
-//! | GET    | /proof_attempts/strategy?class=X&limit=N | Recommend best provers for class  |
-//! | GET    | /proof_attempts/certificates?class=X  | PROVEN/pending cert status        |
+//! | Method | Path                                      | Purpose                           |
+//! |--------|-------------------------------------------|-----------------------------------|
+//! | POST   | /proof_attempts                           | Insert a single attempt row       |
+//! | GET    | /proof_attempts/strategy?class=X&limit=N  | Recommend best provers for class  |
+//! | GET    | /proof_attempts/certificates?class=X      | PROVEN/pending cert status        |
 //!
-//! The handlers speak directly to the ClickHouse HTTP interface (default
-//! `http://localhost:8123`) via `reqwest`.  The URL is read from the
-//! `VERISIM_CLICKHOUSE_URL` environment variable at request time so that no
-//! restart is needed when the ClickHouse endpoint changes.
+//! Responses are emitted as A2ML (text/a2ml) — never JSON.  ClickHouse is
+//! still spoken to over its JSONEachRow wire format internally, but that is
+//! parsing only (inbound from ClickHouse, never emitted to callers).
+//!
+//! The ClickHouse URL is read from `VERISIM_CLICKHOUSE_URL` at request time.
 
 use axum::{
-    Json,
     extract::Query,
     http::StatusCode,
-    response::IntoResponse,
+    response::Response,
 };
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use tracing::{debug, warn};
 
-// ClickHouse supports sending SELECT queries as POST body with Content-Type: text/plain.
-// This avoids any URL-encoding complexity.
+use crate::a2ml::{
+    a2ml_error, a2ml_error_detail, a2ml_response,
+    certificates_to_a2ml, inserted_to_a2ml,
+    parse_certs, parse_recommendations, proof_attempts_to_a2ml,
+    strategy_to_a2ml,
+};
 
-
-// ── Shared HTTP client (one per module, constructed lazily via once_cell) ──
+// ── Shared HTTP client (one per module, constructed lazily) ──────────────────
 
 fn ch_client() -> &'static Client {
     use std::sync::OnceLock;
@@ -48,7 +51,7 @@ fn ch_url() -> String {
         .unwrap_or_else(|_| "http://localhost:8123".to_string())
 }
 
-// ── Inbound proof-attempt row (matches echidnabot VeriSimWriter schema) ──
+// ── Inbound proof-attempt row (matches echidnabot VeriSimWriter schema) ───────
 
 /// A single proof attempt submitted by echidnabot.
 #[derive(Debug, Deserialize, Serialize)]
@@ -71,35 +74,7 @@ pub struct ProofAttemptRow {
     pub error_message: Option<String>,
 }
 
-// ── Response types ──
-
-#[derive(Debug, Serialize)]
-pub struct StrategyResponse {
-    pub recommendations: Vec<Recommendation>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct Recommendation {
-    pub prover: String,
-    pub success_rate: f64,
-    pub avg_duration_ms: f64,
-    pub total_attempts: u64,
-}
-
-#[derive(Debug, Serialize)]
-pub struct CertificatesResponse {
-    pub proven: Vec<CertRow>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct CertRow {
-    pub prover_used: String,
-    pub status: String,
-    pub success_rate: f64,
-    pub total_attempts: u64,
-}
-
-// ── Query params ──
+// ── Query params ─────────────────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
 pub struct ListParams {
@@ -117,15 +92,15 @@ pub struct ClassParam {
     pub class: String,
 }
 
-// ── Handlers ──
+// ── Handlers ─────────────────────────────────────────────────────────────────
 
 /// GET /proof_attempts?limit=N
 ///
 /// Returns up to `limit` (default 1000, max 20000) recent proof-attempt rows
-/// from ClickHouse for retraining the Julia ML models.
+/// from ClickHouse as an A2ML document for retraining the Julia ML models.
 pub async fn list_proof_attempts(
     Query(params): Query<ListParams>,
-) -> impl IntoResponse {
+) -> Response {
     let limit = params.limit.unwrap_or(1000).min(20000);
 
     let sql = format!(
@@ -147,29 +122,23 @@ pub async fn list_proof_attempts(
     {
         Ok(resp) if resp.status().is_success() => {
             let text = resp.text().await.unwrap_or_default();
-            // Return newline-delimited JSON rows as a JSON array for convenience
+            // Parse ClickHouse JSONEachRow internally (never emitted as JSON)
             let rows: Vec<serde_json::Value> = text
                 .lines()
                 .filter(|l| !l.trim().is_empty())
                 .filter_map(|l| serde_json::from_str(l).ok())
                 .collect();
-            (StatusCode::OK, Json(serde_json::json!(rows)))
+            a2ml_response(StatusCode::OK, proof_attempts_to_a2ml(&rows))
         }
         Ok(resp) => {
             let status = resp.status().as_u16();
             let body = resp.text().await.unwrap_or_default();
             warn!("proof_attempts list: ClickHouse {status}: {body}");
-            (
-                StatusCode::BAD_GATEWAY,
-                Json(serde_json::json!({"error": "clickhouse error", "status": status})),
-            )
+            a2ml_response(StatusCode::BAD_GATEWAY, a2ml_error("clickhouse_error", status))
         }
         Err(e) => {
             warn!("proof_attempts list: unreachable: {e}");
-            (
-                StatusCode::SERVICE_UNAVAILABLE,
-                Json(serde_json::json!({"error": "clickhouse unreachable"})),
-            )
+            a2ml_response(StatusCode::SERVICE_UNAVAILABLE, a2ml_error("clickhouse_unreachable", 503))
         }
     }
 }
@@ -177,19 +146,24 @@ pub async fn list_proof_attempts(
 /// POST /proof_attempts
 ///
 /// Inserts a single attempt row into `verisim.proof_attempts` via the
-/// ClickHouse HTTP INSERT ... FORMAT JSONEachRow endpoint.
+/// ClickHouse HTTP INSERT … FORMAT JSONEachRow endpoint.
 pub async fn insert_proof_attempt(
-    Json(row): Json<ProofAttemptRow>,
-) -> impl IntoResponse {
-    let url = format!("{}/?query=INSERT+INTO+verisim.proof_attempts+FORMAT+JSONEachRow", ch_url());
+    axum::Json(row): axum::Json<ProofAttemptRow>,
+) -> Response {
+    let url = format!(
+        "{}/?query=INSERT+INTO+verisim.proof_attempts+FORMAT+JSONEachRow",
+        ch_url()
+    );
 
+    // Serialise the inbound row to JSONEachRow for the ClickHouse wire format.
+    // This is internal I/O to ClickHouse, not an outbound response.
     let body = match serde_json::to_string(&row) {
         Ok(s) => s,
         Err(e) => {
             warn!("proof_attempts: failed to serialise row: {e}");
-            return (
+            return a2ml_response(
                 StatusCode::BAD_REQUEST,
-                Json(serde_json::json!({"error": "serialisation failed", "detail": e.to_string()})),
+                a2ml_error_detail("serialisation_failed", 400, &e.to_string()),
             );
         }
     };
@@ -203,24 +177,23 @@ pub async fn insert_proof_attempt(
         .send()
         .await
     {
-        Ok(resp) if resp.status().is_success() => (
-            StatusCode::CREATED,
-            Json(serde_json::json!({"status": "ok", "attempt_id": row.attempt_id})),
-        ),
+        Ok(resp) if resp.status().is_success() => {
+            a2ml_response(StatusCode::CREATED, inserted_to_a2ml(&row.attempt_id))
+        }
         Ok(resp) => {
             let status = resp.status().as_u16();
-            let body = resp.text().await.unwrap_or_default();
-            warn!("proof_attempts: ClickHouse returned {status}: {body}");
-            (
+            let detail = resp.text().await.unwrap_or_default();
+            warn!("proof_attempts: ClickHouse returned {status}: {detail}");
+            a2ml_response(
                 StatusCode::BAD_GATEWAY,
-                Json(serde_json::json!({"error": "clickhouse error", "status": status, "detail": body})),
+                a2ml_error_detail("clickhouse_error", status, &detail),
             )
         }
         Err(e) => {
             warn!("proof_attempts: ClickHouse unreachable: {e}");
-            (
+            a2ml_response(
                 StatusCode::SERVICE_UNAVAILABLE,
-                Json(serde_json::json!({"error": "clickhouse unreachable", "detail": e.to_string()})),
+                a2ml_error_detail("clickhouse_unreachable", 503, &e.to_string()),
             )
         }
     }
@@ -234,7 +207,7 @@ pub async fn insert_proof_attempt(
 /// avg_duration_ms so no Rust arithmetic is needed.
 pub async fn strategy(
     Query(params): Query<StrategyParams>,
-) -> impl IntoResponse {
+) -> Response {
     let limit = params.limit.unwrap_or(5).min(50);
     let class = params.class.replace('\'', "\\'"); // minimal SQL escape
 
@@ -256,27 +229,18 @@ pub async fn strategy(
     {
         Ok(resp) if resp.status().is_success() => {
             let text = resp.text().await.unwrap_or_default();
-            let recommendations = parse_jsonl_recommendations(&text);
-            (
-                StatusCode::OK,
-                Json(serde_json::json!({"recommendations": recommendations})),
-            )
+            let recommendations = parse_recommendations(&text);
+            a2ml_response(StatusCode::OK, strategy_to_a2ml(&recommendations))
         }
         Ok(resp) => {
             let status = resp.status().as_u16();
             let body = resp.text().await.unwrap_or_default();
             warn!("proof_attempts/strategy: ClickHouse {status}: {body}");
-            (
-                StatusCode::BAD_GATEWAY,
-                Json(serde_json::json!({"error": "clickhouse error", "status": status})),
-            )
+            a2ml_response(StatusCode::BAD_GATEWAY, a2ml_error("clickhouse_error", status))
         }
         Err(e) => {
             warn!("proof_attempts/strategy: unreachable: {e}");
-            (
-                StatusCode::SERVICE_UNAVAILABLE,
-                Json(serde_json::json!({"error": "clickhouse unreachable"})),
-            )
+            a2ml_response(StatusCode::SERVICE_UNAVAILABLE, a2ml_error("clickhouse_unreachable", 503))
         }
     }
 }
@@ -287,7 +251,7 @@ pub async fn strategy(
 /// `mv_proven_certificates`.
 pub async fn certificates(
     Query(params): Query<ClassParam>,
-) -> impl IntoResponse {
+) -> Response {
     let class = params.class.replace('\'', "\\'");
 
     let sql = format!(
@@ -306,68 +270,17 @@ pub async fn certificates(
     {
         Ok(resp) if resp.status().is_success() => {
             let text = resp.text().await.unwrap_or_default();
-            let rows = parse_jsonl_certs(&text);
-            (
-                StatusCode::OK,
-                Json(serde_json::json!({"proven": rows})),
-            )
+            let rows = parse_certs(&text);
+            a2ml_response(StatusCode::OK, certificates_to_a2ml(&rows))
         }
         Ok(resp) => {
             let status = resp.status().as_u16();
             warn!("proof_attempts/certificates: ClickHouse {status}");
-            (
-                StatusCode::BAD_GATEWAY,
-                Json(serde_json::json!({"error": "clickhouse error", "status": status})),
-            )
+            a2ml_response(StatusCode::BAD_GATEWAY, a2ml_error("clickhouse_error", status))
         }
         Err(e) => {
             warn!("proof_attempts/certificates: unreachable: {e}");
-            (
-                StatusCode::SERVICE_UNAVAILABLE,
-                Json(serde_json::json!({"error": "clickhouse unreachable"})),
-            )
+            a2ml_response(StatusCode::SERVICE_UNAVAILABLE, a2ml_error("clickhouse_unreachable", 503))
         }
     }
-}
-
-// ── ClickHouse JSONEachRow parsers ──
-
-/// Parse newline-delimited JSON rows from ClickHouse JSONEachRow output.
-/// Each line is a JSON object; malformed lines are silently skipped.
-fn parse_jsonl_recommendations(text: &str) -> Vec<serde_json::Value> {
-    text.lines()
-        .filter(|l| !l.trim().is_empty())
-        .filter_map(|line| {
-            let v: serde_json::Value = serde_json::from_str(line).ok()?;
-            let prover = v["prover_used"].as_str()?.to_string();
-            let success_rate = v["success_rate"].as_f64().unwrap_or(0.0);
-            let avg_duration_ms = v["avg_duration_ms"].as_f64().unwrap_or(0.0);
-            let total_attempts = v["total_attempts"].as_u64().unwrap_or(0);
-            Some(serde_json::json!({
-                "prover": prover,
-                "success_rate": success_rate,
-                "avg_duration_ms": avg_duration_ms,
-                "total_attempts": total_attempts,
-            }))
-        })
-        .collect()
-}
-
-fn parse_jsonl_certs(text: &str) -> Vec<serde_json::Value> {
-    text.lines()
-        .filter(|l| !l.trim().is_empty())
-        .filter_map(|line| {
-            let v: serde_json::Value = serde_json::from_str(line).ok()?;
-            let prover_used = v["prover_used"].as_str()?.to_string();
-            let status = v["status"].as_str().unwrap_or("pending").to_string();
-            let success_rate = v["success_rate"].as_f64().unwrap_or(0.0);
-            let total_attempts = v["total_attempts"].as_u64().unwrap_or(0);
-            Some(serde_json::json!({
-                "prover_used": prover_used,
-                "status": status,
-                "success_rate": success_rate,
-                "total_attempts": total_attempts,
-            }))
-        })
-        .collect()
 }

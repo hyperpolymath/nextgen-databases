@@ -5,6 +5,7 @@
 //! Exposes all database functionality via REST endpoints.
 
 #![forbid(unsafe_code)]
+pub mod a2ml;
 pub mod auth;
 pub mod federation;
 pub mod graphql;
