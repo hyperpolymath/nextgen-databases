@@ -144,7 +144,7 @@ defmodule VeriSim.Query.VCLE2ETest do
       @pt_upper @pt |> Atom.to_string() |> String.upcase()
 
       test "#{@pt_upper} proof: typecheck → certificate → verify" do
-        # Build a VCL-DT query with this proof type
+        # Build a VCL-UT query with this proof type
         contract = if @pt in [:integrity, :citation, :custom, :sanctify] do
           "(my_contract)"
         else

@@ -20,14 +20,14 @@ let modalities = [
   "PROVENANCE", "SPATIAL",
 ]
 
-/// All 11 proof types supported by the VCL-DT type checker.
+/// All 11 proof types supported by the VCL-UT type checker.
 let proofTypes = [
   "EXISTENCE", "CONSISTENCY", "INTEGRITY", "PROVENANCE",
   "FRESHNESS", "ACCESS", "CITATION", "CUSTOM",
   "ZKP", "PROVEN", "SANCTIFY",
 ]
 
-/// VCL-DT specific keywords (only active in VCL-DT mode).
+/// VCL-UT specific keywords (only active in VCL-UT mode).
 let vclDtKeywords = [
   "PROOF", "THRESHOLD", "VERIFY", "CERTIFY", "ATTEST",
   "WITNESS", "CIRCUIT", "COMMITMENT",

@@ -54,7 +54,7 @@ let checkHealth = (token: float): promise<string> => {
 // VCL Console
 // ---------------------------------------------------------------------------
 
-/// Execute a VCL (VeriSim Query Language) query against the database.
+/// Execute a VCL (VeriSim Consonance Language) query against the database.
 ///
 /// Maps to: POST /vcl/execute
 /// VCL supports octad queries across all 8 modalities with proof

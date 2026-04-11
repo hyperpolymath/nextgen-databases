@@ -12,7 +12,7 @@ defmodule VeriSim.Telemetry.Reporter do
   3. **Performance Summary** — query latency percentiles (from distribution)
   4. **Drift Report** — frequency, modality breakdown, normalisation success rate
   5. **Federation Health** — peer error rates
-  6. **VCL-DT Adoption** — proof type usage distribution
+  6. **VCL-UT Adoption** — proof type usage distribution
 
   ## Privacy guarantees
 
@@ -218,7 +218,7 @@ defmodule VeriSim.Telemetry.Reporter do
   end
 
   @doc """
-  Proof type usage — which VCL-DT proof types are used. Tracks adoption
+  Proof type usage — which VCL-UT proof types are used. Tracks adoption
   of dependent type features.
   """
   def proof_type_usage(snapshot \\ nil) do

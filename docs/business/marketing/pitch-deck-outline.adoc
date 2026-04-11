@@ -111,7 +111,7 @@ representations that together provide a complete picture of each entity.
 ----
                     ┌─────────────────────────┐
                     │       VCL Engine         │
-                    │   (Query + VCL-DT)       │
+                    │   (Query + VCL-UT)       │
                     └────────────┬────────────┘
                                  │
                     ┌────────────▼────────────┐
@@ -219,7 +219,7 @@ does not need to write reconciliation logic.
 | *VCL* -- Purpose-built for cross-modal operations
 
 | Formal verification
-| *VCL-DT* -- Dependent-type proofs of query correctness
+| *VCL-UT* -- Dependent-type proofs of query correctness
 
 | ABI definitions
 | *Idris2* -- Dependent types for interface verification
@@ -234,7 +234,7 @@ does not need to write reconciliation logic.
 
 Emphasise the engineering quality. Rust + Elixir is an increasingly popular
 combination for data infrastructure (used by Discord, Fly.io, and others). The
-test suite is comprehensive and runs in CI on every commit. VCL-DT's dependent
+test suite is comprehensive and runs in CI on every commit. VCL-UT's dependent
 types are optional -- teams can start with plain VCL and adopt formal verification
 incrementally.
 
@@ -365,7 +365,7 @@ coherence from the ground up.
 * *662 tests* (510 Rust + 152 Elixir), *0 failures*
 * *8 modalities* fully architected and implemented
 * *VCL grammar* specified in EBNF with formal semantics
-* *VCL-DT* dependent-type layer with Idris2 proofs
+* *VCL-UT* dependent-type layer with Idris2 proofs
 * *Federation connectors* for PostgreSQL, ArangoDB, Elasticsearch
 * *Comprehensive documentation:* Architecture, deployment, query language,
   drift handling, error handling, safety theory

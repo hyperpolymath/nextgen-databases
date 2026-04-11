@@ -51,8 +51,8 @@ tensor, schema, quality. Configurable thresholds gate normalisation.
 DuckDB, VectorDB, InfluxDB, ObjectStorage.
 Integration tests: 105 tests across 7 adapters (need test-infra stack).
 
-### VCL (VeriSim Query Language)
-Type system: VCL-DT. 11 proof types. Multi-proof parsing.
+### VCL (VeriSim Consonance Language)
+Type system: VCL-UT. 11 proof types. Multi-proof parsing.
 Modality compatibility validation. ReScript playground wired to backend.
 
 ### Hypatia Pipeline

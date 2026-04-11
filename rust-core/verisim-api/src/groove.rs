@@ -150,7 +150,7 @@ fn manifest() -> serde_json::Value {
             },
             "vcl": {
                 "type": "vcl",
-                "description": "VeriSim Query Language — type-safe multi-modal queries",
+                "description": "VeriSim Consonance Language — type-safe multi-modal queries",
                 "protocol": "http",
                 "endpoint": "/api/v1/vcl/execute",
                 "requires_auth": false,

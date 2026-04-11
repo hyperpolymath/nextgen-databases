@@ -98,7 +98,7 @@ Each database module implements a standard protocol for PanLL integration:
 | `verisim.drift.modality_breakdown` | Which modalities drift most | Focus normalisation work |
 | `verisim.normalise.success_rate` | How often normalisation succeeds | Quality metric |
 | `verisim.federation.peer_health` | Federated peer availability | Operational monitoring |
-| `verisim.proof.type_usage` | Which proof types are used | VCL-DT adoption metric |
+| `verisim.proof.type_usage` | Which proof types are used | VCL-UT adoption metric |
 | `verisim.entity.modality_coverage` | Average modalities per entity | Data completeness metric |
 | `verisim.system.uptime` | Server uptime | Reliability metric |
 
@@ -111,7 +111,7 @@ The reporter aggregates raw telemetry into actionable insights:
 3. **Performance Trends** — is p95 latency improving or degrading over time?
 4. **Drift Frequency** — are entities staying consistent or constantly re-normalising?
 5. **Federation Health** — are peer backends reliable or flaky?
-6. **VCL-DT Adoption** — are users using dependent type proofs?
+6. **VCL-UT Adoption** — are users using dependent type proofs?
 
 ### PanLL Integration Points
 

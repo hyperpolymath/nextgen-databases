@@ -291,7 +291,7 @@ show all scores back near zero.
 
 == Querying with VCL
 
-VeriSimDB uses its own query language, *VCL* (VeriSim Query Language),
+VeriSimDB uses its own query language, *VCL* (VeriSim Consonance Language),
 designed for cross-modal queries. VCL is not SQL -- it natively
 understands modalities and drift.
 
@@ -333,9 +333,9 @@ SELECT * FROM FEDERATION /*
 WHERE DOCUMENT.severity > GRAPH.importance
 ----
 
-=== VCL-DT (Formally Verified Queries)
+=== VCL-UT (Formally Verified Queries)
 
-VCL-DT extends VCL with proof certificates. Every result includes a
+VCL-UT extends VCL with proof certificates. Every result includes a
 cryptographic proof that the data satisfies stated constraints:
 
 [source,sql]
@@ -345,7 +345,7 @@ FROM HEXAD 'entity-id'
 PROOF EXISTENCE(entity-id), PROVENANCE(entity-id)
 ----
 
-NOTE: VCL-DT proof generation is under active development. The syntax
+NOTE: VCL-UT proof generation is under active development. The syntax
 parses correctly and proof obligations are extracted, but end-to-end
 verifiable certificates require the Lean type checker integration
 (planned for Q2 2026).

@@ -5,7 +5,7 @@
 ;; cryptographic verification policies, and trust boundaries.
 
 ;; ============================================================================
-;; ZKP Scheme Selection for VCL-DT PROOF Clause
+;; ZKP Scheme Selection for VCL-UT PROOF Clause
 ;; ============================================================================
 ;;
 ;; Decision: PLONK (Permutations over Lagrange-bases for Oecumenical
@@ -32,7 +32,7 @@
 ;; 1. vs Groth16: Groth16 has the smallest proofs and fastest verification,
 ;;    but requires a NEW trusted setup for every circuit change. VeriSimDB's
 ;;    proof contracts change frequently (new types, new properties). PLONK's
-;;    universal SRS means one setup covers all VCL-DT contracts forever.
+;;    universal SRS means one setup covers all VCL-UT contracts forever.
 ;;
 ;; 2. vs STARKs: STARKs are transparent (no trusted setup) and post-quantum,
 ;;    but proof sizes are ~100x larger (45KB vs 400B). For VeriSimDB where

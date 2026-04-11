@@ -376,7 +376,7 @@ User prompt → Haiku classifier → Route to:
 See `KNOWN-ISSUES.adoc` at repo root for all honest gaps. All 25 issues resolved.
 
 Resolved in recent sessions:
-- VCL-DT type checker wired end-to-end (Elixir-native + ReScript + Rust ZKP bridge)
+- VCL-UT type checker wired end-to-end (Elixir-native + ReScript + Rust ZKP bridge)
 - 11 proof types: EXISTENCE, INTEGRITY, CONSISTENCY, PROVENANCE, FRESHNESS, ACCESS, CITATION, CUSTOM, ZKP, PROVEN, SANCTIFY
 - Multi-proof parsing: PROOF A(x) AND B(y) splits correctly
 - Modality compatibility validation (INTEGRITY needs semantic, PROVENANCE needs provenance, etc.)

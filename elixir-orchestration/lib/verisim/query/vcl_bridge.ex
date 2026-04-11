@@ -101,7 +101,7 @@ defmodule VeriSim.Query.VCLBridge do
   end
 
   @doc """
-  Type-check a parsed VCL-DT AST.
+  Type-check a parsed VCL-UT AST.
 
   Sends the AST to the ReScript type checker (VCLBidir.synthesizeQuery)
   via the Deno/Node subprocess. Returns inferred types, proof obligations,
@@ -154,7 +154,7 @@ defmodule VeriSim.Query.VCLBridge do
   @impl true
   def handle_call({:typecheck, _ast}, _from, %{port: nil} = state) do
     # Type checking requires the ReScript subprocess — no fallback.
-    # Callers MUST handle this error; silently passing would defeat VCL-DT.
+    # Callers MUST handle this error; silently passing would defeat VCL-UT.
     {:reply, {:error, :type_checker_unavailable}, state}
   end
 

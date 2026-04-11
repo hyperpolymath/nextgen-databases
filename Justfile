@@ -274,7 +274,7 @@ tour:
     echo "   Drift between them is detected and self-healed."
     echo ""
     echo "4. QUERY LANGUAGE"
-    echo "   VCL (VeriSim Query Language) — NOT SQL."
+    echo "   VCL (VeriSim Consonance Language) — NOT SQL."
     echo "   See docs/ and playground/ for examples."
     echo ""
     echo "5. FEDERATION"

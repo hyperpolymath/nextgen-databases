@@ -87,7 +87,7 @@ automatically.  This is genuinely novel.
   and lacks documentation.  Without a usable query language, VerisimDB is an HTTP
   CRUD API with caching.  _This is the single biggest gap._
 
-| **VCL-DT not wired**
+| **VCL-UT not wired**
 | MEDIUM
 | Lean type definitions exist but the checker is not invoked at runtime.  PROOF
   clauses are syntactically supported but proof certificates are not formally
@@ -274,7 +274,7 @@ heterogeneous databases — ArangoDB, Postgres, Elasticsearch, Neo4j — with
 VerisimDB as the coordination layer.  The IDApTIK database bridge (ArangoDB +
 VerisimDB) is the first working example of this pattern.
 
-=== Layer 3: VCL-DT — Formally Verified Queries (Technical Moat)
+=== Layer 3: VCL-UT — Formally Verified Queries (Technical Moat)
 
 The deepest technical capability.  Small audience (formal methods, regulated
 industries, safety-critical systems) but impossible to replicate quickly.
@@ -283,11 +283,11 @@ _"VerisimDB returns your query results with a machine-verifiable proof
 certificate.  The Lean type checker proves the result satisfies your
 constraints."_
 
-No database in existence does this.  VCL-DT is the reason a competitor
+No database in existence does this.  VCL-UT is the reason a competitor
 cannot clone VerisimDB in a weekend after seeing the drift detection demo.
 It takes years of type theory knowledge to even attempt it.
 
-**Who cares about VCL-DT:**
+**Who cares about VCL-UT:**
 
 - Regulated industries (finance, medical devices, aerospace) where you must
   _prove_ a query result is correct, not just assert it
@@ -296,8 +296,8 @@ It takes years of type theory knowledge to even attempt it.
 - Safety-critical systems (Ada/SPARK territory)
 - Academic formal methods community
 
-**VCL-DT is not the lead pitch.** It is the moat.  Drift detection gets
-people in the door.  Federation keeps them.  VCL-DT ensures nobody can
+**VCL-UT is not the lead pitch.** It is the moat.  Drift detection gets
+people in the door.  Federation keeps them.  VCL-UT ensures nobody can
 compete.
 
 == Competitor Analysis: Data Quality / Observability Space
@@ -533,7 +533,7 @@ future session.
 **Why:** A database without a usable query language is a key-value store with
 extra steps.  This is the single highest-impact improvement.
 
-**Scope:** Not VCL-DT.  Just VCL.  The query language that end users type.
+**Scope:** Not VCL-UT.  Just VCL.  The query language that end users type.
 
 **What "finished" means:**
 
@@ -672,18 +672,18 @@ peers via HTTP adapters.
 
 The `GraphStore` trait abstraction already exists, so this is a backend swap.
 
-=== Priority 7: Wire VCL-DT (HIGH — but after VCL)
+=== Priority 7: Wire VCL-UT (HIGH — but after VCL)
 
-**Why:** VCL-DT is the technical moat — the reason nobody can clone VerisimDB
+**Why:** VCL-UT is the technical moat — the reason nobody can clone VerisimDB
 quickly.  Formally verified query results via Lean type checking is genuinely
 unique in the database world.  But VCL must work reliably first (Priority 1).
 No point verifying proofs in a query language that cannot execute reliably.
 
 **Why it matters more than it might seem:**
 
-VCL-DT is not a nice-to-have.  It is the capability that separates VerisimDB
+VCL-UT is not a nice-to-have.  It is the capability that separates VerisimDB
 from every other database and every data quality tool.  Great Expectations can
-assert "this column has no nulls."  VerisimDB with VCL-DT can return a
+assert "this column has no nulls."  VerisimDB with VCL-UT can return a
 _machine-verifiable proof certificate_ that the query result satisfies
 dependent type constraints.  This is the kind of guarantee required in:
 
@@ -740,11 +740,11 @@ The path forward (priority order):
 4. **One external user** so the assumptions are _tested_
 5. **Heterogeneous federation** so enterprise adoption is _practical_
 6. **Reposition** around drift detection so the value proposition is _clear_
-7. **Wire VCL-DT** so the technical moat is _operational_ (after VCL is solid)
+7. **Wire VCL-UT** so the technical moat is _operational_ (after VCL is solid)
 
 The layered pitch:
 
 - **Drift detection** gets people in the door (broad audience, easy to explain)
 - **Federation** keeps them (watches existing databases, no migration)
 - **Provenance** makes them depend on it (audit trail, GDPR, compliance)
-- **VCL-DT** ensures nobody can compete (years of type theory to replicate)
+- **VCL-UT** ensures nobody can compete (years of type theory to replicate)

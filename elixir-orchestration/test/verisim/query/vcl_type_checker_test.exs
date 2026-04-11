@@ -2,7 +2,7 @@
 
 defmodule VeriSim.Query.VCLTypeCheckerTest do
   @moduledoc """
-  Tests for the Elixir-native VCL-DT type checker.
+  Tests for the Elixir-native VCL-UT type checker.
 
   Verifies that the type checker:
   1. Validates proof types are known

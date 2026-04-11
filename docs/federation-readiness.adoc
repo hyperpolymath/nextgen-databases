@@ -52,7 +52,7 @@ If VCL were removed or not used, VeriSimDB would lose the following federation-c
 
 * **No drift policy enforcement on federated queries.** Drift policies (`DRIFT POLICY strict_consistency`, `DRIFT POLICY eventual`, etc.) are expressed in VCL and enforced by the query router. Without VCL, there is no standard mechanism to declare or enforce consistency requirements across federated peers.
 
-* **No cross-modal consistency checks across instances.** VCL's `PROOF CONSISTENCY` clause can request verification that graph, vector, and semantic modalities agree across federation peers. Without VCL-DT, there is no way to express or verify cross-instance consistency at query time.
+* **No cross-modal consistency checks across instances.** VCL's `PROOF CONSISTENCY` clause can request verification that graph, vector, and semantic modalities agree across federation peers. Without VCL-UT, there is no way to express or verify cross-instance consistency at query time.
 
 * **No unified result format.** VCL queries return results in a consistent format regardless of whether the data came from one instance or twenty. Without VCL, each peer's API response format would need to be handled individually.
 
@@ -127,7 +127,7 @@ Drift detection works: the `verisim-drift` crate computes drift scores across mo
 |Missing
 |No mechanism to verify or enforce consistency across federation peers.
 
-|**VCL-DT PROOF over Federation**
+|**VCL-UT PROOF over Federation**
 |Missing
 |PROOF clauses parse but do not generate real proofs, even for local queries. Federation adds no additional proof capability.
 |===
@@ -157,9 +157,9 @@ Drift detection works: the `verisim-drift` crate computes drift scores across mo
 
 === Phase 3: Verified Federation
 
-**Goal:** VCL-DT proofs work across federation boundaries.
+**Goal:** VCL-UT proofs work across federation boundaries.
 
-* Wire Lean type checker into the VCL-DT execution path (prerequisite: VCL-DT Phase 3 from link:vcl-vs-vcl-dt.adoc[VCL Slipstream vs VCL-DT]).
+* Wire Lean type checker into the VCL-UT execution path (prerequisite: VCL-UT Phase 3 from link:vcl-vs-vcl-dt.adoc[VCL Slipstream vs VCL-UT]).
 * Implement proof witness collection across peers: each peer contributes its portion of the proof.
 * Implement Raft consensus for coordinated writes (cross-instance referential integrity).
 * Implement `PROOF CONSISTENCY` verification across federation peers (cross-instance modal agreement).

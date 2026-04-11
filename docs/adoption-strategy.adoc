@@ -28,7 +28,7 @@ by alignment strength, and provides a concrete outreach plan for each.
 * *Drift detection + auto-repair* across 8 modality representations
 * *Heterogeneous federation* -- unified queries across PostgreSQL, ArangoDB,
   Elasticsearch, and VeriSimDB instances
-* *Formally verifiable queries* (VCL-DT) with proof certificates
+* *Formally verifiable queries* (VCL-UT) with proof certificates
 
 === What VeriSimDB Is Not
 
@@ -133,7 +133,7 @@ A gene entity uses 6 of 8 modalities: graph (pathway relationships), vector
 (sequence embeddings), semantic (Gene Ontology terms), document (literature),
 tensor (expression matrices), provenance (lab, sequencing run, pipeline
 version). Drift detection flags when a gene's pathway position contradicts
-its expression profile. VCL-DT provides reproducibility guarantees. Provenance
+its expression profile. VCL-UT provides reproducibility guarantees. Provenance
 tracking satisfies FDA/EMA regulatory compliance.
 
 ==== Features Used
@@ -141,7 +141,7 @@ tracking satisfies FDA/EMA regulatory compliance.
 * All 8 modalities
 * Drift detection (cross-omics consistency)
 * Provenance tracking (regulatory compliance)
-* VCL-DT (reproducible queries)
+* VCL-UT (reproducible queries)
 
 ==== Outreach Targets
 
@@ -170,7 +170,7 @@ A patient entity spans document (clinical notes), tensor (medical images),
 graph (care team relationships), temporal (longitudinal records), spatial
 (facility locations), and provenance (clinician, device, lab attribution).
 Drift detection catches when a medication list in the pharmacy system diverges
-from the EHR -- a life-safety issue. VCL-DT proof certificates satisfy audit
+from the EHR -- a life-safety issue. VCL-UT proof certificates satisfy audit
 requirements.
 
 ==== Features Used
@@ -178,7 +178,7 @@ requirements.
 * Drift detection (medication/allergy discrepancies)
 * Multi-modal storage (6+ modalities)
 * Heterogeneous federation (EHR + pharmacy + lab databases)
-* VCL-DT (audit-grade queries)
+* VCL-UT (audit-grade queries)
 
 ==== Outreach Targets
 
@@ -280,13 +280,13 @@ A Wikidata entity exists as graph relationships, document text (300+
 languages), vector embeddings, semantic annotations, and provenance (editor,
 bot, source attribution). Drift detection catches when an entity's graph
 classification contradicts its textual description -- precisely the documented
-"conceptual disarray". VCL-DT formally verifies ontological constraints.
+"conceptual disarray". VCL-UT formally verifies ontological constraints.
 
 ==== Features Used
 
 * Drift detection (graph structure vs. semantic classification)
 * Multi-modal storage (graph + document + vector + semantic + provenance)
-* VCL-DT (ontological constraint verification)
+* VCL-UT (ontological constraint verification)
 * Self-normalisation (automated deduplication and constraint repair)
 
 ==== Outreach Targets
@@ -338,7 +338,7 @@ calibration divergence. Heterogeneous federation enables cross-archive queries
 
 [cols="1,1,1,1,1,1"]
 |===
-| Domain | Drift Detection | Federation | VCL-DT | Readiness | Priority
+| Domain | Drift Detection | Federation | VCL-UT | Readiness | Priority
 
 | GraphRAG | Critical | High | Medium | *Ship today* | *1*
 | Biomedical | Critical | High | Critical | Q2 2026 | 2
@@ -384,7 +384,7 @@ Any external adopter should know:
 |===
 | Gap | Impact
 
-| VCL-DT proofs incomplete | PROOF clauses parse but don't generate verifiable
+| VCL-UT proofs incomplete | PROOF clauses parse but don't generate verifiable
   certificates yet. Lean type checker integration planned Q2 2026.
 
 | No SQL dialect | VCL is intentionally not SQL. Users wanting familiar syntax

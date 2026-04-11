@@ -54,7 +54,7 @@ pub enum LintRule {
     OrderByWithoutLimit,
     /// DELETE or UPDATE without WHERE clause.
     DangerousWrite,
-    /// VCL-DT PROOF type not recognized.
+    /// VCL-UT PROOF type not recognized.
     UnknownProofType,
     /// Redundant WHERE clause (always true).
     RedundantWhere,
@@ -123,7 +123,7 @@ const MODALITIES: &[&str] = &[
     "PROVENANCE", "SPATIAL",
 ];
 
-/// Known VCL-DT proof types.
+/// Known VCL-UT proof types.
 const KNOWN_PROOF_TYPES: &[&str] = &[
     "EXISTENCE", "CONSISTENCY", "INTEGRITY", "AUTHENTICITY",
     "PROVENANCE", "ACCESS", "CITATION", "ZKP", "PLONK",

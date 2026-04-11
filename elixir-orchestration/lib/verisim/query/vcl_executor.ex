@@ -162,7 +162,7 @@ defmodule VeriSim.Query.VCLExecutor do
     projections = extract_projections(query_ast)
 
     if proof_specs do
-      # VCL-DT path: type-check → execute → verify proofs → bundle certificate
+      # VCL-UT path: type-check → execute → verify proofs → bundle certificate
       execute_dt_query(query_ast, proof_specs, modalities, source, where_clause,
                        limit, offset, order_by, group_by, aggregates, projections, timeout)
     else
@@ -192,7 +192,7 @@ defmodule VeriSim.Query.VCLExecutor do
     end
   end
 
-  # VCL-DT execution — type check, execute, verify proofs, bundle certificate
+  # VCL-UT execution — type check, execute, verify proofs, bundle certificate
   defp execute_dt_query(query_ast, proof_specs, modalities, source, where_clause,
                          limit, offset, order_by, group_by, aggregates, projections, timeout) do
     alias VeriSim.Query.{VCLBridge, VCLTypeChecker}
@@ -209,7 +209,7 @@ defmodule VeriSim.Query.VCLExecutor do
       {:error, :type_checker_unavailable} ->
         # ReScript subprocess not running. Use the Elixir-native type checker
         # which validates proof types, modality compatibility, and composition.
-        Logger.info("VCL-DT: Using Elixir-native type checker (ReScript subprocess unavailable)")
+        Logger.info("VCL-UT: Using Elixir-native type checker (ReScript subprocess unavailable)")
 
         case VCLTypeChecker.typecheck(query_ast) do
           {:ok, info} ->
@@ -217,17 +217,17 @@ defmodule VeriSim.Query.VCLExecutor do
 
           {:error, reason} ->
             # Native type checker rejected the query — this is a real type error.
-            Logger.error("VCL-DT: Type checking failed: #{inspect(reason)}")
+            Logger.error("VCL-UT: Type checking failed: #{inspect(reason)}")
             nil
         end
 
       {:error, reason} ->
-        Logger.error("VCL-DT: Type checking failed: #{inspect(reason)}")
+        Logger.error("VCL-UT: Type checking failed: #{inspect(reason)}")
         nil
     end
 
     if is_nil(type_info) do
-      {:error, {:type_check_failed, "VCL-DT query type checking failed"}}
+      {:error, {:type_check_failed, "VCL-UT query type checking failed"}}
     else
       # Step 2: Execute the query (get data)
       {pushdown_conditions, cross_modal_conditions} = classify_conditions(where_clause)
@@ -727,7 +727,7 @@ defmodule VeriSim.Query.VCLExecutor do
           end
         else
           # No specific entity — log a warning but allow for global queries.
-          Logger.warning("VCL-DT: Access proof without entity ID — global query, skipping entity-level check")
+          Logger.warning("VCL-UT: Access proof without entity ID — global query, skipping entity-level check")
           {:ok, %{type: :access, entity_id: nil, authorized: true, scope: :global}}
         end
 
