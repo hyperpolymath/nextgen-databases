@@ -6,28 +6,28 @@
 [metadata]
 project = "nextgen-databases"
 version = "0.1.0"
-last-updated = "2026-04-12"
+last-updated = "2026-04-13"
 status = "active"
 
 [project-context]
 name = "nextgen-databases"
-completion-percentage = 62
-phase = "Phase 5 — Tropical Consonance + KRL Integration (P2 + P3 DONE)"
+completion-percentage = 68
+phase = "Phase 5 — Tropical Consonance + KRL Integration (P2 + P3 + RIII DONE)"
 
 [current-position]
-milestone = "verisim-modular-experiment tropical bridge v0.2 + bellman_ford proved + P3 API fixes"
-last-session = "2026-04-12"
-last-action = "P3: integration_test.rs + modality_benchmarks.rs updated to current API; KRaft remove_server flaky tests fixed with poll_until helper"
+milestone = "verisim-modular-experiment tropical bridge v0.3 + bellman_ford proved + P3 API fixes + RIII live"
+last-session = "2026-04-13"
+last-action = "RIII: r3_simplify implemented in KnotTheory.jl (triangle detection + cyclic relabeling + R2 check); _riii_neighbors wired in TangleGraph.jl; TangleGraph v0.3 (RI+RII+RIII all live)"
 
 [tropical-bridge]
-status = "v0.2 — RI + RII live, RIII stub (KnotTheory.jl r3_simplify is no-op)"
+status = "v0.3 — RI + RII + RIII all live (KnotTheory.jl r3_simplify implemented 2026-04-13)"
 isabelle-sorry-tropical-matrices = "NONE — all closed (bellman_ford CLOSED 2026-04-11)"
 isabelle-sorry-other = "cycle_shortcutting CLOSED; floyd_warshall CLOSED; tropm_mat_pow_eq_sum_walks CLOSED; Tropical_Determinants CLOSED 2026-04-11"
-julia-mirror = "TropicalMatrix.jl + TangleGraph.jl + TropicalDeterminant.jl (verisim-modular-experiment/impl/tropical/)"
+julia-mirror = "TropicalMatrix.jl + TangleGraph.jl (v0.3 RIII live) + TropicalDeterminant.jl (verisim-modular-experiment/impl/tropical/)"
 vcl-clauses = "ProofIntegrity, ProofConsistency, ProofFreshness, ProofConsonance, ProofOptimalAssignment — all live"
 
 [pending-tropical]
-1 = "Wire _riii_neighbors when KnotTheory.jl gains live r3_simplify"
+# All three Reidemeister moves live as of 2026-04-13.
 
 [test-coverage]
 unit-tests = "~40 (Elixir consensus + federation adapters)"
@@ -47,13 +47,12 @@ cargo-bench-compile = "PASS (throughput_benchmarks.rs — no errors, no warnings
 gleam-smoke = "Written; requires compiled lith_nif.so to run connection/lifecycle tests"
 
 [blockers]
-- "KRaft remove_server tests: timing-sensitive — mitigated with poll_until helper (was pre-existing timeout failure)"
+# No active blockers.
 
 [route-to-mvp]
 next = "Promote verisim-modular-experiment impl/ to shippable verisim-core package"
-then = "Wire RIII neighbors when KnotTheory.jl gains live r3_simplify"
+then = "Zig FFI port of VerisimCore (consumer target TBD with user)"
 
 [critical-next-actions]
 1 = "Promote impl/ to shippable verisim-core package"
-2 = "Wire _riii_neighbors when KnotTheory.jl gains live r3_simplify"
-3 = "Zig FFI port of VerisimCore per hyperpolymath standard"
+2 = "Zig FFI port of VerisimCore per hyperpolymath standard (target consumer to discuss)"
