@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// VQL Playground — main application entry point.
-// Wires up the editor, VQL-DT toggle, linter, formatter, and query executor.
+// VCL Playground — main application entry point.
+// Wires up the editor, VCL-DT toggle, linter, formatter, and query executor.
 // Tries the real verisim-api backend first, falls back to demo mode.
 
 // === DOM helpers ===
@@ -13,7 +13,7 @@ let addEventListener = (el: {..}, event: string, handler: {..} => unit): unit =>
 
 // === State ===
 
-let vqlDtMode = ref(false)
+let vclDtMode = ref(false)
 let backendConnected = ref(false)
 let queryInFlight = ref(false)
 
@@ -28,30 +28,30 @@ let rec init = () => {
   let statusMode = getElementById("status-mode")
   let statusBar = getElementById("status-bar")
   let statusConnection = getElementById("status-connection")
-  let toggle = getElementById("vql-dt-toggle")
+  let toggle = getElementById("vcl-dt-toggle")
 
   // === Check backend connectivity ===
   checkBackend(statusConnection)->ignore
 
-  // === VQL-DT Toggle ===
+  // === VCL-DT Toggle ===
   let updateMode = () => {
-    if vqlDtMode.contents {
+    if vclDtMode.contents {
       toggle["classList"]["add"]("active")->ignore
-      modeBadge["className"] = "mode-badge vql-dt"
-      modeBadge["textContent"] = "VQL-DT"
-      statusMode["textContent"] = "Mode: VQL-DT (Dependent Types)"
-      statusBar["classList"]["add"]("vql-dt")->ignore
+      modeBadge["className"] = "mode-badge vcl-dt"
+      modeBadge["textContent"] = "VCL-DT"
+      statusMode["textContent"] = "Mode: VCL-DT (Dependent Types)"
+      statusBar["classList"]["add"]("vcl-dt")->ignore
     } else {
       toggle["classList"]["remove"]("active")->ignore
-      modeBadge["className"] = "mode-badge vql"
-      modeBadge["textContent"] = "VQL"
-      statusMode["textContent"] = "Mode: VQL"
-      statusBar["classList"]["remove"]("vql-dt")->ignore
+      modeBadge["className"] = "mode-badge vcl"
+      modeBadge["textContent"] = "VCL"
+      statusMode["textContent"] = "Mode: VCL"
+      statusBar["classList"]["remove"]("vcl-dt")->ignore
     }
   }
 
   addEventListener(toggle, "click", _ => {
-    vqlDtMode := !vqlDtMode.contents
+    vclDtMode := !vclDtMode.contents
     updateMode()->ignore
     // Re-lint current query
     let query = editor["value"]
@@ -65,7 +65,7 @@ let rec init = () => {
     let key: string = e["key"]
     if key == " " || key == "Enter" {
       e["preventDefault"]()
-      vqlDtMode := !vqlDtMode.contents
+      vclDtMode := !vclDtMode.contents
       updateMode()
     }
   })
@@ -128,7 +128,7 @@ let rec init = () => {
   addEventListener(getElementById("lint-btn"), "click", _ => {
     let query: string = editor["value"]
     if String.trim(query) !== "" {
-      let diagnostics = Linter.lint(query, ~vqlDt=vqlDtMode.contents)
+      let diagnostics = Linter.lint(query, ~vclDt=vclDtMode.contents)
       if Array.length(diagnostics) == 0 {
         output["innerHTML"] = `<span class="output-success">No lint issues found.</span>`
       } else {
@@ -151,7 +151,7 @@ let rec init = () => {
   addEventListener(getElementById("format-btn"), "click", _ => {
     let query: string = editor["value"]
     if String.trim(query) !== "" {
-      editor["value"] = Formatter.formatVql(query)
+      editor["value"] = Formatter.formatVcl(query)
       // Trigger input event to update char count
       let inputEvent = document["createEvent"]("Event")
       inputEvent["initEvent"]("input", true, true)->ignore
@@ -167,13 +167,13 @@ let rec init = () => {
   })
 
   addEventListener(getElementById("examples-btn"), "click", _ => {
-    let exs = Examples.forMode(vqlDtMode.contents)
+    let exs = Examples.forMode(vclDtMode.contents)
     let html =
       exs
       ->Array.map(ex => {
         let escaped = String.replaceAll(String.replaceAll(ex.query, "<", "&lt;"), ">", "&gt;")
-        let dtBadge = if ex.vqlDt {
-          ` <span class="mode-badge vql-dt" style="font-size:0.65rem">DT</span>`
+        let dtBadge = if ex.vclDt {
+          ` <span class="mode-badge vcl-dt" style="font-size:0.65rem">DT</span>`
         } else {
           ""
         }
@@ -239,7 +239,7 @@ and executeAndDisplay = (query: string, output: {..}) => {
       executeOnBackend(query, output)->ignore
     } else {
       // Fall back to demo executor (synchronous).
-      let result = DemoExecutor.execute(query, ~vqlDt=vqlDtMode.contents)
+      let result = DemoExecutor.execute(query, ~vclDt=vclDtMode.contents)
       renderResult(result, output)
     }
   }
@@ -268,7 +268,7 @@ and executeOnBackend = async (query: string, output: {..}): unit => {
       `<span class="output-warning">Backend error: ${msg}</span>\n` ++
       `<span class="output-info">Falling back to demo mode...</span>`
     let _ = setTimeout(() => {
-      let result = DemoExecutor.execute(query, ~vqlDt=vqlDtMode.contents)
+      let result = DemoExecutor.execute(query, ~vclDt=vclDtMode.contents)
       renderResult(result, output)
     }, 300)
   }
@@ -322,7 +322,7 @@ and renderResult = (result: DemoExecutor.executeResult, output: {..}) => {
 // === Lint helper ===
 
 and runLint = (query: string, lintBar: {..}) => {
-  let diagnostics = Linter.lint(query, ~vqlDt=vqlDtMode.contents)
+  let diagnostics = Linter.lint(query, ~vclDt=vclDtMode.contents)
   let errors = diagnostics->Array.filter(d => d.severity == Linter.Error)->Array.length
   let warnings = diagnostics->Array.filter(d => d.severity == Linter.Warning)->Array.length
   let hints = diagnostics->Array.filter(d => d.severity == Linter.Hint)->Array.length

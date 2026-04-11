@@ -24,7 +24,7 @@ defmodule VeriSim.Hypatia.ScanIngester do
               │
       VeriSimDB storage
               │
-      Hypatia VQL queries
+      Hypatia VCL queries
 
   ## Usage
 

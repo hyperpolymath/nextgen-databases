@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// VQL syntax highlighting for the playground editor.
+// VCL syntax highlighting for the playground editor.
 // Produces HTML spans with CSS classes for keyword colouring.
 
-let highlightVql = (text: string, ~vqlDt: bool=false): string => {
+let highlightVcl = (text: string, ~vclDt: bool=false): string => {
   let result = ref("")
   let chars = String.split(text, "")
   let len = Array.length(chars)
@@ -46,11 +46,11 @@ let highlightVql = (text: string, ~vqlDt: bool=false): string => {
       let word = String.slice(text, ~start, ~end=i.contents)
       let upper = String.toUpperCase(word)
 
-      if VqlKeywords.isModality(upper) {
+      if VclKeywords.isModality(upper) {
         result := result.contents ++ `<span class="mod">${word}</span>`
-      } else if VqlKeywords.isProofType(upper) && vqlDt {
+      } else if VclKeywords.isProofType(upper) && vclDt {
         result := result.contents ++ `<span class="proof">${word}</span>`
-      } else if VqlKeywords.isKeyword(upper) {
+      } else if VclKeywords.isKeyword(upper) {
         result := result.contents ++ `<span class="kw">${word}</span>`
       } else {
         result := result.contents ++ word

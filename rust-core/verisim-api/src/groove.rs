@@ -148,11 +148,11 @@ fn manifest() -> serde_json::Value {
                 "requires_auth": false,
                 "panel_compatible": false
             },
-            "vql": {
-                "type": "vql",
+            "vcl": {
+                "type": "vcl",
                 "description": "VeriSim Query Language — type-safe multi-modal queries",
                 "protocol": "http",
-                "endpoint": "/api/v1/vql/execute",
+                "endpoint": "/api/v1/vcl/execute",
                 "requires_auth": false,
                 "panel_compatible": true
             },
@@ -194,7 +194,7 @@ const OFFERED_CAPABILITIES: &[&str] = &[
     "provenance",
     "vector-search",
     "spatial-search",
-    "vql",
+    "vcl",
 ];
 
 /// Heartbeat timeout: 15 seconds (3 missed heartbeats at 5s interval, per spec 4.3).

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Author: Jonathan D.A. Jewell <6759885+hyperpolymath@users.noreply.github.com>
-//! Write throughput, read latency, and VQL complexity benchmarks for VeriSimDB.
+//! Write throughput, read latency, and VCL complexity benchmarks for VeriSimDB.
 //!
 //! This file augments `modality_benchmarks.rs` with system-level throughput
 //! and latency measurements that correspond to the missing benchmarks listed
@@ -8,7 +8,7 @@
 //!
 //!   - Write throughput   — N octad inserts/second on the OctadStore hot path.
 //!   - Read latency       — hot path (cached entity), cold path (uncached entity).
-//!   - VQL execution time — by query complexity (simple, moderate, complex).
+//!   - VCL execution time — by query complexity (simple, moderate, complex).
 //!
 //! The benchmarks use in-memory stores only (no persistent disk I/O) to give
 //! reproducible baseline numbers across environments.
@@ -219,19 +219,19 @@ fn bench_read_latency_cold(c: &mut Criterion) {
 }
 
 // ============================================================================
-// VQL Query Execution Time by Complexity
+// VCL Query Execution Time by Complexity
 //
-// Since the VQL executor runs in Elixir, we proxy three complexity tiers
-// via direct OctadStore operations that a VQL query would invoke:
+// Since the VCL executor runs in Elixir, we proxy three complexity tiers
+// via direct OctadStore operations that a VCL query would invoke:
 //
 //   Simple:   single get-by-ID (1 store lookup)
 //   Moderate: get-by-ID + vector similarity (2 store operations)
 //   Complex:  full-text search + vector similarity over 1,000 entities
 // ============================================================================
 
-fn bench_vql_simple_get(c: &mut Criterion) {
+fn bench_vcl_simple_get(c: &mut Criterion) {
     let rt = Runtime::new().unwrap();
-    let mut group = c.benchmark_group("vql_complexity");
+    let mut group = c.benchmark_group("vcl_complexity");
 
     let (entity_id, store) = rt.block_on(async {
         let s = make_octad_store();
@@ -248,9 +248,9 @@ fn bench_vql_simple_get(c: &mut Criterion) {
     group.finish();
 }
 
-fn bench_vql_moderate_multimodal(c: &mut Criterion) {
+fn bench_vcl_moderate_multimodal(c: &mut Criterion) {
     let rt = Runtime::new().unwrap();
-    let mut group = c.benchmark_group("vql_complexity");
+    let mut group = c.benchmark_group("vcl_complexity");
 
     let (entity_id, store) = rt.block_on(async {
         let s = make_octad_store();
@@ -277,9 +277,9 @@ fn bench_vql_moderate_multimodal(c: &mut Criterion) {
     group.finish();
 }
 
-fn bench_vql_complex_cross_modal(c: &mut Criterion) {
+fn bench_vcl_complex_cross_modal(c: &mut Criterion) {
     let rt = Runtime::new().unwrap();
-    let mut group = c.benchmark_group("vql_complexity");
+    let mut group = c.benchmark_group("vcl_complexity");
 
     let store = rt.block_on(async {
         let s = make_octad_store();
@@ -350,10 +350,10 @@ criterion_group!(
 );
 
 criterion_group!(
-    vql_complexity_benches,
-    bench_vql_simple_get,
-    bench_vql_moderate_multimodal,
-    bench_vql_complex_cross_modal,
+    vcl_complexity_benches,
+    bench_vcl_simple_get,
+    bench_vcl_moderate_multimodal,
+    bench_vcl_complex_cross_modal,
 );
 
 criterion_group!(
@@ -364,6 +364,6 @@ criterion_group!(
 criterion_main!(
     write_throughput_benches,
     read_latency_benches,
-    vql_complexity_benches,
+    vcl_complexity_benches,
     replication_latency_benches,
 );

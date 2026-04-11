@@ -247,13 +247,13 @@ defmodule VeriSimClient.Types do
         }
 
   # ---------------------------------------------------------------------------
-  # VqlResponse
+  # VclResponse
   # ---------------------------------------------------------------------------
 
   @typedoc """
-  Response from a VQL query execution or explain request.
+  Response from a VCL query execution or explain request.
   """
-  @type vql_response :: %{
+  @type vcl_response :: %{
           required(:success) => boolean(),
           required(:statement_type) => String.t(),
           required(:row_count) => non_neg_integer(),

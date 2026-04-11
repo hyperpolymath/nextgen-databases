@@ -13,14 +13,14 @@ toc::[]
 
 * **Completion**: 10%
 * **Phase**: Implementation ramp-up
-* **What exists**: Architecture docs, VQL grammar, Rust crate scaffolds, Elixir stubs
-* **What's missing**: Actual modality store implementations, VQL execution engine
+* **What exists**: Architecture docs, VCL grammar, Rust crate scaffolds, Elixir stubs
+* **What's missing**: Actual modality store implementations, VCL execution engine
 
 == Goal
 
 **Week 16 target**: 70% completion
 - All 6 modality stores operational
-- VQL execution engine working
+- VCL execution engine working
 - Testing framework complete
 - Basic federation capability
 
@@ -253,22 +253,22 @@ impl DriftDetector {
 
 ---
 
-== Milestone V3: VQL Execution Engine (Weeks 9-11)
+== Milestone V3: VCL Execution Engine (Weeks 9-11)
 
-**Goal**: Execute VQL queries across all modalities
+**Goal**: Execute VCL queries across all modalities
 
 === Week 9: Parser Integration
 
 ```rust
-// verisim-api/src/vql_bridge.rs
-use rescript_parser::VQLParser; // ReScript → Rust FFI
+// verisim-api/src/vcl_bridge.rs
+use rescript_parser::VCLParser; // ReScript → Rust FFI
 
-pub fn parse_vql(query: &str) -> Result<VQLAst>;
-pub fn execute_vql(ast: VQLAst, octad_store: &OctadStore) -> Result<QueryResult>;
+pub fn parse_vcl(query: &str) -> Result<VCLAst>;
+pub fn execute_vcl(ast: VCLAst, octad_store: &OctadStore) -> Result<QueryResult>;
 ```
 
 **Integration**:
-- ReScript VQL parser → Rust execution engine
+- ReScript VCL parser → Rust execution engine
 - AST serialization (CBOR or JSON)
 
 ---
@@ -282,7 +282,7 @@ pub struct QueryPlan {
     pub estimated_cost: f64,
 }
 
-pub fn plan_query(ast: VQLAst) -> Result<QueryPlan>;
+pub fn plan_query(ast: VCLAst) -> Result<QueryPlan>;
 ```
 
 **Optimization**:
@@ -306,7 +306,7 @@ pub struct ExplainOutput {
 pub fn explain(query: &str) -> Result<ExplainOutput>;
 ```
 
-**Deliverable**: VQL queries execute, EXPLAIN works
+**Deliverable**: VCL queries execute, EXPLAIN works
 
 ---
 
@@ -345,14 +345,14 @@ language: rust
 ```
 
 ```rust
-// fuzz/fuzz_targets/fuzz_vql.rs
+// fuzz/fuzz_targets/fuzz_vcl.rs
 #![no_main]
 use libfuzzer_sys::fuzz_target;
-use verisim_api::parse_vql;
+use verisim_api::parse_vcl;
 
 fuzz_target!(|data: &[u8]| {
     if let Ok(s) = std::str::from_utf8(data) {
-        let _ = parse_vql(s);
+        let _ = parse_vcl(s);
     }
 });
 ```
@@ -411,7 +411,7 @@ pub struct QueryCache {
 **Create**:
 - `QUICKSTART.adoc` - Get running in 5 minutes
 - `API-REFERENCE.adoc` - All Rust APIs documented
-- `VQL-TUTORIAL.adoc` - 10 example queries
+- `VCL-TUTORIAL.adoc` - 10 example queries
 - `DEPLOYMENT-GUIDE.adoc` - Standalone mode setup
 
 **Deliverable**: VeriSimDB at 70% completion
@@ -452,7 +452,7 @@ cargo test --test integration_test
 
 === Fuzz Tests
 ```bash
-cargo fuzz run fuzz_vql -- -max_total_time=300
+cargo fuzz run fuzz_vcl -- -max_total_time=300
 ```
 
 ---
@@ -475,7 +475,7 @@ cargo fuzz run fuzz_vql -- -max_total_time=300
 - [ ] Completion: 40% → 55%
 
 ### Week 11
-- [ ] VQL execution engine complete
+- [ ] VCL execution engine complete
 - [ ] EXPLAIN working
 - [ ] Completion: 55% → 65%
 
@@ -502,7 +502,7 @@ cargo fuzz run fuzz_vql -- -max_total_time=300
 **The only connection**: VeriSimDB could eventually federate to FormBD as an external data source:
 
 ```sql
--- VQL federating to FormBD (future feature)
+-- VCL federating to FormBD (future feature)
 SELECT * FROM octads@formbd_instance WHERE modality = 'document';
 ```
 

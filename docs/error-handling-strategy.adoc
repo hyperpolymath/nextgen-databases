@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 
-= VQL Error Handling Strategy
+= VCL Error Handling Strategy
 :toc: left
 :toclevels: 3
 :sectnums:
@@ -26,7 +26,7 @@ VeriSimDB's error handling provides **comprehensive, actionable feedback** acros
 |Category |When It Happens |Recoverable? |Example
 
 |**Parse Errors**
-|Invalid VQL syntax
+|Invalid VCL syntax
 |No (client fix)
 |`SELECT GRPH FROM ...` (typo)
 
@@ -53,7 +53,7 @@ VeriSimDB's error handling provides **comprehensive, actionable feedback** acros
 
 == Parse Errors
 
-**Cause:** Invalid VQL syntax detected by parser
+**Cause:** Invalid VCL syntax detected by parser
 
 **Characteristics:**
 
@@ -64,7 +64,7 @@ VeriSimDB's error handling provides **comprehensive, actionable feedback** acros
 
 === Example: Unexpected Token
 
-[source,vql]
+[source,vcl]
 ----
 SELECT GRAPH, VECTRO FROM octad abc-123
                 ^^^^^^
@@ -137,7 +137,7 @@ ParseError({
 
 === Example: Contract Violation
 
-[source,vql]
+[source,vcl]
 ----
 SELECT SEMANTIC FROM octad abc-123
   PROOF ACCESS(EthicsApprovalContract)
@@ -204,7 +204,7 @@ TypeError({
 
 === Example: Store Unavailable
 
-[source,vql]
+[source,vcl]
 ----
 SELECT GRAPH FROM store milvus-1 WHERE ...
 ----
@@ -360,7 +360,7 @@ Each modality has its own error types due to domain-specific constraints.
 
 === Example: Partial Results
 
-[source,vql]
+[source,vcl]
 ----
 SELECT GRAPH FROM FEDERATION /universities/* LIMIT 100
 ----
@@ -621,12 +621,12 @@ defmodule VeriSim.ErrorLogger do
   def log_error(error, context) do
     entry = %{
       timestamp: DateTime.utc_now(),
-      error_code: VQLError.get_error_code(error),
-      error_message: VQLError.format(error),
+      error_code: VCLError.get_error_code(error),
+      error_message: VCLError.format(error),
       query_id: context.query_id,
       user_id: context.user_id,
       octad_ids: context.octad_ids,
-      recoverable: VQLError.is_recoverable?(error),
+      recoverable: VCLError.is_recoverable?(error),
       recovery_attempted: context.recovery_attempted,
       recovery_successful: context.recovery_successful
     }
@@ -638,7 +638,7 @@ end
 
 **Audit queries:**
 
-[source,vql]
+[source,vcl]
 ----
 -- Find all errors for a user
 SELECT TEMPORAL FROM audit_log
@@ -655,7 +655,7 @@ WHERE event_type = 'error'
 -- Find stores with high error rates
 SELECT TEMPORAL FROM audit_log
 WHERE event_type = 'error'
-  AND error_code LIKE 'VQL_STORE_%'
+  AND error_code LIKE 'VCL_STORE_%'
 GROUP BY store_id
 ORDER BY COUNT(*) DESC
 ----
@@ -668,7 +668,7 @@ ORDER BY COUNT(*) DESC
 ----
 {
   "error": {
-    "code": "VQL_PARSE_ERROR",
+    "code": "VCL_PARSE_ERROR",
     "message": "Parse Error at 1:14-1:20: Expected 'VECTOR', found 'VECTRO'",
     "hint": "Did you mean 'VECTOR'?",
     "recoverable": false,
@@ -710,7 +710,7 @@ ORDER BY COUNT(*) DESC
 ----
 type queryResult<'a> =
   | Ok('a)
-  | Error(vqlError)
+  | Error(vclError)
   | Partial({data: 'a, failed: array<string>})
 ----
 
@@ -772,7 +772,7 @@ Logger.error("Query execution failed",
 
 [source,elixir]
 ----
-case VQLParser.parse(query_string) do
+case VCLParser.parse(query_string) do
   {:ok, ast} -> execute(ast)
   {:error, parse_error} ->
     # Don't retry parse errors
@@ -851,7 +851,7 @@ end
 
 == Verbosity Levels
 
-VQL supports **four verbosity levels** for error and diagnostic output:
+VCL supports **four verbosity levels** for error and diagnostic output:
 
 [cols="1,2,3"]
 |===
@@ -879,12 +879,12 @@ VQL supports **four verbosity levels** for error and diagnostic output:
 **Command-line:**
 [source,bash]
 ----
-verisim query --verbosity=verbose query.vql
-verisim query --verbosity=silent query.vql  # CI/CD mode
+verisim query --verbosity=verbose query.vcl
+verisim query --verbosity=silent query.vcl  # CI/CD mode
 ----
 
-**VQL pragma:**
-[source,vql]
+**VCL pragma:**
+[source,vcl]
 ----
 SET VERBOSITY VERBOSE;
 
@@ -898,7 +898,7 @@ LIMIT 10;
 [source,bash]
 ----
 export VERISIM_VERBOSITY=debug
-verisim query query.vql
+verisim query query.vcl
 ----
 
 === Verbosity Output Examples
@@ -965,7 +965,7 @@ Query returned 10 results in 234ms
 
 == Friendly Notices and Warnings
 
-Beyond errors, VQL provides **helpful notices** for non-error situations:
+Beyond errors, VCL provides **helpful notices** for non-error situations:
 
 === Notice Types
 
@@ -1002,7 +1002,7 @@ Query returned 10 results in 23ms
 
 ==== Deprecated Syntax (Warning)
 
-[source,vql]
+[source,vcl]
 ----
 VERSION 0.9;
 SELECT * FROM HEXAD abc-123;
@@ -1016,7 +1016,7 @@ SELECT * FROM HEXAD abc-123;
 
 ==== Missing LIMIT (Hint)
 
-[source,vql]
+[source,vcl]
 ----
 SELECT GRAPH, DOCUMENT
 FROM FEDERATION /universities/*
@@ -1042,19 +1042,19 @@ WHERE octad.types INCLUDES "Paper";
 **Suppress warnings:**
 [source,bash]
 ----
-verisim query --no-warnings query.vql
+verisim query --no-warnings query.vcl
 ----
 
 **Suppress hints:**
 [source,bash]
 ----
-verisim query --no-hints query.vql
+verisim query --no-hints query.vcl
 ----
 
 **Strict mode (warnings as errors):**
 [source,bash]
 ----
-verisim query --strict query.vql
+verisim query --strict query.vcl
 # Exit code 1 on any warning
 ----
 
@@ -1062,7 +1062,7 @@ verisim query --strict query.vql
 
 **Status:** STUB - Planned for v3.0
 
-VQL error handling will integrate with **miniKanren** (link:minikanren-integration-v3.adoc[see roadmap]) to:
+VCL error handling will integrate with **miniKanren** (link:minikanren-integration-v3.adoc[see roadmap]) to:
 
 1. **Learn error patterns** - Synthesize predicates from error examples
 2. **Suggest fixes** - Generate correction rules from observed errors
@@ -1203,7 +1203,7 @@ end
 # lib/verisim/query_parser.ex (v3 - suggest fixes)
 defmodule VeriSim.QueryParser do
   def parse(query_string) do
-    case VQLParser.parse(query_string) do
+    case VCLParser.parse(query_string) do
       {:ok, ast} -> {:ok, ast}
       {:error, parse_error} ->
         # v3: Ask miniKanren for fix suggestions
@@ -1252,8 +1252,8 @@ Parse Error at 1:8: Expected 'GRAPH', 'VECTOR', ..., found 'GRPH'
 
 == References
 
-- link:vql-architecture.adoc[VQL Architecture]
+- link:vcl-architecture.adoc[VCL Architecture]
 - link:caching-strategy.adoc[Caching Strategy]
 - link:reversibility-design.adoc[Reversibility Design]
-- link:../src/vql/VQLError.res[VQL Error Types]
+- link:../src/vcl/VCLError.res[VCL Error Types]
 - link:../lib/verisim/error_recovery.ex[Error Recovery Implementation]

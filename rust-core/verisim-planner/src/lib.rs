@@ -16,7 +16,7 @@ pub mod prepared;
 pub mod profiler;
 pub mod slow_query;
 pub mod stats;
-pub mod vql_bridge;
+pub mod vcl_bridge;
 
 use serde::{Deserialize, Serialize};
 use std::fmt;

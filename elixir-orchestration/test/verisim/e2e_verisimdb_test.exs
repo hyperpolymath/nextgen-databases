@@ -15,10 +15,10 @@
 # Test categories:
 #
 #   1. Lifecycle        — write data → read back → verify consistency.
-#   2. VQL              — store data → execute VQL query → validate results.
+#   2. VCL              — store data → execute VCL query → validate results.
 #   3. Schema           — create schema → insert conforming data →
 #                         reject non-conforming data.
-#   4. Error handling   — invalid VQL syntax → clear error, connection
+#   4. Error handling   — invalid VCL syntax → clear error, connection
 #                         failure → graceful degradation.
 
 defmodule VeriSimDB.E2ETest do
@@ -26,7 +26,7 @@ defmodule VeriSimDB.E2ETest do
   End-to-end tests for VeriSimDB.
 
   Exercises the complete stack: Elixir orchestration → Rust core
-  (when available) → VQL layer → schema registry → drift monitor.
+  (when available) → VCL layer → schema registry → drift monitor.
   """
 
   use ExUnit.Case, async: false
@@ -38,8 +38,8 @@ defmodule VeriSimDB.E2ETest do
     RustClient,
     QueryRouter
   }
-  alias VeriSim.Query.{VQLBridge, VQLExecutor}
-  alias VeriSim.Test.VQLTestHelpers, as: H
+  alias VeriSim.Query.{VCLBridge, VCLExecutor}
+  alias VeriSim.Test.VCLTestHelpers, as: H
 
   # Tag for tests that require the Rust core.
   @moduletag :e2e
@@ -47,7 +47,7 @@ defmodule VeriSimDB.E2ETest do
   setup_all do
     {:ok, _} = Application.ensure_all_started(:verisim)
 
-    # Ensure VQLBridge GenServer is running (it is not started by the
+    # Ensure VCLBridge GenServer is running (it is not started by the
     # application supervisor in test mode since it depends on Deno, which
     # may not be available; H.ensure_bridge_started/0 starts it safely).
     _bridge_pid = H.ensure_bridge_started()
@@ -142,29 +142,29 @@ defmodule VeriSimDB.E2ETest do
   end
 
   # ===========================================================================
-  # 2. VQL: store data → execute VQL query → validate results
+  # 2. VCL: store data → execute VCL query → validate results
   # ===========================================================================
 
-  describe "VQL: end-to-end query execution" do
-    test "VQL parse → execute produces structured result for valid query", _ctx do
-      query = "SELECT DOCUMENT.* FROM HEXAD 'e2e-vql-001' LIMIT 5"
+  describe "VCL: end-to-end query execution" do
+    test "VCL parse → execute produces structured result for valid query", _ctx do
+      query = "SELECT DOCUMENT.* FROM HEXAD 'e2e-vcl-001' LIMIT 5"
 
       # Parse the query.
-      {:ok, ast} = VQLBridge.parse(query)
+      {:ok, ast} = VCLBridge.parse(query)
       assert is_map(ast)
       assert :document in (ast[:modalities] || [])
 
       # Execute through the full pipeline.
-      result = VQLExecutor.execute(ast)
+      result = VCLExecutor.execute(ast)
 
       # Must be structured — either results or a clean error.
       assert match?({:ok, _}, result) or match?({:error, _}, result),
-             "VQL execute returned non-structured result: #{inspect(result)}"
+             "VCL execute returned non-structured result: #{inspect(result)}"
     end
 
-    test "VQL multi-modal query selects correct modalities", _ctx do
+    test "VCL multi-modal query selects correct modalities", _ctx do
       query = "SELECT GRAPH.*, VECTOR.* FROM HEXAD 'e2e-multimodal-001' LIMIT 3"
-      {:ok, ast} = VQLBridge.parse(query)
+      {:ok, ast} = VCLBridge.parse(query)
 
       assert :graph in (ast[:modalities] || [])
       assert :vector in (ast[:modalities] || [])
@@ -172,28 +172,28 @@ defmodule VeriSimDB.E2ETest do
              "SELECT GRAPH, VECTOR should not include :document"
     end
 
-    test "VQL INSERT → read-back round-trip (when Rust available)", %{rust_available: rust_available} do
+    test "VCL INSERT → read-back round-trip (when Rust available)", %{rust_available: rust_available} do
       if not rust_available do
         # Execute the mutation path, verify graceful error.
-        mutation_query = "INSERT HEXAD WITH DOCUMENT(title = 'E2E Insert Test', body = 'VQL insert round-trip')"
+        mutation_query = "INSERT HEXAD WITH DOCUMENT(title = 'E2E Insert Test', body = 'VCL insert round-trip')"
 
-        result = VQLBridge.parse_statement(mutation_query)
+        result = VCLBridge.parse_statement(mutation_query)
         case result do
           {:ok, ast} ->
-            exec_result = VQLExecutor.execute_statement(ast)
+            exec_result = VCLExecutor.execute_statement(ast)
             assert match?({:ok, _}, exec_result) or match?({:error, _}, exec_result)
 
           {:error, _} ->
-            # Parse failure accepted — Deno VQL parser may not be running.
+            # Parse failure accepted — Deno VCL parser may not be running.
             assert true
         end
       else
         # Full round-trip with Rust.
-        mutation_query = "INSERT HEXAD WITH DOCUMENT(title = 'E2E Insert Test', body = 'VQL insert round-trip')"
+        mutation_query = "INSERT HEXAD WITH DOCUMENT(title = 'E2E Insert Test', body = 'VCL insert round-trip')"
 
-        case VQLBridge.parse_statement(mutation_query) do
+        case VCLBridge.parse_statement(mutation_query) do
           {:ok, ast} ->
-            case VQLExecutor.execute_statement(ast) do
+            case VCLExecutor.execute_statement(ast) do
               {:ok, %{"id" => entity_id}} ->
                 # Read the entity back via RustClient.
                 {:ok, octad} = RustClient.get_octad(entity_id)
@@ -214,7 +214,7 @@ defmodule VeriSimDB.E2ETest do
       end
     end
 
-    test "VQL EXPLAIN returns plan with required fields", _ctx do
+    test "VCL EXPLAIN returns plan with required fields", _ctx do
       ast = %{
         modalities: [:document, :vector],
         source: {:octad, "e2e-explain-001"},
@@ -224,7 +224,7 @@ defmodule VeriSimDB.E2ETest do
         offset: 0
       }
 
-      {:ok, plan} = VQLExecutor.execute(ast, explain: true)
+      {:ok, plan} = VCLExecutor.execute(ast, explain: true)
 
       assert is_map(plan)
       assert Map.has_key?(plan, :strategy),
@@ -234,17 +234,17 @@ defmodule VeriSimDB.E2ETest do
       assert is_list(plan[:steps])
     end
 
-    test "VQL error path: invalid syntax returns structured error", _ctx do
-      query = "COMPLETELY INVALID VQL $$$ @@@"
+    test "VCL error path: invalid syntax returns structured error", _ctx do
+      query = "COMPLETELY INVALID VCL $$$ @@@"
 
-      result = VQLBridge.parse(query)
+      result = VCLBridge.parse(query)
 
       # Must be {:error, reason}, not a raise.
       assert match?({:error, _}, result),
-             "Expected parse error for invalid VQL, got: #{inspect(result)}"
+             "Expected parse error for invalid VCL, got: #{inspect(result)}"
     end
 
-    test "VQL error path: nonexistent store returns clean error", _ctx do
+    test "VCL error path: nonexistent store returns clean error", _ctx do
       ast = %{
         modalities: [:document],
         source: {:store, "definitely-not-a-store-#{System.unique_integer([:positive])}"},
@@ -254,7 +254,7 @@ defmodule VeriSimDB.E2ETest do
         offset: 0
       }
 
-      result = VQLExecutor.execute(ast)
+      result = VCLExecutor.execute(ast)
 
       # Must be {:ok, []} (empty) or {:error, _} — never crash.
       assert match?({:ok, _}, result) or match?({:error, _}, result)
@@ -386,7 +386,7 @@ defmodule VeriSimDB.E2ETest do
       assert is_map(status)
     end
 
-    test "VQL executor handles nil AST fields without crash" do
+    test "VCL executor handles nil AST fields without crash" do
       # AST with minimal fields — should fail gracefully, not crash.
       # We wrap in try/rescue because the executor may raise a FunctionClauseError
       # when source is nil (depending on the implementation). The critical
@@ -395,7 +395,7 @@ defmodule VeriSimDB.E2ETest do
 
       result =
         try do
-          VQLExecutor.execute(minimal_ast)
+          VCLExecutor.execute(minimal_ast)
         rescue
           e -> {:error, {:executor_raised, inspect(e)}}
         catch

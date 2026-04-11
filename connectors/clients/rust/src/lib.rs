@@ -5,7 +5,7 @@
 //!
 //! A Rust client library for interacting with VeriSimDB — a multi-modal database
 //! supporting octad entity management, drift detection, provenance tracking,
-//! VQL query execution, and federation across distributed instances.
+//! VCL query execution, and federation across distributed instances.
 //!
 //! ## Quick Start
 //!
@@ -30,7 +30,7 @@
 //! - [`search`] — Text, vector, graph-relational, and spatial search operations.
 //! - [`drift`] — Drift score retrieval and normalization triggers.
 //! - [`provenance`] — Immutable provenance chain management.
-//! - [`vql`] — VeriSim Query Language execution and explain plans.
+//! - [`vcl`] — VeriSim Query Language execution and explain plans.
 //! - [`federation`] — Peer registration and federated cross-instance queries.
 //! - [`error`] — Error types and the crate-level `Result` alias.
 
@@ -41,6 +41,6 @@ pub mod octad;
 pub mod search;
 pub mod drift;
 pub mod provenance;
-pub mod vql;
+pub mod vcl;
 pub mod federation;
 pub mod error;

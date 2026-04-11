@@ -4,7 +4,7 @@
   "created_at": "2026-02-13T16:19:59Z",
   "document": {
     "title": "Cross-Modal Drift/Consistency Were Stubs",
-    "body": "\\n**Location:** `elixir-orchestration/lib/verisim/query/vql_executor.ex`\\n\\n**Resolved:** 2026-02-13. `compute_modality_drift/3` now fetches drift from the Rust drift API when available, falling back to cosine distance between extracted modality embeddings (with content fingerprinting for non-vector modalities). `compute_consistency/4` now computes real scores using the specified metric (COSINE, EUCLIDEAN, DOT_PRODUCT, JACCARD). Both functions previously returned hardcoded constants (0.0 and 0.5).\\n\\n**Original issue:** Cross-modal correlation queries parsed correctly but evaluation returned fake scores, making WHERE DRIFT(...) and CONSISTENT(...) conditions meaningless.\\n\\n",
+    "body": "\\n**Location:** `elixir-orchestration/lib/verisim/query/vcl_executor.ex`\\n\\n**Resolved:** 2026-02-13. `compute_modality_drift/3` now fetches drift from the Rust drift API when available, falling back to cosine distance between extracted modality embeddings (with content fingerprinting for non-vector modalities). `compute_consistency/4` now computes real scores using the specified metric (COSINE, EUCLIDEAN, DOT_PRODUCT, JACCARD). Both functions previously returned hardcoded constants (0.0 and 0.5).\\n\\n**Original issue:** Cross-modal correlation queries parsed correctly but evaluation returned fake scores, making WHERE DRIFT(...) and CONSISTENT(...) conditions meaningless.\\n\\n",
     "fields": {
       "type": "known_issue",
       "status": "resolved",

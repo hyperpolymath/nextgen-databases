@@ -53,7 +53,7 @@ The gateway proxies to:
 | GET | `/api/v1/octads` | List octad entities
 | GET | `/api/v1/octads/:id` | Get single octad
 | POST | `/api/v1/octads` | Create octad
-| POST | `/api/v1/vql/execute` | Execute VQL query
+| POST | `/api/v1/vcl/execute` | Execute VCL query
 | GET | `/api/v1/drift/entity/:id` | Get drift metrics
 | GET | `/api/v1/telemetry` | Product telemetry (from Elixir)
 | GET | `/api/v1/status` | Orchestration status
@@ -73,7 +73,7 @@ type Query {
 
 type Mutation {
   createOctad(input: OctadInput!): Octad
-  executeVql(query: String!): VqlResult
+  executeVcl(query: String!): VclResult
 }
 ----
 
@@ -87,7 +87,7 @@ gRPC endpoint directly.
 Defined in `proto/verisimdb.proto`. Services:
 
 * `VeriSimService.Health` — health check
-* `VeriSimService.Query` — execute VQL
+* `VeriSimService.Query` — execute VCL
 * `VeriSimService.GetOctad` — fetch octad
 * `VeriSimService.GetDrift` — drift metrics
 
@@ -98,7 +98,7 @@ Defined in `proto/verisimdb.proto`. Services:
 # Health check
 grpcurl -plaintext localhost:50051 verisimdb.VeriSimService/Health
 
-# Execute a VQL query
+# Execute a VCL query
 grpcurl -plaintext -d '{"query": "SELECT * FROM octads LIMIT 10"}' \
   localhost:50051 verisimdb.VeriSimService/Query
 

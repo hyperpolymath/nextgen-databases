@@ -14,7 +14,7 @@ pub mod grpc;
 pub mod proof_attempts;
 pub mod rbac;
 pub mod transaction;
-pub mod vql;
+pub mod vcl;
 
 use axum::{
     extract::{Path, Query, State},
@@ -670,8 +670,8 @@ pub fn build_router(state: AppState) -> Router {
         .route("/spatial/search/radius", post(spatial_radius_search_handler))
         .route("/spatial/search/bounds", post(spatial_bounds_search_handler))
         .route("/spatial/search/nearest", post(spatial_nearest_handler))
-        // VQL text query endpoint (used by verisim-repl)
-        .route("/vql/execute", post(vql::vql_execute_handler))
+        // VCL text query endpoint (used by verisim-repl)
+        .route("/vcl/execute", post(vcl::vcl_execute_handler))
         // Proof-attempts pipeline (ClickHouse-backed, versioned under /api/v1/)
         .route(
             "/api/v1/proof_attempts",
@@ -1191,7 +1191,7 @@ async fn planner_stats_handler(
 /// Store query request body
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StoreQueryRequest {
-    /// The VQL query text
+    /// The VCL query text
     pub query: String,
     /// Optional embedding for the query
     pub embedding: Option<Vec<f32>>,
@@ -1201,7 +1201,7 @@ pub struct StoreQueryRequest {
     pub proof_obligations: Option<Vec<String>>,
 }
 
-/// Store a VQL query as a octad (homoiconicity)
+/// Store a VCL query as a octad (homoiconicity)
 #[instrument(skip(state, request))]
 async fn store_query_handler(
     State(state): State<AppState>,
@@ -1263,13 +1263,13 @@ async fn similar_queries_handler(
         .await
         .map_err(|e| ApiError::Internal(e.to_string()))?;
 
-    // Filter to only query octads (those with "vql_query" type in document fields)
+    // Filter to only query octads (those with "vcl_query" type in document fields)
     let results: Vec<SearchResultResponse> = octads
         .iter()
         .filter(|h| {
             h.document
                 .as_ref()
-                .map(|d| d.title.starts_with("VQL Query:"))
+                .map(|d| d.title.starts_with("VCL Query:"))
                 .unwrap_or(false)
         })
         .enumerate()
@@ -1402,7 +1402,7 @@ async fn query_explain_analyze_handler(
 /// Request to create a prepared statement
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PreparedCreateRequest {
-    /// The VQL query text
+    /// The VCL query text
     pub query: String,
     /// The logical plan for the query
     pub plan: LogicalPlan,

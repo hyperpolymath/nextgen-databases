@@ -81,13 +81,13 @@ automatically.  This is genuinely novel.
 |===
 | Problem | Severity | Detail
 
-| **VQL is incomplete**
+| **VCL is incomplete**
 | HIGH
-| VQL parses and executes basic queries, but the language is not fully specified
+| VCL parses and executes basic queries, but the language is not fully specified
   and lacks documentation.  Without a usable query language, VerisimDB is an HTTP
   CRUD API with caching.  _This is the single biggest gap._
 
-| **VQL-DT not wired**
+| **VCL-DT not wired**
 | MEDIUM
 | Lean type definitions exist but the checker is not invoked at runtime.  PROOF
   clauses are syntactically supported but proof certificates are not formally
@@ -175,7 +175,7 @@ automatically.  This is genuinely novel.
 
 | **Query language**
 | SPARQL + SQL (both mature, standardised)
-| VQL (custom, incomplete)
+| VCL (custom, incomplete)
 
 | **Linked Data / LOD**
 | First-class citizen -- LOD cloud backbone
@@ -199,7 +199,7 @@ automatically.  This is genuinely novel.
 
 | **Documentation**
 | Extensive (if sometimes dated)
-| Sparse (VQL docs incomplete)
+| Sparse (VCL docs incomplete)
 
 | **Operational complexity**
 | Moderate-high (multi-port, config-heavy)
@@ -274,7 +274,7 @@ heterogeneous databases — ArangoDB, Postgres, Elasticsearch, Neo4j — with
 VerisimDB as the coordination layer.  The IDApTIK database bridge (ArangoDB +
 VerisimDB) is the first working example of this pattern.
 
-=== Layer 3: VQL-DT — Formally Verified Queries (Technical Moat)
+=== Layer 3: VCL-DT — Formally Verified Queries (Technical Moat)
 
 The deepest technical capability.  Small audience (formal methods, regulated
 industries, safety-critical systems) but impossible to replicate quickly.
@@ -283,11 +283,11 @@ _"VerisimDB returns your query results with a machine-verifiable proof
 certificate.  The Lean type checker proves the result satisfies your
 constraints."_
 
-No database in existence does this.  VQL-DT is the reason a competitor
+No database in existence does this.  VCL-DT is the reason a competitor
 cannot clone VerisimDB in a weekend after seeing the drift detection demo.
 It takes years of type theory knowledge to even attempt it.
 
-**Who cares about VQL-DT:**
+**Who cares about VCL-DT:**
 
 - Regulated industries (finance, medical devices, aerospace) where you must
   _prove_ a query result is correct, not just assert it
@@ -296,8 +296,8 @@ It takes years of type theory knowledge to even attempt it.
 - Safety-critical systems (Ada/SPARK territory)
 - Academic formal methods community
 
-**VQL-DT is not the lead pitch.** It is the moat.  Drift detection gets
-people in the door.  Federation keeps them.  VQL-DT ensures nobody can
+**VCL-DT is not the lead pitch.** It is the moat.  Drift detection gets
+people in the door.  Federation keeps them.  VCL-DT ensures nobody can
 compete.
 
 == Competitor Analysis: Data Quality / Observability Space
@@ -483,11 +483,11 @@ The provenance modality is structurally simpler than graph or vector:
   `WHERE provenance.chain CONTAINS 'spark-etl-step-3'`
 - Drift integration: when drift is detected, provenance can pinpoint
   _which transformation step_ introduced the inconsistency
-- VQL extension: `PROVENANCE` clause alongside existing `PROOF` clause
+- VCL extension: `PROVENANCE` clause alongside existing `PROOF` clause
 
 ==== Priority
 
-**CRITICAL.**  Implement after VQL (Priority 1) and the drift demo
+**CRITICAL.**  Implement after VCL (Priority 1) and the drift demo
 (Priority 2), but before or alongside heterogeneous federation (Priority 5).
 Provenance and federation are mutually reinforcing — federation without
 provenance tells you data disagrees; federation _with_ provenance tells you
@@ -506,7 +506,7 @@ fleet management system has this.
 - **Spatial index** — R-tree for efficient proximity and containment queries
 - **CRS metadata** — coordinate reference system (WGS84, UTM, etc.)
 
-==== Spatial Queries in VQL
+==== Spatial Queries in VCL
 
 - `WHERE spatial.within(polygon)` — containment
 - `WHERE spatial.distance(point) < 5000` — proximity (metres)
@@ -528,16 +528,16 @@ compounds with drift detection and federation; spatial is additive.
 Ordered by impact.  Each item is self-contained and can be picked up in any
 future session.
 
-=== Priority 1: Finish VQL (HIGH)
+=== Priority 1: Finish VCL (HIGH)
 
 **Why:** A database without a usable query language is a key-value store with
 extra steps.  This is the single highest-impact improvement.
 
-**Scope:** Not VQL-DT.  Just VQL.  The query language that end users type.
+**Scope:** Not VCL-DT.  Just VCL.  The query language that end users type.
 
 **What "finished" means:**
 
-1. **Language specification** -- a document (adoc or djot) that defines VQL
+1. **Language specification** -- a document (adoc or djot) that defines VCL
    syntax and semantics exhaustively.  Every valid query form documented with
    examples.  Every error case specified.
 
@@ -562,7 +562,7 @@ extra steps.  This is the single highest-impact improvement.
 
 **Deliverables:**
 
-- `docs/VQL-SPEC.adoc` -- language specification
+- `docs/VCL-SPEC.adoc` -- language specification
 - Updated parser/executor to cover all specified forms
 - 20+ integration tests proving the spec is implemented
 
@@ -604,7 +604,7 @@ find assumptions you did not know you made.
 - Find one other project -- academic, open-source, or a friend's -- that has
   multi-representation data and would benefit from drift detection
 - The demo from Priority 2 is the sales pitch
-- Do not wait for VQL to be perfect; the REST API is sufficient for a first
+- Do not wait for VCL to be perfect; the REST API is sufficient for a first
   user
 
 === Priority 4: Positioning and Documentation (MEDIUM)
@@ -672,18 +672,18 @@ peers via HTTP adapters.
 
 The `GraphStore` trait abstraction already exists, so this is a backend swap.
 
-=== Priority 7: Wire VQL-DT (HIGH — but after VQL)
+=== Priority 7: Wire VCL-DT (HIGH — but after VCL)
 
-**Why:** VQL-DT is the technical moat — the reason nobody can clone VerisimDB
+**Why:** VCL-DT is the technical moat — the reason nobody can clone VerisimDB
 quickly.  Formally verified query results via Lean type checking is genuinely
-unique in the database world.  But VQL must work reliably first (Priority 1).
+unique in the database world.  But VCL must work reliably first (Priority 1).
 No point verifying proofs in a query language that cannot execute reliably.
 
 **Why it matters more than it might seem:**
 
-VQL-DT is not a nice-to-have.  It is the capability that separates VerisimDB
+VCL-DT is not a nice-to-have.  It is the capability that separates VerisimDB
 from every other database and every data quality tool.  Great Expectations can
-assert "this column has no nulls."  VerisimDB with VQL-DT can return a
+assert "this column has no nulls."  VerisimDB with VCL-DT can return a
 _machine-verifiable proof certificate_ that the query result satisfies
 dependent type constraints.  This is the kind of guarantee required in:
 
@@ -696,10 +696,10 @@ No other database can do this.  Not Virtuoso, not ArangoDB, not Postgres.
 The Lean type definitions already exist.  The proof obligation generation is
 designed.  The gap is wiring the Lean checker into the execution path.
 
-**Defer until:** VQL spec is complete and integration-tested (Priority 1).
+**Defer until:** VCL spec is complete and integration-tested (Priority 1).
 Then this becomes the highest priority.
 
-**See:** KNOWN-ISSUES #21, `docs/vql-vs-vql-dt.adoc` for the phased roadmap.
+**See:** KNOWN-ISSUES #21, `docs/vcl-vs-vcl-dt.adoc` for the phased roadmap.
 
 == What NOT to Do
 
@@ -734,17 +734,17 @@ and zero external validation.
 
 The path forward (priority order):
 
-1. **Finish VQL** so the database is _queryable_
+1. **Finish VCL** so the database is _queryable_
 2. **Drift detection demo** so the differentiator is _undeniable_
 3. **Provenance / lineage modality** so cross-system data origins are _traceable_ (CRITICAL)
 4. **One external user** so the assumptions are _tested_
 5. **Heterogeneous federation** so enterprise adoption is _practical_
 6. **Reposition** around drift detection so the value proposition is _clear_
-7. **Wire VQL-DT** so the technical moat is _operational_ (after VQL is solid)
+7. **Wire VCL-DT** so the technical moat is _operational_ (after VCL is solid)
 
 The layered pitch:
 
 - **Drift detection** gets people in the door (broad audience, easy to explain)
 - **Federation** keeps them (watches existing databases, no migration)
 - **Provenance** makes them depend on it (audit trail, GDPR, compliance)
-- **VQL-DT** ensures nobody can compete (years of type theory to replicate)
+- **VCL-DT** ensures nobody can compete (years of type theory to replicate)

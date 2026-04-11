@@ -172,17 +172,17 @@ vdbConfigLayout = MkStructLayout "VDBConfig"
 -- QueryRequest Layout (32 bytes, 8-byte aligned)
 --------------------------------------------------------------------------------
 
-||| QueryRequest: VQL query submitted across FFI
-|||   vql_ptr     : Bits64 (8 bytes at offset 0, pointer to UTF-8 VQL string)
-|||   vql_len     : Bits64 (8 bytes at offset 8)
+||| QueryRequest: VCL query submitted across FFI
+|||   vcl_ptr     : Bits64 (8 bytes at offset 0, pointer to UTF-8 VCL string)
+|||   vcl_len     : Bits64 (8 bytes at offset 8)
 |||   timeout_ms  : Bits32 (4 bytes at offset 16)
 |||   proof_type  : Bits32 (4 bytes at offset 20, 0xFF = no proof requested)
 |||   txn_handle  : Bits64 (8 bytes at offset 24, 0 = auto-commit)
 public export
 queryRequestLayout : StructLayout
 queryRequestLayout = MkStructLayout "QueryRequest"
-  [ MkField "vql_ptr"    0  8 8
-  , MkField "vql_len"    8  8 8
+  [ MkField "vcl_ptr"    0  8 8
+  , MkField "vcl_len"    8  8 8
   , MkField "timeout_ms" 16 4 4
   , MkField "proof_type" 20 4 4
   , MkField "txn_handle" 24 8 8

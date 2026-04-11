@@ -7,7 +7,7 @@
 ## Overview
 
 Adding a cost-based query planner (`verisim-planner`) to VeriSimDB's Rust core, plus
-triple API (REST + GraphQL + gRPC) and VQL integration.
+triple API (REST + GraphQL + gRPC) and VCL integration.
 
 ---
 
@@ -142,9 +142,9 @@ service VeriSimOctad {
 
 ---
 
-## Phase 3: VQL AST → LogicalPlan Bridge — NOT STARTED
+## Phase 3: VCL AST → LogicalPlan Bridge — NOT STARTED
 
-**Plan:** Add `rust-core/verisim-planner/src/vql_bridge.rs` that deserializes the ReScript VQL AST JSON format into the planner's `LogicalPlan`.
+**Plan:** Add `rust-core/verisim-planner/src/vcl_bridge.rs` that deserializes the ReScript VCL AST JSON format into the planner's `LogicalPlan`.
 
 **Key mappings:**
 - `AST.modality` → `Modality` (direct, except `All` → expand to 6)
@@ -153,7 +153,7 @@ service VeriSimOctad {
 - `AST.query.limit` → `PlanNode.early_limit`
 - `AST.query.proof` → proof obligation nodes (Phase 4)
 
-**New endpoint:** `POST /query/vql` — accepts VQL AST JSON, returns PhysicalPlan.
+**New endpoint:** `POST /query/vcl` — accepts VCL AST JSON, returns PhysicalPlan.
 
 **Feasibility:** YES — both sides use JSON serde. ~150-200 lines.
 
@@ -167,7 +167,7 @@ service VeriSimOctad {
 - Modify `explain.rs` — include proof section in EXPLAIN output
 - Modify `plan.rs` — add proof obligations to PhysicalPlan
 
-**Cost values (from VQLProofObligation.res):**
+**Cost values (from VCLProofObligation.res):**
 | Proof Type | Estimated Cost |
 |-----------|---------------|
 | Existence | 50ms |
@@ -210,7 +210,7 @@ service VeriSimOctad {
 ```
 Phase 1 (DONE) ─┬─► Phase 2b (GraphQL)
                  ├─► Phase 2c (gRPC)
-                 ├─► Phase 3 (VQL Bridge) ──► Phase 4 (Proof Costing)
+                 ├─► Phase 3 (VCL Bridge) ──► Phase 4 (Proof Costing)
                  ├─► Phase 5 (Statistics)
                  └─► Phase 6 (Cross-Modal)
 ```
@@ -226,7 +226,7 @@ All phases are independent except Phase 4 depends on Phase 3 (bridge must exist 
 | 1. Planner crate | YES — DONE | Done | None |
 | 2b. GraphQL | YES | ~300 lines | Low — async-graphql is mature |
 | 2c. gRPC | YES | ~400 lines + proto | Low — tonic is mature |
-| 3. VQL Bridge | YES | ~200 lines | Low — JSON↔JSON mapping |
+| 3. VCL Bridge | YES | ~200 lines | Low — JSON↔JSON mapping |
 | 4. Proof Costing | YES | ~200 lines | Low — pure arithmetic |
 | 5. Stats Feedback | YES | ~150 lines | Low — extending existing code |
 | 6. Cross-Modal | YES | ~100 lines | Low — extending existing enums |

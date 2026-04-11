@@ -12,7 +12,7 @@ detected and self-healed.
 - **Rust core** (`rust-core/`): 10 crates for modality stores + API server
 - **Elixir/OTP** (`elixir-orchestration/`): GenServer per entity, drift
   monitoring, query routing, schema registry
-- **VQL**: Custom query language (not SQL)
+- **VCL**: Custom query language (not SQL)
 - **Federation**: 10 adapters (MongoDB, Redis, Neo4j, ClickHouse, SurrealDB,
   SQLite, DuckDB, VectorDB, InfluxDB, ObjectStorage)
 - **ABI/FFI**: Idris2 formal spec + Zig C-ABI bridge
@@ -65,5 +65,5 @@ dedicated port with its own data volume.
 | `connectors/clients/` | 6 SDKs (Rust, V, Elixir, ReScript, Julia, Gleam) |
 | `connectors/test-infra/` | 7-database integration test stack |
 | `container/` | Containerfile + compose |
-| `playground/` | VQL playground (ReScript) |
+| `playground/` | VCL playground (ReScript) |
 | `.claude/CLAUDE.md` | Full AI context |

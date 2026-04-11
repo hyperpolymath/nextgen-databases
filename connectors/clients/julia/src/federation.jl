@@ -25,7 +25,7 @@ JSON3.StructTypes.StructType(::Type{PeerRegistration}) = JSON3.StructTypes.Struc
 """
     FederatedQueryRequest
 
-Wraps a VQL query intended for federated execution across cluster peers.
+Wraps a VCL query intended for federated execution across cluster peers.
 """
 struct FederatedQueryRequest
     query::String
@@ -53,7 +53,7 @@ Result from a single peer in a federated query.
 struct PeerQueryResult
     peer_id::String
     peer_name::String
-    result::VqlResult
+    result::VclResult
     elapsed_ms::Float64
     error::Union{String,Nothing}
 end
@@ -109,7 +109,7 @@ end
 """
     federated_query(client, input) -> FederatedQueryResult
 
-Execute a VQL query across one or more federation peers.
+Execute a VCL query across one or more federation peers.
 
 If `peer_ids` is empty, the query is broadcast to all active peers. Results
 are aggregated with per-peer timing and error information.

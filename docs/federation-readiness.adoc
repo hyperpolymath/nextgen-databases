@@ -12,9 +12,9 @@ Federation is the ability for multiple VeriSimDB instances to coordinate queries
 
 Federation in VeriSimDB is distinct from database replication. Replicated databases maintain identical copies of the same data. Federated VeriSimDB instances hold _different_ octad entities that may reference each other through graph edges, share semantic vocabularies, or have vector embeddings in the same latent space. The federation layer coordinates cross-instance queries while each instance retains sovereignty over its own data.
 
-The VQL query language supports federation natively:
+The VCL query language supports federation natively:
 
-[source,vql]
+[source,vcl]
 ----
 SELECT GRAPH, SEMANTIC
 FROM FEDERATION cross_org_research
@@ -36,25 +36,25 @@ The `verisim-api` Rust crate includes API endpoints for federation peer manageme
 
 These routes accept and return JSON. Peer metadata includes the instance URL, supported modalities, version, and last-seen timestamp. Peer registration works and persists across restarts.
 
-=== VQL Parser Accepts FEDERATION Queries
+=== VCL Parser Accepts FEDERATION Queries
 
-The VQL parser (ReScript) correctly parses `FROM FEDERATION <name>` clauses and `DRIFT POLICY <name>` directives. These produce valid AST nodes that flow through the query router. The parser also handles federation-scoped `WHERE` clauses and multi-modality `SELECT` statements against federation targets.
+The VCL parser (ReScript) correctly parses `FROM FEDERATION <name>` clauses and `DRIFT POLICY <name>` directives. These produce valid AST nodes that flow through the query router. The parser also handles federation-scoped `WHERE` clauses and multi-modality `SELECT` statements against federation targets.
 
 === Hypatia FileExecutor Handles FEDERATION Queries
 
 Hypatia's `FileExecutor` module can execute `FEDERATION` queries against local flat files (the verisimdb-data git-backed store). It performs cross-store matching by loading scan results from multiple repositories and correlating them by entity identifiers. This is a file-based simulation of federation, not true distributed query execution, but it validates the query structure and result format.
 
-== What VeriSimDB Loses Without VQL
+== What VeriSimDB Loses Without VCL
 
-If VQL were removed or not used, VeriSimDB would lose the following federation-critical capabilities:
+If VCL were removed or not used, VeriSimDB would lose the following federation-critical capabilities:
 
-* **No structured query language for multi-store coordination.** Without VQL, federated queries would require hand-written API calls to each peer, manual result merging, and no unified query plan. VQL provides a single declarative interface that the federation layer decomposes into per-peer sub-queries.
+* **No structured query language for multi-store coordination.** Without VCL, federated queries would require hand-written API calls to each peer, manual result merging, and no unified query plan. VCL provides a single declarative interface that the federation layer decomposes into per-peer sub-queries.
 
-* **No drift policy enforcement on federated queries.** Drift policies (`DRIFT POLICY strict_consistency`, `DRIFT POLICY eventual`, etc.) are expressed in VQL and enforced by the query router. Without VQL, there is no standard mechanism to declare or enforce consistency requirements across federated peers.
+* **No drift policy enforcement on federated queries.** Drift policies (`DRIFT POLICY strict_consistency`, `DRIFT POLICY eventual`, etc.) are expressed in VCL and enforced by the query router. Without VCL, there is no standard mechanism to declare or enforce consistency requirements across federated peers.
 
-* **No cross-modal consistency checks across instances.** VQL's `PROOF CONSISTENCY` clause can request verification that graph, vector, and semantic modalities agree across federation peers. Without VQL-DT, there is no way to express or verify cross-instance consistency at query time.
+* **No cross-modal consistency checks across instances.** VCL's `PROOF CONSISTENCY` clause can request verification that graph, vector, and semantic modalities agree across federation peers. Without VCL-DT, there is no way to express or verify cross-instance consistency at query time.
 
-* **No unified result format.** VQL queries return results in a consistent format regardless of whether the data came from one instance or twenty. Without VQL, each peer's API response format would need to be handled individually.
+* **No unified result format.** VCL queries return results in a consistent format regardless of whether the data came from one instance or twenty. Without VCL, each peer's API response format would need to be handled individually.
 
 == Current Gaps
 
@@ -95,7 +95,7 @@ Drift detection works: the `verisim-drift` crate computes drift scores across mo
 |Ready
 |Endpoints work, persistence confirmed. Peer metadata stored and retrievable.
 
-|**VQL Parser (FEDERATION syntax)**
+|**VCL Parser (FEDERATION syntax)**
 |Ready
 |Parses `FROM FEDERATION`, `DRIFT POLICY`, and federation-scoped queries correctly. Produces valid AST.
 
@@ -127,7 +127,7 @@ Drift detection works: the `verisim-drift` crate computes drift scores across mo
 |Missing
 |No mechanism to verify or enforce consistency across federation peers.
 
-|**VQL-DT PROOF over Federation**
+|**VCL-DT PROOF over Federation**
 |Missing
 |PROOF clauses parse but do not generate real proofs, even for local queries. Federation adds no additional proof capability.
 |===
@@ -157,9 +157,9 @@ Drift detection works: the `verisim-drift` crate computes drift scores across mo
 
 === Phase 3: Verified Federation
 
-**Goal:** VQL-DT proofs work across federation boundaries.
+**Goal:** VCL-DT proofs work across federation boundaries.
 
-* Wire Lean type checker into the VQL-DT execution path (prerequisite: VQL-DT Phase 3 from link:vql-vs-vql-dt.adoc[VQL Slipstream vs VQL-DT]).
+* Wire Lean type checker into the VCL-DT execution path (prerequisite: VCL-DT Phase 3 from link:vcl-vs-vcl-dt.adoc[VCL Slipstream vs VCL-DT]).
 * Implement proof witness collection across peers: each peer contributes its portion of the proof.
 * Implement Raft consensus for coordinated writes (cross-instance referential integrity).
 * Implement `PROOF CONSISTENCY` verification across federation peers (cross-instance modal agreement).

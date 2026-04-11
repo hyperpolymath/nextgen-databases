@@ -52,7 +52,7 @@ VeriSimDB must support **two fundamentally different query execution models**:
 
 **Example query that exposes the challenge**:
 
-```vql
+```vcl
 -- Dependent-type query: Prove that ALL results satisfy predicate
 SELECT GRAPH, DOCUMENT
 FROM verisim:semantic
@@ -159,8 +159,8 @@ and expr =
 {x : Int | x > 0}
 ```
 
-In VQL:
-```vql
+In VCL:
+```vcl
 VERIFIED(citation_count > 0)  -- Type: {n : Int | n > 0}
 ```
 
@@ -170,8 +170,8 @@ VERIFIED(citation_count > 0)  -- Type: {n : Int | n > 0}
 {xs : List[String] | length(xs) > 0}
 ```
 
-In VQL:
-```vql
+In VCL:
+```vcl
 VERIFIED(authors != [])  -- Type: {as : List[String] | length(as) > 0}
 ```
 
@@ -182,8 +182,8 @@ VERIFIED(authors != [])  -- Type: {as : List[String] | length(as) > 0}
   Proof[∀ h ∈ r. h.document.peer_reviewed = true]
 ```
 
-In VQL:
-```vql
+In VCL:
+```vcl
 PROOF EXISTENCE {
   ∀ r ∈ Result. r.document.peer_reviewed = true
 }
@@ -300,7 +300,7 @@ let rec check ctx expr expected_type =
 
 **Example**:
 
-```vql
+```vcl
 -- Query
 SELECT GRAPH
 FROM verisim:semantic
@@ -357,7 +357,7 @@ let implies (phi1 : expr) (phi2 : expr) : bool =
 
 === 3.1 Proof Contracts
 
-**Four types of proofs** in VQL:
+**Four types of proofs** in VCL:
 
 [cols="1,2,2",options="header"]
 |===
@@ -372,9 +372,9 @@ let implies (phi1 : expr) (phi2 : expr) : bool =
 |**INTEGRITY** |`∀ r ∈ Result. hash(r) = expected` |Prove data integrity (no tampering)
 |===
 
-**VQL examples**:
+**VCL examples**:
 
-```vql
+```vcl
 -- EXISTENCE proof: At least one peer-reviewed paper exists
 SELECT *
 FROM verisim:semantic
@@ -408,7 +408,7 @@ PROOF ACCESS {
 
 ```
 ┌─────────────────┐
-│ VQL Query       │
+│ VCL Query       │
 │ (with PROOF)    │
 └────────┬────────┘
          │
@@ -478,7 +478,7 @@ impl CircuitBuilder {
 
 **Example circuit**:
 
-```vql
+```vcl
 PROOF UNIVERSAL {
   ∀ r ∈ Result. r.document.peer_reviewed = true
 }
@@ -504,7 +504,7 @@ PROOF UNIVERSAL {
 use proven::{Circuit, Proof, ProvingKey, VerifyingKey};
 
 pub async fn generate_proof(
-    query: &VQLQuery,
+    query: &VCLQuery,
     result: &QueryResult,
     contract: &ProofContract,
 ) -> Result<Proof, ProofError> {
@@ -628,7 +628,7 @@ pub fn verify_proof(
 
 **Attack 1: Malicious query (invalid proof claim)**
 
-```vql
+```vcl
 -- Attacker tries to prove false statement
 SELECT *
 FROM verisim:semantic
@@ -659,7 +659,7 @@ Attacker tries to construct fake proof without executing query.
 
 **Attack 3: Type confusion**
 
-```vql
+```vcl
 -- Attacker tries to confuse type checker
 SELECT GRAPH
 FROM verisim:semantic
@@ -710,7 +710,7 @@ if not (equal_type t1 TInt && equal_type t2 TInt) then
 // 1. Cache type-checking results
 static TYPE_CACHE: Lazy<Mutex<HashMap<QueryHash, DependentType>>> = ...;
 
-pub fn type_check_cached(query: &VQLQuery) -> Result<DependentType, TypeError> {
+pub fn type_check_cached(query: &VCLQuery) -> Result<DependentType, TypeError> {
     let hash = compute_hash(query);
 
     if let Some(ty) = TYPE_CACHE.lock().unwrap().get(&hash) {
@@ -724,8 +724,8 @@ pub fn type_check_cached(query: &VQLQuery) -> Result<DependentType, TypeError> {
 
 // 2. Incremental type checking (only check changed parts)
 pub fn type_check_incremental(
-    query: &VQLQuery,
-    prev_query: &VQLQuery,
+    query: &VCLQuery,
+    prev_query: &VCLQuery,
     prev_type: &DependentType,
 ) -> Result<DependentType, TypeError> {
     // Diff queries, only re-check changed AST nodes
@@ -738,7 +738,7 @@ pub fn type_check_incremental(
 
 // 3. Parallel proof generation (batch queries)
 pub async fn generate_proofs_batch(
-    queries: Vec<(VQLQuery, QueryResult)>,
+    queries: Vec<(VCLQuery, QueryResult)>,
 ) -> Result<Vec<Proof>, ProofError> {
     use tokio::task::spawn;
 
@@ -795,7 +795,7 @@ Int
 **Benefit**: Slipstream execution uses erased types (faster, no proof generation).
 
 ```rust
-pub fn execute_query_erased(query: &VQLQuery) -> Result<QueryResult, VQLError> {
+pub fn execute_query_erased(query: &VCLQuery) -> Result<QueryResult, VCLError> {
     // Type check with dependent types
     let full_type = type_check(query)?;
 
@@ -849,7 +849,7 @@ pub extern "C" fn type_check_query(
     query_json: *const c_char,
 ) -> *mut c_char {
     let query_str = unsafe { CStr::from_ptr(query_json).to_str().unwrap() };
-    let query: VQLQuery = serde_json::from_str(query_str).unwrap();
+    let query: VCLQuery = serde_json::from_str(query_str).unwrap();
 
     let type_checker = TypeChecker::new();
     match type_checker.check(&query) {
@@ -868,12 +868,12 @@ pub extern "C" fn type_check_query(
 **ReScript bindings**:
 
 ```rescript
-// VQLTypeChecker.res
+// VCLTypeChecker.res
 @module("./native/type_checker.node")
 external typeCheckQuery: string => string = "type_check_query"
 
-let checkQuery = (query: VQLQuery.t): result<DependentType.t, TypeError.t> => {
-  let queryJson = query->VQLQuery.toJson->Js.Json.stringify
+let checkQuery = (query: VCLQuery.t): result<DependentType.t, TypeError.t> => {
+  let queryJson = query->VCLQuery.toJson->Js.Json.stringify
   let resultJson = typeCheckQuery(queryJson)
 
   switch resultJson->Js.Json.parseExn {
@@ -895,7 +895,7 @@ let checkQuery = (query: VQLQuery.t): result<DependentType.t, TypeError.t> => {
 
 **Example**:
 
-```vql
+```vcl
 -- 1000 results, each with 10-field record
 PROOF UNIVERSAL {
   ∀ r ∈ Result. r.document.word_count > 1000
@@ -960,8 +960,8 @@ prove φ(sample(Result, 100)) with high probability
 **Strategy**: Restrict `VERIFIED()` to verifiable predicates only.
 
 ```rescript
-// VQLTypeChecker.res
-let isVerifiable = (expr: VQLExpr.t): bool => {
+// VCLTypeChecker.res
+let isVerifiable = (expr: VCLExpr.t): bool => {
   switch expr {
   | EBinOp(Eq, _, _) => true
   | EBinOp(Lt | Gt | Lte | Gte, _, _) => true
@@ -1114,7 +1114,7 @@ e ::= x | n | true | false | ()
 
 === A.2 Typing Rules (Complete)
 
-See docs/vql-type-system.adoc for full 30+ typing rules.
+See docs/vcl-type-system.adoc for full 30+ typing rules.
 
 ---
 
@@ -1123,7 +1123,7 @@ See docs/vql-type-system.adoc for full 30+ typing rules.
 === B.1 EXISTENCE Proof
 
 **Query**:
-```vql
+```vcl
 SELECT *
 FROM verisim:semantic
 WHERE octad.types INCLUDES "Paper"
@@ -1145,7 +1145,7 @@ Output: proof π
 === B.2 UNIVERSAL Proof
 
 **Query**:
-```vql
+```vcl
 SELECT *
 FROM verisim:restricted
 WHERE octad.types INCLUDES "MedicalRecord"

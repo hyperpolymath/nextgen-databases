@@ -114,7 +114,7 @@ public export
 data EntityHandle : Type where
   MkEntityHandle : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> EntityHandle
 
-||| Opaque handle to a VQL query
+||| Opaque handle to a VCL query
 public export
 data QueryHandle : Type where
   MkQueryHandle : (ptr : Bits64) -> {auto 0 nonNull : So (ptr /= 0)} -> QueryHandle
@@ -317,7 +317,7 @@ ptrSize _    = 64
 -- Proof Type Enumeration
 --------------------------------------------------------------------------------
 
-||| VQL proof types supported by VeriSimDB
+||| VCL proof types supported by VeriSimDB
 public export
 data ProofType
   = Existence

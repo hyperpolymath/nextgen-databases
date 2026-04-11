@@ -12,7 +12,7 @@
 /// The commands map to VeriSimDB's REST API:
 ///   Rust core (port 8080, prefix /api/v1):
 ///     - Health:       GET  /health
-///     - VQL:          POST /vql/execute
+///     - VCL:          POST /vcl/execute
 ///     - Octads:       GET  /octads, GET /octads/{id}, POST /octads, DELETE /octads/{id}
 ///     - Drift:        GET  /drift/entity/{id}
 ///     - Normaliser:   POST /normalizer/trigger/{id}
@@ -51,20 +51,20 @@ let checkHealth = (token: float): promise<string> => {
 }
 
 // ---------------------------------------------------------------------------
-// VQL Console
+// VCL Console
 // ---------------------------------------------------------------------------
 
-/// Execute a VQL (VeriSim Query Language) query against the database.
+/// Execute a VCL (VeriSim Query Language) query against the database.
 ///
-/// Maps to: POST /vql/execute
-/// VQL supports octad queries across all 8 modalities with proof
+/// Maps to: POST /vcl/execute
+/// VCL supports octad queries across all 8 modalities with proof
 /// generation and drift-aware consistency.
 ///
-/// @param query - The VQL query string to execute
-let queryVql = (query: string, token: float): promise<string> => {
+/// @param query - The VCL query string to execute
+let queryVcl = (query: string, token: float): promise<string> => {
   RuntimeBridge.invokeWithToken(
-    "verisimdb_query_vql",
-    {"url": `${_rustBaseUrl}/vql/execute`, "query": query},
+    "verisimdb_query_vcl",
+    {"url": `${_rustBaseUrl}/vcl/execute`, "query": query},
     token,
   )
 }

@@ -40,7 +40,7 @@ repair it.
 │  Elixir/OTP Orchestration Layer                      │
 │    ├── EntityServer    (GenServer per entity)         │
 │    ├── DriftMonitor    (continuous consistency check)  │
-│    ├── QueryRouter     (distributes VQL queries)     │
+│    ├── QueryRouter     (distributes VCL queries)     │
 │    ├── SchemaRegistry  (type system coordination)    │
 │    └── Federation      (heterogeneous peer queries)  │
 │              ↕ HTTP / NIF                            │
@@ -64,7 +64,7 @@ repair it.
 
 === Optional Dependencies
 
-* **Deno** 2.0+ (for VQL parser bridge -- falls back to built-in parser)
+* **Deno** 2.0+ (for VCL parser bridge -- falls back to built-in parser)
 * **pgvector**, **PostGIS** (if federating with PostgreSQL)
 
 == Installation
@@ -289,10 +289,10 @@ VeriSimDB identifies the document as the authoritative modality and
 regenerates the vector embedding to match. Re-checking drift will
 show all scores back near zero.
 
-== Querying with VQL
+== Querying with VCL
 
-VeriSimDB uses its own query language, *VQL* (VeriSim Query Language),
-designed for cross-modal queries. VQL is not SQL -- it natively
+VeriSimDB uses its own query language, *VCL* (VeriSim Query Language),
+designed for cross-modal queries. VCL is not SQL -- it natively
 understands modalities and drift.
 
 === Basic Queries
@@ -333,9 +333,9 @@ SELECT * FROM FEDERATION /*
 WHERE DOCUMENT.severity > GRAPH.importance
 ----
 
-=== VQL-DT (Formally Verified Queries)
+=== VCL-DT (Formally Verified Queries)
 
-VQL-DT extends VQL with proof certificates. Every result includes a
+VCL-DT extends VCL with proof certificates. Every result includes a
 cryptographic proof that the data satisfies stated constraints:
 
 [source,sql]
@@ -345,7 +345,7 @@ FROM HEXAD 'entity-id'
 PROOF EXISTENCE(entity-id), PROVENANCE(entity-id)
 ----
 
-NOTE: VQL-DT proof generation is under active development. The syntax
+NOTE: VCL-DT proof generation is under active development. The syntax
 parses correctly and proof obligations are extracted, but end-to-end
 verifiable certificates require the Lean type checker integration
 (planned for Q2 2026).
@@ -353,7 +353,7 @@ verifiable certificates require the Lean type checker integration
 == Federation
 
 VeriSimDB can federate queries across heterogeneous databases. A single
-VQL query can transparently route to PostgreSQL, ArangoDB, Elasticsearch,
+VCL query can transparently route to PostgreSQL, ArangoDB, Elasticsearch,
 and other VeriSimDB instances.
 
 === Registering Peers
@@ -568,16 +568,16 @@ curl http://localhost:8080/api/v1/health
 export VERISIM_RUST_CORE_URL=http://localhost:8080/api/v1
 ----
 
-=== VQL parser falls back to built-in
+=== VCL parser falls back to built-in
 
-This is normal. The external Deno-based VQL parser provides richer
+This is normal. The external Deno-based VCL parser provides richer
 error messages but the built-in Elixir parser handles all standard
 queries. The fallback warning can be safely ignored.
 
 == Next Steps
 
-* Read the link:VQL-SPEC.adoc[VQL Specification] for the full query language
-* See link:vql-examples.adoc[VQL Examples] for more query patterns
+* Read the link:VCL-SPEC.adoc[VCL Specification] for the full query language
+* See link:vcl-examples.adoc[VCL Examples] for more query patterns
 * Review link:federation-readiness.adoc[Federation Readiness] for deployment planning
 * Explore link:drift-handling.adoc[Drift Handling] for advanced configuration
 * Check link:deployment-modes.adoc[Deployment Modes] for production setup

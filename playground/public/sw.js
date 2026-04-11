@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// Service Worker for VQL Playground PWA — offline support.
+// Service Worker for VCL Playground PWA — offline support.
 
-const CACHE_NAME = "vql-playground-v1";
+const CACHE_NAME = "vcl-playground-v1";
 const ASSETS = ["/", "/index.html", "/app.js", "/style.css", "/manifest.json"];
 
 self.addEventListener("install", (event) => {

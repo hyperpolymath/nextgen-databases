@@ -4,7 +4,7 @@
 /// Model -- Application state for the VeriSimDB Admin panel.
 ///
 /// Holds the complete UI state including server connection status, octad
-/// entity listings, VQL console state, drift detection results, telemetry
+/// entity listings, VCL console state, drift detection results, telemetry
 /// metrics, and Gossamer capability tokens.
 ///
 /// VeriSimDB's octad model: each entity exists simultaneously across 8
@@ -114,12 +114,12 @@ type model = {
   entityDetail: option<string>,
   /// Active tab in the entity detail view.
   detailTab: detailTab,
-  /// VQL console: current input text.
-  vqlInput: string,
-  /// VQL console: result of the last executed query.
-  vqlResult: option<string>,
-  /// VQL console: whether a query is currently executing.
-  vqlExecuting: bool,
+  /// VCL console: current input text.
+  vclInput: string,
+  /// VCL console: result of the last executed query.
+  vclResult: option<string>,
+  /// VCL console: whether a query is currently executing.
+  vclExecuting: bool,
   /// Drift status for the currently selected entity.
   driftStatus: option<driftInfo>,
   /// Aggregate telemetry data from the Elixir layer.
@@ -130,7 +130,7 @@ type model = {
   networkCap: capabilityStatus,
   /// Filesystem capability token -- required for exports.
   filesystemCap: capabilityStatus,
-  /// Clipboard capability token -- required for VQL copying.
+  /// Clipboard capability token -- required for VCL copying.
   clipboardCap: capabilityStatus,
   /// Error message to display in the UI, if any.
   error: option<string>,
@@ -150,9 +150,9 @@ let initial: model = {
   selectedEntity: None,
   entityDetail: None,
   detailTab: Overview,
-  vqlInput: "",
-  vqlResult: None,
-  vqlExecuting: false,
+  vclInput: "",
+  vclResult: None,
+  vclExecuting: false,
   driftStatus: None,
   telemetry: None,
   orchStatus: None,

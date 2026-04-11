@@ -2,7 +2,7 @@
 //! Circuit Registry for VeriSimDB ZKP Custom Circuits
 //!
 //! In-memory registry mapping circuit names to compiled verification functions.
-//! Custom circuits allow VQL queries to include `PROOF CUSTOM "circuit-name"
+//! Custom circuits allow VCL queries to include `PROOF CUSTOM "circuit-name"
 //! WITH (param=value, ...)` clauses that verify application-specific properties.
 
 use serde::{Deserialize, Serialize};

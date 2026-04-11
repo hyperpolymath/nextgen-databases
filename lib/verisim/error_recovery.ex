@@ -2,7 +2,7 @@
 
 defmodule VeriSim.ErrorRecovery do
   @moduledoc """
-  Error recovery strategies for VQL queries.
+  Error recovery strategies for VCL queries.
 
   Implements:
   1. Retry with exponential backoff

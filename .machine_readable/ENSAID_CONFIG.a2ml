@@ -3,7 +3,7 @@
 ;
 ; ENSAID_CONFIG.a2ml — PanLL configuration for VeriSimDB.
 ; VeriSimDB is a formally verified database with Idris2 ABI, Zig FFI,
-; V-lang API gateway, VQL query language, and a registry subsystem.
+; V-lang API gateway, VCL query language, and a registry subsystem.
 ; This is a key dogfooding project for the full ABI→FFI→Adapter stack.
 
 ; ─────────────────────────────────────────────────────────────────────
@@ -23,9 +23,9 @@ humidity = "dry"
 ; ─────────────────────────────────────────────────────────────────────
 [workspace]
 root = "."
-watch_extensions = [".idr", ".zig", ".v", ".vql", ".gleam", ".toml"]
+watch_extensions = [".idr", ".zig", ".v", ".vcl", ".gleam", ".toml"]
 ; .idr = ABI definitions, .zig = FFI bridge, .v = API gateway,
-; .vql = VeriSimDB Query Language, .gleam = REPL/tooling
+; .vcl = VeriSimDB Query Language, .gleam = REPL/tooling
 ignore_patterns = ["build/", ".git/", "zig-cache/", "zig-out/", "_build/"]
 editor = "vscodium"
 build_command = "just build"
@@ -55,7 +55,7 @@ enabled = [
   "build-dashboard",     ; Multi-language build status (Idris2 + Zig + V)
   "boj",                 ; BoJ dashboard — VeriSimDB is a BoJ consumer
   "database",            ; Database inspection — dogfooding VeriSimDB itself
-  "vm-inspector",        ; Query engine / VQL inspection
+  "vm-inspector",        ; Query engine / VCL inspection
   "security",            ; Security scanning (Hypatia)
   "reposystem",          ; Repository management
   "panic-attack",        ; Error analysis
@@ -88,12 +88,12 @@ action = "run_command"
 command = "cd v-api-gateway && v build ."
 description = "Rebuild V-lang API gateway when Zig FFI changes"
 
-[workflows.vql-test-on-save]
+[workflows.vcl-test-on-save]
 trigger = "file_save"
-match = "src/vql/*.idr"
+match = "src/vcl/*.idr"
 action = "run_command"
-command = "idris2 --check src/vql/Parser.idr"
-description = "Verify VQL parser when query language definitions change"
+command = "idris2 --check src/vcl/Parser.idr"
+description = "Verify VCL parser when query language definitions change"
 
 [workflows.registry-test]
 trigger = "file_save"
@@ -115,7 +115,7 @@ description = "Rebuild debugger when debugger source changes"
 [clades]
 active = ["builder", "database", "terminal", "scanner", "viewer", "bridge"]
 ; Database development uses builder (multi-lang compilation), database
-; (dogfooding VeriSimDB), terminal (VQL REPL), scanner (security),
+; (dogfooding VeriSimDB), terminal (VCL REPL), scanner (security),
 ; viewer (query plans), bridge (editor integration).
 
 ; ─────────────────────────────────────────────────────────────────────
@@ -136,7 +136,7 @@ layout = "three-column"
 focus = "build-dashboard"
 
 [portfolios.query-dev]
-description = "VQL query language development"
+description = "VCL query language development"
 panels = ["editor-bridge", "vm-inspector", "database"]
 layout = "three-column"
 focus = "vm-inspector"

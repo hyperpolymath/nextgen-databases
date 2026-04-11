@@ -5,7 +5,7 @@
 ;; cryptographic verification policies, and trust boundaries.
 
 ;; ============================================================================
-;; ZKP Scheme Selection for VQL-DT PROOF Clause
+;; ZKP Scheme Selection for VCL-DT PROOF Clause
 ;; ============================================================================
 ;;
 ;; Decision: PLONK (Permutations over Lagrange-bases for Oecumenical
@@ -32,7 +32,7 @@
 ;; 1. vs Groth16: Groth16 has the smallest proofs and fastest verification,
 ;;    but requires a NEW trusted setup for every circuit change. VeriSimDB's
 ;;    proof contracts change frequently (new types, new properties). PLONK's
-;;    universal SRS means one setup covers all VQL-DT contracts forever.
+;;    universal SRS means one setup covers all VCL-DT contracts forever.
 ;;
 ;; 2. vs STARKs: STARKs are transparent (no trusted setup) and post-quantum,
 ;;    but proof sizes are ~100x larger (45KB vs 400B). For VeriSimDB where
@@ -131,7 +131,7 @@
 ;; ============================================================================
 ;;
 ;; 1. Hexad Store → Semantic Store: proof blobs stored as CBOR in semantic modality
-;; 2. VQL Parser → Planner: PROOF clause extracted, cost estimated
+;; 2. VCL Parser → Planner: PROOF clause extracted, cost estimated
 ;; 3. Planner → Executor: proof verification dispatched before/after query
 ;; 4. Executor → ZKP Backend: circuit evaluated, proof generated/verified
 ;; 5. Client → API: proof result included in response (pass/fail + proof bytes)

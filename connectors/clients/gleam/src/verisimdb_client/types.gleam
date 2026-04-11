@@ -303,12 +303,12 @@ pub type SearchResult {
 }
 
 // ---------------------------------------------------------------------------
-// VQL types
+// VCL types
 // ---------------------------------------------------------------------------
 
-/// Result of a VQL query execution.
-pub type VqlResult {
-  VqlResult(
+/// Result of a VCL query execution.
+pub type VclResult {
+  VclResult(
     columns: List(String),
     rows: List(List(String)),
     count: Int,
@@ -316,9 +316,9 @@ pub type VqlResult {
   )
 }
 
-/// Query execution plan for a VQL statement.
-pub type VqlExplanation {
-  VqlExplanation(
+/// Query execution plan for a VCL statement.
+pub type VclExplanation {
+  VclExplanation(
     query: String,
     plan: String,
     cost: Float,
@@ -347,7 +347,7 @@ pub type PeerQueryResult {
   PeerQueryResult(
     peer_id: String,
     peer_name: String,
-    result: VqlResult,
+    result: VclResult,
     elapsed_ms: Float,
     error: Option(String),
   )

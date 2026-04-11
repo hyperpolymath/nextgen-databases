@@ -219,8 +219,8 @@ pub:
 	score f64
 }
 
-// VqlResult holds the result of a VQL (VeriSimDB Query Language) execution.
-pub struct VqlResult {
+// VclResult holds the result of a VCL (VeriSimDB Query Language) execution.
+pub struct VclResult {
 pub:
 	columns []string
 	rows    [][]string
@@ -228,8 +228,8 @@ pub:
 	elapsed_ms f64
 }
 
-// VqlExplanation provides the query plan for a VQL statement.
-pub struct VqlExplanation {
+// VclExplanation provides the query plan for a VCL statement.
+pub struct VclExplanation {
 pub:
 	query    string
 	plan     string

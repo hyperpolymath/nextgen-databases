@@ -47,11 +47,11 @@ verisimdb/
 │   ├── verisim-drift/        # Drift detection
 │   ├── verisim-normalizer/   # Self-normalization
 │   ├── verisim-planner/      # Cost-based query planner
-│   ├── verisim-repl/         # Interactive VQL REPL
+│   ├── verisim-repl/         # Interactive VCL REPL
 │   ├── verisim-wal/          # Write-ahead log
 │   └── verisim-storage/      # Storage backend abstraction
 ├── elixir-orchestration/     # Elixir/OTP coordination layer
-├── playground/               # VQL Playground PWA (ReScript)
+├── playground/               # VCL Playground PWA (ReScript)
 ├── container/                # Containerfile for Podman builds
 ├── docs/                     # Architecture and design documents
 ├── contractiles/             # Trust, security, and policy contracts
@@ -158,8 +158,8 @@ cargo fmt --check
 |----------|----------|
 | **Rust** | Core database engine, modality stores, CLI tools |
 | **Elixir** | OTP orchestration, distributed coordination |
-| **ReScript** | VQL parser, playground PWA |
-| **VQL** | VeriSim Query Language (query interface) |
+| **ReScript** | VCL parser, playground PWA |
+| **VCL** | VeriSim Query Language (query interface) |
 
 ### Not Accepted
 

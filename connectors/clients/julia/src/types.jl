@@ -372,36 +372,36 @@ end
 JSON3.StructTypes.StructType(::Type{SearchResult}) = JSON3.StructTypes.Struct()
 
 # ---------------------------------------------------------------------------
-# VQL types
+# VCL types
 # ---------------------------------------------------------------------------
 
 """
-    VqlResult
+    VclResult
 
-Result of a VQL query execution, containing columnar data and timing.
+Result of a VCL query execution, containing columnar data and timing.
 """
-struct VqlResult
+struct VclResult
     columns::Vector{String}
     rows::Vector{Vector{String}}
     count::Int
     elapsed_ms::Float64
 end
 
-JSON3.StructTypes.StructType(::Type{VqlResult}) = JSON3.StructTypes.Struct()
+JSON3.StructTypes.StructType(::Type{VclResult}) = JSON3.StructTypes.Struct()
 
 """
-    VqlExplanation
+    VclExplanation
 
-Query execution plan for a VQL statement, showing cost estimates and warnings.
+Query execution plan for a VCL statement, showing cost estimates and warnings.
 """
-struct VqlExplanation
+struct VclExplanation
     query::String
     plan::String
     cost::Float64
     warnings::Vector{String}
 end
 
-JSON3.StructTypes.StructType(::Type{VqlExplanation}) = JSON3.StructTypes.Struct()
+JSON3.StructTypes.StructType(::Type{VclExplanation}) = JSON3.StructTypes.Struct()
 
 # ---------------------------------------------------------------------------
 # Federation types

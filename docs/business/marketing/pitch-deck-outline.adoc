@@ -110,8 +110,8 @@ representations that together provide a complete picture of each entity.
 
 ----
                     ┌─────────────────────────┐
-                    │       VQL Engine         │
-                    │   (Query + VQL-DT)       │
+                    │       VCL Engine         │
+                    │   (Query + VCL-DT)       │
                     └────────────┬────────────┘
                                  │
                     ┌────────────▼────────────┐
@@ -142,7 +142,7 @@ representations that together provide a complete picture of each entity.
 
 === Speaker Notes
 
-Three layers: the VQL query engine parses and type-checks queries; the drift
+Three layers: the VCL query engine parses and type-checks queries; the drift
 detection engine continuously monitors coherence across modalities; the storage
 layer handles the octad per entity. Federation allows VeriSimDB to bring drift
 detection to existing databases without data migration. Rust provides performance,
@@ -173,7 +173,7 @@ pinecone.query(vector=[0.23, 0.87, ...], top_k=10)
 
 [source]
 ----
--- VQL: Query across modalities with coherence check
+-- VCL: Query across modalities with coherence check
 SELECT entity, coherence_score, drifted_modalities
 FROM entities
 WHERE entity.id = "jane-doe"
@@ -191,7 +191,7 @@ WHERE entity.id = "jane-doe"
 
 Walk through both examples. In the "before" scenario, a developer queries two
 separate databases and has no way to know if the results are consistent. In the
-"after" scenario, VeriSimDB's VQL query spans modalities and includes the
+"after" scenario, VeriSimDB's VCL query spans modalities and includes the
 coherence score directly in the result set. When the score drops below the
 configured threshold, self-normalisation is triggered automatically. The developer
 does not need to write reconciliation logic.
@@ -216,10 +216,10 @@ does not need to write reconciliation logic.
 | *ReScript* -- ML-family type system compiling to JavaScript
 
 | Query language
-| *VQL* -- Purpose-built for cross-modal operations
+| *VCL* -- Purpose-built for cross-modal operations
 
 | Formal verification
-| *VQL-DT* -- Dependent-type proofs of query correctness
+| *VCL-DT* -- Dependent-type proofs of query correctness
 
 | ABI definitions
 | *Idris2* -- Dependent types for interface verification
@@ -234,8 +234,8 @@ does not need to write reconciliation logic.
 
 Emphasise the engineering quality. Rust + Elixir is an increasingly popular
 combination for data infrastructure (used by Discord, Fly.io, and others). The
-test suite is comprehensive and runs in CI on every commit. VQL-DT's dependent
-types are optional -- teams can start with plain VQL and adopt formal verification
+test suite is comprehensive and runs in CI on every commit. VCL-DT's dependent
+types are optional -- teams can start with plain VCL and adopt formal verification
 incrementally.
 
 == Slide 7: Market Opportunity
@@ -293,7 +293,7 @@ the category rather than compete within an established one.
 ┌─────────────────────────────────────────────┐
 │           Community Edition (PMPL)          │
 │  All 8 modalities, drift detection,        │
-│  self-normalisation, VQL, federation       │
+│  self-normalisation, VCL, federation       │
 │  FREE — forever                            │
 ├─────────────────────────────────────────────┤
 │         Commercial Support License          │
@@ -364,8 +364,8 @@ coherence from the ground up.
 
 * *662 tests* (510 Rust + 152 Elixir), *0 failures*
 * *8 modalities* fully architected and implemented
-* *VQL grammar* specified in EBNF with formal semantics
-* *VQL-DT* dependent-type layer with Idris2 proofs
+* *VCL grammar* specified in EBNF with formal semantics
+* *VCL-DT* dependent-type layer with Idris2 proofs
 * *Federation connectors* for PostgreSQL, ArangoDB, Elasticsearch
 * *Comprehensive documentation:* Architecture, deployment, query language,
   drift handling, error handling, safety theory

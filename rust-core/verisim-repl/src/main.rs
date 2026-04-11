@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //!
-//! VQL REPL — Interactive query shell for VeriSimDB.
+//! VCL REPL — Interactive query shell for VeriSimDB.
 //!
 //! Provides a readline-based interactive shell with:
-//! - VQL syntax highlighting
+//! - VCL syntax highlighting
 //! - Tab completion for keywords, modalities, and meta-commands
 //! - Multiline query support (backslash continuation)
 //! - Multiple output formats (table, JSON, CSV)
@@ -18,7 +18,7 @@ mod completer;
 mod formatter;
 mod highlighter;
 pub mod linter;
-pub mod vql_fmt;
+pub mod vcl_fmt;
 
 use clap::Parser;
 use colored::Colorize;
@@ -30,7 +30,7 @@ use rustyline::validate::MatchingBracketValidator;
 use rustyline_derive::{Completer, Helper, Highlighter, Hinter, Validator};
 use std::time::Instant;
 
-use client::VqlClient;
+use client::VclClient;
 use formatter::{format_value, OutputFormat};
 
 /// VeriSimDB version string, pulled from Cargo.toml at compile time.
@@ -40,9 +40,9 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 // CLI argument parsing
 // ---------------------------------------------------------------------------
 
-/// VQL — Interactive query shell for VeriSimDB.
+/// VCL — Interactive query shell for VeriSimDB.
 #[derive(Parser, Debug)]
-#[command(name = "vql", version = VERSION, about = "VQL REPL for VeriSimDB")]
+#[command(name = "vcl", version = VERSION, about = "VCL REPL for VeriSimDB")]
 struct Cli {
     /// Hostname or IP of the verisim-api server.
     #[arg(long, default_value = "localhost")]
@@ -64,11 +64,11 @@ struct Cli {
 /// Combined helper that provides highlighting, completion, hinting, and
 /// bracket validation for the rustyline editor.
 #[derive(Helper, Highlighter, Completer, Hinter, Validator)]
-struct VqlHelper {
+struct VclHelper {
     #[rustyline(Highlighter)]
-    highlighter: highlighter::VqlHighlighter,
+    highlighter: highlighter::VclHighlighter,
     #[rustyline(Completer)]
-    completer: completer::VqlCompleter,
+    completer: completer::VclCompleter,
     #[rustyline(Hinter)]
     hinter: HistoryHinter,
     #[rustyline(Validator)]
@@ -82,7 +82,7 @@ struct VqlHelper {
 /// Mutable session state for the REPL loop.
 struct Session {
     /// HTTP client for the verisim-api server.
-    client: VqlClient,
+    client: VclClient,
     /// Current output format.
     format: OutputFormat,
     /// Whether to display query timing after each result.
@@ -93,7 +93,7 @@ impl Session {
     /// Create a new session from CLI arguments.
     fn new(host: &str, port: u16, format: OutputFormat) -> Self {
         let base_url = format!("http://{host}:{port}");
-        let client = VqlClient::new(&base_url);
+        let client = VclClient::new(&base_url);
         Self {
             client,
             format,
@@ -108,7 +108,7 @@ impl Session {
         } else {
             format!("http://{addr}")
         };
-        self.client = VqlClient::new(&base_url);
+        self.client = VclClient::new(&base_url);
         println!("Connected to {}", self.client.base_url());
     }
 }
@@ -131,31 +131,31 @@ fn main() {
     print_banner(&session);
 
     // Set up readline editor with helper.
-    let helper = VqlHelper {
-        highlighter: highlighter::VqlHighlighter,
-        completer: completer::VqlCompleter,
+    let helper = VclHelper {
+        highlighter: highlighter::VclHighlighter,
+        completer: completer::VclCompleter,
         hinter: HistoryHinter::new(),
         validator: MatchingBracketValidator::new(),
     };
 
-    let mut editor = rustyline::Editor::<VqlHelper, DefaultHistory>::new()
+    let mut editor = rustyline::Editor::<VclHelper, DefaultHistory>::new()
         .expect("failed to create readline editor");
     editor.set_helper(Some(helper));
     editor.set_auto_add_history(true);
 
-    // Load history from ~/.vql_history (ignore errors on first run).
+    // Load history from ~/.vcl_history (ignore errors on first run).
     let history_path = history_file_path();
     let _ = editor.load_history(&history_path);
 
-    // Load .vqlrc from home directory if present.
-    load_vqlrc(&mut session);
+    // Load .vclrc from home directory if present.
+    load_vclrc(&mut session);
 
     // Main REPL loop.
     let mut query_buf = String::new();
 
     loop {
         let prompt = if query_buf.is_empty() {
-            format!("{} ", "vql>".bright_green().bold())
+            format!("{} ", "vcl>".bright_green().bold())
         } else {
             format!("{} ", "  ..".bright_green())
         };
@@ -201,7 +201,7 @@ fn main() {
                     continue;
                 }
 
-                // Single-line VQL query.
+                // Single-line VCL query.
                 // Strip trailing semicolons (SQL habit).
                 let query = trimmed.trim_end_matches(';');
                 execute_query(&mut session, query);
@@ -235,7 +235,7 @@ fn main() {
 // Query execution
 // ---------------------------------------------------------------------------
 
-/// Send a VQL query to the server and display the result.
+/// Send a VCL query to the server and display the result.
 fn execute_query(session: &mut Session, query: &str) {
     if query.is_empty() {
         return;
@@ -295,7 +295,7 @@ fn handle_meta_command(session: &mut Session, line: &str) -> bool {
         }
         "\\explain" => {
             if arg.is_empty() {
-                println!("Usage: \\explain <VQL query>");
+                println!("Usage: \\explain <VCL query>");
             } else {
                 explain_query(session, arg);
             }
@@ -385,18 +385,18 @@ fn check_status(session: &Session) {
 }
 
 // ---------------------------------------------------------------------------
-// .vqlrc loading
+// .vclrc loading
 // ---------------------------------------------------------------------------
 
-/// Load and execute commands from `~/.vqlrc` if the file exists.
+/// Load and execute commands from `~/.vclrc` if the file exists.
 ///
 /// Each non-empty, non-comment line in the file is treated as either a
-/// meta-command or a VQL query (same as typing it at the prompt).
-fn load_vqlrc(session: &mut Session) {
+/// meta-command or a VCL query (same as typing it at the prompt).
+fn load_vclrc(session: &mut Session) {
     let Some(home) = dirs::home_dir() else {
         return;
     };
-    let rc_path = home.join(".vqlrc");
+    let rc_path = home.join(".vclrc");
     if !rc_path.exists() {
         return;
     }
@@ -413,7 +413,7 @@ fn load_vqlrc(session: &mut Session) {
         if trimmed.starts_with('\\') {
             handle_meta_command(session, trimmed);
         } else {
-            // Execute as VQL query (silently, during startup).
+            // Execute as VCL query (silently, during startup).
             let _ = session.client.execute(trimmed);
         }
     }
@@ -423,11 +423,11 @@ fn load_vqlrc(session: &mut Session) {
 // History file path
 // ---------------------------------------------------------------------------
 
-/// Determine the history file path (~/.vql_history).
+/// Determine the history file path (~/.vcl_history).
 fn history_file_path() -> std::path::PathBuf {
     dirs::home_dir()
         .unwrap_or_else(|| std::path::PathBuf::from("."))
-        .join(".vql_history")
+        .join(".vcl_history")
 }
 
 // ---------------------------------------------------------------------------
@@ -439,7 +439,7 @@ fn print_banner(session: &Session) {
     println!();
     println!(
         "{}",
-        "  VeriSimDB VQL REPL".bright_cyan().bold()
+        "  VeriSimDB VCL REPL".bright_cyan().bold()
     );
     println!(
         "  {} {}",
@@ -468,7 +468,7 @@ fn print_banner(session: &Session) {
 /// Print the help text for meta-commands.
 fn print_help() {
     println!();
-    println!("{}", "  VQL Meta-Commands".bright_cyan().bold());
+    println!("{}", "  VCL Meta-Commands".bright_cyan().bold());
     println!();
     println!(
         "  {}  {}",
@@ -508,7 +508,7 @@ fn print_help() {
     println!();
     println!("{}", "  Query Input".bright_cyan().bold());
     println!();
-    println!("  Enter VQL queries at the prompt. End with Enter to execute.");
+    println!("  Enter VCL queries at the prompt. End with Enter to execute.");
     println!("  Use \\ at end of line for multiline continuation.");
     println!("  Trailing semicolons are stripped automatically.");
     println!();

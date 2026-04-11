@@ -107,9 +107,9 @@ fn (mut g Gateway) handle(req http.Request) http.Response {
 		return g.proxy_post_to_rust('/octads', req.data, headers)
 	}
 
-	// VQL execution — proxy to Rust core
-	if url == '/api/v1/vql/execute' && req.method == .post {
-		return g.proxy_post_to_rust('/vql/execute', req.data, headers)
+	// VCL execution — proxy to Rust core
+	if url == '/api/v1/vcl/execute' && req.method == .post {
+		return g.proxy_post_to_rust('/vcl/execute', req.data, headers)
 	}
 
 	// Drift — proxy to Rust core
@@ -309,26 +309,26 @@ fn (g Gateway) do_handle_graphql(data string, headers http.Header) http.Response
 		}
 	}
 
-	if query.contains('executeVql') || query.contains('mutation') {
-		// Extract VQL query from variables
-		vql_query := gql_req.variables['query'] or {
+	if query.contains('executeVcl') || query.contains('mutation') {
+		// Extract VCL query from variables
+		vcl_query := gql_req.variables['query'] or {
 			return http.Response{
 				status_code: 200
-				body:        '{"errors":[{"message":"VQL mutation requires variables.query"}]}'
+				body:        '{"errors":[{"message":"VCL mutation requires variables.query"}]}'
 				header:      headers
 			}
 		}
-		payload := '{"query":"${vql_query}"}'
-		result := proxy_post_json('${g.config.rust_url}/vql/execute', payload) or {
+		payload := '{"query":"${vcl_query}"}'
+		result := proxy_post_json('${g.config.rust_url}/vcl/execute', payload) or {
 			return http.Response{
 				status_code: 200
-				body:        '{"data":{"executeVql":null},"errors":[{"message":"VQL execution failed: ${err.msg()}"}]}'
+				body:        '{"data":{"executeVcl":null},"errors":[{"message":"VCL execution failed: ${err.msg()}"}]}'
 				header:      headers
 			}
 		}
 		return http.Response{
 			status_code: 200
-			body:        '{"data":{"executeVql":${result}}}'
+			body:        '{"data":{"executeVcl":${result}}}'
 			header:      headers
 		}
 	}
@@ -358,7 +358,7 @@ fn (g Gateway) do_handle_graphql(data string, headers http.Header) http.Response
 	// Unsupported query
 	return http.Response{
 		status_code: 200
-		body:        '{"errors":[{"message":"Unrecognised query. Supported: health, telemetry, octads, driftScore, executeVql"}]}'
+		body:        '{"errors":[{"message":"Unrecognised query. Supported: health, telemetry, octads, driftScore, executeVcl"}]}'
 		header:      headers
 	}
 }

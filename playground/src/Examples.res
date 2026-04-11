@@ -1,107 +1,107 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// Example VQL queries for the playground.
-// Covers all 8 octad modalities, real backend queries, and VQL-DT proof types.
+// Example VCL queries for the playground.
+// Covers all 8 octad modalities, real backend queries, and VCL-DT proof types.
 
 type example = {
   label: string,
   query: string,
-  vqlDt: bool,
+  vclDt: bool,
 }
 
 let examples = [
-  // --- Standard VQL examples ---
+  // --- Standard VCL examples ---
   {
     label: "List all hexads",
     query: "SELECT * FROM hexads LIMIT 10",
-    vqlDt: false,
+    vclDt: false,
   },
   {
     label: "Full-text search",
     query: "SEARCH TEXT 'multimodal database' LIMIT 10",
-    vqlDt: false,
+    vclDt: false,
   },
   {
     label: "Vector similarity search",
     query: "SEARCH VECTOR [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8] LIMIT 5",
-    vqlDt: false,
+    vclDt: false,
   },
   {
     label: "Graph traversal",
     query: "SEARCH RELATED 'entity-1' BY 'relates_to'",
-    vqlDt: false,
+    vclDt: false,
   },
   {
     label: "Insert a hexad",
     query: "INSERT INTO hexads (title, body)\nVALUES ('My Entity', 'A multimodal entity in VeriSimDB')",
-    vqlDt: false,
+    vclDt: false,
   },
   {
     label: "Show server status",
     query: "SHOW STATUS",
-    vqlDt: false,
+    vclDt: false,
   },
   {
     label: "Show drift metrics",
     query: "SHOW DRIFT",
-    vqlDt: false,
+    vclDt: false,
   },
   {
     label: "Explain a query",
     query: "EXPLAIN SELECT * FROM hexads WHERE id = 'my-entity' LIMIT 1",
-    vqlDt: false,
+    vclDt: false,
   },
   {
     label: "Count hexads",
     query: "COUNT hexads",
-    vqlDt: false,
+    vclDt: false,
   },
   {
     label: "Multi-modality query (demo)",
     query: "SELECT GRAPH, VECTOR, DOCUMENT, PROVENANCE\nFROM HEXAD\nWHERE name CONTAINS 'example'\nORDER BY score DESC\nLIMIT 20",
-    vqlDt: false,
+    vclDt: false,
   },
   {
     label: "Temporal query (demo)",
     query: "SELECT TEMPORAL, PROVENANCE\nFROM HEXAD\nAT TIME '2026-02-28T00:00:00Z'\nWHERE id = 'entity-123'\nLIMIT 1",
-    vqlDt: false,
+    vclDt: false,
   },
   {
     label: "Federation query (demo)",
     query: "SELECT GRAPH\nFROM FEDERATION STORE 'remote-cluster-1'\nHEXAD\nWHERE region = 'eu-west'\nLIMIT 25",
-    vqlDt: false,
+    vclDt: false,
   },
-  // --- VQL-DT examples ---
+  // --- VCL-DT examples ---
   {
-    label: "Proof of existence (VQL-DT)",
+    label: "Proof of existence (VCL-DT)",
     query: "SELECT SEMANTIC\nFROM HEXAD\nPROOF EXISTENCE\nTHRESHOLD 0.95\nWHERE type = 'Certificate'\nLIMIT 10",
-    vqlDt: true,
+    vclDt: true,
   },
   {
-    label: "Integrity proof (VQL-DT)",
+    label: "Integrity proof (VCL-DT)",
     query: "SELECT SEMANTIC, DOCUMENT\nFROM HEXAD\nPROOF INTEGRITY\nTHRESHOLD 0.99\nWHERE classification = 'audit-trail'\nLIMIT 5",
-    vqlDt: true,
+    vclDt: true,
   },
   {
-    label: "Consistency check (VQL-DT)",
+    label: "Consistency check (VCL-DT)",
     query: "SELECT GRAPH, SEMANTIC\nFROM HEXAD\nPROOF CONSISTENCY\nTHRESHOLD 0.9\nWHERE DRIFT THRESHOLD 0.1\nLIMIT 20",
-    vqlDt: true,
+    vclDt: true,
   },
   {
-    label: "Provenance proof (VQL-DT)",
+    label: "Provenance proof (VCL-DT)",
     query: "SELECT PROVENANCE, SEMANTIC\nFROM HEXAD\nPROOF PROVENANCE\nTHRESHOLD 0.95\nWHERE source = 'verified-origin'\nLIMIT 10",
-    vqlDt: true,
+    vclDt: true,
   },
   {
-    label: "Freshness proof (VQL-DT)",
+    label: "Freshness proof (VCL-DT)",
     query: "SELECT TEMPORAL, SEMANTIC\nFROM HEXAD\nPROOF FRESHNESS\nTHRESHOLD 0.99\nWHERE age_ms < 86400000\nLIMIT 10",
-    vqlDt: true,
+    vclDt: true,
   },
   {
-    label: "Multi-proof composition (VQL-DT)",
+    label: "Multi-proof composition (VCL-DT)",
     query: "SELECT SEMANTIC, PROVENANCE, TEMPORAL\nFROM HEXAD\nPROOF EXISTENCE AND INTEGRITY AND FRESHNESS\nTHRESHOLD 0.95\nWHERE type = 'critical-entity'\nLIMIT 5",
-    vqlDt: true,
+    vclDt: true,
   },
 ]
 
-let forMode = (vqlDt: bool): array<example> =>
-  examples->Array.filter(e => !e.vqlDt || vqlDt)
+let forMode = (vclDt: bool): array<example> =>
+  examples->Array.filter(e => !e.vclDt || vclDt)

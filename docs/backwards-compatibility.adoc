@@ -1,30 +1,30 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 
-= VQL Backwards Compatibility Strategy
+= VCL Backwards Compatibility Strategy
 :toc:
 :toc-placement!:
 
-Strategy for maintaining backwards compatibility across VQL versions, schema evolution, and API changes.
+Strategy for maintaining backwards compatibility across VCL versions, schema evolution, and API changes.
 
 toc::[]
 
 == Overview
 
-VeriSimDB follows **semantic versioning** (SemVer) for VQL and API compatibility:
+VeriSimDB follows **semantic versioning** (SemVer) for VCL and API compatibility:
 
 - **Major version** (1.x.x → 2.x.x): Breaking changes allowed
 - **Minor version** (1.1.x → 1.2.x): New features, backwards compatible
 - **Patch version** (1.1.1 → 1.1.2): Bug fixes only, backwards compatible
 
-Current VQL version: **1.0.0**
+Current VCL version: **1.0.0**
 
 == Compatibility Guarantees
 
 === What We Guarantee
 
-**Query Syntax (VQL):**
+**Query Syntax (VCL):**
 
-- Valid VQL 1.x queries will parse and execute correctly in all 1.x releases
+- Valid VCL 1.x queries will parse and execute correctly in all 1.x releases
 - New keywords/operators are additive (won't conflict with existing identifiers)
 - Deprecations announced at least 2 minor versions before removal
 
@@ -59,11 +59,11 @@ Current VQL version: **1.0.0**
 
 == Versioning Strategy
 
-=== VQL Syntax Versions
+=== VCL Syntax Versions
 
 Each query can optionally specify a version:
 
-```vql
+```vcl
 VERSION 1.0;
 
 FROM verisim:semantic
@@ -123,7 +123,7 @@ LIMIT 10;
 
 **Safe to add in 1.x.x releases:**
 
-- New VQL keywords (if not previously valid identifiers)
+- New VCL keywords (if not previously valid identifiers)
 - New modality types
 - New query operators (`INTERSECT`, `UNION ALL`)
 - New API endpoints
@@ -133,7 +133,7 @@ LIMIT 10;
 
 **Example: Adding `INTERSECT` operator**
 
-```vql
+```vcl
 -- Version 1.2.0 introduces INTERSECT
 -- Old queries (1.0.0) continue to work
 
@@ -148,7 +148,7 @@ INTERSECT
 
 **Requires 2.0.0:**
 
-- Removing VQL keywords
+- Removing VCL keywords
 - Changing query semantics (e.g., `LIMIT` behavior)
 - Removing API endpoints
 - Removing response fields
@@ -156,7 +156,7 @@ INTERSECT
 
 **Example: Removing deprecated `USING` clause**
 
-```vql
+```vcl
 -- Version 1.0.0 syntax (deprecated in 1.2.0)
 FROM verisim:graph
 USING CONTRACT CitationContract
@@ -189,10 +189,10 @@ WHERE octad.types INCLUDES "Paper";
 
 === Deprecation Warnings
 
-**VQL Parser:**
+**VCL Parser:**
 
 ```rescript
-// VQLParser.res
+// VCLParser.res
 let parseUsingClause = (tokens: array<token>): result<ast, parseError> => {
   Logger.warn("USING clause is deprecated since 1.2.0. Use VERIFY instead. Will be removed in 2.0.0.")
 
@@ -221,7 +221,7 @@ Link: <https://verisimdb.org/docs/migration-guide>; rel="sunset"
 ```elixir
 # config.exs
 config :verisim,
-  vql_version: "1.0.0",  # Pin to specific version
+  vcl_version: "1.0.0",  # Pin to specific version
   api_version: "v1"
 ```
 
@@ -240,7 +240,7 @@ config :verisim,
 
 ```yaml
 # Dockerfile
-ENV VQL_VERSION="1.x"  # Auto-upgrade within major version
+ENV VCL_VERSION="1.x"  # Auto-upgrade within major version
 ```
 
 **Trade-offs:**
@@ -260,7 +260,7 @@ ENV VQL_VERSION="1.x"  # Auto-upgrade within major version
    ```
 
 2. **Update queries gradually:**
-   ```vql
+   ```vcl
    -- Old query (1.0.0)
    FROM verisim:graph
    USING CONTRACT CitationContract
@@ -275,8 +275,8 @@ ENV VQL_VERSION="1.x"  # Auto-upgrade within major version
 
 3. **Test both versions side-by-side:**
    ```elixir
-   old_result = VQL.parse_and_execute(old_query, version: "1.0.0")
-   new_result = VQL.parse_and_execute(new_query, version: "1.2.0")
+   old_result = VCL.parse_and_execute(old_query, version: "1.0.0")
+   new_result = VCL.parse_and_execute(new_query, version: "1.2.0")
 
    assert old_result.data == new_result.data
    ```
@@ -292,14 +292,14 @@ ENV VQL_VERSION="1.x"  # Auto-upgrade within major version
 
 === Version Compatibility Matrix
 
-**Test all VQL versions against current parser:**
+**Test all VCL versions against current parser:**
 
 ```elixir
-# test/vql_compatibility_test.exs
-defmodule VeriSim.VQLCompatibilityTest do
+# test/vcl_compatibility_test.exs
+defmodule VeriSim.VCLCompatibilityTest do
   use ExUnit.Case
 
-  @vql_versions ["1.0.0", "1.1.0", "1.2.0"]
+  @vcl_versions ["1.0.0", "1.1.0", "1.2.0"]
   @test_queries [
     # Basic SELECT
     """
@@ -325,7 +325,7 @@ defmodule VeriSim.VQLCompatibilityTest do
 
   test "parse all versions" do
     for query <- @test_queries do
-      assert {:ok, _ast} = VQL.parse(query)
+      assert {:ok, _ast} = VCL.parse(query)
     end
   end
 
@@ -335,9 +335,9 @@ defmodule VeriSim.VQLCompatibilityTest do
     FROM verisim:graph LIMIT 10;
     """
 
-    for version <- @vql_versions do
-      config = %{vql_version: version}
-      assert {:ok, _result} = VQL.execute(query_1_0, config)
+    for version <- @vcl_versions do
+      config = %{vcl_version: version}
+      assert {:ok, _result} = VCL.execute(query_1_0, config)
     end
   end
 end
@@ -377,10 +377,10 @@ defmodule VeriSim.UpgradeTest do
     WHERE octad.id = @id;
     """
 
-    Application.put_env(:verisim, :vql_version, "2.0.0")
+    Application.put_env(:verisim, :vcl_version, "2.0.0")
 
     assert {:error, {:deprecated_syntax, "USING clause removed in 2.0.0"}} =
-      VQL.parse(deprecated_query)
+      VCL.parse(deprecated_query)
   end
 end
 ```
@@ -499,7 +499,7 @@ end
 POST /api/v1/federation/query HTTP/1.1
 Host: remote-store.edu
 X-VeriSimDB-Version: 1.2.0
-X-VQL-Version: 1.0.0
+X-VCL-Version: 1.0.0
 
 {
   "query": "FROM verisim:graph WHERE octad.id = @id"
@@ -511,7 +511,7 @@ X-VQL-Version: 1.0.0
 ```http
 HTTP/1.1 200 OK
 X-VeriSimDB-Version: 1.1.0
-X-VQL-Version-Supported: 1.0.0, 1.1.0
+X-VCL-Version-Supported: 1.0.0, 1.1.0
 
 {
   "data": [...]
@@ -520,7 +520,7 @@ X-VQL-Version-Supported: 1.0.0, 1.1.0
 
 **Version compatibility rules:**
 
-1. **VQL version:** Query must use syntax supported by remote store
+1. **VCL version:** Query must use syntax supported by remote store
    - If remote supports `[1.0.0, 1.1.0]` and query uses `1.2.0` → error
    - Client downgrades query syntax if possible
 
@@ -536,7 +536,7 @@ X-VQL-Version-Supported: 1.0.0, 1.1.0
 ```elixir
 def query_federation(stores, query) do
   # Check if all stores support required features
-  required_features = VQL.detect_features(query)
+  required_features = VCL.detect_features(query)
   # [:zkp_verification, :tensor_modality, :drift_detection]
 
   compatible_stores = Enum.filter(stores, fn store ->
@@ -560,7 +560,7 @@ GET /api/v1/capabilities HTTP/1.1
 Response:
 {
   "verisimdb_version": "1.2.0",
-  "vql_versions": ["1.0.0", "1.1.0", "1.2.0"],
+  "vcl_versions": ["1.0.0", "1.1.0", "1.2.0"],
   "modalities": ["graph", "vector", "semantic", "document", "temporal"],
   "features": [
     "zkp_verification",
@@ -605,14 +605,14 @@ verisim-client = "1.2.0"  # Client version matches server minor version
 ```rust
 // Stable API
 pub trait VeriSimClient {
-    fn query(&self, vql: &str) -> Result<QueryResult>;
+    fn query(&self, vcl: &str) -> Result<QueryResult>;
     fn create_octad(&self, octad: Octad) -> Result<OctadId>;
     fn get_octad(&self, id: OctadId) -> Result<Octad>;
 }
 
 // Adding new methods is OK (minor version bump)
 pub trait VeriSimClient {
-    fn query(&self, vql: &str) -> Result<QueryResult>;
+    fn query(&self, vcl: &str) -> Result<QueryResult>;
     fn create_octad(&self, octad: Octad) -> Result<OctadId>;
     fn get_octad(&self, id: OctadId) -> Result<Octad>;
 
@@ -630,7 +630,7 @@ pub trait VeriSimClient {
 - [ ] Deprecation warnings added for features planned for removal
 - [ ] Documentation updated with new features
 - [ ] `CHANGELOG.md` updated with new features
-- [ ] No breaking changes to API, VQL syntax, or data formats
+- [ ] No breaking changes to API, VCL syntax, or data formats
 - [ ] Federation compatibility tested with previous minor version
 
 === Before Releasing Major Version (1.x.x → 2.x.x)
@@ -652,7 +652,7 @@ VeriSimDB maintains backwards compatibility through:
 2. **Deprecation timeline** - At least 6 months notice before removal
 3. **Format versioning** - Auto-migration for data formats
 4. **API versioning** - Multiple API versions supported concurrently
-5. **VQL versioning** - Explicit version markers in queries
+5. **VCL versioning** - Explicit version markers in queries
 6. **Feature detection** - Capability negotiation for federation
 7. **Comprehensive testing** - Compatibility test suite
 

@@ -23,7 +23,7 @@ import verisimdb_client/types.{
   type OctadInput, type OctadStatus, type PaginatedResponse,
   type PeerQueryResult, type ProvenanceChain, type ProvenanceEvent,
   type SearchResult, type SpatialData, type TensorData, type VectorData,
-  type VqlExplanation, type VqlResult,
+  type VclExplanation, type VclResult,
 }
 
 // ==========================================================================
@@ -682,17 +682,17 @@ pub fn decode_provenance_chain(
 }
 
 // ==========================================================================
-// VqlResult decoding
+// VclResult decoding
 // ==========================================================================
 
-/// Decoder for a VqlResult from a JSON object.
-fn vql_result_decoder() -> decode.Decoder(VqlResult) {
+/// Decoder for a VclResult from a JSON object.
+fn vcl_result_decoder() -> decode.Decoder(VclResult) {
   decode.into({
     use columns <- decode.parameter
     use rows <- decode.parameter
     use count <- decode.parameter
     use elapsed_ms <- decode.parameter
-    types.VqlResult(
+    types.VclResult(
       columns: columns,
       rows: rows,
       count: count,
@@ -705,25 +705,25 @@ fn vql_result_decoder() -> decode.Decoder(VqlResult) {
   |> decode.field("elapsed_ms", decode.float)
 }
 
-/// Decode a VqlResult from a JSON response body string.
-pub fn decode_vql_result(
+/// Decode a VclResult from a JSON response body string.
+pub fn decode_vcl_result(
   body: String,
-) -> Result(VqlResult, VeriSimError) {
-  parse_json(body, vql_result_decoder())
+) -> Result(VclResult, VeriSimError) {
+  parse_json(body, vcl_result_decoder())
 }
 
 // ==========================================================================
-// VqlExplanation decoding
+// VclExplanation decoding
 // ==========================================================================
 
-/// Decoder for a VqlExplanation from a JSON object.
-fn vql_explanation_decoder() -> decode.Decoder(VqlExplanation) {
+/// Decoder for a VclExplanation from a JSON object.
+fn vcl_explanation_decoder() -> decode.Decoder(VclExplanation) {
   decode.into({
     use query <- decode.parameter
     use plan <- decode.parameter
     use cost <- decode.parameter
     use warnings <- decode.parameter
-    types.VqlExplanation(
+    types.VclExplanation(
       query: query,
       plan: plan,
       cost: cost,
@@ -736,11 +736,11 @@ fn vql_explanation_decoder() -> decode.Decoder(VqlExplanation) {
   |> decode.field("warnings", decode.list(decode.string))
 }
 
-/// Decode a VqlExplanation from a JSON response body string.
-pub fn decode_vql_explanation(
+/// Decode a VclExplanation from a JSON response body string.
+pub fn decode_vcl_explanation(
   body: String,
-) -> Result(VqlExplanation, VeriSimError) {
-  parse_json(body, vql_explanation_decoder())
+) -> Result(VclExplanation, VeriSimError) {
+  parse_json(body, vcl_explanation_decoder())
 }
 
 // ==========================================================================
@@ -809,7 +809,7 @@ fn peer_query_result_decoder() -> decode.Decoder(PeerQueryResult) {
   })
   |> decode.field("peer_id", decode.string)
   |> decode.field("peer_name", decode.string)
-  |> decode.field("result", vql_result_decoder())
+  |> decode.field("result", vcl_result_decoder())
   |> decode.field("elapsed_ms", decode.float)
   |> optional_field("error", decode.string)
 }

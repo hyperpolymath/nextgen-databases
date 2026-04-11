@@ -42,7 +42,7 @@ before downstream systems consume contradictory data.
    temporal, provenance, and spatial in one entity
 3. *Self-normalisation* -- Automatic repair of drifted representations with
    configurable resolution strategies
-4. *Proof-carrying queries (VQL-DT)* -- Optional dependent-type verification
+4. *Proof-carrying queries (VCL-DT)* -- Optional dependent-type verification
    of query correctness using Idris2
 5. *Heterogeneous federation* -- Unified querying across PostgreSQL, ArangoDB,
    Elasticsearch, and Neo4j without data migration
@@ -66,16 +66,16 @@ alertable condition -- not an invisible failure mode.
   reloading, and battle-tested concurrency. Rust provides near-C performance with
   memory safety.
 
-* *VQL (Verisimilitude Query Language)*: Purpose-built query language for
+* *VCL (Verisimilitude Query Language)*: Purpose-built query language for
   cross-modal operations. Familiar to SQL users but supports modality-specific
   operations (graph traversals, vector similarity, tensor ops, temporal
   time-travel, spatial containment) in a unified syntax.
 
-* *VQL-DT*: Optional dependent-type layer using Idris2. Proves query type
+* *VCL-DT*: Optional dependent-type layer using Idris2. Proves query type
   correctness, semantic compatibility of cross-modal joins, and threshold
-  validity at compile time. Entirely opt-in -- plain VQL works without it.
+  validity at compile time. Entirely opt-in -- plain VCL works without it.
 
-* *Federation*: Connectors translate between VQL and native query languages
+* *Federation*: Connectors translate between VCL and native query languages
   (SQL, Cypher, AQL, Query DSL). Each connector independently tested with
   fallback to local-only mode. No vendor lock-in.
 
@@ -112,7 +112,7 @@ alertable condition -- not an invisible failure mode.
   (federation) or operates standalone; it does not replace PostgreSQL
 * "AI-native database" -- VeriSimDB serves AI workloads (GraphRAG) but is not
   limited to AI; the core value is data consistency
-* "NoSQL" -- VeriSimDB has its own query language (VQL); calling it NoSQL implies
+* "NoSQL" -- VeriSimDB has its own query language (VCL); calling it NoSQL implies
   it competes with document stores
 
 == Business Audience (CTOs, VP Engineering, Data Leaders)
@@ -188,7 +188,7 @@ continuously and repairs it automatically.
 VeriSimDB formalises the concept of cross-modal drift in multimodal data systems
 and provides an operational system for detecting, quantifying, and repairing
 representational divergence across 8 data modalities. The query language includes
-an optional dependent-type verification layer (VQL-DT) that provides compile-time
+an optional dependent-type verification layer (VCL-DT) that provides compile-time
 proofs of query correctness.
 
 === Supporting Points
@@ -198,8 +198,8 @@ proofs of query correctness.
   multi-model databases store multiple models but do not track inter-model
   consistency.
 
-* *Formal semantics*: VQL has published formal semantics (denotational and
-  operational). VQL-DT extends these with dependent-type judgements formalised in
+* *Formal semantics*: VCL has published formal semantics (denotational and
+  operational). VCL-DT extends these with dependent-type judgements formalised in
   Idris2, providing machine-checkable proofs of query properties.
 
 * *Reproducibility*: The entire system is open source. Experiments can be
@@ -221,7 +221,7 @@ proofs of query correctness.
   in Heterogeneous Database Federations"
 * Case study: IDApTIK game level architecture with Idris2 dependent-type proofs
 * 14-module ABI with 5 cross-domain proofs, zero `believe_me` usage
-* Formal VQL grammar (EBNF) and type system specification
+* Formal VCL grammar (EBNF) and type system specification
 
 === Venues
 
@@ -256,7 +256,7 @@ proofs of query correctness.
 [quote]
 VeriSimDB is a full-featured multimodal database released under a permissive
 open-source licence (PMPL-1.0-or-later, with MPL-2.0 fallback). All 8
-modalities, drift detection, self-normalisation, VQL, and federation are in the
+modalities, drift detection, self-normalisation, VCL, and federation are in the
 community edition. There is no "enterprise edition" that gates features.
 
 === Supporting Points
@@ -296,7 +296,7 @@ community edition. There is no "enterprise edition" that gates features.
 * Rust community (r/rust, Rust Users Forum) -- core engine, storage
 * BEAM community (Erlang/Elixir conferences, Code BEAM) -- fault tolerance
 * Database community (r/database, HN, Lobsters) -- novel architecture
-* Formal methods community (Idris2 Discourse, TYPES mailing list) -- VQL-DT
+* Formal methods community (Idris2 Discourse, TYPES mailing list) -- VCL-DT
 
 === Use These Phrases
 

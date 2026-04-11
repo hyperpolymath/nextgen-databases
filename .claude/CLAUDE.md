@@ -93,8 +93,8 @@ The following files in `.machine_readable/` contain structured project metadata:
 ### ALLOWED
 - **Rust** - Core database engine, modality stores
 - **Elixir** - OTP orchestration layer
-- **ReScript** - VQL parser, federation registry
-- **VQL** - VeriSim Query Language (native query interface, NOT SQL)
+- **ReScript** - VCL parser, federation registry
+- **VCL** - VeriSim Consonance Language (native query interface, NOT SQL)
 
 ### BANNED
 - Python - Use Rust instead
@@ -376,7 +376,7 @@ User prompt → Haiku classifier → Route to:
 See `KNOWN-ISSUES.adoc` at repo root for all honest gaps. All 25 issues resolved.
 
 Resolved in recent sessions:
-- VQL-DT type checker wired end-to-end (Elixir-native + ReScript + Rust ZKP bridge)
+- VCL-DT type checker wired end-to-end (Elixir-native + ReScript + Rust ZKP bridge)
 - 11 proof types: EXISTENCE, INTEGRITY, CONSISTENCY, PROVENANCE, FRESHNESS, ACCESS, CITATION, CUSTOM, ZKP, PROVEN, SANCTIFY
 - Multi-proof parsing: PROOF A(x) AND B(y) splits correctly
 - Modality compatibility validation (INTEGRITY needs semantic, PROVENANCE needs provenance, etc.)
@@ -385,9 +385,9 @@ Resolved in recent sessions:
 - oxrocksdb-sys C++ dependency eliminated (Oxigraph feature-flagged, redb pure-Rust backend added)
 - protoc build dependency eliminated (proto code pre-generated)
 - stapeln container ecosystem integrated (compose.toml, .gatekeeper.yaml, manifest.toml, ct-build.sh)
-- VQL Playground wired to real backend (ApiClient.res, async execution, demo mode fallback, octad modalities)
+- VCL Playground wired to real backend (ApiClient.res, async execution, demo mode fallback, octad modalities)
 - PanLL database module protocol (DatabaseModule.res, DatabaseRegistry.res — VeriSimDB/QuandleDB/LithoGlyph)
-- Product telemetry: opt-in collector (ETS), reporter (JSON), 19 telemetry tests, VQL executor + drift monitor wired
+- Product telemetry: opt-in collector (ETS), reporter (JSON), 19 telemetry tests, VCL executor + drift monitor wired
 - PanLL telemetry dashboard panel with modality heatmap, query patterns, performance metrics
 
 ## Hypatia Integration Status
@@ -396,8 +396,8 @@ Resolved in recent sessions:
 - ScanIngester: panic-attack JSON → octad octads (Document, Graph, Temporal, Vector, Provenance, Semantic)
 - PatternQuery: cross-repo analytics (pipeline health, severity distribution, temporal trends, hotspots)
 - DispatchBridge: reads JSONL dispatch manifests, summarizes outcomes, feeds drift tracking
-- Hypatia VQL layer reads verisimdb-data flat files directly
-- Built-in Elixir VQL parser (no external Deno/Node needed)
+- Hypatia VCL layer reads verisimdb-data flat files directly
+- Built-in Elixir VCL parser (no external Deno/Node needed)
 - 954 canonical patterns tracked across 298 repos
 
 **Needs PAT:** Automated cross-repo dispatch requires a GitHub PAT with `repo` scope.

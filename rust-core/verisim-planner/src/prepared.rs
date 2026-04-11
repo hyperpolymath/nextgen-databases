@@ -420,7 +420,7 @@ impl PlanCache {
     /// Normalization rules:
     /// 1. Collapse all whitespace (spaces, tabs, newlines) into single spaces.
     /// 2. Trim leading and trailing whitespace.
-    /// 3. Lowercase VQL/SQL keywords (SELECT, WHERE, FROM, SEARCH, LIMIT, ORDER, BY, GROUP,
+    /// 3. Lowercase VCL/SQL keywords (SELECT, WHERE, FROM, SEARCH, LIMIT, ORDER, BY, GROUP,
     ///    AND, OR, NOT, JOIN, ON, AS, HAVING, INSERT, UPDATE, DELETE, SET, INTO, VALUES,
     ///    WITH, UNION, INTERSECT, EXCEPT, EXISTS, BETWEEN, LIKE, IN, IS, NULL, TRUE, FALSE,
     ///    ASC, DESC, DISTINCT, ALL, ANY, SOME, CASE, WHEN, THEN, ELSE, END, PROOF, VERIFY,
@@ -610,7 +610,7 @@ impl PlanCache {
         // We split on whitespace, check each token against the keyword list,
         // and lowercase it if it matches. Non-keyword tokens keep original case.
         let keywords = [
-            // SQL/VQL standard keywords
+            // SQL/VCL standard keywords
             "SELECT", "WHERE", "FROM", "SEARCH", "LIMIT", "ORDER", "BY", "GROUP",
             "AND", "OR", "NOT", "JOIN", "ON", "AS", "HAVING", "INSERT", "UPDATE",
             "DELETE", "SET", "INTO", "VALUES", "WITH", "UNION", "INTERSECT", "EXCEPT",
