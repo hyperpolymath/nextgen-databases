@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# justfile — Verisim research prototype build/test recipes
+
+# Run the full test suite via Pkg.test()
+test:
+    julia --project=. -e 'using Pkg; Pkg.test()'
+
+# Run a single test file standalone (flat-include scaffold)
+test-file FILE:
+    julia --project=. test/{{FILE}}
+
+# Run the KRLAdapter dogfood demo
+demo:
+    julia --project=. examples/krladapter_integration.jl
+
+# Drop into an interactive session with the package pre-loaded
+repl:
+    julia --project=. -e 'using Verisim; import KnotTheory'
+
+# Check package integrity
+check:
+    julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.status()'
