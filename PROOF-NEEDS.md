@@ -24,7 +24,7 @@
 
 | # | Component | Prover | Notes |
 |---|-----------|--------|-------|
-| V6 | WAL integrity | L4 | CRC, replay idempotence, segment ordering |
+| **V6** | **WAL integrity** | **L4** | **DONE 2026-04-12** — `verisimdb/verification/proofs/lean4/WALIntegrity.lean` — sequence monotonicity, CRC validity, replay compositionality + checkpoint idempotence |
 | **V7** | **Provenance chain immutability** | **Ag** | **DONE 2026-04-11** — `verisimdb/verification/proofs/agda/ProvenanceChain.agda` |
 | V8 | Drift metric correctness | Iz | Detection algorithm numerical bounds |
 
