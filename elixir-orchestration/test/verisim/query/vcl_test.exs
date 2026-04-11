@@ -246,4 +246,28 @@ defmodule VeriSim.Query.VCLTest do
       assert is_map(ast)
     end
   end
+
+  # ===========================================================================
+  # Security: null-byte sanitisation (P1 hardening)
+  # ===========================================================================
+
+  describe "null-byte sanitisation" do
+    test "rejects query containing a null byte" do
+      # Null bytes in entity IDs truncate C strings at the Rust FFI boundary,
+      # allowing forged IDs. The built-in parser must reject them.
+      assert {:error, msg} = VCLBridge.parse("SELECT GRAPH FROM HEXAD abc\0evil")
+      assert msg =~ "null"
+    end
+
+    test "rejects query with null byte in WHERE clause" do
+      assert {:error, msg} =
+               VCLBridge.parse("SELECT GRAPH FROM HEXAD abc-123 WHERE GRAPH.id = 'ok\0bad'")
+
+      assert msg =~ "null"
+    end
+
+    test "clean query without null bytes is accepted" do
+      assert {:ok, _ast} = VCLBridge.parse("SELECT GRAPH FROM HEXAD abc-123")
+    end
+  end
 end

@@ -347,13 +347,19 @@ defmodule VeriSim.Query.VCLBridge do
   end
 
   defp tokenize(input) do
-    # Simple whitespace-aware tokenizer
-    tokens =
-      input
-      |> String.replace(~r/\s+/, " ")
-      |> String.split(" ", trim: true)
+    # Reject null bytes before tokenising: they truncate C strings silently at the
+    # Rust FFI boundary, allowing entity IDs to be forged via truncation.
+    if String.contains?(input, "\0") do
+      {:error, "VCL query contains null bytes"}
+    else
+      # Simple whitespace-aware tokenizer
+      tokens =
+        input
+        |> String.replace(~r/\s+/, " ")
+        |> String.split(" ", trim: true)
 
-    {:ok, tokens}
+      {:ok, tokens}
+    end
   end
 
   defp parse_tokens(tokens) do
