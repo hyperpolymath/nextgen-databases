@@ -1,46 +1,27 @@
-;; SPDX-License-Identifier: PMPL-1.0-or-later
-;; META.scm - Architectural decisions and project meta-information
-;; Media-Type: application/meta+scheme
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# META.a2ml — Beam meta-level information
+[metadata]
+version = "1.0.0"
+last-updated = "2026-04-11"
 
-(define-meta lithoglyph-beam
-  (version "1.0.0")
+[project-info]
+license = "PMPL-1.0-or-later"
+author = "Jonathan D.A. Jewell (hyperpolymath)"
 
-  (architecture-decisions
-    ;; ADR format: (adr-NNN status date context decision consequences)
-    ((adr-001 accepted "2026-01-30"
-      "Need to establish repository structure and standards"
-      "Adopt RSR (Rhodium Standard Repository) conventions from rsr-template-repo"
-      "Ensures consistency with 500+ repos in hyperpolymath ecosystem. "
-      "Enables automated quality enforcement via gitbot-fleet and Hypatia.")))
+[architecture-decisions]
+decisions = [
+  # No ADRs recorded
+]
 
-  (development-practices
-    (code-style
-      "Follow hyperpolymath language policy: "
-      "Prefer ReScript, Rust, Gleam, Elixir. "
-      "Avoid TypeScript, Go, Python per RSR.")
-    (security
-      "All commits signed. "
-      "Hypatia neurosymbolic scanning enabled. "
-      "OpenSSF Scorecard tracking.")
-    (testing
-      "Comprehensive test coverage required. "
-      "CI/CD runs on all pushes.")
-    (versioning
-      "Semantic versioning (semver). "
-      "Changelog maintained in CHANGELOG.md.")
-    (documentation
-      "README.adoc for overview. "
-      "STATE.scm for current state. "
-      "ECOSYSTEM.scm for relationships.")
-    (branching
-      "Main branch protected. "
-      "Feature branches for new work. "
-      "PRs required for merges."))
+[development-practices]
+versioning = "SemVer"
+documentation = "AsciiDoc"
+build-tool = "just"
 
-  (design-rationale
-    (why-rsr
-      "RSR provides standardized structure across 500+ repos, "
-      "enabling automated tooling and consistent developer experience.")
-    (why-hypatia
-      "Neurosymbolic security scanning combines neural pattern recognition "
-      "with symbolic reasoning for fast, deterministic security checks.")))
+[maintenance-axes]
+scoping-first = true
+axis-1 = "must > intend > like"
+axis-2 = "corrective > adaptive > perfective"
+axis-3 = "systems > compliance > effects"

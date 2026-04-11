@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # STATE.a2ml — Project state checkpoint
 # Converted from STATE.scm on 2026-03-15
-# Updated: 2026-04-11 — Tropical matrix + KRL integration (Phase 3+4+5)
+# Updated: 2026-04-11 — bellman_ford sorry CLOSED; all Isabelle sorries gone
 
 [metadata]
 project = "nextgen-databases"
@@ -11,25 +11,24 @@ status = "active"
 
 [project-context]
 name = "nextgen-databases"
-completion-percentage = 45
+completion-percentage = 50
 phase = "Phase 5 — Tropical Consonance + KRL Integration"
 
 [current-position]
-milestone = "verisim-modular-experiment tropical bridge v0.2"
+milestone = "verisim-modular-experiment tropical bridge v0.2 + bellman_ford proved"
 last-session = "2026-04-11"
-last-action = "Wired KnotTheory.jl RII (r2_simplify) into TangleGraph._rii_neighbors; ProofConsonance VCL clause live; TROPICAL-BRIDGE.adoc updated; contractiles corrected"
+last-action = "Closed bellman_ford OFFICIAL SORRY 2 — full min-plus Bellman-Ford proof in Tropical_Matrices_Full.thy. All Isabelle sorries gone (0 remaining)."
 
 [tropical-bridge]
 status = "v0.2 — RI + RII live, RIII stub (KnotTheory.jl r3_simplify is no-op)"
-isabelle-sorry-tropical-matrices = "1 remaining (bellman_ford in Tropical_Matrices_Full.thy)"
+isabelle-sorry-tropical-matrices = "NONE — all closed (bellman_ford CLOSED 2026-04-11)"
 isabelle-sorry-other = "cycle_shortcutting CLOSED; floyd_warshall CLOSED; tropm_mat_pow_eq_sum_walks CLOSED"
 julia-mirror = "TropicalMatrix.jl + TangleGraph.jl (verisim-modular-experiment/impl/tropical/)"
 vcl-clauses = "ProofIntegrity, ProofConsistency, ProofFreshness, ProofConsonance — all live"
 
 [pending-tropical]
-1 = "Close bellman_ford sorry in Tropical_Matrices_Full.thy (min-plus version)"
-2 = "Add Tropical_Determinants.thy + ProofOptimalAssignment VCL clause"
-3 = "Wire _riii_neighbors when KnotTheory.jl gains live r3_simplify"
+1 = "Add Tropical_Determinants.thy + ProofOptimalAssignment VCL clause"
+2 = "Wire _riii_neighbors when KnotTheory.jl gains live r3_simplify"
 
 [test-coverage]
 unit-tests = "~40 (Elixir consensus + federation adapters)"
@@ -55,14 +54,12 @@ gleam-smoke = "Written; requires compiled lith_nif.so to run connection/lifecycl
 - "modality_benchmarks.rs uses old API — does not compile (pre-existing)"
 
 [route-to-mvp]
-next = "Close bellman_ford sorry (Tropical_Matrices_Full.thy) — upgrades ProofConsonance to machine-checked"
-then = "Add Tropical_Determinants.thy + ProofOptimalAssignment"
+next = "Add Tropical_Determinants.thy + ProofOptimalAssignment VCL clause"
 then = "Fix VQLTypeChecker binary_to_existing_atom crash (P1 hardening)"
 then = "Fix null-byte entity ID sanitisation in VQL parser"
 then = "Update integration_test.rs to current API"
 
 [critical-next-actions]
-1 = "Close bellman_ford OFFICIAL SORRY 2 (min-plus Bellman-Ford optimality)"
-2 = "Tropical_Determinants.thy new file — permanent = optimal assignment"
-3 = "Fix VQLTypeChecker to use String.to_existing_atom with rescue guard (P1)"
-4 = "Add null-byte sanitisation in VQLBridge built-in parser (P1)"
+1 = "Tropical_Determinants.thy new file — permanent = optimal assignment"
+2 = "Fix VQLTypeChecker to use String.to_existing_atom with rescue guard (P1)"
+3 = "Add null-byte sanitisation in VQLBridge built-in parser (P1)"
