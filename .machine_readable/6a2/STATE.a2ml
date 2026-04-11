@@ -6,18 +6,18 @@
 [metadata]
 project = "nextgen-databases"
 version = "0.1.0"
-last-updated = "2026-04-11"
+last-updated = "2026-04-12"
 status = "active"
 
 [project-context]
 name = "nextgen-databases"
-completion-percentage = 55
-phase = "Phase 5 — Tropical Consonance + KRL Integration (P2 DONE)"
+completion-percentage = 62
+phase = "Phase 5 — Tropical Consonance + KRL Integration (P2 + P3 DONE)"
 
 [current-position]
-milestone = "verisim-modular-experiment tropical bridge v0.2 + bellman_ford proved"
-last-session = "2026-04-11"
-last-action = "P2: Tropical_Determinants.thy (sorry-free), TropicalDeterminant.jl, ProofOptimalAssignment VCL clause + 6 tests"
+milestone = "verisim-modular-experiment tropical bridge v0.2 + bellman_ford proved + P3 API fixes"
+last-session = "2026-04-12"
+last-action = "P3: integration_test.rs + modality_benchmarks.rs updated to current API; KRaft remove_server flaky tests fixed with poll_until helper"
 
 [tropical-bridge]
 status = "v0.2 — RI + RII live, RIII stub (KnotTheory.jl r3_simplify is no-op)"
@@ -47,13 +47,13 @@ cargo-bench-compile = "PASS (throughput_benchmarks.rs — no errors, no warnings
 gleam-smoke = "Written; requires compiled lith_nif.so to run connection/lifecycle tests"
 
 [blockers]
-- "Integration test (tests/integration_test.rs) uses old API — does not compile (pre-existing)"
-- "modality_benchmarks.rs uses old API — does not compile (pre-existing)"
+- "KRaft remove_server tests: timing-sensitive — mitigated with poll_until helper (was pre-existing timeout failure)"
 
 [route-to-mvp]
-next = "Update integration_test.rs to current API"
-then = "Update modality_benchmarks.rs to current API"
+next = "Promote verisim-modular-experiment impl/ to shippable verisim-core package"
+then = "Wire RIII neighbors when KnotTheory.jl gains live r3_simplify"
 
 [critical-next-actions]
-1 = "Update integration_test.rs to current API"
-2 = "Update modality_benchmarks.rs to current API"
+1 = "Promote impl/ to shippable verisim-core package"
+2 = "Wire _riii_neighbors when KnotTheory.jl gains live r3_simplify"
+3 = "Zig FFI port of VerisimCore per hyperpolymath standard"

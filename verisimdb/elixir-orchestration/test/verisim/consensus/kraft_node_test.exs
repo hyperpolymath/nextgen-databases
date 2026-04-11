@@ -34,6 +34,28 @@ defmodule VeriSim.Consensus.KRaftNodeTest do
     :exit, _ -> :ok
   end
 
+  # Poll `fun` every `interval_ms` ms until it returns a truthy value, or
+  # fail after `timeout_ms` ms have elapsed.  Used for membership-change
+  # assertions where the commit + apply cycle can be slower under CI load.
+  defp poll_until(fun, timeout_ms \\ 2_000, interval_ms \\ 50) do
+    deadline = System.monotonic_time(:millisecond) + timeout_ms
+
+    Enum.reduce_while(Stream.repeatedly(fn -> :poll end), nil, fn _, _acc ->
+      if fun.() do
+        {:halt, :ok}
+      else
+        remaining = deadline - System.monotonic_time(:millisecond)
+
+        if remaining <= 0 do
+          {:halt, :timeout}
+        else
+          Process.sleep(min(interval_ms, remaining))
+          {:cont, nil}
+        end
+      end
+    end)
+  end
+
   describe "single-node leader election" do
     test "node with 0 peers becomes leader within 500ms" do
       node_id = "solo-#{System.unique_integer([:positive])}"
@@ -179,13 +201,24 @@ defmodule VeriSim.Consensus.KRaftNodeTest do
 
       # Add then remove
       {:ok, _} = KRaftNode.add_server(node_id, "ephemeral-peer", [])
-      Process.sleep(100)
-      {:ok, _} = KRaftNode.remove_server(node_id, "ephemeral-peer")
-      Process.sleep(100)
 
-      registry = KRaftNode.registry(node_id)
-      members = get_in(registry, [:config, :members]) || []
-      refute "ephemeral-peer" in members
+      # Wait for add to be committed before issuing remove
+      :ok =
+        poll_until(fn ->
+          members = get_in(KRaftNode.registry(node_id), [:config, :members]) || []
+          "ephemeral-peer" in members
+        end)
+
+      {:ok, _} = KRaftNode.remove_server(node_id, "ephemeral-peer")
+
+      # Poll until the commit + state-machine apply removes the member
+      result =
+        poll_until(fn ->
+          members = get_in(KRaftNode.registry(node_id), [:config, :members]) || []
+          "ephemeral-peer" not in members
+        end)
+
+      assert result == :ok, "ephemeral-peer was not removed from registry within 2 s"
 
       stop_kraft(pid)
     end
@@ -200,9 +233,20 @@ defmodule VeriSim.Consensus.KRaftNodeTest do
       leader_pid = start_kraft(leader_id, [follower_id])
       follower_pid = start_kraft(follower_id, [leader_id])
 
-      Process.sleep(1_000)
+      # Poll until exactly one leader has been elected (up to 3 s under CI load)
+      result =
+        poll_until(
+          fn ->
+            roles = Enum.map([leader_id, follower_id], &KRaftNode.diagnostics(&1).role)
+            Enum.count(roles, &(&1 == :leader)) == 1
+          end,
+          3_000,
+          100
+        )
 
-      # Find which one is leader
+      assert result == :ok, "Cluster did not elect a leader within 3 s"
+
+      # Find which node is actually the leader
       leader_diag = KRaftNode.diagnostics(leader_id)
       {actual_leader, actual_follower, actual_follower_pid} =
         if leader_diag.role == :leader do
@@ -213,11 +257,19 @@ defmodule VeriSim.Consensus.KRaftNodeTest do
 
       # Remove the follower via the leader
       {:ok, _} = KRaftNode.remove_server(actual_leader, actual_follower)
-      Process.sleep(200)
 
-      # Leader's peer count should now be 0 (follower removed from peers)
-      diag = KRaftNode.diagnostics(actual_leader)
-      assert diag.peer_count == 0
+      # Poll until the leader's peer list has been updated (commit + apply)
+      remove_result =
+        poll_until(
+          fn ->
+            KRaftNode.diagnostics(actual_leader).peer_count == 0
+          end,
+          2_000,
+          50
+        )
+
+      assert remove_result == :ok,
+             "Leader peer_count did not drop to 0 within 2 s after remove_server"
 
       stop_kraft(leader_pid)
       stop_kraft(follower_pid)

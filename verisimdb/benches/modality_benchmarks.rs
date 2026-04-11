@@ -8,14 +8,16 @@ use tokio::runtime::Runtime;
 
 use verisim_document::{Document, DocumentStore, TantivyDocumentStore};
 use verisim_drift::{DriftDetector, DriftThresholds, DriftType};
-use verisim_graph::{GraphEdge, GraphNode, GraphObject, GraphStore, OxiGraphStore};
+use verisim_graph::{GraphEdge, GraphNode, GraphObject, GraphStore, SimpleGraphStore};
 use verisim_octad::{
     OctadConfig, OctadDocumentInput, OctadId, OctadInput, OctadSnapshot, OctadStore,
     OctadVectorInput, OctadSemanticInput, InMemoryOctadStore,
 };
+use verisim_provenance::InMemoryProvenanceStore;
 use verisim_semantic::{
     InMemorySemanticStore, ProofBlob, ProofType, SemanticStore, SemanticType,
 };
+use verisim_spatial::InMemorySpatialStore;
 use verisim_temporal::{InMemoryVersionStore, TemporalStore};
 use verisim_tensor::{InMemoryTensorStore, ReduceOp, Tensor, TensorStore};
 use verisim_vector::{DistanceMetric, Embedding, HnswConfig, HnswVectorStore, VectorStore};
@@ -142,7 +144,7 @@ fn bench_graph_operations(c: &mut Criterion) {
     let mut group = c.benchmark_group("graph");
 
     group.bench_function("insert_edge", |b| {
-        let store = OxiGraphStore::in_memory().unwrap();
+        let store = SimpleGraphStore::in_memory().unwrap();
         let mut counter = 0u64;
 
         b.to_async(&rt).iter(|| {
@@ -160,7 +162,7 @@ fn bench_graph_operations(c: &mut Criterion) {
     });
 
     // Pre-populate for query benchmark
-    let query_store = OxiGraphStore::in_memory().unwrap();
+    let query_store = SimpleGraphStore::in_memory().unwrap();
     let query_node = GraphNode::new("https://example.org/hub");
     rt.block_on(async {
         for i in 0..100 {
@@ -190,12 +192,14 @@ fn bench_octad_operations(c: &mut Criterion) {
     let rt = Runtime::new().unwrap();
     let mut group = c.benchmark_group("octad");
 
-    let graph_store = Arc::new(OxiGraphStore::in_memory().unwrap());
-    let vector_store = Arc::new(HnswVectorStore::new(384, DistanceMetric::Cosine, HnswConfig::default()));
-    let document_store = Arc::new(TantivyDocumentStore::in_memory().unwrap());
-    let tensor_store = Arc::new(InMemoryTensorStore::new());
-    let semantic_store = Arc::new(InMemorySemanticStore::new());
+    let graph_store     = Arc::new(SimpleGraphStore::in_memory().unwrap());
+    let vector_store    = Arc::new(HnswVectorStore::new(384, DistanceMetric::Cosine, HnswConfig::default()));
+    let document_store  = Arc::new(TantivyDocumentStore::in_memory().unwrap());
+    let tensor_store    = Arc::new(InMemoryTensorStore::new());
+    let semantic_store  = Arc::new(InMemorySemanticStore::new());
     let temporal_store: Arc<InMemoryVersionStore<OctadSnapshot>> = Arc::new(InMemoryVersionStore::new());
+    let provenance_store = Arc::new(InMemoryProvenanceStore::new());
+    let spatial_store   = Arc::new(InMemorySpatialStore::new());
 
     let config = OctadConfig::default();
 
@@ -207,6 +211,8 @@ fn bench_octad_operations(c: &mut Criterion) {
         tensor_store,
         semantic_store,
         temporal_store,
+        provenance_store,
+        spatial_store,
     );
 
     group.bench_function("create_octad", |b| {
@@ -300,12 +306,14 @@ fn bench_cross_modal_query(c: &mut Criterion) {
     let rt = Runtime::new().unwrap();
     let mut group = c.benchmark_group("cross_modal");
 
-    let graph_store = Arc::new(OxiGraphStore::in_memory().unwrap());
-    let vector_store = Arc::new(HnswVectorStore::new(384, DistanceMetric::Cosine, HnswConfig::default()));
-    let document_store = Arc::new(TantivyDocumentStore::in_memory().unwrap());
-    let tensor_store = Arc::new(InMemoryTensorStore::new());
-    let semantic_store = Arc::new(InMemorySemanticStore::new());
+    let graph_store     = Arc::new(SimpleGraphStore::in_memory().unwrap());
+    let vector_store    = Arc::new(HnswVectorStore::new(384, DistanceMetric::Cosine, HnswConfig::default()));
+    let document_store  = Arc::new(TantivyDocumentStore::in_memory().unwrap());
+    let tensor_store    = Arc::new(InMemoryTensorStore::new());
+    let semantic_store  = Arc::new(InMemorySemanticStore::new());
     let temporal_store: Arc<InMemoryVersionStore<OctadSnapshot>> = Arc::new(InMemoryVersionStore::new());
+    let provenance_store = Arc::new(InMemoryProvenanceStore::new());
+    let spatial_store   = Arc::new(InMemorySpatialStore::new());
 
     let config = OctadConfig::default();
 
@@ -317,6 +325,8 @@ fn bench_cross_modal_query(c: &mut Criterion) {
         tensor_store,
         semantic_store,
         temporal_store,
+        provenance_store,
+        spatial_store,
     );
 
     // Create 1000 octads with multiple modalities
