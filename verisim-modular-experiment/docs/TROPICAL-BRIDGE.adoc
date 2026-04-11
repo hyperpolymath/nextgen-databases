@@ -1,0 +1,147 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell
+= Tropical Bridge: Isabelle Proofs ↔ Julia Consonance Checker
+Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+2026-04-11
+:toc:
+:toc-placement: preamble
+:sectnums:
+:icons: font
+
+[.lead]
+This document is the formal correspondence table between the Isabelle/HOL
+theorems in `tropical-resource-typing/` and the Julia implementation in
+`impl/tropical/`.  It specifies what the Julia code is *justified by* and
+what gaps remain.
+
+== The Claim
+
+`ProofConsonance` in VCL checks tangle equivalence by asking:
+
+____
+Is the minimum number of Reidemeister moves from tangle A to tangle B
+finite (within the modelled move set)?
+____
+
+The answer is computed by `bellman_ford_matrix` in `TropicalMatrix.jl`,
+which is a direct Julia mirror of the Isabelle `bellman_ford` theorem.
+
+== Formal Correspondence Table
+
+[cols="1,2,2"]
+|===
+|Isabelle (tropical-resource-typing/) |Julia (impl/tropical/) |Notes
+
+|`tropical_min` type +
+`PosInf`, `Fin' n`
+|`Tropical` struct +
+`TROP_ZERO` (Inf), `Tropical(n)`
+|Min-plus carrier.  `Tropical_v2.thy`.
+
+|`a + b = min a b` on `tropical_min`
+|`trop_add(a, b) = min(a.val, b.val)`
+|`tropm_add_idem: a ⊕ a = a` guarantees idempotency.
+
+|`a * b = a + b` on `tropical_min` +
+(∞ absorbing)
+|`trop_mul(a, b)` — returns TROP_ZERO if either is ∞
+|`Tropical_v2.thy` instances.
+
+|`tropm_mat_id n`
+|`trop_mat_id(n)`
+|Diagonal TROP_ONE, off-diagonal TROP_ZERO.
+
+|`tropm_mat_mul n A B i j ≡ ∑ k. A i k * B k j`
+|`trop_mat_mul(A, B)[i,j] = min_k(A[i,k] + B[k,j])`
+|Direct transliteration.
+
+|`tropm_mat_pow n A k`
+|`trop_mat_pow(A, k)`
+|Right-iterated product; `A^0 = I`.
+
+|`tropm_mat_close n A i j ≡ A i j + tropm_mat_id n i j`
+|`trop_mat_close(A)`
+|Entry-wise min with identity.
+
+|`tropm_mat_pow_eq_sum_walks` +
+(proved — was OFFICIAL SORRY 1)
+|Used implicitly: `bellman_ford_matrix` correctness rests on this.
+|`A^k[i,j]` = sum over walks of length k.
+
+|`bellman_ford` +
+(OFFICIAL SORRY 2 — pending)
+|`bellman_ford_matrix(A)` — returns `(I ⊕ A)^{n-1}`
+|**See gap table below.**
+|===
+
+== Gap Table
+
+[cols="1,3,1"]
+|===
+|Gap |Impact |Mitigation
+
+|`bellman_ford` sorry not yet closed
+|Julia `bellman_ford_matrix` is algorithmically correct but lacks
+ machine-checked correctness certificate for the closed-form claim.
+ The algorithm is correct by the matrix-power walk interpretation
+ (`tropm_mat_pow_eq_sum_walks`, proved); only the no-negative-cycle
+ optimality claim is unverified.
+|Planned Session 2 of tropical proof work.
+
+|RI only (no RII/RIII)
+|`TangleGraph.v0.1` models RI moves only.  Two tangles related by RII
+ or RIII moves will receive INCONCLUSIVE (FAIL with reason string), not PASS.
+|`_rii_neighbors` and `_riii_neighbors` stubs in `TangleGraph.jl`; wire
+ to `KnotTheory.jl` once KRLAdapter is linked.
+
+|Infinite Reidemeister graph
+|The full Reidemeister move graph is infinite.  `build_consonance_graph`
+ bounds the BFS at `depth` hops.  Deep equivalences are undecidable in
+ general; the prover is sound but not complete.
+|Use knot invariants (Jones polynomial via `KnotTheory.jl`) as a
+ fast-fail before the tropical path search.
+|===
+
+== The Architecture
+
+----
+Isabelle/HOL                Julia (this package)       VCL layer
+------------------          ----------------------     ---------
+Tropical_v2.thy             TropicalMatrix.jl          Query.jl
+  tropical_min type   ───►    Tropical struct           ProofConsonance
+  add / mul ops               trop_add / trop_mul
+
+Tropical_Matrices_Full.thy  TropicalMatrix.jl
+  tropm_mat_pow       ───►    trop_mat_pow
+  tropm_mat_close             trop_mat_close
+  bellman_ford        ─ ─ ►   bellman_ford_matrix       Prover.jl
+  (sorry pending)               (implemented;            prove(ProofConsonance)
+                                 formal cert pending)
+                              TangleGraph.jl
+                                build_consonance_graph
+                                dt_codes_from_blob
+----
+
+== Usage
+
+[source,julia]
+----
+# Construct ProofConsonance and evaluate
+clause = ProofConsonance(octad_id_trefoil, octad_id_fig8, 3)
+result = prove(clause, store, manager)
+# → VerdictPass("Reidemeister path: 1 move(s) [tropical Bellman-Ford, ...]")
+# or VerdictFail("no path found within depth=3 [RI only; ...]")
+----
+
+== Next Steps
+
+1. *Close `bellman_ford` sorry* (Session 2, `tropical-resource-typing/`).
+   This upgrades the formal status from "algorithmically justified" to
+   "machine-checked."
+2. *Wire RII/RIII* — implement `_rii_neighbors` and `_riii_neighbors` in
+   `TangleGraph.jl` using `KnotTheory.jl` PD-code manipulations.
+3. *Tropical determinant* — add `Tropical_Determinants.thy` (tropical
+   permanent = max-weight perfect matching); expose as `ProofOptimalAssignment`
+   in VCL for optimal tangle adapter chain selection.
+4. *Jones fast-fail* — before Bellman-Ford, check `Jones(dt_a) ≠ Jones(dt_b)`
+   via `KnotTheory.jl` for an immediate disequivalence certificate.

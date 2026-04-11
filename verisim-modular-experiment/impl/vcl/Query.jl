@@ -15,6 +15,7 @@
 module VCLQuery
 
 export ProofClause, ProofIntegrity, ProofConsistency, ProofFreshness,
+       ProofConsonance,
        ProofVerdict, VerdictPass, VerdictFail
 
 # -----------------------------------------------------------------------
@@ -58,6 +59,32 @@ struct ProofFreshness <: ProofClause
     octad_id::Any
     window_ns::Int64
 end
+
+"""
+PROOF CONSONANCE FOR <id_a> AND <id_b> [WITHIN <bound>]
+
+Asks: do two octads represent equivalent tangles / knots / links?
+
+Uses tropical matrix power (Bellman-Ford) to search for a Reidemeister
+move path connecting the two tangle configurations.  A finite minimum
+path weight proves consonance; ∞ means no path was found within the
+modelled move set.
+
+Formal backing:
+  `bellman_ford` theorem — Tropical_Matrices_Full.thy
+  See docs/TROPICAL-BRIDGE.adoc for the Isabelle ↔ Julia correspondence.
+
+Fields:
+  octad_id_a  — first  TangleIR octad
+  octad_id_b  — second TangleIR octad
+  depth       — Reidemeister BFS horizon (default 2)
+"""
+struct ProofConsonance <: ProofClause
+    octad_id_a::Any
+    octad_id_b::Any
+    depth::Int
+end
+ProofConsonance(a, b) = ProofConsonance(a, b, 2)
 
 # -----------------------------------------------------------------------
 # Results
