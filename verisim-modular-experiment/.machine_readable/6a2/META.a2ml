@@ -1,84 +1,27 @@
-;; SPDX-License-Identifier: PMPL-1.0-or-later
-(meta
-  (version "1.0.0")
-  (last-updated "2026-04-05")
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# META.a2ml — Verisim Modular Experiment meta-level information
+[metadata]
+version = "1.0.0"
+last-updated = "2026-04-05"
 
-  (architecture-decisions
-    (decision "shape-absence-as-novel-axis"
-      (status accepted)
-      (date "2026-04-05")
-      (context "Existing verisimdb federation architecture treats all 8 shapes as
-                present-but-located-variably. User raised question: what if shapes
-                can be entirely absent (not just remote)?")
-      (decision "Open 'presence axis' as orthogonal to existing 'location axis'.
-                 Store-level absence is the novel axis this experiment explores.")
-      (rationale "Existing axis: where does each shape live (standalone/federated/hybrid).
-                  New axis: which shapes exist at all. Per-octad absence already handled
-                  (def:octad allows φ(m)=⊥). Store-level absence is new."))
+[project-info]
+license = "PMPL-1.0-or-later"
+author = "Jonathan D.A. Jewell (hyperpolymath)"
 
-    (decision "core-identity-set"
-      (status accepted)
-      (date "2026-04-05")
-      (context "Phase 1 closure test per shape against formal data model.")
-      (decision "Core={Semantic, Temporal, Provenance}. Federable={Vector, Tensor,
-                 Document, Spatial}. Conditional={Graph}.")
-      (rationale "Semantic=VCL proof substrate. Temporal=inv:persist+def:enrichment+
-                  LWW-total-order+attestation-freshness. Provenance=def:enrichment+
-                  federation-trust-substrate. Others admit absence via d(⊥,·)=0.
-                  Graph required iff cross-entity consonance claims in scope."))
+[architecture-decisions]
+decisions = [
+  # No ADRs recorded
+]
 
-    (decision "idris2-abi-plus-julia-impl"
-      (status accepted)
-      (date "2026-04-05")
-      (context "Hyperpolymath standard: Idris2 ABI + Zig FFI. Phase 3 needs a
-                runnable reference implementation.")
-      (decision "Keep Idris2 ABI per standard. Write Phase 3 prototype in Julia
-                 (not Zig). Zig FFI port deferred to Phase 5+ if Path B validates.")
-      (rationale "Julia aligns with Phase 4 dogfood client (KRLAdapter.jl).
-                  Research prototype pays for iteration speed over runtime speed.
-                  ABI remains canonical; Julia is one valid implementation."))
+[development-practices]
+versioning = "SemVer"
+documentation = "AsciiDoc"
+build-tool = "just"
 
-    (decision "single-shape-phase-3-scope"
-      (status accepted)
-      (date "2026-04-05")
-      (context "Phase 3 scope: reference impl + parity test. Choice of which
-                Federable shape to federate first.")
-      (decision "Vector first (per Phase 3 plan). Vector-Document drift is first
-                 pairwise metric in TeX §4.3; HNSW has clean algebraic drift.")
-      (rationale "PLAN.adoc originally named Temporal — corrected (Temporal is Core,
-                  cannot be federated). Vector is natural first Federable peer."))
-
-    (decision "federated-parity-as-decision-gate"
-      (status accepted)
-      (date "2026-04-05")
-      (context "Phase 3 decision gate needs a concrete falsifier.")
-      (decision "Decision gate = aggregate_drift over {Core + peers} numerically
-                 equals aggregate_drift over monolithic store with same data.
-                 If parity fails, revisit Phase 1 classification.")
-      (rationale "Parity at drift level is stronger than VCL-surface-level parity
-                  — if drift computation is identical, any VCL claim evaluating
-                  via drift is preserved.")
-      (outcome "PASSED — 24/24 parity assertions green.")))
-
-  (development-practices
-    (practice "tex-grounded"
-      (description "Every classification verdict traceable to a TeX definition or
-                    theorem in verisimdb/arcvix-octad-data-model.tex.")
-      (enforcement "docs/CORE-CANDIDATES.adoc cites each def/inv/thm."))
-    (practice "seam-audit-every-phase"
-      (description "After each phase, audit ABI↔impl seams and document in SEAMS.adoc.")
-      (enforcement "docs/SEAMS.adoc updated 2026-04-05 after Phase 3."))
-    (practice "typecheck-before-commit"
-      (description "idris2 --build must pass. Julia test suites must pass.")
-      (enforcement "Pre-commit verification noted in session log.")))
-
-  (design-rationale
-    (why-not-subset-of-verisimdb "verisimdb/ is the paved-road canonical octad.
-      Fragmenting its code is not the goal; opening the presence axis is. Experiment
-      stays read-only w.r.t. main verisimdb sources.")
-    (why-not-zig-phase-3 "Zig FFI is the hyperpolymath production standard but
-      carries a porting cost premature for a falsifier experiment. Julia is sufficient
-      to test the central hypothesis.")
-    (why-path-b-over-path-a "Path A (formalise existing federation) is high-probability
-      low-payoff. Path B (shape-absence) is lower-probability higher-payoff. Path B
-      turned out to be live — non-trivial Core exists.")))
+[maintenance-axes]
+scoping-first = true
+axis-1 = "must > intend > like"
+axis-2 = "corrective > adaptive > perfective"
+axis-3 = "systems > compliance > effects"

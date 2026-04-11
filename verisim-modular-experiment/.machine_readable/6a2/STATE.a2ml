@@ -1,142 +1,55 @@
-;; SPDX-License-Identifier: PMPL-1.0-or-later
-(state
-  (metadata
-    (version "0.1.0")
-    (last-updated "2026-04-05")
-    (status active))
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# STATE.a2ml — Verisim Modular Experiment project state
+[metadata]
+project = "verisim-modular-experiment"
+version = "0.1.0"
+last-updated = "2026-04-11"
+status = "active"
+session = "tropical bridge v0.2 — KnotTheory.jl RII wired"
 
-  (project-context
-    (name "verisim-modular-experiment")
-    (purpose "Research experiment: can any octad shape be entirely absent (store-level)
-              without making VCL consonance claims unsound?")
-    (type "research-prototype")
-    (completion-percentage 100)
-    (status-note "All 5 phases complete; experiment closed with positive result."))
+[project-context]
+name = "Verisim Modular Experiment"
+purpose = """Research experiment + tropical bridge: ProofConsonance VCL clause,
+tropical min-plus matrix power (Bellman-Ford), RI+RII Reidemeister moves via KnotTheory.jl."""
+completion-percentage = 80
 
-  (current-position
-    (phase "phase-3-complete-seams-sorted")
-    (summary "Phase 0-3 complete. Core={Semantic,Temporal,Provenance}, Federable={V,T,D,X},
-              Graph conditional. Idris2 ABI typechecks in v0.8.0. Julia reference impl
-              runs 70/70 assertions green across three suites. Federated aggregate-drift
-              numerically equals monolithic aggregate-drift for same data. Path B
-              runtime-confirmed. Seam audit completed and fixes applied."))
+[position]
+phase = "phase-5-tropical-consonance"   # design | implementation | testing | maintenance | archived
+maturity = "experimental"  # experimental | alpha | beta | production | lts
 
-  (phases
-    (phase "phase-0-octad-archaeology"
-      (status complete)
-      (artefact "docs/OCTAD-SHAPES.adoc"))
-    (phase "phase-1-core-identification"
-      (status complete)
-      (decision-gate "passed")
-      (result "Core={S,T,R} Federable={V,T,D,X} Conditional={G}")
-      (artefact "docs/CORE-CANDIDATES.adoc"))
-    (phase "phase-2-federation-contract"
-      (status complete)
-      (artefact "src/Abi/FederationContract.idr" "spec/federation-contract.adoc")
-      (verified "idris2 --build"))
-    (phase "phase-3-reference-impl"
-      (status complete)
-      (decision-gate "passed")
-      (result "70/70 assertions green, federated=monolithic parity confirmed")
-      (language "julia")
-      (federated-shape "vector")
-      (deferred "ed25519" "multi-peer-noninterference" "vcl-parser"))
-    (phase "phase-4-krladapter-dogfood"
-      (status complete)
-      (decision-gate "passed")
-      (result "KRLAdapter.jl client satisfied by Core alone — no Federable shapes required")
-      (artefact "examples/krladapter_integration.jl" "test/test_krladapter_integration.jl"))
-    (phase "phase-5-findings-writeup"
-      (status complete)
-      (artefact "docs/FINDINGS.adoc")))
+[phases]
+phase-0-octad-archaeology  = "complete"
+phase-1-core-identification = "complete"
+phase-2-federation-contract = "complete"
+phase-3-reference-impl      = "complete"
+phase-4-krladapter-dogfood  = "complete"
+phase-5-tropical-consonance = "in-progress (RI+RII live; bellman_ford sorry pending)"
 
-  (components
-    (component "idris2-abi"
-      (status complete)
-      (description "3 modules: Types, VerisimCore, FederationContract. Typechecks clean.")
-      (completion 100))
-    (component "julia-core"
-      (status complete)
-      (description "VerisimCore.jl: enrich!, attest, verify_attest, Identity Persistence.")
-      (completion 100))
-    (component "julia-federation"
-      (status complete)
-      (description "FederationManager.jl: renormalise, aggregate_drift, PeerAttestation.")
-      (completion 100))
-    (component "julia-vector-peer"
-      (status complete)
-      (description "First Federable peer: DriftProjector, CoherenceProjector, LWWAcceptor.")
-      (completion 100))
-    (component "julia-crypto-ed25519"
-      (status complete)
-      (description "Real Ed25519 via Sodium.jl/libsodium. Signatures over provenance
-                    entries and attestations. 7 round-trip assertions in test_seams.jl.")
-      (completion 100))
-    (component "document-peer"
-      (status complete)
-      (description "Second Federable peer. Exercises multi-peer non-interference:
-                    drift pairs (S,V), (S,D), (V,D); independent Ed25519 keys.")
-      (completion 100))
-    (component "vcl-subset"
-      (status complete)
-      (description "VCLQuery AST, VCLProver evaluator, VCLParser string parser.
-                    Supports PROOF INTEGRITY, CONSISTENCY with DRIFT < θ, FRESHNESS.
-                    32 assertions in test_vcl.jl.")
-      (completion 100))
-    (component "documentation"
-      (status complete)
-      (description "README, PLAN, PROOF-NEEDS, DESIGN, OCTAD-SHAPES, CORE-CANDIDATES,
-                    FOLDBACK, SEAMS, PHASE-3-IMPL-PLAN, federation-contract spec, AI manifest.")
-      (completion 90)))
+[tropical-status]
+TropicalMatrix-jl  = "live — min-plus semiring, bellman_ford_matrix"
+TangleGraph-jl-v02 = "live — RI (exact) + RII (KnotTheory.jl r2_simplify)"
+TangleGraph-jl-rii = "wired — _rii_neighbors calls Main.KnotTheory.r2_simplify"
+TangleGraph-jl-riii = "stub — r3_simplify is no-op in KnotTheory.jl v1.0.1"
+Prover-jl          = "live — prove(ProofConsonance, ...)"
+TROPICAL-BRIDGE    = "docs/TROPICAL-BRIDGE.adoc updated to v0.2"
 
-  (verified-results
-    (result "idris2-typecheck"
-      (command "idris2 --build verisim-modular-experiment.ipkg")
-      (status pass))
-    (result "verisim-core-tests"
-      (command "julia --project=. test/test_verisim_core.jl")
-      (status pass)
-      (assertions 25))
-    (result "federation-parity-tests"
-      (command "julia --project=. test/test_federation_parity.jl")
-      (status pass)
-      (assertions 24))
-    (result "seam-tests"
-      (command "julia --project=. test/test_seams.jl")
-      (status pass)
-      (assertions 30))
-    (result "non-interference-tests"
-      (command "julia --project=. test/test_noninterference.jl")
-      (status pass)
-      (assertions 15))
-    (result "vcl-tests"
-      (command "julia --project=. test/test_vcl.jl")
-      (status pass)
-      (assertions 32))
-    (result "krladapter-dogfood-tests"
-      (command "julia --project=. test/test_krladapter_integration.jl")
-      (status pass)
-      (assertions 19)))
+[blockers-and-issues]
+issues = [
+  "bellman_ford OFFICIAL SORRY 2 not yet closed (Tropical_Matrices_Full.thy)",
+  "KnotTheory.jl r3_simplify no-op — RIII neighbors unavailable",
+]
 
-  (total-assertions 145)
+[critical-next-actions]
+actions = [
+  "Close bellman_ford sorry — min-plus Bellman-Ford optimality (no-negative-cycle)",
+  "Add Tropical_Determinants.thy + ProofOptimalAssignment VCL clause",
+  "Wire _riii_neighbors when KnotTheory.jl gains live r3_simplify",
+  "Promote impl/ to shippable verisim-core package",
+  "Zig FFI port of VerisimCore per hyperpolymath standard",
+]
 
-  (foldback-to-main-verisimdb
-    (applied
-      (item "docs/deployment-modes.adoc: 6→8 modalities")
-      (item "docs/federation-readiness.adoc: 6→8 modalities + normalizer strategies")
-      (item "arcvix-octad-data-model.tex: rem:agg-drift-renorm added to §4.2"))
-    (pending
-      (item "Normalizer regeneration stub-status doc update (documented in FOLDBACK.adoc)")))
-
-  (critical-next-actions
-    (action "Experiment closed — Path B confirmed. No immediate actions.")
-    (future-action "Promote impl/ to shippable verisim-core package if/when scheduling allows")
-    (future-action "Zig FFI port of VerisimCore per hyperpolymath standard")
-    (future-action "Formal Idris2-type-level non-interference proof at arbitrary N")
-    (future-action "Runtime IsFederable validation in main verisimdb peer registration"))
-
-  (session-history
-    (session "2026-04-05"
-      (focus "Full experiment scaffold → Phase 3 runtime validation")
-      (phases-closed "0" "1" "2" "3")
-      (highlight "Path B confirmed: non-trivial Core exists"))))
+[maintenance-status]
+last-run-utc = "2026-04-05T00:00:00Z"
+last-result = "unknown"  # unknown | pass | warn | fail

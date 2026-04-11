@@ -3,20 +3,32 @@
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)
 
 @abstract:
-Declared intent and purpose for Burble.
+Declared intent and purpose for nextgen-databases.
 @end
 
 ## Purpose
 
-Burble — // SPDX-License-Identifier: PMPL-1.0-or-later
+Nextgen Databases is a monorepo containing VeriSimDB (identity-persistent
+octad store with VCL proof clauses and tropical matrix consonance checking),
+QuandleDB (quandle-based knot invariant store), and Lithoglyph (graph-based
+storage). It is the primary dogfood target for KRLAdapter.jl and the
+verisim-modular-experiment proof-of-concept.
+
+Tropical proof work (Isabelle/HOL ↔ Julia mirror) lives in
+`tropical-resource-typing/` and is bridged to the VCL layer via
+`verisim-modular-experiment/impl/tropical/`.
 
 ## Anti-Purpose
 
 This project is NOT:
-- A fork or wrapper around another tool
-- A monorepo (unless explicitly structured as one)
+- A standalone database engine (sits above storage primitives)
+- A replacement for existing relational or document databases
+- A general-purpose time-series or event-sourcing store
+- A programming language implementation
 
 ## If In Doubt
 
 If you are unsure whether a change is in scope, ask.
-Sensitive areas: ABI definitions, license headers, CI workflows.
+Sensitive areas: VCL proof semantics, Isabelle/Julia tropical bridge,
+KnotTheory.jl integration boundary (KRLAdapter.jl / TangleGraph.jl only —
+never modify KnotTheory.jl directly).

@@ -13,12 +13,13 @@
 # Reidemeister moves needed to reach tangle B from tangle A, or ∞ if
 # no path exists within the modelled move set.
 #
-# Coverage v0.1 — only Reidemeister I (isolated crossing add/remove).
-# RII (crossing pair cancellation) and RIII (triangle move) require
-# full Gauss/PD code manipulation; that integration point is
-# `KnotTheory.jl` (READ-ONLY community library) via KRLAdapter.jl.
-# Stubs are provided; replace `_rii_neighbors` / `_riii_neighbors`
-# with live calls once the KnotTheory.jl adapter is wired.
+# Coverage v0.2 — Reidemeister I (isolated crossing add/remove) + RII
+# (bigon cancellation via KnotTheory.jl r2_simplify).
+# RIII (triangle move) remains a no-op: KnotTheory.jl v1.0.1 r3_simplify
+# detects triangles but returns the diagram unchanged.  See `_riii_neighbors`
+# for the integration point when a live RIII generator becomes available.
+# KnotTheory.jl is a READ-ONLY community library; all integration goes
+# through this file — never modify KnotTheory.jl directly.
 
 module TangleGraph
 
@@ -103,24 +104,68 @@ function ri_neighbors(dt::Vector{Int})::Vector{Vector{Int}}
 end
 
 """
-    _rii_neighbors(dt) → Vector{Vector{Int}}   [STUB]
+    _rii_neighbors(dt) → Vector{Vector{Int}}
 
-Reidemeister II moves (pair creation/cancellation).
-Requires Gauss/PD code manipulation from KnotTheory.jl.
+Reidemeister II moves (bigon cancellation) via KnotTheory.jl.
+
+Pipeline: DT code → PlanarDiagram (KT.from_dt) → apply r2_simplify
+(removes all bigon pairs in one sweep) → DT code (KT.to_dowker).
+
+Returns a single-element list containing the fully RII-simplified diagram
+if at least one bigon was removed, or an empty list if the input contains
+no RII-reducible structure.  This is "maximal RII contraction" rather than
+enumeration of individual one-step bigon removals; for reachability the
+distinction is immaterial (soundness is preserved, completeness slightly
+increased vs. one-step enumeration).
+
+Note: `to_dowker` may fail on PDs whose arc labels have gaps after bigon
+removal (a known KnotTheory.jl v1.0.1 limitation).  Failures are caught
+silently and return no neighbors rather than a hard error.
 """
 function _rii_neighbors(dt::Vector{Int})::Vector{Vector{Int}}
-    # TODO: wire to KnotTheory.jl Reidemeister II move generator
-    Vector{Vector{Int}}()
+    isempty(dt) && return Vector{Vector{Int}}()
+
+    KT = Main.KnotTheory
+
+    # DT code → PlanarDiagram
+    pd = try
+        KT.from_dt(dt)
+    catch
+        return Vector{Vector{Int}}()
+    end
+
+    # Apply RII simplification
+    pd2 = KT.r2_simplify(pd)
+
+    # No bigons found — diagram unchanged
+    length(pd2.crossings) == length(pd.crossings) && return Vector{Vector{Int}}()
+
+    # Convert simplified diagram back to a DT code
+    result = try
+        KT.to_dowker(pd2)
+    catch
+        # Arc renumbering gap: to_dowker cannot represent the post-removal PD.
+        return Vector{Vector{Int}}()
+    end
+
+    isempty(result) ? Vector{Vector{Int}}() : [result]
 end
 
 """
-    _riii_neighbors(dt) → Vector{Vector{Int}}   [STUB]
+    _riii_neighbors(dt) → Vector{Vector{Int}}
 
-Reidemeister III moves (triangle).
-Requires PD code manipulation from KnotTheory.jl.
+Reidemeister III moves (triangle slide) via KnotTheory.jl.
+
+KnotTheory.jl v1.0.1: `r3_simplify` detects triangle configurations but
+returns the diagram unchanged — R3 is topology-preserving and does not
+reduce crossing count.  Consequently no distinct DT code neighbors can be
+produced and this function always returns an empty list.
+
+When KnotTheory.jl gains a live RIII move generator (see KRLAdapter roadmap),
+replace the body of this function with the appropriate KT call.
 """
 function _riii_neighbors(dt::Vector{Int})::Vector{Vector{Int}}
-    # TODO: wire to KnotTheory.jl Reidemeister III move generator
+    # r3_simplify is a no-op in KnotTheory.jl v1.0.1; no new neighbors.
     Vector{Vector{Int}}()
 end
 
@@ -162,6 +207,9 @@ The graph is used by `bellman_ford_matrix` to check reachability:
   - TROP_ZERO (∞) at [1,2] → no path found in this graph
 
 Note: soundness only; completeness requires full RI/RII/RIII coverage.
+Current coverage: RI (exact one-step) + RII (maximal bigon contraction via
+KnotTheory.jl).  RIII is unsupported until KnotTheory.jl adds a live RIII
+generator.
 """
 function build_consonance_graph(
         dt_a::Vector{Int},

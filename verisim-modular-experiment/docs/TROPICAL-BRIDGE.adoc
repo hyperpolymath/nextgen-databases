@@ -88,11 +88,12 @@ which is a direct Julia mirror of the Isabelle `bellman_ford` theorem.
  optimality claim is unverified.
 |Planned Session 2 of tropical proof work.
 
-|RI only (no RII/RIII)
-|`TangleGraph.v0.1` models RI moves only.  Two tangles related by RII
- or RIII moves will receive INCONCLUSIVE (FAIL with reason string), not PASS.
-|`_rii_neighbors` and `_riii_neighbors` stubs in `TangleGraph.jl`; wire
- to `KnotTheory.jl` once KRLAdapter is linked.
+|RIII not yet wired
+|`TangleGraph.v0.2` covers RI + RII.  Two tangles related *only* by RIII
+ moves will receive FAIL with reason string, not PASS.  `KnotTheory.jl` v1.0.1
+ `r3_simplify` is a no-op (topology-preserving, does not reduce crossings).
+|`_riii_neighbors` stub remains; wire once KnotTheory.jl gains a live RIII
+ generator.
 
 |Infinite Reidemeister graph
 |The full Reidemeister move graph is infinite.  `build_consonance_graph`
@@ -117,9 +118,12 @@ Tropical_Matrices_Full.thy  TropicalMatrix.jl
   bellman_ford        ─ ─ ►   bellman_ford_matrix       Prover.jl
   (sorry pending)               (implemented;            prove(ProofConsonance)
                                  formal cert pending)
-                              TangleGraph.jl
+                              TangleGraph.jl  (v0.2)
                                 build_consonance_graph
                                 dt_codes_from_blob
+                              KnotTheory.jl (READ-ONLY)
+                                r2_simplify ──► _rii_neighbors
+                                r3_simplify (no-op → stub)
 ----
 
 == Usage
@@ -138,8 +142,8 @@ result = prove(clause, store, manager)
 1. *Close `bellman_ford` sorry* (Session 2, `tropical-resource-typing/`).
    This upgrades the formal status from "algorithmically justified" to
    "machine-checked."
-2. *Wire RII/RIII* — implement `_rii_neighbors` and `_riii_neighbors` in
-   `TangleGraph.jl` using `KnotTheory.jl` PD-code manipulations.
+2. *Wire RIII* — `_rii_neighbors` is live (KnotTheory.jl v0.2).  Wire
+   `_riii_neighbors` once KnotTheory.jl gains a non-no-op `r3_simplify`.
 3. *Tropical determinant* — add `Tropical_Determinants.thy` (tropical
    permanent = max-weight perfect matching); expose as `ProofOptimalAssignment`
    in VCL for optimal tangle adapter chain selection.

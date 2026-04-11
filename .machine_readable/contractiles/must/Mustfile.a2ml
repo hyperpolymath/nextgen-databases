@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
-# Mustfile — Physical state contract for Burble
+# Mustfile — Physical state contract for nextgen-databases
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
 # What MUST be true about this repository. Hard requirements.
@@ -7,7 +7,8 @@
 # Fix with: must fix (where deterministic fix exists)
 
 @abstract:
-Physical state invariants for the Burble voice platform.
+Physical state invariants for the nextgen-databases monorepo (VeriSimDB,
+QuandleDB, Lithoglyph).
 These are hard requirements — CI and pre-commit hooks fail if any check fails.
 @end
 
@@ -35,7 +36,7 @@ These are hard requirements — CI and pre-commit hooks fail if any check fails.
 
 ### contributing
 - description: CONTRIBUTING guide must exist
-- run: test -f CONTRIBUTING.adoc || test -f .github/CONTRIBUTING.md
+- run: test -f CONTRIBUTING.md || test -f CONTRIBUTING.adoc
 - severity: warning
 
 ### editorconfig
@@ -43,51 +44,11 @@ These are hard requirements — CI and pre-commit hooks fail if any check fails.
 - run: test -f .editorconfig
 - severity: warning
 
-## Elixir Server
-
-### mix-exs-present
-- description: Elixir mix.exs must exist in server/
-- run: test -f server/mix.exs
-- severity: critical
-
-### elixir-compiles
-- description: Elixir server compiles without errors
-- run: test -f server/mix.exs
-- severity: critical
-- notes: Full compile check via CI (mix compile), file presence check here
-
-### ecto-migrations-exist
-- description: Database migrations directory exists
-- run: test -d server/priv/repo/migrations
-- severity: critical
-
-### config-files-present
-- description: All config files exist
-- run: test -f server/config/config.exs && test -f server/config/dev.exs && test -f server/config/prod.exs && test -f server/config/runtime.exs
-- severity: critical
-
-## Web Client
-
-### rescript-json-present
-- description: ReScript config exists for web client
-- run: test -f client/web/rescript.json
-- severity: warning
-
-### web-entry-point
-- description: Web client entry point exists
-- run: test -f server/priv/static/index.html || test -f client/web/index.html
-- severity: warning
-
 ## SPDX Compliance
-
-### spdx-elixir
-- description: All Elixir files have SPDX header
-- run: test -z "$(find server/lib -name '*.ex' -exec head -1 {} \; 2>/dev/null | grep -cv 'SPDX' | grep -v '^0$')"
-- severity: warning
 
 ### no-agpl
 - description: No AGPL-3.0 references (replaced by PMPL)
-- run: test -z "$(grep -rl 'AGPL-3.0' LICENSE .editorconfig .gitattributes 2>/dev/null)"
+- run: test -z "$(grep -rl 'AGPL-3.0' LICENSE 2>/dev/null)"
 - severity: critical
 
 ## Dangerous Patterns
@@ -128,17 +89,24 @@ These are hard requirements — CI and pre-commit hooks fail if any check fails.
 
 ## Security
 
-### no-secrets-in-config
-- description: No hardcoded secrets in Elixir config
-- run: test -z "$(grep -rE '(secret_key_base|password).*=\"[A-Za-z0-9+/]{32,}\"' server/config/ 2>/dev/null | grep -v 'dev_only\|test_only')"
-- severity: critical
-
-### beam-cookie-absent
-- description: No Erlang cookie in repository
-- run: test -z "$(find . -name '.erlang.cookie' 2>/dev/null)"
+### no-hardcoded-paths
+- description: No hardcoded developer paths in source files
+- run: "! grep -rn '/home/hyper\|/mnt/eclipse' --include='*.rs' --include='*.res' --include='*.ex' --include='*.gleam' --include='*.zig' --include='*.sh' . 2>/dev/null | grep -v '.git/' | head -1"
 - severity: critical
 
 ### env-files-absent
 - description: No .env files committed
-- run: test ! -f .env && test ! -f server/.env && test ! -f .env.local && test ! -f .env.production
+- run: test ! -f .env && test ! -f .env.local && test ! -f .env.production
+- severity: critical
+
+## VeriSimDB / KRL Integration
+
+### state-in-machine-readable
+- description: STATE files only in .machine_readable/ (never root)
+- run: test ! -f STATE.scm && test ! -f STATE.a2ml
+- severity: critical
+
+### no-knottheory-modifications
+- description: KnotTheory.jl is READ-ONLY — never modify its source
+- notes: KRLAdapter integration goes in TangleGraph.jl only; KnotTheory.jl is a community library
 - severity: critical
