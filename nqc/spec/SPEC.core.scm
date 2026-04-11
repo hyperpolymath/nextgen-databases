@@ -52,9 +52,9 @@
     (type DatabaseProfile
       (doc "Everything NQC needs to know about a database backend.")
       (fields
-        (id            String   (doc "Short identifier, e.g. 'vql'. Must be unique."))
+        (id            String   (doc "Short identifier, e.g. 'vcl'. Must be unique."))
         (display-name  String   (doc "Human-readable name, e.g. 'VeriSimDB'."))
-        (language-name String   (doc "Query language name, e.g. 'VQL'."))
+        (language-name String   (doc "Query language name, e.g. 'VCL'."))
         (description   String   (doc "Short description for menus."))
         (aliases       (List String) (doc "Alternative names for lookup."))
         (default-host  String   (doc "Default server hostname."))
@@ -179,13 +179,13 @@
     ;; --- Built-in profiles ---
 
     (builtin-profiles
-      (profile vql
+      (profile vcl
         (display-name "VeriSimDB")
-        (language-name "VQL")
+        (language-name "VCL")
         (description "6-core multimodal database with self-normalization")
         (aliases "verisimdb" "verisim")
         (default-port 8080)
-        (execute-path "/vql/execute")
+        (execute-path "/vcl/execute")
         (supports-dt #t))
 
       (profile gql
@@ -254,7 +254,7 @@
     (format table
       (doc "ASCII table with auto-detected columns.")
       (algorithm
-        (step 1 "Extract 'data' field if present (VQL response shape),"
+        (step 1 "Extract 'data' field if present (VCL response shape),"
                 "otherwise use raw value.")
         (step 2 "Coerce to list. If not a list, format as single object"
                 "or fall back to JSON.")

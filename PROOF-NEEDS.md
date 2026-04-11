@@ -15,8 +15,8 @@
 | # | Component | Prover | Notes |
 |---|-----------|--------|-------|
 | V1 | Octad coherence invariant | I2 | 8 modalities mutually consistent post-operation |
-| V2 | VQL type inference soundness | Cq/L4 | Bidirectional inference correct |
-| **V3** | **VQL subtyping transitivity + decidability** | **L4** | **DONE 2026-04-11** — `verisimdb/verification/proofs/lean4/VCLSubtyping.lean` |
+| V2 | VCL type inference soundness | Cq/L4 | Bidirectional inference correct |
+| **V3** | **VCL subtyping transitivity + decidability** | **L4** | **DONE 2026-04-11** — `verisimdb/verification/proofs/lean4/VCLSubtyping.lean` |
 | **V4** | **Raft consensus safety** | **L4** | **DONE 2026-04-11** — `verisimdb/verification/proofs/lean4/RaftSafety.lean` (single-node; distributed in TLA+) |
 | V5 | Transaction atomicity | TLA | All-or-nothing across 8 modalities |
 

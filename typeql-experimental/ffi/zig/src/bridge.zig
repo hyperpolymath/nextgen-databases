@@ -59,7 +59,7 @@ pub const TxState = enum(u8) {
 // Extension annotations (mirrors Checker.idr ExtensionAnnotations)
 // ============================================================================
 
-/// C-compatible representation of VQL-dt++ extension annotations.
+/// C-compatible representation of VCL-UT extension annotations.
 /// Each field uses a sentinel value to indicate "not present":
 /// -1 for integers, null for pointers.
 pub const ExtensionAnnotations = extern struct {

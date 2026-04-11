@@ -59,7 +59,7 @@ pub fn formatToString(fmt: OutputFormat) []const u8 {
 
 /// Known database backend identifiers, matching Layout.idr tag values.
 pub const DatabaseId = enum(u8) {
-    vql = 0,
+    vcl = 0,
     gql = 1,
     kql = 2,
 };
@@ -67,7 +67,7 @@ pub const DatabaseId = enum(u8) {
 /// Default port for each database.
 pub fn defaultPort(db: DatabaseId) u16 {
     return switch (db) {
-        .vql => 8080,
+        .vcl => 8080,
         .gql => 8081,
         .kql => 8082,
     };
@@ -76,7 +76,7 @@ pub fn defaultPort(db: DatabaseId) u16 {
 /// Execute path for each database.
 pub fn executePath(db: DatabaseId) []const u8 {
     return switch (db) {
-        .vql => "/vql/execute",
+        .vcl => "/vcl/execute",
         .gql => "/gql/execute",
         .kql => "/kql/execute",
     };
@@ -310,13 +310,13 @@ test "formatToString roundtrips" {
 }
 
 test "defaultPort values" {
-    try std.testing.expectEqual(@as(u16, 8080), defaultPort(.vql));
+    try std.testing.expectEqual(@as(u16, 8080), defaultPort(.vcl));
     try std.testing.expectEqual(@as(u16, 8081), defaultPort(.gql));
     try std.testing.expectEqual(@as(u16, 8082), defaultPort(.kql));
 }
 
 test "executePath values" {
-    try std.testing.expectEqualStrings("/vql/execute", executePath(.vql));
+    try std.testing.expectEqualStrings("/vcl/execute", executePath(.vcl));
     try std.testing.expectEqualStrings("/gql/execute", executePath(.gql));
     try std.testing.expectEqualStrings("/kql/execute", executePath(.kql));
 }
