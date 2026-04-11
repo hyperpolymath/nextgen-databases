@@ -18,10 +18,10 @@ import Core
 %default total
 
 -- ============================================================================
--- Parameter Types (VQL-UT value domain)
+-- Parameter Types (VCL-UT value domain)
 -- ============================================================================
 
-||| Types that query parameters can inhabit. These mirror VQL's value types
+||| Types that query parameters can inhabit. These mirror VCL's value types
 ||| but exist as a SEPARATE domain from query structure types. The separation
 ||| is the key insight: structure and data live in different type universes.
 public export

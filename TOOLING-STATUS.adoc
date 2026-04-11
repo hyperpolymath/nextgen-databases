@@ -18,7 +18,7 @@ management, query execution, and PanLL dashboard panels.
 | Database | Query Language | BoJ ID | Status | Key Components
 
 | **VeriSimDB**
-| VQL (Verified Query Language)
+| VCL (Verified Query Language)
 | 1
 | Mature
 | 10 ReScript modules: Parser, TypeChecker, BiDir, Subtyping, ProofObligation, Circuit, Explain, Context, Error, Types
@@ -65,7 +65,7 @@ Located at `boj-server/cartridges/database-mcp/`:
 * `db_connect_sqlite(path) → slot`
 * `db_disconnect(slot) → result`
 * `db_execute_sql(slot, query) → result` — PostgreSQL, SQLite
-* `db_execute_vql(slot, query) → result` — VeriSimDB
+* `db_execute_vcl(slot, query) → result` — VeriSimDB
 * `db_execute_kql(slot, query) → result` — QuandleDB
 * `db_execute_gql(slot, query) → result` — LithoGlyph
 * `db_begin_query(slot) / db_end_query(slot)` — Transaction boundaries
@@ -80,23 +80,23 @@ Located at `boj-server/cartridges/database-mcp/`:
 | `db-status`              | Connection pool health across all backends
 | `db-connections`         | Active connections, QPS metrics
 | `db-verisimdb`           | Octad counts, proof counts, modality status
-| `vql-ut-safety-dashboard` | 10-level safety pipeline visualisation
-| `vql-ut-query-editor`    | Live type-checking with Idris2 kernel (TypeLL)
-| `vql-ut-proof-explorer`  | Obligation tracking and proof certificates
-| `vql-ut-horror-stories`  | Interactive education — what each safety level prevents
+| `vcl-ut-safety-dashboard` | 10-level safety pipeline visualisation
+| `vcl-ut-query-editor`    | Live type-checking with Idris2 kernel (TypeLL)
+| `vcl-ut-proof-explorer`  | Obligation tracking and proof certificates
+| `vcl-ut-horror-stories`  | Interactive education — what each safety level prevents
 |===
 
 == Universal Safety Pipeline (TypeLL → Query Languages)
 
 All query languages share the same 10-level safety model, originating in TypeLL.
-VQL-UT is the reference implementation. KQL and GQL map their constructs to the
+VCL-UT is the reference implementation. KQL and GQL map their constructs to the
 same levels — no separate "-UT" or "-DT" repos needed.
 
 [source]
 ----
 TypeLL (type theory core — defines the 10 levels)
    │
-   ├──→ VQL-UT  (reference implementation, VeriSimDB)
+   ├──→ VCL-UT  (reference implementation, VeriSimDB)
    ├──→ KQL     (applies same levels, QuandleDB)
    └──→ GQL     (applies same levels, LithoGlyph)
 ----
@@ -105,11 +105,11 @@ TypeLL (type theory core — defines the 10 levels)
 
 Each query language has the same two tiers:
 
-1. **The language** (VQL / KQL / GQL) — what users write
+1. **The language** (VCL / KQL / GQL) — what users write
 2. **The safety pipeline** — TypeLL's 10 levels applied progressively behind the
    language. Simple queries exit early at L1-L2. Proof-carrying queries go to L9-L10.
 
-There is no "VQL-DT", "KQL-DT", or "GQL-DT" as separate products. Dependent type
+There is no "VCL-DT", "KQL-DT", or "GQL-DT" as separate products. Dependent type
 features are part of the safety pipeline at the appropriate levels.
 
 === The 10 Safety Levels
@@ -161,7 +161,7 @@ features are part of the safety pipeline at the appropriate levels.
 
 === Per-Database Safety Documentation
 
-* **VQL:** `verisimdb/docs/vql-vs-vql-dt.adoc` — full spec with architecture diagram
+* **VCL:** `verisimdb/docs/vcl-vs-vcl-dt.adoc` — full spec with architecture diagram
 * **KQL:** `quandledb/docs/kql-safety-model.adoc` — KQL-specific mappings + Idris2 proofs
 * **GQL:** `lithoglyph/docs/gql-safety-model.adoc` — GQL-specific mappings + dependent types
 

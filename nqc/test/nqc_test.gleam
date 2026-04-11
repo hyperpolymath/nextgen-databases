@@ -22,17 +22,17 @@ pub fn main() -> Nil {
 // ---------------------------------------------------------------------------
 
 pub fn find_flag_value_present_test() {
-  let args = ["--db", "vql", "--port", "8080"]
-  should.equal(nqc.find_flag_value(args, "--db"), Ok("vql"))
+  let args = ["--db", "vcl", "--port", "8080"]
+  should.equal(nqc.find_flag_value(args, "--db"), Ok("vcl"))
 }
 
 pub fn find_flag_value_second_flag_test() {
-  let args = ["--db", "vql", "--port", "8080"]
+  let args = ["--db", "vcl", "--port", "8080"]
   should.equal(nqc.find_flag_value(args, "--port"), Ok("8080"))
 }
 
 pub fn find_flag_value_missing_flag_test() {
-  let args = ["--db", "vql"]
+  let args = ["--db", "vcl"]
   should.be_error(nqc.find_flag_value(args, "--host"))
 }
 
@@ -47,8 +47,8 @@ pub fn find_flag_value_flag_at_end_without_value_test() {
 }
 
 pub fn find_flag_value_multiple_same_flags_returns_first_test() {
-  let args = ["--db", "vql", "--db", "gql"]
-  should.equal(nqc.find_flag_value(args, "--db"), Ok("vql"))
+  let args = ["--db", "vcl", "--db", "gql"]
+  should.equal(nqc.find_flag_value(args, "--db"), Ok("vcl"))
 }
 
 pub fn find_flag_value_non_flag_args_skipped_test() {

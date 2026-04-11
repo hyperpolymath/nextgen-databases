@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //!
-//! VQL linter — static analysis for VQL queries.
+//! VCL linter — static analysis for VCL queries.
 //!
-//! Detects common issues, antipatterns, and performance pitfalls in VQL
+//! Detects common issues, antipatterns, and performance pitfalls in VCL
 //! queries before execution:
 //!
 //! - Missing LIMIT clause on unbounded queries
@@ -54,7 +54,7 @@ pub enum LintRule {
     OrderByWithoutLimit,
     /// DELETE or UPDATE without WHERE clause.
     DangerousWrite,
-    /// VQL-DT PROOF type not recognized.
+    /// VCL-DT PROOF type not recognized.
     UnknownProofType,
     /// Redundant WHERE clause (always true).
     RedundantWhere,
@@ -67,17 +67,17 @@ pub enum LintRule {
 impl fmt::Display for LintRule {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            LintRule::MissingLimit => write!(f, "VQL001"),
-            LintRule::SelectAllModalities => write!(f, "VQL002"),
-            LintRule::MissingProof => write!(f, "VQL003"),
-            LintRule::UnboundedTraverse => write!(f, "VQL004"),
-            LintRule::MissingThreshold => write!(f, "VQL005"),
-            LintRule::OrderByWithoutLimit => write!(f, "VQL006"),
-            LintRule::DangerousWrite => write!(f, "VQL007"),
-            LintRule::UnknownProofType => write!(f, "VQL008"),
-            LintRule::RedundantWhere => write!(f, "VQL009"),
-            LintRule::MultiModalityNoExplain => write!(f, "VQL010"),
-            LintRule::FederationWithoutStore => write!(f, "VQL011"),
+            LintRule::MissingLimit => write!(f, "VCL001"),
+            LintRule::SelectAllModalities => write!(f, "VCL002"),
+            LintRule::MissingProof => write!(f, "VCL003"),
+            LintRule::UnboundedTraverse => write!(f, "VCL004"),
+            LintRule::MissingThreshold => write!(f, "VCL005"),
+            LintRule::OrderByWithoutLimit => write!(f, "VCL006"),
+            LintRule::DangerousWrite => write!(f, "VCL007"),
+            LintRule::UnknownProofType => write!(f, "VCL008"),
+            LintRule::RedundantWhere => write!(f, "VCL009"),
+            LintRule::MultiModalityNoExplain => write!(f, "VCL010"),
+            LintRule::FederationWithoutStore => write!(f, "VCL011"),
         }
     }
 }
@@ -117,19 +117,19 @@ impl fmt::Display for LintDiagnostic {
     }
 }
 
-/// VQL modality names — all 8 octad modalities.
+/// VCL modality names — all 8 octad modalities.
 const MODALITIES: &[&str] = &[
     "GRAPH", "VECTOR", "TENSOR", "SEMANTIC", "DOCUMENT", "TEMPORAL",
     "PROVENANCE", "SPATIAL",
 ];
 
-/// Known VQL-DT proof types.
+/// Known VCL-DT proof types.
 const KNOWN_PROOF_TYPES: &[&str] = &[
     "EXISTENCE", "CONSISTENCY", "INTEGRITY", "AUTHENTICITY",
     "PROVENANCE", "ACCESS", "CITATION", "ZKP", "PLONK",
 ];
 
-/// Lint a VQL query string and return diagnostics.
+/// Lint a VCL query string and return diagnostics.
 ///
 /// This performs token-level analysis (not full parsing) to detect common
 /// issues. For full AST-based linting, the LSP will use the ReScript parser.
@@ -155,7 +155,7 @@ pub fn lint_query(query: &str) -> Vec<LintDiagnostic> {
     let has_store = tokens.contains(&"STORE");
     let has_semantic = tokens.contains(&"SEMANTIC");
 
-    // VQL001: Missing LIMIT on SELECT
+    // VCL001: Missing LIMIT on SELECT
     if is_select && !has_limit && !is_explain {
         diagnostics.push(LintDiagnostic {
             rule: LintRule::MissingLimit,
@@ -165,7 +165,7 @@ pub fn lint_query(query: &str) -> Vec<LintDiagnostic> {
         });
     }
 
-    // VQL002: SELECT all modalities
+    // VCL002: SELECT all modalities
     if is_select {
         let modality_count = MODALITIES
             .iter()
@@ -181,7 +181,7 @@ pub fn lint_query(query: &str) -> Vec<LintDiagnostic> {
         }
     }
 
-    // VQL003: Semantic without PROOF
+    // VCL003: Semantic without PROOF
     if has_semantic && !has_proof && is_select {
         diagnostics.push(LintDiagnostic {
             rule: LintRule::MissingProof,
@@ -191,7 +191,7 @@ pub fn lint_query(query: &str) -> Vec<LintDiagnostic> {
         });
     }
 
-    // VQL004: TRAVERSE without DEPTH
+    // VCL004: TRAVERSE without DEPTH
     if has_traverse && !has_depth {
         diagnostics.push(LintDiagnostic {
             rule: LintRule::UnboundedTraverse,
@@ -201,7 +201,7 @@ pub fn lint_query(query: &str) -> Vec<LintDiagnostic> {
         });
     }
 
-    // VQL005: DRIFT/CONSISTENCY without THRESHOLD
+    // VCL005: DRIFT/CONSISTENCY without THRESHOLD
     if has_drift && !has_threshold {
         diagnostics.push(LintDiagnostic {
             rule: LintRule::MissingThreshold,
@@ -211,7 +211,7 @@ pub fn lint_query(query: &str) -> Vec<LintDiagnostic> {
         });
     }
 
-    // VQL006: ORDER BY without LIMIT
+    // VCL006: ORDER BY without LIMIT
     if has_order && !has_limit && is_select {
         diagnostics.push(LintDiagnostic {
             rule: LintRule::OrderByWithoutLimit,
@@ -221,7 +221,7 @@ pub fn lint_query(query: &str) -> Vec<LintDiagnostic> {
         });
     }
 
-    // VQL007: Dangerous write without WHERE
+    // VCL007: Dangerous write without WHERE
     if (is_delete || is_update) && !has_where {
         diagnostics.push(LintDiagnostic {
             rule: LintRule::DangerousWrite,
@@ -231,7 +231,7 @@ pub fn lint_query(query: &str) -> Vec<LintDiagnostic> {
         });
     }
 
-    // VQL008: Unknown proof type
+    // VCL008: Unknown proof type
     if has_proof {
         if let Some(proof_pos) = tokens.iter().position(|t| *t == "PROOF") {
             if let Some(proof_type) = tokens.get(proof_pos + 1) {
@@ -251,7 +251,7 @@ pub fn lint_query(query: &str) -> Vec<LintDiagnostic> {
         }
     }
 
-    // VQL009: Redundant WHERE (WHERE 1=1, WHERE TRUE)
+    // VCL009: Redundant WHERE (WHERE 1=1, WHERE TRUE)
     if has_where {
         let where_pos = upper.find("WHERE").unwrap_or(0);
         let after_where = &upper[where_pos + 5..].trim_start();
@@ -268,7 +268,7 @@ pub fn lint_query(query: &str) -> Vec<LintDiagnostic> {
         }
     }
 
-    // VQL010: Multi-modality without EXPLAIN
+    // VCL010: Multi-modality without EXPLAIN
     if is_select && !is_explain {
         let modality_count = MODALITIES
             .iter()
@@ -284,7 +284,7 @@ pub fn lint_query(query: &str) -> Vec<LintDiagnostic> {
         }
     }
 
-    // VQL011: FEDERATION without STORE
+    // VCL011: FEDERATION without STORE
     if has_federation && !has_store {
         diagnostics.push(LintDiagnostic {
             rule: LintRule::FederationWithoutStore,
@@ -493,7 +493,7 @@ mod tests {
     fn test_format_diagnostics_output() {
         let diagnostics = lint_query("DELETE FROM OCTAD");
         let output = format_diagnostics("DELETE FROM OCTAD", &diagnostics);
-        assert!(output.contains("VQL007"));
+        assert!(output.contains("VCL007"));
         assert!(output.contains("error"));
     }
 

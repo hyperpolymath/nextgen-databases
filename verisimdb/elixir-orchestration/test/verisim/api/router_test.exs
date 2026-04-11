@@ -136,7 +136,7 @@ defmodule VeriSim.Api.RouterTest do
       body = Jason.decode!(conn.resp_body)
       assert Map.has_key?(body, "total_proofs")
       assert Map.has_key?(body, "by_type")
-      assert Map.has_key?(body, "vql_dt_active")
+      assert Map.has_key?(body, "vcl_dt_active")
     end
   end
 
@@ -179,7 +179,7 @@ defmodule VeriSim.Api.RouterTest do
         {"/telemetry/drift", ["drift_detected_count", "normalise_attempts", "normalise_success_count", "normalise_success_rate", "modality_breakdown"]},
         {"/telemetry/performance", ["query_count", "avg_duration_ms", "min_duration_ms", "max_duration_ms", "total_duration_ms"]},
         {"/telemetry/federation", ["total_federation_queries", "peer_errors"]},
-        {"/telemetry/proof-types", ["total_proofs", "by_type", "vql_dt_active"]},
+        {"/telemetry/proof-types", ["total_proofs", "by_type", "vcl_dt_active"]},
         {"/telemetry/entities", ["created", "deleted"]}
       ]
 

@@ -5,15 +5,15 @@
 // nqc.gleam — NextGen Query Client entry point.
 //
 // A unified REPL for database query languages. Ships with built-in support
-// for the three NextGen databases (VQL, GQL, KQL) and is extensible to any
+// for the three NextGen databases (VCL, GQL, KQL) and is extensible to any
 // database that speaks HTTP + JSON.
 //
 // Usage:
 //   gleam run                                  # Interactive database selector
-//   gleam run -- --db vql                      # Connect to VeriSimDB
+//   gleam run -- --db vcl                      # Connect to VeriSimDB
 //   gleam run -- --db gql --port 8081          # Connect to Lithoglyph
 //   gleam run -- --db kql --host 10.0.0.5      # Connect to QuandleDB
-//   gleam run -- --db vql --dt                 # Enable dependent types
+//   gleam run -- --db vcl --dt                 # Enable dependent types
 //   gleam run -- --db sql --port 3000          # Connect to a custom SQL database
 
 import gleam/io

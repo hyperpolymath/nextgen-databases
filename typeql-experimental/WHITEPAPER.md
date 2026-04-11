@@ -12,7 +12,7 @@
 
 ## Abstract
 
-TypeQL-Experimental (VQL-dt++) explores the application of Quantitative Type
+TypeQL-Experimental (VCL-dt++) explores the application of Quantitative Type
 Theory (QTT) to database query languages, demonstrating that six categories of
 runtime database errors—connection leaks, protocol violations, effect misuse,
 scope leakage, missing postcondition guarantees, and resource over-consumption—
@@ -78,7 +78,7 @@ a native feature of the language, not an encoding.
 
 ### 1.3 Contributions
 
-1. **Six type-theoretic extensions** to VQL (VeriSim Query Language) that
+1. **Six type-theoretic extensions** to VCL (VeriSim Query Language) that
    eliminate the six bug categories above at compile time (Section 3).
 
 2. **A dual-language architecture** where Idris2 proves properties and ReScript
@@ -88,17 +88,17 @@ a native feature of the language, not an encoding.
    hatches (Section 5).
 
 4. **Backwards-compatible grammar**: All extensions are optional clauses appended
-   to standard VQL queries, requiring no changes to existing queries (Section 6).
+   to standard VCL queries, requiring no changes to existing queries (Section 6).
 
 ---
 
 ## 2. Background
 
-### 2.1 VQL v3.0
+### 2.1 VCL v3.0
 
-VeriSim Query Language (VQL) is the query language for VeriSimDB, a multi-modal
+VeriSim Query Language (VCL) is the query language for VeriSimDB, a multi-modal
 database with eight query modalities (GRAPH, DOCUMENT, VECTOR, TIME_SERIES,
-SPATIAL, STATISTICAL, SEMANTIC, RELATIONAL). VQL supports cross-modal queries
+SPATIAL, STATISTICAL, SEMANTIC, RELATIONAL). VCL supports cross-modal queries
 via HEXAD references (content-addressed UUIDs).
 
 ### 2.2 Quantitative Type Theory
@@ -144,7 +144,7 @@ rather than encoded.
 
 **Solution:** Connections carry a type-level usage counter:
 
-```vql
+```vcl
 SELECT GRAPH, DOCUMENT
 FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
 CONSUME AFTER 1 USE
@@ -171,7 +171,7 @@ runtime exception.
 
 **Solution:** Sessions are indexed by their protocol state:
 
-```vql
+```vcl
 SELECT GRAPH FROM HEXAD ...
 WITH SESSION ReadOnlyProtocol
 ```
@@ -202,7 +202,7 @@ a type error. The state machine is enforced by the compiler.
 **Solution:** Queries declare their effects; the type checker verifies actual
 effects are a subset of declared effects:
 
-```vql
+```vcl
 SELECT GRAPH FROM HEXAD ...
 EFFECTS { Read }
 ```
@@ -226,7 +226,7 @@ query is rejected.
 
 **Solution:** Data is tagged with its transaction scope at the type level:
 
-```vql
+```vcl
 SELECT GRAPH FROM HEXAD ...
 IN TRANSACTION Committed
 ```
@@ -253,7 +253,7 @@ data flow visible in types.
 
 **Solution:** Results are bundled with proofs of postconditions:
 
-```vql
+```vcl
 SELECT GRAPH FROM HEXAD ...
 PROOF ATTACHED IntegrityTheorem
 ```
@@ -277,7 +277,7 @@ independently.
 
 **Solution:** Resources carry a type-level budget:
 
-```vql
+```vcl
 SELECT GRAPH FROM FEDERATION /universities/*
 USAGE LIMIT 100
 ```
@@ -362,7 +362,7 @@ The `Proofs.idr` module proves cross-cutting properties:
 
 The six extensions compose without interference:
 
-```vql
+```vcl
 SELECT GRAPH, DOCUMENT
 FROM HEXAD 550e8400-e29b-41d4-a716-446655440000
 CONSUME AFTER 1 USE
@@ -383,7 +383,7 @@ fact that each extension operates on a different dimension of the type.
 
 ### 6.1 Backwards Compatibility
 
-All extensions are optional clauses appended after standard VQL queries:
+All extensions are optional clauses appended after standard VCL queries:
 
 ```ebnf
 extended_query = query,
@@ -402,14 +402,14 @@ proof_attached_clause = 'PROOF', 'ATTACHED', theorem_name ;
 usage_clause          = 'USAGE', 'LIMIT', positive_integer ;
 ```
 
-No existing VQL keywords are reused. All new keywords (CONSUME, AFTER, USE,
-SESSION, EFFECTS, TRANSACTION, ATTACHED, USAGE) are disjoint from VQL's 60+
+No existing VCL keywords are reused. All new keywords (CONSUME, AFTER, USE,
+SESSION, EFFECTS, TRANSACTION, ATTACHED, USAGE) are disjoint from VCL's 60+
 existing keywords.
 
 ### 6.2 File Extension
 
-TypeQL-Experimental queries use the `.vqlut` extension (VQL Ultimate Type-Safe),
-distinguishing them from standard `.vql` files. (Previously `.vqlpp` — renamed to align with VQL-UT canonical naming.)
+TypeQL-Experimental queries use the `.vclut` extension (VCL Ultimate Type-Safe),
+distinguishing them from standard `.vcl` files. (Previously `.vclpp` — renamed to align with VCL-UT canonical naming.)
 
 ---
 
@@ -436,7 +436,7 @@ types make connection safety and resource budgeting *free*: the language already
 tracks usage quantities on every binding, so `CONSUME AFTER 1 USE` maps directly
 to `(1 conn : Connection)`.
 
-The six extensions compose independently, require no changes to existing VQL
+The six extensions compose independently, require no changes to existing VCL
 queries, and are backed by machine-checked proofs with no axiom escape hatches.
 This work suggests that the next generation of query languages should integrate
 dependent type systems not as an academic exercise but as a practical tool for

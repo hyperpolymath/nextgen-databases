@@ -33,7 +33,7 @@ vcl-clauses = "ProofIntegrity, ProofConsistency, ProofFreshness, ProofConsonance
 [test-coverage]
 unit-tests = "~40 (Elixir consensus + federation adapters)"
 integration-tests = "~12 (federation adapter integration)"
-e2e-tests = "18 (e2e_verisimdb_test.exs — lifecycle, VQL, schema, error handling)"
+e2e-tests = "18 (e2e_verisimdb_test.exs — lifecycle, VCL, schema, error handling)"
 p2p-property-tests = "5 properties + 1 unit (kraft_property_test.exs)"
 aspect-security = "10 tests (aspect/security_test.exs)"
 aspect-concurrency = "14 tests (aspect/concurrency_test.exs)"
@@ -42,24 +42,24 @@ benchmarks = "2 Rust files (modality_benchmarks.rs + throughput_benchmarks.rs)"
 total-new-tests = "43 new tests + 5 properties (2026-04-04)"
 
 [test-status]
-mix-test-failures = "6 pre-existing (VQLTypeChecker binary_to_existing_atom crash, KRaft remove_server timeout)"
+mix-test-failures = "6 pre-existing (VCLTypeChecker binary_to_existing_atom crash, KRaft remove_server timeout)"
 new-test-failures = "0"
 cargo-bench-compile = "PASS (throughput_benchmarks.rs — no errors, no warnings in bench file)"
 gleam-smoke = "Written; requires compiled lith_nif.so to run connection/lifecycle tests"
 
 [blockers]
-- "VQLTypeChecker calls :erlang.binary_to_existing_atom for unknown proof types → ArgumentError (P1 hardening gap)"
-- "VQL parser does not strip null bytes from entity IDs (C-string truncation risk at FFI, P1)"
+- "VCLTypeChecker calls :erlang.binary_to_existing_atom for unknown proof types → ArgumentError (P1 hardening gap)"
+- "VCL parser does not strip null bytes from entity IDs (C-string truncation risk at FFI, P1)"
 - "Integration test (tests/integration_test.rs) uses old API — does not compile (pre-existing)"
 - "modality_benchmarks.rs uses old API — does not compile (pre-existing)"
 
 [route-to-mvp]
 next = "Add Tropical_Determinants.thy + ProofOptimalAssignment VCL clause"
-then = "Fix VQLTypeChecker binary_to_existing_atom crash (P1 hardening)"
-then = "Fix null-byte entity ID sanitisation in VQL parser"
+then = "Fix VCLTypeChecker binary_to_existing_atom crash (P1 hardening)"
+then = "Fix null-byte entity ID sanitisation in VCL parser"
 then = "Update integration_test.rs to current API"
 
 [critical-next-actions]
 1 = "Tropical_Determinants.thy new file — permanent = optimal assignment"
-2 = "Fix VQLTypeChecker to use String.to_existing_atom with rescue guard (P1)"
-3 = "Add null-byte sanitisation in VQLBridge built-in parser (P1)"
+2 = "Fix VCLTypeChecker to use String.to_existing_atom with rescue guard (P1)"
+3 = "Add null-byte sanitisation in VCLBridge built-in parser (P1)"

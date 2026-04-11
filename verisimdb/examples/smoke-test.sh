@@ -4,7 +4,7 @@
 # smoke-test.sh — VeriSimDB smoke test.
 #
 # Validates that the VeriSimDB server is running and can handle basic
-# operations: health check, hexad CRUD, VQL query execution, drift
+# operations: health check, hexad CRUD, VCL query execution, drift
 # endpoint, and orchestration layer health. Returns exit 0 on success,
 # non-zero on failure.
 #
@@ -120,16 +120,16 @@ else
   fail "Hexad read failed"
 fi
 
-# 4. Execute a VQL query — test the query engine
-echo "4. VQL query"
-VQL_RESP=$(curl -sf -X POST "${API_URL}/vql/execute" \
+# 4. Execute a VCL query — test the query engine
+echo "4. VCL query"
+VCL_RESP=$(curl -sf -X POST "${API_URL}/vcl/execute" \
   -H "Content-Type: application/json" \
   -d '{"query":"SELECT * FROM hexads LIMIT 5"}' 2>/dev/null || echo "FAILED")
 
-if [ "$VQL_RESP" != "FAILED" ]; then
-  pass "VQL query executed"
+if [ "$VCL_RESP" != "FAILED" ]; then
+  pass "VCL query executed"
 else
-  fail "VQL query failed"
+  fail "VCL query failed"
 fi
 
 # 5. Check drift endpoint — test drift scoring

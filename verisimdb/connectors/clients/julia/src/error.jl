@@ -102,14 +102,14 @@ struct ProvenanceInvalidError <: VeriSimError
     message::String
 end
 
-"""VQL syntax error."""
-struct VqlParseError <: VeriSimError
+"""VCL syntax error."""
+struct VclParseError <: VeriSimError
     query::String
     message::String
 end
 
-"""VQL runtime error."""
-struct VqlExecutionError <: VeriSimError
+"""VCL runtime error."""
+struct VclExecutionError <: VeriSimError
     query::String
     message::String
 end

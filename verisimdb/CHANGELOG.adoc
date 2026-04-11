@@ -50,12 +50,12 @@ All notable changes to VeriSimDB are documented here. This project uses https://
 - **Circuit Registry** (`circuit_registry.rs`): In-memory registry mapping circuit names to compiled R1CS verification functions.
 - **Circuit Compiler** (`circuit_compiler.rs`): DSL gates (AND, OR, XOR, NOT, LinearCombination) compiled to R1CS constraints.
 - **Verification Key Store** (`verification_keys.rs`): Per-circuit keys with rotation, federation export/import as `KeyExportBundle`.
-- **VQL Circuit DSL** (`VQLCircuit.res`): ReScript types for circuit definition with `parseCustomProof` and `serializeCircuitDef`.
+- **VCL Circuit DSL** (`VCLCircuit.res`): ReScript types for circuit definition with `parseCustomProof` and `serializeCircuitDef`.
 
 ==== Homoiconicity — Queries as Octads (Phase 7)
-- **QueryOctadBuilder** (`query_octad.rs`): Stores VQL queries as octads across all 6 modalities (document=query text, graph=parse tree, vector=embedding, tensor=cost vector, semantic=proof obligations, temporal=execution history).
+- **QueryOctadBuilder** (`query_octad.rs`): Stores VCL queries as octads across all 6 modalities (document=query text, graph=parse tree, vector=embedding, tensor=cost vector, semantic=proof obligations, temporal=execution history).
 - **API endpoints**: `POST /queries` stores a query as octad. `POST /queries/similar` finds similar past queries by vector similarity. `PUT /queries/{id}/optimize` re-plans and updates cost vector.
-- **VQL REFLECT keyword**: `SELECT * FROM REFLECT WHERE FULLTEXT CONTAINS 'drift'` queries the query store itself. Meta-circular: REFLECT queries are themselves stored as octads.
+- **VCL REFLECT keyword**: `SELECT * FROM REFLECT WHERE FULLTEXT CONTAINS 'drift'` queries the query store itself. Meta-circular: REFLECT queries are themselves stored as octads.
 - **Elixir REFLECT executor**: Routes REFLECT source queries to the query store via text search.
 
 === Changed
@@ -78,7 +78,7 @@ All notable changes to VeriSimDB are documented here. This project uses https://
 
 === Added
 - Initial alpha release with 6 modality stores (Graph, Vector, Tensor, Semantic, Document, Temporal).
-- VQL parser (ReScript) with dependent-type and slipstream execution paths.
+- VCL parser (ReScript) with dependent-type and slipstream execution paths.
 - Elixir/OTP orchestration layer with GenServers.
 - Rust HTTP API server (verisim-api) with REST endpoints.
 - Octad entity management (create, read, update, delete, search).
@@ -88,6 +88,6 @@ All notable changes to VeriSimDB are documented here. This project uses https://
 - GitHub CI integration via verisimdb-data git-backed repo.
 - Hypatia VeriSimDB connector for pattern detection.
 - Criterion benchmarks for all modality stores.
-- VQL grammar (ISO/IEC 14977 EBNF compliant).
-- VQL formal semantics (operational + type system).
+- VCL grammar (ISO/IEC 14977 EBNF compliant).
+- VCL formal semantics (operational + type system).
 - Comprehensive documentation (WHITEPAPER, consultation papers, deployment guide).

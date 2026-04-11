@@ -16,63 +16,63 @@ import nqc/database
 // Profile construction — verify each built-in profile has correct metadata
 // ---------------------------------------------------------------------------
 
-pub fn vql_profile_has_correct_id_test() {
-  let p = database.vql_profile()
-  should.equal(p.id, "vql")
+pub fn vcl_profile_has_correct_id_test() {
+  let p = database.vcl_profile()
+  should.equal(p.id, "vcl")
 }
 
-pub fn vql_profile_has_correct_display_name_test() {
-  let p = database.vql_profile()
+pub fn vcl_profile_has_correct_display_name_test() {
+  let p = database.vcl_profile()
   should.equal(p.display_name, "VeriSimDB")
 }
 
-pub fn vql_profile_has_correct_language_test() {
-  let p = database.vql_profile()
-  should.equal(p.language_name, "VQL")
+pub fn vcl_profile_has_correct_language_test() {
+  let p = database.vcl_profile()
+  should.equal(p.language_name, "VCL")
 }
 
-pub fn vql_profile_default_port_is_8080_test() {
-  let p = database.vql_profile()
+pub fn vcl_profile_default_port_is_8080_test() {
+  let p = database.vcl_profile()
   should.equal(p.default_port, 8080)
 }
 
-pub fn vql_profile_execute_path_test() {
-  let p = database.vql_profile()
-  should.equal(p.execute_path, "/vql/execute")
+pub fn vcl_profile_execute_path_test() {
+  let p = database.vcl_profile()
+  should.equal(p.execute_path, "/vcl/execute")
 }
 
-pub fn vql_profile_health_path_test() {
-  let p = database.vql_profile()
+pub fn vcl_profile_health_path_test() {
+  let p = database.vcl_profile()
   should.equal(p.health_path, "/health")
 }
 
-pub fn vql_profile_supports_dependent_types_test() {
-  let p = database.vql_profile()
+pub fn vcl_profile_supports_dependent_types_test() {
+  let p = database.vcl_profile()
   should.be_true(p.supports_dt)
 }
 
-pub fn vql_profile_has_keywords_test() {
-  let p = database.vql_profile()
+pub fn vcl_profile_has_keywords_test() {
+  let p = database.vcl_profile()
   should.be_true(p.keywords != [])
 }
 
-pub fn vql_profile_has_expected_keywords_test() {
-  let p = database.vql_profile()
+pub fn vcl_profile_has_expected_keywords_test() {
+  let p = database.vcl_profile()
   should.be_true(list.contains(p.keywords, "SELECT"))
   should.be_true(list.contains(p.keywords, "HEXAD"))
   should.be_true(list.contains(p.keywords, "DRIFT"))
   should.be_true(list.contains(p.keywords, "PROOF"))
 }
 
-pub fn vql_profile_has_aliases_test() {
-  let p = database.vql_profile()
+pub fn vcl_profile_has_aliases_test() {
+  let p = database.vcl_profile()
   should.be_true(list.contains(p.aliases, "verisimdb"))
   should.be_true(list.contains(p.aliases, "verisim"))
 }
 
-pub fn vql_profile_prompt_test() {
-  let p = database.vql_profile()
-  should.equal(p.prompt, "vql> ")
+pub fn vcl_profile_prompt_test() {
+  let p = database.vcl_profile()
+  should.equal(p.prompt, "vcl> ")
 }
 
 pub fn gql_profile_has_correct_id_test() {
@@ -163,10 +163,10 @@ pub fn builtin_profiles_returns_three_test() {
   should.equal(list.length(profiles), 3)
 }
 
-pub fn builtin_profiles_contains_vql_test() {
+pub fn builtin_profiles_contains_vcl_test() {
   let profiles = database.builtin_profiles()
   let ids = list.map(profiles, fn(p) { p.id })
-  should.be_true(list.contains(ids, "vql"))
+  should.be_true(list.contains(ids, "vcl"))
 }
 
 pub fn builtin_profiles_contains_gql_test() {
@@ -192,7 +192,7 @@ pub fn all_profiles_preserves_builtin_order_test() {
   let all = database.all_profiles()
   let first_three = list.take(all, 3)
   let ids = list.map(first_three, fn(p) { p.id })
-  should.equal(ids, ["vql", "gql", "kql"])
+  should.equal(ids, ["vcl", "gql", "kql"])
 }
 
 pub fn custom_profiles_returns_list_test() {
@@ -206,11 +206,11 @@ pub fn custom_profiles_returns_list_test() {
 // Profile lookup — find_profile by ID and alias
 // ---------------------------------------------------------------------------
 
-pub fn find_profile_by_vql_id_test() {
-  let result = database.find_profile("vql")
+pub fn find_profile_by_vcl_id_test() {
+  let result = database.find_profile("vcl")
   should.be_ok(result)
   let assert Ok(p) = result
-  should.equal(p.id, "vql")
+  should.equal(p.id, "vcl")
 }
 
 pub fn find_profile_by_gql_id_test() {
@@ -231,14 +231,14 @@ pub fn find_profile_by_alias_verisimdb_test() {
   let result = database.find_profile("verisimdb")
   should.be_ok(result)
   let assert Ok(p) = result
-  should.equal(p.id, "vql")
+  should.equal(p.id, "vcl")
 }
 
 pub fn find_profile_by_alias_verisim_test() {
   let result = database.find_profile("verisim")
   should.be_ok(result)
   let assert Ok(p) = result
-  should.equal(p.id, "vql")
+  should.equal(p.id, "vcl")
 }
 
 pub fn find_profile_by_alias_lithoglyph_test() {
@@ -270,10 +270,10 @@ pub fn find_profile_by_alias_quandle_test() {
 }
 
 pub fn find_profile_is_case_insensitive_test() {
-  let result = database.find_profile("VQL")
+  let result = database.find_profile("VCL")
   should.be_ok(result)
   let assert Ok(p) = result
-  should.equal(p.id, "vql")
+  should.equal(p.id, "vcl")
 }
 
 pub fn find_profile_mixed_case_test() {
@@ -297,7 +297,7 @@ pub fn find_profile_error_message_contains_id_test() {
 pub fn find_profile_error_message_lists_available_test() {
   let result = database.find_profile("redis")
   let assert Error(msg) = result
-  should.be_true(string.contains(msg, "vql"))
+  should.be_true(string.contains(msg, "vcl"))
   should.be_true(string.contains(msg, "gql"))
   should.be_true(string.contains(msg, "kql"))
 }
@@ -312,17 +312,17 @@ pub fn find_profile_empty_string_returns_error_test() {
 // ---------------------------------------------------------------------------
 
 pub fn connection_from_profile_uses_default_host_test() {
-  let conn = database.connection_from_profile(database.vql_profile())
+  let conn = database.connection_from_profile(database.vcl_profile())
   should.equal(conn.host, "localhost")
 }
 
 pub fn connection_from_profile_uses_default_port_test() {
-  let conn = database.connection_from_profile(database.vql_profile())
+  let conn = database.connection_from_profile(database.vcl_profile())
   should.equal(conn.port, 8080)
 }
 
 pub fn connection_from_profile_dt_disabled_by_default_test() {
-  let conn = database.connection_from_profile(database.vql_profile())
+  let conn = database.connection_from_profile(database.vcl_profile())
   should.be_false(conn.dt_enabled)
 }
 
@@ -341,8 +341,8 @@ pub fn connection_from_profile_kql_port_test() {
 // URL builders
 // ---------------------------------------------------------------------------
 
-pub fn base_url_default_vql_test() {
-  let conn = database.connection_from_profile(database.vql_profile())
+pub fn base_url_default_vcl_test() {
+  let conn = database.connection_from_profile(database.vcl_profile())
   should.equal(database.base_url(conn), "http://localhost:8080")
 }
 
@@ -357,22 +357,22 @@ pub fn base_url_default_kql_test() {
 }
 
 pub fn base_url_with_custom_host_test() {
-  let conn = database.connection_from_profile(database.vql_profile())
+  let conn = database.connection_from_profile(database.vcl_profile())
   let conn = database.Connection(..conn, host: "10.0.0.5")
   should.equal(database.base_url(conn), "http://10.0.0.5:8080")
 }
 
 pub fn base_url_with_custom_port_test() {
-  let conn = database.connection_from_profile(database.vql_profile())
+  let conn = database.connection_from_profile(database.vcl_profile())
   let conn = database.Connection(..conn, port: 9090)
   should.equal(database.base_url(conn), "http://localhost:9090")
 }
 
-pub fn execute_url_vql_test() {
-  let conn = database.connection_from_profile(database.vql_profile())
+pub fn execute_url_vcl_test() {
+  let conn = database.connection_from_profile(database.vcl_profile())
   should.equal(
     database.execute_url(conn),
-    "http://localhost:8080/vql/execute",
+    "http://localhost:8080/vcl/execute",
   )
 }
 
@@ -392,8 +392,8 @@ pub fn execute_url_kql_test() {
   )
 }
 
-pub fn health_url_vql_test() {
-  let conn = database.connection_from_profile(database.vql_profile())
+pub fn health_url_vcl_test() {
+  let conn = database.connection_from_profile(database.vcl_profile())
   should.equal(database.health_url(conn), "http://localhost:8080/health")
 }
 
@@ -408,11 +408,11 @@ pub fn health_url_kql_test() {
 }
 
 pub fn execute_url_with_custom_host_and_port_test() {
-  let conn = database.connection_from_profile(database.vql_profile())
+  let conn = database.connection_from_profile(database.vcl_profile())
   let conn = database.Connection(..conn, host: "db.example.com", port: 443)
   should.equal(
     database.execute_url(conn),
-    "http://db.example.com:443/vql/execute",
+    "http://db.example.com:443/vcl/execute",
   )
 }
 

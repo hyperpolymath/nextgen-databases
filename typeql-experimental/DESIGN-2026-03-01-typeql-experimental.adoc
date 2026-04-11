@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-= Design Document: typeql-experimental (VQL-dt++)
+= Design Document: typeql-experimental (VCL-dt++)
 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 :date: 2026-03-01
 :repo: nextgen-databases/typeql-experimental
@@ -8,29 +8,29 @@ Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 == Summary
 
 Create an experimental exploration space for six advanced type-theoretic
-extensions to VQL (VeriSim Query Language). These extensions leverage Idris2's
+extensions to VCL (VeriSim Query Language). These extensions leverage Idris2's
 native quantitative type theory (QTT) to provide compiler-enforced resource
 safety, session protocols, and effect tracking for database queries.
 
 == Motivation
 
-VQL-dt (dependently-typed VQL) is ~35% wired end-to-end in VeriSimDB, covering
+VCL-dt (dependently-typed VCL) is ~35% wired end-to-end in VeriSimDB, covering
 Pi/Sigma types, proof clauses, and basic type checking. The next frontier is
 type-level resource management — ensuring connections aren't leaked, transactions
 follow protocols, and effects are tracked statically.
 
-These features are too experimental for the production VQL-dt codebase. A
+These features are too experimental for the production VCL-dt codebase. A
 standalone exploration space allows rapid iteration without destabilising the
 existing type checker.
 
 == Design Decisions
 
-=== D1: VQL, Not SQL
+=== D1: VCL, Not SQL
 
-VQL's cross-modal semantics (HEXAD, 8 modalities, PROOF clauses) are the natural
+VCL's cross-modal semantics (HEXAD, 8 modalities, PROOF clauses) are the natural
 foundation. SQL's relational model is too flat for the kind of properties we want
 to prove (e.g., "this query touches only the GRAPH and DOCUMENT modalities" is a
-natural modal type constraint in VQL but meaningless in SQL).
+natural modal type constraint in VCL but meaningless in SQL).
 
 === D2: Idris2 QTT as Killer Feature
 
@@ -40,9 +40,9 @@ compiler enforces linearity for free. No custom linearity checker needed.
 
 === D3: Delta Grammar, Not Copy
 
-The EBNF extends VQL v3.0 by appending optional clauses AFTER the standard query.
+The EBNF extends VCL v3.0 by appending optional clauses AFTER the standard query.
 No keyword conflicts. All 6 new clause keywords (`CONSUME`, `SESSION`, `EFFECTS`,
-`TRANSACTION`, `ATTACHED`, `USAGE`) are disjoint from VQL's 60+ reserved keywords.
+`TRANSACTION`, `ATTACHED`, `USAGE`) are disjoint from VCL's 60+ reserved keywords.
 
 === D4: Dual-Language Split
 
@@ -130,7 +130,7 @@ from exact-1 to at-most-n.
 * **Phase 2**: Idris2 Kernel (9 modules) — Core, Linear, Session, Effects,
   Modal, ProofCarrying, Quantitative, Checker, Proofs
 * **Phase 3**: ReScript Parser (2 files) — TQLAst.res, TQLParser.res
-* **Phase 4**: Examples & Tests (11 files) — 7 .vqlut examples, 3 Idris2 test
+* **Phase 4**: Examples & Tests (11 files) — 7 .vclut examples, 3 Idris2 test
   modules, 1 ReScript test module
 * **Phase 5**: FFI Skeleton (3 files) — build.zig, build.zig.zon, bridge.zig
 * **Phase 6**: Documentation (1 file) — examples.adoc
@@ -193,5 +193,5 @@ from exact-1 to at-most-n.
 1. `idris2 --typecheck typeql-experimental.ipkg` — all modules compile with `%default total`
 2. `cd ffi/zig && zig build test` — all 5 FFI tests pass
 3. `grep -rn 'believe_me\|assert_total\|assert_smaller' src/abi/` — returns nothing
-4. (Future) ReScript parser compiles and accepts all 7 example `.vqlut` files
+4. (Future) ReScript parser compiles and accepts all 7 example `.vclut` files
 5. (Future) Idris2 proofs validated against ReScript-parsed ASTs

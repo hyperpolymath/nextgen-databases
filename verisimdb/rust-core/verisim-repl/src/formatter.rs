@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //!
-//! Output formatters for VQL query results.
+//! Output formatters for VCL query results.
 //!
 //! Supports three output modes:
 //! - **Table**: Human-readable columnar output using `comfy-table`.

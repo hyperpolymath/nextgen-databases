@@ -1,16 +1,16 @@
 (* @taxonomy: spec/grammar *)
 (* SPDX-License-Identifier: PMPL-1.0-or-later *)
 (* Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk> *)
-(* VQL-dt++ (TypeQL-experimental) Grammar Delta *)
-(* Extends: VQL v3.0 (verisimdb/docs/vql-grammar.ebnf, 317 lines) *)
+(* VCL-dt++ (TypeQL-experimental) Grammar Delta *)
+(* Extends: VCL v3.0 (verisimdb/docs/vcl-grammar.ebnf, 317 lines) *)
 (* Version: 0.1.0 *)
 (* Date: 2026-03-01 *)
 
 (* ============================================================================
    OVERVIEW
 
-   This grammar EXTENDS VQL v3.0 with six new optional clauses appended AFTER
-   the standard query structure. The base VQL grammar is imported by reference
+   This grammar EXTENDS VCL v3.0 with six new optional clauses appended AFTER
+   the standard query structure. The base VCL grammar is imported by reference
    — this file specifies only the delta.
 
    New clauses (all optional, any combination, in this order):
@@ -22,7 +22,7 @@
    5. PROOF ATTACHED <theorem>    — Proof-carrying code (theorem attachment)
    6. USAGE LIMIT <n>             — Quantitative type theory (bounded resources)
 
-   No keyword conflicts with VQL v3.0's 60+ reserved keywords. All new
+   No keyword conflicts with VCL v3.0's 60+ reserved keywords. All new
    keywords are disjoint:
    - CONSUME, AFTER, USE (new)
    - SESSION (new)
@@ -33,10 +33,10 @@
    ============================================================================ *)
 
 (* ============================================================================
-   1. EXTENDED QUERY — Augments VQL v3.0 query production
+   1. EXTENDED QUERY — Augments VCL v3.0 query production
    ============================================================================ *)
 
-(* The base VQL query is:
+(* The base VCL query is:
    query = select_clause, from_clause, [where_clause], [group_by_clause],
            [having_clause], [proof_clause], [order_by_clause],
            [limit_clause], [offset_clause] ;
@@ -141,7 +141,7 @@ transaction_state = 'Fresh'
    Idris2 mapping: ProvedResult : (result : QueryResult) -> (prf : Theorem) -> Type
    Attaches a formal proof to the query result as a sigma pair.
 
-   Note: This is DIFFERENT from VQL's existing PROOF clause. PROOF verifies
+   Note: This is DIFFERENT from VCL's existing PROOF clause. PROOF verifies
    pre-conditions; PROOF ATTACHED attaches post-condition theorems to results.
 
    Example:
@@ -164,7 +164,7 @@ param_list = identifier, '=', literal, { ',', identifier, '=', literal } ;
    Idris2 mapping: BoundedResource : (n : Nat) -> Type
    Generalises linear types from exact-1 to at-most-n across the query plan.
 
-   Note: This is DIFFERENT from VQL's existing LIMIT clause. LIMIT caps result
+   Note: This is DIFFERENT from VCL's existing LIMIT clause. LIMIT caps result
    rows; USAGE LIMIT caps resource consumption (connections, API calls, etc.).
 
    Example:
@@ -178,17 +178,17 @@ usage_clause = 'USAGE', 'LIMIT', positive_integer ;
    8. EXTENDED RESERVED KEYWORDS
    ============================================================================
 
-   New keywords added by VQL-dt++ (disjoint from VQL v3.0's 60+ keywords):
+   New keywords added by VCL-dt++ (disjoint from VCL v3.0's 60+ keywords):
    ============================================================================ *)
 
-vqldtpp_keywords = 'CONSUME' | 'AFTER' | 'USE'
+vcldtpp_keywords = 'CONSUME' | 'AFTER' | 'USE'
                  | 'SESSION'
                  | 'EFFECTS'
                  | 'TRANSACTION'
                  | 'ATTACHED'
                  | 'USAGE' ;
 
-(* Note: 'WITH', 'PROOF', 'LIMIT', 'IN' already exist in VQL v3.0.
+(* Note: 'WITH', 'PROOF', 'LIMIT', 'IN' already exist in VCL v3.0.
    These are reused in new contexts that are syntactically unambiguous:
    - WITH SESSION vs WITH DRIFT — next token distinguishes
    - PROOF ATTACHED vs PROOF EXISTENCE — next token distinguishes

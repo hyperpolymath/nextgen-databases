@@ -16,12 +16,12 @@ VeriSimDB operates as both a standalone database (like PostgreSQL) and a federat
 
 ## ✨ Key Features
 
-### 🔍 VQL Query Language (100% Complete)
-- **VQLParser.res** - Full parser with combinator library (633 lines)
-- **VQLError.res** - Comprehensive error types for all failure modes (14K+ lines)
-- **VQLExplain.res** - Query execution plan visualization (7K+ lines)
-- **VQLTypeChecker.res** - Dependent-type verification with ZKP integration
-- **VQLExecutor** - Bridges ReScript parser to Elixir orchestration
+### 🔍 VCL Query Language (100% Complete)
+- **VCLParser.res** - Full parser with combinator library (633 lines)
+- **VCLError.res** - Comprehensive error types for all failure modes (14K+ lines)
+- **VCLExplain.res** - Query execution plan visualization (7K+ lines)
+- **VCLTypeChecker.res** - Dependent-type verification with ZKP integration
+- **VCLExecutor** - Bridges ReScript parser to Elixir orchestration
 - ISO/IEC 14977 EBNF compliant grammar
 - Two execution paths: Slipstream (fast) and Dependent-type (verified)
 
@@ -84,7 +84,7 @@ Comprehensive test coverage:
 - DriftMonitor
 - SchemaRegistry
 - EntityServer
-- VQLExecutor
+- VCLExecutor
 - End-to-end integration
 
 ### ⚡ Performance Benchmarks (100% Complete)
@@ -156,7 +156,7 @@ Comprehensive 100+ section guide covering:
 
 ### Code Statistics
 - **Total Lines Written:** ~3,839 lines in final session
-- **VQL Implementation:** ~22K lines
+- **VCL Implementation:** ~22K lines
 - **Rust Core:** ~3,860 lines
 - **Elixir Orchestration:** ~2,000+ lines
 - **ReScript Registry:** ~900 lines
@@ -166,7 +166,7 @@ Comprehensive 100+ section guide covering:
 
 ### Project Completion
 - Overall: **100%** ✅
-- VQL: **100%** ✅
+- VCL: **100%** ✅
 - Elixir: **100%** ✅
 - Rust Stores: **80%** 🟡
 - Registry: **100%** ✅
@@ -230,7 +230,7 @@ curl -X POST http://localhost:8080/api/v1/octads \
   }'
 ```
 
-**Query with VQL:**
+**Query with VCL:**
 ```bash
 curl -X POST http://localhost:4000/api/v1/query \
   -H "Content-Type: application/json" \
@@ -319,7 +319,7 @@ Run full benchmarks: `cd benches && cargo bench`
 - Full ZKP proof generation/verification
 - Performance optimizations
 - Federation production testing
-- Additional VQL features (aggregations, joins)
+- Additional VCL features (aggregations, joins)
 
 ### v0.3.0 (Q3 2026)
 - Horizontal scaling enhancements
@@ -378,7 +378,7 @@ See `LICENSE` for full terms.
 
 1. **Deploy:** Follow `DEPLOYMENT.adoc` for your environment
 2. **Test:** Run integration tests and benchmarks
-3. **Experiment:** Create octads and run VQL queries
+3. **Experiment:** Create octads and run VCL queries
 4. **Feedback:** Report issues and contribute
 5. **Community:** Join discussions and share use cases
 

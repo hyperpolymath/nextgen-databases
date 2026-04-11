@@ -58,7 +58,7 @@ pub fn error_to_string_parse_error_test() {
 
 pub fn execute_unreachable_server_returns_error_test() {
   // Connect to a port where nothing is listening.
-  let profile = database.vql_profile()
+  let profile = database.vcl_profile()
   let conn =
     database.Connection(
       profile: profile,
@@ -71,7 +71,7 @@ pub fn execute_unreachable_server_returns_error_test() {
 }
 
 pub fn health_unreachable_server_returns_error_test() {
-  let profile = database.vql_profile()
+  let profile = database.vcl_profile()
   let conn =
     database.Connection(
       profile: profile,

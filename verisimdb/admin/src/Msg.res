@@ -15,15 +15,15 @@ type msg =
   | /// Health check response arrived from the Rust core.
     HealthResult(result<string, string>)
 
-  // --- VQL console ---
-  | /// User typed in the VQL console input.
-    VqlInputChanged(string)
-  | /// User pressed Execute or Ctrl+Enter in the VQL console.
-    ExecuteVql
-  | /// VQL query result arrived.
-    VqlResult(result<string, string>)
-  | /// User clicked "Copy VQL" to copy the current query to clipboard.
-    CopyVql
+  // --- VCL console ---
+  | /// User typed in the VCL console input.
+    VclInputChanged(string)
+  | /// User pressed Execute or Ctrl+Enter in the VCL console.
+    ExecuteVcl
+  | /// VCL query result arrived.
+    VclResult(result<string, string>)
+  | /// User clicked "Copy VCL" to copy the current query to clipboard.
+    CopyVcl
 
   // --- Octad browser ---
   | /// Load or refresh the octad entity list.

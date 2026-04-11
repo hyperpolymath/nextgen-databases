@@ -5,7 +5,7 @@
 // formatter_test.gleam — Comprehensive tests for query result formatting.
 //
 // Covers: parse_format, csv_escape, and format_result for all three output
-// modes (Table, Json, Csv) with various input shapes including VQL-style
+// modes (Table, Json, Csv) with various input shapes including VCL-style
 // responses, raw arrays, single objects, and empty data.
 
 import gleam/dynamic.{type Dynamic}
@@ -148,8 +148,8 @@ pub fn format_result_table_single_map_test() {
   should.be_true(string.contains(result, "ok"))
 }
 
-pub fn format_result_table_vql_response_shape_test() {
-  // VQL responses wrap data in {"success": true, "data": [...], "row_count": n}.
+pub fn format_result_table_vcl_response_shape_test() {
+  // VCL responses wrap data in {"success": true, "data": [...], "row_count": n}.
   let row = map_from_pairs([#("entity", "user-1"), #("status", "active")])
   let response = map_from_mixed([
     #("success", to_dynamic(True)),

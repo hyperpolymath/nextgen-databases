@@ -5,7 +5,7 @@
 // database.gleam — Extensible database profile registry for the NextGen Query Client.
 //
 // Defines database profiles (connection parameters, keywords, prompts) for
-// the three built-in NextGen databases (VQL, GQL, KQL) and supports custom
+// the three built-in NextGen databases (VCL, GQL, KQL) and supports custom
 // profiles for any database that speaks HTTP + JSON. All databases use the
 // same protocol pattern: POST /execute with {"query": "..."} and receive
 // JSON results.
@@ -20,15 +20,15 @@ import gleam/list
 import gleam/string
 
 /// A database profile — everything NQC needs to know about a database.
-/// Built-in databases (VQL, GQL, KQL) are pre-defined profiles.
+/// Built-in databases (VCL, GQL, KQL) are pre-defined profiles.
 /// Custom databases use the same structure.
 pub type DatabaseProfile {
   DatabaseProfile(
-    /// Short identifier used in CLI flags and \db command (e.g. "vql", "sql").
+    /// Short identifier used in CLI flags and \db command (e.g. "vcl", "sql").
     id: String,
     /// Human-readable name (e.g. "VeriSimDB", "PostgreSQL").
     display_name: String,
-    /// Query language name (e.g. "VQL", "SQL").
+    /// Query language name (e.g. "VCL", "SQL").
     language_name: String,
     /// Short description for the interactive selector.
     description: String,
@@ -38,11 +38,11 @@ pub type DatabaseProfile {
     default_host: String,
     /// Default server port.
     default_port: Int,
-    /// API endpoint path for query execution (e.g. "/vql/execute").
+    /// API endpoint path for query execution (e.g. "/vcl/execute").
     execute_path: String,
     /// API endpoint path for health checks (e.g. "/health").
     health_path: String,
-    /// REPL prompt string (e.g. "vql> ").
+    /// REPL prompt string (e.g. "vcl> ").
     prompt: String,
     /// Whether this database supports dependent type verification.
     supports_dt: Bool,
@@ -71,18 +71,18 @@ pub type Connection {
 // ---------------------------------------------------------------------------
 
 /// VeriSimDB — 6-core multimodal database with self-normalization.
-pub fn vql_profile() -> DatabaseProfile {
+pub fn vcl_profile() -> DatabaseProfile {
   DatabaseProfile(
-    id: "vql",
+    id: "vcl",
     display_name: "VeriSimDB",
-    language_name: "VQL",
+    language_name: "VCL",
     description: "6-core multimodal database with self-normalization",
     aliases: ["verisimdb", "verisim"],
     default_host: "localhost",
     default_port: 8080,
-    execute_path: "/vql/execute",
+    execute_path: "/vcl/execute",
     health_path: "/health",
-    prompt: "vql> ",
+    prompt: "vcl> ",
     supports_dt: True,
     keywords: [
       "SELECT", "FROM", "WHERE", "LIMIT", "INSERT", "INTO", "VALUES",
@@ -147,7 +147,7 @@ pub fn kql_profile() -> DatabaseProfile {
 
 /// Return all built-in database profiles (the three NextGen databases).
 pub fn builtin_profiles() -> List(DatabaseProfile) {
-  [vql_profile(), gql_profile(), kql_profile()]
+  [vcl_profile(), gql_profile(), kql_profile()]
 }
 
 /// Return all available database profiles — builtins plus any custom ones.

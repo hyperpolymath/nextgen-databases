@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// VQL formatter — canonical formatting for queries.
+// VCL formatter — canonical formatting for queries.
 
 /// Clause-starting keywords that get their own line.
 let clauseStarters = [
@@ -8,7 +8,7 @@ let clauseStarters = [
   "TRAVERSE", "PROOF", "EXPLAIN",
 ]
 
-let formatVql = (query: string): string => {
+let formatVcl = (query: string): string => {
   let upper = String.toUpperCase
   let tokens =
     Js.String2.splitByRe(query, %re("/(\s+|'[^']*'|\"[^\"]*\")/"))
@@ -30,7 +30,7 @@ let formatVql = (query: string): string => {
       result := result.contents ++ trimmed
     } else {
       let word = upper(trimmed)
-      let formatted = if VqlKeywords.isKeyword(word) || VqlKeywords.isModality(word) {
+      let formatted = if VclKeywords.isKeyword(word) || VclKeywords.isModality(word) {
         word
       } else {
         trimmed

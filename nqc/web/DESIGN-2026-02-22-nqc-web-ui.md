@@ -23,7 +23,7 @@ web/
 ├── index.html             # HTML shell + all CSS (dark terminal theme)
 ├── serve.js               # DONE — Deno static file server (SPA fallback)
 ├── src/
-│   ├── Database.res       # DONE — Profile type + VQL/GQL/KQL builtins (mirrors Gleam)
+│   ├── Database.res       # DONE — Profile type + VCL/GQL/KQL builtins (mirrors Gleam)
 │   ├── Route.res          # DONE — Route type + URL parser (cadre-router)
 │   ├── Msg.res            # DONE — Message variants + outputFormat/connectionState types
 │   ├── Model.res          # DONE — Application state + init function
@@ -102,7 +102,7 @@ Response: any 2xx = healthy
 ### Database ports
 | DB | Port | Execute Path | Health Path |
 |----|------|-------------|-------------|
-| VQL (VeriSimDB) | 8080 | /vql/execute | /health |
+| VCL (VeriSimDB) | 8080 | /vcl/execute | /health |
 | GQL (Lithoglyph) | 8081 | /gql/execute | /health |
 | KQL (QuandleDB) | 8082 | /kql/execute | /health |
 

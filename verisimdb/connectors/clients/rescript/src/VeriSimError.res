@@ -31,8 +31,8 @@ type t =
   | ModalityUnavailable(string)
   | DriftComputationError(string)
   | ProvenanceInvalid(string)
-  | VqlParseError(string)
-  | VqlExecutionError(string)
+  | VclParseError(string)
+  | VclExecutionError(string)
   | FederationError(string)
   // --- Client-side errors ---
   | ConnectionError(string)
@@ -60,8 +60,8 @@ let message = (err: t): string => {
   | ModalityUnavailable(msg) => `Modality unavailable: ${msg}`
   | DriftComputationError(msg) => `Drift computation error: ${msg}`
   | ProvenanceInvalid(msg) => `Provenance invalid: ${msg}`
-  | VqlParseError(msg) => `VQL parse error: ${msg}`
-  | VqlExecutionError(msg) => `VQL execution error: ${msg}`
+  | VclParseError(msg) => `VCL parse error: ${msg}`
+  | VclExecutionError(msg) => `VCL execution error: ${msg}`
   | FederationError(msg) => `Federation error: ${msg}`
   | ConnectionError(msg) => `Connection error: ${msg}`
   | TimeoutError(msg) => `Timeout error: ${msg}`
@@ -119,8 +119,8 @@ let isRetryable = (err: t): bool => {
   | ModalityUnavailable(_) => false
   | DriftComputationError(_) => false
   | ProvenanceInvalid(_) => false
-  | VqlParseError(_) => false
-  | VqlExecutionError(_) => false
+  | VclParseError(_) => false
+  | VclExecutionError(_) => false
   | FederationError(_) => false
   | SerializationError(_) => false
   | UnknownError(_) => false

@@ -8,7 +8,7 @@
 /// system applied to a database administration context.
 ///
 /// Architecture:
-///   - Model.res       -- State types (octads, VQL, drift, telemetry, caps)
+///   - Model.res       -- State types (octads, VCL, drift, telemetry, caps)
 ///   - Msg.res         -- Message types
 ///   - App.res         -- init, update, view (this file)
 ///   - VeriSimDbCmd    -- IPC commands to the VeriSimDB backend
@@ -19,7 +19,7 @@
 ///   +---------------------------------------------+
 ///   | Header: status, runtime, health, caps       |
 ///   +----------+----------------------------------+
-///   | VQL Console (top bar, full width)            |
+///   | VCL Console (top bar, full width)            |
 ///   | [input area]         [results]               |
 ///   +----------+----------------------------------+
 ///   | Sidebar  | Entity Detail (main)              |
@@ -113,37 +113,37 @@ let update = (model: Model.model, msg: Msg.msg): (Model.model, Tea_Cmd.t<Msg.msg
   | HealthResult(Error(err)) =>
     ({...model, status: Disconnected, error: Some(`Health check failed: ${err}`)}, Tea_Cmd.none)
 
-  // --- VQL console ---
-  | VqlInputChanged(input) =>
-    ({...model, vqlInput: input}, Tea_Cmd.none)
+  // --- VCL console ---
+  | VclInputChanged(input) =>
+    ({...model, vclInput: input}, Tea_Cmd.none)
 
-  | ExecuteVql =>
+  | ExecuteVcl =>
     switch getNetworkToken(model) {
     | Some(token) =>
-      if String.trim(model.vqlInput) == "" {
-        ({...model, error: Some("VQL query cannot be empty.")}, Tea_Cmd.none)
+      if String.trim(model.vclInput) == "" {
+        ({...model, error: Some("VCL query cannot be empty.")}, Tea_Cmd.none)
       } else {
         let cmd = cmdFromPromise(
-          () => VeriSimDbCmd.queryVql(model.vqlInput, token),
-          result => Msg.VqlResult(Ok(result)),
-          err => Msg.VqlResult(Error(err)),
+          () => VeriSimDbCmd.queryVcl(model.vclInput, token),
+          result => Msg.VclResult(Ok(result)),
+          err => Msg.VclResult(Error(err)),
         )
-        ({...model, vqlExecuting: true, vqlResult: None, error: None}, cmd)
+        ({...model, vclExecuting: true, vclResult: None, error: None}, cmd)
       }
     | None => ({...model, error: Some("Network capability required.")}, Tea_Cmd.none)
     }
 
-  | VqlResult(Ok(result)) =>
-    ({...model, vqlExecuting: false, vqlResult: Some(result), error: None}, Tea_Cmd.none)
+  | VclResult(Ok(result)) =>
+    ({...model, vclExecuting: false, vclResult: Some(result), error: None}, Tea_Cmd.none)
 
-  | VqlResult(Error(err)) =>
-    ({...model, vqlExecuting: false, error: Some(`VQL query failed: ${err}`)}, Tea_Cmd.none)
+  | VclResult(Error(err)) =>
+    ({...model, vclExecuting: false, error: Some(`VCL query failed: ${err}`)}, Tea_Cmd.none)
 
-  | CopyVql =>
+  | CopyVcl =>
     switch getClipboardToken(model) {
     | Some(token) =>
       let cmd = cmdFromPromise(
-        () => Capabilities.copyToClipboard(model.vqlInput, token)->Promise.thenResolve(_ => "copied"),
+        () => Capabilities.copyToClipboard(model.vclInput, token)->Promise.thenResolve(_ => "copied"),
         _result => Msg.NoOp,
         _err => Msg.NoOp,
       )
@@ -639,57 +639,57 @@ let view = (model: Model.model): Tea_Html.t<Msg.msg> => {
         Tea_Html.noNode
       },
 
-      // --- VQL Console (top panel, full width) ---
+      // --- VCL Console (top panel, full width) ---
       Tea_Html.section(
-        [Tea_Html.Attributes.class("vql-console")],
+        [Tea_Html.Attributes.class("vcl-console")],
         [
           Tea_Html.div(
-            [Tea_Html.Attributes.class("vql-header")],
+            [Tea_Html.Attributes.class("vcl-header")],
             [
-              Tea_Html.h2([], [Tea_Html.text("VQL Console")]),
+              Tea_Html.h2([], [Tea_Html.text("VCL Console")]),
               Tea_Html.div(
-                [Tea_Html.Attributes.class("vql-actions")],
+                [Tea_Html.Attributes.class("vcl-actions")],
                 [
                   Tea_Html.button(
                     [
-                      Tea_Html.Attributes.class(model.vqlExecuting ? "vql-executing" : "vql-execute"),
-                      Tea_Html.Attributes.disabled(model.vqlExecuting),
-                      Tea_Html.Events.onClick(Msg.ExecuteVql),
+                      Tea_Html.Attributes.class(model.vclExecuting ? "vcl-executing" : "vcl-execute"),
+                      Tea_Html.Attributes.disabled(model.vclExecuting),
+                      Tea_Html.Events.onClick(Msg.ExecuteVcl),
                     ],
-                    [Tea_Html.text(model.vqlExecuting ? "Executing..." : "Execute")],
+                    [Tea_Html.text(model.vclExecuting ? "Executing..." : "Execute")],
                   ),
                   Tea_Html.button(
-                    [Tea_Html.Events.onClick(Msg.CopyVql)],
-                    [Tea_Html.text("Copy VQL")],
+                    [Tea_Html.Events.onClick(Msg.CopyVcl)],
+                    [Tea_Html.text("Copy VCL")],
                   ),
                 ],
               ),
             ],
           ),
           Tea_Html.div(
-            [Tea_Html.Attributes.class("vql-body")],
+            [Tea_Html.Attributes.class("vcl-body")],
             [
               Tea_Html.textarea(
                 [
-                  Tea_Html.Attributes.class("vql-input"),
-                  Tea_Html.Attributes.placeholder("Enter VQL query... e.g. FETCH entity WHERE type = 'Document' PROOF EXISTENCE"),
-                  Tea_Html.Attributes.value(model.vqlInput),
-                  Tea_Html.Events.onInput(value => Msg.VqlInputChanged(value)),
+                  Tea_Html.Attributes.class("vcl-input"),
+                  Tea_Html.Attributes.placeholder("Enter VCL query... e.g. FETCH entity WHERE type = 'Document' PROOF EXISTENCE"),
+                  Tea_Html.Attributes.value(model.vclInput),
+                  Tea_Html.Events.onInput(value => Msg.VclInputChanged(value)),
                 ],
                 [],
               ),
               Tea_Html.div(
-                [Tea_Html.Attributes.class("vql-result")],
+                [Tea_Html.Attributes.class("vcl-result")],
                 [
-                  switch model.vqlResult {
+                  switch model.vclResult {
                   | Some(result) =>
                     Tea_Html.pre(
-                      [Tea_Html.Attributes.class("vql-result-content")],
+                      [Tea_Html.Attributes.class("vcl-result-content")],
                       [Tea_Html.text(result)],
                     )
                   | None =>
                     Tea_Html.p(
-                      [Tea_Html.Attributes.class("vql-placeholder")],
+                      [Tea_Html.Attributes.class("vcl-placeholder")],
                       [Tea_Html.text("Query results will appear here")],
                     )
                   },

@@ -28,12 +28,12 @@ test("fromUrl: root path maps to Picker", () => {
   }
 })
 
-test("fromUrl: /query/vql maps to Query with dbId=vql", () => {
-  let url = Tea_Url.parse("/query/vql")
+test("fromUrl: /query/vcl maps to Query with dbId=vcl", () => {
+  let url = Tea_Url.parse("/query/vcl")
   let route = Route.fromUrl(url)
   switch route {
   | Route.Query({dbId, dt, format}) =>
-    strictEqual(dbId, "vql")
+    strictEqual(dbId, "vcl")
     strictEqual(dt, false)
     strictEqual(format, "table")
   | Route.Picker | Route.NotFound => ok(false)
@@ -62,12 +62,12 @@ test("fromUrl: /query/kql?format=json parses format parameter", () => {
   }
 })
 
-test("fromUrl: /query/vql?dt=true&format=csv parses both params", () => {
-  let url = Tea_Url.parse("/query/vql?dt=true&format=csv")
+test("fromUrl: /query/vcl?dt=true&format=csv parses both params", () => {
+  let url = Tea_Url.parse("/query/vcl?dt=true&format=csv")
   let route = Route.fromUrl(url)
   switch route {
   | Route.Query({dbId, dt, format}) =>
-    strictEqual(dbId, "vql")
+    strictEqual(dbId, "vcl")
     strictEqual(dt, true)
     strictEqual(format, "csv")
   | Route.Picker | Route.NotFound => ok(false)
@@ -101,8 +101,8 @@ test("toPath: Picker serializes to /", () => {
 })
 
 test("toPath: Query with defaults serializes to /query/:dbId", () => {
-  let path = Route.toPath(Route.Query({dbId: "vql", dt: false, format: "table"}))
-  strictEqual(path, "/query/vql")
+  let path = Route.toPath(Route.Query({dbId: "vcl", dt: false, format: "table"}))
+  strictEqual(path, "/query/vcl")
 })
 
 test("toPath: Query with dt=true includes ?dt=true", () => {

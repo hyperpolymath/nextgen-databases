@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-= VQL-UT Annotated Examples
+= VCL-UT Annotated Examples
 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 :date: 2026-03-01
 :toc: macro
 
 == Overview
 
-This document provides comprehensive, annotated examples of each VQL-UT
-extension and their combinations. Each example shows the VQL-UT surface syntax,
+This document provides comprehensive, annotated examples of each VCL-UT
+extension and their combinations. Each example shows the VCL-UT surface syntax,
 the Idris2 type-level encoding, and the property being enforced.
 
 == 1. Linear Types: CONSUME AFTER N USE
@@ -27,7 +27,7 @@ double-uses a connection.
 
 === Example
 
-[source,vql]
+[source,vcl]
 ----
 -- Single-use connection: use once, then it must be released
 SELECT GRAPH, DOCUMENT
@@ -73,7 +73,7 @@ index, and the type system only permits operations that match the current state.
 
 === Example
 
-[source,vql]
+[source,vcl]
 ----
 -- Read-only session: mutations are statically forbidden
 SELECT GRAPH, DOCUMENT
@@ -113,7 +113,7 @@ are a subset of declared effects.
 
 === Example
 
-[source,vql]
+[source,vcl]
 ----
 -- Only Read effect is permitted
 SELECT GRAPH, VECTOR
@@ -147,7 +147,7 @@ evidence of being in the matching world.
 
 === Example
 
-[source,vql]
+[source,vcl]
 ----
 -- Data is scoped to the Active transaction
 SELECT GRAPH, DOCUMENT
@@ -184,7 +184,7 @@ not an afterthought.
 
 === Example
 
-[source,vql]
+[source,vcl]
 ----
 -- Result carries an integrity proof
 SELECT GRAPH, DOCUMENT
@@ -219,7 +219,7 @@ natural number that decreases with each consumption.
 
 === Example
 
-[source,vql]
+[source,vcl]
 ----
 -- Budget 100 resource units
 SELECT GRAPH, VECTOR, DOCUMENT
@@ -244,7 +244,7 @@ let (_, b98) = consume b99       -- 99 → 98
 
 === Example
 
-[source,vql]
+[source,vcl]
 ----
 SELECT GRAPH, DOCUMENT
 FROM HEXAD 550e8400-e29b-41d4-a716-446655440000

@@ -7,7 +7,7 @@ defmodule VeriSim.IntegrationTest do
   Tests:
   - Elixir orchestration layer
   - Communication with Rust core
-  - VQL query execution
+  - VCL query execution
   - Drift detection and normalization
   - Cross-modal queries
   """
@@ -20,7 +20,7 @@ defmodule VeriSim.IntegrationTest do
     DriftMonitor,
     SchemaRegistry,
     EntityServer,
-    Query.VQLExecutor
+    Query.VCLExecutor
   }
 
   @moduletag :integration
@@ -185,7 +185,7 @@ defmodule VeriSim.IntegrationTest do
     end
   end
 
-  describe "VQL Executor" do
+  describe "VCL Executor" do
     test "generates explain plans" do
       query_ast = %{
         modalities: [:graph, :vector],
@@ -196,7 +196,7 @@ defmodule VeriSim.IntegrationTest do
         offset: 0
       }
 
-      {:ok, plan} = VQLExecutor.execute(query_ast, explain: true)
+      {:ok, plan} = VCLExecutor.execute(query_ast, explain: true)
 
       assert is_map(plan)
       assert Map.has_key?(plan, :strategy)
@@ -213,7 +213,7 @@ defmodule VeriSim.IntegrationTest do
         offset: 0
       }
 
-      result = VQLExecutor.execute(query_ast)
+      result = VCLExecutor.execute(query_ast)
 
       # Expect error for nonexistent octad
       assert match?({:error, _}, result)

@@ -39,7 +39,7 @@ The architecture shared across all three databases follows a layered stack:
   Web Frontend (ReScript SPA)
 ----
 
-Each layer is domain-specific. VeriSimDB uses VQL over a Rust/Elixir engine.
+Each layer is domain-specific. VeriSimDB uses VCL over a Rust/Elixir engine.
 QuandleDB uses KQL over a Julia (Skein.jl) engine. LithoGlyph uses GQL over
 a Forth/Factor/Zig engine with Idris2 proofs.
 
@@ -59,7 +59,7 @@ cd verisimdb/elixir-orchestration && mix run ../demos/drift-detection/run_demo.e
 This demo creates 1000 entities, corrupts 50, and verifies that the drift
 detector identifies all 50 with zero false positives (in the sample output).
 The Elixir orchestration layer (`verisimdb/elixir-orchestration/`) coordinates
-the Rust core (`verisimdb/src/`) and the VQL parser (`verisimdb/src/vql/`).
+the Rust core (`verisimdb/src/`) and the VCL parser (`verisimdb/src/vcl/`).
 
 The ABI layer at `verisimdb/src/abi/` (Idris2: `Types.idr`, `Layout.idr`,
 `Foreign.idr`) provides machine-checked memory layout proofs for the C-ABI
@@ -68,9 +68,9 @@ bridge between Rust and Elixir. The capability registry at
 
 === Honest caveat
 
-VeriSimDB is at beta. The drift detection loop works (demo is live). The VQL
+VeriSimDB is at beta. The drift detection loop works (demo is live). The VCL
 query language is approximately 40% complete — basic entity CRUD and
-cross-modal consistency queries work; advanced dependent-type queries (VQL-DT)
+cross-modal consistency queries work; advanced dependent-type queries (VCL-DT)
 are planned. The "formally verified queries" claim in the README refers to
 the Idris2 ABI proofs, not end-to-end query verification (which is roadmap).
 
@@ -92,7 +92,7 @@ ____
 
 | *VeriSimDB*
 | PRIMARY — active development
-| Beta. Drift detection, octad entity model, Elixir orchestration, VQL parser
+| Beta. Drift detection, octad entity model, Elixir orchestration, VCL parser
 (~40% complete), Idris2 ABI proofs. Deployed with per-project instances
 (per VeriSimDB policy: one instance per consumer repo, never shared).
 
@@ -136,7 +136,7 @@ use VeriSimDB.
 | Technology | Role in Next-Gen Databases | Also Used In
 
 | *Rust* (VeriSimDB core)
-| Storage engine, VQL parser, drift detection algorithms
+| Storage engine, VCL parser, drift detection algorithms
 | ephapax, gitbot-fleet, protocol-squisher
 
 | *Elixir* (VeriSimDB orchestration)
@@ -144,7 +144,7 @@ use VeriSimDB.
 | burble (voice platform), gossamer (service discovery target)
 
 | *ReScript* (all frontends)
-| VQL query UI, QuandleDB frontend, planned LithoGlyph frontend
+| VCL query UI, QuandleDB frontend, planned LithoGlyph frontend
 | idaptik, panll, gossamer-powered SPAs
 
 | *Idris2 ABI* (VeriSimDB + planned LithoGlyph)
@@ -180,10 +180,10 @@ repo for cross-modal entity consistency
 | Path | What It Proves
 
 | `verisimdb/`
-| Primary database. `src/` — Rust core (storage, drift detection, VQL parser).
+| Primary database. `src/` — Rust core (storage, drift detection, VCL parser).
 `src/abi/` — Idris2 ABI proofs (Types.idr, Layout.idr, Foreign.idr).
 `src/registry/` — modality capability registry.
-`src/vql/` — VQL query language parser and evaluator.
+`src/vcl/` — VCL query language parser and evaluator.
 `elixir-orchestration/` — Elixir/Phoenix distributed coordinator.
 `api/` — JSON HTTP API surface.
 `demos/` — drift-detection demo (the live proof that octad consistency works).

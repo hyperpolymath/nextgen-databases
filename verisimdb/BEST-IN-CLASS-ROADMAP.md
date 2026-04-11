@@ -5,7 +5,7 @@ Criticality-ordered plan. Toolchain first, then infrastructure, then ecosystem.
 **Completed prerequisites** (this session):
 - [x] verisim-planner crate (cost-based query planning)
 - [x] Triple API (REST + GraphQL + gRPC)
-- [x] VQL AST → LogicalPlan bridge
+- [x] VCL AST → LogicalPlan bridge
 - [x] Proof obligation costing (per-type: existence→ZKP)
 - [x] Adaptive tuning (actual vs estimated latency feedback)
 - [x] Post-processing + cross-modal cost models
@@ -13,33 +13,33 @@ Criticality-ordered plan. Toolchain first, then infrastructure, then ecosystem.
 
 ---
 
-## Phase 1: VQL Toolchain (HIGHEST PRIORITY)
+## Phase 1: VCL Toolchain (HIGHEST PRIORITY)
 
-### 1.1 VQL REPL — Rust CLI
+### 1.1 VCL REPL — Rust CLI
 **Criticality: CRITICAL** | Effort: Medium | Crate: `verisim-repl`
 
 Every database has an interactive shell. Without one, VeriSimDB is unusable
 for exploration and debugging.
 
-- Rust CLI binary (`vql` command)
+- Rust CLI binary (`vcl` command)
 - Readline/rustyline for input editing, history, multiline
 - HTTP client to verisim-api (configurable endpoint)
 - Commands: `\connect`, `\explain`, `\timing`, `\format json|table|csv`
-- Syntax highlighting for VQL keywords
+- Syntax highlighting for VCL keywords
 - Tab completion for modalities, proof types
 - Output formatters: table (default), JSON, CSV
-- `.vqlrc` config file support
+- `.vclrc` config file support
 
-### 1.2 VQL REPL — Elixir IEx Extension
-**Criticality: HIGH** | Effort: Small | Module: `VeriSim.VQL.IEx`
+### 1.2 VCL REPL — Elixir IEx Extension
+**Criticality: HIGH** | Effort: Small | Module: `VeriSim.VCL.IEx`
 
-- `use VeriSim.VQL.IEx` in IEx sessions
-- `vql("SELECT GRAPH FROM OCTAD ...")` function
+- `use VeriSim.VCL.IEx` in IEx sessions
+- `vcl("SELECT GRAPH FROM OCTAD ...")` function
 - Pretty-printed results with modality indicators
-- `vql_explain/1` for EXPLAIN output
+- `vcl_explain/1` for EXPLAIN output
 - Direct in-process execution (no HTTP round-trip)
 
-### 1.3 VQL Language Server (LSP)
+### 1.3 VCL Language Server (LSP)
 **Criticality: HIGH** | Effort: Large | Crate: `verisim-lsp`
 
 - Diagnostics: parse errors, unknown modalities, type mismatches
@@ -49,11 +49,11 @@ for exploration and debugging.
 - VS Code extension + Neovim plugin
 - Uses existing ReScript parser via JSON bridge
 
-### 1.4 VQL Formatter
+### 1.4 VCL Formatter
 **Criticality: MEDIUM** | Effort: Small | Module in `verisim-repl`
 
-- `vql fmt` subcommand
-- Canonical formatting for VQL queries
+- `vcl fmt` subcommand
+- Canonical formatting for VCL queries
 - Keyword uppercasing, consistent indentation
 - Integrates with LSP `textDocument/formatting`
 
@@ -137,7 +137,7 @@ Configurable by admin, overridable by user, defaults to global.
 ### 3.4 ZKP Integration (PLONK)
 **Criticality: HIGH** | Effort: Large
 
-Real zero-knowledge proof verification for VQL-DT PROOF clause.
+Real zero-knowledge proof verification for VCL-DT PROOF clause.
 Scheme: PLONK (see contractiles/trust/Trustfile for rationale).
 
 - `ark-plonk` integration in verisim-semantic
@@ -202,7 +202,7 @@ Close the loop between estimated and actual costs.
 
 - Parse-once, execute-many for repeated queries
 - Plan caching (skip re-optimization for identical plans)
-- Parameterized queries (prevent VQL injection)
+- Parameterized queries (prevent VCL injection)
 - Cache invalidation on schema/config changes
 
 ### 5.3 Result Streaming
@@ -245,7 +245,7 @@ Close the loop between estimated and actual costs.
 **Criticality: MEDIUM** | Effort: Large
 
 - Federation resolver returns real results (currently empty)
-- Cross-instance VQL queries
+- Cross-instance VCL queries
 - Drift-aware federation (respect drift policies)
 - Federation discovery protocol
 
@@ -266,16 +266,16 @@ Can't claim best-in-class without numbers.
 ### 7.2 Client Libraries
 **Criticality: HIGH** | Effort: Medium
 
-- Rust SDK (typed, async, with VQL builder)
+- Rust SDK (typed, async, with VCL builder)
 - Elixir SDK (direct BEAM integration)
-- ReScript SDK (VQL builder + type-safe results)
+- ReScript SDK (VCL builder + type-safe results)
 - Each SDK: connection pooling, retry logic, auth
 
 ### 7.3 Documentation Site
 **Criticality: MEDIUM** | Effort: Medium
 
 - API reference (auto-generated from proto + GraphQL schema)
-- VQL language guide with examples
+- VCL language guide with examples
 - Architecture guide (Marr's three levels)
 - Tutorial: "Build a multimodal search in 10 minutes"
 - Deployment guide (Podman + Containerfile)
@@ -323,23 +323,23 @@ Can't claim best-in-class without numbers.
 
 | # | Item | Phase | Criticality |
 |---|------|-------|-------------|
-| 1 | VQL REPL (Rust CLI) | 1.1 | CRITICAL |
+| 1 | VCL REPL (Rust CLI) | 1.1 | CRITICAL |
 | 2 | Write-Ahead Log | 2.1 | CRITICAL |
 | 3 | Real normalizer regeneration | 4.1 | CRITICAL |
 | 4 | Authentication | 3.1 | CRITICAL |
 | 5 | ACID transactions | 2.2 | CRITICAL |
-| 6 | VQL REPL (Elixir IEx) | 1.2 | HIGH |
+| 6 | VCL REPL (Elixir IEx) | 1.2 | HIGH |
 | 7 | ZKP/PLONK integration | 3.4 | HIGH |
 | 8 | Authorization (RBAC) | 3.2 | HIGH |
 | 9 | Query profiling (EXPLAIN ANALYZE) | 5.1 | HIGH |
-| 10 | VQL LSP | 1.3 | HIGH |
+| 10 | VCL LSP | 1.3 | HIGH |
 | 11 | Persistence backends | 2.3 | HIGH |
 | 12 | Benchmarks vs ArangoDB/SurrealDB/Virtuoso | 7.1 | HIGH |
 | 13 | Client libraries | 7.2 | HIGH |
 | 14 | Snapshots & backup | 2.4 | HIGH |
 | 15 | Conflict resolution | 4.2 | HIGH |
 | 16 | Replication | 6.1 | HIGH |
-| 17 | VQL formatter | 1.4 | MEDIUM |
+| 17 | VCL formatter | 1.4 | MEDIUM |
 | 18 | Encryption at rest | 3.3 | MEDIUM |
 | 19 | Result streaming | 5.3 | MEDIUM |
 | 20 | Prepared statements | 5.2 | MEDIUM |

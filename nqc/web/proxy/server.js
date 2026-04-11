@@ -11,7 +11,7 @@
  *   /api/{dbId}/*  →  localhost:{port}/*
  *
  * Port mapping (mirrors Database.res builtins):
- *   vql  → 8080  (VeriSimDB)
+ *   vcl  → 8080  (VeriSimDB)
  *   gql  → 8081  (Lithoglyph)
  *   kql  → 8082  (QuandleDB)
  *
@@ -27,7 +27,7 @@
 // Database ID → port mapping.
 // Keep in sync with Database.res builtins.
 const PORT_MAP = {
-  vql: 8080,
+  vcl: 8080,
   gql: 8081,
   kql: 8082,
 };

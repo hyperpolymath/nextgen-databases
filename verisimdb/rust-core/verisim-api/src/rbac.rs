@@ -42,7 +42,7 @@ pub enum Permission {
     Write,
     /// Administrative operations (config changes, normalizer triggers, key management).
     Admin,
-    /// Execute queries (VQL execution, query planning, EXPLAIN).
+    /// Execute queries (VCL execution, query planning, EXPLAIN).
     Execute,
 }
 

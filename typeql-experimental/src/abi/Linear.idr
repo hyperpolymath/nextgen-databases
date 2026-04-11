@@ -25,7 +25,7 @@ import Core
 ||| When remaining = S n, the connection can be used once (yielding a
 ||| connection with count n). When remaining = 0, it can only be closed.
 |||
-||| This is the Idris2 encoding of VQL-dt++ `CONSUME AFTER n USE`.
+||| This is the Idris2 encoding of VCL-dt++ `CONSUME AFTER n USE`.
 public export
 data LinConn : (remaining : Nat) -> Type where
   ||| Construct a connection with a given remaining usage count.

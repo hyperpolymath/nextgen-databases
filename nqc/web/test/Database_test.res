@@ -4,7 +4,7 @@
 @@ocaml.doc("
 Tests for Database.res — profile registry and JSON decoder.
 Verifies that:
-  - Built-in profiles (VQL, GQL, KQL) are present and correct
+  - Built-in profiles (VCL, GQL, KQL) are present and correct
   - findById resolves by canonical id and aliases
   - decodeProfile correctly parses valid JSON and rejects invalid JSON
 ")
@@ -25,11 +25,11 @@ test("builtins contains 3 profiles", () => {
   strictEqual(Array.length(Database.builtins), 3)
 })
 
-test("VQL profile has correct id and port", () => {
-  strictEqual(Database.vql.id, "vql")
-  strictEqual(Database.vql.defaultPort, 8080)
-  strictEqual(Database.vql.languageName, "VQL")
-  ok(Database.vql.supportsDt)
+test("VCL profile has correct id and port", () => {
+  strictEqual(Database.vcl.id, "vcl")
+  strictEqual(Database.vcl.defaultPort, 8080)
+  strictEqual(Database.vcl.languageName, "VCL")
+  ok(Database.vcl.supportsDt)
 })
 
 test("GQL profile has correct id and port", () => {
@@ -52,16 +52,16 @@ test("all() includes at least the 3 builtins", () => {
 // findById tests
 // ============================================================================
 
-test("findById resolves canonical id 'vql'", () => {
-  switch Database.findById("vql") {
-  | Some(p) => strictEqual(p.id, "vql")
+test("findById resolves canonical id 'vcl'", () => {
+  switch Database.findById("vcl") {
+  | Some(p) => strictEqual(p.id, "vcl")
   | None => ok(false)
   }
 })
 
 test("findById resolves alias 'verisimdb'", () => {
   switch Database.findById("verisimdb") {
-  | Some(p) => strictEqual(p.id, "vql")
+  | Some(p) => strictEqual(p.id, "vcl")
   | None => ok(false)
   }
 })
@@ -81,8 +81,8 @@ test("findById resolves alias 'quandle'", () => {
 })
 
 test("findById is case-insensitive", () => {
-  switch Database.findById("VQL") {
-  | Some(p) => strictEqual(p.id, "vql")
+  switch Database.findById("VCL") {
+  | Some(p) => strictEqual(p.id, "vcl")
   | None => ok(false)
   }
 })

@@ -7,7 +7,7 @@ defmodule VeriSimClient do
 
   Holds connection configuration (base URL, authentication, timeout) and
   provides low-level HTTP helpers that the domain modules (`Octad`, `Search`,
-  `Drift`, `Provenance`, `Vql`, `Federation`) delegate to.
+  `Drift`, `Provenance`, `Vcl`, `Federation`) delegate to.
 
   ## Quick Start
 

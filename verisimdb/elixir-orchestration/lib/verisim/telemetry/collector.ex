@@ -20,18 +20,18 @@ defmodule VeriSim.Telemetry.Collector do
 
   | Metric | Type | Source |
   |--------|------|--------|
-  | query_count | counter | VQL executor |
-  | query_duration_sum | sum | VQL executor |
-  | query_duration_min/max | gauge | VQL executor |
-  | modality_usage | counter map | VQL executor / query router |
-  | query_pattern | counter map | VQL executor (SELECT/INSERT/DELETE/SEARCH/SHOW) |
+  | query_count | counter | VCL executor |
+  | query_duration_sum | sum | VCL executor |
+  | query_duration_min/max | gauge | VCL executor |
+  | modality_usage | counter map | VCL executor / query router |
+  | query_pattern | counter map | VCL executor (SELECT/INSERT/DELETE/SEARCH/SHOW) |
   | drift_detected_count | counter | drift monitor |
   | drift_modality_breakdown | counter map | drift monitor |
   | normalise_count | counter | normaliser |
   | normalise_success_count | counter | normaliser |
   | federation_query_count | counter | federation resolver |
   | federation_peer_errors | counter map | federation resolver |
-  | proof_type_usage | counter map | VQL-DT executor |
+  | proof_type_usage | counter map | VCL-DT executor |
   | entity_created_count | counter | entity server |
   | entity_deleted_count | counter | entity server |
   """

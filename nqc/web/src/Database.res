@@ -17,7 +17,7 @@ and keyword lists for a NextGen database engine.
 A database profile defines everything needed to connect to and interact with
 a NextGen database engine.  The `id` is the canonical short identifier used
 in URLs and profile lookups. `languageName` is the query language acronym
-(VQL, GQL, KQL) while `displayName` is the human-friendly engine name.
+(VCL, GQL, KQL) while `displayName` is the human-friendly engine name.
 ")
 type profile = {
   id: string,
@@ -39,22 +39,22 @@ type profile = {
 // ============================================================================
 
 @ocaml.doc("
-VeriSimDB (VQL) — 6-core multimodal database with self-normalization.
+VeriSimDB (VCL) — 6-core multimodal database with self-normalization.
 Handles text, vector, graph, tensor, semantic, document, and temporal data
 within a single hexad-based storage model.  Supports dependent-type
 verification of query results via PROOF/WITNESS/VERIFY keywords.
 ")
-let vql: profile = {
-  id: "vql",
+let vcl: profile = {
+  id: "vcl",
   displayName: "VeriSimDB",
-  languageName: "VQL",
+  languageName: "VCL",
   description: "6-core multimodal database with self-normalization",
   aliases: ["verisimdb", "verisim"],
   defaultHost: "localhost",
   defaultPort: 8080,
-  executePath: "/vql/execute",
+  executePath: "/vcl/execute",
   healthPath: "/health",
-  prompt: "vql> ",
+  prompt: "vcl> ",
   supportsDt: true,
   keywords: [
     "SELECT", "FROM", "WHERE", "LIMIT", "INSERT", "INTO", "VALUES",
@@ -127,7 +127,7 @@ let kql: profile = {
 All built-in database profiles.  The array ordering determines the
 display order in the Picker page card grid.
 ")
-let builtins: array<profile> = [vql, gql, kql]
+let builtins: array<profile> = [vcl, gql, kql]
 
 @ocaml.doc("
 Mutable storage for user-defined custom profiles loaded at runtime.

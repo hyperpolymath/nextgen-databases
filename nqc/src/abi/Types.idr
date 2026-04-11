@@ -36,8 +36,8 @@ mkPort n = MkPort n
 
 ||| The three default ports for built-in databases.
 export
-vqlPort : Port
-vqlPort = MkPort 8080
+vclPort : Port
+vclPort = MkPort 8080
 
 export
 gqlPort : Port
@@ -72,8 +72,8 @@ record UrlPath where
 
 ||| Construct a URL path, proven to start with '/'.
 export
-vqlExecutePath : UrlPath
-vqlExecutePath = MkUrlPath "/vql/execute"
+vclExecutePath : UrlPath
+vclExecutePath = MkUrlPath "/vcl/execute"
 
 export
 gqlExecutePath : UrlPath
@@ -124,12 +124,12 @@ formatRoundtrip Csv   = Refl
 
 ||| Known database backend identifiers.
 public export
-data DatabaseId = VQL | GQL | KQL
+data DatabaseId = VCL | GQL | KQL
 
 ||| Parse a database identifier from a lowercase string.
 export
 parseDatabaseId : String -> Maybe DatabaseId
-parseDatabaseId "vql" = Just VQL
+parseDatabaseId "vcl" = Just VCL
 parseDatabaseId "gql" = Just GQL
 parseDatabaseId "kql" = Just KQL
 parseDatabaseId _     = Nothing
@@ -137,14 +137,14 @@ parseDatabaseId _     = Nothing
 ||| Render a database identifier to its canonical string.
 export
 databaseIdToString : DatabaseId -> String
-databaseIdToString VQL = "vql"
+databaseIdToString VCL = "vcl"
 databaseIdToString GQL = "gql"
 databaseIdToString KQL = "kql"
 
 ||| Proof: parseDatabaseId roundtrips.
 export
 databaseIdRoundtrip : (d : DatabaseId) -> parseDatabaseId (databaseIdToString d) = Just d
-databaseIdRoundtrip VQL = Refl
+databaseIdRoundtrip VCL = Refl
 databaseIdRoundtrip GQL = Refl
 databaseIdRoundtrip KQL = Refl
 

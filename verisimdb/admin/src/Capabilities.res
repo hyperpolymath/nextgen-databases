@@ -6,7 +6,7 @@
 /// VeriSimDB Admin requires three capabilities:
 ///   1 = network    -- Required for all VeriSimDB API calls (Rust core + Elixir layer)
 ///   2 = filesystem -- Required for exporting query results and octad data
-///   5 = clipboard  -- Required for copying VQL queries to clipboard
+///   5 = clipboard  -- Required for copying VCL queries to clipboard
 ///
 /// Flow:
 ///   1. App starts with NO capabilities (sandbox by default)
@@ -27,7 +27,7 @@ module Kind = {
   /// drift reports to disk.
   let filesystem = 2
 
-  /// Clipboard access -- copying VQL queries and entity IDs to the system
+  /// Clipboard access -- copying VCL queries and entity IDs to the system
   /// clipboard.
   let clipboard = 5
 
@@ -44,9 +44,9 @@ module Kind = {
   /// Description of why VeriSimDB Admin needs this capability.
   let description = (kind: int): string => {
     switch kind {
-    | 1 => "Connect to VeriSimDB Rust core and Elixir orchestration layer to manage octads, run VQL queries, and monitor drift."
+    | 1 => "Connect to VeriSimDB Rust core and Elixir orchestration layer to manage octads, run VCL queries, and monitor drift."
     | 2 => "Export query results, octad snapshots, and drift reports to local files."
-    | 5 => "Copy VQL queries and entity IDs to the system clipboard."
+    | 5 => "Copy VCL queries and entity IDs to the system clipboard."
     | _ => "Unknown capability."
     }
   }
@@ -80,9 +80,9 @@ let requestFilesystemAccess = (): promise<float> => {
   requestCapability(Kind.filesystem)
 }
 
-/// Request clipboard capability -- needed for VQL copy operations.
+/// Request clipboard capability -- needed for VCL copy operations.
 ///
-/// The VQL console allows copying queries and results to the clipboard
+/// The VCL console allows copying queries and results to the clipboard
 /// for use in other tools.
 let requestClipboardAccess = (): promise<float> => {
   requestCapability(Kind.clipboard)

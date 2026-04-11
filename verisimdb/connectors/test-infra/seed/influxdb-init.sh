@@ -126,12 +126,12 @@ for offset in $(seq 0 5 60); do
         "query_latency,service=verisimdb,query_type=search duration_ms=${LATENCY}i ${TS}"
 done
 
-# VQL query latency (separate measurement)
+# VCL query latency (separate measurement)
 for offset in $(seq 0 10 60); do
     TS=$((NOW - offset * 60))
     LATENCY=$(( (offset * 11 + 7) % 80 + 5 ))
     write_lines "metrics" \
-        "query_latency,service=verisimdb,query_type=vql duration_ms=${LATENCY}i ${TS}"
+        "query_latency,service=verisimdb,query_type=vcl duration_ms=${LATENCY}i ${TS}"
 done
 
 echo "  Query latency metrics written."
@@ -168,7 +168,7 @@ echo ""
 echo "=== InfluxDB 2 seed complete ==="
 echo "  Buckets:    metrics, drift_scores, federation_health"
 echo "  Drift:      7 data points across 3 hexads"
-echo "  Latency:    ~20 data points (search + VQL)"
+echo "  Latency:    ~20 data points (search + VCL)"
 echo "  Federation: 7 adapter health checks + 3 sync events"
 echo ""
 echo "  Verify with:"

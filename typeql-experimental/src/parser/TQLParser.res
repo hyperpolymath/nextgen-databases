@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 //
-// TQLParser.res — Parser for VQL-dt++ extended syntax
+// TQLParser.res — Parser for VCL-dt++ extended syntax
 //
-// Implements parser combinators for the six new VQL-dt++ clauses:
+// Implements parser combinators for the six new VCL-dt++ clauses:
 // 1. CONSUME AFTER n USE       — Linear types
 // 2. WITH SESSION protocol     — Session types
 // 3. EFFECTS { e1, e2, ... }   — Effect systems
@@ -12,10 +12,10 @@
 // 5. PROOF ATTACHED theorem    — Proof-carrying code
 // 6. USAGE LIMIT n             — Quantitative type theory
 //
-// Follows the same combinator pattern as VeriSimDB's VQLParser.res.
+// Follows the same combinator pattern as VeriSimDB's VCLParser.res.
 
 // ============================================================================
-// Parser Combinators (same pattern as VQLParser.res)
+// Parser Combinators (same pattern as VCLParser.res)
 // ============================================================================
 
 module Parser = {
@@ -354,8 +354,8 @@ module ExtensionParsers = {
 
 type parseError = Parser.parseError
 
-// Parse just the extension annotations (after the base VQL query).
-// Input should be the remainder of the query string after the base VQL
+// Parse just the extension annotations (after the base VCL query).
+// Input should be the remainder of the query string after the base VCL
 // grammar has been parsed.
 let parseExtensions = (input: string): Result<TQLAst.extensionAnnotations, parseError> => {
   let p = Parser.bind(Parser.ws, _ => ExtensionParsers.extensionAnnotations)

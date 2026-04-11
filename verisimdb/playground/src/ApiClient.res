@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-// VQL Playground API client — connects to a real verisim-api backend.
+// VCL Playground API client — connects to a real verisim-api backend.
 // Falls back gracefully to demo mode when the backend is unreachable.
 
-/// Response shape from POST /api/v1/vql/execute.
-type vqlResponse = {
+/// Response shape from POST /api/v1/vcl/execute.
+type vclResponse = {
   success: bool,
   statement_type: string,
   row_count: int,
@@ -54,10 +54,10 @@ let checkHealth = async (): result<string, string> => {
   }
 }
 
-/// Execute a VQL query against the real backend.
-/// Returns Ok(vqlResponse) on success, Error(string) on failure.
-let executeQuery = async (query: string): result<vqlResponse, string> => {
-  let url = getBaseUrl() ++ "/api/v1/vql/execute"
+/// Execute a VCL query against the real backend.
+/// Returns Ok(vclResponse) on success, Error(string) on failure.
+let executeQuery = async (query: string): result<vclResponse, string> => {
+  let url = getBaseUrl() ++ "/api/v1/vcl/execute"
   let bodyDict = Dict.make()
   Dict.set(bodyDict, "query", JSON.Encode.string(query))
   let body = JSON.Encode.object(bodyDict)
@@ -197,8 +197,8 @@ let formatExplainResponse = (data: JSON.t): string => {
   text.contents
 }
 
-/// Convert a VQL response with a JSON data array into a table result.
-let formatAsTable = (response: vqlResponse): DemoExecutor.executeResult => {
+/// Convert a VCL response with a JSON data array into a table result.
+let formatAsTable = (response: vclResponse): DemoExecutor.executeResult => {
   switch JSON.Classify.classify(response.data) {
   | JSON.Classify.Array(items) =>
     if Array.length(items) == 0 {
@@ -258,9 +258,9 @@ let formatAsTable = (response: vqlResponse): DemoExecutor.executeResult => {
   }
 }
 
-/// Convert a VQL API response into a DemoExecutor-compatible result.
+/// Convert a VCL API response into a DemoExecutor-compatible result.
 /// This bridges the real backend response format to the existing rendering code.
-let toExecuteResult = (response: vqlResponse): DemoExecutor.executeResult => {
+let toExecuteResult = (response: vclResponse): DemoExecutor.executeResult => {
   if !response.success {
     DemoExecutor.Error(
       switch response.message {

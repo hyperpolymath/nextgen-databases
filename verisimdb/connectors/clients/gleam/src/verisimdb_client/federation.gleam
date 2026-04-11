@@ -86,7 +86,7 @@ pub fn list_peers(
   }
 }
 
-/// Execute a VQL query across one or more federation peers.
+/// Execute a VCL query across one or more federation peers.
 ///
 /// If peer_ids is empty, the query is broadcast to all active peers.
 ///

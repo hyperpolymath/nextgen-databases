@@ -15,8 +15,8 @@ This debugger MUST be designed so that **PanLL can embed and drive it programmat
 |-----------|-----------|----------|
 | Modality Inspector | Pane-W (results) | View all 8 octad modalities for a given entity |
 | Drift Heatmap | Pane-W (results) | Colour-coded grid of drift scores across entities |
-| VQL Trace | Pane-N (reasoning) | Step-by-step VQL query execution trace |
-| Proof Verifier | Pane-L (constraints) | VQL-DT proof obligation checking and certificate display |
+| VCL Trace | Pane-N (reasoning) | Step-by-step VCL query execution trace |
+| Proof Verifier | Pane-L (constraints) | VCL-DT proof obligation checking and certificate display |
 | Federation Map | Pane-W (results) | Live peer status, replication lag, adapter types |
 | Performance Flamegraph | Pane-W (results) | Query latency breakdown by modality |
 | Normalisation Timeline | Pane-N (reasoning) | History of self-normalisation events, before/after states |
@@ -38,9 +38,9 @@ PanLL should use this debugger as its **canonical example** for the database des
 
 PanLL should use **Eclexia** (from `nextgen-languages/eclexia/`) as the canonical example for its language design/development/evaluation module. The VeriSimDB debugger connects to Eclexia via:
 
-- VQL is defined in Eclexia's grammar format → debugger can show VQL parse trees
-- VQL-DT proof obligations are typed in Eclexia's type system → debugger can show type derivation trees
-- Eclexia's REPL can be embedded as a debugger panel for interactive VQL exploration
+- VCL is defined in Eclexia's grammar format → debugger can show VCL parse trees
+- VCL-DT proof obligations are typed in Eclexia's type system → debugger can show type derivation trees
+- Eclexia's REPL can be embedded as a debugger panel for interactive VCL exploration
 
 ## Implementation Spec
 
@@ -61,7 +61,7 @@ Build the TUI skeleton with these panels:
 │  ├── provenance: [chain]         │                                  │
 │  └── spatial: [coords]           │                                  │
 ├──────────────────────────────────┼──────────────────────────────────┤
-│  VQL Trace                       │  Proof Verifier                  │
+│  VCL Trace                       │  Proof Verifier                  │
 │  > SELECT * FROM octads          │  PROOF EXISTENCE(entity-001)     │
 │    1. Parse: 2ms                 │    ✅ octad_id: found            │
 │    2. Type-check: 15ms           │    ✅ modality_count: 8          │
@@ -86,16 +86,16 @@ Connect to VeriSimDB via:
 Expose a JSON-over-stdio protocol so PanLL can drive the debugger headlessly:
 - `{"cmd": "inspect", "entity_id": "..."}` → returns entity data for all 8 modalities
 - `{"cmd": "drift_scan", "threshold": 0.3}` → returns entities with drift above threshold
-- `{"cmd": "trace_vql", "query": "SELECT ..."}` → returns execution trace
+- `{"cmd": "trace_vcl", "query": "SELECT ..."}` → returns execution trace
 - `{"cmd": "verify_proof", "query": "... PROOF ..."}` → returns proof certificates
 - `{"cmd": "health"}` → returns full telemetry snapshot
 
 ### Phase 4: Eclexia Integration
 
 Add a panel that can:
-- Parse VQL using Eclexia's grammar and show the parse tree
-- Show VQL-DT type derivation trees using Eclexia's type system
-- Provide an interactive VQL REPL powered by Eclexia's evaluator
+- Parse VCL using Eclexia's grammar and show the parse tree
+- Show VCL-DT type derivation trees using Eclexia's type system
+- Provide an interactive VCL REPL powered by Eclexia's evaluator
 
 ## Build Commands
 

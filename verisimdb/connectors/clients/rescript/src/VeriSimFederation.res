@@ -76,7 +76,7 @@ let listPeers = async (
   }
 }
 
-/** Execute a VQL query across one or more federation peers.
+/** Execute a VCL query across one or more federation peers.
  *
  * If peerIds is empty, the query is broadcast to all active peers.
  *

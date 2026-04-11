@@ -9,7 +9,7 @@
 ```
                         ┌─────────────────────────────────────────┐
                         │              DB ANALYST / USER          │
-                        │        (KQL, VQL, Web Dashboards)       │
+                        │        (KQL, VCL, Web Dashboards)       │
                         └───────────────────┬─────────────────────┘
                                             │
                                             ▼
@@ -31,7 +31,7 @@
                         ┌─────────────────────────────────────────┐
                         │          SATELLITE REPOSITORIES         │
                         │  ┌───────────┐  ┌───────────┐  ┌───────┐│
-                        │  │ Skein.jl  │  │ VQL Parser│  │ FBQL- ││
+                        │  │ Skein.jl  │  │ VCL Parser│  │ FBQL- ││
                         │  │ (Engine)  │  │ (ReScript)│  │ DT    ││
                         │  └───────────┘  └───────────┘  └───────┘│
                         │  ┌───────────┐  ┌───────────┐  ┌───────┐│
@@ -67,7 +67,7 @@ DATABASE PORTFOLIO
 
 QUERY LANGUAGES
   KQL (Knot Query)                  ██████░░░░  60%    Topology invariants active
-  VQL (Verification)                ████░░░░░░  40%    Compiler in progress
+  VCL (Verification)                ████░░░░░░  40%    Compiler in progress
   FBQL-DT (Dependently Typed)       █████░░░░░  50%    Compile-time proofs active
 
 REPO INFRASTRUCTURE

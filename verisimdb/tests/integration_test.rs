@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 //! Integration Tests for VeriSimDB
 //!
-//! Tests the full stack: Rust stores → HTTP API → Elixir orchestration → VQL
+//! Tests the full stack: Rust stores → HTTP API → Elixir orchestration → VCL
 
 use verisim_api::{ApiConfig, ConcreteOctadStore};
 use verisim_document::{Document, TantivyDocumentStore};
@@ -295,7 +295,7 @@ async fn test_multi_modal_query() {
     let octad_id = store.create(input).await.unwrap();
 
     // Query combining text search, vector similarity, and semantic types
-    // In full implementation, would use VQL multi-modal query
+    // In full implementation, would use VCL multi-modal query
 }
 
 #[tokio::test]

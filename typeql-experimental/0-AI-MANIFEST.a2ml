@@ -5,8 +5,8 @@
 
 ## WHAT IS THIS?
 
-This is the AI manifest for **typeql-experimental** (VQL-dt++ / TypeQL-experimental).
-An experimental exploration of six advanced type-theoretic extensions to VQL:
+This is the AI manifest for **typeql-experimental** (VCL-dt++ / TypeQL-experimental).
+An experimental exploration of six advanced type-theoretic extensions to VCL:
 
 1. **Linear types** — resource-counted connections via Idris2 QTT
 2. **Session types** — protocol-indexed database sessions
@@ -20,7 +20,7 @@ An experimental exploration of six advanced type-theoretic extensions to VQL:
 - **Idris2 kernel**: 9/9 modules type-check clean (`idris2 --typecheck`)
 - **Zig FFI bridge**: 5/5 tests pass (`zig build test`, Zig 0.15.2)
 - **ReScript parser**: Written, not yet build-tested
-- **Examples**: 7 annotated .vqlut files
+- **Examples**: 7 annotated .vclut files
 - **Banned patterns**: Zero `believe_me`, `assert_total`, `assert_smaller`
 - **Overall completion**: ~85%
 
@@ -54,7 +54,7 @@ An experimental exploration of six advanced type-theoretic extensions to VQL:
 2. **No `assert_total`** — All functions provably total via `%default total`.
 3. **No `assert_smaller`** — Termination proved structurally.
 4. **No SCM duplication** — `.machine_readable/` is authoritative.
-5. **Delta grammar** — Extends VQL v3.0 (317 lines in `verisimdb/docs/vql-grammar.ebnf`).
+5. **Delta grammar** — Extends VCL v3.0 (317 lines in `verisimdb/docs/vcl-grammar.ebnf`).
 6. **Dual-language split** — Idris2 for types/proofs, ReScript for parsing.
 7. **Monorepo sub-project** — No `.git` directory. Inherits parent workflows.
 
@@ -71,9 +71,9 @@ Idris2 Type Kernel                    ReScript Parser
 | ProofCarrying.idr  |                    syntax
 | Quantitative.idr   |                        |
 | Checker.idr        |               +------------------+
-| Proofs.idr         |               | .vqlut files     |
+| Proofs.idr         |               | .vclut files     |
 +--------------------+               +------------------+
-  proves properties                  VQL-UT query language
+  proves properties                  VCL-UT query language
          |
          v
 +--------------------+
@@ -101,7 +101,7 @@ grep -rn 'believe_me\|assert_total\|assert_smaller' src/abi/
 ## KEY RELATIONSHIPS
 
 - **Parent**: `nextgen-databases` monorepo
-- **Sibling**: `verisimdb` (VQL v3.0 base grammar, VQL-dt ~35% wired)
+- **Sibling**: `verisimdb` (VCL v3.0 base grammar, VCL-dt ~35% wired)
 - **Sibling**: `lithoglyph` (GQL-dt, Idris2 ABI patterns)
 - **Reference**: `proven` (formal verification library)
 
@@ -119,7 +119,7 @@ grep -rn 'believe_me\|assert_total\|assert_smaller' src/abi/
 - Read `.machine_readable/STATE.scm` for current status
 - Understand the dual-language split (Idris2 + ReScript)
 - Know the banned patterns (believe_me, assert_total, assert_smaller)
-- Check `docs/vql-dtpp-grammar.ebnf` for the grammar delta
+- Check `docs/vcl-dtpp-grammar.ebnf` for the grammar delta
 
 ## META
 

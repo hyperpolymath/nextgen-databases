@@ -106,12 +106,12 @@ Sample output:
 |Query language
 |No (Python API)
 |No (UI)
-|**VQL (with dependent types)**
+|**VCL (with dependent types)**
 
 |Formal verification
 |No
 |No
-|**VQL-DT (proof certificates)**
+|**VCL-DT (proof certificates)**
 |===
 
 == The Octad: Eight Modalities
@@ -241,9 +241,9 @@ VeriSimDB can also operate as a **federation coordinator** over existing databas
 └────────────────────────────────────────────────────────────────┘
 ----
 
-== VQL: VeriSim Query Language
+== VCL: VeriSim Query Language
 
-VQL provides unified querying across all eight modalities with two execution paths:
+VCL provides unified querying across all eight modalities with two execution paths:
 
 === Slipstream (Fast, No Proofs)
 
@@ -264,7 +264,7 @@ SELECT * FROM HEXAD 'entity-001'
 SELECT * FROM FEDERATION /* WITH DRIFT STRICT
 ----
 
-=== VQL-DT (Dependent Types with Proof Certificates)
+=== VCL-DT (Dependent Types with Proof Certificates)
 
 [source,sql]
 ----
@@ -281,7 +281,7 @@ SELECT GRAPH.* FROM HEXAD 'entity-001'
   PROOF INTEGRITY(my_contract)
 ----
 
-VQL-DT queries return a `ProvedResult` with data AND a proof certificate:
+VCL-DT queries return a `ProvedResult` with data AND a proof certificate:
 
 [source,elixir]
 ----
@@ -335,7 +335,7 @@ iex -S mix
 ----
 cargo test                    # Rust: 510+ tests
 cd elixir-orchestration
-mix test                      # Elixir: 160+ tests (VQL, consensus, telemetry, federation, hypatia)
+mix test                      # Elixir: 160+ tests (VCL, consensus, telemetry, federation, hypatia)
 ----
 
 === Container
@@ -399,7 +399,7 @@ grpcurl -plaintext localhost:50051 list
 # Health check
 grpcurl -plaintext localhost:50051 verisimdb.VeriSimService/Health
 
-# Execute a VQL query
+# Execute a VCL query
 grpcurl -plaintext -d '{"query": "SELECT * FROM octads LIMIT 10"}' \
   localhost:50051 verisimdb.VeriSimService/Query
 
@@ -430,15 +430,15 @@ verisimdb/
 │   ├── lib/verisim/
 │   │   ├── drift/             # DriftMonitor GenServer
 │   │   ├── entity/            # EntityServer (per-entity GenServer)
-│   │   ├── query/             # VQL parser, executor, bridge
+│   │   ├── query/             # VCL parser, executor, bridge
 │   │   └── rust_client.ex     # HTTP client for Rust core
 │   └── test/
 ├── demos/
 │   └── drift-detection/       # Drift detection demo script
 ├── docs/                      # Specifications and design documents
-│   ├── vql-grammar.ebnf       # VQL formal grammar
-│   ├── vql-formal-semantics.adoc
-│   └── vql-type-system.adoc
+│   ├── vcl-grammar.ebnf       # VCL formal grammar
+│   ├── vcl-formal-semantics.adoc
+│   └── vcl-type-system.adoc
 ├── registry/                  # ReScript federation registry
 └── .machine_readable/         # STATE.scm, META.scm, ECOSYSTEM.scm
 ----
@@ -461,19 +461,19 @@ Universities and research institutions federate their archives while maintaining
 Vector embeddings and symbolic graphs coexist in the same namespace. AI systems query both modalities without ETL, with formal proof certificates guaranteeing query correctness.
 
 === Verifiable Data Exchange
-ZKP proofs and dependent types enable tamper-evident knowledge exchange. VQL-DT queries return data with cryptographic proof certificates — you can verify the result without trusting the source.
+ZKP proofs and dependent types enable tamper-evident knowledge exchange. VCL-DT queries return data with cryptographic proof certificates — you can verify the result without trusting the source.
 
 == Documentation
 
-* link:docs/vql-grammar.ebnf[VQL Grammar] — Formal EBNF specification
-* link:docs/vql-formal-semantics.adoc[VQL Formal Semantics] — Operational semantics
-* link:docs/vql-type-system.adoc[VQL Type System] — Dependent types and bidirectional type checking
+* link:docs/vcl-grammar.ebnf[VCL Grammar] — Formal EBNF specification
+* link:docs/vcl-formal-semantics.adoc[VCL Formal Semantics] — Operational semantics
+* link:docs/vcl-type-system.adoc[VCL Type System] — Dependent types and bidirectional type checking
 * link:docs/drift-handling.adoc[Drift Handling] — Detection, repair, federation drift
 * link:docs/safety-and-fault-tolerance.adoc[Safety & Fault Tolerance] — Memory, kernel, platform, supply chain safety
 * link:docs/deployment-modes.adoc[Deployment Modes] — Standalone, federated, hybrid
 * link:docs/getting-started.adoc[Getting Started] — Step-by-step setup guide
 * link:docs/adoption-strategy.adoc[Adoption Strategy] — Target domains and rollout plan
-* link:docs/VQL-SPEC.adoc[VQL Specification] — 2785-line normative language spec
+* link:docs/VCL-SPEC.adoc[VCL Specification] — 2785-line normative language spec
 * link:docs/papers/[White Papers] — Academic and industry papers
 
 == License

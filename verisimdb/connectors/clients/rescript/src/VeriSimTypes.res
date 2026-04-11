@@ -274,19 +274,19 @@ type searchResult = {
 }
 
 // --------------------------------------------------------------------------
-// VQL types
+// VCL types
 // --------------------------------------------------------------------------
 
-/** Result of a VQL query execution. */
-type vqlResult = {
+/** Result of a VCL query execution. */
+type vclResult = {
   columns: array<string>,
   rows: array<array<string>>,
   count: int,
   elapsedMs: float,
 }
 
-/** Query execution plan explanation for a VQL statement. */
-type vqlExplanation = {
+/** Query execution plan explanation for a VCL statement. */
+type vclExplanation = {
   query: string,
   plan: string,
   cost: float,
@@ -311,7 +311,7 @@ type federationPeer = {
 type peerQueryResult = {
   peerId: string,
   peerName: string,
-  result: vqlResult,
+  result: vclResult,
   elapsedMs: float,
   error: option<string>,
 }

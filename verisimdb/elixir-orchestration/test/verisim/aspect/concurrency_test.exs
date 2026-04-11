@@ -9,7 +9,7 @@
 # Test categories:
 #
 #   1. Concurrent entity writes  — last-write-wins or CRDT merge, never corrupt.
-#   2. Parallel VQL queries      — all queries complete without contention.
+#   2. Parallel VCL queries      — all queries complete without contention.
 #   3. Concurrent Kraft proposals — at most one accepted per term slot.
 #   4. DriftMonitor under load   — concurrent drift reports do not corrupt state.
 #   5. SchemaRegistry concurrency — concurrent type registrations are serialised.
@@ -29,8 +29,8 @@ defmodule VeriSim.Aspect.ConcurrencyTest do
 
   alias VeriSim.{DriftMonitor, SchemaRegistry}
   alias VeriSim.Consensus.KRaftNode
-  alias VeriSim.Query.{VQLBridge, VQLExecutor}
-  alias VeriSim.Test.VQLTestHelpers, as: H
+  alias VeriSim.Query.{VCLBridge, VCLExecutor}
+  alias VeriSim.Test.VCLTestHelpers, as: H
 
   # Number of concurrent writers / readers for load tests.
   @concurrency 20
@@ -118,20 +118,20 @@ defmodule VeriSim.Aspect.ConcurrencyTest do
   end
 
   # ===========================================================================
-  # 2. Parallel VQL Queries
+  # 2. Parallel VCL Queries
   #
-  # @concurrency Tasks simultaneously execute VQL queries through the executor.
+  # @concurrency Tasks simultaneously execute VCL queries through the executor.
   # All must complete; none must crash or block indefinitely.
   # ===========================================================================
 
-  describe "parallel VQL queries" do
-    test "concurrent VQL parse calls produce consistent results" do
+  describe "parallel VCL queries" do
+    test "concurrent VCL parse calls produce consistent results" do
       query = "SELECT DOCUMENT.* FROM HEXAD 'entity-001' LIMIT 10"
 
       tasks =
         for _i <- 1..@concurrency do
           Task.async(fn ->
-            VQLBridge.parse(query)
+            VCLBridge.parse(query)
           end)
         end
 
@@ -152,7 +152,7 @@ defmodule VeriSim.Aspect.ConcurrencyTest do
       end
     end
 
-    test "concurrent VQL executions do not contend on internal state" do
+    test "concurrent VCL executions do not contend on internal state" do
       # Build a simple no-proof query AST (avoids Rust-core dependency).
       ast = %{
         modalities: [:document],
@@ -166,7 +166,7 @@ defmodule VeriSim.Aspect.ConcurrencyTest do
       tasks =
         for _i <- 1..@concurrency do
           Task.async(fn ->
-            VQLExecutor.execute(ast)
+            VCLExecutor.execute(ast)
           end)
         end
 
@@ -194,7 +194,7 @@ defmodule VeriSim.Aspect.ConcurrencyTest do
       tasks =
         for _i <- 1..@concurrency do
           Task.async(fn ->
-            VQLExecutor.execute(ast, explain: true)
+            VCLExecutor.execute(ast, explain: true)
           end)
         end
 

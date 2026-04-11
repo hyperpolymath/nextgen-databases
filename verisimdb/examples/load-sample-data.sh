@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: PMPL-1.0-or-later
 #
-# load-sample-data.sh — Load VeriSimDB sample data and run example VQL queries.
+# load-sample-data.sh — Load VeriSimDB sample data and run example VCL queries.
 #
 # This script loads 50 sample hexad entities from seed.json into a running
-# VeriSimDB instance, then executes all VQL example queries from the
-# vql-queries/ directory. It is intended for demonstration and testing.
+# VeriSimDB instance, then executes all VCL example queries from the
+# vcl-queries/ directory. It is intended for demonstration and testing.
 #
 # The sample data tells the story of a research institution ecosystem:
 # 10 academic papers, 10 researchers, 10 organisations, 10 datasets,
@@ -122,27 +122,27 @@ echo "Loading complete. Check output above for individual results."
 echo ""
 
 # ---------------------------------------------------------------------------
-# Run VQL example queries
+# Run VCL example queries
 # ---------------------------------------------------------------------------
 
-echo "=== Running VQL Example Queries ==="
+echo "=== Running VCL Example Queries ==="
 echo ""
 
-VQL_DIR="${SCRIPT_DIR}/vql-queries"
+VCL_DIR="${SCRIPT_DIR}/vcl-queries"
 
-if [[ ! -d "$VQL_DIR" ]]; then
-  echo "WARNING: VQL queries directory not found at ${VQL_DIR}"
+if [[ ! -d "$VCL_DIR" ]]; then
+  echo "WARNING: VCL queries directory not found at ${VCL_DIR}"
   echo "Skipping query execution."
   exit 0
 fi
 
-for vql_file in "${VQL_DIR}"/*.vql; do
-  [[ -f "$vql_file" ]] || continue
+for vcl_file in "${VCL_DIR}"/*.vcl; do
+  [[ -f "$vcl_file" ]] || continue
 
-  BASENAME=$(basename "$vql_file")
+  BASENAME=$(basename "$vcl_file")
 
   # Extract the query: strip comment lines (--) and collapse whitespace
-  QUERY=$(grep -v '^--' "$vql_file" | tr '\n' ' ' | sed 's/  */ /g' | xargs)
+  QUERY=$(grep -v '^--' "$vcl_file" | tr '\n' ' ' | sed 's/  */ /g' | xargs)
 
   if [[ -z "$QUERY" ]]; then
     echo "--- ${BASENAME} --- (empty query, skipping)"
@@ -157,7 +157,7 @@ for vql_file in "${VQL_DIR}"/*.vql; do
   # Escape double quotes in the query for JSON payload
   ESCAPED_QUERY=$(echo "$QUERY" | sed 's/"/\\"/g')
 
-  RESULT=$(curl -sf -X POST "${API_URL}/vql/execute" \
+  RESULT=$(curl -sf -X POST "${API_URL}/vcl/execute" \
     -H "Content-Type: application/json" \
     -d "{\"query\": \"${ESCAPED_QUERY}\"}" 2>/dev/null || echo '{"error": "query execution failed or server unreachable"}')
 

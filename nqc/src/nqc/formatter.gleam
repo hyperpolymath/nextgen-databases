@@ -49,10 +49,10 @@ fn format_json(value: Dynamic) -> String {
 /// Format as an ASCII table.
 ///
 /// Handles two response shapes:
-/// 1. VQL execute response: {"success": true, "data": [...], "row_count": n}
+/// 1. VCL execute response: {"success": true, "data": [...], "row_count": n}
 /// 2. Raw JSON object or array
 fn format_table(value: Dynamic) -> String {
-  // Try to extract the "data" field (VQL execute response format).
+  // Try to extract the "data" field (VCL execute response format).
   // Falls back to the raw value if "data" doesn't exist.
   let data_result = extract_field_or_self(value, "data")
 

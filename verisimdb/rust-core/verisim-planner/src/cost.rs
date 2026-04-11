@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 //! Cost model and estimation.
 //!
-//! Base costs match VQLExplain.res values. Mode multipliers match
+//! Base costs match VCLExplain.res values. Mode multipliers match
 //! query_planner_config.ex (conservative=1.5x, balanced=1.0x, aggressive=0.8x).
 
 use serde::{Deserialize, Serialize};
@@ -25,7 +25,7 @@ pub struct BaseCost {
 impl BaseCost {
     /// Get the default base cost for a modality.
     ///
-    /// Values match VQLExplain.res:
+    /// Values match VCLExplain.res:
     /// - Graph: 150ms, 0.2 selectivity
     /// - Vector: 50ms, 0.01 selectivity
     /// - Tensor: 200ms, 0.5 selectivity
@@ -133,7 +133,7 @@ impl CostEstimate {
 ///
 /// Different proof types have vastly different verification costs.
 /// Values derived from the consultation-dependent-types-zkp.adoc
-/// and VQLProofObligation.res cost estimates.
+/// and VCLProofObligation.res cost estimates.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProofCost {
     /// Base verification time in milliseconds.
@@ -147,7 +147,7 @@ pub struct ProofCost {
 impl ProofCost {
     /// Get the cost for a proof type by name.
     ///
-    /// Proof types from VQLProofObligation.res:
+    /// Proof types from VCLProofObligation.res:
     /// - Existence: trivial check (octad exists)
     /// - Citation: contract lookup in registry
     /// - Access: semantic store rights check
@@ -309,7 +309,7 @@ impl CostModel {
     /// Estimate the cost of executing a single plan node.
     ///
     /// Factors:
-    /// 1. Base cost for the modality (from VQLExplain.res)
+    /// 1. Base cost for the modality (from VCLExplain.res)
     /// 2. Optimization mode multiplier (from query_planner_config.ex)
     /// 3. Store statistics (if available)
     /// 4. Early limit reduction
@@ -486,7 +486,7 @@ mod tests {
     use crate::config::PlannerConfig;
 
     #[test]
-    fn test_base_costs_match_vql_explain() {
+    fn test_base_costs_match_vcl_explain() {
         assert_eq!(BaseCost::for_modality(Modality::Graph).time_ms, 150.0);
         assert_eq!(BaseCost::for_modality(Modality::Vector).time_ms, 50.0);
         assert_eq!(BaseCost::for_modality(Modality::Tensor).time_ms, 200.0);

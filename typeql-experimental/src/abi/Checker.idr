@@ -4,7 +4,7 @@
 -- Checker.idr — Unified type checker composing all six extensions
 --
 -- This module ties together the individual extension checkers into a
--- unified VQL-dt++ type checking pipeline. A query with any combination
+-- unified VCL-dt++ type checking pipeline. A query with any combination
 -- of the 6 extension clauses is validated by composing the relevant checks.
 
 module Checker
@@ -24,7 +24,7 @@ import Data.Nat
 -- Extension Annotations
 -- ============================================================================
 
-||| A parsed VQL-dt++ query's extension annotations. Each field is optional
+||| A parsed VCL-dt++ query's extension annotations. Each field is optional
 ||| (None means the clause was not present in the query).
 public export
 record ExtensionAnnotations where

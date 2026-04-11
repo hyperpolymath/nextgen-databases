@@ -4,7 +4,7 @@
 # VeriSimDB Julia Client — Main module.
 #
 # This is the top-level module for the VeriSimDB Julia client SDK. It aggregates
-# all submodules (types, error, client, octad, search, drift, provenance, vql,
+# all submodules (types, error, client, octad, search, drift, provenance, vcl,
 # federation) and re-exports the public API.
 #
 # Usage:
@@ -30,7 +30,7 @@ include("octad.jl")
 include("search.jl")
 include("drift.jl")
 include("provenance.jl")
-include("vql.jl")
+include("vcl.jl")
 include("federation.jl")
 
 # --- Public exports ---
@@ -44,7 +44,7 @@ export GraphData, GraphEdge, VectorData, TensorData, DocumentContent, SpatialDat
 export DriftScore, DriftLevel, DriftStatusReport
 export ProvenanceEvent, ProvenanceChain, ProvenanceEventInput
 export PaginatedResponse, SearchResult
-export VqlResult, VqlExplanation
+export VclResult, VclExplanation
 export FederationPeer
 
 # Octad CRUD
@@ -60,8 +60,8 @@ export get_drift_score, drift_status, normalize_drift
 # Provenance
 export get_provenance_chain, record_provenance, verify_provenance
 
-# VQL
-export execute_vql, explain_vql
+# VCL
+export execute_vcl, explain_vcl
 
 # Federation
 export register_peer, list_peers, federated_query

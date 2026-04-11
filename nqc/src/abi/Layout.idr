@@ -53,7 +53,7 @@ formatTagsDistinct Csv   Csv   neq _ = neq Refl
 ||| Tag values for DatabaseId enum.
 public export
 databaseIdTag : Types.DatabaseId -> Bits8
-databaseIdTag Types.VQL = 0
+databaseIdTag Types.VCL = 0
 databaseIdTag Types.GQL = 1
 databaseIdTag Types.KQL = 2
 

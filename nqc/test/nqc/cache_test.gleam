@@ -23,26 +23,26 @@ pub fn empty_cache_has_size_zero_test() {
 pub fn put_then_get_returns_value_test() {
   let c = cache.empty()
   let value = to_dynamic("result")
-  let c = cache.put(c, "vql", "SELECT 1", value)
-  should.be_ok(cache.get(c, "vql", "SELECT 1"))
+  let c = cache.put(c, "vcl", "SELECT 1", value)
+  should.be_ok(cache.get(c, "vcl", "SELECT 1"))
 }
 
 pub fn get_missing_returns_error_test() {
   let c = cache.empty()
-  should.be_error(cache.get(c, "vql", "SELECT 1"))
+  should.be_error(cache.get(c, "vcl", "SELECT 1"))
 }
 
 pub fn put_increments_size_test() {
   let c = cache.empty()
-  let c = cache.put(c, "vql", "SELECT 1", to_dynamic(1))
-  let c = cache.put(c, "vql", "SELECT 2", to_dynamic(2))
+  let c = cache.put(c, "vcl", "SELECT 1", to_dynamic(1))
+  let c = cache.put(c, "vcl", "SELECT 2", to_dynamic(2))
   should.equal(cache.size(c), 2)
 }
 
 pub fn same_key_overwrites_test() {
   let c = cache.empty()
-  let c = cache.put(c, "vql", "SELECT 1", to_dynamic("first"))
-  let c = cache.put(c, "vql", "SELECT 1", to_dynamic("second"))
+  let c = cache.put(c, "vcl", "SELECT 1", to_dynamic("first"))
+  let c = cache.put(c, "vcl", "SELECT 1", to_dynamic("second"))
   should.equal(cache.size(c), 1)
 }
 
@@ -52,13 +52,13 @@ pub fn same_key_overwrites_test() {
 
 pub fn insert_query_not_cached_test() {
   let c = cache.empty()
-  let c = cache.put(c, "vql", "INSERT INTO users VALUES (1)", to_dynamic("ok"))
+  let c = cache.put(c, "vcl", "INSERT INTO users VALUES (1)", to_dynamic("ok"))
   should.equal(cache.size(c), 0)
 }
 
 pub fn delete_query_not_cached_test() {
   let c = cache.empty()
-  let c = cache.put(c, "vql", "DELETE FROM users WHERE id = 1", to_dynamic("ok"))
+  let c = cache.put(c, "vcl", "DELETE FROM users WHERE id = 1", to_dynamic("ok"))
   should.equal(cache.size(c), 0)
 }
 
@@ -70,7 +70,7 @@ pub fn create_query_not_cached_test() {
 
 pub fn update_query_not_cached_test() {
   let c = cache.empty()
-  let c = cache.put(c, "vql", "UPDATE users SET name = 'Bob'", to_dynamic("ok"))
+  let c = cache.put(c, "vcl", "UPDATE users SET name = 'Bob'", to_dynamic("ok"))
   should.equal(cache.size(c), 0)
 }
 
@@ -82,7 +82,7 @@ pub fn deform_query_not_cached_test() {
 
 pub fn select_query_is_cached_test() {
   let c = cache.empty()
-  let c = cache.put(c, "vql", "SELECT * FROM users", to_dynamic("data"))
+  let c = cache.put(c, "vcl", "SELECT * FROM users", to_dynamic("data"))
   should.equal(cache.size(c), 1)
 }
 
@@ -92,19 +92,19 @@ pub fn select_query_is_cached_test() {
 
 pub fn different_dbs_separate_cache_test() {
   let c = cache.empty()
-  let c = cache.put(c, "vql", "SELECT 1", to_dynamic("vql-result"))
+  let c = cache.put(c, "vcl", "SELECT 1", to_dynamic("vcl-result"))
   let c = cache.put(c, "gql", "SELECT 1", to_dynamic("gql-result"))
   should.equal(cache.size(c), 2)
-  should.be_ok(cache.get(c, "vql", "SELECT 1"))
+  should.be_ok(cache.get(c, "vcl", "SELECT 1"))
   should.be_ok(cache.get(c, "gql", "SELECT 1"))
 }
 
 pub fn invalidate_db_clears_only_that_db_test() {
   let c = cache.empty()
-  let c = cache.put(c, "vql", "SELECT 1", to_dynamic("v"))
+  let c = cache.put(c, "vcl", "SELECT 1", to_dynamic("v"))
   let c = cache.put(c, "gql", "SELECT 1", to_dynamic("g"))
-  let c = cache.invalidate_db(c, "vql")
-  should.be_error(cache.get(c, "vql", "SELECT 1"))
+  let c = cache.invalidate_db(c, "vcl")
+  should.be_error(cache.get(c, "vcl", "SELECT 1"))
   should.be_ok(cache.get(c, "gql", "SELECT 1"))
 }
 
@@ -114,8 +114,8 @@ pub fn invalidate_db_clears_only_that_db_test() {
 
 pub fn clear_empties_cache_test() {
   let c = cache.empty()
-  let c = cache.put(c, "vql", "SELECT 1", to_dynamic(1))
-  let c = cache.put(c, "vql", "SELECT 2", to_dynamic(2))
+  let c = cache.put(c, "vcl", "SELECT 1", to_dynamic(1))
+  let c = cache.put(c, "vcl", "SELECT 2", to_dynamic(2))
   let c = cache.clear(c)
   should.equal(cache.size(c), 0)
 }

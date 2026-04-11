@@ -33,8 +33,8 @@ pub enum VeriSimErrorCode {
 	modality_unavailable // Requested modality is not enabled
 	drift_computation    // Drift score computation failed
 	provenance_invalid   // Provenance chain integrity failure
-	vql_parse_error      // VQL syntax error
-	vql_execution_error  // VQL runtime error
+	vcl_parse_error      // VCL syntax error
+	vcl_execution_error  // VCL runtime error
 	federation_error     // Federation peer communication failure
 	// Client-side errors
 	connection_error     // Network connectivity failure
@@ -112,8 +112,8 @@ fn string_to_error_code(s string) VeriSimErrorCode {
 		'MODALITY_UNAVAILABLE' { .modality_unavailable }
 		'DRIFT_COMPUTATION' { .drift_computation }
 		'PROVENANCE_INVALID' { .provenance_invalid }
-		'VQL_PARSE_ERROR' { .vql_parse_error }
-		'VQL_EXECUTION_ERROR' { .vql_execution_error }
+		'VCL_PARSE_ERROR' { .vcl_parse_error }
+		'VCL_EXECUTION_ERROR' { .vcl_execution_error }
 		'FEDERATION_ERROR' { .federation_error }
 		else { .unknown }
 	}

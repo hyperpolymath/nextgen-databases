@@ -208,9 +208,9 @@ From Kafka's migration to KRaft (similar problem domain):
 └─────────────────┘
 ```
 
-**VQL query-time repair**:
+**VCL query-time repair**:
 
-```vql
+```vcl
 -- User's query
 SELECT GRAPH, DOCUMENT
 FROM verisim:semantic
@@ -229,9 +229,9 @@ LIMIT 100;
 impl OctadStore {
     pub async fn query_with_repair(
         &self,
-        query: &VQLQuery,
+        query: &VCLQuery,
         repair_policy: RepairPolicy,
-    ) -> Result<QueryResult, VQLError> {
+    ) -> Result<QueryResult, VCLError> {
         // Execute query
         let raw_results = self.execute_query(query).await?;
 
@@ -243,7 +243,7 @@ impl OctadStore {
             let repaired = match repair_policy {
                 RepairPolicy::LatestWins => self.repair_latest_wins(raw_results, drift_detected),
                 RepairPolicy::Quorum => self.repair_quorum(raw_results, drift_detected).await?,
-                RepairPolicy::Manual => return Err(VQLError::ManualRepairRequired(drift_detected)),
+                RepairPolicy::Manual => return Err(VCLError::ManualRepairRequired(drift_detected)),
             };
 
             // Cache repaired results

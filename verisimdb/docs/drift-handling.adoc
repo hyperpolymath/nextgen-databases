@@ -14,7 +14,7 @@ toc::[]
 
 1. **Drift Detection** - Automatic monitoring across modalities
 2. **Drift Repair** - Reconciliation strategies to restore consistency
-3. **Drift-Aware Queries** - VQL extensions for querying drifted data
+3. **Drift-Aware Queries** - VCL extensions for querying drifted data
 4. **Drift Tolerance** - Configurable policies for acceptable inconsistency
 
 == Types of Drift
@@ -146,11 +146,11 @@ defmodule VeriSim.DriftMonitor do
 end
 ```
 
-=== On-Demand Detection (VQL)
+=== On-Demand Detection (VCL)
 
 **Explicit drift check query:**
 
-```vql
+```vcl
 DRIFT DETECT
 FROM verisim:graph
 WHERE octad.id = @id;
@@ -179,7 +179,7 @@ WHERE octad.id = @id;
 
 **Batch drift detection:**
 
-```vql
+```vcl
 DRIFT DETECT
 FROM verisim:graph
 WHERE octad.types INCLUDES "https://schema.org/Paper"
@@ -194,7 +194,7 @@ LIMIT 100;
 
 Most recent update across all modalities becomes canonical.
 
-```vql
+```vcl
 DRIFT REPAIR
 FROM verisim:graph
 WHERE octad.id = @id
@@ -234,7 +234,7 @@ pub fn repair_latest_wins(octad_id: &Uuid) -> Result<RepairResult, Error> {
 
 Value that appears in majority of modalities wins.
 
-```vql
+```vcl
 DRIFT REPAIR
 FROM verisim:graph
 WHERE octad.id = @id
@@ -274,7 +274,7 @@ pub fn repair_quorum(octad_id: &Uuid) -> Result<RepairResult, Error> {
 
 Present conflict to user for manual decision.
 
-```vql
+```vcl
 DRIFT REPAIR
 FROM verisim:graph
 WHERE octad.id = @id
@@ -322,7 +322,7 @@ POST /api/v1/drift/resolve HTTP/1.1
 
 Combine values intelligently (domain-specific).
 
-```vql
+```vcl
 DRIFT REPAIR
 FROM verisim:graph
 WHERE octad.id = @id
@@ -364,7 +364,7 @@ config :verisim,
 
 **After repair, verify consistency:**
 
-```vql
+```vcl
 DRIFT VERIFY
 FROM verisim:graph
 WHERE octad.id = @id;
@@ -388,7 +388,7 @@ WHERE octad.id = @id;
 
 **Accept some drift** (performance optimization):
 
-```vql
+```vcl
 FROM verisim:graph
 WITH DRIFT TOLERANCE 0.1  -- Allow 10% drift
 WHERE octad.types INCLUDES "https://schema.org/Paper"
@@ -420,7 +420,7 @@ LIMIT 100;
 
 **Require perfect consistency** (default):
 
-```vql
+```vcl
 FROM verisim:graph
 WITH DRIFT TOLERANCE 0.0  -- No drift allowed
 WHERE octad.types INCLUDES "https://schema.org/Paper"
@@ -437,7 +437,7 @@ LIMIT 100;
 
 **Time-travel query** using temporal modality:
 
-```vql
+```vcl
 -- Query BEFORE repair (as of specific time)
 FROM verisim:temporal
 WHERE octad.id = @id
@@ -454,7 +454,7 @@ WHERE octad.id = @id;
 
 **Query across federated stores with mixed drift:**
 
-```vql
+```vcl
 FROM verisim:federation
 WHERE octad.types INCLUDES "https://schema.org/Paper"
 WITH DRIFT TOLERANCE 0.2  -- Tolerate 20% drift across federation
@@ -540,7 +540,7 @@ pub fn classify_drift_severity(drift: &Drift) -> DriftSeverity {
 
 **Detection:**
 
-```vql
+```vcl
 DRIFT DETECT FEDERATION
 FROM verisim:federation
 WHERE octad.id = @id
@@ -589,9 +589,9 @@ Store E reports: title = "HACKED!!!"  ❌ BYZANTINE
 Action: Exclude Store E from quorum, investigate tampering
 ```
 
-**VQL query with Byzantine tolerance:**
+**VCL query with Byzantine tolerance:**
 
-```vql
+```vcl
 FROM verisim:federation
 WHERE octad.id = @id
 WITH BYZANTINE TOLERANCE 1  -- Tolerate 1 faulty node
@@ -607,9 +607,9 @@ MIN QUORUM 3;
 3. **Propagation phase** - Leader broadcasts canonical value
 4. **Verification phase** - All stores confirm consistency
 
-**VQL:**
+**VCL:**
 
-```vql
+```vcl
 DRIFT REPAIR FEDERATION
 FROM verisim:federation
 WHERE octad.id = @id
@@ -623,7 +623,7 @@ COORDINATOR @university_a;
 
 **View all drift events for a Octad:**
 
-```vql
+```vcl
 DRIFT HISTORY
 FROM verisim:temporal
 WHERE octad.id = @id
@@ -661,7 +661,7 @@ LIMIT 10;
 
 **System-wide drift statistics:**
 
-```vql
+```vcl
 DRIFT METRICS
 FROM verisim:system
 WHERE period = 'last_24_hours';
@@ -824,9 +824,9 @@ end
 
 VeriSimDB provides comprehensive drift handling through:
 
-1. **Detection** - Automatic monitoring + on-demand VQL queries
+1. **Detection** - Automatic monitoring + on-demand VCL queries
 2. **Repair** - Multiple strategies (latest_wins, quorum, manual, merge)
-3. **Query Integration** - Drift-aware VQL with tolerance controls
+3. **Query Integration** - Drift-aware VCL with tolerance controls
 4. **Federation** - Cross-org drift detection and Byzantine tolerance
 5. **Audit** - Complete drift history in verisim-temporal
 

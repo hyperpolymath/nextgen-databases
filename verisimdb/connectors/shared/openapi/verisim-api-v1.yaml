@@ -4,7 +4,7 @@
 # OpenAPI 3.1 specification for the VeriSimDB REST API.
 # Covers all octad CRUD operations, search endpoints, drift monitoring,
 # provenance chain management, spatial queries, normalisation triggers,
-# and VQL query execution.
+# and VCL query execution.
 
 openapi: "3.1.0"
 
@@ -44,7 +44,7 @@ tags:
     description: Self-normalisation trigger and status
   - name: provenance
     description: Provenance chain management and verification
-  - name: vql
+  - name: vcl
     description: VeriSim Query Language execution
 
 paths:
@@ -947,17 +947,17 @@ paths:
                 $ref: "../json-schema/error.json"
 
   # ---------------------------------------------------------------------------
-  # VQL
+  # VCL
   # ---------------------------------------------------------------------------
-  /api/v1/vql/execute:
+  /api/v1/vcl/execute:
     post:
-      operationId: executeVql
-      summary: Execute a VQL query
+      operationId: executeVcl
+      summary: Execute a VCL query
       description: |
-        Executes a VeriSim Query Language (VQL) query against the
-        database.  VQL is VeriSimDB's native query language, providing
+        Executes a VeriSim Query Language (VCL) query against the
+        database.  VCL is VeriSimDB's native query language, providing
         cross-modal querying with optional proof requirements.
-      tags: [vql]
+      tags: [vcl]
       requestBody:
         required: true
         content:
@@ -969,7 +969,7 @@ paths:
                 query:
                   type: string
                   description: |
-                    VQL query string.  Example:
+                    VCL query string.  Example:
                     `FIND entities WHERE document CONTAINS "neural" AND vector SIMILAR TO [0.1, 0.2, ...] LIMIT 10`
                 explain:
                   type: boolean
@@ -1005,7 +1005,7 @@ paths:
                     type: object
                     description: Query execution plan (only when explain=true).
         "400":
-          description: VQL syntax error or invalid query.
+          description: VCL syntax error or invalid query.
           content:
             application/json:
               schema:

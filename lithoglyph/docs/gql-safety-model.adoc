@@ -8,7 +8,7 @@
 
 == Overview
 
-GQL (Graph Query Language) follows the same two-tier model as VQL:
+GQL (Graph Query Language) follows the same two-tier model as VCL:
 
 [cols="1,2,3", options="header"]
 |===
@@ -25,9 +25,9 @@ GQL (Graph Query Language) follows the same two-tier model as VQL:
   Proof-carrying queries activate L9-L10.
 |===
 
-== Relationship to VQL-UT
+== Relationship to VCL-UT
 
-The 10 safety levels originate in **TypeLL** (the core type theory). VQL-UT is
+The 10 safety levels originate in **TypeLL** (the core type theory). VCL-UT is
 the reference implementation for database queries. GQL maps its own constructs
 to the same 10 levels — it does not have a separate "-UT" repo.
 
@@ -35,7 +35,7 @@ to the same 10 levels — it does not have a separate "-UT" repo.
 ----
 TypeLL (type theory core — defines the 10 levels)
    │
-   ├──→ VQL-UT  (reference implementation, VeriSimDB)
+   ├──→ VCL-UT  (reference implementation, VeriSimDB)
    ├──→ KQL     (applies same levels, QuandleDB)
    └──→ GQL     (applies same levels, LithoGlyph)
 ----
@@ -138,4 +138,4 @@ the formal type proofs that underpin levels L2 and L9.
 * `studio/lib/bs/src/GqldtPreview.res` — GQL dependent type preview component
 * `src/Lith/` — Idris2 ABI definitions (LithBridge, LithForeign, LithLayout)
 * `ARCHITECTURE.adoc` — Full system architecture
-* https://github.com/hyperpolymath/vql-ut[VQL-UT] — Reference implementation of the 10-level safety pipeline
+* https://github.com/hyperpolymath/vcl-ut[VCL-UT] — Reference implementation of the 10-level safety pipeline

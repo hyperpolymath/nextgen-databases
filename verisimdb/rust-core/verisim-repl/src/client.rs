@@ -4,12 +4,12 @@
 //! HTTP client for communicating with the verisim-api server.
 //!
 //! Wraps `reqwest::blocking::Client` and provides typed methods for
-//! VQL query execution, EXPLAIN output, and health checks.
+//! VCL query execution, EXPLAIN output, and health checks.
 
 use reqwest::blocking::Client;
 use serde_json::Value;
 
-/// Error type for VQL client operations.
+/// Error type for VCL client operations.
 #[derive(Debug)]
 pub enum ClientError {
     /// HTTP transport or connection error.
@@ -44,14 +44,14 @@ impl From<reqwest::Error> for ClientError {
 ///
 /// All methods use blocking I/O so they can be called directly from the
 /// synchronous REPL loop without an async runtime.
-pub struct VqlClient {
+pub struct VclClient {
     /// Base URL of the verisim-api server (e.g. `http://localhost:8080`).
     base_url: String,
     /// Underlying HTTP client (connection-pooled).
     http: Client,
 }
 
-impl VqlClient {
+impl VclClient {
     /// Create a new client pointing at the given base URL.
     ///
     /// The URL should include the scheme and port but no trailing slash.
@@ -73,24 +73,24 @@ impl VqlClient {
         &self.base_url
     }
 
-    /// Execute a VQL query string.
+    /// Execute a VCL query string.
     ///
-    /// Sends `POST /vql/execute` with body `{"query": "<vql>"}`.
+    /// Sends `POST /vcl/execute` with body `{"query": "<vcl>"}`.
     /// Returns the raw JSON response from the server.
     pub fn execute(&self, query: &str) -> Result<Value, ClientError> {
-        let url = format!("{}/vql/execute", self.base_url);
+        let url = format!("{}/vcl/execute", self.base_url);
         let payload = serde_json::json!({ "query": query });
 
         let response = self.http.post(&url).json(&payload).send()?;
         self.handle_response(response)
     }
 
-    /// Request EXPLAIN output for a VQL query.
+    /// Request EXPLAIN output for a VCL query.
     ///
-    /// Sends the query through the VQL execute endpoint with an EXPLAIN
+    /// Sends the query through the VCL execute endpoint with an EXPLAIN
     /// prefix, which returns a query plan without executing the query.
     pub fn explain(&self, query: &str) -> Result<Value, ClientError> {
-        let url = format!("{}/vql/execute", self.base_url);
+        let url = format!("{}/vcl/execute", self.base_url);
         let explain_query = format!("EXPLAIN {}", query);
         let payload = serde_json::json!({ "query": explain_query });
 
@@ -129,13 +129,13 @@ mod tests {
 
     #[test]
     fn test_client_creation() {
-        let client = VqlClient::new("http://localhost:8080");
+        let client = VclClient::new("http://localhost:8080");
         assert_eq!(client.base_url(), "http://localhost:8080");
     }
 
     #[test]
     fn test_trailing_slash_stripped() {
-        let client = VqlClient::new("http://localhost:8080/");
+        let client = VclClient::new("http://localhost:8080/");
         assert_eq!(client.base_url(), "http://localhost:8080");
     }
 

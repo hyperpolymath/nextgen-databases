@@ -4,7 +4,7 @@
 //
 // client.gleam — HTTP client for NextGen database APIs.
 //
-// Sends VQL/GQL/KQL queries to the appropriate database server and returns
+// Sends VCL/GQL/KQL queries to the appropriate database server and returns
 // parsed JSON responses. All three databases use the same protocol pattern:
 // POST a JSON body with {"query": "<text>"} and receive JSON results.
 

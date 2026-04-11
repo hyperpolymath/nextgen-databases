@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //!
-//! Tab-completion for the VQL REPL.
+//! Tab-completion for the VCL REPL.
 //!
 //! Provides context-aware completion for:
-//! - VQL keywords (SELECT, FROM, WHERE, PROOF, LIMIT, etc.)
+//! - VCL keywords (SELECT, FROM, WHERE, PROOF, LIMIT, etc.)
 //! - Modality names (GRAPH, VECTOR, TENSOR, SEMANTIC, DOCUMENT, TEMPORAL)
 //! - Meta-commands (\\connect, \\explain, \\format, etc.)
 
 use rustyline::completion::{Completer, Pair};
 use rustyline::Context;
 
-/// All completable VQL keywords.
+/// All completable VCL keywords.
 const KEYWORDS: &[&str] = &[
     "SELECT", "FROM", "WHERE", "PROOF", "LIMIT", "OFFSET", "ORDER", "BY",
     "GROUP", "HAVING", "AS", "AND", "OR", "NOT", "IN", "BETWEEN", "LIKE",
@@ -36,15 +36,15 @@ const META_COMMANDS: &[&str] = &[
     "\\help", "\\quit", "\\q",
 ];
 
-/// Tab-completer for VQL input.
+/// Tab-completer for VCL input.
 ///
 /// Completes the word under the cursor by matching against known keywords,
 /// modality names, and meta-commands. Matching is case-insensitive; the
 /// replacement preserves the user's casing style (upper if the prefix is
 /// uppercase, otherwise lowercase).
-pub struct VqlCompleter;
+pub struct VclCompleter;
 
-impl Completer for VqlCompleter {
+impl Completer for VclCompleter {
     type Candidate = Pair;
 
     fn complete(
@@ -95,7 +95,7 @@ impl Completer for VqlCompleter {
             }
         }
 
-        // VQL keywords.
+        // VCL keywords.
         for kw in KEYWORDS {
             if kw.starts_with(&upper_prefix) {
                 let replacement = if use_upper {

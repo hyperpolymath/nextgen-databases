@@ -7,7 +7,7 @@
  *   1. Meta-command layer — backslash-prefixed commands for REPL control
  *   2. Query passthrough layer — forwards raw query text to the active database
  *
- * The query languages themselves (VQL, GQL, KQL) are defined by their
+ * The query languages themselves (VCL, GQL, KQL) are defined by their
  * respective database specifications. NQC only parses meta-commands; all
  * other input is treated as opaque query text, stripped of trailing
  * semicolons, and forwarded verbatim.
@@ -123,8 +123,8 @@ base_url = "http://" , host_address , ":" , port_number ;
 
 output_format = "table" | "json" | "csv" ;
 
-(* VQL-style response shape (also accepted by table/CSV formatters): *)
-vql_response = '{"success":' , boolean , ',"data":' , json_array ,
+(* VCL-style response shape (also accepted by table/CSV formatters): *)
+vcl_response = '{"success":' , boolean , ',"data":' , json_array ,
                ',"row_count":' , integer , '}' ;
 
 (* Generic response — any valid JSON is accepted. *)

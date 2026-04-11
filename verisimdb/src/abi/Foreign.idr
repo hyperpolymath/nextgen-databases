@@ -182,10 +182,10 @@ normalize db eid = do
     Nothing => VError
 
 --------------------------------------------------------------------------------
--- VQL Query Execution
+-- VCL Query Execution
 --------------------------------------------------------------------------------
 
-||| Parse and execute a VQL query
+||| Parse and execute a VCL query
 ||| db: VDBHandle, req_ptr: pointer to QueryRequest struct
 ||| Returns: ResultSetHandle (0 on failure)
 export

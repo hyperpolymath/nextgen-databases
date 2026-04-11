@@ -15,13 +15,13 @@ type executeResult =
   | Error(string)
 
 /// Generate demo data based on the query modalities.
-let execute = (query: string, ~vqlDt: bool=false): executeResult => {
+let execute = (query: string, ~vclDt: bool=false): executeResult => {
   let upper = String.toUpperCase(query)
   let startTime = Date.now()
 
   // EXPLAIN mode
   if String.includes(upper, "EXPLAIN") {
-    let modalities = VqlKeywords.modalities->Array.filter(m => String.includes(upper, m))
+    let modalities = VclKeywords.modalities->Array.filter(m => String.includes(upper, m))
     let plan = ref("=== EXPLAIN OUTPUT ===\n\n")
     plan := plan.contents ++ "Strategy: " ++ (if Array.length(modalities) >= 2 { "Parallel" } else { "Sequential" }) ++ "\n\n"
 
@@ -41,7 +41,7 @@ let execute = (query: string, ~vqlDt: bool=false): executeResult => {
       plan := plan.contents ++ `  Selectivity: 0.5\n\n`
     })
 
-    if vqlDt && String.includes(upper, "PROOF") {
+    if vclDt && String.includes(upper, "PROOF") {
       plan := plan.contents ++ "Proof verification: ENABLED\n"
       plan := plan.contents ++ "ZKP scheme: PLONK\n"
       plan := plan.contents ++ "Circuit compilation: deferred\n"
@@ -57,7 +57,7 @@ let execute = (query: string, ~vqlDt: bool=false): executeResult => {
   }
   // SELECT queries — generate demo data
   else if String.includes(upper, "SELECT") {
-    let modalities = VqlKeywords.modalities->Array.filter(m => String.includes(upper, m))
+    let modalities = VclKeywords.modalities->Array.filter(m => String.includes(upper, m))
     if Array.length(modalities) == 0 {
       Error("No modalities specified in SELECT clause")
     } else {
@@ -72,7 +72,7 @@ let execute = (query: string, ~vqlDt: bool=false): executeResult => {
           | "GRAPH" => `{edges: ${Int.toString(3 + i)}, type: "Entity"}`
           | "VECTOR" => `[${Float.toFixed(Float.fromInt(i) *. 0.1, ~digits=2)}, 0.50, 0.30]`
           | "TENSOR" => `shape=[3,3], dtype=f32`
-          | "SEMANTIC" => if vqlDt { `{proof: "verified", scheme: "PLONK"}` } else { `{types: ["Thing"]}` }
+          | "SEMANTIC" => if vclDt { `{proof: "verified", scheme: "PLONK"}` } else { `{types: ["Thing"]}` }
           | "DOCUMENT" => `"Sample document ${Int.toString(i + 1)}"`
           | "TEMPORAL" => `{version: ${Int.toString(i + 1)}, ts: "2026-02-28"}`
           | "PROVENANCE" => `{source: "scan-v1", actor: "hypatia", chain_length: ${Int.toString(i + 1)}}`
@@ -93,6 +93,6 @@ let execute = (query: string, ~vqlDt: bool=false): executeResult => {
       })
     }
   } else {
-    Error("Unrecognized query — VQL queries must start with SELECT, EXPLAIN, INSERT, UPDATE, or DELETE")
+    Error("Unrecognized query — VCL queries must start with SELECT, EXPLAIN, INSERT, UPDATE, or DELETE")
   }
 }

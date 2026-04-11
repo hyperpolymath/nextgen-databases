@@ -11,7 +11,7 @@ Author: Jonathan D.A. Jewell.
 
 **Computational**: Maintain cross-modal consistency across 8 representations.
 **Algorithmic**: Octad entities, drift detection with thresholds, OTP supervision.
-**Implementational**: Rust stores + Elixir coordination + VQL queries.
+**Implementational**: Rust stores + Elixir coordination + VCL queries.
 
 ```
 Elixir OTP: EntityServer, DriftMonitor, QueryRouter, SchemaRegistry
@@ -31,7 +31,7 @@ oxrocksdb-sys eliminated (redb pure-Rust backend). protoc eliminated
 
 OTP app with supervision tree. GenServer per entity.
 Hypatia integration: ScanIngester, PatternQuery, DispatchBridge (37 tests).
-Built-in VQL parser (no external runtime needed).
+Built-in VCL parser (no external runtime needed).
 Product telemetry: opt-in ETS collector + JSON reporter.
 
 ## Key Subsystems
@@ -51,8 +51,8 @@ tensor, schema, quality. Configurable thresholds gate normalisation.
 DuckDB, VectorDB, InfluxDB, ObjectStorage.
 Integration tests: 105 tests across 7 adapters (need test-infra stack).
 
-### VQL (VeriSim Query Language)
-Type system: VQL-DT. 11 proof types. Multi-proof parsing.
+### VCL (VeriSim Query Language)
+Type system: VCL-DT. 11 proof types. Multi-proof parsing.
 Modality compatibility validation. ReScript playground wired to backend.
 
 ### Hypatia Pipeline
@@ -106,7 +106,7 @@ just doctor / heal / tour / help-me
 
 ## Language Policy
 
-Allowed: Rust, Elixir, ReScript, VQL, Idris2, Zig.
+Allowed: Rust, Elixir, ReScript, VCL, Idris2, Zig.
 Banned: Python, Go, Node.js.
 
 ## Code Patterns
@@ -141,7 +141,7 @@ All 25 historical issues resolved. See KNOWN-ISSUES.adoc.
 | `connectors/clients/` | 6 SDKs |
 | `connectors/test-infra/` | Integration test databases |
 | `container/` | Containerfiles + compose |
-| `playground/` | VQL playground (ReScript) |
+| `playground/` | VCL playground (ReScript) |
 | `src/abi/` | Idris2 ABI |
 | `ffi/zig/` | Zig FFI |
 | `spec/` | Grammar EBNF |

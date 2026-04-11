@@ -10,7 +10,7 @@
 ///
 /// Capability tokens: Every privileged operation (network requests to the
 /// VeriSimDB Rust core and Elixir orchestration layer, filesystem access
-/// for exports, clipboard for VQL copying) requires a valid token obtained
+/// for exports, clipboard for VCL copying) requires a valid token obtained
 /// via `__gossamer_cap_grant`. Tokens are time-limited (TTL from config)
 /// and can be revoked by the runtime at any time.
 

@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 // Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 //
-// TQLAst.res — Extended AST types for VQL-dt++ (TypeQL-experimental)
+// TQLAst.res — Extended AST types for VCL-dt++ (TypeQL-experimental)
 //
 // Defines the AST nodes for the six new extension clauses that augment
-// standard VQL queries. These types mirror the Idris2 kernel types but
+// standard VCL queries. These types mirror the Idris2 kernel types but
 // in a form suitable for parser output.
 
 // ============================================================================
-// VQL Base Types (adapted from VeriSimDB VQLParser.res)
+// VCL Base Types (adapted from VeriSimDB VCLParser.res)
 // ============================================================================
 
-// VQL modalities — the octad (8 modalities).
+// VCL modalities — the octad (8 modalities).
 type modality =
   | Graph
   | Vector
@@ -98,7 +98,7 @@ and simpleCondition =
   | FulltextMatches(string)
   | FieldCondition(string, operator, literal)
 
-// Proof types from VQL PROOF clause.
+// Proof types from VCL PROOF clause.
 type proofType =
   | Existence
   | Citation
@@ -196,7 +196,7 @@ type usageLimit = {
 // Extension Annotations (all optional)
 // ============================================================================
 
-// Collected extension annotations from a VQL-dt++ query.
+// Collected extension annotations from a VCL-dt++ query.
 // Each field is None if the corresponding clause was not present.
 type extensionAnnotations = {
   consumeAfter: option<usageSpec>,
@@ -221,7 +221,7 @@ let emptyAnnotations: extensionAnnotations = {
 // Extended Query AST
 // ============================================================================
 
-// A standard VQL query (base, before extensions).
+// A standard VCL query (base, before extensions).
 type baseQuery = {
   modalities: array<modality>,
   projections: option<array<fieldRef>>,
@@ -236,7 +236,7 @@ type baseQuery = {
   offset: option<int>,
 }
 
-// A VQL-dt++ extended query = base VQL query + extension annotations.
+// A VCL-dt++ extended query = base VCL query + extension annotations.
 type extendedQuery = {
   base: baseQuery,
   extensions: extensionAnnotations,

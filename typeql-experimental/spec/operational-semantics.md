@@ -134,7 +134,7 @@ v ∈ Value ::=
 
 ## 4. Runtime Semantics
 
-### 4.1 Query Evaluation (standard VQL pipeline)
+### 4.1 Query Evaluation (standard VCL pipeline)
 
 ```
     D ⊢ SELECT modalities FROM hexad WHERE conditions ⇓ rows

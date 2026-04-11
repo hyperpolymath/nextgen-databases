@@ -26,7 +26,7 @@ CSS classes are defined in `index.html` under `.nqc-editor*`.
 @ocaml.doc("
 Render the query editor.
 `query`    — current textarea content (controlled component)
-`prompt`   — database-specific placeholder (e.g. 'vql> ')
+`prompt`   — database-specific placeholder (e.g. 'vcl> ')
 `keywords` — array of query language keywords for hint ribbon
 `history`  — session query history for the recall dropdown
 `dispatch` — TEA message dispatcher

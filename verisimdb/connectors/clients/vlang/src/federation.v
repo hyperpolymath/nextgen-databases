@@ -20,11 +20,11 @@ pub:
 	metadata map[string]string
 }
 
-// FederatedQueryRequest wraps a VQL query intended for federated execution
+// FederatedQueryRequest wraps a VCL query intended for federated execution
 // across all peers in the cluster.
 pub struct FederatedQueryRequest {
 pub:
-	query    string            // VQL query string
+	query    string            // VCL query string
 	params   map[string]string // Named parameters
 	peer_ids []string          // Specific peers to query (empty = all peers)
 	timeout  int = 30000       // Per-peer timeout in milliseconds
@@ -43,7 +43,7 @@ pub struct PeerQueryResult {
 pub:
 	peer_id    string
 	peer_name  string
-	result     VqlResult
+	result     VclResult
 	elapsed_ms f64
 	error      ?string
 }
@@ -80,14 +80,14 @@ pub fn (c Client) list_peers() ![]FederationPeer {
 	return json.decode([]FederationPeer, resp.body)
 }
 
-// federated_query executes a VQL query across one or more federation peers.
+// federated_query executes a VCL query across one or more federation peers.
 //
 // If peer_ids is empty, the query is broadcast to all active peers. Results
 // are aggregated and returned with per-peer timing and error information.
 //
 // Parameters:
 //   c     — The authenticated Client.
-//   input — The federated query request including VQL, parameters, and target peers.
+//   input — The federated query request including VCL, parameters, and target peers.
 //
 // Returns:
 //   A FederatedQueryResult aggregating all peer responses, or an error.

@@ -1,19 +1,19 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Author: Jonathan D.A. Jewell <6759885+hyperpolymath@users.noreply.github.com>
 #
-# VQL security aspect tests.
+# VCL security aspect tests.
 #
-# Validates that the VQL execution pipeline is hardened against the attack
+# Validates that the VCL execution pipeline is hardened against the attack
 # surface of a multi-tenant distributed database:
 #
-#   1. VQL Injection     — crafted query strings do not escape their parse
+#   1. VCL Injection     — crafted query strings do not escape their parse
 #                          context and execute unintended operations.
 #   2. Unauthorised Access — requests without valid authentication are
 #                          rejected with a clear error, not silently
 #                          truncated or granted partial data.
 #   3. Cross-Tenant Isolation — an authenticated tenant cannot read or
 #                          mutate octads belonging to a different tenant,
-#                          even with a well-formed VQL query.
+#                          even with a well-formed VCL query.
 #   4. Error Disclosure  — error responses do not leak internal paths,
 #                          stack traces, or schema metadata to the caller.
 #
@@ -22,10 +22,10 @@
 
 defmodule VeriSim.Aspect.SecurityTest do
   @moduledoc """
-  Security aspect tests for VQL and federation.
+  Security aspect tests for VCL and federation.
 
   Covers:
-  - VQL injection through crafted query strings
+  - VCL injection through crafted query strings
   - Unauthorised access rejection
   - Cross-tenant isolation enforcement
   - Error message hygiene (no internal detail leakage)
@@ -33,8 +33,8 @@ defmodule VeriSim.Aspect.SecurityTest do
 
   use ExUnit.Case, async: false
 
-  alias VeriSim.Query.{VQLBridge, VQLExecutor, VQLTypeChecker}
-  alias VeriSim.Test.VQLTestHelpers, as: H
+  alias VeriSim.Query.{VCLBridge, VCLExecutor, VCLTypeChecker}
+  alias VeriSim.Test.VCLTestHelpers, as: H
 
   setup_all do
     pid = H.ensure_bridge_started()
@@ -42,23 +42,23 @@ defmodule VeriSim.Aspect.SecurityTest do
   end
 
   # ===========================================================================
-  # 1. VQL Injection
+  # 1. VCL Injection
   #
-  # The VQL parser must treat all string literals as opaque data, not
+  # The VCL parser must treat all string literals as opaque data, not
   # executable code. Injection attempts should either:
   #   a) Fail at the parse stage with {:error, _}, or
   #   b) Parse successfully as a literal string (correctly escaping the payload).
   #
-  # In either case, the injected payload must not execute as SQL/VQL commands.
+  # In either case, the injected payload must not execute as SQL/VCL commands.
   # ===========================================================================
 
-  describe "VQL injection: crafted query strings are neutralised" do
+  describe "VCL injection: crafted query strings are neutralised" do
     test "single-quote injection in entity ID cannot escape string context" do
-      # Classic SQL injection attempt embedded in a VQL entity ID.
+      # Classic SQL injection attempt embedded in a VCL entity ID.
       payload = "entity'; DROP TABLE octads; --"
       query = "SELECT * FROM HEXAD '#{payload}'"
 
-      result = VQLBridge.parse(query)
+      result = VCLBridge.parse(query)
 
       case result do
         {:error, _reason} ->
@@ -87,10 +87,10 @@ defmodule VeriSim.Aspect.SecurityTest do
     end
 
     test "semicolon injection in WHERE clause is rejected or escaped" do
-      # Attempt to inject a second VQL statement via a WHERE literal.
+      # Attempt to inject a second VCL statement via a WHERE literal.
       query = ~S(SELECT DOCUMENT.* FROM HEXAD 'entity-001' WHERE DOCUMENT.title = 'a'; DELETE HEXAD 'entity-001')
 
-      result = VQLBridge.parse(query)
+      result = VCLBridge.parse(query)
 
       # The parser must not produce an AST that represents two statements
       # when given a single-statement query string.
@@ -110,7 +110,7 @@ defmodule VeriSim.Aspect.SecurityTest do
     end
 
     test "null-byte injection in entity ID is handled without process crash" do
-      # NOTE: The VQL built-in parser does NOT strip null bytes from entity IDs
+      # NOTE: The VCL built-in parser does NOT strip null bytes from entity IDs
       # (as of 2026-04-04). The null byte survives into the AST. This is a
       # known gap: downstream stores must sanitise or reject IDs containing
       # null bytes to prevent C-string truncation vulnerabilities at the FFI
@@ -123,17 +123,17 @@ defmodule VeriSim.Aspect.SecurityTest do
 
       result =
         try do
-          VQLBridge.parse(query)
+          VCLBridge.parse(query)
         rescue
           e -> {:crashed, e}
         end
 
       # Must not raise — structured result is mandatory.
       refute match?({:crashed, _}, result),
-             "VQL parser raised an exception on null-byte input: #{inspect(result)}"
+             "VCL parser raised an exception on null-byte input: #{inspect(result)}"
 
       assert match?({:ok, _}, result) or match?({:error, _}, result),
-             "VQL parser must return {:ok, _} or {:error, _} for null-byte input"
+             "VCL parser must return {:ok, _} or {:error, _} for null-byte input"
     end
 
     test "excessively long query string does not crash the parser" do
@@ -142,7 +142,7 @@ defmodule VeriSim.Aspect.SecurityTest do
       query = "SELECT DOCUMENT.* FROM HEXAD '#{long_payload}'"
 
       # The parser must return either {:ok, _} or {:error, _} — never raise.
-      result = VQLBridge.parse(query)
+      result = VCLBridge.parse(query)
       assert match?({:ok, _}, result) or match?({:error, _}, result),
              "Parser must not raise on oversized input"
     end
@@ -153,7 +153,7 @@ defmodule VeriSim.Aspect.SecurityTest do
       nested = Enum.reduce(1..100, inner, fn _, acc -> "(#{acc}) AND DOCUMENT.x > 0" end)
       query = "SELECT DOCUMENT.* FROM HEXAD 'entity-001' WHERE #{nested}"
 
-      result = VQLBridge.parse(query)
+      result = VCLBridge.parse(query)
       assert match?({:ok, _}, result) or match?({:error, _}, result),
              "Parser must not overflow on deeply nested conditions"
     end
@@ -162,7 +162,7 @@ defmodule VeriSim.Aspect.SecurityTest do
   # ===========================================================================
   # 2. Unauthorised Access
   #
-  # The VQL executor must reject requests that lack a valid authentication
+  # The VCL executor must reject requests that lack a valid authentication
   # context. The shape of authentication is a `:tenant_id` or `:auth_token`
   # in the execution options; absences must be handled gracefully.
   # ===========================================================================
@@ -175,7 +175,7 @@ defmodule VeriSim.Aspect.SecurityTest do
       # propagated correctly.
       query = "SELECT * FROM HEXAD 'entity-001'"
 
-      result = VQLExecutor.execute_string(query, auth_token: nil)
+      result = VCLExecutor.execute_string(query, auth_token: nil)
 
       # Must be either {:ok, []} (no data — no auth, no results), or
       # {:error, reason} (explicit rejection).  Must NEVER return data for
@@ -193,11 +193,11 @@ defmodule VeriSim.Aspect.SecurityTest do
       end
     end
 
-    test "VQL type checker does not expose schema internals in error messages" do
+    test "VCL type checker does not expose schema internals in error messages" do
       # The type checker should reject unknown proof types without revealing
       # internal proof-obligation structure or schema implementation details.
       #
-      # NOTE: As of 2026-04-04, VQLTypeChecker.do_normalize/1 calls
+      # NOTE: As of 2026-04-04, VCLTypeChecker.do_normalize/1 calls
       # :erlang.binary_to_existing_atom/1 on the proof type string, which raises
       # ArgumentError for atoms not previously interned (e.g., "xattack").
       # This is a hardening gap: the type checker should guard with
@@ -206,10 +206,10 @@ defmodule VeriSim.Aspect.SecurityTest do
       query = "SELECT GRAPH.* FROM HEXAD 'entity-001' PROOF XATTACK(entity-001)"
 
       typecheck_result =
-        case VQLBridge.parse(query) do
+        case VCLBridge.parse(query) do
           {:ok, ast} ->
             try do
-              VQLTypeChecker.typecheck(ast)
+              VCLTypeChecker.typecheck(ast)
             rescue
               ArgumentError -> {:error, {:unknown_proof_type, "XATTACK"}}
               e -> {:error, {:unexpected_exception, inspect(e)}}
@@ -229,7 +229,7 @@ defmodule VeriSim.Aspect.SecurityTest do
                  "Error leaks filesystem path: #{reason_str}"
 
           # Error must not contain internal module names that reveal architecture.
-          refute reason_str =~ "VeriSim.Query.VQLTypeChecker.Impl",
+          refute reason_str =~ "VeriSim.Query.VCLTypeChecker.Impl",
                  "Error leaks internal module: #{reason_str}"
 
         {:ok, _} ->
@@ -240,7 +240,7 @@ defmodule VeriSim.Aspect.SecurityTest do
 
     test "parse error messages do not disclose internal grammar details" do
       # Deliberately invalid query.
-      result = VQLBridge.parse("INVALID QUERY SYNTAX $$$ @@@ ###")
+      result = VCLBridge.parse("INVALID QUERY SYNTAX $$$ @@@ ###")
 
       case result do
         {:error, reason} ->
@@ -264,7 +264,7 @@ defmodule VeriSim.Aspect.SecurityTest do
   # ===========================================================================
   # 3. Cross-Tenant Isolation
   #
-  # A VQL query for tenant A must not return data belonging to tenant B.
+  # A VCL query for tenant A must not return data belonging to tenant B.
   # The isolation mechanism is namespace-prefixed octad IDs: tenant IDs are
   # encoded in the entity ID prefix (e.g., "tenant-A::entity-001").
   #
@@ -293,8 +293,8 @@ defmodule VeriSim.Aspect.SecurityTest do
         offset: 0
       }
 
-      result_a = VQLExecutor.execute(ast_a)
-      result_b = VQLExecutor.execute(ast_b)
+      result_a = VCLExecutor.execute(ast_a)
+      result_b = VCLExecutor.execute(ast_b)
 
       # Both may return {:error, :not_found} (Rust core not running), or
       # {:ok, results}. The key invariant is that result_a must not contain
@@ -357,7 +357,7 @@ defmodule VeriSim.Aspect.SecurityTest do
         }
       }
 
-      result = VQLExecutor.execute_mutation(mutation_ast[:_0])
+      result = VCLExecutor.execute_mutation(mutation_ast[:_0])
 
       case result do
         {:ok, created} ->
@@ -393,7 +393,7 @@ defmodule VeriSim.Aspect.SecurityTest do
         offset: 0
       }
 
-      result = VQLExecutor.execute(ast)
+      result = VCLExecutor.execute(ast)
 
       case result do
         {:error, reason} ->
@@ -419,7 +419,7 @@ defmodule VeriSim.Aspect.SecurityTest do
         proof: [%{raw: "EXISTENCE()"}]  # Missing contract name
       }
 
-      result = VQLTypeChecker.typecheck(query_ast)
+      result = VCLTypeChecker.typecheck(query_ast)
 
       case result do
         {:error, reason} ->

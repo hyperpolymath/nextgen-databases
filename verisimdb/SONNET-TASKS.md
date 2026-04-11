@@ -14,13 +14,13 @@
 ### Languages
 - **Rust** — all crates under `rust-core/`. Edition 2021. Workspace root is `/var$REPOS_DIR/verisimdb/Cargo.toml`.
 - **Elixir** — files under `elixir-orchestration/` and `lib/`. Mix project is `elixir-orchestration/mix.exs`.
-- **ReScript** — files under `src/vql/`. Do NOT touch the parser (`VQLParser.res`); it works.
+- **ReScript** — files under `src/vcl/`. Do NOT touch the parser (`VCLParser.res`); it works.
 
 ### What NOT to touch (these work — leave them alone)
-- `src/vql/VQLParser.res` — functional VQL parser
-- `src/vql/VQLError.res` — error types
-- `src/vql/VQLTypeChecker.res` — type checker
-- `src/vql/VQLExplain.res` — AST-based explain (fixed in Round 1)
+- `src/vcl/VCLParser.res` — functional VCL parser
+- `src/vcl/VCLError.res` — error types
+- `src/vcl/VCLTypeChecker.res` — type checker
+- `src/vcl/VCLExplain.res` — AST-based explain (fixed in Round 1)
 - `rust-core/verisim-graph/` — Oxigraph integration works
 - `rust-core/verisim-drift/` — drift detection works (11 tests pass)
 - `rust-core/verisim-normalizer/` — normalization strategies work

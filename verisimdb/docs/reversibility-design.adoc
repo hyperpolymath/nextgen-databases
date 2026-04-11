@@ -312,7 +312,7 @@ impl EventLog {
 
 **Event sourcing enables query replay:**
 
-[source,vql]
+[source,vcl]
 ----
 -- Original query (3 hours ago)
 SELECT GRAPH, VECTOR
@@ -402,8 +402,8 @@ end
 1. Enable reversibility for Temporal + Semantic (already done!)
 2. Add snapshot infrastructure for Document/Graph
 3. Design CoW layer for Vector/Tensor
-4. Create VQL syntax for time-travel queries:
-   ```vql
+4. Create VCL syntax for time-travel queries:
+   ```vcl
    SELECT * FROM HEXAD abc-123 AS OF '2026-01-22T12:00:00Z'
    REVERT TO '2026-01-22T12:00:00Z'
    ```
@@ -412,5 +412,5 @@ end
 
 - link:../WHITEPAPER.md[VeriSimDB White Paper] - Temporal modality design
 - link:technical-specification-kraft-metadata-log.adoc[KRaft Log] - Append-only log
-- link:vql-architecture.adoc[VQL Architecture] - Query execution
+- link:vcl-architecture.adoc[VCL Architecture] - Query execution
 - https://martin.kleppmann.com/2015/05/27/logs-for-data-infrastructure.html[Designing Data-Intensive Applications]

@@ -5,7 +5,7 @@
 --
 -- Attach formal theorems to query results. The result type becomes a
 -- dependent pair (sigma type) bundling the data with its proof. This is
--- DIFFERENT from VQL's existing PROOF clause: PROOF verifies pre-conditions;
+-- DIFFERENT from VCL's existing PROOF clause: PROOF verifies pre-conditions;
 -- PROOF ATTACHED attaches post-condition theorems to results.
 
 module ProofCarrying
@@ -136,7 +136,7 @@ proofCount (AndProved mp _) = S (proofCount mp)
 -- Query Result with Proofs
 -- ============================================================================
 
-||| A VQL-dt++ query result with attached proofs.
+||| A VCL-dt++ query result with attached proofs.
 ||| Wraps Core.QueryResult with zero or more theorems.
 public export
 ProvedQueryResult : Type

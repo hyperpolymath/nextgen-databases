@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-= typeql-experimental (VQL-dt++)
+= typeql-experimental (VCL-dt++)
 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-:description: Experimental type-theoretic extensions to VQL
+:description: Experimental type-theoretic extensions to VCL
 :toc: macro
 :icons: font
 
 == Overview
 
 **typeql-experimental** explores six advanced type-theoretic extensions to the
-VeriSim Query Language (VQL), building on the VQL-dt dependent type system
+VeriSim Query Language (VCL), building on the VCL-dt dependent type system
 (~35% wired in VeriSimDB). Rather than bolting these onto the production
 codebase, this is a standalone exploration space within the `nextgen-databases`
 monorepo.
@@ -17,7 +17,7 @@ The six extensions are:
 
 [cols="1,2,2"]
 |===
-|Extension |VQL-UT Syntax |Idris2 Mechanism
+|Extension |VCL-UT Syntax |Idris2 Mechanism
 
 |Linear Types
 |`CONSUME AFTER N USE`
@@ -64,9 +64,9 @@ The six extensions are:
 
 |Grammar Specification
 |Complete
-|Delta EBNF extending VQL v3.0
+|Delta EBNF extending VCL v3.0
 
-|Examples (7 .vqlut files)
+|Examples (7 .vclut files)
 |Complete
 |All 6 extensions + combined maximal query
 
@@ -83,7 +83,7 @@ The six extensions are:
   specification AND proof checker_.
 
 * **ReScript** (`src/parser/`) — Parser and surface syntax. Consistent with
-  existing VQL parser patterns in VeriSimDB. Handles parsing and surface-level
+  existing VCL parser patterns in VeriSimDB. Handles parsing and surface-level
   validation.
 
 * **Zig** (`ffi/zig/`) — C-compatible FFI bridge. Exposes the type checker's
@@ -129,14 +129,14 @@ grep -rn 'believe_me\|assert_total\|assert_smaller' src/abi/
 
 == Grammar
 
-The query language extends VQL v3.0 with six new optional clauses appended
-after the standard query. See `docs/vql-dtpp-grammar.ebnf` for the delta
+The query language extends VCL v3.0 with six new optional clauses appended
+after the standard query. See `docs/vcl-dtpp-grammar.ebnf` for the delta
 grammar. No keyword conflicts — all new clause keywords are disjoint from
-VQL's 60+ reserved keywords.
+VCL's 60+ reserved keywords.
 
 Example (maximal query using all 6 extensions):
 
-[source,vql]
+[source,vcl]
 ----
 SELECT GRAPH, DOCUMENT
 FROM HEXAD 550e8400-e29b-41d4-a716-446655440000

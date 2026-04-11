@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
 //! Circuit Compiler for VeriSimDB
 //!
-//! Compiles circuit definitions from the VQL DSL into R1CS constraint systems
+//! Compiles circuit definitions from the VCL DSL into R1CS constraint systems
 //! suitable for verification. Circuits are parameterizable at runtime via
-//! VQL `WITH (param=value, ...)` clauses.
+//! VCL `WITH (param=value, ...)` clauses.
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -43,7 +43,7 @@ pub struct CircuitDef {
     pub wires: Vec<WireDef>,
     /// Gate definitions
     pub gates: Vec<GateDef>,
-    /// Parameter names (filled from VQL WITH clause at runtime)
+    /// Parameter names (filled from VCL WITH clause at runtime)
     pub parameters: Vec<String>,
 }
 

@@ -8,7 +8,7 @@
 
 == Overview
 
-KQL (Knot Query Language) follows the same two-tier model as VQL:
+KQL (Knot Query Language) follows the same two-tier model as VCL:
 
 [cols="1,2,3", options="header"]
 |===
@@ -25,9 +25,9 @@ KQL (Knot Query Language) follows the same two-tier model as VQL:
   Proof-carrying queries (with `PROOF` clause) activate L9-L10.
 |===
 
-== Relationship to VQL-UT
+== Relationship to VCL-UT
 
-The 10 safety levels originate in **TypeLL** (the core type theory). VQL-UT is
+The 10 safety levels originate in **TypeLL** (the core type theory). VCL-UT is
 the reference implementation for database queries. KQL maps its own constructs
 to the same 10 levels — it does not have a separate "-UT" repo.
 
@@ -35,7 +35,7 @@ to the same 10 levels — it does not have a separate "-UT" repo.
 ----
 TypeLL (type theory core — defines the 10 levels)
    │
-   ├──→ VQL-UT  (reference implementation, VeriSimDB)
+   ├──→ VCL-UT  (reference implementation, VeriSimDB)
    ├──→ KQL     (applies same levels, QuandleDB)
    └──→ GQL     (applies same levels, LithoGlyph)
 ----
@@ -114,4 +114,4 @@ the safety pipeline".
 
 * `spec/dependent-type-variants.md` — Full Idris2 proof specifications for KQL's dependent types
 * `docs/design/KQL-SQL-LANDSCAPE-RESEARCH-2026-02-22.md` — KQL design research
-* https://github.com/hyperpolymath/vql-ut[VQL-UT] — Reference implementation of the 10-level safety pipeline
+* https://github.com/hyperpolymath/vcl-ut[VCL-UT] — Reference implementation of the 10-level safety pipeline

@@ -34,7 +34,7 @@ Query parameters `dt` and `format` are extracted for the Query page.
 
 Examples:
   `/`                          => Picker
-  `/query/vql`                 => Query({dbId: 'vql', dt: false, format: 'table'})
+  `/query/vcl`                 => Query({dbId: 'vcl', dt: false, format: 'table'})
   `/query/gql?dt=true`         => Query({dbId: 'gql', dt: true, format: 'table'})
   `/query/kql?format=json`     => Query({dbId: 'kql', dt: false, format: 'json'})
   `/anything-else`             => NotFound

@@ -50,10 +50,10 @@ pub type VeriSimError {
   DriftComputationError(message: String)
   /// Provenance chain integrity failure.
   ProvenanceInvalid(message: String)
-  /// VQL syntax error.
-  VqlParseError(message: String)
-  /// VQL runtime error.
-  VqlExecutionError(message: String)
+  /// VCL syntax error.
+  VclParseError(message: String)
+  /// VCL runtime error.
+  VclExecutionError(message: String)
   /// Federation peer communication failure.
   FederationError(message: String)
 
@@ -84,8 +84,8 @@ pub fn message(err: VeriSimError) -> String {
     ModalityUnavailable(msg) -> "Modality unavailable: " <> msg
     DriftComputationError(msg) -> "Drift computation error: " <> msg
     ProvenanceInvalid(msg) -> "Provenance invalid: " <> msg
-    VqlParseError(msg) -> "VQL parse error: " <> msg
-    VqlExecutionError(msg) -> "VQL execution error: " <> msg
+    VclParseError(msg) -> "VCL parse error: " <> msg
+    VclExecutionError(msg) -> "VCL execution error: " <> msg
     FederationError(msg) -> "Federation error: " <> msg
     ConnectionError(msg) -> "Connection error: " <> msg
     TimeoutError(msg) -> "Timeout error: " <> msg
@@ -135,8 +135,8 @@ pub fn is_retryable(err: VeriSimError) -> Bool {
     ModalityUnavailable(_) -> False
     DriftComputationError(_) -> False
     ProvenanceInvalid(_) -> False
-    VqlParseError(_) -> False
-    VqlExecutionError(_) -> False
+    VclParseError(_) -> False
+    VclExecutionError(_) -> False
     FederationError(_) -> False
     SerializationError(_) -> False
     UnknownError(_) -> False

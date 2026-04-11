@@ -82,7 +82,7 @@ async function handler(request) {
 
   // SPA fallback — serve index.html for any unmatched path
   // This enables cadre-router client-side routing to work with
-  // direct URL navigation (e.g. typing /query/vql in the address bar)
+  // direct URL navigation (e.g. typing /query/vcl in the address bar)
   const indexPath = baseDir + "index.html";
   const indexData = await tryReadFile(indexPath);
   if (indexData) {
