@@ -48,16 +48,23 @@ the same data.
 == How do I run it?
 
 ```bash
-# Idris2 ABI — typechecks 3 modules
+# Idris2 ABI — typechecks 4 modules (includes VCLProtocol.idr)
 idris2 --build verisim-modular-experiment.ipkg
 
-# Julia reference implementation — 70 assertions across 3 suites
-julia --project=. test/test_verisim_core.jl
-julia --project=. test/test_federation_parity.jl
-julia --project=. test/test_seams.jl
+# Julia package test suite — 145 assertions across 6 suites via Pkg.test()
+just test
+
+# Zig CLI unit tests (verdict parser + protocol invariants)
+just cli-test
+
+# Build the Zig CLI binary
+just cli-build-release
+
+# Send a VCL query through the full CLI → Julia pipeline
+just cli-query "PROOF INTEGRITY FOR abababababababababababababababababab"
 ```
 
-Requirements: Julia 1.12+, Idris2 0.8.0, libsodium (auto-fetched via Sodium.jl).
+Requirements: Julia 1.10+, Idris2 0.8.0, Zig 0.15+, libsodium (auto-fetched via Sodium.jl).
 
 == Where is everything?
 
@@ -75,7 +82,16 @@ Requirements: Julia 1.12+, Idris2 0.8.0, libsodium (auto-fetched via Sodium.jl).
 |Central + subordinate proof obligations, and what's discharged.
 
 |`src/Abi/`
-|Idris2 ABI definitions — `Types.idr`, `VerisimCore.idr`, `FederationContract.idr`.
+|Idris2 ABI definitions — `Types.idr`, `VerisimCore.idr`, `FederationContract.idr`, `VCLProtocol.idr` (CLI stdio wire protocol).
+
+|`src/Verisim.jl`
+|Julia package entry point. Loads all impl modules into `Main` via `Base.include`, exposes thin delegators.
+
+|`src/vcl_server.jl`
+|Julia stdio server for the CLI consumer. Spawned by the Zig binary; reads VCL from stdin, proves via `Verisim` package, emits A2ML verdicts.
+
+|`ffi/zig/`
+|Zig CLI binary (`verisim`). Spawns `vcl_server.jl` as a subprocess; pipes queries through; forwards A2ML verdicts to stdout. `build.zig`, `build.zig.zon`, `src/verisim_cli.zig`.
 
 |`impl/`
 |Julia reference implementation — `VerisimCore.jl`, `FederationManager.jl`,
@@ -133,9 +149,10 @@ All 5 phases + 3 deferred items complete. **Experiment closed, Path B confirmed.
 
 Open post-experiment work (not blocking):
 
-* Promote `impl/` to shippable `verisim-core` sibling package.
-* Zig FFI port of VerisimCore per hyperpolymath standard.
+* ✓ **Package**: `impl/` promoted to shippable `Verisim` Julia package (`src/Verisim.jl`, `Project.toml`, `test/runtests.jl`).
+* ✓ **CLI consumer**: `ffi/zig/` — Zig binary + `src/vcl_server.jl` Julia server + `src/Abi/VCLProtocol.idr` Idris2 ABI. Subprocess architecture (OS-level isolation per estate priority order). 4/4 unit tests green.
 * Formal Idris2-type-level non-interference proof at arbitrary N.
+* **Phase 6 refactor** (optional): migrate `impl/` from flat-include scaffold to proper Julia `src/` with `using ..Sibling` — removes `Main.X` cross-references and `Base.include(Main, f)`.
 
 == What if the result had been negative?
 

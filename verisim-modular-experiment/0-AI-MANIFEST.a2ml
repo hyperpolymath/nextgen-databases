@@ -14,13 +14,15 @@ VCL consonance guarantees.
 the paved-road deployment. This experiment is a falsifier that produced
 a positive result: the octad IS divisible.
 
-## CURRENT STATUS (2026-04-05)
+## CURRENT STATUS (2026-04-14)
 
 - **Experiment status**: CLOSED with positive result. All 5 phases complete.
 - **Path B**: runtime-confirmed. Core = {Semantic, Temporal, Provenance}.
-- **Tests**: 145/145 green across 6 Julia test suites.
-- **Idris2 ABI**: 3 modules typecheck clean in Idris2 0.8.0.
-- **Overall completion**: 100% (research prototype).
+- **Tests**: 145/145 green across 6 Julia test suites (via `just test` / `Pkg.test()`).
+- **Idris2 ABI**: 4 modules typecheck clean (Types, VerisimCore, FederationContract, VCLProtocol).
+- **Julia package**: `Verisim` — `src/Verisim.jl`, `Project.toml v0.1.0`, `test/runtests.jl`.
+- **CLI consumer**: Zig binary (`ffi/zig/`) + Julia server (`src/vcl_server.jl`). 4/4 Zig unit tests green.
+- **Overall completion**: 100% (research prototype + consumer).
 
 ## KEY FINDING
 
@@ -47,6 +49,22 @@ projection, Ed25519 attestation, coherence surface, LWW conflict resolution).
 - `Types.idr` — 8-shape enum + Core/Federable/Conditional classification
 - `VerisimCore.idr` — identity-core ABI (enrich, attest, verify)
 - `FederationContract.idr` — 5-clause contract + IsFederable predicate
+- `VCLProtocol.idr` — CLI stdio wire protocol (VCLQuery, VerdictResult, WellFormedExchange, A2ML framing constants)
+
+### Julia Package: `src/Verisim.jl`
+
+Package module. Loads impl files into `Main` via `Base.include`; exposes thin
+delegators: `prove`, `parse_vcl`, `Store`, `Manager`, `OctadId`, `SemanticBlob`,
+`enrich!`, `get_core`, all ProofClause constructors, Tropical types.
+
+### CLI Consumer: `ffi/zig/` + `src/vcl_server.jl`
+
+- `ffi/zig/src/verisim_cli.zig` — Zig 0.15 binary. Spawns Julia child process,
+  pipes queries in, reads A2ML verdicts out. Subprocess = OS process isolation.
+  No libjulia embedding. `VERISIM_PACKAGE_PATH` env override; default: 4 dirs up.
+- `src/vcl_server.jl` — Julia server script. Read by `julia --project=<pkg>`.
+  Shared `Store`+`Manager` across session. Emits `[vcl-verdict]` A2ML blocks.
+- Build: `just cli-build-release` | Test: `just cli-test` | Query: `just cli-query "..."`
 
 ### Julia Reference Implementation: `impl/`
 
@@ -81,11 +99,18 @@ projection, Ed25519 attestation, coherence surface, LWW conflict resolution).
 ## HOW TO RUN
 
 ```bash
-# Idris2 ABI
+# Idris2 ABI (4 modules)
 idris2 --build verisim-modular-experiment.ipkg
 
-# Julia test suites (6 files, 145 assertions)
-for f in test/*.jl; do julia --project=. $f; done
+# Julia package test suite (145 assertions, 6 suites)
+just test                    # or: julia --project=. -e 'using Pkg; Pkg.test()'
+
+# Zig CLI unit tests
+just cli-test
+
+# Build + run a VCL query end-to-end
+just cli-build-release
+just cli-query "PROOF INTEGRITY FOR abababababababababababababababababab"
 ```
 
 ## LIFECYCLE HOOKS
