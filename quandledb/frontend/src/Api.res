@@ -83,3 +83,42 @@ let fetchStatistics = async (): result<Types.statistics, string> => {
   | Error(e) => Error(e)
   }
 }
+
+let postQuery = async (
+  ~src: string,
+  ~format: string="auto",
+  ~maxRows: int=1000,
+): result<Types.queryResponse, Types.queryError> => {
+  try {
+    let bodyObj = Js.Dict.empty()
+    Js.Dict.set(bodyObj, "query",    Js.Json.string(src))
+    Js.Dict.set(bodyObj, "format",   Js.Json.string(format))
+    Js.Dict.set(bodyObj, "max_rows", Js.Json.number(Belt.Int.toFloat(maxRows)))
+    let bodyStr = Js.Json.stringify(Js.Json.object_(bodyObj))
+
+    let resp = await fetch(baseUrl ++ "/api/query", {
+      "method": "POST",
+      "headers": {"Content-Type": "application/json"},
+      "body": bodyStr,
+    })
+    let json = await responseJson(resp)
+
+    if responseOk(resp) {
+      switch Decoders.decodeQueryResponse(json) {
+      | Ok(r) => Ok(r)
+      | Error(e) =>
+        Error({Types.errorKind: "decode_error", message: e, line: None, col: None})
+      }
+    } else {
+      Error(Decoders.decodeQueryError(json))
+    }
+  } catch {
+  | exn =>
+    Error({
+      Types.errorKind: "network_error",
+      message: Js.String2.make(exn),
+      line: None,
+      col: None,
+    })
+  }
+}

@@ -34,6 +34,7 @@ module NavBar = {
       <div className="navbar-links">
         {navLink(Route.Dashboard, "Dashboard")}
         {navLink(Route.KnotList, "Knots")}
+        {navLink(Route.Query, "Query")}
       </div>
     </nav>
   }

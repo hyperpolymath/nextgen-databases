@@ -7,6 +7,7 @@ type t =
   | Dashboard
   | KnotList
   | KnotDetail(string)
+  | Query
   | NotFound
 
 let fromPath = (path: string): t => {
@@ -19,6 +20,7 @@ let fromPath = (path: string): t => {
   | [] => Dashboard
   | ["knots"] => KnotList
   | ["knots", name] => KnotDetail(name)
+  | ["query"] => Query
   | _ => NotFound
   }
 }
@@ -28,6 +30,7 @@ let toPath = (route: t): string =>
   | Dashboard => "/"
   | KnotList => "/knots"
   | KnotDetail(name) => "/knots/" ++ name
+  | Query => "/query"
   | NotFound => "/404"
   }
 

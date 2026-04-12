@@ -21,6 +21,8 @@ type msg =
   | SetFilters(Types.filters)
 
 @val external pushState: (Js.Nullable.t<string>, string, string) => unit = "history.pushState"
+@val external addWindowEventListener: (string, 'a => unit) => unit = "window.addEventListener"
+@val external removeWindowEventListener: (string, 'a => unit) => unit = "window.removeEventListener"
 
 @react.component
 let make = () => {
@@ -50,10 +52,8 @@ let make = () => {
   // Listen for popstate (browser back/forward)
   React.useEffect0(() => {
     let handler = _ => dispatch(UrlChanged)
-    Webapi.Dom.Window.addEventListener(Webapi.Dom.window, "popstate", handler)
-    Some(
-      () => Webapi.Dom.Window.removeEventListener(Webapi.Dom.window, "popstate", handler),
-    )
+    addWindowEventListener("popstate", handler)
+    Some(() => removeWindowEventListener("popstate", handler))
   })
 
   // Fetch data when route changes
@@ -61,7 +61,6 @@ let make = () => {
     switch model.route {
     | Dashboard =>
       if model.stats == NotAsked {
-        dispatch(GotStatistics(Error(""))->ignore)
         let _ = {
           open Promise
           Api.fetchStatistics()->then(result => {
@@ -89,6 +88,7 @@ let make = () => {
           })
         }
       }
+    | Query => ()
     | NotFound => ()
     }
     None
@@ -124,6 +124,7 @@ let make = () => {
         />
       | KnotDetail(_) =>
         <Page_KnotDetail knot={model.knotDetail} onNavigate=navigate />
+      | Query => <Page_Query />
       | NotFound =>
         <div className="not-found">
           <h1> {React.string("404 - Not Found")} </h1>

@@ -54,3 +54,32 @@ let emptyFilters: filters = {
   genus: None,
   nameSearch: "",
 }
+
+// ── KRL/SQL query types ───────────────────────────────────────────────────────
+
+type stageTrace = {
+  stage: string,
+  rowsIn: int,
+  rowsOut: int,
+  elapsedMs: float,
+  note: string,
+}
+
+type queryResponse = {
+  rows: array<Js.Json.t>,
+  count: int,
+  parseTimeMs: float,
+  evalTimeMs: float,
+  totalMs: float,
+  pushdownUsed: bool,
+  parseSource: string,
+  warnings: array<string>,
+  trace: array<stageTrace>,
+}
+
+type queryError = {
+  errorKind: string,
+  message: string,
+  line: option<int>,
+  col: option<int>,
+}
