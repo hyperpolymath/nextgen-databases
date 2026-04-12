@@ -1,0 +1,199 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+
+= VeriSimDB — Show Me The Receipts
+:toc: preamble
+:icons: font
+
+The README makes claims. This file backs them up with code paths, honest
+caveats, and enough structural detail for an external reviewer to know where
+to look when something goes wrong.
+
+== Claim 1: "100% drift detection and repair rate across 1000 entities"
+
+[quote, README.adoc §Drift Detection Demo]
+____
+Detection rate: 100.0%
+Repair rate: 100.0%
+Consistency rate: 100.0%
+____
+
+=== How it works
+
+`demos/drift-detection/run_demo.exs` creates 1,000 octad entities, corrupts 50
+of them (semantic/vector/graph divergence), then runs the full
+`VeriSim.DriftMonitor` → `StorageRegenerator` pipeline. The demo exits cleanly
+only when `VeriSim.EntityServer.get/1` returns consistent state for every
+entity.
+
+The detection path: `rust-core/verisim-drift/` measures divergence between
+modality pairs using cosine similarity (Vector ↔ Semantic) and Jaccard index
+(Document ↔ Semantic). Scores above configurable thresholds trigger a
+`DriftEvent`, which `VeriSim.DriftMonitor` routes to the normalizer.
+
+The repair path: `rust-core/verisim-normalizer/src/storage_regenerator.rs`
+(`StorageRegenerator`) identifies the most authoritative modality and
+regenerates drifted modalities from it — six cross-regeneration pairs (Document
+→ Vector, Document → Semantic, Semantic → Graph, etc.). Regeneration uses
+FNV-1a trigram hashing to 384-dim embeddings for Document → Vector, and
+keyword extraction for Document → Semantic.
+
+=== Honest caveat
+
+The demo runs in-memory on a single node — both detection and repair are
+synchronous in this configuration. Production deployments with the Elixir OTP
+supervision tree and persistent storage (redb + Tantivy WAL) have higher
+latency. The 100% rates reflect the in-memory ephemeral case; network partitions
+or storage engine failures are handled by OTP supervision restart, not by the
+normalizer.
+
+=== Code path
+
+| File | What it does |
+|------|-------------|
+| `rust-core/verisim-drift/src/lib.rs` | Drift score computation across modality pairs |
+| `rust-core/verisim-normalizer/src/storage_regenerator.rs` | Cross-modality regeneration (68 tests) |
+| `elixir-orchestration/lib/verisim/drift_monitor.ex` | OTP GenServer: drift event coordinator |
+| `elixir-orchestration/lib/verisim/entity_server.ex` | Per-entity GenServer under DynamicSupervisor |
+| `demos/drift-detection/run_demo.exs` | Runnable demo: 1000 entities, 50 corrupted |
+
+== Claim 2: "Eight modalities per entity — Graph, Vector, Tensor, Semantic, Document, Temporal, Provenance, Spatial"
+
+[quote, README.adoc §The Octad]
+____
+Each entity in VeriSimDB can have representations across eight modalities.
+Drift detection operates across all of them.
+____
+
+=== How it works
+
+`rust-core/verisim-octad/` defines the unified `OctadStore` type. Each octad
+entity carries one optional value per modality. The eight Rust storage backends
+are independent crates:
+
+| Modality | Crate | Storage engine |
+|----------|-------|----------------|
+| Graph | `verisim-graph` | Pure Rust `SimpleGraphStore` (RDF triples + property graph) |
+| Vector | `verisim-vector` | HNSW in-memory similarity index |
+| Tensor | `verisim-tensor` | ndarray / Burn multi-dimensional arrays |
+| Semantic | `verisim-semantic` | CBOR proof blobs (ciborium) |
+| Document | `verisim-document` | Tantivy full-text (LZ4 compressed) |
+| Temporal | `verisim-temporal` | chrono version history + time-series |
+| Provenance | `verisim-provenance` | SHA-256 hash-chain origin tracking |
+| Spatial | `verisim-spatial` | R-tree geospatial index (radius/bounds/nearest) |
+
+`OctadBuilder` in `rust-core/verisim-octad/` provides a fluent API to populate
+any subset of modalities before creating an entity. Unset modalities are `None`
+— no phantom drift signals.
+
+=== Honest caveat
+
+Tensor modality is the most research-stage of the eight. The storage engine
+compiles and tests pass, but real-world use cases (beyond numeric arrays) are
+still being refined. The README acknowledges "novel applications, details
+forthcoming." Do not rely on the Tensor modality for production data without
+reviewing the open issues in `docs/`.
+
+== Claim 3: "VCL query language with dependent types and proof certificates (VCL-UT)"
+
+[quote, README.adoc §How It Compares]
+____
+Query language: VCL (with dependent types)
+Formal verification: VCL-UT (proof certificates)
+____
+
+=== How it works
+
+VCL (VeriSim Consonance Language) is the native query interface — NOT SQL.
+The built-in Elixir VCL parser lives in `elixir-orchestration/lib/verisim/vcl/`
+and translates VCL ASTs against flat-file stores via `FileExecutor`. The parser
+handles `FETCH`, `FILTER`, `GROUP`, `FEDERATION`, and `PROOF` clauses.
+
+VCL-UT extends VCL with typed proof certificates. Eleven proof types are
+supported: `EXISTENCE`, `INTEGRITY`, `CONSISTENCY`, `PROVENANCE`, `FRESHNESS`,
+`ACCESS`, `CITATION`, `CUSTOM`, `ZKP`, `PROVEN`, `SANCTIFY`. Multi-proof
+queries (`PROOF A(x) AND B(y)`) parse and split correctly.
+
+The Idris2 ABI layer (`src/abi/`) provides formal dependent-type specifications
+for VCL query shapes; proof certificates are verified against the ABI before
+storage. The `proven` library integration bridges to external certificate-based
+JSON/CBOR verification.
+
+=== Honest caveat
+
+VCL federation (cross-store queries against remote VeriSimDB instances) is
+currently local-only. The `FileExecutor` handles `FEDERATION` clauses against
+local flat files; the multi-store remote executor is planned but not
+implemented. Do not use VCL for cross-instance federation in production.
+
+The ReScript VCL Playground in `panll/` connects to the real backend API with
+a demo-mode fallback — the fallback is active when `verisim-api` is not running
+locally.
+
+== Dogfooded Across The Account
+
+[cols="1,2,2", options="header"]
+|===
+| Technology / Pattern | Role in VeriSimDB | Also Used In
+
+| *Rust workspace (12 crates)*
+| `rust-core/` — each modality is a separate crate (`verisim-graph`, `-vector`,
+  `-tensor`, `-semantic`, `-document`, `-temporal`, `-provenance`, `-spatial`,
+  `-octad`, `-drift`, `-normalizer`, `-api`); Cargo workspace coordinates them
+| ephapax (17-crate Rust workspace), panic-attack (Rust analysis engine),
+  hypatia (`src/rust/` adapters + CLI), a2ml-rs, k9-rs
+
+| *Elixir/OTP orchestration*
+| `elixir-orchestration/` — one `EntityServer` GenServer per entity under
+  `DynamicSupervisor`; `DriftMonitor`, `QueryRouter`, `SchemaRegistry` as OTP
+  GenServers; fault isolation: one crashed entity does not affect others
+| hypatia (8 OTP GenServers), burble (room-per-GenServer, DynamicSupervisor),
+  gitbot-fleet (bot GenServers)
+
+| *Idris2 ABI + Zig FFI standard*
+| `src/abi/` — Idris2 ABI definitions for VCL proof types and octad entity
+  contracts; Zig FFI bridge for C-ABI runtime interop
+| gossamer (`src/interface/abi/`), burble (`src/Burble/ABI/`), ephapax (`idris2/`),
+  typed-wasm, tangle — universal ABI/FFI pattern across the estate
+
+| *Stapeln container ecosystem*
+| `container/compose.toml` (selur-compose stack), `container/.gatekeeper.yaml`
+  (svalinn edge gateway), `container/manifest.toml` (.ctp bundle manifest);
+  Chainguard base images throughout
+| burble (`containers/compose.toml`), hypatia (Containerfile), boj-server,
+  all containerised repos via stapeln policy
+
+| *VCL (VeriSim Consonance Language)*
+| Native query interface; built-in Elixir parser + FileExecutor; VCL-UT proof
+  certificates; ReScript Playground panel via PanLL
+| hypatia (`lib/vcl/` — VCL client GenServer, file executor, cross-repo analytics);
+  nextgen-databases monorepo siblings (QuandleDB, LithoGlyph)
+|===
+
+== File Map
+
+[cols="1,3", options="header"]
+|===
+| Path | What's There
+
+| `rust-core/verisim-octad/` | Unified `OctadStore` + `OctadBuilder` — the entity model
+| `rust-core/verisim-drift/` | Drift score computation (cosine similarity, Jaccard index)
+| `rust-core/verisim-normalizer/src/storage_regenerator.rs` | Cross-modality regeneration (68 tests, 6 source→target pairs)
+| `rust-core/verisim-api/` | HTTP API — REST endpoint (8080/8090/8091/8092 per project)
+| `elixir-orchestration/lib/verisim/entity_server.ex` | Per-entity GenServer
+| `elixir-orchestration/lib/verisim/drift_monitor.ex` | Drift event coordinator
+| `elixir-orchestration/lib/verisim/vcl/` | VCL parser, FileExecutor, query functions
+| `elixir-orchestration/lib/verisim/hypatia/` | Hypatia integration: ScanIngester, PatternQuery, DispatchBridge (37 tests)
+| `connectors/clients/` | 5 client SDKs (Rust, Elixir, ReScript, Julia, Gleam)
+| `connectors/test-infra/` | selur-compose: 7 databases for federation adapter integration tests
+| `container/Containerfile` | Chainguard-based container (in-memory or persistent build arg)
+| `container/compose.toml` | Full stack: rust-core + elixir + svalinn gateway
+| `demos/drift-detection/run_demo.exs` | Runnable demo: 1000 entities, 50 corrupted, 100% detect+repair
+| `src/abi/` | Idris2 ABI definitions — VCL types, proof certificates, octad contracts
+|===
+
+== Questions?
+
+Open an issue or reach out at j.d.a.jewell@open.ac.uk. For instance
+deployment, each consuming project should run its own VeriSimDB container on a
+unique port — do not share the dev instance across projects. See
+`CLAUDE.md §CRITICAL: Instance Policy` for the port assignment table.
