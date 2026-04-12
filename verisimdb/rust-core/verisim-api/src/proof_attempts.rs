@@ -6,6 +6,7 @@
 //!
 //! | Method | Path                                      | Purpose                           |
 //! |--------|-------------------------------------------|-----------------------------------|
+//! | GET    | /proof_attempts?limit=N&offset=M          | List attempt rows (paged)         |
 //! | POST   | /proof_attempts                           | Insert a single attempt row       |
 //! | GET    | /proof_attempts/strategy?class=X&limit=N  | Recommend best provers for class  |
 //! | GET    | /proof_attempts/certificates?class=X      | PROVEN/pending cert status        |
@@ -15,10 +16,13 @@
 //! parsing only (inbound from ClickHouse, never emitted to callers).
 //!
 //! The ClickHouse URL is read from `VERISIM_CLICKHOUSE_URL` at request time.
+//! Optional write auth: if `VERISIM_PROOF_ATTEMPTS_TOKEN` is set, callers must
+//! provide either `X-Proof-Attempts-Token: <token>` or
+//! `Authorization: Bearer <token>` on `POST /proof_attempts`.
 
 use axum::{
     extract::Query,
-    http::StatusCode,
+    http::{HeaderMap, StatusCode},
     response::Response,
 };
 use reqwest::Client;
@@ -51,6 +55,28 @@ fn ch_url() -> String {
         .unwrap_or_else(|_| "http://localhost:8123".to_string())
 }
 
+fn required_insert_token() -> Option<String> {
+    std::env::var("VERISIM_PROOF_ATTEMPTS_TOKEN")
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+}
+
+fn provided_insert_token(headers: &HeaderMap) -> Option<String> {
+    if let Some(v) = headers
+        .get("x-proof-attempts-token")
+        .and_then(|v| v.to_str().ok())
+    {
+        return Some(v.trim().to_string());
+    }
+
+    headers
+        .get("authorization")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.strip_prefix("Bearer "))
+        .map(|v| v.trim().to_string())
+}
+
 // ── Inbound proof-attempt row (matches echidnabot VeriSimWriter schema) ───────
 
 /// A single proof attempt submitted by echidnabot.
@@ -79,6 +105,7 @@ pub struct ProofAttemptRow {
 #[derive(Debug, Deserialize)]
 pub struct ListParams {
     pub limit: Option<usize>,
+    pub offset: Option<usize>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -94,14 +121,15 @@ pub struct ClassParam {
 
 // ── Handlers ─────────────────────────────────────────────────────────────────
 
-/// GET /proof_attempts?limit=N
+/// GET /proof_attempts?limit=N&offset=M
 ///
 /// Returns up to `limit` (default 1000, max 20000) recent proof-attempt rows
 /// from ClickHouse as an A2ML document for retraining the Julia ML models.
 pub async fn list_proof_attempts(
     Query(params): Query<ListParams>,
 ) -> Response {
-    let limit = params.limit.unwrap_or(1000).min(20000);
+    let limit = params.limit.unwrap_or(1000).clamp(1, 20000);
+    let offset = params.offset.unwrap_or(0);
 
     let sql = format!(
         "SELECT attempt_id, obligation_id, repo, file, claim, obligation_class, \
@@ -110,6 +138,7 @@ pub async fn list_proof_attempts(
          FROM verisim.proof_attempts \
          ORDER BY started_at DESC \
          LIMIT {limit} \
+         OFFSET {offset} \
          FORMAT JSONEachRow"
     );
 
@@ -148,8 +177,31 @@ pub async fn list_proof_attempts(
 /// Inserts a single attempt row into `verisim.proof_attempts` via the
 /// ClickHouse HTTP INSERT … FORMAT JSONEachRow endpoint.
 pub async fn insert_proof_attempt(
+    headers: HeaderMap,
     axum::Json(row): axum::Json<ProofAttemptRow>,
 ) -> Response {
+    if let Some(expected) = required_insert_token() {
+        match provided_insert_token(&headers) {
+            Some(provided) if provided == expected => {}
+            Some(_) => {
+                return a2ml_response(
+                    StatusCode::UNAUTHORIZED,
+                    a2ml_error_detail("invalid_proof_attempts_token", 401, "Token mismatch"),
+                );
+            }
+            None => {
+                return a2ml_response(
+                    StatusCode::UNAUTHORIZED,
+                    a2ml_error_detail(
+                        "proof_attempts_auth_required",
+                        401,
+                        "Set X-Proof-Attempts-Token or Authorization: Bearer",
+                    ),
+                );
+            }
+        }
+    }
+
     let url = format!(
         "{}/?query=INSERT+INTO+verisim.proof_attempts+FORMAT+JSONEachRow",
         ch_url()
