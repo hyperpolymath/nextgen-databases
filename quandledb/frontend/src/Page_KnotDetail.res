@@ -54,7 +54,17 @@ let make = (
                   "Seifert Circles",
                   k.seifertCircleCount->Belt.Option.map(Belt.Int.toString),
                 )}
+                {renderOptField(
+                  "Determinant",
+                  k.determinant->Belt.Option.map(Belt.Int.toString),
+                )}
+                {renderOptField(
+                  "Signature",
+                  k.signature->Belt.Option.map(Belt.Int.toString),
+                )}
+                {renderOptField("Alexander Polynomial", k.alexanderDisplay)}
                 {renderOptField("Jones Polynomial", k.jonesDisplay)}
+                {renderOptField("HOMFLY-PT", k.homflyPolynomial)}
               </tbody>
             </table>
           </div>

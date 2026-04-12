@@ -19,17 +19,23 @@
 
 == v0.2.0 - Resolution Language (KRL)
 
-* [ ] KRL (Knot Resolution Language) parser
-* [ ] Query DSL for topological predicates
-* [ ] Query editor in frontend with syntax highlighting
-* [ ] Composable predicates via text interface
+* [x] KRL (Knot Resolution Language) parser (recursive-descent, 9 precedence levels)
+* [x] SQL→KRL frontend (SELECT/WHERE/ORDER BY/LIMIT desugaring)
+* [x] KRL evaluator (filter, sort, take, skip, return, group_by, aggregate, find_equivalent)
+* [x] Predicate pushdown to Skein.jl (crossing_number, writhe, genus, determinant, signature)
+* [x] Query editor in frontend with Ctrl+Enter shortcut and example quick-load buttons
+* [x] Composable predicates via text interface (AND/OR/NOT, nested parentheses)
+* [x] Per-stage execution trace panel (rows_in/out, elapsed_ms, note)
+* [x] Circuit-breaker fault isolation (Skein DB + semantic sidecar)
+* [x] `/health` and `/metrics` (Prometheus) endpoints
+* [x] DB-free seam test suite (8 seams, MockDataProvider + MockSemProvider)
 
 == v0.3.0 - Extended Invariants
 
-* [ ] Alexander polynomial computation and display
-* [ ] HOMFLY-PT polynomial
-* [ ] Knot signature
-* [ ] Knot determinant
+* [x] Alexander polynomial display (`format_alexander`: sparse coeff map → t^n notation)
+* [x] HOMFLY-PT polynomial (on-demand via KnotTheory.jl, bounded to ≤12 crossings)
+* [x] Knot signature (surfaced from Skein.jl schema to API and frontend)
+* [x] Knot determinant (surfaced to frontend; filterable in KRL and SQL)
 
 == v0.4.0 - Links and Tangles
 

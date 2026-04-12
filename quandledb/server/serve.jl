@@ -475,25 +475,136 @@ function format_jones(jp::String)
     replace(s, "q^" => "q^")
 end
 
-function knot_to_dict(record::KnotRecord; semantic=nothing)
+"""
+    format_alexander(poly) -> Union{String, Nothing}
+
+Pretty-print a stored Alexander polynomial.  The serialised form is
+`"exp:coeff,exp:coeff,..."` (produced by `_serialise_int_poly` in KnotTheoryExt).
+Renders using the variable `t`, e.g. `"-1:1,0:-3,1:1"` → `"t⁻¹ - 3 + t"`.
+Returns `nothing` for a nothing/missing input.
+"""
+function format_alexander(poly::Nothing)
+    nothing
+end
+
+function format_alexander(poly::String)
+    try
+        terms = String[]
+        for pair in split(poly, ",")
+            parts = split(pair, ":")
+            length(parts) == 2 || continue
+            exp  = parse(Int, parts[1])
+            coef = parse(Int, parts[2])
+            coef == 0 && continue
+            base = exp == 0 ? "" :
+                   exp == 1 ? "t" :
+                   exp == -1 ? "t⁻¹" :
+                   exp > 0 ? "t^$(exp)" : "t^($(exp))"
+            if coef == 1
+                push!(terms, isempty(base) ? "1" : base)
+            elseif coef == -1
+                push!(terms, isempty(base) ? "-1" : "-$(base)")
+            else
+                push!(terms, isempty(base) ? string(coef) : "$(coef)$(base)")
+            end
+        end
+        isempty(terms) && return "0"
+        # Join with sign-aware spacing
+        result = terms[1]
+        for t in terms[2:end]
+            if startswith(t, "-")
+                result *= " - " * t[2:end]
+            else
+                result *= " + " * t
+            end
+        end
+        result
+    catch
+        poly   # fall back to raw string on any parse failure
+    end
+end
+
+"""
+    format_homfly(poly) -> Union{String, Nothing}
+
+Render a HOMFLY-PT polynomial (Dict{Tuple{Int,Int},Int} keyed by (l-exp, m-exp))
+as a human-readable string, e.g. `"-l⁻¹m² + lm²"`.
+"""
+function format_homfly(poly::Nothing)
+    nothing
+end
+
+function format_homfly(poly::Dict)
+    isempty(poly) && return "0"
+    var_str = (exp::Int, letter::String) ->
+        exp == 0  ? "" :
+        exp == 1  ? letter :
+        exp == -1 ? "$(letter)⁻¹" :
+        exp > 0   ? "$(letter)^$(exp)" : "$(letter)^($(exp))"
+    terms = String[]
+    for (le, me) in sort(collect(keys(poly)))
+        c = poly[(le, me)]
+        c == 0 && continue
+        lpart = var_str(le, "l")
+        mpart = var_str(me, "m")
+        mono  = lpart * mpart
+        isempty(mono) && (mono = "1")
+        if c == 1
+            push!(terms, mono)
+        elseif c == -1
+            push!(terms, "-$(mono)")
+        else
+            push!(terms, "$(c)$(mono)")
+        end
+    end
+    isempty(terms) && return "0"
+    result = terms[1]
+    for t in terms[2:end]
+        result *= startswith(t, "-") ? " - " * t[2:end] : " + " * t
+    end
+    result
+end
+
+"""
+    compute_homfly(record) -> Union{String, Nothing}
+
+Attempt on-demand HOMFLY-PT computation via KnotTheory.jl.  Skips knots with
+more than 12 crossings (state-sum is exponential) and silently returns `nothing`
+on any error.
+"""
+function compute_homfly(record::KnotRecord)
+    record.crossing_number > 12 && return nothing
+    isnothing(record.pd_code) && return nothing
+    try
+        pd   = to_planardiagram(record)     # requires KnotTheory.jl loaded
+        raw  = KnotTheory.homfly_polynomial(pd)
+        format_homfly(raw)
+    catch
+        nothing
+    end
+end
+
+function knot_to_dict(record::KnotRecord; semantic=nothing, homfly=nothing)
     Dict{String, Any}(
-        "id" => record.id,
-        "name" => record.name,
-        "gauss_code" => record.gauss_code.crossings,
-        "diagram_format" => record.diagram_format,
-        "crossing_number" => record.crossing_number,
-        "writhe" => record.writhe,
-        "genus" => record.genus,
+        "id"                   => record.id,
+        "name"                 => record.name,
+        "gauss_code"           => record.gauss_code.crossings,
+        "diagram_format"       => record.diagram_format,
+        "crossing_number"      => record.crossing_number,
+        "writhe"               => record.writhe,
+        "genus"                => record.genus,
         "seifert_circle_count" => record.seifert_circle_count,
-        "determinant" => record.determinant,
-        "signature" => record.signature,
+        "determinant"          => record.determinant,
+        "signature"            => record.signature,
         "alexander_polynomial" => record.alexander_polynomial,
-        "jones_polynomial" => record.jones_polynomial,
-        "jones_display" => format_jones(record.jones_polynomial),
-        "metadata" => record.metadata,
-        "semantic" => semantic,
-        "created_at" => string(record.created_at),
-        "updated_at" => string(record.updated_at),
+        "alexander_display"    => format_alexander(record.alexander_polynomial),
+        "jones_polynomial"     => record.jones_polynomial,
+        "jones_display"        => format_jones(record.jones_polynomial),
+        "homfly_polynomial"    => homfly,
+        "metadata"             => record.metadata,
+        "semantic"             => semantic,
+        "created_at"           => string(record.created_at),
+        "updated_at"           => string(record.updated_at),
     )
 end
 
@@ -610,7 +721,10 @@ end
 function handle_knot_detail(db::SkeinDB, sdb::SemanticIndexDB, name::String)
     record = fetch_knot(db, name)
     isnothing(record) && return error_response("Knot '$name' not found"; status = 404)
-    json_response(knot_to_dict(record; semantic = semantic_summary_by_name(sdb, record.name)))
+    homfly = compute_homfly(record)
+    json_response(knot_to_dict(record;
+        semantic = semantic_summary_by_name(sdb, record.name),
+        homfly   = homfly))
 end
 
 function handle_semantic_detail(db::SkeinDB, sdb::SemanticIndexDB, name::String)

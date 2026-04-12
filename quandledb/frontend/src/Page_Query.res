@@ -19,6 +19,10 @@ let examples = [
     "SELECT name, crossing_number, writhe\nFROM knots\nWHERE crossing_number = 4\nORDER BY name ASC",
   ),
   (
+    "By determinant",
+    "from knots\n| filter determinant == 3\n| return name, crossing_number, determinant, signature, alexander_polynomial",
+  ),
+  (
     "All invariants",
     "from invariants",
   ),
