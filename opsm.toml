@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# nextgen-databases workspace manifest.
+# OPSM is the native package manager for all nextgen database projects.
+#
+# Usage:
+#   opsm install              # install workspace deps
+#   opsm publish --registry hf  # publish all member packages
+#   opsm runtime install      # install pinned tool versions below
+
+[workspace]
+members = [
+  "lithoglyph",
+  "nqc",
+  "quandledb",
+  "typeql-experimental",
+  "verisim-core",
+  "verisimdb",
+  "verisim-modular-experiment",
+]
+
+default_registry = "hf"
+
+[workspace.opsm]
+trust_level = "hyperpolymath"
+
+[workspace.dependencies]
+proven = { git = "https://github.com/hyperpolymath/proven", registry = "hf" }
+groove = { git = "https://github.com/hyperpolymath/groove", registry = "hf" }
+
+[runtime]
+# Tool versions for nextgen-databases development.
+# All managed via OPSM runtime extension.
+rust = "nightly"        # VeriSimDB, QuandleDB core
+erlang = "26.2.0"       # Lithoglyph, NQC BEAM layer
+elixir = "1.16.0"
+zig = "0.14.0"          # ABI/FFI layer
+just = "1.46.0"
+deno = "2.6.10"
+
+# Idris2 is managed via the idris2 OPSM registry directly
+# opsm install idris2 --registry idris2

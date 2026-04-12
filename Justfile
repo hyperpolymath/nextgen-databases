@@ -5,6 +5,32 @@
 default:
     @just --list
 
+# ============================================================
+# OPSM — native package management for nextgen-databases
+# ============================================================
+
+# Install all workspace dependencies via OPSM
+deps:
+    @command -v opsm >/dev/null 2>&1 || (echo "OPSM not found — install from https://github.com/hyperpolymath/odds-and-sods-package-manager" && exit 1)
+    opsm install --workspace
+
+# Install pinned tool versions from [runtime] in opsm.toml
+runtime-install:
+    @command -v opsm >/dev/null 2>&1 || (echo "OPSM not found" && exit 1)
+    opsm runtime install --from opsm.toml
+
+# Publish all workspace members to the Hyperpolymath Forge Registry
+publish:
+    @command -v opsm >/dev/null 2>&1 || (echo "OPSM not found" && exit 1)
+    opsm publish --workspace --registry hf
+
+# Audit workspace packages (license + sustainability)
+audit:
+    @command -v opsm >/dev/null 2>&1 || (echo "OPSM not found" && exit 1)
+    opsm audit --workspace
+
+# ============================================================
+
 # Self-diagnostic — checks dependencies, permissions, paths
 doctor:
     @echo "Running diagnostics for nextgen-databases..."
