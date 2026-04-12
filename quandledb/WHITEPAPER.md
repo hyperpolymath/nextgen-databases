@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
-# KRL: A Knot-Theoretic Query Language for Topological Data
+# KRL: A Knot-Theoretic Resolution Language for Topological Data
 
 **Author:** Jonathan D.A. Jewell
 **Version:** 1.0
@@ -12,7 +12,7 @@
 
 ## Abstract
 
-We present KRL (Knot Resolution Language), a domain-specific query language for
+We present KRL (Knot Resolution Language), a domain-specific resolution language for
 QuandleDB that treats mathematical equivalence as a first-class query primitive.
 Traditional database query languages (SQL, GraphQL, Cypher) model equality as a
 binary predicate: two values are either equal or not. This model is fundamentally
@@ -411,7 +411,7 @@ KRL demonstrates that domain-specific query languages can and should respect
 the mathematical structure of their data. For topological data, binary equality
 is the wrong abstraction. By grounding query semantics in HoTT identity types,
 executing queries via equality saturation, and carrying provenance through
-results, KRL provides a query language that is mathematically honest about
+results, KRL provides a resolution language that is mathematically honest about
 what it means for two knots to be "the same."
 
 The broader lesson is that the choice of equality model is a fundamental design

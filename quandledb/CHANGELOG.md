@@ -41,4 +41,4 @@ History preserved in the absorption commit message.
 - fix: replace Obj.magic with typed Fetch API bindings in Api.res
 - chore: batch RSR compliance
 - docs: KRL safety model — two-tier architecture with TypeLL levels
-- feat: KRL query language design — SQL compat + dependent type variants
+- feat: KRL resolution language design — SQL compat + dependent type variants
