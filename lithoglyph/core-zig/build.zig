@@ -56,7 +56,7 @@ pub fn build(b: *std.Build) void {
     });
 
     // Unit tests for crypto
-    const _crypto_tests = b.addTest(.{
+    const crypto_tests = b.addTest(.{
         .name = "crypto-tests",
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/crypto_test.zig"),
@@ -66,8 +66,10 @@ pub fn build(b: *std.Build) void {
     });
 
     const run_blocks_tests = b.addRunArtifact(blocks_tests);
+    const run_crypto_tests = b.addRunArtifact(crypto_tests);
 
     const test_step = b.step("test", "Run unit tests");
     test_step.dependOn(&run_bridge_tests.step);
     test_step.dependOn(&run_blocks_tests.step);
+    test_step.dependOn(&run_crypto_tests.step);
 }

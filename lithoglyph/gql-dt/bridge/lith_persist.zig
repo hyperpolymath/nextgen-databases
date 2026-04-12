@@ -229,8 +229,10 @@ pub fn lith_debug_init_status() i32 {
 // ============================================================================
 
 test "basic persistence" {
-    try std.testing.expectEqual(LithStatus.ok, lith_init(null, 0));
-    try std.testing.expect(lith_is_init());
+    // lith_init returns i32: 0 = already initialised, 42 = fresh init (special marker)
+    const init_res = lith_init(null, 0);
+    try std.testing.expect(init_res == 0 or init_res == 42);
+    try std.testing.expect(lith_is_init(0));
 
     var row_id: u64 = 0;
     try std.testing.expectEqual(LithStatus.ok, lith_insert_row(
@@ -250,7 +252,7 @@ test "basic persistence" {
     try std.testing.expectEqual(@as(u64, 1), row_id);
     try std.testing.expectEqual(@as(u64, 1), lith_table_count("test", 4));
 
-    try std.testing.expectEqual(LithStatus.ok, lith_save());
+    try std.testing.expectEqual(LithStatus.ok, lith_save(0));
     try std.testing.expectEqual(LithStatus.ok, lith_close());
-    try std.testing.expect(!lith_is_init());
+    try std.testing.expect(!lith_is_init(0));
 }

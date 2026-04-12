@@ -64,7 +64,7 @@ test "double encryption detection" {
     const test_data = "test";
     try block.setPayload(test_data);
     
-    const key = [crypto.AES256_KEY_SIZE]u8{0};
+    const key = std.mem.zeroes([crypto.AES256_KEY_SIZE]u8);
     
     // First encryption
     try block.encrypt(key);

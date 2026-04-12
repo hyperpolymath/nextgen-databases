@@ -247,7 +247,7 @@ pub const Block = struct {
 
     /// Check if block payload is encrypted
     pub fn isEncrypted(self: *const Block) bool {
-        return self.header.encrypted;
+        return (self.header.flags & 0x02) != 0; // bit 1 = encrypted in BlockFlags
     }
 
     /// Derive encryption key from master key

@@ -3,6 +3,9 @@
 //
 // Provides AES-256-GCM encryption for block payloads
 // Designed to integrate with Svalinn Vault's existing crypto system
+//
+// NOTE: All crypto functions below are PLACEHOLDERS for structure only.
+// Real implementation must use libsodium or std.crypto.aead.aes_gcm.
 
 const std = @import("std");
 const builtin = @import("builtin");
@@ -15,6 +18,9 @@ const blocks = @import("blocks.zig");
 pub const AES256_KEY_SIZE: usize = 32; // 256 bits
 pub const AES_GCM_NONCE_SIZE: usize = 12; // 96 bits for GCM
 pub const AES_GCM_TAG_SIZE: usize = 16; // 128 bits authentication tag
+
+// Encrypted flag bit in BlockHeader.flags
+const ENCRYPTED_FLAG: u32 = 0x02; // bit 1 of BlockFlags
 
 // ============================================================
 // Error Types
@@ -38,15 +44,14 @@ pub fn encryptBlockPayload(
     block: *blocks.Block,
     key: [AES256_KEY_SIZE]u8,
 ) !void {
-    if (block.header.encrypted) {
+    if ((block.header.flags & ENCRYPTED_FLAG) != 0) {
         return; // Already encrypted
     }
 
-    // Create nonce: block_id (8 bytes) + counter (4 bytes)
-    var nonce = [AES_GCM_NONCE_SIZE]u8 = undefined;
-    @memcpy(&nonce[0..8], &block.header.block_id, 8);
-    @memcpy(&nonce[8..12], &block.header.sequence, 4);
-    // Last 4 bytes zero for now
+    // Create nonce: block_id (8 bytes) + lower 4 bytes of sequence
+    var nonce: [AES_GCM_NONCE_SIZE]u8 = undefined;
+    std.mem.writeInt(u64, nonce[0..8], block.header.block_id, .little);
+    std.mem.writeInt(u32, nonce[8..12], @truncate(block.header.sequence), .little);
 
     // Encrypt payload in-place
     const payload_len = block.header.payload_len;
@@ -59,20 +64,16 @@ pub fn encryptBlockPayload(
         return CryptoError.BufferTooSmall;
     }
 
-    // Encrypt using AES-GCM
-    // Note: In real implementation, we'd use a proper crypto library
-    // This is a placeholder showing the structure
     try aes256GcmEncryptInPlace(
-        &block.payload[0..payload_len],
+        block.payload[0..payload_len],
         &key,
         &nonce,
-        &block.payload[payload_len..payload_len + AES_GCM_TAG_SIZE]
+        block.payload[payload_len .. payload_len + AES_GCM_TAG_SIZE],
     );
 
     // Update header
     block.header.payload_len = @intCast(payload_len + AES_GCM_TAG_SIZE);
-    block.header.encrypted = true;
-    block.header.flags |= @as(u32, @bitCast(@intFromEnum(blocks.BlockFlags.encrypted)));
+    block.header.flags |= ENCRYPTED_FLAG;
 
     // Recalculate checksum of encrypted data
     block.header.checksum = blocks.crc32c(&block.payload, block.header.payload_len);
@@ -83,7 +84,7 @@ pub fn decryptBlockPayload(
     block: *blocks.Block,
     key: [AES256_KEY_SIZE]u8,
 ) !void {
-    if (!block.header.encrypted) {
+    if ((block.header.flags & ENCRYPTED_FLAG) == 0) {
         return; // Not encrypted
     }
 
@@ -95,22 +96,20 @@ pub fn decryptBlockPayload(
     const payload_len = total_len - AES_GCM_TAG_SIZE;
 
     // Create nonce (same as encryption)
-    var nonce = [AES_GCM_NONCE_SIZE]u8 = undefined;
-    @memcpy(&nonce[0..8], &block.header.block_id, 8);
-    @memcpy(&nonce[8..12], &block.header.sequence, 4);
+    var nonce: [AES_GCM_NONCE_SIZE]u8 = undefined;
+    std.mem.writeInt(u64, nonce[0..8], block.header.block_id, .little);
+    std.mem.writeInt(u32, nonce[8..12], @truncate(block.header.sequence), .little);
 
-    // Decrypt in-place
     try aes256GcmDecryptInPlace(
-        &block.payload[0..payload_len],
+        block.payload[0..payload_len],
         &key,
         &nonce,
-        &block.payload[payload_len..total_len]
+        block.payload[payload_len..total_len],
     );
 
     // Update header
     block.header.payload_len = @intCast(payload_len);
-    block.header.encrypted = false;
-    block.header.flags &= ~@as(u32, @bitCast(@intFromEnum(blocks.BlockFlags.encrypted)));
+    block.header.flags &= ~ENCRYPTED_FLAG;
 
     // Recalculate checksum of decrypted data
     block.header.checksum = blocks.crc32c(&block.payload, block.header.payload_len);
@@ -121,105 +120,94 @@ pub fn decryptBlockPayload(
 // ============================================================
 
 // Journal entries need special handling because they contain
-// both the operation and its inverse
+// both the operation and its inverse.
+// NOTE: caller owns `out_buf` and must ensure it is at least
+// `entry_data.len + AES_GCM_TAG_SIZE` bytes long.
 pub fn encryptJournalEntry(
-    entry_data: []u8,
+    entry_data: []const u8,
     key: [AES256_KEY_SIZE]u8,
     entry_id: u64,
-) ![]u8 {
-    // Similar to block encryption but with different nonce
-    var nonce = [AES_GCM_NONCE_SIZE]u8 = undefined;
-    @memcpy(&nonce[0..8], &entry_id, 8);
-    // Use fixed pattern for journal entries
+    out_buf: []u8,
+) !usize {
+    const needed = entry_data.len + AES_GCM_TAG_SIZE;
+    if (out_buf.len < needed) return CryptoError.BufferTooSmall;
+
+    // Build nonce: entry_id (8 bytes) + "JNL\0" marker
+    var nonce: [AES_GCM_NONCE_SIZE]u8 = undefined;
+    std.mem.writeInt(u64, nonce[0..8], entry_id, .little);
     nonce[8] = 'J';
     nonce[9] = 'N';
     nonce[10] = 'L';
     nonce[11] = 0;
 
-    // Allocate buffer for encrypted data + tag
-    var buffer: [entry_data.len + AES_GCM_TAG_SIZE]u8 = undefined;
-    @memcpy(&buffer[0..entry_data.len], entry_data);
+    @memcpy(out_buf[0..entry_data.len], entry_data);
 
-    // Encrypt
     try aes256GcmEncryptInPlace(
-        &buffer[0..entry_data.len],
+        out_buf[0..entry_data.len],
         &key,
         &nonce,
-        &buffer[entry_data.len..entry_data.len + AES_GCM_TAG_SIZE]
+        out_buf[entry_data.len..needed],
     );
 
-    return &buffer;
+    return needed;
 }
 
 // ============================================================
 // Key Derivation
 // ============================================================
 
-// Derive encryption key from master key and block type
+// Derive encryption key from master key and block type.
+// PLACEHOLDER — real implementation must use HKDF or BLAKE3-KDF.
 pub fn deriveBlockKey(
     master_key: []const u8,
     block_type: blocks.BlockType,
     block_id: u64,
 ) ![AES256_KEY_SIZE]u8 {
-    // Use BLAKE3 for key derivation (matches vault's crypto)
-    // In real implementation, use proper KDF
-    var key = [AES256_KEY_SIZE]u8 = undefined;
-    
-    // Simple XOR-based derivation for example
-    // Real implementation would use HKDF or similar
+    var key: [AES256_KEY_SIZE]u8 = undefined;
+    const bt: u8 = @truncate(@intFromEnum(block_type));
     for (0..AES256_KEY_SIZE) |i| {
-        if (i < master_key.len) {
-            key[i] = master_key[i] ^ @as(u8, @truncate(block_type)) ^ @as(u8, @truncate(block_id >> (i % 8)));
-        } else {
-            key[i] = @as(u8, @truncate(block_type)) ^ @as(u8, @truncate(block_id >> (i % 8)));
-        }
+        const shift: u6 = @intCast(i % 8);
+        const id_byte: u8 = @truncate(block_id >> shift);
+        key[i] = if (i < master_key.len) master_key[i] ^ bt ^ id_byte else bt ^ id_byte;
     }
-    
     return key;
 }
 
 // ============================================================
-// Placeholder Crypto Functions
-// (In real implementation, use libsodium or similar)
+// Placeholder Crypto Primitives
+// (Replace with libsodium / std.crypto.aead.aes_gcm in production)
 // ============================================================
 
 fn aes256GcmEncryptInPlace(
     data: []u8,
-    key: anytype,
-    nonce: anytype,
+    key: *const [AES256_KEY_SIZE]u8,
+    nonce: *const [AES_GCM_NONCE_SIZE]u8,
     tag_out: []u8,
 ) !void {
-    // This is a placeholder - real implementation would use
-    // a proper crypto library like libsodium or OpenSSL
-    
-    // For now, just XOR with key (INSECURE - for structure only!)
-    var key_bytes = @ptrCast([*]const u8, &key);
-    for (0..data.len) |i| {
-        data[i] ^= key_bytes[i % @intCast(key_bytes.len)];
+    _ = nonce; // placeholder — nonce not used in XOR stub
+    // INSECURE placeholder: XOR with key bytes only
+    for (data, 0..) |*byte, i| {
+        byte.* ^= key[i % AES256_KEY_SIZE];
     }
-    
-    // Fill tag with dummy data
-    for (0..tag_out.len) |i| {
-        tag_out[i] = @as(u8, @truncate(i));
+    // Fill tag with dummy pattern
+    for (tag_out, 0..) |*b, i| {
+        b.* = @truncate(i);
     }
 }
 
 fn aes256GcmDecryptInPlace(
     data: []u8,
-    key: anytype,
-    nonce: anytype,
+    key: *const [AES256_KEY_SIZE]u8,
+    nonce: *const [AES_GCM_NONCE_SIZE]u8,
     tag: []const u8,
 ) !void {
-    // Verify tag (dummy check)
-    for (0..tag.len) |i| {
-        if (tag[i] != @as(u8, @truncate(i))) {
-            return CryptoError.AuthenticationFailed;
-        }
+    _ = nonce; // placeholder
+    // Verify dummy tag
+    for (tag, 0..) |b, i| {
+        if (b != @as(u8, @truncate(i))) return CryptoError.AuthenticationFailed;
     }
-    
-    // Decrypt (same as encrypt for XOR)
-    var key_bytes = @ptrCast([*]const u8, &key);
-    for (0..data.len) |i| {
-        data[i] ^= key_bytes[i % @intCast(key_bytes.len)];
+    // INSECURE placeholder: XOR is its own inverse
+    for (data, 0..) |*byte, i| {
+        byte.* ^= key[i % AES256_KEY_SIZE];
     }
 }
