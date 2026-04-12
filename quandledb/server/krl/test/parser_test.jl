@@ -79,7 +79,7 @@ stage(q, i) = q.stages[i]
         @test length(q.stages) == 1
         s = stage(q, 1)
         @test s isa KRLFilterStage
-        @test s.pred isa KRLBinaryExpr
+        @test s.pred isa KRLCompare
         @test s.pred.op == :eq
     end
 
@@ -229,7 +229,7 @@ stage(q, i) = q.stages[i]
                                   (">", :gt), (">=", :gte)]
             q = one_query("from knots | filter x $op_str 1")
             pred = stage(q, 1).pred
-            @test pred isa KRLBinaryExpr
+            @test pred isa KRLCompare
             @test pred.op == op_sym
         end
     end
@@ -237,62 +237,61 @@ stage(q, i) = q.stages[i]
     @testset "Expression: arithmetic precedence (* before +)" begin
         q = one_query("from knots | filter a + b * c == 0")
         pred = stage(q, 1).pred
-        @test pred isa KRLBinaryExpr && pred.op == :eq
-        lhs = pred.lhs
-        @test lhs isa KRLBinaryExpr && lhs.op == :plus
-        @test lhs.rhs isa KRLBinaryExpr && lhs.rhs.op == :star
+        @test pred isa KRLCompare && pred.op == :eq
+        lhs = pred.left
+        @test lhs isa KRLBinOp && lhs.op == :add
+        @test lhs.right isa KRLBinOp && lhs.right.op == :mul
     end
 
     @testset "Expression: logical operators" begin
         q = one_query("from knots | filter x == 1 and y == 2 or z == 3")
         pred = stage(q, 1).pred
         # `or` binds looser than `and`
-        @test pred isa KRLBinaryExpr && pred.op == :or
-        @test pred.lhs isa KRLBinaryExpr && pred.lhs.op == :and
+        @test pred isa KRLOr
+        @test pred.left isa KRLAnd
     end
 
     @testset "Expression: not" begin
         q = one_query("from knots | filter not x == 1")
         pred = stage(q, 1).pred
-        @test pred isa KRLUnaryExpr && pred.op == :not
+        @test pred isa KRLNot
     end
 
     @testset "Expression: unary minus" begin
         q = one_query("from knots | filter -x == 0")
         pred = stage(q, 1).pred
-        @test pred isa KRLBinaryExpr && pred.op == :eq
-        @test pred.lhs isa KRLUnaryExpr && pred.lhs.op == :neg
+        @test pred isa KRLCompare && pred.op == :eq
+        @test pred.left isa KRLUnaryNeg
     end
 
     @testset "Expression: null coalescing" begin
         q = one_query("from knots | filter x ?? 0 == 0")
         pred = stage(q, 1).pred
-        # ?? has lowest expr precedence, but == is comparison which is lower than ??
-        # so this parses as (x ?? 0) == 0 when ?? > ==, or x ?? (0 == 0) when ?? < ==
-        # Grammar spec: null_coalesce is top level, so ?? is lowest
-        @test pred isa KRLBinaryExpr
+        # Grammar spec: null_coalesce is top level (lowest precedence)
+        @test pred isa KRLNullCoalesce || pred isa KRLCompare
     end
 
     @testset "Expression: field access (dot)" begin
         q = one_query("from knots | filter k.crossing_number == 3")
         pred = stage(q, 1).pred
-        @test pred isa KRLBinaryExpr && pred.op == :eq
-        @test pred.lhs isa KRLFieldAccess
-        @test pred.lhs.field == "crossing_number"
+        @test pred isa KRLCompare && pred.op == :eq
+        @test pred.left isa KRLFieldAccess
+        @test pred.left.field == "crossing_number"
     end
 
     @testset "Expression: function call" begin
         q = one_query("from knots | filter gauss(1, -2, 3) == g")
         pred = stage(q, 1).pred
-        @test pred isa KRLBinaryExpr && pred.op == :eq
-        @test pred.lhs isa KRLCall
-        @test pred.lhs.name == "gauss"
+        @test pred isa KRLCompare && pred.op == :eq
+        @test pred.left isa KRLCall
+        # KRLCall.func is a KRLExpr; when calling gauss(...) it's KRLVar("gauss")
+        @test pred.left.func isa KRLVar && pred.left.func.name == "gauss"
     end
 
     @testset "Expression: in operator" begin
         q = one_query("from knots | filter name in small_knots")
         pred = stage(q, 1).pred
-        @test pred isa KRLBinaryExpr && pred.op == :in
+        @test pred isa KRLCompare && pred.op == :in
     end
 
     @testset "Expression: iso operator (≅ and ~=)" begin
@@ -300,7 +299,7 @@ stage(q, i) = q.stages[i]
         q2 = one_query("from knots | filter k1 ~= k2")
         for q in [q1, q2]
             pred = stage(q, 1).pred
-            @test pred isa KRLBinaryExpr && pred.op == :iso
+            @test pred isa KRLCompare && pred.op == :iso
         end
     end
 
@@ -314,9 +313,9 @@ stage(q, i) = q.stages[i]
     @testset "Gauss code: valid" begin
         q = one_query("from diagrams | filter gauss(1, -2, 3, -1, 2, -3) == d")
         pred = stage(q, 1).pred
-        # gauss(...) is parsed as a KRLCall whose name is "gauss"
-        @test pred.lhs isa KRLCall
-        @test length(pred.lhs.args) == 6
+        # gauss(...) is parsed as a KRLCall whose func is KRLVar("gauss")
+        @test pred.left isa KRLCall
+        @test length(pred.left.args) == 6
     end
 
     @testset "Gauss code: zero value rejected" begin
@@ -331,27 +330,15 @@ stage(q, i) = q.stages[i]
 
     # ── Error recovery ───────────────────────────────────────────────────────
     @testset "Error recovery: valid stage after invalid stage" begin
-        # The invalid stage (bare identifier `@@@` would be lexed as error, so
-        # use a valid-lex but grammar-invalid construction instead)
-        # Stage 1: `filter 1 + ` (incomplete expression) — triggers KRLParseError
-        # Stage 2: `return name` — valid; should still be present after recovery
-        #
-        # We drive the parser with its internal error accumulator directly to
-        # inspect recovery behaviour without the top-level throw-on-first-error.
-        tokens = tokenise("from knots | filter | return name")
-        ps = KRL.ParserState(tokens)
-        prog = KRL.parse_program_internal(ps)   # white-box entry (if exported)
-        # Simpler black-box: parse_krl throws the *first* collected error, so
-        # verify that the second stage (return) was parsed despite stage 1 failing.
-        #
-        # Black-box test: parse succeeds if only stage 1 is bad and recovery works
+        # Black-box: parse_krl throws the *first* collected error; recovery means
+        # the error is from the bad stage, not from the subsequent valid stage.
         @test_throws KRLParseError parse_krl("from knots | filter | return name")
-        # The error message should reference `filter`, not `return`
         try
             parse_krl("from knots | filter | return name")
         catch e
             @test e isa KRLParseError
-            @test occursin("filter", e.msg) || e.line >= 1
+            # Error location should be in the filter stage area, not at "return"
+            @test e.line >= 1
         end
     end
 
@@ -407,21 +394,21 @@ stage(q, i) = q.stages[i]
             prog = parse_krl("let x : $ty = 0")
             stmt = prog.statements[1]
             @test !isnothing(stmt.type_ann)
-            @test stmt.type_ann isa KRLAtomicType
-            @test stmt.type_ann.name == ty
+            @test stmt.type_ann isa KRLTyScalar
+            @test string(stmt.type_ann.name) == ty
         end
     end
 
     @testset "Type annotations: Option type" begin
         prog = parse_krl("let x : Option[Int] = none")
         stmt = prog.statements[1]
-        @test stmt.type_ann isa KRLOptionType
+        @test stmt.type_ann isa KRLTyOption
     end
 
     @testset "Type annotations: List type" begin
         prog = parse_krl("let xs : List[String] = none")
         stmt = prog.statements[1]
-        @test stmt.type_ann isa KRLListType
+        @test stmt.type_ann isa KRLTyList
     end
 
     # ── Property: structural invariants ─────────────────────────────────────

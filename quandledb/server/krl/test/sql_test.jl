@@ -91,14 +91,14 @@ stage(q, i) = q.stages[i]
         q = sql_query("SELECT * FROM knots WHERE crossing_number <= 6")
         # stages: [filter, return]
         @test stage(q, 1) isa KRLFilterStage
-        @test stage(q, 1).pred isa KRLBinaryExpr
+        @test stage(q, 1).pred isa KRLCompare
         @test stage(q, 1).pred.op == :lte
     end
 
     @testset "WHERE with AND" begin
         q = sql_query("SELECT * FROM knots WHERE crossing_number >= 3 AND crossing_number <= 6")
         @test stage(q, 1) isa KRLFilterStage
-        @test stage(q, 1).pred.op == :and
+        @test stage(q, 1).pred isa KRLAnd
     end
 
     # ── ORDER BY clause ──────────────────────────────────────────────────────

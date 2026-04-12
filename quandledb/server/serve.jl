@@ -23,6 +23,12 @@ using SHA
 include("quandle_semantic.jl")
 using .QuandleSemantic
 
+include("Diagnostics.jl")
+include("krl/KRL.jl")
+using .KRL: parse_any, parse_krl, parse_sql, KRLParseError, KRLLexError,
+            eval_krl_program, make_eval_context, DataProvider, SemProvider,
+            eval_result_summary
+
 # -- Semantic sidecar ---------------------------------------------------------
 
 const SEMANTIC_SCHEMA_VERSION = 1
@@ -384,6 +390,80 @@ function parse_args(args)
     (; dbpath, port, static_dir, semantic_index)
 end
 
+# -- KRL provider implementations (wired to Skein + semantic sidecar) ---------
+
+"""
+    SkeinDataProvider(db, circuit_breaker)
+
+Concrete DataProvider wrapping the live Skein DB.
+All calls go through `cb` (a CircuitBreaker) so failures are isolated.
+"""
+struct SkeinDataProvider <: DataProvider
+    db::SkeinDB
+    cb::CircuitBreaker
+end
+
+function KRL.fetch_all(p::SkeinDataProvider; crossing_number=nothing, writhe=nothing,
+                       genus=nothing, determinant=nothing, signature=nothing,
+                       name_like=nothing, limit=nothing, kwargs...)
+    call_with_breaker!(p.cb, () -> begin
+        rows = query(p.db;
+            crossing_number = crossing_number,
+            writhe          = writhe,
+            genus           = genus,
+            determinant     = determinant,
+            signature       = signature,
+            name_like       = name_like,
+            limit           = something(limit, 50_000),
+        )
+        [knot_to_dict(r) for r in rows]
+    end)
+end
+
+function KRL.fetch_one(p::SkeinDataProvider, name::String)
+    call_with_breaker!(p.cb, () -> begin
+        r = fetch_knot(p.db, name)
+        isnothing(r) ? nothing : knot_to_dict(r)
+    end)
+end
+
+KRL.count(p::SkeinDataProvider) =
+    call_with_breaker!(p.cb, () -> count_knots(p.db))
+
+"""
+    SemanticSemProvider(sdb, circuit_breaker)
+
+Concrete SemProvider wrapping the semantic sidecar.
+"""
+struct SemanticSemProvider <: SemProvider
+    sdb::SemanticIndexDB
+    cb::CircuitBreaker
+end
+
+function KRL.equiv_buckets(p::SemanticSemProvider, name::String)
+    call_with_breaker!(p.cb, () -> begin
+        buckets = semantic_equivalence_buckets(p.sdb, name)
+        isnothing(buckets) ? nothing : buckets
+    end)
+end
+
+function KRL.fetch_invariants(p::SemanticSemProvider)
+    call_with_breaker!(p.cb, () -> begin
+        sql = "SELECT DISTINCT knot_name, jones_polynomial, alexander_polynomial,
+                       determinant, signature, quandle_key
+               FROM quandle_semantic_index ORDER BY knot_name LIMIT 10000"
+        rows = DBInterface.execute(p.sdb.conn, sql)
+        [Dict{String,Any}(
+            "name"                  => r[:knot_name],
+            "jones_polynomial"      => r[:jones_polynomial],
+            "alexander_polynomial"  => r[:alexander_polynomial],
+            "determinant"           => r[:determinant],
+            "signature"             => r[:signature],
+            "quandle_key"           => r[:quandle_key],
+        ) for r in rows]
+    end)
+end
+
 # -- JSON helpers -------------------------------------------------------------
 
 function format_jones(jp::Nothing)
@@ -612,6 +692,110 @@ function handle_semantic_index(sdb::SemanticIndexDB, params::Dict{String, String
     json_response(Dict("semantic_index" => rows, "count" => length(rows), "limit" => limit, "offset" => offset))
 end
 
+function handle_krl_query(data::DataProvider, sem::SemProvider,
+                         metrics::QueryMetrics, req::HTTP.Request)
+    t0 = time()
+    source = :unknown
+    error_class = nothing
+
+    body = try
+        body_str = String(req.body)
+        isempty(body_str) && return error_response("Request body is empty"; status=400)
+        JSON3.read(body_str, Dict{String, Any})
+    catch
+        return error_response("Request body is not valid JSON"; status=400)
+    end
+
+    src = get(body, "query", nothing)
+    isnothing(src) && return error_response("Missing 'query' field"; status=400)
+
+    fmt_hint = get(body, "format", "auto")
+    max_rows = min(Int(get(body, "max_rows", 1000)), 10_000)
+
+    # ── Parse phase ─────────────────────────────────────────────────────────
+    parse_t0 = time()
+    prog = try
+        fmt_hint == "sql" ? parse_sql(src) :
+        fmt_hint == "krl" ? parse_krl(src) :
+                            parse_any(src)
+    catch e
+        parse_ms = (time() - parse_t0) * 1000
+        if e isa KRLLexError || e isa KRLParseError
+            error_class = :parse_error
+            record_query!(metrics, source, (time()-t0)*1000; error_class)
+            return json_response(Dict(
+                "error"   => "parse_error",
+                "message" => sprint(showerror, e),
+                "line"    => hasproperty(e, :line) ? e.line : nothing,
+                "col"     => hasproperty(e, :col)  ? e.col  : nothing,
+                "parse_time_ms" => round(parse_ms, digits=2),
+            ); status=422)
+        end
+        rethrow()
+    end
+    parse_ms = (time() - parse_t0) * 1000
+
+    # Detect parse source from program structure
+    source = fmt_hint == "sql" ? :sql :
+             fmt_hint == "krl" ? :krl :
+             (occursin(r"^(SELECT|WITH)\b"i, lstrip(src)) ? :sql : :krl)
+
+    # ── Eval phase ──────────────────────────────────────────────────────────
+    eval_t0 = time()
+    result = try
+        ctx = make_eval_context(data, sem;
+                                max_rows  = max_rows,
+                                timeout_s = Float64(get(body, "timeout_s", 30)))
+        eval_krl_program(prog, ctx; parse_source=source)
+    catch e
+        eval_ms = (time() - eval_t0) * 1000
+        error_class =
+            e isa CircuitOpenError  ? :circuit_open :
+            e isa KRLEvalError && occursin("timeout", e.msg) ? :timeout : :eval_error
+        record_query!(metrics, source, (time()-t0)*1000; error_class)
+        status = error_class == :timeout ? 408 : 500
+        return json_response(Dict(
+            "error"        => string(error_class),
+            "message"      => sprint(showerror, e),
+            "parse_time_ms" => round(parse_ms, digits=2),
+            "eval_time_ms"  => round(eval_ms, digits=2),
+        ); status)
+    end
+    eval_ms = (time() - eval_t0) * 1000
+
+    record_query!(metrics, source, (time()-t0)*1000;
+                  pushdown = result.pushdown_used)
+
+    json_response(Dict(
+        "rows"          => result.rows,
+        "count"         => length(result.rows),
+        "parse_time_ms" => round(parse_ms, digits=2),
+        "eval_time_ms"  => round(eval_ms, digits=2),
+        "total_ms"      => round((time()-t0)*1000, digits=2),
+        "pushdown_used" => result.pushdown_used,
+        "parse_source"  => string(result.parse_source),
+        "warnings"      => result.warnings,
+        "trace"         => eval_result_summary(result)["trace"],
+    ))
+end
+
+function handle_health(skein_probe, sem_probe, krl_ok::Bool,
+                       metrics::QueryMetrics,
+                       cb_skein::CircuitBreaker,
+                       cb_sem::CircuitBreaker)
+    report = check_health(skein_probe, sem_probe, krl_ok, metrics, cb_skein, cb_sem)
+    d = health_report_dict(report)
+    status = report.overall == :ok ? 200 : report.overall == :degraded ? 200 : 503
+    json_response(d; status)
+end
+
+function handle_metrics(metrics::QueryMetrics,
+                        cb_skein::CircuitBreaker,
+                        cb_sem::CircuitBreaker)
+    txt = prometheus_text(metrics, cb_skein, cb_sem)
+    HTTP.Response(200, ["Content-Type" => "text/plain; version=0.0.4"], txt)
+end
+
 function handle_statistics(db::SkeinDB, sdb::SemanticIndexDB)
     stats = statistics(db)
 
@@ -641,44 +825,61 @@ end
 
 # -- Router ------------------------------------------------------------------
 
-function router(db::SkeinDB, sdb::SemanticIndexDB, static_dir::String, req::HTTP.Request)
-    uri = req.target
-    path = extract_path(uri)
+function router(db::SkeinDB, sdb::SemanticIndexDB, static_dir::String,
+                data::DataProvider, sem::SemProvider,
+                metrics::QueryMetrics,
+                cb_skein::CircuitBreaker, cb_sem::CircuitBreaker,
+                krl_ok::Bool,
+                req::HTTP.Request)
+    uri    = req.target
+    path   = extract_path(uri)
     params = extract_query_params(uri)
     method = uppercase(String(req.method))
 
     if method == "OPTIONS"
         return HTTP.Response(204, [
-            "Access-Control-Allow-Origin" => "*",
-            "Access-Control-Allow-Methods" => "GET, OPTIONS",
+            "Access-Control-Allow-Origin"  => "*",
+            "Access-Control-Allow-Methods" => "GET, POST, OPTIONS",
             "Access-Control-Allow-Headers" => "Content-Type",
         ])
     end
 
+    # ── POST endpoints ───────────────────────────────────────────────────────
+    if method == "POST"
+        path == "/api/query" && return handle_krl_query(data, sem, metrics, req)
+        return error_response("Method not allowed"; status = 405)
+    end
+
     method != "GET" && return error_response("Method not allowed"; status = 405)
 
-    if path == "/api/knots"
-        return handle_knots(db, sdb, params)
-    elseif path == "/api/semantic"
-        return handle_semantic_index(sdb, params)
-    elseif path == "/api/statistics"
-        return handle_statistics(db, sdb)
-    end
+    # ── GET endpoints ────────────────────────────────────────────────────────
+    path == "/health"          && return handle_health(
+        () -> (count_knots(db) >= 0, "$(count_knots(db)) knots"),
+        () -> begin
+            n = 0
+            for row in DBInterface.execute(sdb.conn, "SELECT COUNT(*) AS n FROM quandle_semantic_index")
+                n = Int(row[:n])
+            end
+            (true, "$n indexed")
+        end,
+        krl_ok, metrics, cb_skein, cb_sem)
+
+    path == "/metrics"         && return handle_metrics(metrics, cb_skein, cb_sem)
+    path == "/api/knots"       && return handle_knots(db, sdb, params)
+    path == "/api/semantic"    && return handle_semantic_index(sdb, params)
+    path == "/api/statistics"  && return handle_statistics(db, sdb)
 
     m_equiv = match(r"^/api/semantic-equivalents/(.+)$", path)
-    if !isnothing(m_equiv)
+    !isnothing(m_equiv) &&
         return handle_semantic_equivalents(db, sdb, m_equiv.captures[1])
-    end
 
     m_sem = match(r"^/api/semantic/(.+)$", path)
-    if !isnothing(m_sem)
+    !isnothing(m_sem) &&
         return handle_semantic_detail(db, sdb, m_sem.captures[1])
-    end
 
     m_knot = match(r"^/api/knots/(.+)$", path)
-    if !isnothing(m_knot)
+    !isnothing(m_knot) &&
         return handle_knot_detail(db, sdb, m_knot.captures[1])
-    end
 
     serve_static(static_dir, path)
 end
@@ -701,6 +902,11 @@ function main()
         println()
     end
 
+    # ── Circuit breakers ─────────────────────────────────────────────────────
+    cb_skein = CircuitBreaker("skein_db";    threshold=3, cooldown_s=30.0)
+    cb_sem   = CircuitBreaker("semantic_idx"; threshold=5, cooldown_s=20.0)
+
+    # ── Open databases ────────────────────────────────────────────────────────
     db = SkeinDB(config.dbpath; readonly = true)
     total = count_knots(db)
 
@@ -709,8 +915,26 @@ function main()
     sdb = SemanticIndexDB(semantic_path)
     indexed = rebuild_semantic_index!(sdb, db)
 
+    # ── Provider wrappers ─────────────────────────────────────────────────────
+    data = SkeinDataProvider(db, cb_skein)
+    sem  = SemanticSemProvider(sdb, cb_sem)
+
+    # ── Global metrics ────────────────────────────────────────────────────────
+    metrics = QueryMetrics()
+
+    # ── KRL parser self-test ──────────────────────────────────────────────────
+    krl_ok, krl_detail = krl_parser_selftest()
+
     println("Loaded $total knots from Skein database.")
     println("Indexed $indexed knots into semantic sidecar.")
+    println("KRL parser: $krl_detail")
+    println()
+    println("Endpoints:")
+    println("  GET  /health         — liveness + component status")
+    println("  GET  /metrics        — Prometheus exposition format")
+    println("  POST /api/query      — KRL or SQL query (JSON body {query: ...})")
+    println("  GET  /api/knots      — filtered knot list")
+    println("  GET  /api/statistics — database statistics")
     println()
     println("Starting server on http://localhost:$(config.port)")
     println("Press Ctrl+C to stop.")
@@ -719,7 +943,7 @@ function main()
     static_dir = abspath(config.static_dir)
     HTTP.serve(config.port) do req
         try
-            router(db, sdb, static_dir, req)
+            router(db, sdb, static_dir, data, sem, metrics, cb_skein, cb_sem, krl_ok, req)
         catch e
             @error "Request error" exception = (e, catch_backtrace())
             error_response("Internal server error"; status = 500)
