@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= VeriSimDB V Client — Deprecated (2026-04-12)
+:toc:
+
+== Status
+
+The V-lang VeriSimDB client (`src/`) is *deprecated* as of 2026-04-12
+following the estate-wide V-lang ban (2026-04-10).
+
+== Migration Target: Rust Client
+
+The canonical Rust client at `connectors/clients/rust/` provides identical
+coverage:
+
+[cols="1,1"]
+|===
+| V module (deprecated) | Rust module
+
+| `src/client.v`         | `src/client.rs`
+| `src/octad.v`          | `src/octad.rs`
+| `src/drift.v`          | `src/drift.rs`
+| `src/search.v`         | `src/search.rs`
+| `src/federation.v`     | `src/federation.rs`
+| `src/provenance.v`     | `src/provenance.rs`
+| `src/vcl.v`            | `src/vcl.rs`
+| `src/error.v`          | `src/error.rs`
+| `src/types.v`          | `src/types.rs`
+|===
+
+[source,toml]
+----
+[dependencies]
+verisimdb-client = { path = "connectors/clients/rust" }
+----
+
+== Auth Migration
+
+The V `Auth` discriminated union maps directly to the Rust enum:
+
+[source,rust]
+----
+use verisimdb_client::{Auth, Client};
+
+let client = Client::new("http://localhost:8200")
+    .with_auth(Auth::ApiKey("your-key".to_string()));
+----
