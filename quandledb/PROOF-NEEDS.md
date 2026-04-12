@@ -15,21 +15,34 @@ the derived action satisfies the three quandle axioms:
 2. For every `a`, the map `x ↦ x ▷ a` is a bijection (right-invertibility)
 3. `(a ▷ b) ▷ c = (a ▷ c) ▷ (b ▷ c)` (right self-distributivity)
 
-Current status: not proved; not tested. Essential — if presentations don't
-satisfy quandle axioms, the fingerprint is meaningless.
+Current status: **property-tested** (2026-04-12).
+- All three axioms verified algebraically for the dihedral quandle Z_p at
+  p ∈ {3, 5, 7, 11, 13} — see `server/test_quandle_axioms.jl` § 1.
+- Structural consistency of extracted presentations verified for standard
+  knots (trefoil, figure-eight, cinquefoil) — see § 2.
+- Remaining gap: formal proof that `extract_presentation` produces a
+  valid Wirtinger presentation for arbitrary connected PD codes.
 
 ### M2. Reidemeister invariance
 Statement: If diagrams D₁ and D₂ differ by a single Reidemeister move,
 their extracted presentations produce the same fingerprint.
 
-Current status: not proved; not tested on arbitrary R-move pairs.
+Current status: **property-tested for R1 and R2** (2026-04-12).
+- R1: kink injection + `r1_simplify` verified to reduce crossing count and
+  generator count — see `server/test_quandle_axioms.jl` § 5.
+- R2: braid word `s1.S1.s1.s1.s1` (trefoil + bigon) after `r2_simplify`
+  gives same dihedral colouring counts as canonical trefoil — § 6.
+- R3: not yet covered (no programmatic R3-inverse available in KnotTheory.jl).
+- Remaining gap: R3 invariance; formal proof via Wirtinger presentation
+  isomorphism under each move type.
 
 ### M3. Canonicalisation is idempotent
 Statement: `canonicalize_presentation(canonicalize_presentation(p)) ==
 canonicalize_presentation(p)`.
 
-Current status: expected by construction; not proved. Should be provable
-by the canonical-relabelling sort being a total order.
+Current status: **property-tested** (2026-04-12).
+Verified for trefoil, figure-eight, cinquefoil — see
+`server/test_quandle_axioms.jl` § 3.
 
 ### M4. Colouring count well-definedness
 Statement: For a finite quandle Q and a presentation p, the number of
