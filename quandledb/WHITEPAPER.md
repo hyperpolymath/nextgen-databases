@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
-# KQL: A Knot-Theoretic Query Language for Topological Data
+# KRL: A Knot-Theoretic Query Language for Topological Data
 
 **Author:** Jonathan D.A. Jewell
 **Version:** 1.0
@@ -12,13 +12,13 @@
 
 ## Abstract
 
-We present KQL (Knot Query Language), a domain-specific query language for
+We present KRL (Knot Resolution Language), a domain-specific query language for
 QuandleDB that treats mathematical equivalence as a first-class query primitive.
 Traditional database query languages (SQL, GraphQL, Cypher) model equality as a
 binary predicate: two values are either equal or not. This model is fundamentally
 inadequate for topological data, where two objects (e.g., knot diagrams) may be
 equivalent via multiple distinct paths (Reidemeister moves), and the space of
-equivalences itself has mathematical structure. KQL addresses this by grounding
+equivalences itself has mathematical structure. KRL addresses this by grounding
 its semantics in Homotopy Type Theory (HoTT), where equality is not a boolean
 but a *type*—the type of paths between two objects. The result is a query language
 where equivalence queries return not just matching objects but the *derivations*
@@ -73,7 +73,7 @@ SQL's relational model fails for knot data in several fundamental ways:
 
 This paper presents:
 
-1. **KQL's semantic model** grounded in HoTT identity types, where equivalence
+1. **KRL's semantic model** grounded in HoTT identity types, where equivalence
    queries return types, not booleans (Section 3).
 2. **E-graph-backed execution** using equality saturation (egglog) to compactly
    represent equivalence classes (Section 4).
@@ -137,14 +137,14 @@ structure.
 
 ---
 
-## 3. KQL Semantic Model
+## 3. KRL Semantic Model
 
 ### 3.1 Equivalence as a Type
 
-KQL's fundamental departure from SQL is that equivalence queries return *types*,
+KRL's fundamental departure from SQL is that equivalence queries return *types*,
 not booleans:
 
-```kql
+```krl
 from knots
 | where equivalent_to("3_1")
 | return equivalences
@@ -164,9 +164,9 @@ matching knot K, the *equivalence evidence*:
 }
 ```
 
-### 3.2 Identity Types in KQL
+### 3.2 Identity Types in KRL
 
-KQL models three levels of identity:
+KRL models three levels of identity:
 
 1. **Definitional equality** (`==`): Identical representations (same Gauss code).
    Decidable, trivial.
@@ -177,7 +177,7 @@ KQL models three levels of identity:
 3. **Path equality** (`~`): Equivalent via explicit isotopy (sequence of
    Reidemeister moves). Returns the path itself.
 
-```kql
+```krl
 from knots
 | where K ≅ "3_1" via [jones, genus, crossing_number]
 | return K, proof
@@ -185,7 +185,7 @@ from knots
 
 ### 3.3 Quotient Types
 
-KQL represents equivalence classes as quotient types:
+KRL represents equivalence classes as quotient types:
 
 ```
 Knot / ≅ = { [K] | K ∈ Knot }
@@ -201,12 +201,12 @@ data.
 
 ### 4.1 Equality Saturation
 
-KQL queries are executed against an *e-graph* (equivalence graph), a data
+KRL queries are executed against an *e-graph* (equivalence graph), a data
 structure that compactly represents equivalence classes. Following the egglog
-paradigm (Willsey et al., PLDI 2023), KQL combines Datalog-style recursive
+paradigm (Willsey et al., PLDI 2023), KRL combines Datalog-style recursive
 queries with equality saturation:
 
-```kql
+```krl
 # Define equivalence rules
 rule jones_equivalent(K1, K2) :-
   knot(K1), knot(K2),
@@ -226,7 +226,7 @@ from knots
 
 ### 4.2 Stratified Invariant Evaluation
 
-Not all invariants are equally expensive to compute. KQL's query planner
+Not all invariants are equally expensive to compute. KRL's query planner
 evaluates invariants in order of increasing cost:
 
 | Stratum | Invariants | Cost |
@@ -248,7 +248,7 @@ evidence for equivalence.
 
 ### 5.1 Semiring Annotations
 
-Following the provenance semiring framework (Green et al., 2007), KQL annotates
+Following the provenance semiring framework (Green et al., 2007), KRL annotates
 every result with provenance information recording how the result was derived:
 
 ```
@@ -277,7 +277,7 @@ Provenance = Semiring(
 
 ### 6.1 Schema as Category
 
-Following Spivak (2014), KQL models the database schema as a category C:
+Following Spivak (2014), KRL models the database schema as a category C:
 
 - **Objects:** Entity types (Knot, Invariant, Isotopy, Diagram).
 - **Morphisms:** Relationships (has_invariant, has_diagram, isotopy_between).
@@ -285,7 +285,7 @@ Following Spivak (2014), KQL models the database schema as a category C:
 
 ### 6.2 Queries as Functors
 
-A KQL query is a functor Q : C → C' between schema categories. This provides:
+A KRL query is a functor Q : C → C' between schema categories. This provides:
 
 - **Compositionality:** Queries compose as functors compose.
 - **Type safety:** Functors preserve categorical structure, preventing ill-typed
@@ -298,9 +298,9 @@ A KQL query is a functor Q : C → C' between schema categories. This provides:
 
 ### 7.1 Pipeline Syntax
 
-KQL adopts PRQL's pipeline approach for readability:
+KRL adopts PRQL's pipeline approach for readability:
 
-```kql
+```krl
 from knots
 | filter crossing_number <= 10
 | filter genus == 1
@@ -311,7 +311,7 @@ from knots
 
 ### 7.2 Equivalence Queries
 
-```kql
+```krl
 from knots
 | find_equivalent "3_1" via [jones, genus]
 | return equivalences with provenance
@@ -322,7 +322,7 @@ from knots
 For navigating relationships between knots (e.g., knots related by specific
 operations like connected sum):
 
-```kql
+```krl
 from knots as K1
 | match (K1)-[:CONNECTED_SUM]->(K2)
 | where K2.crossing_number < K1.crossing_number
@@ -331,7 +331,7 @@ from knots as K1
 
 ### 7.4 Reidemeister Move Queries
 
-```kql
+```krl
 from diagrams as D1
 | find_path D1 ~> "3_1" via reidemeister
 | return path, move_count
@@ -346,7 +346,7 @@ from diagrams as D1
 | Layer | Language | Purpose |
 |-------|----------|---------|
 | Engine | Julia (Skein.jl) | Knot storage, invariant computation |
-| Query Parser | Julia | KQL parsing and AST construction |
+| Query Parser | Julia | KRL parsing and AST construction |
 | E-graph Engine | Julia | Equality saturation, equivalence classes |
 | API | Julia (HTTP.jl) | REST API for queries |
 | Frontend | ReScript + React | Interactive query interface |
@@ -379,39 +379,39 @@ end
   structured equivalences.
 - **Cypher** (Robinson et al., 2015): Graph pattern matching. Useful for
   navigating knot relationships but no equivalence semantics.
-- **PRQL** (PRQL Project, 2022): Pipeline syntax for SQL. KQL adopts its
+- **PRQL** (PRQL Project, 2022): Pipeline syntax for SQL. KRL adopts its
   ergonomics but not its relational semantics.
 - **HoTTSQL** (Chu et al., PLDI 2017): SQL semantics via HoTT. Proves
-  equivalence of SQL queries, not of data. KQL adapts HoTT for data equivalence.
+  equivalence of SQL queries, not of data. KRL adapts HoTT for data equivalence.
 - **egglog** (Willsey et al., PLDI 2023): Equality saturation + Datalog.
-  KQL's execution engine.
-- **CQL** (Spivak, 2014): Categorical Query Language. KQL's schema model.
+  KRL's execution engine.
+- **CQL** (Spivak, 2014): Categorical Query Language. KRL's schema model.
 
 ### 9.2 Knot Theory Software
 
 - **SnapPy** (Culler et al.): 3-manifold topology. Computations, not queries.
-- **KnotInfo** (Livingston & Moore): Web database. SQL backend, no KQL.
+- **KnotInfo** (Livingston & Moore): Web database. SQL backend, no KRL.
 - **Knot Atlas**: Wiki-based. No structured query language.
-- **Skein.jl** (hyperpolymath): Julia knot engine. KQL's computation backend.
+- **Skein.jl** (hyperpolymath): Julia knot engine. KRL's computation backend.
 
 ### 9.3 Type Theory and Equality
 
-- **HoTT** (Univalent Foundations, 2013): Identity types as paths. KQL's
+- **HoTT** (Univalent Foundations, 2013): Identity types as paths. KRL's
   semantic foundation.
 - **Cubical Agda** (Vezzosi et al., 2019): Computational HoTT. Potential
   future implementation target.
-- **Lean 4 mathlib** (mathlib Community): Formal quandle definitions. KQL's
+- **Lean 4 mathlib** (mathlib Community): Formal quandle definitions. KRL's
   proof library.
 
 ---
 
 ## 10. Conclusion
 
-KQL demonstrates that domain-specific query languages can and should respect
+KRL demonstrates that domain-specific query languages can and should respect
 the mathematical structure of their data. For topological data, binary equality
 is the wrong abstraction. By grounding query semantics in HoTT identity types,
 executing queries via equality saturation, and carrying provenance through
-results, KQL provides a query language that is mathematically honest about
+results, KRL provides a query language that is mathematically honest about
 what it means for two knots to be "the same."
 
 The broader lesson is that the choice of equality model is a fundamental design

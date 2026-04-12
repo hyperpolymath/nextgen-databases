@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
-# KQL–SQL Compatibility Layer
+# KRL–SQL Compatibility Layer
 
 **Version:** 0.1.0
 **Date:** 2026-03-20
@@ -10,17 +10,17 @@
 
 ## 1. Purpose
 
-This document defines how standard SQL (ISO 9075) concepts map to KQL's
+This document defines how standard SQL (ISO 9075) concepts map to KRL's
 pipeline syntax. The goal is twofold:
 
 1. **Accessibility:** Users familiar with SQL can write queries against
-   QuandleDB without learning KQL's pipeline syntax from scratch.
+   QuandleDB without learning KRL's pipeline syntax from scratch.
 2. **Interoperability:** External tools (BI dashboards, ODBC/JDBC drivers)
-   can issue SQL queries that are mechanically translated to KQL pipelines.
+   can issue SQL queries that are mechanically translated to KRL pipelines.
 
-KQL is *not* a SQL dialect — it is a superset with fundamentally richer
+KRL is *not* a SQL dialect — it is a superset with fundamentally richer
 semantics (equivalence types, provenance, dependent types). The SQL
-compatibility layer covers the relational subset of KQL.
+compatibility layer covers the relational subset of KRL.
 
 ---
 
@@ -38,8 +38,8 @@ ORDER BY crossing_number ASC
 LIMIT 20;
 ```
 
-```kql
--- KQL translation
+```krl
+-- KRL translation
 from knots
 | filter crossing_number <= 10
 | filter genus == 1
@@ -68,8 +68,8 @@ GROUP BY crossing_number
 HAVING cnt > 5;
 ```
 
-```kql
--- KQL
+```krl
+-- KRL
 from knots
 | group_by crossing_number
 | aggregate count(*) as cnt
@@ -92,8 +92,8 @@ WHERE crossing_number IN (
 );
 ```
 
-```kql
--- KQL
+```krl
+-- KRL
 let genus_1_crossings = from knots
   | filter genus == 1
   | return crossing_number
@@ -108,7 +108,7 @@ from knots
 
 ### 2.4 Joins
 
-KQL does not have explicit JOIN syntax — knot relationships are modelled
+KRL does not have explicit JOIN syntax — knot relationships are modelled
 as equivalence queries and graph patterns instead. For SQL compatibility:
 
 ```sql
@@ -119,8 +119,8 @@ WHERE K1.jones_polynomial = K2.jones_polynomial
   AND K1.name != K2.name;
 ```
 
-```kql
--- KQL (natural expression of the same query)
+```krl
+-- KRL (natural expression of the same query)
 from knots
 | find_equivalent via [jones]
 | return source.name, target.name
@@ -131,9 +131,9 @@ from knots
 - Cross-joins → not directly supported (use `match` patterns for relationships)
 - Foreign-key joins → `match (A)-[:REL]->(B)` graph pattern
 
-### 2.5 SQL Functions → KQL Equivalents
+### 2.5 SQL Functions → KRL Equivalents
 
-| SQL | KQL | Notes |
+| SQL | KRL | Notes |
 |-----|-----|-------|
 | `COUNT(*)` | `count(*)` | Identical |
 | `MIN(expr)` | `min(expr)` | Identical |
@@ -152,28 +152,28 @@ from knots
 
 ## 3. SQL Features NOT Supported
 
-These SQL features have no KQL equivalent because they conflict with
-KQL's type-safe, provenance-carrying semantics:
+These SQL features have no KRL equivalent because they conflict with
+KRL's type-safe, provenance-carrying semantics:
 
-| SQL Feature | Why Not in KQL | KQL Alternative |
+| SQL Feature | Why Not in KRL | KRL Alternative |
 |-------------|----------------|-----------------|
-| `NULL` (three-valued logic) | KQL uses `Option[τ]` — explicit absence | `Option[τ]` with `none` |
+| `NULL` (three-valued logic) | KRL uses `Option[τ]` — explicit absence | `Option[τ]` with `none` |
 | `UNION ALL` | Untyped bag union loses provenance | `merge` with provenance tracking |
 | `INSERT/UPDATE/DELETE` | QuandleDB is read-only (invariants are computed) | Skein.jl REPL |
 | `CREATE TABLE` | Schema is fixed (knots + invariants) | — |
 | `ALTER TABLE` | Schema is fixed | — |
 | `GRANT/REVOKE` | No access control model yet | — |
-| Implicit type coercion | KQL is strongly typed | Explicit `x : T` |
+| Implicit type coercion | KRL is strongly typed | Explicit `x : T` |
 
 ---
 
 ## 4. Extensions Beyond SQL
 
-KQL provides capabilities that have NO SQL equivalent:
+KRL provides capabilities that have NO SQL equivalent:
 
-### 4.1 Equivalence Queries (unique to KQL)
+### 4.1 Equivalence Queries (unique to KRL)
 
-```kql
+```krl
 from knots
 | find_equivalent "3_1" via [jones, genus]
 | return equivalences with provenance
@@ -182,9 +182,9 @@ from knots
 Returns structured `Equivalence[Knot]` records with proof derivations
 and invariant provenance. SQL can only return boolean equality.
 
-### 4.2 Path Queries (unique to KQL)
+### 4.2 Path Queries (unique to KRL)
 
-```kql
+```krl
 from diagrams as D
 | find_path D ~> "3_1" via reidemeister
 | return path, move_count
@@ -192,9 +192,9 @@ from diagrams as D
 
 Finds explicit Reidemeister move sequences between diagram representations.
 
-### 4.3 Dependent Type Annotations (unique to KQL)
+### 4.3 Dependent Type Annotations (unique to KRL)
 
-```kql
+```krl
 -- Query result type depends on which invariants are requested
 from knots
 | filter crossing_number <= 10
@@ -203,7 +203,7 @@ from knots
   -- The return clause DETERMINES the record type (dependent projection)
 ```
 
-### 4.4 Provenance Tracking (unique to KQL)
+### 4.4 Provenance Tracking (unique to KRL)
 
 Every query result can carry provenance metadata showing which
 invariants were computed and at what confidence level.
@@ -213,26 +213,26 @@ invariants were computed and at what confidence level.
 ## 5. Implementation Strategy
 
 The SQL compatibility layer is implemented as a **syntactic frontend**
-that parses SQL and emits a KQL AST. The KQL type checker and
+that parses SQL and emits a KRL AST. The KRL type checker and
 evaluator then process the AST normally.
 
 ```
-SQL input → SQL parser → KQL AST → Type checker → Evaluator → Result
+SQL input → SQL parser → KRL AST → Type checker → Evaluator → Result
                                          ↑
-KQL input → KQL parser ─────────────────┘
+KRL input → KRL parser ─────────────────┘
 ```
 
 The SQL parser is a **subset parser** — it accepts only the SQL features
-that have KQL translations (§2). Unsupported features produce a clear
-error message pointing the user to the KQL syntax for the equivalent
+that have KRL translations (§2). Unsupported features produce a clear
+error message pointing the user to the KRL syntax for the equivalent
 operation.
 
 ### 5.1 Type Safety
 
-SQL queries are translated to **typed** KQL AST nodes. The type checker
-runs on the KQL AST regardless of whether the query was written in SQL
-or KQL. This means SQL queries get the same type-safety guarantees as
-native KQL queries — including pipeline type preservation (§4 of
+SQL queries are translated to **typed** KRL AST nodes. The type checker
+runs on the KRL AST regardless of whether the query was written in SQL
+or KRL. This means SQL queries get the same type-safety guarantees as
+native KRL queries — including pipeline type preservation (§4 of
 type-system.md).
 
 ### 5.2 Provenance

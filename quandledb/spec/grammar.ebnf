@@ -1,6 +1,6 @@
 (* SPDX-License-Identifier: PMPL-1.0-or-later *)
 (* Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk> *)
-(* KQL (Knot Query Language) Formal Grammar — EBNF (ISO 14977) *)
+(* KRL (Knot Resolution Language) Formal Grammar — EBNF (ISO 14977) *)
 (* Designed for QuandleDB v0.2.0 *)
 (* Version: 0.1.0 — 2026-03-14 *)
 (* @taxonomy: spec/grammar *)
@@ -104,7 +104,7 @@ statement = query
 
 (* --- Pipeline Queries --- *)
 (*                                                                   *)
-(* KQL uses a pipeline syntax inspired by PRQL.                      *)
+(* KRL uses a pipeline syntax inspired by PRQL.                      *)
 (* Queries are composed of stages separated by pipe operators.       *)
 (*                                                                   *)
 (* Example:                                                          *)
@@ -174,7 +174,7 @@ aggregate_fn = "count" | "min" | "max" | "avg" | "sum" ;
 
 (* --- Equivalence Queries --- *)
 (*                                                                   *)
-(* The core of KQL: queries that find topologically equivalent       *)
+(* The core of KRL: queries that find topologically equivalent       *)
 (* knots and return the derivation of equivalence.                   *)
 (*                                                                   *)
 (* Example:                                                          *)
@@ -329,7 +329,7 @@ let_binding = "let" , identifier , [ ":" , type_annotation ] , "=" , expression 
 
 (* --- Axiom Definitions --- *)
 (*                                                                   *)
-(* Axioms declare mathematical facts that KQL can use in proofs.     *)
+(* Axioms declare mathematical facts that KRL can use in proofs.     *)
 (*                                                                   *)
 (* Example:                                                          *)
 (*   axiom reidemeister_preserves_invariants :                        *)
@@ -343,7 +343,7 @@ axiom_body = [ "forall" , param_list , "," ]
 
 (* --- Type Annotations --- *)
 (*                                                                   *)
-(* KQL types reflect the mathematical structures of knot theory.     *)
+(* KRL types reflect the mathematical structures of knot theory.     *)
 
 type_annotation = "Int" | "Float" | "String" | "Bool"
                 | "Knot" | "Diagram" | "Invariant"
@@ -366,8 +366,8 @@ type_annotation = "Int" | "Float" | "String" | "Bool"
 (* SQL COMPATIBILITY SYNTAX                                          *)
 (* ================================================================ *)
 (*                                                                   *)
-(* KQL accepts a subset of SQL as an alternative front-end syntax.   *)
-(* SQL queries are mechanically translated to KQL pipelines.         *)
+(* KRL accepts a subset of SQL as an alternative front-end syntax.   *)
+(* SQL queries are mechanically translated to KRL pipelines.         *)
 (*                                                                   *)
 (* Example:                                                          *)
 (*   SELECT name, crossing_number FROM knots                         *)

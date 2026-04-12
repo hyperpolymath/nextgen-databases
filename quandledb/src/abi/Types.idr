@@ -1,6 +1,6 @@
 -- SPDX-License-Identifier: PMPL-1.0-or-later
 -- Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath)
--- KQL (Knot Query Language): Equivalence and Pipeline Safety Proofs
+-- KRL (Knot Resolution Language): Equivalence and Pipeline Safety Proofs
 
 module Types
 
@@ -8,22 +8,22 @@ module Types
 
 -- | KQL value types
 public export
-data KqlTy : Type where
-  TyInt        : KqlTy
-  TyFloat      : KqlTy
-  TyString     : KqlTy
-  TyBool       : KqlTy
-  TyKnot       : KqlTy
-  TyDiagram    : KqlTy
-  TyPolynomial : KqlTy
-  TyGaussCode  : KqlTy
-  TyQuandle    : KqlTy
-  TyList       : KqlTy -> KqlTy
-  TyOption     : KqlTy -> KqlTy
-  TyRecord     : List (String, KqlTy) -> KqlTy
-  TyResultSet  : KqlTy -> KqlTy
-  TyEquiv      : KqlTy -> KqlTy
-  TyProvenance : KqlTy
+data KrlTy : Type where
+  TyInt        : KrlTy
+  TyFloat      : KrlTy
+  TyString     : KrlTy
+  TyBool       : KrlTy
+  TyKnot       : KrlTy
+  TyDiagram    : KrlTy
+  TyPolynomial : KrlTy
+  TyGaussCode  : KrlTy
+  TyQuandle    : KrlTy
+  TyList       : KrlTy -> KrlTy
+  TyOption     : KrlTy -> KrlTy
+  TyRecord     : List (String, KrlTy) -> KrlTy
+  TyResultSet  : KrlTy -> KrlTy
+  TyEquiv      : KrlTy -> KrlTy
+  TyProvenance : KrlTy
 
 -- | Confidence levels for invariant matching
 public export
@@ -47,7 +47,7 @@ data ConfLeq : Confidence -> Confidence -> Type where
 
 -- | Pipeline stages as type-level transformations
 public export
-data PipeStage : KqlTy -> KqlTy -> Type where
+data PipeStage : KrlTy -> KrlTy -> Type where
   Filter    : PipeStage (TyResultSet t) (TyResultSet t)
   Sort      : PipeStage (TyResultSet t) (TyResultSet t)
   Take      : Nat -> PipeStage (TyResultSet t) (TyResultSet t)
@@ -57,7 +57,7 @@ data PipeStage : KqlTy -> KqlTy -> Type where
 
 -- | Pipeline composition (type-safe chaining)
 public export
-data Pipeline : KqlTy -> KqlTy -> Type where
+data Pipeline : KrlTy -> KrlTy -> Type where
   Empty : Pipeline t t
   Then  : PipeStage t1 t2 -> Pipeline t2 t3 -> Pipeline t1 t3
 
@@ -135,7 +135,7 @@ combinePreservesInvariants p1 p2 =
 -- The confidence parameter is a type-level tag that tracks the
 -- strength of the equivalence claim through the pipeline.
 public export
-data ConfEquiv : KqlTy -> Confidence -> Type where
+data ConfEquiv : KrlTy -> Confidence -> Type where
   MkConfEquiv : (source : String)  -- knot name
              -> (target : String)  -- knot name
              -> (paths  : List (String, Confidence))  -- (invariant, confidence) pairs
@@ -146,14 +146,14 @@ data ConfEquiv : KqlTy -> Confidence -> Type where
 -- | Dependent projection: type-level field selection.
 -- Proves that projecting fields from a record type produces a valid sub-record.
 public export
-data HasField : String -> List (String, KqlTy) -> KqlTy -> Type where
+data HasField : String -> List (String, KrlTy) -> KrlTy -> Type where
   Here  : HasField f ((f, t) :: rest) t
   There : HasField f rest t -> HasField f ((g, t') :: rest) t
 
 -- | Project a list of field names from a record type.
 -- Each field must exist (witnessed by HasField proofs).
 public export
-data ProjectFields : List String -> List (String, KqlTy) -> List (String, KqlTy) -> Type where
+data ProjectFields : List String -> List (String, KrlTy) -> List (String, KrlTy) -> Type where
   ProjNil  : ProjectFields [] fs []
   ProjCons : HasField f fs t
           -> ProjectFields rest fs fs'
@@ -162,7 +162,7 @@ data ProjectFields : List String -> List (String, KqlTy) -> List (String, KqlTy)
 -- | Invariant type registry (type-level function).
 -- Maps invariant names to their result types.
 public export
-InvType : String -> KqlTy
+InvType : String -> KrlTy
 InvType "crossing_number" = TyInt
 InvType "writhe"          = TyInt
 InvType "genus"           = TyOption TyInt

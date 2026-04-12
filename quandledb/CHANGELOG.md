@@ -20,7 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 - Absorbed into `nextgen-databases/` monorepo (removed nested .git dir)
-- KQL → renamed reference to align with KRL stack naming
+- KRL → renamed reference to align with KRL stack naming
 
 ## [Absorbed into monorepo] 2026-04-05
 
@@ -40,5 +40,5 @@ History preserved in the absorption commit message.
 ### Prior history (pre-absorption)
 - fix: replace Obj.magic with typed Fetch API bindings in Api.res
 - chore: batch RSR compliance
-- docs: KQL safety model — two-tier architecture with TypeLL levels
-- feat: KQL query language design — SQL compat + dependent type variants
+- docs: KRL safety model — two-tier architecture with TypeLL levels
+- feat: KRL query language design — SQL compat + dependent type variants

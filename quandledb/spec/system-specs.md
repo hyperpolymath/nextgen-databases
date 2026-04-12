@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
-# QuandleDB/KQL System Specification
+# QuandleDB/KRL System Specification
 
 ## Overview
 
 QuandleDB is a knot-theoretic database for storing, querying, and
 classifying knots via algebraic invariants. The stack comprises Julia
-(server and engine via Skein.jl) and ReScript (frontend). Knot Query
-Language (KQL) provides the query interface.
+(server and engine via Skein.jl) and ReScript (frontend). Knot Resolution
+Language (KRL) provides the query interface.
 
 ## Memory Model
 
@@ -32,7 +32,7 @@ with path compression, stored as a flat `Vector{Int}` for cache locality.
 
 The e-graph enforces a configurable node limit (default: 10M e-nodes).
 When reached, saturation halts and returns best-known equivalence
-classes. Adjustable per query via `SATURATE ... LIMIT n` KQL clause.
+classes. Adjustable per query via `SATURATE ... LIMIT n` KRL clause.
 
 ### ReScript Frontend
 
@@ -45,7 +45,7 @@ query-composition layer.
 
 ### Julia Task Parallelism
 
-KQL evaluation proceeds in strata: stratum 0 computes base invariants
+KRL evaluation proceeds in strata: stratum 0 computes base invariants
 (crossing number, writhe), stratum 1 computes polynomial invariants
 (Jones, HOMFLY-PT via Skein.jl), stratum 2 computes homological
 invariants (Khovanov homology). Strata evaluate sequentially, but
@@ -54,7 +54,7 @@ via `Threads.@spawn`.
 
 ### Query Isolation
 
-Each KQL query runs in its own Julia `Task` with a private e-graph
+Each KRL query runs in its own Julia `Task` with a private e-graph
 instance. Queries share read access to the global `KnotCatalog`.
 Catalog mutations are serialized through a `ReentrantLock`-protected
 append operation, eliminating write contention.
@@ -77,7 +77,7 @@ stored as proof steps attached to each e-class merge. Queryable via
 ### Computation Cost Effect
 
 Each computed invariant carries a cost annotation (wall-clock
-microseconds and allocation bytes). Exposed via `EXPLAIN COST` KQL
+microseconds and allocation bytes). Exposed via `EXPLAIN COST` KRL
 clause. Queries exceeding a cost budget (configurable via `BUDGET`
 clause) are terminated early with a partial result and cost report.
 
@@ -101,7 +101,7 @@ One module per concern: `KnotViewer.res`, `QueryEditor.res`,
 `ServerClient.res`, `Cache.res`, `KnotTypes.res`. Interface files
 (`.resi`) define public APIs.
 
-### KQL Query Modules
+### KRL Query Modules
 
 User-defined modules via `MODULE name { ... }` blocks encapsulate
 named queries and invariant definitions, imported with `USE`. Module
@@ -110,5 +110,5 @@ resolution is flat. Modules are stored server-side in the catalog.
 ### Cross-Language Boundary
 
 Julia and ReScript communicate via JSON over HTTP or WebSocket. The
-wire format is defined by `schema/kql-wire.json`. ReScript types are
+wire format is defined by `schema/krl-wire.json`. ReScript types are
 generated from this schema for cross-boundary type safety.

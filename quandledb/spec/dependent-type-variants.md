@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
-# KQL Dependent Type Variants
+# KRL Dependent Type Variants
 
 **Version:** 0.1.0
 **Date:** 2026-03-20
@@ -10,7 +10,7 @@
 
 ## 1. Overview
 
-KQL's type system goes beyond conventional query language types (SQL's
+KRL's type system goes beyond conventional query language types (SQL's
 scalar types, GraphQL's object types) by incorporating **dependent types**
 — types that depend on values. This enables:
 
@@ -23,7 +23,7 @@ scalar types, GraphQL's object types) by incorporating **dependent types**
 4. **Stratum-bounded evaluation:** The evaluation strategy is indexed by
    the number of invariant strata, proving termination.
 
-This document specifies how these dependent types surface in the KQL
+This document specifies how these dependent types surface in the KRL
 language and how they map to Idris2 ABI proofs.
 
 ---
@@ -34,7 +34,7 @@ language and how they map to Idris2 ABI proofs.
 
 In SQL, `SELECT a, b FROM t` always produces a two-column result, but
 the schema of the result is only checked at planning time — not at the
-type level. In KQL, the `return` clause is a **dependent projection**:
+type level. In KRL, the `return` clause is a **dependent projection**:
 the return type is computed from the fields listed.
 
 ### 2.2 Typing Rule
@@ -66,7 +66,7 @@ in the source record (via `Elem` proof).
 
 ### 2.4 User-Facing Syntax
 
-```kql
+```krl
 -- The return clause determines the result type
 from knots
 | return name, crossing_number
@@ -88,7 +88,7 @@ from knots
 
 ### 3.1 The Problem
 
-When KQL reports that two knots are equivalent, the strength of that
+When KRL reports that two knots are equivalent, the strength of that
 claim depends on which invariants were used. Jones polynomial matching
 is *necessary* but not *sufficient*; quandle isomorphism is *exact*.
 The type of the result should reflect this.
@@ -139,7 +139,7 @@ combineConf : ConfEquiv t c1 -> ConfEquiv t c2 -> ConfEquiv t (MinConf c1 c2)
 
 ### 3.5 User-Facing Syntax
 
-```kql
+```krl
 -- Request only exact results
 from knots
 | find_equivalent "3_1" via [quandle] confidence >= exact
@@ -184,7 +184,7 @@ InvariantType "quandle"          = TyOption TyQuandle
 
 ### 4.3 Dependent Via Clause
 
-```kql
+```krl
 -- The 'via' clause determines which invariant fields appear in results
 from knots
 | find_equivalent "3_1" via [jones, genus]
@@ -221,7 +221,7 @@ ViaResultType : ViaClause invs -> KqlTy
 
 ### 5.1 The Problem
 
-KQL's equivalence queries evaluate invariants in order of increasing
+KRL's equivalence queries evaluate invariants in order of increasing
 cost (crossing number is cheap; quandle isomorphism is expensive).
 The type system must guarantee that evaluation terminates.
 
@@ -276,10 +276,10 @@ All dependent type variants have corresponding Idris2 proofs in
 
 1. **Type definitions** (`KqlTy`, `PipeStage`, `Pipeline`, `Confidence`)
 2. **Proofs** (`pipeAssoc`, `combinePreservesInvariants`, `StratumBounded`)
-3. **Translation** — each KQL type variant maps to an Idris2 type that
+3. **Translation** — each KRL type variant maps to an Idris2 type that
    can be type-checked at compile time
 
 The SQL compatibility layer (§sql-compat.md) translates SQL queries into
-KQL AST nodes, which are then type-checked against these dependent types.
+KRL AST nodes, which are then type-checked against these dependent types.
 SQL queries that would produce ill-typed results (e.g., projecting a
 non-existent field) are rejected at translation time.

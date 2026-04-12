@@ -1,4 +1,4 @@
-# KQL Design: SQL Landscape Research — 2026-02-22
+# KRL Design: SQL Landscape Research — 2026-02-22
 ## Comprehensive Survey for QuandleDB Query Language Design
 
 **Date:** 2026-02-22
@@ -17,7 +17,7 @@
 3. **HoTT identity types** — paths = equivalences (from HoTTSQL paper)
 4. **Surfaced through:** PRQL-style pipeline syntax + Cypher-style graph pattern matching
 
-The closest existing system is **egglog** (PLDI 2023). The theoretical foundation is **HoTTSQL's univalent semantics**. KQL should build on both.
+The closest existing system is **egglog** (PLDI 2023). The theoretical foundation is **HoTTSQL's univalent semantics**. KRL should build on both.
 
 ---
 
@@ -112,10 +112,10 @@ The closest existing system is **egglog** (PLDI 2023). The theoretical foundatio
 - **Good:** Multi-model with SQL-like syntax
 - **Bad:** Lack of type safety, SDK limitations, limited maturity
 
-### KQL (Kusto / Azure) — NAME COLLISION
+### KQL (Kusto / Azure) — NAME COLLISION [Resolved]
 - **Good:** Pipeline syntax for log analytics
 - **Bad:** Read-only, can't INSERT/UPDATE, Azure lock-in
-- **Note:** Shares our acronym. Context disambiguates, but consider alternate naming.
+- **Note:** Previously shared acronym with our language. Resolved by renaming our language to KRL (Knot Resolution Language).
 
 ### DuckDB SQL Extensions
 - **Right:** Community extensions (6M downloads/week), SQL-only extensions, SQL/PGQ graph queries outperform Neo4j 10-100x
@@ -151,7 +151,7 @@ SQL departs from Codd's relational model: bags not sets, NULLs, ordering, duplic
 - SQL semantics formalized via homotopy type theory
 - Relations as functions from tuples to univalent types
 - Bag equality proved via univalence axiom (700+ lines Coq → 40 lines)
-- **Critical insight for KQL:** Equality is not binary. Multiple distinct paths (proofs of equality) between objects. The space of equivalences has structure. THIS IS EXACTLY KNOT EQUIVALENCE.
+- **Critical insight for KRL:** Equality is not binary. Multiple distinct paths (proofs of equality) between objects. The space of equivalences has structure. THIS IS EXACTLY KNOT EQUIVALENCE.
 
 ### egglog (PLDI 2023)
 - Merges Datalog with equality saturation
@@ -203,7 +203,7 @@ QuandleDB stores mathematical structures where the fundamental operation is *equ
 
 ---
 
-## Part 6: What KQL Should Borrow vs Avoid
+## Part 6: What KRL Should Borrow vs Avoid
 
 ### Borrow
 | Source | What |
@@ -230,7 +230,7 @@ QuandleDB stores mathematical structures where the fundamental operation is *equ
 
 ---
 
-## Part 7: Proposed KQL Architecture
+## Part 7: Proposed KRL Architecture
 
 1. **Foundation:** Category-theoretic data model (Spivak). Schema = category, instance = functor.
 2. **Equality model:** HoTT identity types. `x == y` returns a *type* (possibly empty, possibly inhabited, possibly multiply inhabited). "These knots are equivalent, and here are the equivalences."

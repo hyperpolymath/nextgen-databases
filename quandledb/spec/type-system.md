@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
-# KQL Type System Specification
+# KRL Type System Specification
 
 **Version:** 0.1.0
 **Date:** 2026-03-14
@@ -56,7 +56,7 @@ Fields with `Option[τ]` may not be computed for all knots.
 
 ### 3.1 Identity Type
 
-KQL's distinguishing feature is that equivalence queries return *types*, not
+KRL's distinguishing feature is that equivalence queries return *types*, not
 booleans. The identity type `Equivalence[τ]` represents the space of paths
 between two values of type `τ`:
 

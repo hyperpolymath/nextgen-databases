@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 
-# KQL Operational Semantics
+# KRL Operational Semantics
 
 **Version:** 0.1.0
 **Date:** 2026-03-14
@@ -66,7 +66,7 @@ EGraph = equivalence classes over Knot, saturated by rules
 
 ## 4. Pipeline Semantics
 
-KQL queries are pipelines: each stage transforms a result set.
+KRL queries are pipelines: each stage transforms a result set.
 
 ```
     D, ρ ⊢ from_clause ⇓ R₀
