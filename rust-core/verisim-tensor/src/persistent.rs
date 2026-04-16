@@ -104,18 +104,18 @@ mod tests {
 
     #[tokio::test]
     async fn test_persistent_tensor_roundtrip() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("TODO: handle error");
         let path = dir.path().join("tensor.redb");
 
         {
-            let store = RedbTensorStore::open(&path).await.unwrap();
-            let t = Tensor::new("t1", vec![2, 3], vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).unwrap();
-            store.put(&t).await.unwrap();
+            let store = RedbTensorStore::open(&path).await.expect("TODO: handle error");
+            let t = Tensor::new("t1", vec![2, 3], vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).expect("TODO: handle error");
+            store.put(&t).await.expect("TODO: handle error");
         }
 
         {
-            let store = RedbTensorStore::open(&path).await.unwrap();
-            let t = store.get("t1").await.unwrap().unwrap();
+            let store = RedbTensorStore::open(&path).await.expect("TODO: handle error");
+            let t = store.get("t1").await.expect("TODO: handle error").expect("TODO: handle error");
             assert_eq!(t.shape, vec![2, 3]);
             assert_eq!(t.data, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
         }

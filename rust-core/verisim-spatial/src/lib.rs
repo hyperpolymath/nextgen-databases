@@ -482,7 +482,7 @@ mod tests {
 
     #[test]
     fn test_spatial_data_point() {
-        let data = SpatialData::point(51.5074, -0.1278, None).unwrap();
+        let data = SpatialData::point(51.5074, -0.1278, None).expect("TODO: handle error");
         assert_eq!(data.geometry_type, GeometryType::Point);
         assert_eq!(data.srid, 4326);
     }
@@ -490,22 +490,22 @@ mod tests {
     #[tokio::test]
     async fn test_in_memory_store_index_and_get() {
         let store = InMemorySpatialStore::new();
-        let data = SpatialData::point(51.5074, -0.1278, None).unwrap();
+        let data = SpatialData::point(51.5074, -0.1278, None).expect("TODO: handle error");
 
-        store.index("entity-1", data.clone()).await.unwrap();
-        let retrieved = store.get("entity-1").await.unwrap();
+        store.index("entity-1", data.clone()).await.expect("TODO: handle error");
+        let retrieved = store.get("entity-1").await.expect("TODO: handle error");
         assert!(retrieved.is_some());
-        assert_eq!(retrieved.unwrap().coordinates.latitude, 51.5074);
+        assert_eq!(retrieved.expect("TODO: handle error").coordinates.latitude, 51.5074);
     }
 
     #[tokio::test]
     async fn test_in_memory_store_delete() {
         let store = InMemorySpatialStore::new();
-        let data = SpatialData::point(51.5074, -0.1278, None).unwrap();
+        let data = SpatialData::point(51.5074, -0.1278, None).expect("TODO: handle error");
 
-        store.index("entity-1", data).await.unwrap();
-        store.delete("entity-1").await.unwrap();
-        assert!(store.get("entity-1").await.unwrap().is_none());
+        store.index("entity-1", data).await.expect("TODO: handle error");
+        store.delete("entity-1").await.expect("TODO: handle error");
+        assert!(store.get("entity-1").await.expect("TODO: handle error").is_none());
     }
 
     #[tokio::test]
@@ -514,23 +514,23 @@ mod tests {
 
         // London
         store
-            .index("london", SpatialData::point(51.5074, -0.1278, None).unwrap())
+            .index("london", SpatialData::point(51.5074, -0.1278, None).expect("TODO: handle error"))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         // Paris
         store
-            .index("paris", SpatialData::point(48.8566, 2.3522, None).unwrap())
+            .index("paris", SpatialData::point(48.8566, 2.3522, None).expect("TODO: handle error"))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         // New York
         store
-            .index("nyc", SpatialData::point(40.7128, -74.0060, None).unwrap())
+            .index("nyc", SpatialData::point(40.7128, -74.0060, None).expect("TODO: handle error"))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         // Search within 500 km of London — should find London and Paris
-        let center = Coordinates::new(51.5074, -0.1278, None).unwrap();
-        let results = store.search_radius(&center, 500.0, 10).await.unwrap();
+        let center = Coordinates::new(51.5074, -0.1278, None).expect("TODO: handle error");
+        let results = store.search_radius(&center, 500.0, 10).await.expect("TODO: handle error");
 
         assert_eq!(results.len(), 2, "Should find London and Paris within 500km");
         assert_eq!(results[0].entity_id, "london", "London should be closest");
@@ -542,19 +542,19 @@ mod tests {
 
         // London
         store
-            .index("london", SpatialData::point(51.5074, -0.1278, None).unwrap())
+            .index("london", SpatialData::point(51.5074, -0.1278, None).expect("TODO: handle error"))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         // Paris
         store
-            .index("paris", SpatialData::point(48.8566, 2.3522, None).unwrap())
+            .index("paris", SpatialData::point(48.8566, 2.3522, None).expect("TODO: handle error"))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         // New York
         store
-            .index("nyc", SpatialData::point(40.7128, -74.0060, None).unwrap())
+            .index("nyc", SpatialData::point(40.7128, -74.0060, None).expect("TODO: handle error"))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         // Bounding box around Western Europe
         let bounds = BoundingBox {
@@ -564,7 +564,7 @@ mod tests {
             max_lon: 10.0,
         };
 
-        let results = store.search_within(&bounds, 10).await.unwrap();
+        let results = store.search_within(&bounds, 10).await.expect("TODO: handle error");
         assert_eq!(results.len(), 2, "Should find London and Paris in W. Europe box");
     }
 
@@ -573,21 +573,21 @@ mod tests {
         let store = InMemorySpatialStore::new();
 
         store
-            .index("london", SpatialData::point(51.5074, -0.1278, None).unwrap())
+            .index("london", SpatialData::point(51.5074, -0.1278, None).expect("TODO: handle error"))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
-            .index("paris", SpatialData::point(48.8566, 2.3522, None).unwrap())
+            .index("paris", SpatialData::point(48.8566, 2.3522, None).expect("TODO: handle error"))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
-            .index("nyc", SpatialData::point(40.7128, -74.0060, None).unwrap())
+            .index("nyc", SpatialData::point(40.7128, -74.0060, None).expect("TODO: handle error"))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         // k-nearest to London (k=2) — should return London then Paris
-        let point = Coordinates::new(51.5074, -0.1278, None).unwrap();
-        let results = store.nearest(&point, 2).await.unwrap();
+        let point = Coordinates::new(51.5074, -0.1278, None).expect("TODO: handle error");
+        let results = store.nearest(&point, 2).await.expect("TODO: handle error");
 
         assert_eq!(results.len(), 2);
         assert_eq!(results[0].entity_id, "london");

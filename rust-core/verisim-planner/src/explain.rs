@@ -351,8 +351,8 @@ mod tests {
         let plan = sample_physical_plan();
         let explain = ExplainOutput::from_physical_plan(&plan, &PlannerConfig::default());
 
-        let json = serde_json::to_string(&explain).unwrap();
-        let parsed: ExplainOutput = serde_json::from_str(&json).unwrap();
+        let json = serde_json::to_string(&explain).expect("TODO: handle error");
+        let parsed: ExplainOutput = serde_json::from_str(&json).expect("TODO: handle error");
         assert_eq!(parsed.steps.len(), explain.steps.len());
         assert!((parsed.total_cost_ms - explain.total_cost_ms).abs() < f64::EPSILON);
     }

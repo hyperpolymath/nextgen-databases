@@ -213,8 +213,8 @@ mod tests {
     #[test]
     fn test_certificate_roundtrip_json() {
         let cert = sample_certificate();
-        let json = serde_json::to_vec(&cert).unwrap();
-        let parsed = parse_proven_certificate(&json).unwrap();
+        let json = serde_json::to_vec(&cert).expect("TODO: handle error");
+        let parsed = parse_proven_certificate(&json).expect("TODO: handle error");
         assert_eq!(parsed.statement, cert.statement);
         assert_eq!(parsed.prover, ProverKind::Z3);
     }
@@ -223,22 +223,22 @@ mod tests {
     fn test_certificate_roundtrip_cbor() {
         let cert = sample_certificate();
         let mut cbor = Vec::new();
-        ciborium::into_writer(&cert, &mut cbor).unwrap();
-        let parsed = parse_proven_certificate_cbor(&cbor).unwrap();
+        ciborium::into_writer(&cert, &mut cbor).expect("TODO: handle error");
+        let parsed = parse_proven_certificate_cbor(&cbor).expect("TODO: handle error");
         assert_eq!(parsed.statement, cert.statement);
     }
 
     #[test]
     fn test_verify_valid_certificate() {
         let cert = sample_certificate();
-        assert!(verify_proven_certificate(&cert).unwrap());
+        assert!(verify_proven_certificate(&cert).expect("TODO: handle error"));
     }
 
     #[test]
     fn test_verify_invalid_signature() {
         let mut cert = sample_certificate();
         cert.signature = "sha256:0000000000000000000000000000000000000000000000000000000000000000".to_string();
-        assert!(!verify_proven_certificate(&cert).unwrap());
+        assert!(!verify_proven_certificate(&cert).expect("TODO: handle error"));
     }
 
     #[test]
@@ -251,7 +251,7 @@ mod tests {
     #[test]
     fn test_certificate_to_proof_blob() {
         let cert = sample_certificate();
-        let blob = certificate_to_proof_blob(&cert).unwrap();
+        let blob = certificate_to_proof_blob(&cert).expect("TODO: handle error");
         assert_eq!(blob.claim, cert.statement);
         assert!(!blob.data.is_empty());
     }
@@ -265,7 +265,7 @@ mod tests {
             false,
             Some("Proof failed".to_string()),
         );
-        assert!(!verify_proven_certificate(&cert).unwrap());
+        assert!(!verify_proven_certificate(&cert).expect("TODO: handle error"));
     }
 
     #[test]

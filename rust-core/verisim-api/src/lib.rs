@@ -2194,7 +2194,7 @@ mod tests {
             config.persistence_dir = Some(tmp.to_string_lossy().into_owned());
         }
 
-        AppState::new_async(config).await.unwrap()
+        AppState::new_async(config).await.expect("TODO: handle error")
     }
 
     #[tokio::test]
@@ -2207,10 +2207,10 @@ mod tests {
                 Request::builder()
                     .uri("/health")
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("TODO: handle error"),
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         assert_eq!(response.status(), StatusCode::OK);
     }
@@ -2225,10 +2225,10 @@ mod tests {
                 Request::builder()
                     .uri("/ready")
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("TODO: handle error"),
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         assert_eq!(response.status(), StatusCode::OK);
     }
@@ -2258,19 +2258,19 @@ mod tests {
                     .method("POST")
                     .uri("/octads")
                     .header("content-type", "application/json")
-                    .body(Body::from(serde_json::to_string(&create_request).unwrap()))
-                    .unwrap(),
+                    .body(Body::from(serde_json::to_string(&create_request).expect("TODO: handle error")))
+                    .expect("TODO: handle error"),
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         assert_eq!(response.status(), StatusCode::CREATED);
 
         // Parse response to get ID
         let body = axum::body::to_bytes(response.into_body(), 1024 * 1024)
             .await
-            .unwrap();
-        let created: OctadResponse = serde_json::from_slice(&body).unwrap();
+            .expect("TODO: handle error");
+        let created: OctadResponse = serde_json::from_slice(&body).expect("TODO: handle error");
 
         // Get the octad
         let response = app
@@ -2278,10 +2278,10 @@ mod tests {
                 Request::builder()
                     .uri(format!("/octads/{}", created.id))
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("TODO: handle error"),
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         assert_eq!(response.status(), StatusCode::OK);
     }
@@ -2311,11 +2311,11 @@ mod tests {
                     .method("POST")
                     .uri("/octads")
                     .header("content-type", "application/json")
-                    .body(Body::from(serde_json::to_string(&create_request).unwrap()))
-                    .unwrap(),
+                    .body(Body::from(serde_json::to_string(&create_request).expect("TODO: handle error")))
+                    .expect("TODO: handle error"),
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         // Search for it
         let response = app
@@ -2323,10 +2323,10 @@ mod tests {
                 Request::builder()
                     .uri("/search/text?q=Rust&limit=10")
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("TODO: handle error"),
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         assert_eq!(response.status(), StatusCode::OK);
     }
@@ -2341,10 +2341,10 @@ mod tests {
                 Request::builder()
                     .uri("/drift/status")
                     .body(Body::empty())
-                    .unwrap(),
+                    .expect("TODO: handle error"),
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         assert_eq!(response.status(), StatusCode::OK);
     }

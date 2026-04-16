@@ -362,17 +362,17 @@ mod tests {
     async fn test_version_store() {
         let store: InMemoryVersionStore<String> = InMemoryVersionStore::new();
 
-        let v1 = store.append("entity1", "data v1".to_string(), "alice", Some("initial")).await.unwrap();
-        let v2 = store.append("entity1", "data v2".to_string(), "bob", Some("update")).await.unwrap();
+        let v1 = store.append("entity1", "data v1".to_string(), "alice", Some("initial")).await.expect("TODO: handle error");
+        let v2 = store.append("entity1", "data v2".to_string(), "bob", Some("update")).await.expect("TODO: handle error");
 
         assert_eq!(v1, 1);
         assert_eq!(v2, 2);
 
-        let latest = store.latest("entity1").await.unwrap().unwrap();
+        let latest = store.latest("entity1").await.expect("TODO: handle error").expect("TODO: handle error");
         assert_eq!(latest.version, 2);
         assert_eq!(latest.data, "data v2");
 
-        let v1_data = store.at_version("entity1", 1).await.unwrap().unwrap();
+        let v1_data = store.at_version("entity1", 1).await.expect("TODO: handle error").expect("TODO: handle error");
         assert_eq!(v1_data.data, "data v1");
     }
 
@@ -380,11 +380,11 @@ mod tests {
     async fn test_time_series() {
         let store: InMemoryTimeSeriesStore<f64> = InMemoryTimeSeriesStore::new();
 
-        store.append("cpu", TimePoint::now(0.5)).await.unwrap();
-        store.append("cpu", TimePoint::now(0.7)).await.unwrap();
-        store.append("cpu", TimePoint::now(0.6)).await.unwrap();
+        store.append("cpu", TimePoint::now(0.5)).await.expect("TODO: handle error");
+        store.append("cpu", TimePoint::now(0.7)).await.expect("TODO: handle error");
+        store.append("cpu", TimePoint::now(0.6)).await.expect("TODO: handle error");
 
-        let latest = store.latest("cpu").await.unwrap().unwrap();
+        let latest = store.latest("cpu").await.expect("TODO: handle error").expect("TODO: handle error");
         assert!((latest.value - 0.6).abs() < f64::EPSILON);
     }
 }

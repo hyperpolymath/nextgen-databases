@@ -1422,9 +1422,9 @@ mod tests {
 
         InMemoryOctadStore::new(
             config,
-            Arc::new(SimpleGraphStore::in_memory().unwrap()),
+            Arc::new(SimpleGraphStore::in_memory().expect("TODO: handle error")),
             Arc::new(BruteForceVectorStore::new(3, DistanceMetric::Cosine)),
-            Arc::new(TantivyDocumentStore::in_memory().unwrap()),
+            Arc::new(TantivyDocumentStore::in_memory().expect("TODO: handle error")),
             Arc::new(InMemoryTensorStore::new()),
             Arc::new(InMemorySemanticStore::new()),
             Arc::new(InMemoryVersionStore::new()),
@@ -1442,14 +1442,14 @@ mod tests {
             .with_embedding(vec![0.1, 0.2, 0.3])
             .build();
 
-        let octad = store.create(input).await.unwrap();
+        let octad = store.create(input).await.expect("TODO: handle error");
         assert!(octad.status.modality_status.document);
         assert!(octad.status.modality_status.vector);
         assert!(octad.status.modality_status.temporal);
 
-        let retrieved = store.get(&octad.id).await.unwrap();
+        let retrieved = store.get(&octad.id).await.expect("TODO: handle error");
         assert!(retrieved.is_some());
-        let retrieved = retrieved.unwrap();
+        let retrieved = retrieved.expect("TODO: handle error");
         assert_eq!(retrieved.id, octad.id);
     }
 
@@ -1472,11 +1472,11 @@ mod tests {
             .with_embedding(vec![0.0, 1.0, 0.0])
             .build();
 
-        store.create(input1).await.unwrap();
-        store.create(input2).await.unwrap();
-        store.create(input3).await.unwrap();
+        store.create(input1).await.expect("TODO: handle error");
+        store.create(input2).await.expect("TODO: handle error");
+        store.create(input3).await.expect("TODO: handle error");
 
-        let results = store.search_similar(&[1.0, 0.0, 0.0], 2).await.unwrap();
+        let results = store.search_similar(&[1.0, 0.0, 0.0], 2).await.expect("TODO: handle error");
         assert_eq!(results.len(), 2);
     }
 
@@ -1494,12 +1494,12 @@ mod tests {
             .with_embedding(vec![0.4, 0.5, 0.6])
             .build();
 
-        store.create(input1).await.unwrap();
-        store.create(input2).await.unwrap();
+        store.create(input1).await.expect("TODO: handle error");
+        store.create(input2).await.expect("TODO: handle error");
 
-        let results = store.search_text("Rust", 10).await.unwrap();
+        let results = store.search_text("Rust", 10).await.expect("TODO: handle error");
         assert_eq!(results.len(), 1);
-        assert!(results[0].document.as_ref().unwrap().title.contains("Rust"));
+        assert!(results[0].document.as_ref().expect("TODO: handle error").title.contains("Rust"));
     }
 
     #[tokio::test]
@@ -1511,15 +1511,15 @@ mod tests {
             .with_embedding(vec![0.1, 0.2, 0.3])
             .build();
 
-        let octad = store.create(input).await.unwrap();
+        let octad = store.create(input).await.expect("TODO: handle error");
         assert_eq!(octad.status.version, 1);
 
         let update_input = OctadBuilder::new()
             .with_document("Updated", "Updated content")
             .build();
 
-        let updated = store.update(&octad.id, update_input).await.unwrap();
+        let updated = store.update(&octad.id, update_input).await.expect("TODO: handle error");
         assert_eq!(updated.status.version, 2);
-        assert!(updated.document.as_ref().unwrap().title.contains("Updated"));
+        assert!(updated.document.as_ref().expect("TODO: handle error").title.contains("Updated"));
     }
 }

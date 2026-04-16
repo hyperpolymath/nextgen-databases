@@ -637,10 +637,10 @@ mod tests {
         state
             .peers
             .write()
-            .unwrap()
+            .expect("TODO: handle error")
             .insert("peer-1".to_string(), peer);
 
-        let peers = state.peers.read().unwrap();
+        let peers = state.peers.read().expect("TODO: handle error");
         assert_eq!(peers.len(), 1);
         assert_eq!(peers["peer-1"].trust_level, 0.95);
     }

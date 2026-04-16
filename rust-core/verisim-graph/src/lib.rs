@@ -313,17 +313,17 @@ mod tests {
 
     #[tokio::test]
     async fn test_insert_and_query() {
-        let store = SimpleGraphStore::in_memory().unwrap();
+        let store = SimpleGraphStore::in_memory().expect("TODO: handle error");
         let edge = GraphEdge {
             subject: GraphNode::new("https://example.org/Alice"),
             predicate: GraphNode::new("https://example.org/knows"),
             object: GraphObject::Node(GraphNode::new("https://example.org/Bob")),
         };
 
-        store.insert(&edge).await.unwrap();
-        assert!(store.exists(&edge).await.unwrap());
+        store.insert(&edge).await.expect("TODO: handle error");
+        assert!(store.exists(&edge).await.expect("TODO: handle error"));
 
-        let outgoing = store.outgoing(&edge.subject).await.unwrap();
+        let outgoing = store.outgoing(&edge.subject).await.expect("TODO: handle error");
         assert_eq!(outgoing.len(), 1);
     }
 
@@ -336,10 +336,10 @@ mod tests {
             object: GraphObject::Node(GraphNode::new("https://example.org/Bob")),
         };
 
-        store.insert(&edge).await.unwrap();
+        store.insert(&edge).await.expect("TODO: handle error");
 
         let bob = GraphNode::new("https://example.org/Bob");
-        let incoming = store.incoming(&bob).await.unwrap();
+        let incoming = store.incoming(&bob).await.expect("TODO: handle error");
         assert_eq!(incoming.len(), 1);
     }
 
@@ -352,11 +352,11 @@ mod tests {
             object: GraphObject::Node(GraphNode::new("https://example.org/Bob")),
         };
 
-        store.insert(&edge).await.unwrap();
-        assert!(store.exists(&edge).await.unwrap());
+        store.insert(&edge).await.expect("TODO: handle error");
+        assert!(store.exists(&edge).await.expect("TODO: handle error"));
 
-        store.delete(&edge).await.unwrap();
-        assert!(!store.exists(&edge).await.unwrap());
+        store.delete(&edge).await.expect("TODO: handle error");
+        assert!(!store.exists(&edge).await.expect("TODO: handle error"));
     }
 
     #[tokio::test]
@@ -371,10 +371,10 @@ mod tests {
             },
         };
 
-        store.insert(&edge).await.unwrap();
-        assert!(store.exists(&edge).await.unwrap());
+        store.insert(&edge).await.expect("TODO: handle error");
+        assert!(store.exists(&edge).await.expect("TODO: handle error"));
 
-        let outgoing = store.outgoing(&edge.subject).await.unwrap();
+        let outgoing = store.outgoing(&edge.subject).await.expect("TODO: handle error");
         assert_eq!(outgoing.len(), 1);
     }
 
@@ -394,17 +394,17 @@ mod tests {
             object: GraphObject::Node(GraphNode::new("https://example.org/Carol")),
         };
 
-        store.insert(&e1).await.unwrap();
-        store.insert(&e2).await.unwrap();
+        store.insert(&e1).await.expect("TODO: handle error");
+        store.insert(&e2).await.expect("TODO: handle error");
 
         let alice = GraphNode::new("https://example.org/Alice");
 
         // 1 hop: Alice, Bob
-        let neighbors_1 = store.neighborhood(&alice, 1).await.unwrap();
+        let neighbors_1 = store.neighborhood(&alice, 1).await.expect("TODO: handle error");
         assert_eq!(neighbors_1.len(), 2);
 
         // 2 hops: Alice, Bob, Carol
-        let neighbors_2 = store.neighborhood(&alice, 2).await.unwrap();
+        let neighbors_2 = store.neighborhood(&alice, 2).await.expect("TODO: handle error");
         assert_eq!(neighbors_2.len(), 3);
     }
 
@@ -418,10 +418,10 @@ mod tests {
         };
 
         // Insert the same edge twice
-        store.insert(&edge).await.unwrap();
-        store.insert(&edge).await.unwrap();
+        store.insert(&edge).await.expect("TODO: handle error");
+        store.insert(&edge).await.expect("TODO: handle error");
 
-        let outgoing = store.outgoing(&edge.subject).await.unwrap();
+        let outgoing = store.outgoing(&edge.subject).await.expect("TODO: handle error");
         assert_eq!(outgoing.len(), 1, "Duplicate edges should be deduplicated");
     }
 }

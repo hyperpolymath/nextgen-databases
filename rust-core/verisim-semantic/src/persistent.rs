@@ -248,12 +248,12 @@ mod tests {
 
     #[tokio::test]
     async fn test_persistent_semantic_roundtrip() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("TODO: handle error");
         let path = dir.path().join("semantic.redb");
 
         // Write data in one session.
         {
-            let store = RedbSemanticStore::open(&path).await.unwrap();
+            let store = RedbSemanticStore::open(&path).await.expect("TODO: handle error");
 
             let person_type =
                 SemanticType::new("https://example.org/Person", "Person").with_constraint(
@@ -263,7 +263,7 @@ mod tests {
                         message: "Person must have a name".to_string(),
                     },
                 );
-            store.register_type(&person_type).await.unwrap();
+            store.register_type(&person_type).await.expect("TODO: handle error");
 
             let mut properties = HashMap::new();
             properties.insert(
@@ -279,32 +279,32 @@ mod tests {
                 properties,
                 provenance: Provenance::default(),
             };
-            store.annotate(&ann).await.unwrap();
+            store.annotate(&ann).await.expect("TODO: handle error");
 
             let proof = ProofBlob::new(
                 "e1 is-a Person",
                 crate::ProofType::TypeAssignment,
                 vec![1, 2, 3],
             );
-            store.store_proof(&proof).await.unwrap();
+            store.store_proof(&proof).await.expect("TODO: handle error");
         }
 
         // Reopen and verify data survived.
         {
-            let store = RedbSemanticStore::open(&path).await.unwrap();
+            let store = RedbSemanticStore::open(&path).await.expect("TODO: handle error");
 
             let typ = store
                 .get_type("https://example.org/Person")
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
             assert!(typ.is_some());
-            assert_eq!(typ.unwrap().label, "Person");
+            assert_eq!(typ.expect("TODO: handle error").label, "Person");
 
-            let ann = store.get_annotations("e1").await.unwrap();
+            let ann = store.get_annotations("e1").await.expect("TODO: handle error");
             assert!(ann.is_some());
-            assert_eq!(ann.unwrap().entity_id, "e1");
+            assert_eq!(ann.expect("TODO: handle error").entity_id, "e1");
 
-            let proofs = store.get_proofs("e1 is-a Person").await.unwrap();
+            let proofs = store.get_proofs("e1 is-a Person").await.expect("TODO: handle error");
             assert_eq!(proofs.len(), 1);
             assert_eq!(proofs[0].claim, "e1 is-a Person");
         }

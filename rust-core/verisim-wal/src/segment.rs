@@ -172,7 +172,7 @@ mod tests {
 
     impl TestDir {
         fn new() -> Self {
-            let inner = TempDir::new().unwrap();
+            let inner = TempDir::new().expect("TODO: handle error");
             let path = inner.path().to_path_buf();
             Self {
                 _inner: inner,
@@ -182,8 +182,8 @@ mod tests {
 
         fn create_segment(&self, start_seq: u64, size_bytes: usize) {
             let file_path = segment_path(&self.path, start_seq);
-            let mut file = File::create(file_path).unwrap();
-            file.write_all(&vec![0u8; size_bytes]).unwrap();
+            let mut file = File::create(file_path).expect("TODO: handle error");
+            file.write_all(&vec![0u8; size_bytes]).expect("TODO: handle error");
         }
     }
 
@@ -225,9 +225,9 @@ mod tests {
         dir.create_segment(50, 2048);
 
         // Create a non-segment file that should be ignored.
-        File::create(dir.path.join("readme.txt")).unwrap();
+        File::create(dir.path.join("readme.txt")).expect("TODO: handle error");
 
-        let segments = list_segments(&dir.path).unwrap();
+        let segments = list_segments(&dir.path).expect("TODO: handle error");
         assert_eq!(segments.len(), 3);
         assert_eq!(segments[0].start_sequence, 1);
         assert_eq!(segments[0].file_size, 512);
@@ -238,7 +238,7 @@ mod tests {
     #[test]
     fn test_list_segments_empty_dir() {
         let dir = TestDir::new();
-        let segments = list_segments(&dir.path).unwrap();
+        let segments = list_segments(&dir.path).expect("TODO: handle error");
         assert!(segments.is_empty());
     }
 
@@ -267,10 +267,10 @@ mod tests {
         dir.create_segment(100, 100);
 
         // Prune everything before sequence 100.
-        let removed = prune_segments_before(&dir.path, 100).unwrap();
+        let removed = prune_segments_before(&dir.path, 100).expect("TODO: handle error");
         assert_eq!(removed, 2);
 
-        let remaining = list_segments(&dir.path).unwrap();
+        let remaining = list_segments(&dir.path).expect("TODO: handle error");
         assert_eq!(remaining.len(), 1);
         assert_eq!(remaining[0].start_sequence, 100);
     }
@@ -282,10 +282,10 @@ mod tests {
 
         // Even though sequence 1 < checkpoint 999, we should not remove it
         // because there is no later segment covering the checkpoint.
-        let removed = prune_segments_before(&dir.path, 999).unwrap();
+        let removed = prune_segments_before(&dir.path, 999).expect("TODO: handle error");
         assert_eq!(removed, 0);
 
-        let remaining = list_segments(&dir.path).unwrap();
+        let remaining = list_segments(&dir.path).expect("TODO: handle error");
         assert_eq!(remaining.len(), 1);
     }
 }

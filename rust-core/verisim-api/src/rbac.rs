@@ -873,7 +873,7 @@ mod tests {
         // First entry: admin allowed read.
         let allowed_entry = entries.iter().find(|e| e.decision == AccessDecision::Allowed);
         assert!(allowed_entry.is_some(), "Expected an ALLOWED entry");
-        let allowed = allowed_entry.unwrap();
+        let allowed = allowed_entry.expect("TODO: handle error");
         assert_eq!(allowed.client_id, "audit-admin");
         assert_eq!(allowed.client_role, "admin");
         assert_eq!(allowed.required_permission, Permission::Read);
@@ -881,7 +881,7 @@ mod tests {
         // Second entry: reader denied write.
         let denied_entry = entries.iter().find(|e| e.decision == AccessDecision::Denied);
         assert!(denied_entry.is_some(), "Expected a DENIED entry");
-        let denied = denied_entry.unwrap();
+        let denied = denied_entry.expect("TODO: handle error");
         assert_eq!(denied.client_id, "audit-reader");
         assert_eq!(denied.client_role, "reader");
         assert_eq!(denied.required_permission, Permission::Write);

@@ -814,7 +814,7 @@ mod tests {
             )
             .await;
 
-        let resolution = resolver.resolve(&conflict.id, None).await.unwrap();
+        let resolution = resolver.resolve(&conflict.id, None).await.expect("TODO: handle error");
 
         // LastWriterWins picks the last modality in the list
         assert_eq!(resolution.winning_modality, Some(Modality::Vector));
@@ -849,7 +849,7 @@ mod tests {
             )
             .await;
 
-        let resolution = resolver.resolve(&conflict.id, None).await.unwrap();
+        let resolution = resolver.resolve(&conflict.id, None).await.expect("TODO: handle error");
 
         // Document has higher priority than Vector in the custom order
         assert_eq!(resolution.winning_modality, Some(Modality::Document));
@@ -887,7 +887,7 @@ mod tests {
                 Some(ConflictPolicy::ModalityPriority(priority_order)),
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         // Vector is higher priority than Document in the reversed order
         assert_eq!(resolution.winning_modality, Some(Modality::Vector));
@@ -919,7 +919,7 @@ mod tests {
 
         // Conflict should now be InProgress
         let active = resolver.active_conflicts().await;
-        let found = active.iter().find(|c| c.id == conflict.id).unwrap();
+        let found = active.iter().find(|c| c.id == conflict.id).expect("TODO: handle error");
         assert_eq!(found.status, ConflictStatus::InProgress);
     }
 
@@ -953,11 +953,11 @@ mod tests {
                 Some("Semantic annotations are more recent".to_string()),
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         assert_eq!(resolution.winning_modality, Some(Modality::Semantic));
         assert_eq!(resolution.resolver, "admin-user-42");
-        assert!(resolution.notes.as_ref().unwrap().contains("more recent"));
+        assert!(resolution.notes.as_ref().expect("TODO: handle error").contains("more recent"));
         assert_eq!(resolution.policy_used, ConflictPolicy::ManualResolve);
     }
 
@@ -983,7 +983,7 @@ mod tests {
             .await;
 
         // Should resolve automatically
-        let resolution = resolver.resolve(&conflict.id, None).await.unwrap();
+        let resolution = resolver.resolve(&conflict.id, None).await.expect("TODO: handle error");
         assert_eq!(resolution.resolver, "system");
 
         // Should be in history now, not active
@@ -1021,7 +1021,7 @@ mod tests {
 
         // Conflict should be InProgress now
         let active = resolver.active_conflicts().await;
-        let found = active.iter().find(|c| c.id == conflict.id).unwrap();
+        let found = active.iter().find(|c| c.id == conflict.id).expect("TODO: handle error");
         assert_eq!(found.status, ConflictStatus::InProgress);
     }
 
@@ -1043,7 +1043,7 @@ mod tests {
         resolver
             .dismiss(&conflict.id, "False positive -- data was updated concurrently")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         // Should not be active
         let active = resolver.active_conflicts().await;
@@ -1051,15 +1051,15 @@ mod tests {
 
         // Should be in history with Dismissed status
         let history = resolver.history(10).await;
-        let found = history.iter().find(|c| c.id == conflict.id).unwrap();
+        let found = history.iter().find(|c| c.id == conflict.id).expect("TODO: handle error");
         assert_eq!(found.status, ConflictStatus::Dismissed);
         assert!(found
             .resolution
             .as_ref()
-            .unwrap()
+            .expect("TODO: handle error")
             .notes
             .as_ref()
-            .unwrap()
+            .expect("TODO: handle error")
             .contains("False positive"));
     }
 
@@ -1079,7 +1079,7 @@ mod tests {
                     &format!("Conflict {}", i),
                 )
                 .await;
-            resolver.resolve(&conflict.id, None).await.unwrap();
+            resolver.resolve(&conflict.id, None).await.expect("TODO: handle error");
         }
 
         // Full history should have 3 entries
@@ -1112,7 +1112,7 @@ mod tests {
                     &format!("Conflict {}", i),
                 )
                 .await;
-            resolver.resolve(&conflict.id, None).await.unwrap();
+            resolver.resolve(&conflict.id, None).await.expect("TODO: handle error");
         }
 
         // History should be capped at 3
@@ -1163,7 +1163,7 @@ mod tests {
             .await;
 
         // Resolve one of entity-A's conflicts
-        resolver.resolve(&c1.id, None).await.unwrap();
+        resolver.resolve(&c1.id, None).await.expect("TODO: handle error");
 
         // by_entity should return both A conflicts (1 resolved in history, 1 active)
         let a_conflicts = resolver.by_entity("entity-A").await;
@@ -1207,7 +1207,7 @@ mod tests {
             )
             .await;
 
-        let resolution = resolver.resolve(&conflict.id, None).await.unwrap();
+        let resolution = resolver.resolve(&conflict.id, None).await.expect("TODO: handle error");
 
         // Per-pair override should use ModalityPriority with Document winning
         assert_eq!(resolution.winning_modality, Some(Modality::Document));
@@ -1247,7 +1247,7 @@ mod tests {
             .await;
 
         // First resolve succeeds
-        resolver.resolve(&conflict.id, None).await.unwrap();
+        resolver.resolve(&conflict.id, None).await.expect("TODO: handle error");
 
         // Second resolve should fail -- conflict has moved to history
         let err = resolver.resolve(&conflict.id, None).await.unwrap_err();
@@ -1341,7 +1341,7 @@ mod tests {
         assert_eq!(active.len(), 3);
 
         // Resolve the first
-        resolver.resolve(&c1.id, None).await.unwrap();
+        resolver.resolve(&c1.id, None).await.expect("TODO: handle error");
 
         // Now 2 active, 1 in history
         let active = resolver.active_conflicts().await;
@@ -1389,7 +1389,7 @@ mod tests {
         assert_eq!(active[1].id, c2.id);
 
         // Resolve one
-        resolver.resolve(&c1.id, None).await.unwrap();
+        resolver.resolve(&c1.id, None).await.expect("TODO: handle error");
 
         let active = resolver.active_conflicts().await;
         assert_eq!(active.len(), 1);
@@ -1412,10 +1412,10 @@ mod tests {
             .await;
 
         // Serialize the conflict to JSON
-        let json = serde_json::to_string_pretty(&conflict).unwrap();
+        let json = serde_json::to_string_pretty(&conflict).expect("TODO: handle error");
 
         // Deserialize back
-        let deserialized: Conflict = serde_json::from_str(&json).unwrap();
+        let deserialized: Conflict = serde_json::from_str(&json).expect("TODO: handle error");
 
         assert_eq!(deserialized.id, conflict.id);
         assert_eq!(deserialized.entity_id, "entity-json");
@@ -1425,10 +1425,10 @@ mod tests {
         assert!(deserialized.resolution.is_none());
 
         // Resolve and round-trip the resolution
-        let resolution = resolver.resolve(&conflict.id, None).await.unwrap();
-        let resolution_json = serde_json::to_string_pretty(&resolution).unwrap();
+        let resolution = resolver.resolve(&conflict.id, None).await.expect("TODO: handle error");
+        let resolution_json = serde_json::to_string_pretty(&resolution).expect("TODO: handle error");
         let deserialized_resolution: ConflictResolution =
-            serde_json::from_str(&resolution_json).unwrap();
+            serde_json::from_str(&resolution_json).expect("TODO: handle error");
 
         assert_eq!(
             deserialized_resolution.policy_used,
@@ -1447,8 +1447,8 @@ mod tests {
         // postcard, CBOR) can handle tuple keys natively.
         let config = test_config();
 
-        let json = serde_json::to_string_pretty(&config).unwrap();
-        let deserialized: ConflictConfig = serde_json::from_str(&json).unwrap();
+        let json = serde_json::to_string_pretty(&config).expect("TODO: handle error");
+        let deserialized: ConflictConfig = serde_json::from_str(&json).expect("TODO: handle error");
 
         assert_eq!(deserialized.default_policy, config.default_policy);
         assert!((deserialized.auto_resolve_threshold - config.auto_resolve_threshold).abs()
@@ -1479,7 +1479,7 @@ mod tests {
             )
             .await;
 
-        let resolution = resolver.resolve(&conflict.id, None).await.unwrap();
+        let resolution = resolver.resolve(&conflict.id, None).await.expect("TODO: handle error");
 
         // AutoMerge does not pick a single winner
         assert!(resolution.winning_modality.is_none());
@@ -1501,7 +1501,7 @@ mod tests {
             )
             .await;
 
-        resolver.dismiss(&conflict.id, "First dismissal").await.unwrap();
+        resolver.dismiss(&conflict.id, "First dismissal").await.expect("TODO: handle error");
 
         // Second dismissal should fail (not found -- moved to history)
         let err = resolver

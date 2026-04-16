@@ -339,9 +339,9 @@ mod tests {
     /// for the lifetime of the test (NamedTempFile's Drop would unlink the
     /// path while redb still holds it open, breaking `approximate_size`).
     fn temp_backend() -> (RedbBackend, tempfile::TempDir) {
-        let dir = tempdir().unwrap();
+        let dir = tempdir().expect("TODO: handle error");
         let path = dir.path().join("test.redb");
-        let backend = RedbBackend::open(&path).unwrap();
+        let backend = RedbBackend::open(&path).expect("TODO: handle error");
         (backend, dir)
     }
 
@@ -350,51 +350,51 @@ mod tests {
         let (backend, _dir) = temp_backend();
 
         // Get on empty store returns None
-        assert_eq!(backend.get(b"key1").await.unwrap(), None);
-        assert!(!backend.exists(b"key1").await.unwrap());
+        assert_eq!(backend.get(b"key1").await.expect("TODO: handle error"), None);
+        assert!(!backend.exists(b"key1").await.expect("TODO: handle error"));
 
         // Put and get
-        backend.put(b"key1", b"value1").await.unwrap();
-        assert_eq!(backend.get(b"key1").await.unwrap(), Some(b"value1".to_vec()));
-        assert!(backend.exists(b"key1").await.unwrap());
+        backend.put(b"key1", b"value1").await.expect("TODO: handle error");
+        assert_eq!(backend.get(b"key1").await.expect("TODO: handle error"), Some(b"value1".to_vec()));
+        assert!(backend.exists(b"key1").await.expect("TODO: handle error"));
 
         // Overwrite
-        backend.put(b"key1", b"updated").await.unwrap();
-        assert_eq!(backend.get(b"key1").await.unwrap(), Some(b"updated".to_vec()));
+        backend.put(b"key1", b"updated").await.expect("TODO: handle error");
+        assert_eq!(backend.get(b"key1").await.expect("TODO: handle error"), Some(b"updated".to_vec()));
 
         // Delete existing key
-        assert!(backend.delete(b"key1").await.unwrap());
-        assert_eq!(backend.get(b"key1").await.unwrap(), None);
+        assert!(backend.delete(b"key1").await.expect("TODO: handle error"));
+        assert_eq!(backend.get(b"key1").await.expect("TODO: handle error"), None);
 
         // Delete non-existent key
-        assert!(!backend.delete(b"nonexistent").await.unwrap());
+        assert!(!backend.delete(b"nonexistent").await.expect("TODO: handle error"));
     }
 
     #[tokio::test]
     async fn test_scan_prefix() {
         let (backend, _dir) = temp_backend();
 
-        backend.put(b"user:1:name", b"Alice").await.unwrap();
-        backend.put(b"user:1:age", b"30").await.unwrap();
-        backend.put(b"user:2:name", b"Bob").await.unwrap();
-        backend.put(b"post:1:title", b"Hello").await.unwrap();
+        backend.put(b"user:1:name", b"Alice").await.expect("TODO: handle error");
+        backend.put(b"user:1:age", b"30").await.expect("TODO: handle error");
+        backend.put(b"user:2:name", b"Bob").await.expect("TODO: handle error");
+        backend.put(b"post:1:title", b"Hello").await.expect("TODO: handle error");
 
         // Scan "user:1:" prefix
-        let results = backend.scan_prefix(b"user:1:", 10).await.unwrap();
+        let results = backend.scan_prefix(b"user:1:", 10).await.expect("TODO: handle error");
         assert_eq!(results.len(), 2);
         assert_eq!(results[0].0, b"user:1:age".to_vec());
         assert_eq!(results[1].0, b"user:1:name".to_vec());
 
         // Scan "user:" prefix — all user keys
-        let results = backend.scan_prefix(b"user:", 10).await.unwrap();
+        let results = backend.scan_prefix(b"user:", 10).await.expect("TODO: handle error");
         assert_eq!(results.len(), 3);
 
         // Scan with limit
-        let results = backend.scan_prefix(b"user:", 2).await.unwrap();
+        let results = backend.scan_prefix(b"user:", 2).await.expect("TODO: handle error");
         assert_eq!(results.len(), 2);
 
         // Scan with no matching prefix
-        let results = backend.scan_prefix(b"missing:", 10).await.unwrap();
+        let results = backend.scan_prefix(b"missing:", 10).await.expect("TODO: handle error");
         assert!(results.is_empty());
     }
 
@@ -402,14 +402,14 @@ mod tests {
     async fn test_multi_get() {
         let (backend, _dir) = temp_backend();
 
-        backend.put(b"a", b"1").await.unwrap();
-        backend.put(b"b", b"2").await.unwrap();
-        backend.put(b"c", b"3").await.unwrap();
+        backend.put(b"a", b"1").await.expect("TODO: handle error");
+        backend.put(b"b", b"2").await.expect("TODO: handle error");
+        backend.put(b"c", b"3").await.expect("TODO: handle error");
 
         let results = backend
             .multi_get(&[b"a" as &[u8], b"missing", b"c"])
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         assert_eq!(results.len(), 3);
         assert_eq!(results[0], Some(b"1".to_vec()));
@@ -428,19 +428,19 @@ mod tests {
                 (b"z", b"30"),
             ])
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        assert_eq!(backend.get(b"x").await.unwrap(), Some(b"10".to_vec()));
-        assert_eq!(backend.get(b"y").await.unwrap(), Some(b"20".to_vec()));
-        assert_eq!(backend.get(b"z").await.unwrap(), Some(b"30".to_vec()));
+        assert_eq!(backend.get(b"x").await.expect("TODO: handle error"), Some(b"10".to_vec()));
+        assert_eq!(backend.get(b"y").await.expect("TODO: handle error"), Some(b"20".to_vec()));
+        assert_eq!(backend.get(b"z").await.expect("TODO: handle error"), Some(b"30".to_vec()));
     }
 
     #[tokio::test]
     async fn test_flush_compacts() {
         let (backend, _dir) = temp_backend();
-        backend.put(b"key", b"val").await.unwrap();
-        backend.flush().await.unwrap();
-        assert_eq!(backend.get(b"key").await.unwrap(), Some(b"val".to_vec()));
+        backend.put(b"key", b"val").await.expect("TODO: handle error");
+        backend.flush().await.expect("TODO: handle error");
+        assert_eq!(backend.get(b"key").await.expect("TODO: handle error"), Some(b"val".to_vec()));
     }
 
     #[tokio::test]
@@ -453,27 +453,27 @@ mod tests {
     async fn test_approximate_size() {
         let (backend, _dir) = temp_backend();
         // After writing data, file size should be non-zero
-        backend.put(b"key", b"value").await.unwrap();
-        let size = backend.approximate_size().await.unwrap();
+        backend.put(b"key", b"value").await.expect("TODO: handle error");
+        let size = backend.approximate_size().await.expect("TODO: handle error");
         assert!(size.is_some());
-        assert!(size.unwrap() > 0);
+        assert!(size.expect("TODO: handle error") > 0);
     }
 
     #[tokio::test]
     async fn test_persistence_across_reopen() {
-        let dir = tempdir().unwrap();
+        let dir = tempdir().expect("TODO: handle error");
         let path = dir.path().join("persist-test.redb");
 
         // Write data and drop
         {
-            let backend = RedbBackend::open(&path).unwrap();
-            backend.put(b"persistent-key", b"persistent-value").await.unwrap();
+            let backend = RedbBackend::open(&path).expect("TODO: handle error");
+            backend.put(b"persistent-key", b"persistent-value").await.expect("TODO: handle error");
         }
 
         // Reopen and verify data survived
         {
-            let backend = RedbBackend::open(&path).unwrap();
-            let val = backend.get(b"persistent-key").await.unwrap();
+            let backend = RedbBackend::open(&path).expect("TODO: handle error");
+            let val = backend.get(b"persistent-key").await.expect("TODO: handle error");
             assert_eq!(val, Some(b"persistent-value".to_vec()));
         }
     }

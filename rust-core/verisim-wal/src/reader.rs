@@ -280,31 +280,31 @@ mod tests {
             operation: WalOperation::Insert,
             modality,
             entity_id: entity_id.to_string(),
-            payload: serde_json::to_vec(&serde_json::json!({"test": true})).unwrap(),
+            payload: serde_json::to_vec(&serde_json::json!({"test": true})).expect("TODO: handle error"),
         }
     }
 
     #[test]
     fn test_write_and_read_back() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         // Write entries.
         {
-            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
+            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
             writer
                 .append(test_entry("entity-1", WalModality::Graph))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("entity-2", WalModality::Vector))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("entity-3", WalModality::Tensor))
-                .unwrap();
+                .expect("TODO: handle error");
         }
 
         // Read entries.
-        let reader = WalReader::open(dir.path()).unwrap();
-        let entries: Vec<WalEntry> = reader.replay_all().unwrap().collect();
+        let reader = WalReader::open(dir.path()).expect("TODO: handle error");
+        let entries: Vec<WalEntry> = reader.replay_all().expect("TODO: handle error").collect();
 
         assert_eq!(entries.len(), 3);
         assert_eq!(entries[0].sequence, 1);
@@ -318,21 +318,21 @@ mod tests {
 
     #[test]
     fn test_replay_from_sequence() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         {
-            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
+            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
             for i in 0..10 {
                 writer
                     .append(test_entry(&format!("e-{i}"), WalModality::Document))
-                    .unwrap();
+                    .expect("TODO: handle error");
             }
         }
 
-        let reader = WalReader::open(dir.path()).unwrap();
+        let reader = WalReader::open(dir.path()).expect("TODO: handle error");
 
         // Replay from sequence 5 onward.
-        let entries: Vec<WalEntry> = reader.replay_from(5).unwrap().collect();
+        let entries: Vec<WalEntry> = reader.replay_from(5).expect("TODO: handle error").collect();
         assert_eq!(entries.len(), 6); // sequences 5, 6, 7, 8, 9, 10
         assert_eq!(entries[0].sequence, 5);
         assert_eq!(entries[5].sequence, 10);
@@ -340,106 +340,106 @@ mod tests {
 
     #[test]
     fn test_find_last_checkpoint() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         {
-            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
+            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
             writer
                 .append(test_entry("e-1", WalModality::Graph))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("e-2", WalModality::Vector))
-                .unwrap();
-            let cp1 = writer.checkpoint().unwrap();
+                .expect("TODO: handle error");
+            let cp1 = writer.checkpoint().expect("TODO: handle error");
             assert_eq!(cp1, 3);
 
             writer
                 .append(test_entry("e-3", WalModality::Tensor))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("e-4", WalModality::Semantic))
-                .unwrap();
-            let cp2 = writer.checkpoint().unwrap();
+                .expect("TODO: handle error");
+            let cp2 = writer.checkpoint().expect("TODO: handle error");
             assert_eq!(cp2, 6);
 
             writer
                 .append(test_entry("e-5", WalModality::Document))
-                .unwrap();
+                .expect("TODO: handle error");
         }
 
-        let reader = WalReader::open(dir.path()).unwrap();
-        let last_cp = reader.find_last_checkpoint().unwrap();
+        let reader = WalReader::open(dir.path()).expect("TODO: handle error");
+        let last_cp = reader.find_last_checkpoint().expect("TODO: handle error");
         assert_eq!(last_cp, Some(6));
     }
 
     #[test]
     fn test_no_checkpoint_returns_none() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         {
-            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
+            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
             writer
                 .append(test_entry("e-1", WalModality::Graph))
-                .unwrap();
+                .expect("TODO: handle error");
         }
 
-        let reader = WalReader::open(dir.path()).unwrap();
-        assert_eq!(reader.find_last_checkpoint().unwrap(), None);
+        let reader = WalReader::open(dir.path()).expect("TODO: handle error");
+        assert_eq!(reader.find_last_checkpoint().expect("TODO: handle error"), None);
     }
 
     #[test]
     fn test_empty_wal_produces_empty_iterator() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         // Create the WAL directory with a writer (creates empty segment).
         {
-            let _writer = WalWriter::open(dir.path(), SyncMode::Async).unwrap();
+            let _writer = WalWriter::open(dir.path(), SyncMode::Async).expect("TODO: handle error");
         }
 
-        let reader = WalReader::open(dir.path()).unwrap();
-        let entries: Vec<WalEntry> = reader.replay_all().unwrap().collect();
+        let reader = WalReader::open(dir.path()).expect("TODO: handle error");
+        let entries: Vec<WalEntry> = reader.replay_all().expect("TODO: handle error").collect();
         assert!(entries.is_empty());
     }
 
     #[test]
     fn test_corrupted_entry_skipped() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         // Write some entries.
         {
-            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
+            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
             writer
                 .append(test_entry("good-1", WalModality::Graph))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("will-corrupt", WalModality::Vector))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("good-3", WalModality::Tensor))
-                .unwrap();
+                .expect("TODO: handle error");
         }
 
         // Tamper with the second entry's CRC in the segment file.
-        let segments = list_segments(dir.path()).unwrap();
+        let segments = list_segments(dir.path()).expect("TODO: handle error");
         assert_eq!(segments.len(), 1);
 
-        let mut data = fs::read(&segments[0].path).unwrap();
+        let mut data = fs::read(&segments[0].path).expect("TODO: handle error");
 
         // Find the second entry. The first entry starts at offset 0.
         // Read the first entry's length to find the second entry's offset.
         let first_len =
-            u32::from_le_bytes(data[0..4].try_into().unwrap()) as usize;
+            u32::from_le_bytes(data[0..4].try_into().expect("TODO: handle error")) as usize;
         let second_entry_offset = 4 + first_len;
 
         // The CRC is at bytes [offset+4..offset+8] (after entry_length).
         let crc_offset = second_entry_offset + 4;
         data[crc_offset] ^= 0xFF; // Flip some bits in the CRC.
 
-        fs::write(&segments[0].path, &data).unwrap();
+        fs::write(&segments[0].path, &data).expect("TODO: handle error");
 
         // Read back: should get entries 1 and 3, but skip 2.
-        let reader = WalReader::open(dir.path()).unwrap();
-        let entries: Vec<WalEntry> = reader.replay_all().unwrap().collect();
+        let reader = WalReader::open(dir.path()).expect("TODO: handle error");
+        let entries: Vec<WalEntry> = reader.replay_all().expect("TODO: handle error").collect();
 
         assert_eq!(entries.len(), 2);
         assert_eq!(entries[0].entity_id, "good-1");
@@ -448,32 +448,32 @@ mod tests {
 
     #[test]
     fn test_multiple_modalities_in_same_wal() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         {
-            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
+            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
             writer
                 .append(test_entry("e-1", WalModality::Graph))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("e-2", WalModality::Vector))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("e-3", WalModality::Tensor))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("e-4", WalModality::Semantic))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("e-5", WalModality::Document))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("e-6", WalModality::Temporal))
-                .unwrap();
+                .expect("TODO: handle error");
         }
 
-        let reader = WalReader::open(dir.path()).unwrap();
-        let entries: Vec<WalEntry> = reader.replay_all().unwrap().collect();
+        let reader = WalReader::open(dir.path()).expect("TODO: handle error");
+        let entries: Vec<WalEntry> = reader.replay_all().expect("TODO: handle error").collect();
 
         assert_eq!(entries.len(), 6);
         assert_eq!(entries[0].modality, WalModality::Graph);
@@ -486,38 +486,38 @@ mod tests {
 
     #[test]
     fn test_checkpoint_and_replay_from_checkpoint() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         {
-            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
+            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
 
             // Phase 1: some data + checkpoint.
             writer
                 .append(test_entry("old-1", WalModality::Graph))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("old-2", WalModality::Vector))
-                .unwrap();
-            let cp = writer.checkpoint().unwrap();
+                .expect("TODO: handle error");
+            let cp = writer.checkpoint().expect("TODO: handle error");
             assert_eq!(cp, 3);
 
             // Phase 2: more data after checkpoint.
             writer
                 .append(test_entry("new-1", WalModality::Tensor))
-                .unwrap();
+                .expect("TODO: handle error");
             writer
                 .append(test_entry("new-2", WalModality::Semantic))
-                .unwrap();
+                .expect("TODO: handle error");
         }
 
-        let reader = WalReader::open(dir.path()).unwrap();
+        let reader = WalReader::open(dir.path()).expect("TODO: handle error");
 
         // Find the checkpoint.
-        let cp_seq = reader.find_last_checkpoint().unwrap().unwrap();
+        let cp_seq = reader.find_last_checkpoint().expect("TODO: handle error").expect("TODO: handle error");
         assert_eq!(cp_seq, 3);
 
         // Replay only from checkpoint onward.
-        let entries: Vec<WalEntry> = reader.replay_from(cp_seq + 1).unwrap().collect();
+        let entries: Vec<WalEntry> = reader.replay_from(cp_seq + 1).expect("TODO: handle error").collect();
         assert_eq!(entries.len(), 2);
         assert_eq!(entries[0].entity_id, "new-1");
         assert_eq!(entries[1].entity_id, "new-2");
@@ -525,46 +525,46 @@ mod tests {
 
     #[test]
     fn test_entry_count() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         {
-            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
+            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
             for _ in 0..7 {
                 writer
                     .append(test_entry("e", WalModality::Graph))
-                    .unwrap();
+                    .expect("TODO: handle error");
             }
         }
 
-        let reader = WalReader::open(dir.path()).unwrap();
-        assert_eq!(reader.entry_count().unwrap(), 7);
+        let reader = WalReader::open(dir.path()).expect("TODO: handle error");
+        assert_eq!(reader.entry_count().expect("TODO: handle error"), 7);
     }
 
     #[test]
     fn test_segment_rotation_read_across_segments() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         // Write with tiny segments to force rotation.
         {
             let mut writer =
-                WalWriter::open_with_max_size(dir.path(), SyncMode::Fsync, 100).unwrap();
+                WalWriter::open_with_max_size(dir.path(), SyncMode::Fsync, 100).expect("TODO: handle error");
             for i in 0..20 {
                 writer
                     .append(test_entry(
                         &format!("entity-{i}"),
                         WalModality::Graph,
                     ))
-                    .unwrap();
+                    .expect("TODO: handle error");
             }
         }
 
         // Verify multiple segments were created.
-        let segments = list_segments(dir.path()).unwrap();
+        let segments = list_segments(dir.path()).expect("TODO: handle error");
         assert!(segments.len() > 1);
 
         // Read all entries across segments.
-        let reader = WalReader::open(dir.path()).unwrap();
-        let entries: Vec<WalEntry> = reader.replay_all().unwrap().collect();
+        let reader = WalReader::open(dir.path()).expect("TODO: handle error");
+        let entries: Vec<WalEntry> = reader.replay_all().expect("TODO: handle error").collect();
         assert_eq!(entries.len(), 20);
 
         // Verify sequence continuity.
@@ -576,19 +576,19 @@ mod tests {
 
     #[test]
     fn test_exact_size_iterator() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         {
-            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
+            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
             for _ in 0..5 {
                 writer
                     .append(test_entry("e", WalModality::Graph))
-                    .unwrap();
+                    .expect("TODO: handle error");
             }
         }
 
-        let reader = WalReader::open(dir.path()).unwrap();
-        let iter = reader.replay_all().unwrap();
+        let reader = WalReader::open(dir.path()).expect("TODO: handle error");
+        let iter = reader.replay_all().expect("TODO: handle error");
         assert_eq!(iter.len(), 5);
     }
 }

@@ -149,8 +149,8 @@ mod tests {
     #[test]
     fn test_logical_plan_json_roundtrip() {
         let plan = sample_logical_plan();
-        let json = serde_json::to_string(&plan).unwrap();
-        let parsed: LogicalPlan = serde_json::from_str(&json).unwrap();
+        let json = serde_json::to_string(&plan).expect("TODO: handle error");
+        let parsed: LogicalPlan = serde_json::from_str(&json).expect("TODO: handle error");
         assert_eq!(parsed.nodes.len(), 2);
         assert_eq!(parsed.nodes[0].modality, Modality::Graph);
         assert_eq!(parsed.nodes[1].modality, Modality::Vector);
@@ -183,8 +183,8 @@ mod tests {
             },
             notes: vec!["Single modality — sequential execution".to_string()],
         };
-        let json = serde_json::to_string(&plan).unwrap();
-        let parsed: PhysicalPlan = serde_json::from_str(&json).unwrap();
+        let json = serde_json::to_string(&plan).expect("TODO: handle error");
+        let parsed: PhysicalPlan = serde_json::from_str(&json).expect("TODO: handle error");
         assert_eq!(parsed.steps.len(), 1);
         assert_eq!(parsed.strategy, ExecutionStrategy::Sequential);
     }
@@ -192,19 +192,19 @@ mod tests {
     #[test]
     fn test_query_source_variants() {
         let octad = QuerySource::Octad;
-        let json = serde_json::to_string(&octad).unwrap();
+        let json = serde_json::to_string(&octad).expect("TODO: handle error");
         assert!(json.contains("octad"));
 
         let fed = QuerySource::Federation {
             nodes: vec!["node1".to_string()],
         };
-        let json = serde_json::to_string(&fed).unwrap();
+        let json = serde_json::to_string(&fed).expect("TODO: handle error");
         assert!(json.contains("federation"));
 
         let store = QuerySource::Store {
             modality: Modality::Graph,
         };
-        let json = serde_json::to_string(&store).unwrap();
+        let json = serde_json::to_string(&store).expect("TODO: handle error");
         assert!(json.contains("store"));
     }
 }

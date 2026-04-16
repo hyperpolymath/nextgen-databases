@@ -118,7 +118,7 @@ impl QueryOctadBuilder {
                 if !self.executions.is_empty() {
                     fields.insert(
                         "last_executed".to_string(),
-                        self.executions.last().unwrap().executed_at.to_rfc3339(),
+                        self.executions.last().expect("TODO: handle error").executed_at.to_rfc3339(),
                     );
                     fields.insert(
                         "execution_count".to_string(),
@@ -207,7 +207,7 @@ mod tests {
         assert!(input.tensor.is_some());
         assert!(input.semantic.is_some());
 
-        let doc = input.document.unwrap();
+        let doc = input.document.expect("TODO: handle error");
         assert!(doc.title.starts_with("VCL Query:"));
         assert!(doc.body.contains("drift"));
     }

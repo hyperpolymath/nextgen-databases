@@ -229,7 +229,7 @@ mod tests {
             post_processing: vec![],
         };
 
-        let physical = planner.optimize(&plan).unwrap();
+        let physical = planner.optimize(&plan).expect("TODO: handle error");
         assert_eq!(physical.strategy, ExecutionStrategy::Sequential);
         assert_eq!(physical.steps.len(), 1);
     }
@@ -237,7 +237,7 @@ mod tests {
     #[test]
     fn test_multi_modality_parallel() {
         let planner = Planner::new(PlannerConfig::default());
-        let physical = planner.optimize(&graph_vector_plan()).unwrap();
+        let physical = planner.optimize(&graph_vector_plan()).expect("TODO: handle error");
         assert_eq!(physical.strategy, ExecutionStrategy::Parallel);
         assert_eq!(physical.steps.len(), 2);
     }
@@ -245,7 +245,7 @@ mod tests {
     #[test]
     fn test_vector_before_graph() {
         let planner = Planner::new(PlannerConfig::default());
-        let physical = planner.optimize(&graph_vector_plan()).unwrap();
+        let physical = planner.optimize(&graph_vector_plan()).expect("TODO: handle error");
 
         // Vector has priority 20, Graph has priority 40 → Vector first
         assert_eq!(physical.steps[0].modality, Modality::Vector);
@@ -282,8 +282,8 @@ mod tests {
             post_processing: vec![],
         };
 
-        let physical = planner.optimize(&plan).unwrap();
-        let last = physical.steps.last().unwrap();
+        let physical = planner.optimize(&plan).expect("TODO: handle error");
+        let last = physical.steps.last().expect("TODO: handle error");
         assert_eq!(last.modality, Modality::Semantic);
     }
 
@@ -311,7 +311,7 @@ mod tests {
             post_processing: vec![],
         };
 
-        let physical = planner.optimize(&plan).unwrap();
+        let physical = planner.optimize(&plan).expect("TODO: handle error");
         assert_eq!(physical.steps[0].modality, Modality::Temporal);
     }
 
@@ -332,7 +332,7 @@ mod tests {
     #[test]
     fn test_explain_generates_output() {
         let planner = Planner::new(PlannerConfig::default());
-        let explain = planner.explain(&graph_vector_plan()).unwrap();
+        let explain = planner.explain(&graph_vector_plan()).expect("TODO: handle error");
         assert_eq!(explain.steps.len(), 2);
         assert!(!explain.text_output.is_empty());
     }
@@ -340,7 +340,7 @@ mod tests {
     #[test]
     fn test_integration_graph_vector() {
         let planner = Planner::new(PlannerConfig::default());
-        let physical = planner.optimize(&graph_vector_plan()).unwrap();
+        let physical = planner.optimize(&graph_vector_plan()).expect("TODO: handle error");
 
         // Vector ordered before Graph
         assert_eq!(physical.steps[0].modality, Modality::Vector);
@@ -350,7 +350,7 @@ mod tests {
         assert_eq!(physical.strategy, ExecutionStrategy::Parallel);
 
         // EXPLAIN output contains expected sections
-        let explain = planner.explain(&graph_vector_plan()).unwrap();
+        let explain = planner.explain(&graph_vector_plan()).expect("TODO: handle error");
         assert!(explain.text_output.contains("Step"));
         assert!(explain.text_output.contains("Strategy"));
         assert!(explain.text_output.contains("vector"));

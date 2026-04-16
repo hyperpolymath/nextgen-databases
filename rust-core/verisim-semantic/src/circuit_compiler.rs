@@ -240,7 +240,7 @@ mod tests {
             parameters: vec!["x".into()],
         };
 
-        let compiled = compile_circuit(&def).unwrap();
+        let compiled = compile_circuit(&def).expect("TODO: handle error");
         assert_eq!(compiled.ir.name, "test-multiply");
         assert_eq!(compiled.ir.constraints.len(), 1);
         assert!(!compiled.circuit_hash.is_empty());
@@ -264,14 +264,14 @@ mod tests {
             parameters: vec![],
         };
 
-        let compiled = compile_circuit(&def).unwrap();
+        let compiled = compile_circuit(&def).expect("TODO: handle error");
 
         // a=3, b=4 → c should be 12
-        let valid = compiled.verify(&[12.0], &[3.0, 4.0]).unwrap();
+        let valid = compiled.verify(&[12.0], &[3.0, 4.0]).expect("TODO: handle error");
         assert!(valid);
 
         // Wrong: a=3, b=4, c=10
-        let invalid = compiled.verify(&[10.0], &[3.0, 4.0]).unwrap();
+        let invalid = compiled.verify(&[10.0], &[3.0, 4.0]).expect("TODO: handle error");
         assert!(!invalid);
     }
 

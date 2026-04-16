@@ -179,20 +179,20 @@ mod tests {
         };
 
         // Put and get.
-        store.put("rec1", &record).await.unwrap();
-        let retrieved: TestRecord = store.get("rec1").await.unwrap().unwrap();
+        store.put("rec1", &record).await.expect("TODO: handle error");
+        let retrieved: TestRecord = store.get("rec1").await.expect("TODO: handle error").expect("TODO: handle error");
         assert_eq!(retrieved, record);
 
         // Missing key.
-        let missing: Option<TestRecord> = store.get("nonexistent").await.unwrap();
+        let missing: Option<TestRecord> = store.get("nonexistent").await.expect("TODO: handle error");
         assert!(missing.is_none());
 
         // Delete.
-        assert!(store.delete("rec1").await.unwrap());
-        assert!(store.get::<TestRecord>("rec1").await.unwrap().is_none());
+        assert!(store.delete("rec1").await.expect("TODO: handle error"));
+        assert!(store.get::<TestRecord>("rec1").await.expect("TODO: handle error").is_none());
 
         // Delete non-existent.
-        assert!(!store.delete("rec1").await.unwrap());
+        assert!(!store.delete("rec1").await.expect("TODO: handle error"));
     }
 
     #[tokio::test]
@@ -201,20 +201,20 @@ mod tests {
         let store_a = TypedStore::new(backend.clone(), "ns_a");
         let store_b = TypedStore::new(backend.clone(), "ns_b");
 
-        store_a.put("key", &"value_a".to_string()).await.unwrap();
-        store_b.put("key", &"value_b".to_string()).await.unwrap();
+        store_a.put("key", &"value_a".to_string()).await.expect("TODO: handle error");
+        store_b.put("key", &"value_b".to_string()).await.expect("TODO: handle error");
 
         // Each namespace sees its own value.
-        let val_a: String = store_a.get("key").await.unwrap().unwrap();
-        let val_b: String = store_b.get("key").await.unwrap().unwrap();
+        let val_a: String = store_a.get("key").await.expect("TODO: handle error").expect("TODO: handle error");
+        let val_b: String = store_b.get("key").await.expect("TODO: handle error").expect("TODO: handle error");
         assert_eq!(val_a, "value_a");
         assert_eq!(val_b, "value_b");
 
         // Deleting from one namespace does not affect the other.
-        store_a.delete("key").await.unwrap();
-        assert!(store_a.get::<String>("key").await.unwrap().is_none());
+        store_a.delete("key").await.expect("TODO: handle error");
+        assert!(store_a.get::<String>("key").await.expect("TODO: handle error").is_none());
         assert_eq!(
-            store_b.get::<String>("key").await.unwrap().unwrap(),
+            store_b.get::<String>("key").await.expect("TODO: handle error").expect("TODO: handle error"),
             "value_b"
         );
     }
@@ -224,11 +224,11 @@ mod tests {
         let backend = InMemoryBackend::new();
         let store = TypedStore::new(backend, "items");
 
-        store.put("fruit:apple", &10u32).await.unwrap();
-        store.put("fruit:banana", &20u32).await.unwrap();
-        store.put("vegetable:carrot", &30u32).await.unwrap();
+        store.put("fruit:apple", &10u32).await.expect("TODO: handle error");
+        store.put("fruit:banana", &20u32).await.expect("TODO: handle error");
+        store.put("vegetable:carrot", &30u32).await.expect("TODO: handle error");
 
-        let fruits: Vec<(String, u32)> = store.scan_prefix("fruit:", 10).await.unwrap();
+        let fruits: Vec<(String, u32)> = store.scan_prefix("fruit:", 10).await.expect("TODO: handle error");
         assert_eq!(fruits.len(), 2);
         assert_eq!(fruits[0].0, "fruit:apple");
         assert_eq!(fruits[0].1, 10);
@@ -236,7 +236,7 @@ mod tests {
         assert_eq!(fruits[1].1, 20);
 
         // Scan with limit.
-        let limited: Vec<(String, u32)> = store.scan_prefix("fruit:", 1).await.unwrap();
+        let limited: Vec<(String, u32)> = store.scan_prefix("fruit:", 1).await.expect("TODO: handle error");
         assert_eq!(limited.len(), 1);
     }
 
@@ -246,17 +246,17 @@ mod tests {
         let store = TypedStore::new(backend, "prims");
 
         // Integer.
-        store.put("int", &42i64).await.unwrap();
-        assert_eq!(store.get::<i64>("int").await.unwrap().unwrap(), 42);
+        store.put("int", &42i64).await.expect("TODO: handle error");
+        assert_eq!(store.get::<i64>("int").await.expect("TODO: handle error").expect("TODO: handle error"), 42);
 
         // Boolean.
-        store.put("flag", &true).await.unwrap();
-        assert_eq!(store.get::<bool>("flag").await.unwrap().unwrap(), true);
+        store.put("flag", &true).await.expect("TODO: handle error");
+        assert_eq!(store.get::<bool>("flag").await.expect("TODO: handle error").expect("TODO: handle error"), true);
 
         // Vec.
-        store.put("list", &vec![1, 2, 3]).await.unwrap();
+        store.put("list", &vec![1, 2, 3]).await.expect("TODO: handle error");
         assert_eq!(
-            store.get::<Vec<i32>>("list").await.unwrap().unwrap(),
+            store.get::<Vec<i32>>("list").await.expect("TODO: handle error").expect("TODO: handle error"),
             vec![1, 2, 3]
         );
     }
@@ -268,7 +268,7 @@ mod tests {
 
         // Write raw invalid JSON bytes directly via the backend.
         let key = b"bad:broken";
-        backend.put(key, b"not-valid-json!!!").await.unwrap();
+        backend.put(key, b"not-valid-json!!!").await.expect("TODO: handle error");
 
         // Attempt to deserialize as a struct should fail.
         let result = store.get::<TestRecord>("broken").await;

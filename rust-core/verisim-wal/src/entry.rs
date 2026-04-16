@@ -224,7 +224,7 @@ impl WalEntry {
         if stored_crc != computed_crc {
             // Try to extract sequence for a better error message.
             let sequence = if inner.len() >= 8 {
-                u64::from_le_bytes(inner[0..8].try_into().unwrap())
+                u64::from_le_bytes(inner[0..8].try_into().expect("TODO: handle error"))
             } else {
                 0
             };
@@ -247,14 +247,14 @@ impl WalEntry {
         if inner.len() < offset + 8 {
             return Err(WalError::UnexpectedEof(offset as u64));
         }
-        let sequence = u64::from_le_bytes(inner[offset..offset + 8].try_into().unwrap());
+        let sequence = u64::from_le_bytes(inner[offset..offset + 8].try_into().expect("TODO: handle error"));
         offset += 8;
 
         // Timestamp (i64 LE, Unix millis).
         if inner.len() < offset + 8 {
             return Err(WalError::UnexpectedEof(offset as u64));
         }
-        let timestamp_millis = i64::from_le_bytes(inner[offset..offset + 8].try_into().unwrap());
+        let timestamp_millis = i64::from_le_bytes(inner[offset..offset + 8].try_into().expect("TODO: handle error"));
         offset += 8;
 
         let timestamp = Utc
@@ -281,7 +281,7 @@ impl WalEntry {
             return Err(WalError::UnexpectedEof(offset as u64));
         }
         let entity_id_len =
-            u32::from_le_bytes(inner[offset..offset + 4].try_into().unwrap()) as usize;
+            u32::from_le_bytes(inner[offset..offset + 4].try_into().expect("TODO: handle error")) as usize;
         offset += 4;
 
         if inner.len() < offset + entity_id_len {
@@ -295,7 +295,7 @@ impl WalEntry {
             return Err(WalError::UnexpectedEof(offset as u64));
         }
         let payload_len =
-            u32::from_le_bytes(inner[offset..offset + 4].try_into().unwrap()) as usize;
+            u32::from_le_bytes(inner[offset..offset + 4].try_into().expect("TODO: handle error")) as usize;
         offset += 4;
 
         if inner.len() < offset + payload_len {
@@ -338,7 +338,7 @@ mod tests {
                 "type": "test",
                 "value": seq
             }))
-            .unwrap(),
+            .expect("TODO: handle error"),
         }
     }
 
@@ -348,10 +348,10 @@ mod tests {
         let bytes = entry.serialize();
 
         // Read entry_length from the first 4 bytes.
-        let entry_length = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
+        let entry_length = u32::from_le_bytes(bytes[0..4].try_into().expect("TODO: handle error"));
 
         // Deserialize from the bytes after the length prefix.
-        let recovered = WalEntry::deserialize(&bytes[4..], entry_length).unwrap();
+        let recovered = WalEntry::deserialize(&bytes[4..], entry_length).expect("TODO: handle error");
 
         assert_eq!(entry.sequence, recovered.sequence);
         assert_eq!(entry.operation, recovered.operation);
@@ -374,7 +374,7 @@ mod tests {
         let tamper_offset = bytes.len() - 1;
         bytes[tamper_offset] ^= 0xFF;
 
-        let entry_length = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
+        let entry_length = u32::from_le_bytes(bytes[0..4].try_into().expect("TODO: handle error"));
         let result = WalEntry::deserialize(&bytes[4..], entry_length);
 
         assert!(result.is_err());
@@ -399,7 +399,7 @@ mod tests {
             WalOperation::Delete,
             WalOperation::Checkpoint,
         ] {
-            assert_eq!(WalOperation::from_byte(op.to_byte()).unwrap(), op);
+            assert_eq!(WalOperation::from_byte(op.to_byte()).expect("TODO: handle error"), op);
         }
     }
 
@@ -416,7 +416,7 @@ mod tests {
             WalModality::Spatial,
             WalModality::All,
         ] {
-            assert_eq!(WalModality::from_byte(modality.to_byte()).unwrap(), modality);
+            assert_eq!(WalModality::from_byte(modality.to_byte()).expect("TODO: handle error"), modality);
         }
     }
 
@@ -441,8 +441,8 @@ mod tests {
             payload: Vec::new(),
         };
         let bytes = entry.serialize();
-        let entry_length = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
-        let recovered = WalEntry::deserialize(&bytes[4..], entry_length).unwrap();
+        let entry_length = u32::from_le_bytes(bytes[0..4].try_into().expect("TODO: handle error"));
+        let recovered = WalEntry::deserialize(&bytes[4..], entry_length).expect("TODO: handle error");
         assert_eq!(recovered.entity_id, "");
         assert!(recovered.payload.is_empty());
     }
@@ -459,8 +459,8 @@ mod tests {
             payload: vec![1, 2, 3],
         };
         let bytes = entry.serialize();
-        let entry_length = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
-        let recovered = WalEntry::deserialize(&bytes[4..], entry_length).unwrap();
+        let entry_length = u32::from_le_bytes(bytes[0..4].try_into().expect("TODO: handle error"));
+        let recovered = WalEntry::deserialize(&bytes[4..], entry_length).expect("TODO: handle error");
         assert_eq!(recovered.entity_id, long_id);
     }
 }

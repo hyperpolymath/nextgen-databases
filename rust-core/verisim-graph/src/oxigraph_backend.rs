@@ -154,17 +154,17 @@ mod tests {
 
     #[tokio::test]
     async fn test_oxigraph_insert_and_query() {
-        let store = OxiGraphStore::in_memory().unwrap();
+        let store = OxiGraphStore::in_memory().expect("TODO: handle error");
         let edge = GraphEdge {
             subject: GraphNode::new("https://example.org/Alice"),
             predicate: GraphNode::new("https://example.org/knows"),
             object: GraphObject::Node(GraphNode::new("https://example.org/Bob")),
         };
 
-        store.insert(&edge).await.unwrap();
-        assert!(store.exists(&edge).await.unwrap());
+        store.insert(&edge).await.expect("TODO: handle error");
+        assert!(store.exists(&edge).await.expect("TODO: handle error"));
 
-        let outgoing = store.outgoing(&edge.subject).await.unwrap();
+        let outgoing = store.outgoing(&edge.subject).await.expect("TODO: handle error");
         assert_eq!(outgoing.len(), 1);
     }
 }

@@ -213,33 +213,33 @@ mod tests {
 
     #[tokio::test]
     async fn test_persistent_spatial_roundtrip() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("TODO: handle error");
         let path = dir.path().join("spatial.redb");
 
         // Write data in one session.
         {
-            let store = RedbSpatialStore::open(&path).await.unwrap();
-            let london = SpatialData::point(51.5074, -0.1278, Some(11.0)).unwrap();
-            store.index("london", london).await.unwrap();
+            let store = RedbSpatialStore::open(&path).await.expect("TODO: handle error");
+            let london = SpatialData::point(51.5074, -0.1278, Some(11.0)).expect("TODO: handle error");
+            store.index("london", london).await.expect("TODO: handle error");
 
-            let paris = SpatialData::point(48.8566, 2.3522, None).unwrap();
-            store.index("paris", paris).await.unwrap();
+            let paris = SpatialData::point(48.8566, 2.3522, None).expect("TODO: handle error");
+            store.index("paris", paris).await.expect("TODO: handle error");
         }
 
         // Reopen and verify data survived.
         {
-            let store = RedbSpatialStore::open(&path).await.unwrap();
+            let store = RedbSpatialStore::open(&path).await.expect("TODO: handle error");
 
-            let london = store.get("london").await.unwrap().unwrap();
+            let london = store.get("london").await.expect("TODO: handle error").expect("TODO: handle error");
             assert!((london.coordinates.latitude - 51.5074).abs() < 0.001);
             assert!((london.coordinates.longitude - (-0.1278)).abs() < 0.001);
 
-            let paris = store.get("paris").await.unwrap().unwrap();
+            let paris = store.get("paris").await.expect("TODO: handle error").expect("TODO: handle error");
             assert!((paris.coordinates.latitude - 48.8566).abs() < 0.001);
 
             // Test radius search — 500 km from London should find both cities.
-            let center = Coordinates::new(51.5074, -0.1278, None).unwrap();
-            let results = store.search_radius(&center, 500.0, 10).await.unwrap();
+            let center = Coordinates::new(51.5074, -0.1278, None).expect("TODO: handle error");
+            let results = store.search_radius(&center, 500.0, 10).await.expect("TODO: handle error");
             assert_eq!(results.len(), 2);
             assert_eq!(results[0].entity_id, "london");
 
@@ -250,11 +250,11 @@ mod tests {
                 max_lat: 55.0,
                 max_lon: 10.0,
             };
-            let bbox_results = store.search_within(&bounds, 10).await.unwrap();
+            let bbox_results = store.search_within(&bounds, 10).await.expect("TODO: handle error");
             assert_eq!(bbox_results.len(), 2);
 
             // Test nearest.
-            let nearest = store.nearest(&center, 1).await.unwrap();
+            let nearest = store.nearest(&center, 1).await.expect("TODO: handle error");
             assert_eq!(nearest.len(), 1);
             assert_eq!(nearest[0].entity_id, "london");
         }
@@ -262,23 +262,23 @@ mod tests {
 
     #[tokio::test]
     async fn test_persistent_spatial_delete() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("TODO: handle error");
         let path = dir.path().join("spatial-del.redb");
 
-        let store = RedbSpatialStore::open(&path).await.unwrap();
-        let data = SpatialData::point(51.5074, -0.1278, None).unwrap();
-        store.index("london", data).await.unwrap();
+        let store = RedbSpatialStore::open(&path).await.expect("TODO: handle error");
+        let data = SpatialData::point(51.5074, -0.1278, None).expect("TODO: handle error");
+        store.index("london", data).await.expect("TODO: handle error");
 
-        store.delete("london").await.unwrap();
-        assert!(store.get("london").await.unwrap().is_none());
+        store.delete("london").await.expect("TODO: handle error");
+        assert!(store.get("london").await.expect("TODO: handle error").is_none());
     }
 
     #[tokio::test]
     async fn test_persistent_spatial_invalid_coordinates() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("TODO: handle error");
         let path = dir.path().join("spatial-invalid.redb");
 
-        let store = RedbSpatialStore::open(&path).await.unwrap();
+        let store = RedbSpatialStore::open(&path).await.expect("TODO: handle error");
         let bad = SpatialData {
             coordinates: Coordinates::new_unchecked(999.0, 0.0, None),
             geometry_type: crate::GeometryType::Point,

@@ -209,12 +209,12 @@ mod tests {
 
     #[tokio::test]
     async fn test_persistent_temporal_roundtrip() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("TODO: handle error");
         let path = dir.path().join("temporal.redb");
 
         // Write data in one session.
         {
-            let store = RedbVersionStore::open(&path).await.unwrap();
+            let store = RedbVersionStore::open(&path).await.expect("TODO: handle error");
             let v1 = store
                 .append(
                     "entity-1",
@@ -223,7 +223,7 @@ mod tests {
                     Some("initial creation"),
                 )
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
             assert_eq!(v1, 1);
 
             let v2 = store
@@ -234,24 +234,24 @@ mod tests {
                     Some("updated name"),
                 )
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
             assert_eq!(v2, 2);
         }
 
         // Reopen and verify data survived.
         {
-            let store = RedbVersionStore::open(&path).await.unwrap();
+            let store = RedbVersionStore::open(&path).await.expect("TODO: handle error");
 
-            let latest = store.latest("entity-1").await.unwrap().unwrap();
+            let latest = store.latest("entity-1").await.expect("TODO: handle error").expect("TODO: handle error");
             assert_eq!(latest.version, 2);
             assert_eq!(latest.data["name"], "Alice Updated");
             assert_eq!(latest.author, "bob");
 
-            let v1 = store.at_version("entity-1", 1).await.unwrap().unwrap();
+            let v1 = store.at_version("entity-1", 1).await.expect("TODO: handle error").expect("TODO: handle error");
             assert_eq!(v1.data["name"], "Alice");
             assert_eq!(v1.author, "alice");
 
-            let history = store.history("entity-1", 10).await.unwrap();
+            let history = store.history("entity-1", 10).await.expect("TODO: handle error");
             assert_eq!(history.len(), 2);
             // History is most recent first.
             assert_eq!(history[0].version, 2);

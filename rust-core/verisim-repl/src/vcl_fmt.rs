@@ -392,7 +392,7 @@ mod tests {
         let input = "explain select graph from octad";
         let output = format_vcl(input);
         // EXPLAIN and SELECT should stay on the same line
-        let first_line = output.lines().next().unwrap();
+        let first_line = output.lines().next().expect("TODO: handle error");
         assert!(first_line.contains("EXPLAIN"));
         assert!(first_line.contains("SELECT"));
     }

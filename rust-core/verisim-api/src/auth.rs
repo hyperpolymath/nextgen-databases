@@ -423,7 +423,7 @@ fn validate_jwt(token: &str, config: &AuthConfig) -> Result<ClientIdentity, Stri
     if let Some(exp) = claims.get("exp").and_then(|v| v.as_i64()) {
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
+            .expect("TODO: handle error")
             .as_secs() as i64;
         if now > exp {
             return Err("JWT token expired".to_string());
@@ -577,7 +577,7 @@ mod tests {
 
         let entry = registry.validate("my-secret-key");
         assert!(entry.is_some());
-        let entry = entry.unwrap();
+        let entry = entry.expect("TODO: handle error");
         assert_eq!(entry.label, "Test Key");
         assert_eq!(entry.role, ClientRole::Writer);
         assert!(entry.active);
@@ -665,7 +665,7 @@ mod tests {
     #[test]
     fn test_base64url_decode() {
         // "hello" in base64url is "aGVsbG8"
-        let decoded = base64url_decode("aGVsbG8").unwrap();
+        let decoded = base64url_decode("aGVsbG8").expect("TODO: handle error");
         assert_eq!(decoded, b"hello");
     }
 
@@ -700,7 +700,7 @@ mod tests {
 
         let result = validate_jwt(&token, &config);
         assert!(result.is_ok());
-        let identity = result.unwrap();
+        let identity = result.expect("TODO: handle error");
         assert_eq!(identity.id, "test-user");
         assert_eq!(identity.role, ClientRole::Admin);
     }

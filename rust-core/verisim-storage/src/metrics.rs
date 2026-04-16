@@ -221,10 +221,10 @@ mod tests {
         let inner = InMemoryBackend::new();
         let metered = MetricsBackend::new(inner);
 
-        metered.put(b"k", b"v").await.unwrap();
-        metered.get(b"k").await.unwrap();
-        metered.get(b"k").await.unwrap();
-        metered.get(b"missing").await.unwrap();
+        metered.put(b"k", b"v").await.expect("TODO: handle error");
+        metered.get(b"k").await.expect("TODO: handle error");
+        metered.get(b"k").await.expect("TODO: handle error");
+        metered.get(b"missing").await.expect("TODO: handle error");
 
         let stats = metered.stats().await;
         assert_eq!(stats.get_count, 3);
@@ -236,8 +236,8 @@ mod tests {
         let inner = InMemoryBackend::new();
         let metered = MetricsBackend::new(inner);
 
-        metered.put(b"a", b"hello").await.unwrap(); // 5 bytes
-        metered.put(b"b", b"world!").await.unwrap(); // 6 bytes
+        metered.put(b"a", b"hello").await.expect("TODO: handle error"); // 5 bytes
+        metered.put(b"b", b"world!").await.expect("TODO: handle error"); // 6 bytes
 
         let stats = metered.stats().await;
         assert_eq!(stats.put_count, 2);
@@ -249,9 +249,9 @@ mod tests {
         let inner = InMemoryBackend::new();
         let metered = MetricsBackend::new(inner);
 
-        metered.put(b"k", b"v").await.unwrap();
-        metered.delete(b"k").await.unwrap();
-        metered.delete(b"nope").await.unwrap();
+        metered.put(b"k", b"v").await.expect("TODO: handle error");
+        metered.delete(b"k").await.expect("TODO: handle error");
+        metered.delete(b"nope").await.expect("TODO: handle error");
 
         let stats = metered.stats().await;
         assert_eq!(stats.delete_count, 2);
@@ -262,11 +262,11 @@ mod tests {
         let inner = InMemoryBackend::new();
         let metered = MetricsBackend::new(inner);
 
-        metered.put(b"pfx:a", b"11").await.unwrap(); // key=5 + val=2 = 7
-        metered.put(b"pfx:b", b"22").await.unwrap(); // key=5 + val=2 = 7
-        metered.put(b"other", b"xx").await.unwrap();
+        metered.put(b"pfx:a", b"11").await.expect("TODO: handle error"); // key=5 + val=2 = 7
+        metered.put(b"pfx:b", b"22").await.expect("TODO: handle error"); // key=5 + val=2 = 7
+        metered.put(b"other", b"xx").await.expect("TODO: handle error");
 
-        let results = metered.scan_prefix(b"pfx:", 10).await.unwrap();
+        let results = metered.scan_prefix(b"pfx:", 10).await.expect("TODO: handle error");
         assert_eq!(results.len(), 2);
 
         let stats = metered.stats().await;
@@ -280,13 +280,13 @@ mod tests {
         let inner = InMemoryBackend::new();
         let metered = MetricsBackend::new(inner);
 
-        metered.put(b"a", b"1").await.unwrap();
-        metered.put(b"b", b"22").await.unwrap();
+        metered.put(b"a", b"1").await.expect("TODO: handle error");
+        metered.put(b"b", b"22").await.expect("TODO: handle error");
 
         metered
             .multi_get(&[b"a" as &[u8], b"b", b"missing"])
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         let stats = metered.stats().await;
         // multi_get adds keys.len() to get_count.
@@ -306,7 +306,7 @@ mod tests {
                 (b"b", b"2222"),
             ])
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         let stats = metered.stats().await;
         assert_eq!(stats.put_count, 2);
@@ -319,8 +319,8 @@ mod tests {
         let inner = InMemoryBackend::new();
         let metered = MetricsBackend::new(inner);
 
-        metered.put(b"k", b"v").await.unwrap();
-        metered.get(b"k").await.unwrap();
+        metered.put(b"k", b"v").await.expect("TODO: handle error");
+        metered.get(b"k").await.expect("TODO: handle error");
 
         let stats = metered.stats().await;
         // Latency should be non-negative (it might be very small).
@@ -333,8 +333,8 @@ mod tests {
         let inner = InMemoryBackend::new();
         let metered = MetricsBackend::new(inner);
 
-        metered.put(b"a", b"1").await.unwrap();
-        metered.get(b"a").await.unwrap();
+        metered.put(b"a", b"1").await.expect("TODO: handle error");
+        metered.get(b"a").await.expect("TODO: handle error");
 
         let before = metered.stats().await;
         assert_eq!(before.get_count, 1);
@@ -360,11 +360,11 @@ mod tests {
     async fn test_flush_delegates_to_inner() {
         let inner = InMemoryBackend::new();
         let metered = MetricsBackend::new(inner);
-        metered.put(b"k", b"v").await.unwrap();
-        metered.flush().await.unwrap();
+        metered.put(b"k", b"v").await.expect("TODO: handle error");
+        metered.flush().await.expect("TODO: handle error");
         // Data should survive flush.
         assert_eq!(
-            metered.get(b"k").await.unwrap(),
+            metered.get(b"k").await.expect("TODO: handle error"),
             Some(b"v".to_vec())
         );
     }
@@ -373,8 +373,8 @@ mod tests {
     async fn test_approximate_size_delegates() {
         let inner = InMemoryBackend::new();
         let metered = MetricsBackend::new(inner);
-        metered.put(b"abc", b"defgh").await.unwrap();
-        let size = metered.approximate_size().await.unwrap();
+        metered.put(b"abc", b"defgh").await.expect("TODO: handle error");
+        let size = metered.approximate_size().await.expect("TODO: handle error");
         assert_eq!(size, Some(8)); // 3 + 5
     }
 }

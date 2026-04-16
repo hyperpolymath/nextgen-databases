@@ -223,7 +223,7 @@ mod tests {
     fn test_collector_initializes_all_modalities() {
         let collector = StatisticsCollector::new();
         for m in Modality::ALL {
-            let stats = collector.get(m).unwrap();
+            let stats = collector.get(m).expect("TODO: handle error");
             assert_eq!(stats.modality, m);
             assert_eq!(stats.query_count, 0);
             assert_eq!(stats.total_rows, 0);
@@ -236,7 +236,7 @@ mod tests {
         let mut collector = StatisticsCollector::new();
         collector.record_execution(Modality::Vector, 42.0, 10);
 
-        let stats = collector.get(Modality::Vector).unwrap();
+        let stats = collector.get(Modality::Vector).expect("TODO: handle error");
         assert_eq!(stats.query_count, 1);
         assert!((stats.avg_latency_ms - 42.0).abs() < f64::EPSILON);
         assert_eq!(stats.avg_rows_returned, 10);
@@ -248,11 +248,11 @@ mod tests {
 
         // First execution
         collector.record_execution(Modality::Graph, 100.0, 50);
-        assert!((collector.get(Modality::Graph).unwrap().avg_latency_ms - 100.0).abs() < f64::EPSILON);
+        assert!((collector.get(Modality::Graph).expect("TODO: handle error").avg_latency_ms - 100.0).abs() < f64::EPSILON);
 
         // Second execution — EMA: 0.1 * 200 + 0.9 * 100 = 110
         collector.record_execution(Modality::Graph, 200.0, 100);
-        let stats = collector.get(Modality::Graph).unwrap();
+        let stats = collector.get(Modality::Graph).expect("TODO: handle error");
         assert!((stats.avg_latency_ms - 110.0).abs() < f64::EPSILON);
         assert_eq!(stats.query_count, 2);
     }
@@ -261,7 +261,7 @@ mod tests {
     fn test_update_row_count() {
         let mut collector = StatisticsCollector::new();
         collector.update_row_count(Modality::Document, 5000);
-        assert_eq!(collector.get(Modality::Document).unwrap().total_rows, 5000);
+        assert_eq!(collector.get(Modality::Document).expect("TODO: handle error").total_rows, 5000);
     }
 
     #[test]
@@ -321,7 +321,7 @@ mod tests {
         let graph_adj = adjustments2.iter().find(|(m, _)| *m == Modality::Graph);
         assert!(graph_adj.is_some(), "Graph should have adjustment");
         assert_eq!(
-            graph_adj.unwrap().1,
+            graph_adj.expect("TODO: handle error").1,
             crate::config::OptimizationMode::Aggressive,
             "Actual << estimated → Aggressive"
         );
@@ -341,7 +341,7 @@ mod tests {
         let doc_adj = adjustments.iter().find(|(m, _)| *m == Modality::Document);
         assert!(doc_adj.is_some(), "Document should have adjustment");
         assert_eq!(
-            doc_adj.unwrap().1,
+            doc_adj.expect("TODO: handle error").1,
             crate::config::OptimizationMode::Conservative,
             "Actual >> estimated → Conservative"
         );

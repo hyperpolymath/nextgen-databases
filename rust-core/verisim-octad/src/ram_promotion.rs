@@ -393,8 +393,8 @@ mod tests {
         let mut pm = PromotionManager::new();
         pm.enable(10_000_000);
 
-        pm.promote(&Modality::Graph, 1000).unwrap();
-        pm.promote(&Modality::Vector, 1000).unwrap();
+        pm.promote(&Modality::Graph, 1000).expect("TODO: handle error");
+        pm.promote(&Modality::Vector, 1000).expect("TODO: handle error");
 
         pm.demote(&Modality::Graph);
         assert_eq!(pm.promoted_count(), 1);
@@ -437,8 +437,8 @@ mod tests {
         let mut pm = PromotionManager::new();
         pm.enable(10_000_000);
 
-        pm.promote(&Modality::Graph, 1000).unwrap();
-        pm.promote(&Modality::Vector, 1000).unwrap();
+        pm.promote(&Modality::Graph, 1000).expect("TODO: handle error");
+        pm.promote(&Modality::Vector, 1000).expect("TODO: handle error");
         pm.demote_all();
 
         assert_eq!(pm.promoted_count(), 0);
@@ -451,7 +451,7 @@ mod tests {
         let mut pm = PromotionManager::new();
         pm.enable(10_000_000);
 
-        pm.promote(&Modality::Graph, 1000).unwrap();
+        pm.promote(&Modality::Graph, 1000).expect("TODO: handle error");
         pm.demote(&Modality::Graph);
 
         assert_eq!(pm.history().len(), 2);

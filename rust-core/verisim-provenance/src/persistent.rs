@@ -90,7 +90,7 @@ impl ProvenanceStore for RedbProvenanceStore {
             .or_insert_with(|| ProvenanceChain::new(entity_id));
 
         chain.append(event_type, actor, source, description);
-        let record = chain.records.last().unwrap().clone();
+        let record = chain.records.last().expect("TODO: handle error").clone();
 
         // Persist the updated chain to redb.
         self.persist_chain(entity_id, chain).await?;
@@ -175,12 +175,12 @@ mod tests {
 
     #[tokio::test]
     async fn test_persistent_provenance_roundtrip() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("TODO: handle error");
         let path = dir.path().join("prov.redb");
 
         // Write data in one session.
         {
-            let store = RedbProvenanceStore::open(&path).await.unwrap();
+            let store = RedbProvenanceStore::open(&path).await.expect("TODO: handle error");
             store
                 .record_event(
                     "entity-1",
@@ -190,7 +190,7 @@ mod tests {
                     "Initial creation",
                 )
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
             store
                 .record_event(
                     "entity-1",
@@ -200,47 +200,47 @@ mod tests {
                     "Updated vector embedding",
                 )
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
         }
 
         // Reopen and verify data survived.
         {
-            let store = RedbProvenanceStore::open(&path).await.unwrap();
+            let store = RedbProvenanceStore::open(&path).await.expect("TODO: handle error");
 
-            let chain = store.get_chain("entity-1").await.unwrap();
+            let chain = store.get_chain("entity-1").await.expect("TODO: handle error");
             assert_eq!(chain.len(), 2);
             assert!(chain.verify().is_ok());
 
-            let origin = store.get_origin("entity-1").await.unwrap().unwrap();
+            let origin = store.get_origin("entity-1").await.expect("TODO: handle error").expect("TODO: handle error");
             assert_eq!(origin.actor, "alice");
             assert_eq!(origin.event_type, ProvenanceEventType::Created);
 
-            let latest = store.get_latest("entity-1").await.unwrap().unwrap();
+            let latest = store.get_latest("entity-1").await.expect("TODO: handle error").expect("TODO: handle error");
             assert_eq!(latest.actor, "bob");
             assert_eq!(latest.event_type, ProvenanceEventType::Modified);
 
             // Verify chain integrity
-            assert!(store.verify_chain("entity-1").await.unwrap());
+            assert!(store.verify_chain("entity-1").await.expect("TODO: handle error"));
 
             // Non-existent entity returns false, not error
-            assert!(!store.verify_chain("no-such-entity").await.unwrap());
+            assert!(!store.verify_chain("no-such-entity").await.expect("TODO: handle error"));
         }
     }
 
     #[tokio::test]
     async fn test_persistent_provenance_search_by_actor() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("TODO: handle error");
         let path = dir.path().join("prov-search.redb");
 
-        let store = RedbProvenanceStore::open(&path).await.unwrap();
+        let store = RedbProvenanceStore::open(&path).await.expect("TODO: handle error");
         store
             .record_event("e1", ProvenanceEventType::Created, "alice", None, "Created e1")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .record_event("e2", ProvenanceEventType::Created, "bob", None, "Created e2")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .record_event(
                 "e3",
@@ -250,27 +250,27 @@ mod tests {
                 "Imported e3",
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        let alice_records = store.search_by_actor("alice").await.unwrap();
+        let alice_records = store.search_by_actor("alice").await.expect("TODO: handle error");
         assert_eq!(alice_records.len(), 2);
 
-        let bob_records = store.search_by_actor("bob").await.unwrap();
+        let bob_records = store.search_by_actor("bob").await.expect("TODO: handle error");
         assert_eq!(bob_records.len(), 1);
     }
 
     #[tokio::test]
     async fn test_persistent_provenance_delete_chain() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("TODO: handle error");
         let path = dir.path().join("prov-delete.redb");
 
-        let store = RedbProvenanceStore::open(&path).await.unwrap();
+        let store = RedbProvenanceStore::open(&path).await.expect("TODO: handle error");
         store
             .record_event("e1", ProvenanceEventType::Created, "alice", None, "Created")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        store.delete_chain("e1").await.unwrap();
+        store.delete_chain("e1").await.expect("TODO: handle error");
         assert!(store.get_chain("e1").await.is_err());
     }
 }

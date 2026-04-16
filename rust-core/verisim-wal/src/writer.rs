@@ -359,19 +359,19 @@ mod tests {
 
     #[test]
     fn test_open_fresh_directory() {
-        let dir = TempDir::new().unwrap();
-        let writer = WalWriter::open(dir.path(), SyncMode::Async).unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
+        let writer = WalWriter::open(dir.path(), SyncMode::Async).expect("TODO: handle error");
         assert_eq!(writer.next_sequence(), 1);
     }
 
     #[test]
     fn test_append_increments_sequence() {
-        let dir = TempDir::new().unwrap();
-        let mut writer = WalWriter::open(dir.path(), SyncMode::Async).unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
+        let mut writer = WalWriter::open(dir.path(), SyncMode::Async).expect("TODO: handle error");
 
-        let seq1 = writer.append(test_entry(WalModality::Graph)).unwrap();
-        let seq2 = writer.append(test_entry(WalModality::Vector)).unwrap();
-        let seq3 = writer.append(test_entry(WalModality::Tensor)).unwrap();
+        let seq1 = writer.append(test_entry(WalModality::Graph)).expect("TODO: handle error");
+        let seq2 = writer.append(test_entry(WalModality::Vector)).expect("TODO: handle error");
+        let seq3 = writer.append(test_entry(WalModality::Tensor)).expect("TODO: handle error");
 
         assert_eq!(seq1, 1);
         assert_eq!(seq2, 2);
@@ -381,12 +381,12 @@ mod tests {
 
     #[test]
     fn test_checkpoint_writes_entry() {
-        let dir = TempDir::new().unwrap();
-        let mut writer = WalWriter::open(dir.path(), SyncMode::Async).unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
+        let mut writer = WalWriter::open(dir.path(), SyncMode::Async).expect("TODO: handle error");
 
-        writer.append(test_entry(WalModality::Graph)).unwrap();
-        writer.append(test_entry(WalModality::Vector)).unwrap();
-        let cp_seq = writer.checkpoint().unwrap();
+        writer.append(test_entry(WalModality::Graph)).expect("TODO: handle error");
+        writer.append(test_entry(WalModality::Vector)).expect("TODO: handle error");
+        let cp_seq = writer.checkpoint().expect("TODO: handle error");
 
         assert_eq!(cp_seq, 3);
         assert_eq!(writer.next_sequence(), 4);
@@ -394,17 +394,17 @@ mod tests {
 
     #[test]
     fn test_segment_rotation() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
         // Use a tiny max segment size to force rotation.
         let mut writer =
-            WalWriter::open_with_max_size(dir.path(), SyncMode::Async, 100).unwrap();
+            WalWriter::open_with_max_size(dir.path(), SyncMode::Async, 100).expect("TODO: handle error");
 
         // Write entries until rotation occurs.
         for _ in 0..10 {
-            writer.append(test_entry(WalModality::Document)).unwrap();
+            writer.append(test_entry(WalModality::Document)).expect("TODO: handle error");
         }
 
-        let segments = list_segments(dir.path()).unwrap();
+        let segments = list_segments(dir.path()).expect("TODO: handle error");
         assert!(
             segments.len() > 1,
             "Expected multiple segments after rotation, got {}",
@@ -414,59 +414,59 @@ mod tests {
 
     #[test]
     fn test_resume_after_close() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
 
         // Write some entries.
         {
-            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
-            writer.append(test_entry(WalModality::Graph)).unwrap();
-            writer.append(test_entry(WalModality::Vector)).unwrap();
-            writer.append(test_entry(WalModality::Tensor)).unwrap();
+            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
+            writer.append(test_entry(WalModality::Graph)).expect("TODO: handle error");
+            writer.append(test_entry(WalModality::Vector)).expect("TODO: handle error");
+            writer.append(test_entry(WalModality::Tensor)).expect("TODO: handle error");
         }
 
         // Re-open and verify sequence continues.
         {
-            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
-            let seq = writer.append(test_entry(WalModality::Semantic)).unwrap();
+            let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
+            let seq = writer.append(test_entry(WalModality::Semantic)).expect("TODO: handle error");
             assert_eq!(seq, 4, "Expected sequence 4 after resuming, got {seq}");
         }
     }
 
     #[test]
     fn test_open_creates_directory() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
         let wal_path = dir.path().join("subdir").join("wal");
         assert!(!wal_path.exists());
 
-        let _writer = WalWriter::open(&wal_path, SyncMode::Async).unwrap();
+        let _writer = WalWriter::open(&wal_path, SyncMode::Async).expect("TODO: handle error");
         assert!(wal_path.exists());
     }
 
     #[test]
     fn test_fsync_mode() {
-        let dir = TempDir::new().unwrap();
-        let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
+        let mut writer = WalWriter::open(dir.path(), SyncMode::Fsync).expect("TODO: handle error");
 
         // Should not panic or error even with fsync on every write.
         for _ in 0..5 {
-            writer.append(test_entry(WalModality::Temporal)).unwrap();
+            writer.append(test_entry(WalModality::Temporal)).expect("TODO: handle error");
         }
     }
 
     #[test]
     fn test_periodic_sync_mode() {
-        let dir = TempDir::new().unwrap();
+        let dir = TempDir::new().expect("TODO: handle error");
         let mut writer = WalWriter::open(
             dir.path(),
             SyncMode::Periodic(Duration::from_millis(10)),
         )
-        .unwrap();
+        .expect("TODO: handle error");
 
         for _ in 0..5 {
-            writer.append(test_entry(WalModality::Temporal)).unwrap();
+            writer.append(test_entry(WalModality::Temporal)).expect("TODO: handle error");
         }
 
         // Explicit sync should always work.
-        writer.sync().unwrap();
+        writer.sync().expect("TODO: handle error");
     }
 }

@@ -296,8 +296,8 @@ mod tests {
     #[test]
     fn test_parse_report_json() {
         let report = sample_report();
-        let json = serde_json::to_vec(&report).unwrap();
-        let parsed = parse_sanctify_report(&json).unwrap();
+        let json = serde_json::to_vec(&report).expect("TODO: handle error");
+        let parsed = parse_sanctify_report(&json).expect("TODO: handle error");
         assert_eq!(parsed.issues.len(), 3);
         assert_eq!(parsed.summary.critical, 1);
         assert_eq!(parsed.summary.high, 1);
@@ -337,7 +337,7 @@ mod tests {
             report,
         );
         // Valid contract (resolution flags match issue counts)
-        assert!(validate_contract(&contract).unwrap());
+        assert!(validate_contract(&contract).expect("TODO: handle error"));
     }
 
     #[test]
@@ -366,7 +366,7 @@ mod tests {
             created_at: chrono::Utc::now().to_rfc3339(),
         };
         // Should return false (inconsistent)
-        assert!(!validate_contract(&contract).unwrap());
+        assert!(!validate_contract(&contract).expect("TODO: handle error"));
     }
 
     #[test]
@@ -377,7 +377,7 @@ mod tests {
             "octad-xyz".to_string(),
             report,
         );
-        let blob = contract_to_proof_blob(&contract).unwrap();
+        let blob = contract_to_proof_blob(&contract).expect("TODO: handle error");
         assert!(blob.claim.contains("security-audit:audit-003"));
         assert!(blob.claim.contains("octad:octad-xyz"));
         assert!(!blob.data.is_empty());
@@ -408,6 +408,6 @@ mod tests {
         );
         assert!(contract.all_critical_resolved);
         assert!(contract.all_high_resolved);
-        assert!(validate_contract(&contract).unwrap());
+        assert!(validate_contract(&contract).expect("TODO: handle error"));
     }
 }

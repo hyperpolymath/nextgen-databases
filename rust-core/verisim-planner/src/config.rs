@@ -161,8 +161,8 @@ mod tests {
     #[test]
     fn test_config_serde_roundtrip() {
         let config = PlannerConfig::default();
-        let json = serde_json::to_string(&config).unwrap();
-        let parsed: PlannerConfig = serde_json::from_str(&json).unwrap();
+        let json = serde_json::to_string(&config).expect("TODO: handle error");
+        let parsed: PlannerConfig = serde_json::from_str(&json).expect("TODO: handle error");
         assert_eq!(parsed.global_mode, config.global_mode);
         assert_eq!(parsed.parallel_threshold, config.parallel_threshold);
     }

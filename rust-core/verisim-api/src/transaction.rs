@@ -359,8 +359,8 @@ mod tests {
     async fn test_begin_commit() {
         let mgr = TransactionManager::new(TransactionConfig::default());
 
-        let txn_id = mgr.begin().await.unwrap();
-        let status = mgr.status(&txn_id).await.unwrap();
+        let txn_id = mgr.begin().await.expect("TODO: handle error");
+        let status = mgr.status(&txn_id).await.expect("TODO: handle error");
         assert_eq!(status.state, TransactionState::Active);
         assert_eq!(status.operation_count, 0);
 
@@ -375,16 +375,16 @@ mod tests {
             },
         )
         .await
-        .unwrap();
+        .expect("TODO: handle error");
 
-        let status = mgr.status(&txn_id).await.unwrap();
+        let status = mgr.status(&txn_id).await.expect("TODO: handle error");
         assert_eq!(status.operation_count, 1);
 
         // Commit
-        let ops = mgr.commit(&txn_id).await.unwrap();
+        let ops = mgr.commit(&txn_id).await.expect("TODO: handle error");
         assert_eq!(ops.len(), 1);
 
-        let status = mgr.status(&txn_id).await.unwrap();
+        let status = mgr.status(&txn_id).await.expect("TODO: handle error");
         assert_eq!(status.state, TransactionState::Committed);
     }
 
@@ -392,7 +392,7 @@ mod tests {
     async fn test_begin_rollback() {
         let mgr = TransactionManager::new(TransactionConfig::default());
 
-        let txn_id = mgr.begin().await.unwrap();
+        let txn_id = mgr.begin().await.expect("TODO: handle error");
 
         mgr.buffer_operation(
             &txn_id,
@@ -404,20 +404,20 @@ mod tests {
             },
         )
         .await
-        .unwrap();
+        .expect("TODO: handle error");
 
-        let discarded = mgr.rollback(&txn_id).await.unwrap();
+        let discarded = mgr.rollback(&txn_id).await.expect("TODO: handle error");
         assert_eq!(discarded, 1);
 
-        let status = mgr.status(&txn_id).await.unwrap();
+        let status = mgr.status(&txn_id).await.expect("TODO: handle error");
         assert_eq!(status.state, TransactionState::RolledBack);
     }
 
     #[tokio::test]
     async fn test_double_commit_fails() {
         let mgr = TransactionManager::new(TransactionConfig::default());
-        let txn_id = mgr.begin().await.unwrap();
-        mgr.commit(&txn_id).await.unwrap();
+        let txn_id = mgr.begin().await.expect("TODO: handle error");
+        mgr.commit(&txn_id).await.expect("TODO: handle error");
         let result = mgr.commit(&txn_id).await;
         assert!(result.is_err());
     }
@@ -425,8 +425,8 @@ mod tests {
     #[tokio::test]
     async fn test_operation_on_committed_fails() {
         let mgr = TransactionManager::new(TransactionConfig::default());
-        let txn_id = mgr.begin().await.unwrap();
-        mgr.commit(&txn_id).await.unwrap();
+        let txn_id = mgr.begin().await.expect("TODO: handle error");
+        mgr.commit(&txn_id).await.expect("TODO: handle error");
 
         let result = mgr
             .buffer_operation(
@@ -449,8 +449,8 @@ mod tests {
             timeout_seconds: 300,
         });
 
-        let _t1 = mgr.begin().await.unwrap();
-        let _t2 = mgr.begin().await.unwrap();
+        let _t1 = mgr.begin().await.expect("TODO: handle error");
+        let _t2 = mgr.begin().await.expect("TODO: handle error");
         let result = mgr.begin().await;
         assert!(result.is_err());
     }
