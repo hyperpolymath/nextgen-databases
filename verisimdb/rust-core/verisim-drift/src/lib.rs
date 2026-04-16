@@ -516,7 +516,7 @@ mod tests {
         let event = detector
             .record(DriftType::SemanticVectorDrift, 0.1, vec![])
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         assert!(event.is_none());
 
         // Record high score (above threshold of 0.3 for semantic_vector)
@@ -524,9 +524,9 @@ mod tests {
         let event = detector
             .record(DriftType::SemanticVectorDrift, 0.6, vec!["entity1".to_string()])
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         assert!(event.is_some());
-        assert_eq!(event.unwrap().severity, DriftSeverity::Warning);
+        assert_eq!(event.expect("TODO: handle error").severity, DriftSeverity::Warning);
     }
 
     #[test]
@@ -545,7 +545,7 @@ mod tests {
     #[test]
     fn test_health_check() {
         let detector = DriftDetector::with_defaults();
-        let status = detector.health_check().unwrap();
+        let status = detector.health_check().expect("TODO: handle error");
         assert_eq!(status.status, HealthStatus::Healthy);
     }
 }

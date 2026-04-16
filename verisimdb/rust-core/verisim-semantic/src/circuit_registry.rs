@@ -251,7 +251,7 @@ mod tests {
             ]),
         };
 
-        let circuit_bytes = serde_json::to_vec(&ir).unwrap();
+        let circuit_bytes = serde_json::to_vec(&ir).expect("TODO: handle error");
         let hash = sha256_hex(&circuit_bytes);
 
         CompiledCircuit {
@@ -266,18 +266,18 @@ mod tests {
         let registry = CircuitRegistry::new();
         let circuit = make_test_circuit();
 
-        registry.register_circuit("multiply", circuit).unwrap();
+        registry.register_circuit("multiply", circuit).expect("TODO: handle error");
 
         // x=3, z=12 → y must be 4 (3 * 4 = 12)
         // Assignment: [x=3, z=12, y=4] → 3 * 4 = 12 ✓
         let public_inputs = &[3.0, 12.0]; // x, z
         let witness = &[4.0];              // y
 
-        let valid = registry.verify_with_circuit("multiply", witness, public_inputs).unwrap();
+        let valid = registry.verify_with_circuit("multiply", witness, public_inputs).expect("TODO: handle error");
         assert!(valid);
 
         // Wrong witness: 3 * 5 = 15 ≠ 12
-        let invalid = registry.verify_with_circuit("multiply", &[5.0], public_inputs).unwrap();
+        let invalid = registry.verify_with_circuit("multiply", &[5.0], public_inputs).expect("TODO: handle error");
         assert!(!invalid);
     }
 
@@ -293,7 +293,7 @@ mod tests {
         let registry = CircuitRegistry::new();
         let circuit = make_test_circuit();
 
-        registry.register_circuit("multiply", circuit.clone()).unwrap();
+        registry.register_circuit("multiply", circuit.clone()).expect("TODO: handle error");
         let result = registry.register_circuit("multiply", circuit);
         assert!(matches!(result, Err(CircuitError::AlreadyExists(_))));
     }
@@ -303,11 +303,11 @@ mod tests {
         let registry = CircuitRegistry::new();
         let circuit = make_test_circuit();
 
-        registry.register_circuit("mul", circuit).unwrap();
-        let list = registry.list_circuits().unwrap();
+        registry.register_circuit("mul", circuit).expect("TODO: handle error");
+        let list = registry.list_circuits().expect("TODO: handle error");
         assert_eq!(list, vec!["mul"]);
 
-        assert!(registry.unregister_circuit("mul").unwrap());
-        assert!(registry.list_circuits().unwrap().is_empty());
+        assert!(registry.unregister_circuit("mul").expect("TODO: handle error"));
+        assert!(registry.list_circuits().expect("TODO: handle error").is_empty());
     }
 }

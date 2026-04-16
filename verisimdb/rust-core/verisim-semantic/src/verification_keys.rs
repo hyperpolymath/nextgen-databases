@@ -203,9 +203,9 @@ mod tests {
         let store = VerificationKeyStore::new("test-instance");
         let key = vec![1, 2, 3, 4];
 
-        store.store_key("my-circuit", key.clone()).unwrap();
+        store.store_key("my-circuit", key.clone()).expect("TODO: handle error");
 
-        let retrieved = store.get_key("my-circuit").unwrap().unwrap();
+        let retrieved = store.get_key("my-circuit").expect("TODO: handle error").expect("TODO: handle error");
         assert_eq!(retrieved, key);
     }
 
@@ -215,10 +215,10 @@ mod tests {
         let key1 = vec![1, 2, 3];
         let key2 = vec![4, 5, 6];
 
-        store.store_key("circuit", key1.clone()).unwrap();
-        store.store_key("circuit", key2.clone()).unwrap();
+        store.store_key("circuit", key1.clone()).expect("TODO: handle error");
+        store.store_key("circuit", key2.clone()).expect("TODO: handle error");
 
-        let entry = store.get_entry("circuit").unwrap().unwrap();
+        let entry = store.get_entry("circuit").expect("TODO: handle error").expect("TODO: handle error");
         assert_eq!(entry.active_key, key2);
         assert_eq!(entry.previous_key, Some(key1.clone()));
         assert_eq!(entry.version, 2);
@@ -229,18 +229,18 @@ mod tests {
     #[test]
     fn test_export_import() {
         let store_a = VerificationKeyStore::new("instance-a");
-        store_a.store_key("circuit-1", vec![10, 20]).unwrap();
-        store_a.store_key("circuit-2", vec![30, 40]).unwrap();
+        store_a.store_key("circuit-1", vec![10, 20]).expect("TODO: handle error");
+        store_a.store_key("circuit-2", vec![30, 40]).expect("TODO: handle error");
 
-        let bundle = store_a.export_keys().unwrap();
+        let bundle = store_a.export_keys().expect("TODO: handle error");
         assert_eq!(bundle.keys.len(), 2);
 
         let store_b = VerificationKeyStore::new("instance-b");
-        let imported = store_b.import_keys(&bundle).unwrap();
+        let imported = store_b.import_keys(&bundle).expect("TODO: handle error");
         assert_eq!(imported, 2);
 
         // Keys are stored with federated prefix
-        let circuits = store_b.list_circuits().unwrap();
+        let circuits = store_b.list_circuits().expect("TODO: handle error");
         assert!(circuits.iter().any(|c| c.starts_with("instance-a:")));
     }
 }

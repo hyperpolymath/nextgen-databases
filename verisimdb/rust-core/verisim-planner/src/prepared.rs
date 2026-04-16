@@ -736,7 +736,7 @@ mod tests {
         let stmt = cache.get(&id).await;
 
         assert!(stmt.is_some(), "prepared statement should be retrievable");
-        let stmt = stmt.unwrap();
+        let stmt = stmt.expect("TODO: handle error");
         assert_eq!(stmt.id, id);
         assert_eq!(stmt.original_query, "SEARCH graph WHERE type = $t");
         assert_eq!(stmt.parameter_names, vec!["$t"]);
@@ -842,10 +842,10 @@ mod tests {
         let mut params = HashMap::new();
         params.insert("$t".to_string(), ParamValue::String("Person".to_string()));
 
-        let stmt = cache.execute_prepared(&id, &params).await.unwrap();
+        let stmt = cache.execute_prepared(&id, &params).await.expect("TODO: handle error");
         assert_eq!(stmt.use_count, 1, "first execute should set use_count to 1");
 
-        let stmt2 = cache.execute_prepared(&id, &params).await.unwrap();
+        let stmt2 = cache.execute_prepared(&id, &params).await.expect("TODO: handle error");
         assert_eq!(stmt2.use_count, 2, "second execute should set use_count to 2");
         assert!(
             stmt2.last_used >= stmt.last_used,
@@ -979,19 +979,19 @@ mod tests {
         let id = cache.prepare("SEARCH graph WHERE type = $t", logical).await;
 
         // Initially no cached physical plan.
-        let stmt = cache.get(&id).await.unwrap();
+        let stmt = cache.get(&id).await.expect("TODO: handle error");
         assert!(stmt.cached_physical_plan.is_none());
 
         // Cache the physical plan.
         cache.cache_plan(&id, physical).await;
 
         // Now it should be present.
-        let stmt = cache.get(&id).await.unwrap();
+        let stmt = cache.get(&id).await.expect("TODO: handle error");
         assert!(
             stmt.cached_physical_plan.is_some(),
             "physical plan should be cached"
         );
-        let plan = stmt.cached_physical_plan.unwrap();
+        let plan = stmt.cached_physical_plan.expect("TODO: handle error");
         assert_eq!(plan.steps.len(), 1);
         assert_eq!(plan.steps[0].modality, Modality::Graph);
     }
@@ -1007,14 +1007,14 @@ mod tests {
         let id = cache.prepare("SEARCH graph WHERE type = $t", logical).await;
         cache.cache_plan(&id, physical).await;
 
-        let stmt = cache.get(&id).await.unwrap();
+        let stmt = cache.get(&id).await.expect("TODO: handle error");
 
         // Serialize to JSON.
-        let json = serde_json::to_string_pretty(&stmt).unwrap();
+        let json = serde_json::to_string_pretty(&stmt).expect("TODO: handle error");
         assert!(!json.is_empty());
 
         // Deserialize back.
-        let parsed: PreparedStatement = serde_json::from_str(&json).unwrap();
+        let parsed: PreparedStatement = serde_json::from_str(&json).expect("TODO: handle error");
         assert_eq!(parsed.id, stmt.id);
         assert_eq!(parsed.original_query, stmt.original_query);
         assert_eq!(parsed.parameter_names, stmt.parameter_names);
@@ -1023,15 +1023,15 @@ mod tests {
 
         // CacheConfig round-trip.
         let config = CacheConfig::default();
-        let config_json = serde_json::to_string(&config).unwrap();
-        let parsed_config: CacheConfig = serde_json::from_str(&config_json).unwrap();
+        let config_json = serde_json::to_string(&config).expect("TODO: handle error");
+        let parsed_config: CacheConfig = serde_json::from_str(&config_json).expect("TODO: handle error");
         assert_eq!(parsed_config.max_entries, config.max_entries);
         assert_eq!(parsed_config.ttl_seconds, config.ttl_seconds);
 
         // CacheStats round-trip.
         let stats = cache.stats_async().await;
-        let stats_json = serde_json::to_string(&stats).unwrap();
-        let parsed_stats: CacheStats = serde_json::from_str(&stats_json).unwrap();
+        let stats_json = serde_json::to_string(&stats).expect("TODO: handle error");
+        let parsed_stats: CacheStats = serde_json::from_str(&stats_json).expect("TODO: handle error");
         assert_eq!(parsed_stats.total_entries, stats.total_entries);
 
         // CacheError round-trip.
@@ -1039,8 +1039,8 @@ mod tests {
             expected: vec!["$a".to_string()],
             provided: vec!["$b".to_string()],
         };
-        let err_json = serde_json::to_string(&err).unwrap();
-        let parsed_err: CacheError = serde_json::from_str(&err_json).unwrap();
+        let err_json = serde_json::to_string(&err).expect("TODO: handle error");
+        let parsed_err: CacheError = serde_json::from_str(&err_json).expect("TODO: handle error");
         match parsed_err {
             CacheError::ParameterMismatch { expected, provided } => {
                 assert_eq!(expected, vec!["$a"]);
@@ -1059,10 +1059,10 @@ mod tests {
             ParamValue::Null,
         ];
         for pv in &params {
-            let pv_json = serde_json::to_string(pv).unwrap();
-            let parsed_pv: ParamValue = serde_json::from_str(&pv_json).unwrap();
+            let pv_json = serde_json::to_string(pv).expect("TODO: handle error");
+            let parsed_pv: ParamValue = serde_json::from_str(&pv_json).expect("TODO: handle error");
             // Verify the variant matches (structural equality check).
-            let re_json = serde_json::to_string(&parsed_pv).unwrap();
+            let re_json = serde_json::to_string(&parsed_pv).expect("TODO: handle error");
             assert_eq!(pv_json, re_json);
         }
     }

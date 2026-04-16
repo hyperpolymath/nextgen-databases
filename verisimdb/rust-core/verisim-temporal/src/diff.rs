@@ -162,7 +162,7 @@ mod tests {
     fn test_compare_values_same() {
         let old_val = "value".to_string();
         let new_val = "value".to_string();
-        let diff = compare_values(Some(&old_val), Some(&new_val)).unwrap();
+        let diff = compare_values(Some(&old_val), Some(&new_val)).expect("TODO: handle error");
         assert!(!diff.has_change());
     }
 
@@ -170,7 +170,7 @@ mod tests {
     fn test_compare_values_changed() {
         let old_val = "old".to_string();
         let new_val = "new".to_string();
-        let diff = compare_values(Some(&old_val), Some(&new_val)).unwrap();
+        let diff = compare_values(Some(&old_val), Some(&new_val)).expect("TODO: handle error");
         assert!(diff.has_change());
         assert_eq!(diff, Diff::Changed { old: "old".to_string(), new: "new".to_string() });
     }
@@ -178,14 +178,14 @@ mod tests {
     #[test]
     fn test_compare_values_added() {
         let new_val = "new".to_string();
-        let diff = compare_values(None, Some(&new_val)).unwrap();
+        let diff = compare_values(None, Some(&new_val)).expect("TODO: handle error");
         assert_eq!(diff, Diff::Added { value: "new".to_string() });
     }
 
     #[test]
     fn test_compare_values_removed() {
         let old_val = "old".to_string();
-        let diff = compare_values(Some(&old_val), None).unwrap();
+        let diff = compare_values(Some(&old_val), None).expect("TODO: handle error");
         assert_eq!(diff, Diff::Removed { value: "old".to_string() });
     }
 

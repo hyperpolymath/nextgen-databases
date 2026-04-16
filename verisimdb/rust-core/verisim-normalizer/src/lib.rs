@@ -389,8 +389,8 @@ impl NormalizationStrategy for GraphDocumentStrategy {
         match (has_document, has_graph) {
             (true, true) => {
                 // Both present — graph needs reconstruction from document (document authoritative)
-                let doc = octad.document.as_ref().unwrap();
-                let graph = octad.graph_node.as_ref().unwrap();
+                let doc = octad.document.as_ref().expect("TODO: handle error");
+                let graph = octad.graph_node.as_ref().expect("TODO: handle error");
                 changes.push(NormalizationChange {
                     modality: "graph".to_string(),
                     field: "relationships".to_string(),
@@ -404,7 +404,7 @@ impl NormalizationStrategy for GraphDocumentStrategy {
             }
             (true, false) => {
                 // Only document — graph modality needs creation
-                let doc = octad.document.as_ref().unwrap();
+                let doc = octad.document.as_ref().expect("TODO: handle error");
                 changes.push(NormalizationChange {
                     modality: "graph".to_string(),
                     field: "graph_node".to_string(),
@@ -415,7 +415,7 @@ impl NormalizationStrategy for GraphDocumentStrategy {
             }
             (false, true) => {
                 // Only graph — document modality needs creation
-                let graph = octad.graph_node.as_ref().unwrap();
+                let graph = octad.graph_node.as_ref().expect("TODO: handle error");
                 changes.push(NormalizationChange {
                     modality: "document".to_string(),
                     field: "document".to_string(),
@@ -778,9 +778,9 @@ mod tests {
             "Test drift",
         );
 
-        let result = normalizer.handle_drift(&octad, &event).await.unwrap();
+        let result = normalizer.handle_drift(&octad, &event).await.expect("TODO: handle error");
         assert!(result.is_some());
-        let result = result.unwrap();
+        let result = result.expect("TODO: handle error");
         assert!(result.success);
         assert!(!result.changes.is_empty());
         assert!(result.changes[0].new_value.contains("Test Document"));
@@ -825,7 +825,7 @@ mod tests {
             "Graph missing",
         );
 
-        let result = strategy.normalize(&octad, &event).await.unwrap();
+        let result = strategy.normalize(&octad, &event).await.expect("TODO: handle error");
         assert!(result.success);
         assert_eq!(result.changes[0].modality, "graph");
         assert!(result.changes[0].new_value.contains("Test Document"));

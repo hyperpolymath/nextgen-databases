@@ -204,30 +204,30 @@ mod tests {
 
     #[tokio::test]
     async fn test_persistent_vector_roundtrip() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("TODO: handle error");
         let path = dir.path().join("vector.redb");
 
         // Create store and insert embeddings
         {
             let store = RedbVectorStore::open(&path, 3, DistanceMetric::Cosine)
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
 
             store
                 .upsert(&Embedding::new("a", vec![1.0, 0.0, 0.0]))
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
             store
                 .upsert(&Embedding::new("b", vec![0.0, 1.0, 0.0]))
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
             store
                 .upsert(&Embedding::new("c", vec![0.9, 0.1, 0.0]))
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
 
             // Verify search works
-            let results = store.search(&[1.0, 0.0, 0.0], 2).await.unwrap();
+            let results = store.search(&[1.0, 0.0, 0.0], 2).await.expect("TODO: handle error");
             assert_eq!(results.len(), 2);
             assert_eq!(results[0].id, "a"); // Most similar to [1,0,0]
         }
@@ -236,18 +236,18 @@ mod tests {
         {
             let store = RedbVectorStore::open(&path, 3, DistanceMetric::Cosine)
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
 
             // Verify data persisted
-            let a = store.get("a").await.unwrap();
+            let a = store.get("a").await.expect("TODO: handle error");
             assert!(a.is_some());
-            assert_eq!(a.unwrap().vector, vec![1.0, 0.0, 0.0]);
+            assert_eq!(a.expect("TODO: handle error").vector, vec![1.0, 0.0, 0.0]);
 
-            let b = store.get("b").await.unwrap();
+            let b = store.get("b").await.expect("TODO: handle error");
             assert!(b.is_some());
 
             // Verify search still works after reload
-            let results = store.search(&[1.0, 0.0, 0.0], 2).await.unwrap();
+            let results = store.search(&[1.0, 0.0, 0.0], 2).await.expect("TODO: handle error");
             assert_eq!(results.len(), 2);
             assert_eq!(results[0].id, "a");
         }
@@ -255,21 +255,21 @@ mod tests {
 
     #[tokio::test]
     async fn test_persistent_vector_delete() {
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("TODO: handle error");
         let path = dir.path().join("vector-del.redb");
 
         {
             let store = RedbVectorStore::open(&path, 3, DistanceMetric::Cosine)
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
 
             store
                 .upsert(&Embedding::new("x", vec![1.0, 0.0, 0.0]))
                 .await
-                .unwrap();
-            store.delete("x").await.unwrap();
+                .expect("TODO: handle error");
+            store.delete("x").await.expect("TODO: handle error");
 
-            let result: Option<Embedding> = store.get("x").await.unwrap();
+            let result: Option<Embedding> = store.get("x").await.expect("TODO: handle error");
             assert!(result.is_none());
         }
 
@@ -277,8 +277,8 @@ mod tests {
         {
             let store = RedbVectorStore::open(&path, 3, DistanceMetric::Cosine)
                 .await
-                .unwrap();
-            let result: Option<Embedding> = store.get("x").await.unwrap();
+                .expect("TODO: handle error");
+            let result: Option<Embedding> = store.get("x").await.expect("TODO: handle error");
             assert!(result.is_none());
         }
     }

@@ -56,7 +56,7 @@ pub fn build(b: *std.Build) void {
     });
 
     // Unit tests for crypto
-    const crypto_tests = b.addTest(.{
+    const _crypto_tests = b.addTest(.{
         .name = "crypto-tests",
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/crypto_test.zig"),

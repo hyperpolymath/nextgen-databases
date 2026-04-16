@@ -117,16 +117,16 @@ mod tests {
     fn test_modality_display_roundtrip() {
         for m in Modality::ALL {
             let s = m.to_string();
-            let parsed: Modality = s.parse().unwrap();
+            let parsed: Modality = s.parse().expect("TODO: handle error");
             assert_eq!(m, parsed);
         }
     }
 
     #[test]
     fn test_modality_case_insensitive_parse() {
-        assert_eq!("GRAPH".parse::<Modality>().unwrap(), Modality::Graph);
-        assert_eq!("Vector".parse::<Modality>().unwrap(), Modality::Vector);
-        assert_eq!("SEMANTIC".parse::<Modality>().unwrap(), Modality::Semantic);
+        assert_eq!("GRAPH".parse::<Modality>().expect("TODO: handle error"), Modality::Graph);
+        assert_eq!("Vector".parse::<Modality>().expect("TODO: handle error"), Modality::Vector);
+        assert_eq!("SEMANTIC".parse::<Modality>().expect("TODO: handle error"), Modality::Semantic);
     }
 
     #[test]
@@ -137,8 +137,8 @@ mod tests {
     #[test]
     fn test_modality_serde_roundtrip() {
         for m in Modality::ALL {
-            let json = serde_json::to_string(&m).unwrap();
-            let parsed: Modality = serde_json::from_str(&json).unwrap();
+            let json = serde_json::to_string(&m).expect("TODO: handle error");
+            let parsed: Modality = serde_json::from_str(&json).expect("TODO: handle error");
             assert_eq!(m, parsed);
         }
     }

@@ -402,9 +402,9 @@ mod tests {
     use tempfile::tempdir;
 
     fn temp_store() -> (RedbGraphStore, tempfile::TempDir) {
-        let dir = tempdir().unwrap();
+        let dir = tempdir().expect("TODO: handle error");
         let path = dir.path().join("graph-test.redb");
-        let store = RedbGraphStore::persistent(&path).unwrap();
+        let store = RedbGraphStore::persistent(&path).expect("TODO: handle error");
         (store, dir)
     }
 
@@ -425,9 +425,9 @@ mod tests {
             "https://example.org/Bob",
         );
 
-        assert!(!store.exists(&edge).await.unwrap());
-        store.insert(&edge).await.unwrap();
-        assert!(store.exists(&edge).await.unwrap());
+        assert!(!store.exists(&edge).await.expect("TODO: handle error"));
+        store.insert(&edge).await.expect("TODO: handle error");
+        assert!(store.exists(&edge).await.expect("TODO: handle error"));
     }
 
     #[tokio::test]
@@ -450,12 +450,12 @@ mod tests {
             "https://example.org/Carol",
         );
 
-        store.insert(&e1).await.unwrap();
-        store.insert(&e2).await.unwrap();
-        store.insert(&e3).await.unwrap();
+        store.insert(&e1).await.expect("TODO: handle error");
+        store.insert(&e2).await.expect("TODO: handle error");
+        store.insert(&e3).await.expect("TODO: handle error");
 
         let alice = GraphNode::new("https://example.org/Alice");
-        let outgoing = store.outgoing(&alice).await.unwrap();
+        let outgoing = store.outgoing(&alice).await.expect("TODO: handle error");
         assert_eq!(outgoing.len(), 2);
     }
 
@@ -474,11 +474,11 @@ mod tests {
             "https://example.org/Bob",
         );
 
-        store.insert(&e1).await.unwrap();
-        store.insert(&e2).await.unwrap();
+        store.insert(&e1).await.expect("TODO: handle error");
+        store.insert(&e2).await.expect("TODO: handle error");
 
         let bob = GraphNode::new("https://example.org/Bob");
-        let incoming = store.incoming(&bob).await.unwrap();
+        let incoming = store.incoming(&bob).await.expect("TODO: handle error");
         assert_eq!(incoming.len(), 2);
     }
 
@@ -491,15 +491,15 @@ mod tests {
             "https://example.org/Bob",
         );
 
-        store.insert(&edge).await.unwrap();
-        assert!(store.exists(&edge).await.unwrap());
+        store.insert(&edge).await.expect("TODO: handle error");
+        assert!(store.exists(&edge).await.expect("TODO: handle error"));
 
-        store.delete(&edge).await.unwrap();
-        assert!(!store.exists(&edge).await.unwrap());
+        store.delete(&edge).await.expect("TODO: handle error");
+        assert!(!store.exists(&edge).await.expect("TODO: handle error"));
 
         // Verify indices are cleaned up
         let alice = GraphNode::new("https://example.org/Alice");
-        let outgoing = store.outgoing(&alice).await.unwrap();
+        let outgoing = store.outgoing(&alice).await.expect("TODO: handle error");
         assert_eq!(outgoing.len(), 0);
     }
 
@@ -515,15 +515,15 @@ mod tests {
             },
         };
 
-        store.insert(&edge).await.unwrap();
-        assert!(store.exists(&edge).await.unwrap());
+        store.insert(&edge).await.expect("TODO: handle error");
+        assert!(store.exists(&edge).await.expect("TODO: handle error"));
 
-        let outgoing = store.outgoing(&edge.subject).await.unwrap();
+        let outgoing = store.outgoing(&edge.subject).await.expect("TODO: handle error");
         assert_eq!(outgoing.len(), 1);
 
         // Literals should NOT appear in the object index
         let alice_node = GraphNode::new("Alice");
-        let incoming = store.incoming(&alice_node).await.unwrap();
+        let incoming = store.incoming(&alice_node).await.expect("TODO: handle error");
         assert_eq!(incoming.len(), 0);
     }
 
@@ -543,17 +543,17 @@ mod tests {
             "https://example.org/Carol",
         );
 
-        store.insert(&e1).await.unwrap();
-        store.insert(&e2).await.unwrap();
+        store.insert(&e1).await.expect("TODO: handle error");
+        store.insert(&e2).await.expect("TODO: handle error");
 
         let alice = GraphNode::new("https://example.org/Alice");
 
         // 1 hop: Alice, Bob
-        let neighbors_1 = store.neighborhood(&alice, 1).await.unwrap();
+        let neighbors_1 = store.neighborhood(&alice, 1).await.expect("TODO: handle error");
         assert_eq!(neighbors_1.len(), 2);
 
         // 2 hops: Alice, Bob, Carol
-        let neighbors_2 = store.neighborhood(&alice, 2).await.unwrap();
+        let neighbors_2 = store.neighborhood(&alice, 2).await.expect("TODO: handle error");
         assert_eq!(neighbors_2.len(), 3);
     }
 
@@ -567,16 +567,16 @@ mod tests {
         );
 
         // Insert the same edge twice
-        store.insert(&edge).await.unwrap();
-        store.insert(&edge).await.unwrap();
+        store.insert(&edge).await.expect("TODO: handle error");
+        store.insert(&edge).await.expect("TODO: handle error");
 
-        let outgoing = store.outgoing(&edge.subject).await.unwrap();
+        let outgoing = store.outgoing(&edge.subject).await.expect("TODO: handle error");
         assert_eq!(outgoing.len(), 1, "Duplicate edges should be deduplicated");
     }
 
     #[tokio::test]
     async fn test_persistence_across_reopen() {
-        let dir = tempdir().unwrap();
+        let dir = tempdir().expect("TODO: handle error");
         let path = dir.path().join("persist-test.redb");
 
         let edge = test_edge(
@@ -587,15 +587,15 @@ mod tests {
 
         // Write and drop
         {
-            let store = RedbGraphStore::persistent(&path).unwrap();
-            store.insert(&edge).await.unwrap();
+            let store = RedbGraphStore::persistent(&path).expect("TODO: handle error");
+            store.insert(&edge).await.expect("TODO: handle error");
         }
 
         // Reopen and verify
         {
-            let store = RedbGraphStore::persistent(&path).unwrap();
-            assert!(store.exists(&edge).await.unwrap());
-            let outgoing = store.outgoing(&edge.subject).await.unwrap();
+            let store = RedbGraphStore::persistent(&path).expect("TODO: handle error");
+            assert!(store.exists(&edge).await.expect("TODO: handle error"));
+            let outgoing = store.outgoing(&edge.subject).await.expect("TODO: handle error");
             assert_eq!(outgoing.len(), 1);
         }
     }

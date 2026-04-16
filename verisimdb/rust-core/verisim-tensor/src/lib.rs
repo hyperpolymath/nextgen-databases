@@ -275,17 +275,17 @@ mod tests {
     async fn test_tensor_store() {
         let store = InMemoryTensorStore::new();
 
-        let tensor = Tensor::new("t1", vec![2, 3], vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).unwrap();
-        store.put(&tensor).await.unwrap();
+        let tensor = Tensor::new("t1", vec![2, 3], vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).expect("TODO: handle error");
+        store.put(&tensor).await.expect("TODO: handle error");
 
-        let retrieved = store.get("t1").await.unwrap().unwrap();
+        let retrieved = store.get("t1").await.expect("TODO: handle error").expect("TODO: handle error");
         assert_eq!(retrieved.shape, vec![2, 3]);
         assert_eq!(retrieved.data, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
     }
 
     #[test]
     fn test_tensor_to_ndarray() {
-        let tensor = Tensor::new("t", vec![2, 2], vec![1.0, 2.0, 3.0, 4.0]).unwrap();
+        let tensor = Tensor::new("t", vec![2, 2], vec![1.0, 2.0, 3.0, 4.0]).expect("TODO: handle error");
         let arr = tensor.to_ndarray();
         assert_eq!(arr.shape(), &[2, 2]);
     }
@@ -294,37 +294,37 @@ mod tests {
     async fn test_reduce_max() {
         let store = InMemoryTensorStore::new();
         // 2x3 tensor: [[1, 5, 3], [4, 2, 6]]
-        let tensor = Tensor::new("t_max", vec![2, 3], vec![1.0, 5.0, 3.0, 4.0, 2.0, 6.0]).unwrap();
-        store.put(&tensor).await.unwrap();
+        let tensor = Tensor::new("t_max", vec![2, 3], vec![1.0, 5.0, 3.0, 4.0, 2.0, 6.0]).expect("TODO: handle error");
+        store.put(&tensor).await.expect("TODO: handle error");
 
         // Max along axis 0 → [4, 5, 6]
-        let result = store.reduce("t_max", 0, ReduceOp::Max).await.unwrap();
+        let result = store.reduce("t_max", 0, ReduceOp::Max).await.expect("TODO: handle error");
         assert_eq!(result.data, vec![4.0, 5.0, 6.0]);
 
         // Max along axis 1 → [5, 6]
-        let result = store.reduce("t_max", 1, ReduceOp::Max).await.unwrap();
+        let result = store.reduce("t_max", 1, ReduceOp::Max).await.expect("TODO: handle error");
         assert_eq!(result.data, vec![5.0, 6.0]);
     }
 
     #[tokio::test]
     async fn test_reduce_min() {
         let store = InMemoryTensorStore::new();
-        let tensor = Tensor::new("t_min", vec![2, 3], vec![1.0, 5.0, 3.0, 4.0, 2.0, 6.0]).unwrap();
-        store.put(&tensor).await.unwrap();
+        let tensor = Tensor::new("t_min", vec![2, 3], vec![1.0, 5.0, 3.0, 4.0, 2.0, 6.0]).expect("TODO: handle error");
+        store.put(&tensor).await.expect("TODO: handle error");
 
         // Min along axis 0 → [1, 2, 3]
-        let result = store.reduce("t_min", 0, ReduceOp::Min).await.unwrap();
+        let result = store.reduce("t_min", 0, ReduceOp::Min).await.expect("TODO: handle error");
         assert_eq!(result.data, vec![1.0, 2.0, 3.0]);
     }
 
     #[tokio::test]
     async fn test_reduce_prod() {
         let store = InMemoryTensorStore::new();
-        let tensor = Tensor::new("t_prod", vec![2, 3], vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).unwrap();
-        store.put(&tensor).await.unwrap();
+        let tensor = Tensor::new("t_prod", vec![2, 3], vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]).expect("TODO: handle error");
+        store.put(&tensor).await.expect("TODO: handle error");
 
         // Prod along axis 0 → [1*4, 2*5, 3*6] = [4, 10, 18]
-        let result = store.reduce("t_prod", 0, ReduceOp::Prod).await.unwrap();
+        let result = store.reduce("t_prod", 0, ReduceOp::Prod).await.expect("TODO: handle error");
         assert_eq!(result.data, vec![4.0, 10.0, 18.0]);
     }
 }

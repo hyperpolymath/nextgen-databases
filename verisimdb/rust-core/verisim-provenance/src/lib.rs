@@ -294,7 +294,7 @@ impl ProvenanceChain {
 
         let record = ProvenanceRecord::new(event_type, actor, source, description, parent_hash);
         self.records.push(record);
-        self.records.last().unwrap()
+        self.records.last().expect("TODO: handle error")
     }
 }
 
@@ -380,7 +380,7 @@ impl ProvenanceStore for InMemoryProvenanceStore {
 
         chain.append(event_type, actor, source, description);
 
-        let record = chain.records.last().unwrap().clone();
+        let record = chain.records.last().expect("TODO: handle error").clone();
         debug!(
             entity_id = %entity_id,
             event = %record.event_type,
@@ -514,8 +514,8 @@ mod tests {
         chain.append(ProvenanceEventType::Created, "alice", None, "Created");
         chain.append(ProvenanceEventType::Modified, "bob", None, "Modified");
 
-        assert_eq!(chain.origin().unwrap().actor, "alice");
-        assert_eq!(chain.latest().unwrap().actor, "bob");
+        assert_eq!(chain.origin().expect("TODO: handle error").actor, "alice");
+        assert_eq!(chain.latest().expect("TODO: handle error").actor, "bob");
     }
 
     #[tokio::test]
@@ -532,7 +532,7 @@ mod tests {
                 "Imported from external source",
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         assert_eq!(record.event_type, ProvenanceEventType::Created);
 
         // Record second event
@@ -545,10 +545,10 @@ mod tests {
                 "Updated vector embedding",
             )
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         // Retrieve chain
-        let chain = store.get_chain("entity-100").await.unwrap();
+        let chain = store.get_chain("entity-100").await.expect("TODO: handle error");
         assert_eq!(chain.len(), 2);
         assert!(chain.verify().is_ok());
     }
@@ -558,19 +558,19 @@ mod tests {
         let store = InMemoryProvenanceStore::new();
 
         // Non-existent chain returns false (not an error)
-        assert!(!store.verify_chain("no-such-entity").await.unwrap());
+        assert!(!store.verify_chain("no-such-entity").await.expect("TODO: handle error"));
 
         // Create a chain and verify it
         store
             .record_event("e1", ProvenanceEventType::Created, "alice", None, "Created")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .record_event("e1", ProvenanceEventType::Modified, "bob", None, "Modified")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        assert!(store.verify_chain("e1").await.unwrap());
+        assert!(store.verify_chain("e1").await.expect("TODO: handle error"));
     }
 
     #[tokio::test]
@@ -580,20 +580,20 @@ mod tests {
         store
             .record_event("e1", ProvenanceEventType::Created, "alice", None, "Created e1")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .record_event("e2", ProvenanceEventType::Created, "bob", None, "Created e2")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .record_event("e3", ProvenanceEventType::Imported, "alice", None, "Imported e3")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        let alice_records = store.search_by_actor("alice").await.unwrap();
+        let alice_records = store.search_by_actor("alice").await.expect("TODO: handle error");
         assert_eq!(alice_records.len(), 2);
 
-        let bob_records = store.search_by_actor("bob").await.unwrap();
+        let bob_records = store.search_by_actor("bob").await.expect("TODO: handle error");
         assert_eq!(bob_records.len(), 1);
     }
 
@@ -604,16 +604,16 @@ mod tests {
         store
             .record_event("e1", ProvenanceEventType::Created, "alice", None, "Created")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .record_event("e1", ProvenanceEventType::Modified, "bob", None, "Modified")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        let origin = store.get_origin("e1").await.unwrap().unwrap();
+        let origin = store.get_origin("e1").await.expect("TODO: handle error").expect("TODO: handle error");
         assert_eq!(origin.actor, "alice");
 
-        let latest = store.get_latest("e1").await.unwrap().unwrap();
+        let latest = store.get_latest("e1").await.expect("TODO: handle error").expect("TODO: handle error");
         assert_eq!(latest.actor, "bob");
     }
 
@@ -624,10 +624,10 @@ mod tests {
         store
             .record_event("e1", ProvenanceEventType::Created, "alice", None, "Created")
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         assert!(store.get_chain("e1").await.is_ok());
 
-        store.delete_chain("e1").await.unwrap();
+        store.delete_chain("e1").await.expect("TODO: handle error");
         assert!(store.get_chain("e1").await.is_err());
     }
 

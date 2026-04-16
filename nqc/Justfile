@@ -1,0 +1,73 @@
+# NextGen Query Client - Justfile
+# Build automation and development tasks
+
+# Default target
+default:
+    just --list
+
+# Build the web application
+build-web:
+    cd web && deno task build
+
+# Run development server
+dev:
+    cd web && deno task dev
+
+# Build production bundle
+prod:
+    cd web && deno task prod
+
+# Run the application
+run:
+    ./nqc-launcher.sh --start
+
+# Stop the application
+stop:
+    ./nqc-launcher.sh --stop
+
+# Check status
+status:
+    ./nqc-launcher.sh --status
+
+# Install desktop integration
+install:
+    ./nqc-launcher.sh --integ
+
+# Uninstall desktop integration
+uninstall:
+    ./nqc-launcher.sh --disinteg
+
+# Clean build artifacts
+clean:
+    rm -rf web/node_modules web/.deno web/dist
+    rm -f /tmp/nqc.pid /tmp/nqc.log
+
+# Run tests
+test:
+    # Add test commands here
+    echo "Tests not yet implemented"
+
+# Audit scripts (inspired by git-scripts)
+audit-scripts:
+    ./scripts/audit-scripts.sh
+
+# Format code
+fmt:
+    cd web && deno fmt
+
+# Lint code
+lint:
+    cd web && deno lint
+
+# Show help
+help:
+    just --list
+
+# Cross-launch invariant-path
+invariant-path:
+    /var/mnt/eclipse/repos/.desktop-tools/invariant-path-launcher.sh --auto
+
+# Combined workflow - build and run
+build-run:
+    just build-web
+    just run

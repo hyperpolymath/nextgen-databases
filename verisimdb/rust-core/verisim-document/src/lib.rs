@@ -297,36 +297,36 @@ mod tests {
 
     #[tokio::test]
     async fn test_index_and_search() {
-        let store = TantivyDocumentStore::in_memory().unwrap();
+        let store = TantivyDocumentStore::in_memory().expect("TODO: handle error");
 
         let doc1 = Document::new("d1", "Rust Programming", "Rust is a systems programming language");
         let doc2 = Document::new("d2", "Python Tutorial", "Python is great for beginners");
 
-        store.index(&doc1).await.unwrap();
-        store.index(&doc2).await.unwrap();
-        store.commit().await.unwrap();
+        store.index(&doc1).await.expect("TODO: handle error");
+        store.index(&doc2).await.expect("TODO: handle error");
+        store.commit().await.expect("TODO: handle error");
 
-        let results = store.search("Rust", 10).await.unwrap();
+        let results = store.search("Rust", 10).await.expect("TODO: handle error");
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].id, "d1");
     }
 
     #[tokio::test]
     async fn test_search_with_snippets() {
-        let store = TantivyDocumentStore::in_memory().unwrap();
+        let store = TantivyDocumentStore::in_memory().expect("TODO: handle error");
 
         let doc = Document::new(
             "d1",
             "Rust Guide",
             "Rust is a systems programming language focused on safety and performance",
         );
-        store.index(&doc).await.unwrap();
-        store.commit().await.unwrap();
+        store.index(&doc).await.expect("TODO: handle error");
+        store.commit().await.expect("TODO: handle error");
 
-        let results = store.search("safety", 10).await.unwrap();
+        let results = store.search("safety", 10).await.expect("TODO: handle error");
         assert_eq!(results.len(), 1);
         assert!(results[0].snippet.is_some(), "Snippet should not be None");
-        let snippet = results[0].snippet.as_ref().unwrap();
+        let snippet = results[0].snippet.as_ref().expect("TODO: handle error");
         assert!(snippet.contains("safety"), "Snippet should contain the search term");
     }
 }

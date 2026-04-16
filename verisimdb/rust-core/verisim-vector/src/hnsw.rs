@@ -276,7 +276,7 @@ impl Graph {
             return;
         }
 
-        let ep = self.entry_point.unwrap();
+        let ep = self.entry_point.expect("TODO: handle error");
         let mut current_ep = vec![ep];
 
         // Phase 1: Greedy descent from top layer to (node level + 1)
@@ -522,11 +522,11 @@ mod tests {
         let e2 = Embedding::new("e2", vec![0.9, 0.1, 0.0]);
         let e3 = Embedding::new("e3", vec![0.0, 1.0, 0.0]);
 
-        store.upsert(&e1).await.unwrap();
-        store.upsert(&e2).await.unwrap();
-        store.upsert(&e3).await.unwrap();
+        store.upsert(&e1).await.expect("TODO: handle error");
+        store.upsert(&e2).await.expect("TODO: handle error");
+        store.upsert(&e3).await.expect("TODO: handle error");
 
-        let results = store.search(&[1.0, 0.0, 0.0], 2).await.unwrap();
+        let results = store.search(&[1.0, 0.0, 0.0], 2).await.expect("TODO: handle error");
         assert_eq!(results.len(), 2);
         assert_eq!(results[0].id, "e1");
         assert_eq!(results[1].id, "e2");
@@ -539,13 +539,13 @@ mod tests {
         store
             .upsert(&Embedding::new("e1", vec![1.0, 0.0, 0.0]))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .upsert(&Embedding::new("e1", vec![0.0, 1.0, 0.0]))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        let emb = store.get("e1").await.unwrap().unwrap();
+        let emb = store.get("e1").await.expect("TODO: handle error").expect("TODO: handle error");
         assert_eq!(emb.vector, vec![0.0, 1.0, 0.0]);
     }
 
@@ -556,10 +556,10 @@ mod tests {
         store
             .upsert(&Embedding::new("e1", vec![1.0, 0.0, 0.0]))
             .await
-            .unwrap();
-        store.delete("e1").await.unwrap();
+            .expect("TODO: handle error");
+        store.delete("e1").await.expect("TODO: handle error");
 
-        assert!(store.get("e1").await.unwrap().is_none());
+        assert!(store.get("e1").await.expect("TODO: handle error").is_none());
         assert_eq!(store.len(), 0);
     }
 
@@ -579,17 +579,17 @@ mod tests {
         store
             .upsert(&Embedding::new("origin", vec![0.0, 0.0]))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .upsert(&Embedding::new("near", vec![1.0, 0.0]))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .upsert(&Embedding::new("far", vec![10.0, 10.0]))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        let results = store.search(&[0.0, 0.0], 2).await.unwrap();
+        let results = store.search(&[0.0, 0.0], 2).await.expect("TODO: handle error");
         assert_eq!(results[0].id, "origin");
         assert_eq!(results[1].id, "near");
     }
@@ -601,13 +601,13 @@ mod tests {
         store
             .upsert(&Embedding::new("high", vec![1.0, 1.0, 1.0]))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .upsert(&Embedding::new("low", vec![0.1, 0.1, 0.1]))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        let results = store.search(&[1.0, 1.0, 1.0], 2).await.unwrap();
+        let results = store.search(&[1.0, 1.0, 1.0], 2).await.expect("TODO: handle error");
         assert_eq!(results[0].id, "high");
         assert!(results[0].score > results[1].score);
     }
@@ -624,10 +624,10 @@ mod tests {
             store
                 .upsert(&Embedding::new(format!("v{i}"), vec))
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
         }
 
-        let results = store.search(&vec![1.0; dim], 10).await.unwrap();
+        let results = store.search(&vec![1.0; dim], 10).await.expect("TODO: handle error");
         assert_eq!(results.len(), 10);
 
         // Scores should be monotonically non-increasing
@@ -639,7 +639,7 @@ mod tests {
     #[tokio::test]
     async fn test_hnsw_empty_search() {
         let store = HnswVectorStore::with_defaults(3, DistanceMetric::Cosine);
-        let results = store.search(&[1.0, 0.0, 0.0], 5).await.unwrap();
+        let results = store.search(&[1.0, 0.0, 0.0], 5).await.expect("TODO: handle error");
         assert!(results.is_empty());
     }
 
@@ -650,19 +650,19 @@ mod tests {
         store
             .upsert(&Embedding::new("a", vec![1.0, 0.0, 0.0]))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .upsert(&Embedding::new("b", vec![0.9, 0.1, 0.0]))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         store
             .upsert(&Embedding::new("c", vec![0.0, 1.0, 0.0]))
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        store.delete("a").await.unwrap();
+        store.delete("a").await.expect("TODO: handle error");
 
-        let results = store.search(&[1.0, 0.0, 0.0], 3).await.unwrap();
+        let results = store.search(&[1.0, 0.0, 0.0], 3).await.expect("TODO: handle error");
         assert!(!results.iter().any(|r| r.id == "a"));
         assert_eq!(results[0].id, "b");
     }

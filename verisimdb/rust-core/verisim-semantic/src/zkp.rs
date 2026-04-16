@@ -90,7 +90,7 @@ pub fn merkle_root(leaves: &[Vec<u8>]) -> [u8; 32] {
     // Pad to even number if necessary
     while current_level.len() > 1 {
         if current_level.len() % 2 != 0 {
-            let last = *current_level.last().unwrap();
+            let last = *current_level.last().expect("TODO: handle error");
             current_level.push(last);
         }
 
@@ -118,7 +118,7 @@ pub fn merkle_proof(leaves: &[Vec<u8>], index: usize) -> Option<MerkleProof> {
     while hashed.len() > 1 {
         // Pad to even
         if hashed.len() % 2 != 0 {
-            let last = *hashed.last().unwrap();
+            let last = *hashed.last().expect("TODO: handle error");
             hashed.push(last);
         }
 
@@ -283,7 +283,7 @@ mod tests {
 
         // Prove each leaf
         for i in 0..leaves.len() {
-            let proof = merkle_proof(&leaves, i).unwrap();
+            let proof = merkle_proof(&leaves, i).expect("TODO: handle error");
             assert!(
                 verify_merkle_proof(&proof),
                 "Merkle proof failed for leaf {i}"
@@ -296,7 +296,7 @@ mod tests {
         let leaves = vec![b"a".to_vec(), b"b".to_vec(), b"c".to_vec()];
 
         for i in 0..leaves.len() {
-            let proof = merkle_proof(&leaves, i).unwrap();
+            let proof = merkle_proof(&leaves, i).expect("TODO: handle error");
             assert!(verify_merkle_proof(&proof));
         }
     }
@@ -304,7 +304,7 @@ mod tests {
     #[test]
     fn test_merkle_proof_tampered() {
         let leaves = vec![b"a".to_vec(), b"b".to_vec(), b"c".to_vec(), b"d".to_vec()];
-        let mut proof = merkle_proof(&leaves, 0).unwrap();
+        let mut proof = merkle_proof(&leaves, 0).expect("TODO: handle error");
 
         // Tamper with the leaf
         proof.leaf = b"tampered".to_vec();
@@ -345,7 +345,7 @@ mod tests {
             b"claim-3".to_vec(),
         ];
 
-        let proof = merkle_proof(&leaves, 1).unwrap();
+        let proof = merkle_proof(&leaves, 1).expect("TODO: handle error");
         let proof_data = VerifiableProofData::MerkleInclusion(proof);
 
         // Merkle proof verification doesn't use the claim parameter directly

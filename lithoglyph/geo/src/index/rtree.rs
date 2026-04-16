@@ -46,10 +46,10 @@ impl SpatialIndex {
         let point = [entry.lon(), entry.lat()];
         let rtree_entry = GeomWithData::new(point, entry.lithoglyph_id);
 
-        let mut tree = self.tree.write().unwrap();
+        let mut tree = self.tree.write().expect("TODO: handle error");
         tree.insert(rtree_entry);
 
-        let mut stats = self.stats.write().unwrap();
+        let mut stats = self.stats.write().expect("TODO: handle error");
         stats.entry_count += 1;
     }
 
@@ -63,10 +63,10 @@ impl SpatialIndex {
         let count = rtree_entries.len();
         let new_tree = RTree::bulk_load(rtree_entries);
 
-        let mut tree = self.tree.write().unwrap();
+        let mut tree = self.tree.write().expect("TODO: handle error");
         *tree = new_tree;
 
-        let mut stats = self.stats.write().unwrap();
+        let mut stats = self.stats.write().expect("TODO: handle error");
         stats.entry_count = count;
         stats.last_rebuild = Some(chrono::Utc::now());
 
@@ -75,16 +75,16 @@ impl SpatialIndex {
 
     /// Clear the index
     pub fn clear(&self) {
-        let mut tree = self.tree.write().unwrap();
+        let mut tree = self.tree.write().expect("TODO: handle error");
         *tree = RTree::new();
 
-        let mut stats = self.stats.write().unwrap();
+        let mut stats = self.stats.write().expect("TODO: handle error");
         stats.entry_count = 0;
     }
 
     /// Query entries within a bounding box
     pub fn query_bbox(&self, bbox: BoundingBox) -> Vec<SpatialQueryResult> {
-        let tree = self.tree.read().unwrap();
+        let tree = self.tree.read().expect("TODO: handle error");
 
         let aabb = AABB::from_corners([bbox.min_lon, bbox.min_lat], [bbox.max_lon, bbox.max_lat]);
 
@@ -101,7 +101,7 @@ impl SpatialIndex {
 
     /// Query entries within a radius of a point
     pub fn query_radius(&self, lat: f64, lon: f64, radius_km: f64) -> Vec<SpatialQueryResult> {
-        let tree = self.tree.read().unwrap();
+        let tree = self.tree.read().expect("TODO: handle error");
         let center = Point::new(lon, lat);
 
         // Convert km to approximate degrees for initial bbox filter
@@ -136,7 +136,7 @@ impl SpatialIndex {
 
     /// Find k nearest neighbors to a point
     pub fn query_nearest(&self, lat: f64, lon: f64, k: usize) -> Vec<SpatialQueryResult> {
-        let tree = self.tree.read().unwrap();
+        let tree = self.tree.read().expect("TODO: handle error");
         let center = Point::new(lon, lat);
 
         tree.nearest_neighbor_iter(&[lon, lat])
@@ -156,12 +156,12 @@ impl SpatialIndex {
 
     /// Get index statistics
     pub fn stats(&self) -> IndexStats {
-        self.stats.read().unwrap().clone()
+        self.stats.read().expect("TODO: handle error").clone()
     }
 
     /// Get entry count
     pub fn len(&self) -> usize {
-        self.tree.read().unwrap().size()
+        self.tree.read().expect("TODO: handle error").size()
     }
 
     /// Check if index is empty
@@ -208,7 +208,7 @@ mod tests {
 
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].entry.lithoglyph_id, "doc_london");
-        assert!(results[0].distance_km.unwrap() < 1.0); // Should be very close
+        assert!(results[0].distance_km.expect("TODO: handle error") < 1.0); // Should be very close
     }
 
     #[test]

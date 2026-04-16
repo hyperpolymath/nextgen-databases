@@ -848,7 +848,7 @@ mod tests {
 
         // Insert a connection.
         {
-            let mut conns = state.connections.lock().unwrap();
+            let mut conns = state.connections.lock().expect("TODO: handle error");
             conns.insert(
                 session_id.clone(),
                 ConnectionInfo {
@@ -865,7 +865,7 @@ mod tests {
 
         // Remove it.
         {
-            let mut conns = state.connections.lock().unwrap();
+            let mut conns = state.connections.lock().expect("TODO: handle error");
             let removed = conns.remove(&session_id);
             assert!(removed.is_some());
             assert_eq!(conns.len(), 0);

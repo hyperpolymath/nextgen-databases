@@ -682,8 +682,8 @@ mod tests {
         let mut stats = StatisticsCollector::new();
 
         // Verify initial state: zero queries for Vector and Graph
-        assert_eq!(stats.get(Modality::Vector).unwrap().query_count, 0);
-        assert_eq!(stats.get(Modality::Graph).unwrap().query_count, 0);
+        assert_eq!(stats.get(Modality::Vector).expect("TODO: handle error").query_count, 0);
+        assert_eq!(stats.get(Modality::Graph).expect("TODO: handle error").query_count, 0);
 
         let base = Utc::now();
         let (s0, e0) = make_timestamps(base, 42.0);
@@ -695,12 +695,12 @@ mod tests {
         let _profile = profiler.finish(&mut stats);
 
         // After finish(), stats should have recorded one execution per modality
-        let vector_stats = stats.get(Modality::Vector).unwrap();
+        let vector_stats = stats.get(Modality::Vector).expect("TODO: handle error");
         assert_eq!(vector_stats.query_count, 1);
         assert!((vector_stats.avg_latency_ms - 42.0).abs() < f64::EPSILON);
         assert_eq!(vector_stats.avg_rows_returned, 12);
 
-        let graph_stats = stats.get(Modality::Graph).unwrap();
+        let graph_stats = stats.get(Modality::Graph).expect("TODO: handle error");
         assert_eq!(graph_stats.query_count, 1);
         assert!((graph_stats.avg_latency_ms - 180.0).abs() < f64::EPSILON);
         assert_eq!(graph_stats.avg_rows_returned, 190);
@@ -837,8 +837,8 @@ mod tests {
 
         let profile = profiler.finish(&mut stats);
 
-        let json = serde_json::to_string(&profile).unwrap();
-        let parsed: QueryProfile = serde_json::from_str(&json).unwrap();
+        let json = serde_json::to_string(&profile).expect("TODO: handle error");
+        let parsed: QueryProfile = serde_json::from_str(&json).expect("TODO: handle error");
 
         assert_eq!(parsed.plan_id, "serde-test");
         assert_eq!(parsed.steps.len(), 2);

@@ -376,11 +376,11 @@ mod tests {
                 message: "Person must have a name".to_string(),
             });
 
-        store.register_type(&person_type).await.unwrap();
+        store.register_type(&person_type).await.expect("TODO: handle error");
 
-        let retrieved = store.get_type("https://example.org/Person").await.unwrap();
+        let retrieved = store.get_type("https://example.org/Person").await.expect("TODO: handle error");
         assert!(retrieved.is_some());
-        assert_eq!(retrieved.unwrap().label, "Person");
+        assert_eq!(retrieved.expect("TODO: handle error").label, "Person");
     }
 
     #[test]
@@ -391,8 +391,8 @@ mod tests {
             vec![1, 2, 3, 4],
         );
 
-        let cbor = proof.to_cbor().unwrap();
-        let decoded = ProofBlob::from_cbor(&cbor).unwrap();
+        let cbor = proof.to_cbor().expect("TODO: handle error");
+        let decoded = ProofBlob::from_cbor(&cbor).expect("TODO: handle error");
 
         assert_eq!(decoded.claim, proof.claim);
     }

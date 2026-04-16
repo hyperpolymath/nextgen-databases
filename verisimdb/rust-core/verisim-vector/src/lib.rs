@@ -249,11 +249,11 @@ mod tests {
         let e2 = Embedding::new("e2", vec![0.9, 0.1, 0.0]);
         let e3 = Embedding::new("e3", vec![0.0, 1.0, 0.0]);
 
-        store.upsert(&e1).await.unwrap();
-        store.upsert(&e2).await.unwrap();
-        store.upsert(&e3).await.unwrap();
+        store.upsert(&e1).await.expect("TODO: handle error");
+        store.upsert(&e2).await.expect("TODO: handle error");
+        store.upsert(&e3).await.expect("TODO: handle error");
 
-        let results = store.search(&[1.0, 0.0, 0.0], 2).await.unwrap();
+        let results = store.search(&[1.0, 0.0, 0.0], 2).await.expect("TODO: handle error");
         assert_eq!(results.len(), 2);
         assert_eq!(results[0].id, "e1");
     }

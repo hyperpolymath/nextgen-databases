@@ -986,7 +986,7 @@ mod tests {
             Some(TransactionState::Active)
         );
 
-        mgr.commit(txn_id).await.unwrap();
+        mgr.commit(txn_id).await.expect("TODO: handle error");
 
         assert_eq!(
             mgr.get_transaction_state(txn_id).await,
@@ -1001,7 +1001,7 @@ mod tests {
         let mgr = new_manager();
         let txn_id = mgr.begin(IsolationLevel::ReadCommitted).await;
 
-        let undo = mgr.rollback(txn_id).await.unwrap();
+        let undo = mgr.rollback(txn_id).await.expect("TODO: handle error");
         assert!(undo.is_empty());
 
         assert_eq!(
@@ -1017,7 +1017,7 @@ mod tests {
         let mgr = new_manager();
         let txn_id = mgr.begin(IsolationLevel::ReadCommitted).await;
 
-        mgr.commit(txn_id).await.unwrap();
+        mgr.commit(txn_id).await.expect("TODO: handle error");
 
         let result = mgr.commit(txn_id).await;
         assert!(matches!(
@@ -1033,7 +1033,7 @@ mod tests {
         let mgr = new_manager();
         let txn_id = mgr.begin(IsolationLevel::ReadCommitted).await;
 
-        mgr.rollback(txn_id).await.unwrap();
+        mgr.rollback(txn_id).await.expect("TODO: handle error");
 
         let result = mgr.commit(txn_id).await;
         assert!(matches!(
@@ -1066,10 +1066,10 @@ mod tests {
 
         mgr.acquire_lock(txn_a, "entity-1", "graph", LockType::Shared)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         mgr.acquire_lock(txn_b, "entity-1", "graph", LockType::Shared)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         // Both should hold the lock
         let holders = mgr.lock_holders("entity-1", "graph").await;
@@ -1086,7 +1086,7 @@ mod tests {
 
         mgr.acquire_lock(txn_a, "entity-1", "vector", LockType::Shared)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         let result = mgr
             .acquire_lock(txn_b, "entity-1", "vector", LockType::Exclusive)
@@ -1104,7 +1104,7 @@ mod tests {
 
         mgr.acquire_lock(txn_a, "entity-1", "document", LockType::Exclusive)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         let result = mgr
             .acquire_lock(txn_b, "entity-1", "document", LockType::Exclusive)
@@ -1121,17 +1121,17 @@ mod tests {
 
         mgr.acquire_lock(txn_a, "entity-1", "tensor", LockType::Exclusive)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         assert!(mgr.is_locked("entity-1", "tensor").await);
 
-        mgr.commit(txn_a).await.unwrap();
+        mgr.commit(txn_a).await.expect("TODO: handle error");
         assert!(!mgr.is_locked("entity-1", "tensor").await);
 
         // Another transaction can now lock it
         let txn_b = mgr.begin(IsolationLevel::ReadCommitted).await;
         mgr.acquire_lock(txn_b, "entity-1", "tensor", LockType::Exclusive)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
     }
 
     // -- Test 10: Locks released on rollback --
@@ -1143,10 +1143,10 @@ mod tests {
 
         mgr.acquire_lock(txn_a, "entity-1", "semantic", LockType::Exclusive)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         assert!(mgr.is_locked("entity-1", "semantic").await);
 
-        mgr.rollback(txn_a).await.unwrap();
+        mgr.rollback(txn_a).await.expect("TODO: handle error");
         assert!(!mgr.is_locked("entity-1", "semantic").await);
     }
 
@@ -1159,15 +1159,15 @@ mod tests {
 
         mgr.record_undo(txn_id, "e1", "graph", Some(vec![1, 2, 3]), 1)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         mgr.record_undo(txn_id, "e1", "vector", Some(vec![4, 5, 6]), 1)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         mgr.record_undo(txn_id, "e1", "document", None, 0)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        let undo = mgr.rollback(txn_id).await.unwrap();
+        let undo = mgr.rollback(txn_id).await.expect("TODO: handle error");
         assert_eq!(undo.len(), 3);
         // Should be in reverse order: document, vector, graph
         assert_eq!(undo[0].modality, "document");
@@ -1189,12 +1189,12 @@ mod tests {
 
         mgr.record_undo(txn_id, "e1", "graph", None, 0)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         mgr.record_undo(txn_id, "e1", "vector", None, 0)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
-        mgr.commit(txn_id).await.unwrap();
+        mgr.commit(txn_id).await.expect("TODO: handle error");
 
         assert_eq!(mgr.current_version("e1", "graph").await, 1);
         assert_eq!(mgr.current_version("e1", "vector").await, 1);
@@ -1210,14 +1210,14 @@ mod tests {
 
         // Transaction A reads entity e1/graph at version 0
         let txn_a = mgr.begin(IsolationLevel::Serializable).await;
-        mgr.record_read(txn_a, "e1", "graph").await.unwrap();
+        mgr.record_read(txn_a, "e1", "graph").await.expect("TODO: handle error");
 
         // Transaction B writes to e1/graph and commits, bumping version to 1
         let txn_b = mgr.begin(IsolationLevel::ReadCommitted).await;
         mgr.record_undo(txn_b, "e1", "graph", None, 0)
             .await
-            .unwrap();
-        mgr.commit(txn_b).await.unwrap();
+            .expect("TODO: handle error");
+        mgr.commit(txn_b).await.expect("TODO: handle error");
 
         // Transaction A tries to commit, but e1/graph is now v1 (was v0 at read)
         let result = mgr.commit(txn_a).await;
@@ -1240,13 +1240,13 @@ mod tests {
         let mgr = new_manager();
 
         let txn_a = mgr.begin(IsolationLevel::Serializable).await;
-        mgr.record_read(txn_a, "e1", "graph").await.unwrap();
+        mgr.record_read(txn_a, "e1", "graph").await.expect("TODO: handle error");
         mgr.record_undo(txn_a, "e1", "vector", None, 0)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         // Nobody else modifies e1/graph, so commit should succeed
-        mgr.commit(txn_a).await.unwrap();
+        mgr.commit(txn_a).await.expect("TODO: handle error");
         assert_eq!(
             mgr.get_transaction_state(txn_a).await,
             Some(TransactionState::Committed)
@@ -1288,12 +1288,12 @@ mod tests {
         // A locks e1/graph exclusively
         mgr.acquire_lock(txn_a, "e1", "graph", LockType::Exclusive)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         // B locks e2/graph exclusively
         mgr.acquire_lock(txn_b, "e2", "graph", LockType::Exclusive)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         // B tries to lock e1/graph -> conflict (A holds it), creates wait edge B->A
         let result_b = mgr
@@ -1340,10 +1340,10 @@ mod tests {
         let txn_b = mgr.begin(IsolationLevel::ReadCommitted).await;
         assert_eq!(mgr.active_count().await, 2);
 
-        mgr.commit(txn_a).await.unwrap();
+        mgr.commit(txn_a).await.expect("TODO: handle error");
         assert_eq!(mgr.active_count().await, 1);
 
-        mgr.rollback(txn_b).await.unwrap();
+        mgr.rollback(txn_b).await.expect("TODO: handle error");
         assert_eq!(mgr.active_count().await, 0);
     }
 
@@ -1356,8 +1356,8 @@ mod tests {
         let txn_b = mgr.begin(IsolationLevel::ReadCommitted).await;
         let _txn_c = mgr.begin(IsolationLevel::ReadCommitted).await;
 
-        mgr.commit(txn_a).await.unwrap();
-        mgr.rollback(txn_b).await.unwrap();
+        mgr.commit(txn_a).await.expect("TODO: handle error");
+        mgr.rollback(txn_b).await.expect("TODO: handle error");
 
         let purged = mgr.purge_completed().await;
         assert_eq!(purged, 2);
@@ -1377,18 +1377,18 @@ mod tests {
         for modality in MODALITIES {
             mgr.acquire_lock(txn_id, "e1", modality, LockType::Exclusive)
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
         }
 
         // Record undo for all eight modalities (octad)
         for modality in MODALITIES {
             mgr.record_undo(txn_id, "e1", modality, Some(vec![0xDE, 0xAD]), 0)
                 .await
-                .unwrap();
+                .expect("TODO: handle error");
         }
 
         // Simulate a failure after writing all modalities -> rollback
-        let undo = mgr.rollback(txn_id).await.unwrap();
+        let undo = mgr.rollback(txn_id).await.expect("TODO: handle error");
         assert_eq!(undo.len(), MODALITIES.len());
 
         // All locks should be released
@@ -1419,10 +1419,10 @@ mod tests {
         // Acquire the same lock twice -> should succeed silently
         mgr.acquire_lock(txn_id, "e1", "temporal", LockType::Shared)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
         mgr.acquire_lock(txn_id, "e1", "temporal", LockType::Shared)
             .await
-            .unwrap();
+            .expect("TODO: handle error");
 
         let holders = mgr.lock_holders("e1", "temporal").await;
         assert_eq!(holders.len(), 1);

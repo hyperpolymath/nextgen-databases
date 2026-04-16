@@ -125,7 +125,7 @@ impl SlowQueryLog {
         plan: &PhysicalPlan,
         step_times: &[(Modality, f64, usize)], // (modality, time_ms, rows)
     ) -> bool {
-        let config = self.config.read().unwrap();
+        let config = self.config.read().expect("TODO: handle error");
         if !config.enabled {
             return false;
         }
@@ -205,7 +205,7 @@ impl SlowQueryLog {
         let max_entries = config.max_entries;
         drop(config);
 
-        let mut entries = self.entries.write().unwrap();
+        let mut entries = self.entries.write().expect("TODO: handle error");
         entries.push_back(entry);
         while entries.len() > max_entries {
             entries.pop_front();
@@ -216,38 +216,38 @@ impl SlowQueryLog {
 
     /// Get recent slow queries.
     pub fn recent(&self, limit: usize) -> Vec<SlowQueryEntry> {
-        let entries = self.entries.read().unwrap();
+        let entries = self.entries.read().expect("TODO: handle error");
         entries.iter().rev().take(limit).cloned().collect()
     }
 
     /// Get all slow queries.
     pub fn all(&self) -> Vec<SlowQueryEntry> {
-        self.entries.read().unwrap().iter().cloned().collect()
+        self.entries.read().expect("TODO: handle error").iter().cloned().collect()
     }
 
     /// Get the count of recorded slow queries.
     pub fn count(&self) -> usize {
-        self.entries.read().unwrap().len()
+        self.entries.read().expect("TODO: handle error").len()
     }
 
     /// Clear the slow query log.
     pub fn clear(&self) {
-        self.entries.write().unwrap().clear();
+        self.entries.write().expect("TODO: handle error").clear();
     }
 
     /// Update configuration.
     pub fn set_config(&self, config: SlowQueryConfig) {
-        *self.config.write().unwrap() = config;
+        *self.config.write().expect("TODO: handle error") = config;
     }
 
     /// Get current configuration.
     pub fn config(&self) -> SlowQueryConfig {
-        self.config.read().unwrap().clone()
+        self.config.read().expect("TODO: handle error").clone()
     }
 
     /// Summary statistics.
     pub fn summary(&self) -> SlowQuerySummary {
-        let entries = self.entries.read().unwrap();
+        let entries = self.entries.read().expect("TODO: handle error");
         if entries.is_empty() {
             return SlowQuerySummary::default();
         }
@@ -437,7 +437,7 @@ mod tests {
 
         let entries = log.recent(1);
         assert_eq!(entries.len(), 1);
-        let bottleneck = entries[0].bottleneck.as_ref().unwrap();
+        let bottleneck = entries[0].bottleneck.as_ref().expect("TODO: handle error");
         assert_eq!(bottleneck.modality, Modality::Semantic);
         assert!(bottleneck.percentage > 80.0);
     }
@@ -543,8 +543,8 @@ mod tests {
         log.record(Some("SELECT TEMPORAL FROM OCTAD"), 20.0, &plan, &step_times);
 
         let entries = log.recent(1);
-        let json = serde_json::to_string(&entries[0]).unwrap();
-        let parsed: SlowQueryEntry = serde_json::from_str(&json).unwrap();
+        let json = serde_json::to_string(&entries[0]).expect("TODO: handle error");
+        let parsed: SlowQueryEntry = serde_json::from_str(&json).expect("TODO: handle error");
         assert_eq!(parsed.query_text, Some("SELECT TEMPORAL FROM OCTAD".to_string()));
     }
 }

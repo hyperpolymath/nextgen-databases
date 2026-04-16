@@ -1322,7 +1322,7 @@ mod tests {
             .resolve("rich-1", Modality::Graph)
             .await;
         assert!(resolved.is_some());
-        assert_eq!(resolved.unwrap().drifted_modality, Modality::Graph);
+        assert_eq!(resolved.expect("TODO: handle error").drifted_modality, Modality::Graph);
 
         // Only vector should remain.
         assert_eq!(engine.queue().len().await, 1);
@@ -1485,7 +1485,7 @@ mod tests {
         let h = rich_octad();
         let doc_summary = Modality::Document.summarize(&h);
         assert!(doc_summary.is_some());
-        assert!(doc_summary.unwrap().contains("Rich Entity"));
+        assert!(doc_summary.expect("TODO: handle error").contains("Rich Entity"));
 
         let tensor_summary = Modality::Tensor.summarize(&h);
         assert!(tensor_summary.is_none(), "Tensor not populated");

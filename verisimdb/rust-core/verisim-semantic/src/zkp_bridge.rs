@@ -381,7 +381,7 @@ mod tests {
             membership_index: None,
         };
 
-        let proof = generate_zkp(&request).unwrap();
+        let proof = generate_zkp(&request).expect("TODO: handle error");
         assert_eq!(proof.privacy_level, PrivacyLevel::Public);
         assert!(proof.blinding_nonce.is_none());
         assert!(verify_zkp(&proof, claim));
@@ -401,7 +401,7 @@ mod tests {
             membership_index: None,
         };
 
-        let proof = generate_zkp(&request).unwrap();
+        let proof = generate_zkp(&request).expect("TODO: handle error");
         assert!(!verify_zkp(&proof, b"entity:456 has-type Robot"));
     }
 
@@ -419,7 +419,7 @@ mod tests {
             membership_index: None,
         };
 
-        let proof = generate_zkp(&request).unwrap();
+        let proof = generate_zkp(&request).expect("TODO: handle error");
         assert_eq!(proof.privacy_level, PrivacyLevel::Private);
         assert!(proof.blinding_nonce.is_some());
         assert!(proof.commitment.is_some());
@@ -440,7 +440,7 @@ mod tests {
             membership_index: None,
         };
 
-        let proof = generate_zkp(&request).unwrap();
+        let proof = generate_zkp(&request).expect("TODO: handle error");
         assert!(!verify_zkp(&proof, b"fake-claim"));
     }
 
@@ -463,7 +463,7 @@ mod tests {
             membership_index: Some(1),
         };
 
-        let proof = generate_zkp(&request).unwrap();
+        let proof = generate_zkp(&request).expect("TODO: handle error");
         assert!(proof.merkle_root.is_some());
         assert!(verify_zkp(&proof, &claims[1]));
     }
@@ -482,7 +482,7 @@ mod tests {
             membership_index: None,
         };
 
-        let proof = generate_zkp(&request).unwrap();
+        let proof = generate_zkp(&request).expect("TODO: handle error");
         assert_eq!(proof.privacy_level, PrivacyLevel::ZeroKnowledge);
         assert!(proof.blinding_nonce.is_some());
         assert!(proof.commitment.is_some());
@@ -508,7 +508,7 @@ mod tests {
             membership_index: Some(2),
         };
 
-        let proof = generate_zkp(&request).unwrap();
+        let proof = generate_zkp(&request).expect("TODO: handle error");
         assert!(proof.merkle_root.is_some());
         // Blinded proof verifies via Merkle structure
         assert!(verify_zkp(&proof, &claims[2]));
@@ -533,7 +533,7 @@ mod tests {
             membership_set: Some(claims.clone()),
             membership_index: Some(0),
         };
-        let private_proof = generate_zkp(&private_req).unwrap();
+        let private_proof = generate_zkp(&private_req).expect("TODO: handle error");
 
         // ZK proof: blinded Merkle root
         let zk_req = ZkpProofRequest {
@@ -545,7 +545,7 @@ mod tests {
             membership_set: Some(claims.clone()),
             membership_index: Some(0),
         };
-        let zk_proof = generate_zkp(&zk_req).unwrap();
+        let zk_proof = generate_zkp(&zk_req).expect("TODO: handle error");
 
         // Roots should differ (one is blinded)
         assert_ne!(private_proof.merkle_root, zk_proof.merkle_root);
@@ -592,13 +592,13 @@ mod tests {
             constraints: vec![constraint],
             parameter_map: HashMap::new(),
         };
-        let circuit_bytes = serde_json::to_vec(&ir).unwrap();
+        let circuit_bytes = serde_json::to_vec(&ir).expect("TODO: handle error");
         let compiled = CompiledCircuit {
             ir,
             circuit_hash: sha256_hex(&circuit_bytes),
             verification_key: vec![0u8; 32],
         };
-        registry.register_circuit("test-mul", compiled).unwrap();
+        registry.register_circuit("test-mul", compiled).expect("TODO: handle error");
 
         let request = ZkpProofRequest {
             claim: b"verified-computation".to_vec(),
@@ -610,10 +610,10 @@ mod tests {
             membership_index: None,
         };
 
-        let proof = generate_zkp_with_circuit(&request, &registry).unwrap();
+        let proof = generate_zkp_with_circuit(&request, &registry).expect("TODO: handle error");
         assert!(proof.circuit_result.is_some());
 
-        let cr = proof.circuit_result.unwrap();
+        let cr = proof.circuit_result.expect("TODO: handle error");
         assert!(cr.satisfied);
         assert_eq!(cr.circuit_name, "test-mul");
         assert_eq!(cr.constraints_checked, 1);

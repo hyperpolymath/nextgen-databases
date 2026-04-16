@@ -1,0 +1,195 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// NQC Hub GUI — AffineScript TEA Interface
+// Underpinned by Cadre Router (Affine Stack Implementation)
+//
+// Purpose: Provide a formally verified, resource-safe interface for the
+// NextGen Query Client Hub — Web UI for VeriSimDB, Lithoglyph, and QuandleDB.
+
+// ── Types ─────────────────────────────────────────────────────────────────
+
+enum OutputFormat {
+  Table,
+  Json,
+  Csv
+}
+
+enum ConnectionState {
+  Disconnected,
+  Connecting,
+  Connected,
+  ConnectionError(String)
+}
+
+struct DatabaseProfile {
+  id: String,
+  display_name: String,
+  language_name: String,
+  supports_dt: Bool
+}
+
+struct HistoryEntry {
+  query: String,
+  db_id: String
+}
+
+enum Route {
+  Picker,
+  Query(String),
+  NotFound
+}
+
+// ── Model ───────────────────────────────────────────────────────────────────
+
+struct Model {
+  route: Route,
+  query_text: String,
+  active_db_id: String,
+  connection: ConnectionState,
+  format: OutputFormat,
+  dt_enabled: Bool,
+  history_depth: Int
+}
+
+// ── Msg ──────────────────────────────────────────────────────────────────────
+
+enum Msg {
+  Navigate(Route),
+  UpdateQuery(String),
+  SelectDatabase(String),
+  SubmitQuery,
+  SetFormat(OutputFormat),
+  ToggleDt,
+  PopState
+}
+
+// ── TEA Logic ────────────────────────────────────────────────────────────────
+
+fn nqc_init() -> Model {
+  {
+    route: Route::Picker,
+    query_text: "",
+    active_db_id: "",
+    connection: ConnectionState::Disconnected,
+    format: OutputFormat::Table,
+    dt_enabled: false,
+    history_depth: 0
+  }
+}
+
+fn nqc_update(@linear msg: Msg, @linear model: Model) -> Model {
+  match model {
+    { route: r, query_text: q, active_db_id: db, connection: c, format: f, dt_enabled: dt, history_depth: h } => {
+      match msg {
+        Navigate(new_route) => {
+          {
+            route: new_route,
+            query_text: q,
+            active_db_id: db,
+            connection: c,
+            format: f,
+            dt_enabled: dt,
+            history_depth: h + 1
+          }
+        }
+
+        UpdateQuery(new_text) => {
+          {
+            route: r,
+            query_text: new_text,
+            active_db_id: db,
+            connection: c,
+            format: f,
+            dt_enabled: dt,
+            history_depth: h
+          }
+        }
+
+        SelectDatabase(new_db) => {
+          {
+            route: Route::Query(new_db),
+            query_text: q,
+            active_db_id: new_db,
+            connection: ConnectionState::Connecting,
+            format: f,
+            dt_enabled: dt,
+            history_depth: h + 1
+          }
+        }
+
+        SubmitQuery => {
+          // In a real implementation, this would trigger a Command.
+          // For the TEA model, we update the connection state.
+          {
+            route: r,
+            query_text: q,
+            active_db_id: db,
+            connection: ConnectionState::Connected,
+            format: f,
+            dt_enabled: dt,
+            history_depth: h
+          }
+        }
+
+        SetFormat(new_format) => {
+          {
+            route: r,
+            query_text: q,
+            active_db_id: db,
+            connection: c,
+            format: new_format,
+            dt_enabled: dt,
+            history_depth: h
+          }
+        }
+
+        ToggleDt => {
+          {
+            route: r,
+            query_text: q,
+            active_db_id: db,
+            connection: c,
+            format: f,
+            dt_enabled: !dt,
+            history_depth: h
+          }
+        }
+
+        PopState => {
+          if h > 0 {
+            {
+              route: Route::Picker,
+              query_text: q,
+              active_db_id: "",
+              connection: ConnectionState::Disconnected,
+              format: f,
+              dt_enabled: dt,
+              history_depth: h - 1
+            }
+          } else {
+            {
+              route: r,
+              query_text: q,
+              active_db_id: db,
+              connection: c,
+              format: f,
+              dt_enabled: dt,
+              history_depth: 0
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+fn nqc_view(model: Model) -> String {
+  match model.route {
+    Picker => "NQC HUB: Select a Database (VeriSimDB, Lithoglyph, QuandleDB)",
+    Query(id) => "QUERY EDITOR: " + id + " | DT: " + (if model.dt_enabled { "ON" } else { "OFF" }),
+    NotFound => "404: Route Not Found"
+  }
+}
+
+fn nqc_subs(model: Model) -> String {
+  "None"
+}

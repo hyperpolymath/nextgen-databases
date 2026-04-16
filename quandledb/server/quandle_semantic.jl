@@ -4,6 +4,7 @@ module QuandleSemantic
 
 using KnotTheory
 using SHA
+using Blake3Hash
 
 export QuandleRelation, QuandlePresentation
 export extract_presentation, canonicalize_presentation, canonical_presentation_blob
@@ -188,7 +189,12 @@ function canonical_presentation_blob(p::QuandlePresentation)::String
         sign_flag = r.is_inverse ? -1 : 1
         push!(rel_tokens, string(r.lhs, ",", r.rhs, ",", r.out, ",", sign_flag))
     end
-    string("qpres-v1|g=", c.generator_count, "|r=", join(rel_tokens, ";"))
+    blob = string("qpres-v1|g=", c.generator_count, "|r=", join(rel_tokens, ";"))
+    # Compute BLAKE3 hash of the blob
+    ctx = Blake3Hash.Blake3Ctx()
+    Blake3Hash.update!(ctx, Vector{UInt8}(blob))
+    fingerprint = bytes2hex(Blake3Hash.digest(ctx))
+    fingerprint
 end
 
 function _modinv(a::Int, p::Int)
@@ -247,7 +253,7 @@ end
 function _dihedral_colouring_count(p::QuandlePresentation, modulus::Int)::Int
     g = p.generator_count
     r = length(p.relations)
-    g == 0 && return 1
+    g == 0 && return modulus  # Unknot has modulus colourings
     r == 0 && return modulus^g
 
     M = zeros(Int, r, g)

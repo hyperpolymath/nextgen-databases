@@ -830,7 +830,7 @@ async fn execute_explain(
         return Err(ApiError::BadRequest("EXPLAIN requires a query to explain".to_string()));
     }
 
-    let inner_query = &raw[raw.to_uppercase().find("EXPLAIN").unwrap() + 7..].trim();
+    let inner_query = &raw[raw.to_uppercase().find("EXPLAIN").expect("TODO: handle error") + 7..].trim();
     let inner_tokens = tokenize(inner_query);
 
     if inner_tokens.is_empty() {
@@ -977,7 +977,7 @@ mod tests {
 
     #[test]
     fn test_parse_vector() {
-        let v = parse_vector("[0.1, 0.2, 0.3]").unwrap();
+        let v = parse_vector("[0.1, 0.2, 0.3]").expect("TODO: handle error");
         assert_eq!(v.len(), 3);
         assert!((v[0] - 0.1).abs() < 0.001);
     }

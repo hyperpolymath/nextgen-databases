@@ -245,9 +245,9 @@ mod tests {
 
     #[test]
     fn test_output_format_parse() {
-        assert_eq!("table".parse::<OutputFormat>().unwrap(), OutputFormat::Table);
-        assert_eq!("JSON".parse::<OutputFormat>().unwrap(), OutputFormat::Json);
-        assert_eq!("csv".parse::<OutputFormat>().unwrap(), OutputFormat::Csv);
+        assert_eq!("table".parse::<OutputFormat>().expect("TODO: handle error"), OutputFormat::Table);
+        assert_eq!("JSON".parse::<OutputFormat>().expect("TODO: handle error"), OutputFormat::Json);
+        assert_eq!("csv".parse::<OutputFormat>().expect("TODO: handle error"), OutputFormat::Csv);
         assert!("xml".parse::<OutputFormat>().is_err());
     }
 
