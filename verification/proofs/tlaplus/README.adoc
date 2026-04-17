@@ -1,0 +1,58 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= VeriSimDB TLA+ proofs
+:toc:
+
+== V5: Octad transaction atomicity
+
+Specification: `OctadAtomicity.tla` +
+Configuration: `OctadAtomicity.cfg` +
+Source being verified: `rust-core/verisim-octad/src/transaction.rs`
+
+Models the VeriSimDB transaction lifecycle over an 8-modality octad
+(`graph`, `vector`, `tensor`, `semantic`, `document`, `temporal`,
+`provenance`, `spatial`) under an adversary that can crash a PENDING
+transaction at any point. Safety properties:
+
+* `Atomicity` -- `COMMITTED` implies all 8 modalities updated; `ABORTED`
+  implies none. (The central all-or-nothing claim.)
+* `NoObservablePartial` -- any terminal transaction's update set is
+  either the full 8 modalities or the empty set.
+* `StatusMonotone` -- no terminal status ever reverts (paired with
+  Atomicity closes off "committed then rolled back" bugs).
+
+Liveness: `EveryTxnResolves` -- every transaction eventually reaches a
+terminal status (COMMITTED or ABORTED), given weak fairness on the
+`Commit \/ Abort` disjunction.
+
+== Running TLC
+
+Preferred: `just verify-tlaplus` from the verisimdb repo root. Works with
+or without a host Java install (falls back to an ephemeral
+`eclipse-temurin:21-jre` podman container).
+
+Manual invocation:
+
+[source,bash]
+----
+cd verification/proofs/tlaplus/
+java -cp ~/.local/share/tla2tools.jar tlc2.TLC \
+  -workers auto -config OctadAtomicity.cfg OctadAtomicity.tla
+----
+
+The default config bounds the model to 2 transactions and 2 crash
+events. State space: 134,160 distinct states at depth 19, ~18s on an
+8-core laptop. Verified 2026-04-17.
+
+== Cross-references
+
+* `developer-ecosystem/standards/docs/proofs/spec-templates/T1-critical/verisimdb.md` -- V5
+* `/home/hyper/Desktop/proof-debt-plan.md` -- Dependability / VeriSimDB V5
+
+== Future specs in this directory
+
+V9 (normalizer determinism) and V10 (transaction serializability) are
+the remaining TLA+-shaped VeriSimDB obligations. They will land as
+separate `.tla` files under this directory; extend `verify-tlaplus` in
+the Justfile to run each.

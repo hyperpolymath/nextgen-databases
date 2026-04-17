@@ -35,6 +35,37 @@ build-abi:
 build-ffi:
     cd ffi/zig && zig build
 
+# Model-check TLA+ specifications (e.g. V5 Octad transaction atomicity)
+verify-tlaplus:
+    #!/usr/bin/env bash
+    # Uses host Java if available, otherwise an ephemeral eclipse-temurin:21-jre
+    # container. Honours $TLA2TOOLS_JAR for a pre-fetched jar location.
+    set -euo pipefail
+    SPEC_DIR="verification/proofs/tlaplus"
+    TLA2TOOLS_JAR="${TLA2TOOLS_JAR:-$HOME/.local/share/tla2tools.jar}"
+    if [ ! -f "$TLA2TOOLS_JAR" ]; then
+        mkdir -p "$(dirname "$TLA2TOOLS_JAR")"
+        echo "Fetching tla2tools.jar -> $TLA2TOOLS_JAR"
+        curl -sSL -o "$TLA2TOOLS_JAR" \
+            https://github.com/tlaplus/tlaplus/releases/latest/download/tla2tools.jar
+    fi
+    run_tlc() {
+        local spec="$1" cfg="$2"
+        echo "== TLC on $spec ($cfg)"
+        if command -v java >/dev/null 2>&1; then
+            (cd "$SPEC_DIR" && java -XX:+UseParallelGC -cp "$TLA2TOOLS_JAR" tlc2.TLC \
+                -workers auto -config "$cfg" "$spec")
+        else
+            podman run --rm \
+                -v "$PWD/$SPEC_DIR:/work:Z" \
+                -v "$TLA2TOOLS_JAR:/tla2tools.jar:ro,Z" \
+                -w /work docker.io/library/eclipse-temurin:21-jre \
+                java -XX:+UseParallelGC -cp /tla2tools.jar tlc2.TLC \
+                    -workers auto -config "$cfg" "$spec"
+        fi
+    }
+    run_tlc OctadAtomicity.tla OctadAtomicity.cfg
+
 # ── Test ───────────────────────────────────────────────────────
 
 # Run Rust tests
