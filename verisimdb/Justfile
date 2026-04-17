@@ -64,8 +64,9 @@ verify-tlaplus:
                     -workers auto -config "$cfg" "$spec"
         fi
     }
-    run_tlc OctadAtomicity.tla OctadAtomicity.cfg
+    run_tlc OctadAtomicity.tla  OctadAtomicity.cfg
     run_tlc Normalizer.tla      Normalizer.cfg
+    run_tlc Serializability.tla Serializability.cfg
 
 # ── Test ───────────────────────────────────────────────────────
 
