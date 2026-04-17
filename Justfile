@@ -65,6 +65,7 @@ verify-tlaplus:
         fi
     }
     run_tlc OctadAtomicity.tla OctadAtomicity.cfg
+    run_tlc Normalizer.tla      Normalizer.cfg
 
 # ── Test ───────────────────────────────────────────────────────
 
