@@ -1,0 +1,96 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+name: Verify TLA+ specs (verisimdb)
+
+# Model-checks the VeriSimDB TLA+ specifications (V5 OctadAtomicity,
+# V9 Normalizer, V10 Serializability). Triggers on push / PR touching the
+# specs, weekly schedule, and manual dispatch.
+#
+# Note: nextgen-databases is a monorepo. This workflow intentionally scopes
+# its path filter to verisimdb/ so unrelated changes (lithoglyph, nqc,
+# quandledb) don't re-trigger TLC.
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'verisimdb/verification/proofs/tlaplus/**'
+      - '.github/workflows/verify-tlaplus.yml'
+      - 'verisimdb/Justfile'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'verisimdb/verification/proofs/tlaplus/**'
+      - '.github/workflows/verify-tlaplus.yml'
+      - 'verisimdb/Justfile'
+  schedule:
+    - cron: '30 4 * * 1'   # Mondays 04:30 UTC (offset from hypatia's 04:00)
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  tlc:
+    name: TLC model-check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Eclipse Temurin 21 JRE
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache tla2tools.jar
+        id: cache-tla
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: ~/.local/share/tla2tools.jar
+          key: tla2tools-v1.8.0
+
+      - name: Fetch tla2tools.jar
+        if: steps.cache-tla.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/.local/share
+          curl -sSL -o ~/.local/share/tla2tools.jar \
+            https://github.com/tlaplus/tlaplus/releases/latest/download/tla2tools.jar
+          ls -la ~/.local/share/tla2tools.jar
+
+      - name: Model-check all specs
+        working-directory: verisimdb/verification/proofs/tlaplus
+        run: |
+          set -e
+          fail=0
+          for spec in OctadAtomicity Normalizer Serializability; do
+            echo "::group::$spec"
+            if ! java -XX:+UseParallelGC \
+                 -cp "$HOME/.local/share/tla2tools.jar" tlc2.TLC \
+                 -workers auto -config "${spec}.cfg" "${spec}.tla" \
+                 | tee "${spec}.log"; then
+              fail=1
+            fi
+            if grep -q "Error:" "${spec}.log"; then
+              echo "::error::TLC found a violation in ${spec}"
+              fail=1
+            fi
+            if ! grep -q "Model checking completed. No error has been found." \
+                 "${spec}.log"; then
+              echo "::error::${spec} did not report clean completion"
+              fail=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $fail
+
+      - name: Upload TLC logs on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: tlc-logs
+          path: verisimdb/verification/proofs/tlaplus/*.log
+          retention-days: 14
