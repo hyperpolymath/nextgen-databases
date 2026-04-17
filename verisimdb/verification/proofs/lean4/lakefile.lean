@@ -3,7 +3,7 @@ import Lake
 open Lake DSL
 
 package verisimdb_proofs where
-  name := "verisimdb_proofs"
+  name := `verisimdb_proofs
 
 lean_lib VeriSimDBProofs where
-  roots := #[`VCLSubtyping, `RaftSafety, `WALIntegrity]
+  roots := #[`VCLSubtyping, `VCLTypeSoundness, `RaftSafety, `WALIntegrity]

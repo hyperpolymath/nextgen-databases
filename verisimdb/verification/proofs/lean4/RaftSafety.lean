@@ -104,8 +104,8 @@ A **valid** append carries:
 
 /-- `getElem?` of the last element in a singleton-appended list. -/
 private theorem getElem?_snoc_last {α} (l : List α) (x : α) :
-    (l ++ [x])[l.length]? = some x :=
-  List.getElem?_concat_length
+    (l ++ [x])[l.length]? = some x := by
+  exact List.getElem?_concat_length l x
 
 /-- In bounds `getElem?` of appended list equals original. -/
 private theorem getElem?_snoc_left {α} (l : List α) (x : α) (i : Nat)
@@ -167,13 +167,13 @@ theorem appendEntry_WF (rl : RaftLog) (e : RaftEntry)
         rw [getElem?_snoc_left _ _ _ hi_lt] at hgi
         have hlen_pos : 0 < rl.entries.length :=
           Nat.lt_of_le_of_lt (Nat.zero_le i) hi_lt
-        have hne : rl.entries ≠ [] := List.length_pos_iff.mp hlen_pos
+        have hne : rl.entries ≠ [] := (List.length_pos.mp hlen_pos)
         have hbound : rl.entries.length - 1 < rl.entries.length := by omega
         have hlast_get : rl.entries.getLast? = some (rl.entries.getLast hne) :=
-          List.getLast?_eq_some_getLast hne
+          List.getLast?_eq_getLast rl.entries hne
         have hlast_idx : rl.entries[rl.entries.length - 1]? = some (rl.entries.getLast hne) := by
           rw [List.getElem?_eq_getElem hbound]
-          exact (congrArg some (List.getLast_eq_getElem hne)).symm
+          exact (congrArg some (List.getLast_eq_getElem rl.entries hne)).symm
         have hterm_e := hterm (rl.entries.getLast hne) hlast_get
         have hei_last : ei.term ≤ (rl.entries.getLast hne).term :=
           hwf.termMono i (rl.entries.length - 1) ei (rl.entries.getLast hne)
