@@ -51,6 +51,15 @@ actions = [
 ]
 
 [session-history]
+# 2026-04-17: Echidna ProverKind drift audit (commit 8f573f1 — 28 new
+#             *TypeChecker variants). VeriSimDB's ProverKind (in
+#             rust-core/verisim-semantic/src/proven_bridge.rs) is NOT a
+#             mirror of echidna's: it's a proven-library-domain enum with
+#             6 variants (Z3, Lean, Coq, Agda, Idris2, Custom(String))
+#             documenting the prover that produced a ProvenCertificate —
+#             strictly independent of echidna's dispatcher backend list.
+#             verisim-semantic has no path dep on echidna. No action required.
+#             Build + 53/53 semantic tests pass post-audit.
 # 2026-04-11: Added three proof_attempts routes under /api/v1/:
 #               GET  ?limit=N         — list rows for Julia retraining (ClickHouse SELECT)
 #               POST                  — insert attempt row (ClickHouse INSERT JSONEachRow)
