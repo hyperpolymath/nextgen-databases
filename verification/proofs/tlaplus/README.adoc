@@ -67,15 +67,42 @@ Default config: 4 modalities (`graph`, `vector`, `semantic`,
 `document`), 3 distinct values, `MaxSteps=3`. 84 reachable states,
 finishes in < 1s. Verified 2026-04-17.
 
+== V10: Transaction serializability
+
+Specification: `Serializability.tla` +
+Configuration: `Serializability.cfg` +
+Source being verified: `rust-core/verisim-octad/src/transaction.rs` (concurrent path)
+
+Extends V5's single-transaction atomicity to concurrent transactions
+under atomic two-phase locking. Each transaction declares a fixed
+read-set + write-set; `Begin(t)` atomically acquires the whole
+access-set (or blocks), `Commit(t)` releases locks and appends to the
+commit log -- which is, by construction, a valid serial schedule.
+
+Safety (composite `SerializabilitySafe`):
+
+* `NoSharedLocks` -- 2PL mutex invariant.
+* `LocksOnlyWhileActive` -- IDLE/COMMITTED txns hold no locks.
+* `ActiveHoldsFullAccessSet` -- no partial lock acquisitions.
+* `CommitLogInjective` -- each txn commits at most once.
+* `CommitLogSound` -- log entries are only COMMITTED txns.
+* `NoConcurrentConflict` -- the central claim: two conflicting
+  transactions are never simultaneously ACTIVE, so every schedule is
+  conflict-equivalent to the commit-log order.
+
+Liveness: `EveryTxnCommits` -- every txn eventually commits (atomic
+acquisition rules out deadlock and therefore starvation under WF).
+
+Default scenario: 3 transactions (t1, t2, t3) × 3 modalities (m1, m2, m3)
+with every pair of txns conflicting on at least one modality. 31
+reachable states, depth 7, sub-second. Verified 2026-04-17.
+
 == Cross-references
 
-* `developer-ecosystem/standards/docs/proofs/spec-templates/T1-critical/verisimdb.md` -- V5, V9
-* `/home/hyper/Desktop/proof-debt-plan.md` -- Dependability / VeriSimDB V5, V9
+* `developer-ecosystem/standards/docs/proofs/spec-templates/T1-critical/verisimdb.md` -- V5, V9, V10
+* `/home/hyper/Desktop/proof-debt-plan.md` -- Dependability / VeriSimDB V5, V9, V10
 
-== Future specs in this directory
+== Remaining TLA+ work
 
-V10 (transaction serializability) is the remaining TLA+-shaped VeriSimDB
-obligation. It will land as a separate `Serializability.tla`; extend
-`verify-tlaplus` in the Justfile to include it. State-space concerns:
-V10 models concurrent transactions and may blow up past V5/V9's sub-
-second runs -- start with 2 transactions, widen cautiously.
+None at this tier. V5/V9/V10 close the TLA+-shaped VeriSimDB proof
+obligations. V2/V3/V4/V6 stay Lean4-blocked; V11/V12 are Idris2-shaped.
