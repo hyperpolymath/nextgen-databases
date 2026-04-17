@@ -45,14 +45,37 @@ The default config bounds the model to 2 transactions and 2 crash
 events. State space: 134,160 distinct states at depth 19, ~18s on an
 8-core laptop. Verified 2026-04-17.
 
+== V9: Normalizer determinism + convergence
+
+Specification: `Normalizer.tla` +
+Configuration: `Normalizer.cfg` +
+Source being verified: `rust-core/verisim-normalizer/src/lib.rs`
+
+Models self-normalisation as a deterministic state transition: pick
+the highest-priority modality as source, rewrite every modality to
+the source's value. Safety properties:
+
+* `SourceIsMaximal` -- the `CHOOSE` in `SourceOf` always returns the
+  unique priority-maximum (determinism hinges on this).
+* `NormalizeIdempotent` -- `Normalize(Normalize(s)) = Normalize(s)`.
+* `PostStepNoDrift` -- after any normalisation round, drift is gone.
+* `FixedPointStable` -- on a drift-free state, `Normalize` is identity.
+
+Liveness: `Convergence` -- `<>[]~HasDrift` (eventually-always drift-free).
+
+Default config: 4 modalities (`graph`, `vector`, `semantic`,
+`document`), 3 distinct values, `MaxSteps=3`. 84 reachable states,
+finishes in < 1s. Verified 2026-04-17.
+
 == Cross-references
 
-* `developer-ecosystem/standards/docs/proofs/spec-templates/T1-critical/verisimdb.md` -- V5
-* `/home/hyper/Desktop/proof-debt-plan.md` -- Dependability / VeriSimDB V5
+* `developer-ecosystem/standards/docs/proofs/spec-templates/T1-critical/verisimdb.md` -- V5, V9
+* `/home/hyper/Desktop/proof-debt-plan.md` -- Dependability / VeriSimDB V5, V9
 
 == Future specs in this directory
 
-V9 (normalizer determinism) and V10 (transaction serializability) are
-the remaining TLA+-shaped VeriSimDB obligations. They will land as
-separate `.tla` files under this directory; extend `verify-tlaplus` in
-the Justfile to run each.
+V10 (transaction serializability) is the remaining TLA+-shaped VeriSimDB
+obligation. It will land as a separate `Serializability.tla`; extend
+`verify-tlaplus` in the Justfile to include it. State-space concerns:
+V10 models concurrent transactions and may blow up past V5/V9's sub-
+second runs -- start with 2 transactions, widen cautiously.
