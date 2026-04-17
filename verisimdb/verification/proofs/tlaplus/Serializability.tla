@@ -26,23 +26,27 @@ EXTENDS Naturals, FiniteSets, Sequences, TLC
 \* straightforwardly model-checkable. Alternative scenarios live as separate
 \* .tla files.
 \*
-\* The scenario chosen: 3 transactions and 3 modalities, with pairwise
-\* conflicts forming a simple chain. This is the smallest non-trivial
-\* serializability test:
-\*   - t1 reads {m1, m2}, writes {m1}.   (conflicts with t2 on m1)
-\*   - t2 reads {m1},     writes {m2}.   (conflicts with t1 on m1,
-\*                                        with t3 on m2)
-\*   - t3 reads {m2},     writes {m3}.   (conflicts with t2 on m2)
-\* Every pair of txns has an overlapping access-set, so 2PL must serialise
-\* *some* total order on them. TLC explores all possible commit orders.
+\* Scenario chosen: 3 transactions, 3 modalities, *partial* conflict graph.
+\* This is deliberately richer than the all-pairs-conflict case, which would
+\* trivially degenerate to a serial execution (at most 1 ACTIVE txn at any
+\* time, so serializability is free). Here:
+\*   - t1 reads {m1}, writes {m1}   -- disjoint from t2 (can run concurrently)
+\*   - t2 reads {m2}, writes {m2}   -- disjoint from t1 (can run concurrently)
+\*   - t3 reads {m1, m2}, writes {m3}  -- conflicts with BOTH t1 and t2
+\*
+\* Consequence: the reachable state graph contains states where t1 and t2
+\* are simultaneously ACTIVE (real concurrency), but t3 must serialise
+\* against each of them (real serialisation under 2PL). This scenario
+\* genuinely exercises `NoConcurrentConflict` rather than trivially
+\* satisfying it.
 
 Txns == {"t1", "t2", "t3"}
 Modalities == {"m1", "m2", "m3"}
 
 TxnReads  == [t \in Txns |->
-    CASE t = "t1" -> {"m1", "m2"}
-      [] t = "t2" -> {"m1"}
-      [] t = "t3" -> {"m2"}]
+    CASE t = "t1" -> {"m1"}
+      [] t = "t2" -> {"m2"}
+      [] t = "t3" -> {"m1", "m2"}]
 
 TxnWrites == [t \in Txns |->
     CASE t = "t1" -> {"m1"}
