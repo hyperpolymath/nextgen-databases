@@ -39,7 +39,13 @@ use sha2::{Digest, Sha256};
 
 use super::{ProofBlob, ProofType, SemanticError};
 
-/// Supported prover backends from the proven library.
+/// Supported prover backends from the `proven` library (Idris2 ZKP system).
+///
+/// NOTE: This `ProverKind` is NOT a mirror of ECHIDNA's dispatcher backend
+/// enum. It lives in the `proven`-certificate domain and records which prover
+/// produced a given `ProvenCertificate`. Keep it decoupled from echidna —
+/// audited 2026-04-17 against echidna commit `8f573f1` (which expanded its
+/// own ProverKind from 30 → ~68 variants). This enum is deliberately minimal.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ProverKind {
