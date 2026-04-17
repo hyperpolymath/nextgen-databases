@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Justfile for Lith NIF
+
+set shell := ["bash", "-euo", "pipefail", "-c"]
+
+priv_dir := "../priv"
+
+default:
+    @just --list --unsorted
+
+all:
+    @mkdir -p {{priv_dir}}
+    @ERL_INCLUDE_PATH="$$(erl -noshell -eval 'io:format("~s/usr/include", [code:root_dir()])' -s init stop)" \
+      zig build -Doptimize=ReleaseSafe
+
+lith:
+    @lith_path="${LITH_PATH:-$HOME/Documents/hyperpolymath-repos/lith}"
+    cd "$$lith_path/core-zig" && zig build
+
+erl:
+    erlc -o ../ebin src/lith_nif.erl
+
+clean:
+    rm -rf zig-cache zig-out {{priv_dir}}/lith_nif.so
+
+test:
+    zig build test
+
+install: all
+    @erl_lib_path="$$(erl -noshell -eval 'io:format("~s/usr/lib", [code:root_dir()])' -s init stop)"
+    cp {{priv_dir}}/lith_nif.so "$$erl_lib_path/"
+
+dev: all erl
+    @echo "NIF built successfully"
+    @echo "Library: {{priv_dir}}/lith_nif.so"

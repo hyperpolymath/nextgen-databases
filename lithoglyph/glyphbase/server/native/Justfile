@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Justfile for Lith NIF C wrapper
+
+set shell := ["bash", "-euo", "pipefail", "-c"]
+
+default:
+    @just --list --unsorted
+
+all:
+    @erl_include="$$(erl -eval 'io:format("~s", [code:root_dir()])' -s init stop -noshell)/erts-$$(erl -eval 'io:format("~s", [erlang:system_info(version)])' -s init stop -noshell)/include"
+    @mkdir -p ../priv
+    ${CC:-cc} -fPIC -O2 -Wall -I"$$erl_include" lith_nif.c -o ../priv/lith_nif.so -shared -L../../../lith/ffi/zig/zig-out/lib -llith
+    @echo "Built ../priv/lith_nif.so"
+
+clean:
+    rm -f ../priv/lith_nif.so
+    rm -rf ../priv

@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # Source the original launcher to maintain all existing functionality
-source "/var/mnt/eclipse/repos/nextgen-databases/nqc/nqc-launcher.sh"
+source "/var/mnt/eclipse/repos/developer-ecosystem/nextgen-databases/nqc/nqc-launcher.sh"
 
 # Enhanced functions
 run_tui() {
@@ -43,7 +43,7 @@ launch_invariant_path() {
     if [[ ! -f "$ip_launcher" ]]; then
         err "invariant-path launcher not found at $ip_launcher"
         err "Trying alternative location..."
-        ip_launcher="/var/mnt/eclipse/repos/invariant-path/invariant-path-launcher"
+        ip_launcher="/var/mnt/eclipse/repos/verification-ecosystem/invariant-path/invariant-path-launcher"
     fi
     
     if [[ -f "$ip_launcher" ]]; then
