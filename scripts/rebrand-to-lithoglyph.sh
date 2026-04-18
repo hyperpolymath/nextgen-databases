@@ -114,7 +114,7 @@ done
 # Rebrand build files
 echo ""
 echo "Rebranding build files..."
-for file in justfile docker-compose.yml server/ffi/zig/build.zig server/native/build.zig server/native/Makefile; do
+for file in Justfile docker-compose.yml server/ffi/zig/build.zig server/native/build.zig server/native/Makefile; do
     rebrand_file "$file"
 done
 

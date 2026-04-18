@@ -121,7 +121,7 @@ podman pull ghcr.io/hyperpolymath/glyphbase:latest
 # Run with podman
 podman run -p 4000:4000 -v ./data:/data:Z ghcr.io/hyperpolymath/glyphbase:latest
 
-# Or use justfile
+# Or use Justfile
 just docker-build  # Uses podman
 just docker-run
 ```
