@@ -308,12 +308,16 @@ where
                                 .map(|s| s.version + 1)
                                 .unwrap_or(1);
 
+                            // Recover observed_at from the WAL-logged input
+                            let observed_at = input.temporal.as_ref().map(|t| t.observed_at);
+
                             octads.insert(
                                 entity_id.clone(),
                                 OctadStatus {
                                     id,
                                     created_at: now,
                                     modified_at: now,
+                                    observed_at,
                                     version,
                                     modality_status,
                                 },
@@ -926,11 +930,14 @@ where
             )));
         }
 
-        // Create status
+        // Create status. observed_at is the territory clock (caller-supplied),
+        // independent of created_at which is the ingestion clock set by the DB.
+        let observed_at = input.temporal.as_ref().map(|t| t.observed_at);
         let status = OctadStatus {
             id: id.clone(),
             created_at: now,
             modified_at: now,
+            observed_at,
             version,
             modality_status: modality_status.clone(),
         };
@@ -1164,11 +1171,19 @@ where
             )));
         }
 
-        // Update status
+        // Update status. If the caller supplied a fresh observed_at, use it;
+        // otherwise preserve the previous value — updates that don't touch the
+        // temporal modality should not erase the territory clock.
+        let observed_at = input
+            .temporal
+            .as_ref()
+            .map(|t| t.observed_at)
+            .or(existing.observed_at);
         let status = OctadStatus {
             id: id.clone(),
             created_at: existing.created_at,
             modified_at: now,
+            observed_at,
             version,
             modality_status: modality_status.clone(),
         };
@@ -1521,5 +1536,81 @@ mod tests {
         let updated = store.update(&octad.id, update_input).await.expect("TODO: handle error");
         assert_eq!(updated.status.version, 2);
         assert!(updated.document.as_ref().expect("TODO: handle error").title.contains("Updated"));
+    }
+
+    #[tokio::test]
+    async fn test_observed_at_round_trip_and_preservation() {
+        // Veridical-simulation gap closure: an entity's territory clock
+        // (observed_at) must survive a create/get and must persist across
+        // updates that don't touch the temporal modality.
+        let store = create_test_store();
+
+        let observed = chrono::DateTime::parse_from_rfc3339("2026-04-27T15:30:00Z")
+            .expect("static RFC3339 literal parses")
+            .with_timezone(&Utc);
+
+        let create_input = OctadBuilder::new()
+            .with_document("Email", "Body")
+            .with_embedding(vec![0.1, 0.2, 0.3])
+            .with_observed_at(observed)
+            .build();
+        let octad = store.create(create_input).await.expect("create succeeds");
+
+        assert_eq!(
+            octad.status.observed_at,
+            Some(observed),
+            "observed_at must survive create"
+        );
+
+        let fetched = store
+            .status(&octad.id)
+            .await
+            .expect("status succeeds")
+            .expect("status present");
+        assert_eq!(fetched.observed_at, Some(observed), "observed_at survives status read");
+
+        let update_no_temporal = OctadBuilder::new()
+            .with_document("Email v2", "Body v2")
+            .build();
+        let updated = store
+            .update(&octad.id, update_no_temporal)
+            .await
+            .expect("update succeeds");
+        assert_eq!(
+            updated.status.observed_at,
+            Some(observed),
+            "update without temporal input must preserve prior observed_at"
+        );
+
+        let new_observed = chrono::DateTime::parse_from_rfc3339("2026-04-27T16:00:00Z")
+            .expect("static RFC3339 literal parses")
+            .with_timezone(&Utc);
+        let update_with_temporal = OctadBuilder::new()
+            .with_document("Email v3", "Body v3")
+            .with_observed_at(new_observed)
+            .build();
+        let updated2 = store
+            .update(&octad.id, update_with_temporal)
+            .await
+            .expect("update succeeds");
+        assert_eq!(
+            updated2.status.observed_at,
+            Some(new_observed),
+            "update with temporal input must override prior observed_at"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_observed_at_absent_when_not_supplied() {
+        let store = create_test_store();
+        let input = OctadBuilder::new()
+            .with_document("No clock", "No clock body")
+            .with_embedding(vec![0.4, 0.5, 0.6])
+            .build();
+        let octad = store.create(input).await.expect("create succeeds");
+        assert!(
+            octad.status.observed_at.is_none(),
+            "observed_at must be None when caller did not supply temporal input"
+        );
     }
 }

@@ -46,8 +46,8 @@ use verisim_planner::{
 use verisim_octad::{
     BoundingBox, Coordinates, OctadConfig, OctadDocumentInput, OctadGraphInput,
     OctadId, OctadInput, OctadProvenanceInput, OctadSemanticInput, OctadSnapshot,
-    OctadSpatialInput, OctadStore, OctadTensorInput, OctadVectorInput,
-    InMemoryOctadStore, ProvenanceStore, SpatialStore,
+    OctadSpatialInput, OctadStore, OctadTemporalInput, OctadTensorInput,
+    OctadVectorInput, InMemoryOctadStore, ProvenanceStore, SpatialStore,
 };
 use verisim_provenance::InMemoryProvenanceStore;
 use verisim_spatial::InMemorySpatialStore;
@@ -238,12 +238,22 @@ pub struct OctadRequest {
     pub relationships: Option<Vec<(String, String)>>,
     /// Tensor data
     pub tensor: Option<TensorRequest>,
+    /// Temporal observation (real-world clock, distinct from ingestion time)
+    pub temporal: Option<TemporalRequest>,
     /// Provenance event
     pub provenance: Option<ProvenanceRequest>,
     /// Spatial coordinates
     pub spatial: Option<SpatialRequest>,
     /// Metadata
     pub metadata: Option<std::collections::HashMap<String, String>>,
+}
+
+/// Temporal observation in request — caller-supplied real-world time
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TemporalRequest {
+    /// RFC 3339 timestamp of the underlying real-world event (e.g. an email's
+    /// `Date:` header). Stored on the octad as `OctadStatus.observed_at`.
+    pub observed_at: String,
 }
 
 /// Provenance event data in request
@@ -277,8 +287,10 @@ pub struct SpatialRequest {
 }
 
 impl OctadRequest {
-    /// Convert to OctadInput
-    fn to_octad_input(&self) -> OctadInput {
+    /// Convert to OctadInput. Fallible because the temporal field is supplied
+    /// as RFC 3339 text and may fail to parse — surface that as 400 Bad Request
+    /// rather than swallowing it as a missing observation.
+    fn to_octad_input(&self) -> Result<OctadInput, ApiError> {
         let mut input = OctadInput::default();
 
         if let (Some(title), Some(body)) = (&self.title, &self.body) {
@@ -322,6 +334,17 @@ impl OctadRequest {
             });
         }
 
+        if let Some(temporal) = &self.temporal {
+            let observed_at = chrono::DateTime::parse_from_rfc3339(&temporal.observed_at)
+                .map_err(|e| {
+                    ApiError::BadRequest(format!(
+                        "temporal.observed_at must be RFC 3339: {e}"
+                    ))
+                })?
+                .with_timezone(&chrono::Utc);
+            input.temporal = Some(OctadTemporalInput { observed_at });
+        }
+
         if let Some(provenance) = &self.provenance {
             input.provenance = Some(OctadProvenanceInput {
                 event_type: provenance.event_type.clone(),
@@ -346,7 +369,7 @@ impl OctadRequest {
             input.metadata = metadata.clone();
         }
 
-        input
+        Ok(input)
     }
 }
 
@@ -378,6 +401,11 @@ pub struct OctadResponse {
 pub struct OctadStatusResponse {
     pub created_at: String,
     pub modified_at: String,
+    /// RFC 3339 territory clock — the real-world time the entity was observed,
+    /// distinct from `created_at` (the database ingestion time). Omitted from
+    /// the JSON when the entity has no caller-supplied observation time.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub observed_at: Option<String>,
     pub version: u64,
 }
 
@@ -388,6 +416,7 @@ impl From<&verisim_octad::Octad> for OctadResponse {
             status: OctadStatusResponse {
                 created_at: h.status.created_at.to_rfc3339(),
                 modified_at: h.status.modified_at.to_rfc3339(),
+                observed_at: h.status.observed_at.map(|t| t.to_rfc3339()),
                 version: h.status.version,
             },
             has_graph: h.graph_node.is_some(),
@@ -856,7 +885,7 @@ async fn create_octad_handler(
     State(state): State<AppState>,
     Json(request): Json<OctadRequest>,
 ) -> Result<(StatusCode, Json<OctadResponse>), ApiError> {
-    let input = request.to_octad_input();
+    let input = request.to_octad_input()?;
 
     let octad = state
         .octad_store
@@ -895,7 +924,7 @@ async fn update_octad_handler(
 ) -> Result<Json<OctadResponse>, ApiError> {
     validate_octad_id(&id)?;
     let octad_id = OctadId::new(&id);
-    let input = request.to_octad_input();
+    let input = request.to_octad_input()?;
 
     let octad = state
         .octad_store
@@ -2246,6 +2275,7 @@ mod tests {
             types: None,
             relationships: None,
             tensor: None,
+            temporal: None,
             metadata: None,
             provenance: None,
             spatial: None,
@@ -2287,6 +2317,91 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_temporal_observed_at_round_trip() {
+        // Phase 1 gap closure: caller-supplied real-world time (e.g. an email's
+        // Date: header) must round-trip through POST/GET as RFC 3339 in the
+        // OctadStatusResponse.observed_at field.
+        let state = create_test_state().await;
+        let app = build_router(state);
+
+        let create_request = OctadRequest {
+            title: Some("Email subject".to_string()),
+            body: Some("Email body".to_string()),
+            embedding: Some(vec![0.1, 0.2, 0.3]),
+            types: None,
+            relationships: None,
+            tensor: None,
+            temporal: Some(TemporalRequest {
+                observed_at: "2026-04-27T15:30:00Z".to_string(),
+            }),
+            metadata: None,
+            provenance: None,
+            spatial: None,
+        };
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/octads")
+                    .header("content-type", "application/json")
+                    .body(Body::from(
+                        serde_json::to_string(&create_request).expect("serialize create request"),
+                    ))
+                    .expect("build POST request"),
+            )
+            .await
+            .expect("oneshot create");
+        assert_eq!(response.status(), StatusCode::CREATED);
+
+        let body = axum::body::to_bytes(response.into_body(), 1024 * 1024)
+            .await
+            .expect("read create body");
+        let created: OctadResponse = serde_json::from_slice(&body).expect("decode response");
+
+        let observed = created
+            .status
+            .observed_at
+            .as_ref()
+            .expect("create response surfaces observed_at");
+        assert!(
+            observed.starts_with("2026-04-27T15:30:00"),
+            "observed_at must reflect caller-supplied time, got {observed}"
+        );
+
+        // Bad RFC 3339 must surface as 400, not be silently dropped
+        let bad_request = OctadRequest {
+            title: Some("Bad".to_string()),
+            body: Some("Bad".to_string()),
+            embedding: Some(vec![0.1, 0.2, 0.3]),
+            types: None,
+            relationships: None,
+            tensor: None,
+            temporal: Some(TemporalRequest {
+                observed_at: "not-a-date".to_string(),
+            }),
+            metadata: None,
+            provenance: None,
+            spatial: None,
+        };
+        let bad_response = app
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/octads")
+                    .header("content-type", "application/json")
+                    .body(Body::from(
+                        serde_json::to_string(&bad_request).expect("serialize bad request"),
+                    ))
+                    .expect("build bad POST request"),
+            )
+            .await
+            .expect("oneshot bad create");
+        assert_eq!(bad_response.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[tokio::test]
     async fn test_text_search() {
         let state = create_test_state().await;
         let app = build_router(state);
@@ -2299,6 +2414,7 @@ mod tests {
             types: None,
             relationships: None,
             tensor: None,
+            temporal: None,
             metadata: None,
             provenance: None,
             spatial: None,
