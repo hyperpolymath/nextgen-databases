@@ -394,6 +394,50 @@ pub struct OctadResponse {
     pub has_spatial: bool,
     pub version_count: u64,
     pub provenance_chain_length: u64,
+    /// Populated only when the caller passes `?include=types` on a GET. Listed
+    /// in the order the entity declares them. Cheap to surface but opt-in so
+    /// the default response shape stays small.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub semantic_types: Option<Vec<String>>,
+}
+
+/// Per-request flags controlling which expensive or large fields the GET
+/// /octads/{id} response should include. Driven by `?include=…` (a
+/// comma-separated list).
+#[derive(Debug, Default, Clone, Copy)]
+pub struct IncludeFlags {
+    /// Surface `semantic_types` (the entity's declared type IRIs)
+    pub types: bool,
+    /// Surface the stored vector bytes (Phase 1 Step 3 — Task #12)
+    pub embedding: bool,
+}
+
+impl IncludeFlags {
+    /// Parse a `?include=` value (comma-separated). Unknown tokens are ignored
+    /// rather than errored — the API's forward-compatibility contract is that
+    /// a future client may request includes the current server doesn't know
+    /// about.
+    pub fn parse(raw: Option<&str>) -> Self {
+        let mut flags = Self::default();
+        if let Some(s) = raw {
+            for token in s.split(',').map(|t| t.trim()).filter(|t| !t.is_empty()) {
+                match token {
+                    "types" => flags.types = true,
+                    "embedding" => flags.embedding = true,
+                    _ => {}
+                }
+            }
+        }
+        flags
+    }
+}
+
+/// Query parameters for `GET /octads/{id}`
+#[derive(Debug, Deserialize)]
+pub struct OctadGetQuery {
+    /// Comma-separated list of optional includes — currently `types`,
+    /// `embedding`. Unknown tokens are ignored.
+    pub include: Option<String>,
 }
 
 /// Status response
@@ -411,6 +455,24 @@ pub struct OctadStatusResponse {
 
 impl From<&verisim_octad::Octad> for OctadResponse {
     fn from(h: &verisim_octad::Octad) -> Self {
+        Self::with_includes(h, IncludeFlags::default())
+    }
+}
+
+impl OctadResponse {
+    /// Build a response from an octad, honouring per-request include flags
+    /// for opt-in fields (semantic types, vector bytes, …).
+    pub fn with_includes(h: &verisim_octad::Octad, flags: IncludeFlags) -> Self {
+        let semantic_types = if flags.types {
+            Some(
+                h.semantic
+                    .as_ref()
+                    .map(|s| s.types.clone())
+                    .unwrap_or_default(),
+            )
+        } else {
+            None
+        };
         Self {
             id: h.id.to_string(),
             status: OctadStatusResponse {
@@ -428,6 +490,7 @@ impl From<&verisim_octad::Octad> for OctadResponse {
             has_spatial: h.spatial_data.is_some(),
             version_count: h.version_count,
             provenance_chain_length: h.provenance_chain_length,
+            semantic_types,
         }
     }
 }
@@ -901,6 +964,7 @@ async fn create_octad_handler(
 async fn get_octad_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
+    Query(query): Query<OctadGetQuery>,
 ) -> Result<Json<OctadResponse>, ApiError> {
     validate_octad_id(&id)?;
     let octad_id = OctadId::new(&id);
@@ -912,7 +976,8 @@ async fn get_octad_handler(
         .map_err(|e| ApiError::Internal(e.to_string()))?
         .ok_or_else(|| ApiError::NotFound(format!("Octad {} not found", id)))?;
 
-    Ok(Json(OctadResponse::from(&octad)))
+    let flags = IncludeFlags::parse(query.include.as_deref());
+    Ok(Json(OctadResponse::with_includes(&octad, flags)))
 }
 
 /// Update octad handler
@@ -2314,6 +2379,107 @@ mod tests {
             .expect("TODO: handle error");
 
         assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_include_types_round_trip() {
+        // Phase 1 gap closure: GET /octads/{id}?include=types must surface the
+        // entity's declared semantic types as semantic_types: Vec<String>. The
+        // default GET (no include) must still omit the field so legacy clients
+        // see no schema change.
+        let state = create_test_state().await;
+        let app = build_router(state);
+
+        let create_request = OctadRequest {
+            title: Some("Typed entity".to_string()),
+            body: Some("Body".to_string()),
+            embedding: Some(vec![0.1, 0.2, 0.3]),
+            types: Some(vec![
+                "https://example.org/Email".to_string(),
+                "https://schema.org/Message".to_string(),
+            ]),
+            relationships: None,
+            tensor: None,
+            temporal: None,
+            metadata: None,
+            provenance: None,
+            spatial: None,
+        };
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/octads")
+                    .header("content-type", "application/json")
+                    .body(Body::from(
+                        serde_json::to_string(&create_request).expect("serialize create request"),
+                    ))
+                    .expect("build POST request"),
+            )
+            .await
+            .expect("oneshot create");
+        assert_eq!(response.status(), StatusCode::CREATED);
+
+        let body = axum::body::to_bytes(response.into_body(), 1024 * 1024)
+            .await
+            .expect("read create body");
+        let created: OctadResponse =
+            serde_json::from_slice(&body).expect("decode create response");
+        assert!(
+            created.semantic_types.is_none(),
+            "default response (POST) must not surface semantic_types"
+        );
+
+        // GET without include — types still omitted
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri(format!("/octads/{}", created.id))
+                    .body(Body::empty())
+                    .expect("build GET request"),
+            )
+            .await
+            .expect("oneshot get");
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = axum::body::to_bytes(response.into_body(), 1024 * 1024)
+            .await
+            .expect("read get body");
+        let got: OctadResponse = serde_json::from_slice(&body).expect("decode get response");
+        assert!(
+            got.semantic_types.is_none(),
+            "default GET must not surface semantic_types"
+        );
+
+        // GET with ?include=types — types surfaced verbatim
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri(format!("/octads/{}?include=types", created.id))
+                    .body(Body::empty())
+                    .expect("build GET request"),
+            )
+            .await
+            .expect("oneshot get with include");
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = axum::body::to_bytes(response.into_body(), 1024 * 1024)
+            .await
+            .expect("read get body");
+        let got: OctadResponse =
+            serde_json::from_slice(&body).expect("decode get response with include");
+        let types = got
+            .semantic_types
+            .as_ref()
+            .expect("?include=types must surface semantic_types");
+        assert_eq!(
+            types,
+            &vec![
+                "https://example.org/Email".to_string(),
+                "https://schema.org/Message".to_string(),
+            ],
+            "semantic_types must round-trip in declaration order"
+        );
     }
 
     #[tokio::test]
