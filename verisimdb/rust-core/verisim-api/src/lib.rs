@@ -399,6 +399,11 @@ pub struct OctadResponse {
     /// the default response shape stays small.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub semantic_types: Option<Vec<String>>,
+    /// Populated only when the caller passes `?include=embedding` on a GET.
+    /// The stored vector is returned verbatim (same dimension, same
+    /// component values) so the Vector shape is byte-exactly verifiable.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub embedding: Option<Vec<f32>>,
 }
 
 /// Per-request flags controlling which expensive or large fields the GET
@@ -473,6 +478,11 @@ impl OctadResponse {
         } else {
             None
         };
+        let embedding = if flags.embedding {
+            h.embedding.as_ref().map(|e| e.vector.clone())
+        } else {
+            None
+        };
         Self {
             id: h.id.to_string(),
             status: OctadStatusResponse {
@@ -491,6 +501,7 @@ impl OctadResponse {
             version_count: h.version_count,
             provenance_chain_length: h.provenance_chain_length,
             semantic_types,
+            embedding,
         }
     }
 }
@@ -2379,6 +2390,106 @@ mod tests {
             .expect("TODO: handle error");
 
         assert_eq!(response.status(), StatusCode::OK);
+    }
+
+    #[tokio::test]
+    async fn test_include_embedding_byte_exact_round_trip() {
+        // Phase 1 gap closure: GET /octads/{id}?include=embedding must
+        // surface the stored Vec<f32> verbatim — same dimension, same
+        // component values, no truncation, no reorder. This is what makes
+        // the Vector shape byte-exactly veridical.
+        let state = create_test_state().await;
+        let app = build_router(state);
+
+        let original: Vec<f32> = vec![0.1, 0.2, 0.3];
+        let create_request = OctadRequest {
+            title: Some("Vec round-trip".to_string()),
+            body: Some("Body".to_string()),
+            embedding: Some(original.clone()),
+            types: None,
+            relationships: None,
+            tensor: None,
+            temporal: None,
+            metadata: None,
+            provenance: None,
+            spatial: None,
+        };
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/octads")
+                    .header("content-type", "application/json")
+                    .body(Body::from(
+                        serde_json::to_string(&create_request).expect("serialize create request"),
+                    ))
+                    .expect("build POST request"),
+            )
+            .await
+            .expect("oneshot create");
+        assert_eq!(response.status(), StatusCode::CREATED);
+        let body = axum::body::to_bytes(response.into_body(), 1024 * 1024)
+            .await
+            .expect("read create body");
+        let created: OctadResponse =
+            serde_json::from_slice(&body).expect("decode create response");
+        assert!(
+            created.embedding.is_none(),
+            "POST response must not surface embedding by default"
+        );
+
+        // GET without include — embedding must be omitted
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri(format!("/octads/{}", created.id))
+                    .body(Body::empty())
+                    .expect("build GET request"),
+            )
+            .await
+            .expect("oneshot get");
+        let body = axum::body::to_bytes(response.into_body(), 1024 * 1024)
+            .await
+            .expect("read get body");
+        let got: OctadResponse = serde_json::from_slice(&body).expect("decode get response");
+        assert!(
+            got.embedding.is_none(),
+            "default GET must not surface embedding"
+        );
+
+        // GET with ?include=embedding — bytes must match exactly
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .uri(format!("/octads/{}?include=embedding", created.id))
+                    .body(Body::empty())
+                    .expect("build GET request"),
+            )
+            .await
+            .expect("oneshot get with include=embedding");
+        let body = axum::body::to_bytes(response.into_body(), 1024 * 1024)
+            .await
+            .expect("read get body");
+        let got: OctadResponse =
+            serde_json::from_slice(&body).expect("decode get response with embedding");
+        let returned = got
+            .embedding
+            .as_ref()
+            .expect("?include=embedding must surface embedding");
+        assert_eq!(
+            returned.len(),
+            original.len(),
+            "byte-exact round-trip — same dimension"
+        );
+        for (i, (a, b)) in original.iter().zip(returned.iter()).enumerate() {
+            assert_eq!(
+                a.to_bits(),
+                b.to_bits(),
+                "byte-exact round-trip — component {i} differs ({a} vs {b})"
+            );
+        }
     }
 
     #[tokio::test]
