@@ -114,10 +114,17 @@ impl From<&str> for OctadId {
 pub struct OctadStatus {
     /// Entity ID
     pub id: OctadId,
-    /// When the entity was created
+    /// When the entity was created (ingestion time, set by the database)
     pub created_at: DateTime<Utc>,
-    /// When last modified
+    /// When last modified (ingestion time)
     pub modified_at: DateTime<Utc>,
+    /// Caller-supplied real-world observation time, distinct from `created_at`.
+    /// `created_at` records when the entity entered the database; `observed_at`
+    /// records when the underlying event happened in the territory the entity
+    /// represents (e.g. an email's `Date:` header). Optional because not every
+    /// entity has a meaningful real-world timestamp.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub observed_at: Option<DateTime<Utc>>,
     /// Current version
     pub version: u64,
     /// Status per modality
@@ -178,6 +185,10 @@ pub struct OctadInput {
     pub semantic: Option<OctadSemanticInput>,
     /// Document content (optional)
     pub document: Option<OctadDocumentInput>,
+    /// Temporal observation time (optional). When supplied, `OctadStatus.observed_at`
+    /// is populated. Distinct from the version snapshot (which the database always
+    /// writes at ingestion time): this is the territory's clock, not the database's.
+    pub temporal: Option<OctadTemporalInput>,
     /// Provenance event (optional)
     pub provenance: Option<OctadProvenanceInput>,
     /// Spatial coordinates (optional)
@@ -230,6 +241,15 @@ pub struct OctadDocumentInput {
     pub body: String,
     /// Additional fields
     pub fields: HashMap<String, String>,
+}
+
+/// Temporal modality input — the entity's real-world observation time
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OctadTemporalInput {
+    /// When the underlying event happened in the territory the entity represents
+    /// (e.g. an email's `Date:` header). UTC; callers must convert from local
+    /// timezones before submission.
+    pub observed_at: DateTime<Utc>,
 }
 
 /// Provenance modality input — records a lineage event
@@ -426,6 +446,12 @@ impl OctadBuilder {
             srid: None,
             properties: HashMap::new(),
         });
+        self
+    }
+
+    /// Add real-world observation time (territory clock, not database ingestion time)
+    pub fn with_observed_at(mut self, observed_at: DateTime<Utc>) -> Self {
+        self.input.temporal = Some(OctadTemporalInput { observed_at });
         self
     }
 
