@@ -163,7 +163,7 @@ cargo fmt --check
 
 ### Not Accepted
 
-- TypeScript (use ReScript instead)
+- TypeScript (use AffineScript instead)
 - Python (use Rust or Julia instead)
 - Go (use Rust instead)
 - Node.js/npm/bun (use Deno if JS runtime needed)
