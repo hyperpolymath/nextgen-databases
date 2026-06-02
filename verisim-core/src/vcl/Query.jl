@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 #
 # vcl/Query.jl — minimal VCL AST for the subset the experiment needs.
 #

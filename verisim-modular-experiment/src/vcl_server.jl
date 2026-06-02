@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 #
 # src/vcl_server.jl — Julia stdio server for the verisim CLI.
 #

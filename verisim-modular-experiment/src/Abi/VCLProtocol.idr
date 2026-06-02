@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 ||| VCLProtocol.idr — the CLI stdio wire protocol ABI.
 |||
 ||| Defines the contract between the `verisim` Zig CLI binary and the
