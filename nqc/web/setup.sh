@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 # Setup script for NQC Web UI — creates symlinks for local ReScript packages
 # that the ReScript compiler resolves via node_modules.
 
