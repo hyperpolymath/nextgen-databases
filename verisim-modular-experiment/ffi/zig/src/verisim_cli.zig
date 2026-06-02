@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // verisim_cli.zig — Verisim VCL query CLI (Zig 0.15).
 //
 // Contract (Abi.VCLProtocol):

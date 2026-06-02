@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 ||| Types.idr — Octad shape enumeration and Core/Federable partition.
 |||
 ||| Derived from verisimdb/arcvix-octad-data-model.tex Definition 3

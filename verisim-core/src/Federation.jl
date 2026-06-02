@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 #
 # FederationManager.jl — Clauses 1 & 3 (shape-orthogonal) + peer
 # registration + aggregate-drift orchestration.

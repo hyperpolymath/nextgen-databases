@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // build.zig — Zig build script for the verisim CLI (Zig 0.15 API).
 //
 // Produces a single binary: zig-out/bin/verisim

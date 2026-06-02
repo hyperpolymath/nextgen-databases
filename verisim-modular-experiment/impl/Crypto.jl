@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 #
 # Crypto.jl — Ed25519 signing for VeriSimCore / federation peers.
 #
