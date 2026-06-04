@@ -6,7 +6,18 @@
 :toc-placement: macro
 
 Browser-based query client for NextGen databases (VeriSimDB, Lithoglyph, QuandleDB).
-Built with **ReScript 12** + **rescript-tea** (The Elm Architecture) + **cadre-router**.
+
+[NOTE]
+====
+The ReScript + rescript-tea + React implementation was **removed** — ReScript is
+banned estate-wide (Hyperpolymath Standard; shared CI gate
+`cicd_rules/banned_language_file`). The canonical interface is now the AffineScript
+TEA spec at `../src/ui/tea/nqc_gui.affine` (`Model`/`Msg`/`init`/`update`/`view`/`subs`).
+Browser rendering is pending the affinescript-ecosystem fetch+DOM mounter
+(**affinescript#56**); the Deno static server (`serve.js`) and CORS proxy
+(`proxy/server.js`) shell remain. Sections below that describe the ReScript build
+are retained for history only.
+====
 
 toc::[]
 
