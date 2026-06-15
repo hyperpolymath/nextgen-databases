@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 // (PMPL-1.0-or-later preferred; MPL-2.0 required for Gleam ecosystem tooling)
-// Author: Jonathan D.A. Jewell <6759885+hyperpolymath@users.noreply.github.com>
+// Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 //
 // Lithoglyph BEAM smoke tests — Gleam gleeunit suite.
 //
