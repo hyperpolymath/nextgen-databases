@@ -1,0 +1,49 @@
+// SPDX-License-Identifier: MPL-2.0
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= ReScript / TypeScript / npm → AffineScript + Rust + Deno — Migration Plan
+:toc: left
+
+Status: PLAN (inventory + strategy). Execution is per-app, tracked separately.
+Baseline: main @ e473bcf.
+
+== Why
+Per the Hyperpolymath Standard, ReScript and TypeScript are banned estate-wide
+and npm/bun are replaced by Deno. The governance gates *Trusted-base reduction
+policy* and *Language / package anti-pattern policy* fail on nextgen-databases
+because its subprojects still carry these. Target mapping:
+UI → *AffineScript* (TEA); systems / perf → *Rust*; npm → *Deno* (deno.json).
+
+== Inventory (main @ e473bcf)
+*143* `.res/.resi/.ts/.tsx` files + *4* `package.json`, by subproject:
+
+[cols="2,1,3",options=header]
+|===
+| Area | Effort | Notes / target
+| `lithoglyph/glyphbase/ui` (AirTable-like app) | HIGHEST (~30 .res) | Grid/Kanban/Calendar/Form/Gallery + stores + bindings (Yjs/Jotai/Webapi/Fetch). → AffineScript TEA, mirroring `quandledb/frontend` + `nqc`. *Binding layer blocked on affinescript#56.*
+| `lithoglyph` core: clients/rescript, analytics, distributed, normalizer, perf, stability, studio, gql-dt, tools/sdk-gen | HIGH | UI → AffineScript; systems/perf → Rust.
+| `lithoglyph/integrations` (Directus / Ghost / Payload / Strapi) | MEDIUM | CMS adapters bridging JS-only systems — candidate for a *documented exception* or thin Deno-ESM shim rather than full rewrite. Needs a decision.
+| `verisimdb` (admin, connectors/clients/rescript, playground) | MEDIUM | admin → AffineScript; connectors → Rust/AffineScript; playground → Deno.
+| `typeql-experimental` | LOW | Experimental — assess keep vs drop before migrating.
+| 4 × `package.json` (glyphbase/ui, gql-dt/vscode-extension, studio, verisimdb/playground) | — | → deno.json where Deno-runnable; vscode-extension may need an exception.
+|===
+
+== Strategy
+. *Leaf-first.* Migrate modules with no dependents first to establish the
+  pattern, then the apps. Glyphbase UI last (largest, binding-blocked).
+. *Per-app ADR + PR.* Never a big-bang; each app/subproject is its own change.
+. *Language mapping.* UI → AffineScript TEA; systems/perf/connectors → Rust;
+  package.json → deno.json.
+. *Exceptions.* The CMS integrations and the VSCode extension bridge JS-only
+  ecosystems; record an explicit exception rather than force a rewrite.
+
+== Blockers (must clear before the UI layers can land)
+. *AffineScript toolchain*: no compiler in CI / this container; `affinescript#56`
+  (DOM/fetch bindings) still pending — required for the `glyphbase/ui/bindings/*`
+  and `api/Client` layers.
+. Until the toolchain is ready, migrate the *non-UI* surface first
+  (systems → Rust, package.json → deno.json), leaving UI rewrites staged.
+
+== Next concrete steps
+. Decide the integrations/vscode-extension *exception vs rewrite* question.
+. Confirm AffineScript CI availability; if absent, sequence Rust/systems work first.
+. Pick the first leaf module for a proof-of-pattern PR.
