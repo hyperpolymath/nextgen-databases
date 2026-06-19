@@ -40,37 +40,43 @@ Bot-specific instructions for:
 
 ## CORE INVARIANTS
 
-1. **No SCM duplication** - Root must NOT contain .machine_readable/6a2/STATE.a2ml, .machine_readable/6a2/META.a2ml, etc.
-2. **Single source of truth** - `.machine_readable/` is authoritative
-3. **No stale metadata** - If root SCMs exist, they are OUT OF DATE
-4. **License consistency** - All code PMPL-1.0-or-later unless platform requires MPL-2.0
-5. **Author attribution** - Always "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"
+1. **Coordination only — no implementation** - This repo coordinates a portfolio of
+   databases. Per-database source, schemas, migrations, query-language implementations,
+   and per-database docs MUST live in that database's own repo (see `REGISTRY.adoc`).
+   Adding per-database implementation content here is an ERROR.
+2. **No SCM duplication** - Root must NOT contain .machine_readable/6a2/STATE.a2ml, .machine_readable/6a2/META.a2ml, etc.
+3. **Single source of truth** - `.machine_readable/` is authoritative
+4. **No stale metadata** - If root SCMs exist, they are OUT OF DATE
+5. **License consistency** - All code PMPL-1.0-or-later unless platform requires MPL-2.0
+6. **Author attribution** - Always "Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"
 
 ## REPOSITORY STRUCTURE
 
-<!-- CUSTOMIZE THIS SECTION FOR YOUR REPO -->
-
-This repo contains:
+This is a **coordination repo**. Intended (target) contents:
 
 ```
 nextgen-databases/
-├── 0-AI-MANIFEST.a2ml         # THIS FILE (start here)
-├── README.adoc                 # Database portfolio overview
-├── .machine_readable/          # SCM files (6 files)
-│   ├── .machine_readable/6a2/STATE.a2ml
-│   ├── .machine_readable/6a2/META.a2ml
-│   ├── .machine_readable/6a2/ECOSYSTEM.a2ml
-│   ├── .machine_readable/6a2/AGENTIC.a2ml
-│   ├── .machine_readable/6a2/NEUROSYM.a2ml
-│   └── .machine_readable/6a2/PLAYBOOK.a2ml
-├── .bot_directives/            # Bot instructions
-└── contractiles/               # Contractiles
+├── 0-AI-MANIFEST.a2ml          # THIS FILE (start here)
+├── CLAUDE.md / AGENTS.md       # Agent guardrails (coordination-only)
+├── REGISTRY.adoc               # Authoritative map: database/language -> its own repo
+├── README.adoc / EXPLAINME.adoc / TOPOLOGY.md / ROADMAP.adoc   # Portfolio docs
+├── tests/                      # CROSS-database integration tests only
+├── docs/                       # Coordination docs (incl. migration runbooks)
+├── .machine_readable/          # Canonical SCM metadata
+├── .github/ .well-known/ LICENSES/   # Governance, protocols, licenses
+└── flake.nix / Justfile / stapeln.toml / opsm.toml   # Shared env & orchestration
 ```
+
+LEGACY (being extracted to their own repos — see
+`docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc` and `REGISTRY.adoc`):
+`verisimdb/`, `lithoglyph/`, `quandledb/`, `nqc/`, `typeql-experimental/`,
+`verisim-core/`, `verisim-modular-experiment/`. **Do NOT add new content to these.**
 
 ## KEY RELATIONSHIPS
 
-This is a **parent/tracking repository** — no implementation code.
-Satellite repos: quandledb, verisimdb, lithoglyph, glyphbase
+This is a **parent/tracking (coordination) repository** — no implementation code.
+Satellite repos (authoritative list in `REGISTRY.adoc`): verisimdb, lithoglyph,
+glyphbase, quandledb, gnpl, vcl-ut, krl, nqc.
 
 ## SESSION STARTUP CHECKLIST
 
