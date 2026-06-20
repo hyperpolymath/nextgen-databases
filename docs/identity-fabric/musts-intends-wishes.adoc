@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= nextgen-databases — Normative Scope (Must / Intend / Wish)
+:toc: preamble
+:revdate: 2026-06-19
+
+[abstract]
+Per-repo normative-scope record for nextgen-databases (the research-overview +
+incubator monorepo for the database / query / identity layer, and the home of
+`verisim-core/`). Estate rule (2026-06-19): every repo carries its own scoped
+table; crossover content is duplicated and marked until resolved, then wired into
+the other relevant repos. `◇` marks proposals not yet canonical.
+
+== Confirmed stack placement (2026-06-19)
+
+[literal]
+krl (surface DSL) → tangle (TangleIR + type-safe core) → VerisimCore (categorical
+abstraction — incubated here as verisim-core/) → Skein.jl / quandledb (storage +
+equivalence)
+
+== Levels
+
+* *MUST* — required to be what it is (RFC 2119 normative).
+* *INTEND* — committed direction.
+* *WISH* — aspirational.
+
+== nextgen-databases (own)
+
+[cols="1,5", options="header"]
+|===
+| Level | nextgen-databases
+
+| *MUST*
+| Be the *research-overview + incubator* for the database/query/identity layer;
+  honestly host its sub-projects (`nqc` Gleam query-calculus; *`verisim-core`* —
+  the VerisimCore categorical layer, in Julia; `verisimdb`; `lithoglyph`;
+  `typeql-experimental`; a `quandledb` copy) with their own provenance; estate
+  governance — LICENSE/REUSE, SPDX headers, no banned files; honest KRL-stack
+  grounding (no op↔component category error).
+
+| *INTEND*
+| *Pay down the template debt* (the live debt per `AFFIRMATION.adoc`: 19
+  `{{PLACEHOLDER}}` files + 17 `rsr-template-repo` references); execute the
+  *ReScript/TS/npm → AffineScript/Rust/Deno migration* now planned in
+  `RESCRIPT-TS-AFFINESCRIPT-MIGRATION.adoc`; mature `verisim-core` toward the
+  shippable VerisimCore layer; graduate stabilised sub-projects into their own
+  repos; give the aggregate a real readiness story.
+
+| *WISH*
+| A coherent next-gen query surface (the `nqc` calculus) over the VerisimCore +
+  Skein/QuandleDB substrate ◇; VerisimDB as a self-hostable identity-state store
+  ◇; a clean separation of incubated experiments from shipped components.
+|===
+
+== Cross-repo wiring
+
+nextgen-databases is the *incubator* — most notably the home of `verisim-core/`,
+the VerisimCore categorical-abstraction layer that sits (maintainer-confirmed
+2026-06-19) between TangleIR and the storage/equivalence faces. The shipped faces
+of that layer live in their own repos: *Skein.jl* (engine), *quandledb*
+(persistence + equivalence). The load-bearing shared invariant is
+*equivalence-integrity* (the `a = a` idem core).
+
+Sibling repos' key concerns (keep in sync as crossover resolves): *krl* — the
+resolution DSL surface; *tangle* — TangleIR + type-safe core; *quandledb* —
+equivalence / identity face; *Skein.jl* — computational engine; *echo-types* —
+structured-loss theory + the identity-fabric framing (Conway·Fichte / Bruner /
+Ricoeur). See `../AFFIRMATION.adoc`.

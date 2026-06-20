@@ -1,0 +1,140 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= AFFIRMATION — nextgen-databases, as of 2026-06-19
+:toc: macro
+:toclevels: 2
+
+_the No-Bullshit file: what we affirm was true and checkable at this moment_
+
+[NOTE]
+====
+*Genre.* An *affirmation* is a solemn declaration of the truth of a statement,
+made by someone who _declines to swear an oath_ — our truth-as-best-believed at
+a stamped instant, binding on our honesty, not a claim of infallibility. It is
+not the README (where this is going) and not the EXPLAINME (how it is built);
+it is _what can we honestly affirm was true and checkable at a stamped moment_.
+Every repo in the estate carries one, per the 2026-06-19 estate rule.
+====
+
+toc::[]
+
+== What this is, and how it works
+
+A short, dated, jointly-signed snapshot of what we can _honestly and verifiably_
+claim about the nextgen-databases repo at one exact commit. *Ground truth, not
+memory:* the gate results below were produced by running the checks this session.
+*Material caveat:* this is a *research-overview monorepo* aggregating several
+sub-projects, and *none of their build/test toolchains were runnable this session*
+(`just`, `deno`, `julia`, `gleam` are absent; only `git`, `Agda`, `rustc` present)
+— so this affirms *structure and gate-state*, not a built/tested estate. *No
+intentional overclaim;* the owner's signed commit is the authoritative form (the
+AI party cannot GPG-sign).
+
+== Verifiable anchor
+
+[cols="1,3"]
+|===
+| *Repo*        | `hyperpolymath/nextgen-databases` — research-overview monorepo for the next-gen database / query / identity layer
+| *Branch*      | `claude/practical-newton-9eFe2` (feature branch; not anchored to `main`)
+| *Commit (HEAD)* | `2ae2a2c8cc184de9b54527da0702d4b1ae75321e`
+| *Permalink*   | https://github.com/hyperpolymath/nextgen-databases/tree/2ae2a2c8cc184de9b54527da0702d4b1ae75321e
+| *Verified*    | 2026-06-19 (checks run this session; date, not a claimed UTC instant)
+| *Working-tree delta* | Clean except this untracked `AFFIRMATION.adoc`. HEAD carries one commit ahead of `main` — the unmerged migration-plan doc (`…/RESCRIPT-TS-AFFINESCRIPT-MIGRATION.adoc`, +49).
+| *Toolchain (present)* | `git`, `Agda 2.6.3`, `rustc`. *Absent:* `just`, `deno`, `julia`, `gleam`, OCaml.
+| *Run method*  | `contractile`/RSR gate bodies as bash. *No sub-project built or tested* (toolchains absent).
+| *HEAD signature* | Not signed by the AI party; the maintainer's signed commit is authoritative.
+|===
+
+== Companion documents (cross-check)
+
+* *`README.adoc`* — `= Next-Generation Databases — Research Overview` (real).
+* *`EXPLAINME.adoc`* — `= Next-Gen Databases — Show Me The Receipts` (real).
+* *Template residue (loud)* — *19 files* with `{{PLACEHOLDER}}` tokens and *17
+  files* referencing `rsr-template-repo`. Substantial instantiation debt.
+* *GitHub description / topics* — not fetched this session.
+
+== The honest state (one breath)
+
+nextgen-databases is a *research-overview monorepo* that aggregates the estate's
+database / query / identity sub-projects — `nqc/` (a Gleam query-calculus
+project), *`verisim-core/`* (a Julia package — the VerisimCore *categorical
+abstraction* layer of the stack), `verisimdb/`, `verisim-modular-experiment/`,
+`lithoglyph/`, `typeql-experimental/`, and a `quandledb/` copy — with real code
+(~120 Rust files plus Julia + Gleam). The `MUST`/`TRUST` gates pass, but the repo
+carries *heavy template residue* and an *in-flight migration* (ReScript/TS/npm →
+AffineScript/Rust/Deno). It is honestly a *research-stage aggregator*, not a
+shipped, built-and-tested product.
+
+== What is solid (and how we checked)
+
+* *MUST/TRUST-style checks — PASS.* Run as bash: LICENSE present; no banned
+  `Dockerfile`/`Makefile`; LICENSE carries an SPDX/MPL identifier; no `.env` /
+  `credentials.json`. (SPDX header scan: 1 unheadered file in the sampled set —
+  a near-pass, flagged.)
+* *Real sub-project content.* `verisim-core/` is a structured Julia package
+  (`Project.toml`, `src/`, `test/`); `nqc/` is a Gleam project (`gleam.toml`,
+  `ffi/`, launchers); ~120 `.rs` files across the tree. This is genuine WIP
+  engineering, not template filler.
+
+== Known-incomplete but honestly fenced (loud, never silent)
+
+* *Heavy template residue.* 19 `{{PLACEHOLDER}}` files + 17 `rsr-template-repo`
+  references remain — the largest instantiation debt in the estate so far.
+* *In-flight migration.* The HEAD commit adds a *plan* to migrate ReScript/TS/npm
+  → AffineScript/Rust/Deno; the migration itself is *not done*.
+* *No single READINESS / proof grade.* As an aggregator it has `PROOF-NEEDS.md`
+  but no top-level readiness grade; per-sub-project maturity varies.
+
+== Outstanding / not-run (no spin)
+
+* *No sub-project was built or tested this session.* `julia` (verisim-core),
+  `gleam` (nqc), `deno` are absent. We affirm the sub-projects *exist and are
+  structured*; we do *not* affirm they build or pass tests from this session.
+  In-environment `julia … Pkg.test()` / `gleam test` are the authoritative checks.
+
+== Reproduce it yourself
+
+[source,bash]
+----
+git rev-parse HEAD          # expect 2ae2a2c8cc184de9b54527da0702d4b1ae75321e
+test -f LICENSE; test ! -f Dockerfile -a ! -f Makefile; grep -q 'SPDX\|MPL' LICENSE
+grep -rl '{{'{{'}}[A-Z_]*{{'}}'}}' --include='*.adoc' --include='*.md' . | grep -v PLACEHOLDERS | wc -l   # ~19
+grep -rl 'rsr-template-repo' . | grep -v '.git/' | wc -l                                    # ~17
+ls verisim-core/ nqc/        # real sub-projects
+# NOT runnable without toolchains: ( cd verisim-core && julia --project=. -e 'using Pkg; Pkg.test()' )
+----
+
+== One-line characterisation (quote this)
+
+"nextgen-databases is a research-overview monorepo aggregating the estate's
+database/query/identity sub-projects — `nqc` (Gleam), `verisim-core` (Julia, the
+VerisimCore categorical layer), `verisimdb`, `lithoglyph`, `typeql-experimental`,
+`quandledb` — with real code (~120 Rust + Julia + Gleam). `MUST`/`TRUST` gates
+pass, but it carries heavy template residue (19 placeholder files, 17
+`rsr-template-repo` refs) and an in-flight ReScript/TS → AffineScript/Rust
+migration plan; *no* sub-project was built or tested this session (julia/gleam/
+deno absent). A research-stage aggregator, honestly fenced. No intentional
+overclaim."
+
+== Key concern + cross-repo wiring
+
+nextgen-databases's *key concern* is being the *research-overview + incubator*
+for the database/query/identity layer — and it is the *home of `verisim-core/`*,
+the VerisimCore categorical-abstraction layer whose stack placement was
+maintainer-confirmed 2026-06-19: *krl → tangle/TangleIR → VerisimCore → Skein.jl /
+quandledb*. Per the estate rule it carries its own scope table at
+`docs/identity-fabric/musts-intends-wishes.adoc`. Adjacent: *quandledb* /
+*Skein.jl* (the shipped storage + engine faces), *tangle* (TangleIR), *krl*
+(surface DSL), *echo-types* (structured-loss theory).
+
+== Joint attestation
+
+To the best of our joint belief at the timestamp above, every claim here is true
+and was checked as described — with the un-built sub-projects and the template
+debt stated rather than hidden.
+
+* *Engineering party (AI):* ran the gate/RSR checks recorded here as bash on
+  2026-06-19; did *not* build or test any sub-project (toolchains absent).
+* *Owner / maintainer:* Jonathan D.A. Jewell — signs by committing this file with
+  `-S`; the signed commit at the SHA above is authoritative.
+* *Signed-off-date:* (fill on signing)
