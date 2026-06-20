@@ -10,15 +10,19 @@ repositories that own each database and each query language. `nextgen-databases`
 Registered in the estate clade registry: https://github.com/hyperpolymath/gv-clade-index
 (see `.machine_readable/CLADE.a2ml`).
 
+Resite: decisions finalised; execution per
+`docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc` (plan) and
+`docs/migration/RESITE-CODEX-HANDOFF.adoc` (step-by-step agent command sheet).
+
 == Databases
 
 [cols="1,2,1,2",options=header]
 |===
 | Database | Repository | Status | Query language (repo)
-| VeriSimDB (cross-modal consistency) | hyperpolymath/verisimdb | exists | VCL — in-repo (`verisimdb/src/vcl/`)
-| Lithoglyph (narrative-first) | hyperpolymath/lithoglyph | to create | GQL/GNPL — hyperpolymath/gnpl
+| VeriSimDB (cross-modal consistency) | hyperpolymath/verisimdb | exists (canonical) | VCL — nested in verisimdb
+| Lithoglyph (narrative-first) | hyperpolymath/lithoglyph | to create | GNPL — hyperpolymath/gnpl
 | Glyphbase (Lithoglyph web UI) | hyperpolymath/glyphbase | to create | —
-| QuandleDB (knot-theory) | hyperpolymath/quandledb | exists (stub) | KRL — hyperpolymath/krl
+| QuandleDB (knot-theory) | hyperpolymath/quandledb | exists (canonical) | KRL — hyperpolymath/krl
 |===
 
 == Query languages
@@ -27,20 +31,25 @@ Registered in the estate clade registry: https://github.com/hyperpolymath/gv-cla
 |===
 | Language | Repository | Status | Notes
 | VCL (Verified Consonance Language) | (in hyperpolymath/verisimdb) | exists | Production; stays nested in verisimdb
-| VCL-UT (usage-tracked extension) | hyperpolymath/vcl-ut | exists | Maps to `typeql-experimental/`; standalone-vs-fold DECISION pending
+| VCL-UT (usage-tracked extension) | hyperpolymath/vcl-ut | exists (canonical) | Maps to `typeql-experimental/`; reconcile + delete copy
 | GNPL / GQL (Glyph query language) | hyperpolymath/gnpl | to create | From `lithoglyph/gql-dt/` + `lithoglyph/core-factor/gql/`
-| KRL (Knot query language) | hyperpolymath/krl | exists | Implementation not present in this monorepo
+| KRL (Knot query language) | hyperpolymath/krl | exists (canonical) | No KRL content in this monorepo
 | NQC (Nested Query Calculus) | hyperpolymath/nqc | to create | Already standalone in `nqc/` (Gleam)
 |===
 
-== Undecided / research (see runbook)
+== VeriSim satellites
 
 [cols="1,2",options=header]
 |===
 | Component | Disposition
-| `verisim-core/` (slim Julia identity-core) | Own repo `verisim-core` *or* fold into verisimdb — DECISION
-| `verisim-modular-experiment/` (research-experiment) | Move to a research repo *or* keep as a documented exception — DECISION
+| `verisim-core/` (slim Julia identity-core) | → own repo *hyperpolymath/VerisimCore.jl* (Julia-package pattern); create + push
+| `verisim-modular-experiment/` | → *folded into hyperpolymath/verisimdb* as a standard feature (no longer an experiment)
 |===
+
+== Reference strategy (after extraction)
+
+Hybrid: `verisimdb` and `lithoglyph` are git submodules of this coordination repo; every other
+repo is referenced by link from this registry.
 
 == What belongs in *this* (coordination) repo
 

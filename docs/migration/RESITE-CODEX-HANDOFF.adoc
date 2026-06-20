@@ -1,0 +1,208 @@
+// SPDX-License-Identifier: MPL-2.0
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Resite execution — Codex agent handoff
+:toc: left
+
+Status: READY TO EXECUTE (pending repo access). Source repo baseline: `main`.
+
+== Audience & how to use this
+You are an autonomous coding agent (e.g. Codex) executing the resite of the
+`hyperpolymath/nextgen-databases` *coordination repo*: every database / query language is
+being moved to its own repo so this repo becomes thin. This file is self-contained — follow
+it top to bottom. `REGISTRY.adoc` is the authoritative map; this file is the command sheet.
+
+== Preconditions (verify first; STOP if unmet)
+. `gh` CLI authenticated to the `hyperpolymath` org with `repo` + repo-creation rights:
+  `gh auth status` and `gh repo view hyperpolymath/verisimdb` must succeed.
+. `git filter-repo` installed: `git filter-repo --version`
+  (install via `pipx install git-filter-repo`, `brew install git-filter-repo`, or distro pkg).
+. Write access to existing repos: `verisimdb`, `quandledb`, `vcl-ut`.
+. Create access for new repos: `lithoglyph`, `glyphbase`, `gnpl`, `nqc`, `VerisimCore.jl`.
+If any check fails, STOP and report exactly which access is missing. Do not work around it.
+
+== Golden safety rules (do not violate)
+. *Never* `git push` to `main`/`master` of an *existing* repo. Existing repos
+  (`verisimdb`, `quandledb`, `vcl-ut`) get an `import/from-monorepo` branch + PR only.
+. *Reconcile before delete*: never `git rm` a directory from the coordination repo until its
+  destination demonstrably contains the content (diff clean or PR merged).
+. *One repo at a time*; verify each before moving on.
+. Operate on throwaway clones under `/tmp`, never on a working clone you intend to keep.
+. New repos: default visibility *public* (matches the org). Change to `--private` if told to.
+
+== Final mapping (authoritative: REGISTRY.adoc)
+[cols="2,2,1,2",options=header]
+|===
+| Source (monorepo) | Destination | Exists? | Action
+| `nqc/` | hyperpolymath/nqc | create | extract as-is
+| `verisim-core/` | hyperpolymath/VerisimCore.jl | create | extract (Julia package)
+| `lithoglyph/glyphbase/` | hyperpolymath/glyphbase | create | un-nest
+| `lithoglyph/gql-dt/` + `lithoglyph/core-factor/gql/` | hyperpolymath/gnpl | create | un-nest (2 paths)
+| `lithoglyph/` (minus the two above) | hyperpolymath/lithoglyph | create | slimmed parent
+| `typeql-experimental/` | hyperpolymath/vcl-ut | exists | reconcile -> delete copy
+| `quandledb/` (stub) | hyperpolymath/quandledb | exists | reconcile -> delete copy
+| `verisimdb/` (incl. `src/vcl/`) | hyperpolymath/verisimdb | exists | reconcile -> delete copy; VCL stays nested
+| `verisim-modular-experiment/` | hyperpolymath/verisimdb | exists | FOLD IN as standard feature -> delete
+| (no KRL content here) | hyperpolymath/krl | exists | no-op
+|===
+
+== Step 0 — setup
+[source,sh]
+----
+git filter-repo --version
+gh auth status
+git clone https://github.com/hyperpolymath/nextgen-databases /tmp/ngdb
+cd /tmp/ngdb && git rev-parse HEAD          # record baseline SHA in your final report
+# sanity-check the un-nest subpaths exist before extracting:
+ls -d lithoglyph/glyphbase lithoglyph/gql-dt lithoglyph/core-factor/gql
+----
+
+== Step 1 — create + populate NEW repos (no risk to existing)
+Do smallest first to prove the pattern. Generic single-path helper:
+[source,sh]
+----
+extract() {  # $1 = subdir/ (trailing slash)  $2 = /tmp workdir name
+  rm -rf "/tmp/$2"
+  git clone --no-local /tmp/ngdb "/tmp/$2"
+  ( cd "/tmp/$2" && git filter-repo --path "$1" --path-rename "$1:" )
+  ( cd "/tmp/$2" && git log --oneline -1 && echo "files: $(git ls-files | wc -l)" )
+}
+publish() {  # $1 = /tmp workdir  $2 = owner/repo  $3 = description
+  gh repo create "$2" --public --description "$3" --disable-wiki
+  ( cd "$1" && git remote add dest "https://github.com/$2.git" && git push dest HEAD:main )
+}
+----
+
+=== 1a. nqc
+[source,sh]
+----
+extract nqc/ nqc
+publish /tmp/nqc hyperpolymath/nqc "NQC — Nested Query Calculus (Gleam)"
+----
+
+=== 1b. VerisimCore.jl
+[source,sh]
+----
+extract verisim-core/ VerisimCore.jl
+publish /tmp/VerisimCore.jl hyperpolymath/VerisimCore.jl "VerisimCore.jl — slim Julia identity-core of VeriSimDB"
+----
+
+=== 1c. glyphbase (un-nest)
+[source,sh]
+----
+extract lithoglyph/glyphbase/ glyphbase
+publish /tmp/glyphbase hyperpolymath/glyphbase "Glyphbase — Lithoglyph web UI / data layer"
+----
+
+=== 1d. gnpl (un-nest, two source paths)
+[source,sh]
+----
+rm -rf /tmp/gnpl && git clone --no-local /tmp/ngdb /tmp/gnpl
+( cd /tmp/gnpl && git filter-repo \
+    --path lithoglyph/gql-dt/ --path lithoglyph/core-factor/gql/ \
+    --path-rename lithoglyph/gql-dt/:gql-dt/ \
+    --path-rename lithoglyph/core-factor/gql/:core-factor-gql/ )
+publish /tmp/gnpl hyperpolymath/gnpl "GNPL — Glyph query language (dependently-typed)"
+----
+
+=== 1e. lithoglyph (slimmed: drop the un-nested subdirs; two filter-repo passes)
+[source,sh]
+----
+rm -rf /tmp/lithoglyph && git clone --no-local /tmp/ngdb /tmp/lithoglyph
+( cd /tmp/lithoglyph \
+    && git filter-repo --path lithoglyph/ --path-rename lithoglyph/: \
+    && git filter-repo --invert-paths --path glyphbase/ --path gql-dt/ --path core-factor/gql/ )
+publish /tmp/lithoglyph hyperpolymath/lithoglyph "Lithoglyph — narrative-first, reversible, audit-grade database"
+----
+
+== Step 2 — reconcile EXISTING repos (never clobber)
+For each, compare the monorepo copy against the live canonical repo, then decide.
+[source,sh]
+----
+reconcile() {  # $1 = subdir/  $2 = owner/repo
+  name="${2##*/}"
+  rm -rf "/tmp/mono-$name"; git clone --no-local /tmp/ngdb "/tmp/mono-$name"
+  ( cd "/tmp/mono-$name" && git filter-repo --path "$1" --path-rename "$1:" )
+  rm -rf "/tmp/canon-$name"; git clone "https://github.com/$2" "/tmp/canon-$name"
+  echo "===== DIFF  $1  vs  $2  ====="
+  diff -rq --exclude=.git "/tmp/mono-$name" "/tmp/canon-$name" || true
+}
+reconcile quandledb/ hyperpolymath/quandledb          # stub here; expect canonical is ahead
+reconcile typeql-experimental/ hyperpolymath/vcl-ut
+reconcile verisimdb/ hyperpolymath/verisimdb
+----
+Decision per repo, from the diff:
+
+* *No monorepo-unique content* (canonical already has it) -> nothing to push; mark
+  "safe to delete" for Step 4.
+* *Monorepo has unique/newer content worth keeping* -> open an import PR (never push main):
+[source,sh]
+----
+cd /tmp/mono-<name>
+git remote add dest "https://github.com/hyperpolymath/<name>.git"
+git push dest HEAD:refs/heads/import/from-monorepo
+gh pr create --repo hyperpolymath/<name> --base main --head import/from-monorepo \
+  --title "Import unique work from the nextgen-databases monorepo copy" \
+  --body "Reconciles the stale monorepo duplicate before it is deleted from the coordination repo."
+----
+  Mark "delete after this PR merges".
+
+== Step 3 — fold modular-experiment into verisimdb
+The capability is being standardised (no longer an experiment). Bring it in via a feature
+branch + PR; do not create a separate repo.
+[source,sh]
+----
+rm -rf /tmp/mod && git clone --no-local /tmp/ngdb /tmp/mod
+( cd /tmp/mod && git filter-repo \
+    --path verisim-modular-experiment/ --path-rename verisim-modular-experiment/:modular-core/ )
+cd /tmp/mod
+git remote add dest https://github.com/hyperpolymath/verisimdb.git
+git push dest HEAD:refs/heads/feature/modular-core
+gh pr create --repo hyperpolymath/verisimdb --base main --head feature/modular-core \
+  --title "Standardise modular-core (from verisim-modular-experiment)" \
+  --body "Folds the proven modular-experiment in as a standard verisimdb feature."
+----
+
+== Step 4 — thin the coordination repo (one PR on nextgen-databases)
+Only after each destination above is confirmed (diff clean or PR merged).
+[source,sh]
+----
+cd /tmp/ngdb
+git checkout -b resite/thin-coordination
+git rm -r nqc verisim-core lithoglyph typeql-experimental verisim-modular-experiment quandledb verisimdb
+git submodule add https://github.com/hyperpolymath/verisimdb.git verisimdb
+git submodule add https://github.com/hyperpolymath/lithoglyph.git lithoglyph
+----
+Then edit, in this repo:
+
+* `REGISTRY.adoc` — set every row to its final state / link.
+* `0-AI-MANIFEST.a2ml` — empty the LEGACY directory list (nothing legacy remains).
+* `EXPLAINME.adoc`, `TOPOLOGY.md`, `README.adoc` — describe the thin structure (submodules +
+  registry links).
+* `.github/workflows/placement-guard.yml` — empty the `GRANDFATHER` regex so ANY database
+  path is now a hard error (not a warning).
+* `.claude/hooks/block-db-writes.sh` — keep the dest map (for helpful messages) but the
+  directories no longer exist, so any reintroduction is blocked outright.
+* `docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc` — set `Status: DONE`.
+
+[source,sh]
+----
+git add -A
+git commit -m "chore(resite): thin coordination repo to references; remove extracted databases"
+git push -u origin resite/thin-coordination
+gh pr create --base main --title "Resite: thin the coordination repo" \
+  --body "Removes extracted databases (now in their own repos), adds verisimdb + lithoglyph as submodules, and points REGISTRY.adoc at the canonical repos. Closes the resite."
+----
+
+== Verification (run before declaring done)
+* Each NEW repo: `git -C /tmp/<name> log --oneline -1` shows preserved history; the GitHub
+  repo has files at root and an `0-AI-MANIFEST.a2ml`.
+* Each EXISTING repo: the Step-2 diff is empty, or the import PR is merged.
+* Coordination repo after Step 4:
+  `git ls-tree HEAD verisimdb lithoglyph` shows `commit` (submodule) entries, not trees;
+  `git ls-files | grep -E '^(nqc|verisim-core|typeql-experimental|quandledb|verisim-modular-experiment)/'`
+  returns nothing; the placement-guard `GRANDFATHER` regex is empty;
+  `git clone --recurse-submodules` of the coordination repo still yields verisimdb + lithoglyph.
+
+== Final report (post this back)
+For every row in the mapping: action taken, destination URL, PR link (if any), and
+verification result. List anything skipped and why.
