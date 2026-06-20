@@ -1,0 +1,88 @@
+# SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# placement-guard.yml — Coordination-repo content placement guard.
+# nextgen-databases is a COORDINATION repo: per-database implementation content belongs
+# in each database's own repo (see REGISTRY.adoc), not here. This gate FAILS a PR/push
+# that ADDS files outside the allowed coordination paths.
+name: Placement Guard
+
+on:
+  pull_request:
+    branches: ['**']
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  placement:
+    name: Content placement check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine added files
+        id: diff
+        run: |
+          set -uo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch --no-tags origin "${{ github.base_ref }}" || true
+            BASE="origin/${{ github.base_ref }}"
+          else
+            BASE="${{ github.event.before }}"
+            case "$BASE" in
+              0000000000000000000000000000000000000000|"") BASE="$(git rev-parse HEAD~1 2>/dev/null || echo origin/main)" ;;
+            esac
+          fi
+          echo "Comparing against: $BASE"
+          git diff --name-only --diff-filter=A "$BASE...HEAD" > /tmp/added.txt 2>/dev/null \
+            || git diff --name-only --diff-filter=A "$BASE" HEAD > /tmp/added.txt
+          echo "Added files:"; cat /tmp/added.txt || true
+
+      - name: Check placement
+        run: |
+          set -uo pipefail
+
+          # Allowed coordination paths (regex, anchored at repo root).
+          ALLOW='^(README|EXPLAINME|TOPOLOGY|ROADMAP|TOOLING-STATUS|REGISTRY|CONTRIBUTING|CODE_OF_CONDUCT|SECURITY|MAINTAINERS|NOTICE|LICENSE|PROOF-NEEDS|TEST-NEEDS|QUICKSTART-[A-Z]+|0-AI-MANIFEST|CLAUDE|AGENTS|llm-warmup-[a-z]+)\.[A-Za-z0-9]+$'
+          ALLOW="$ALLOW"'|^(docs|tests|scripts|\.github|\.claude|\.machine_readable|\.bot_directives|\.well-known|\.hypatia|LICENSES|contractiles)/'
+          ALLOW="$ALLOW"'|^(flake\.nix|guix\.scm|Justfile|contractile\.just|stapeln\.toml|opsm\.toml|setup\.sh|\.gitignore|\.gitattributes|\.editorconfig|\.gitlab-ci\.yml|\.nojekyll)$'
+
+          # Legacy per-database dirs (grandfathered: warn, do not fail — being extracted).
+          GRANDFATHER='^(verisimdb|lithoglyph|quandledb|nqc|typeql-experimental|verisim-core|verisim-modular-experiment)/'
+
+          FAIL=0
+          while IFS= read -r f; do
+            [ -z "$f" ] && continue
+            if echo "$f" | grep -Eq "$ALLOW"; then
+              continue
+            fi
+            if echo "$f" | grep -Eq "$GRANDFATHER"; then
+              echo "::warning file=${f}::Added inside a legacy database directory. This content should live in its own repo (see REGISTRY.adoc); these directories are being extracted."
+              continue
+            fi
+            echo "::error file=${f}::Misplaced content. nextgen-databases is a coordination repo — this belongs in a database/language repo. See REGISTRY.adoc."
+            FAIL=1
+          done < /tmp/added.txt
+
+          {
+            echo "## Placement Guard"
+            echo ""
+            if [ "$FAIL" -eq 0 ]; then
+              echo ":white_check_mark: No misplaced new content detected."
+            else
+              echo ":x: New files were added outside the allowed coordination paths."
+              echo ""
+              echo "\`nextgen-databases\` is a **coordination repo**. Per-database code, schemas,"
+              echo "docs, and query languages belong in their own repos — see \`REGISTRY.adoc\`."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit $FAIL

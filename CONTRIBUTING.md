@@ -16,34 +16,33 @@ just test    # Run test suite
 ```
 
 ### Repository Structure
+
+`nextgen-databases` is a **coordination repo** — it does not hold database
+implementations. Each database and query language has its own repo (see `REGISTRY.adoc`).
+
 ```
 nextgen-databases/
-├── src/                 # Source code (Perimeter 1-2)
-├── lib/                 # Library code (Perimeter 1-2)
-├── extensions/          # Extensions (Perimeter 2)
-├── plugins/             # Plugins (Perimeter 2)
-├── tools/               # Tooling (Perimeter 2)
-├── docs/                # Documentation (Perimeter 3)
-│   ├── architecture/    # ADRs, specs (Perimeter 2)
-│   └── proposals/       # RFCs (Perimeter 3)
-├── examples/            # Examples (Perimeter 3)
-├── spec/                # Spec tests (Perimeter 3)
-├── tests/               # Test suite (Perimeter 2-3)
-├── .well-known/         # Protocol files (Perimeter 1-3)
-├── .github/             # GitHub config (Perimeter 1)
-│   ├── ISSUE_TEMPLATE/
-│   └── workflows/
-├── CHANGELOG.md
-├── CODE_OF_CONDUCT.md
-├── CONTRIBUTING.md      # This file
-├── GOVERNANCE.md
-├── LICENSE
-├── MAINTAINERS.md
-├── README.adoc
-├── SECURITY.md
-├── flake.nix            # Nix flake (Perimeter 1)
-└── Justfile             # Task runner (Perimeter 1)
+├── README.adoc / EXPLAINME.adoc / TOPOLOGY.md / ROADMAP.adoc  # Portfolio docs
+├── REGISTRY.adoc        # Authoritative map: database/language -> its own repo
+├── CLAUDE.md / AGENTS.md / 0-AI-MANIFEST.a2ml                 # Agent guardrails
+├── docs/                # Coordination docs (incl. migration runbooks)
+├── tests/               # CROSS-database integration tests only
+├── .machine_readable/   # Canonical SCM metadata
+├── .github/             # CI/CD, issue templates, governance
+├── .well-known/ LICENSES/
+└── flake.nix / Justfile / stapeln.toml / opsm.toml           # Shared env & orchestration
 ```
+
+#### What belongs here vs. in a database repo
+
+- ✅ **Here**: portfolio docs, the registry, cross-database integration tests, shared
+  infrastructure/orchestration, governance and machine-readable metadata.
+- ❌ **Not here — use the database's own repo**: per-database source code, schemas,
+  migrations, storage engines, query-language implementations, per-database design docs,
+  whitepapers, benchmarks, and datasets. See `REGISTRY.adoc` for the destination repo.
+
+A CI guard (`.github/workflows/placement-guard.yml`) and a local pre-write hook
+(`.claude/hooks/block-db-writes.sh`) enforce this.
 
 ---
 

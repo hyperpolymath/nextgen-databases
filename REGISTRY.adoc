@@ -1,0 +1,67 @@
+// SPDX-License-Identifier: MPL-2.0
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Database & Query-Language Registry — where each thing lives
+:toc:
+
+This is the *authoritative map* of the Next-Gen Databases portfolio to the standalone
+repositories that own each database and each query language. `nextgen-databases` is a
+*coordination repo*: implementation content belongs in the repos below, *not* here.
+
+Registered in the estate clade registry: https://github.com/hyperpolymath/gv-clade-index
+(see `.machine_readable/CLADE.a2ml`).
+
+Resite: decisions finalised; execution per
+`docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc` (plan) and
+`docs/migration/RESITE-CODEX-HANDOFF.adoc` (step-by-step agent command sheet).
+
+== Databases
+
+[cols="1,2,1,2",options=header]
+|===
+| Database | Repository | Status | Query language (repo)
+| VeriSimDB (cross-modal consistency) | hyperpolymath/verisimdb | exists (canonical) | VCL — nested in verisimdb
+| Lithoglyph (narrative-first) | hyperpolymath/lithoglyph | to create | GNPL — hyperpolymath/gnpl
+| Glyphbase (Lithoglyph web UI) | hyperpolymath/glyphbase | to create | —
+| QuandleDB (knot-theory) | hyperpolymath/quandledb | exists (canonical) | KRL — hyperpolymath/krl
+|===
+
+== Query languages
+
+[cols="1,2,1,2",options=header]
+|===
+| Language | Repository | Status | Notes
+| VCL (Verified Consonance Language) | (in hyperpolymath/verisimdb) | exists | Production; stays nested in verisimdb
+| VCL-UT (usage-tracked extension) | hyperpolymath/vcl-ut | exists (canonical) | Maps to `typeql-experimental/`; reconcile + delete copy
+| GNPL / GQL (Glyph query language) | hyperpolymath/gnpl | to create | From `lithoglyph/gql-dt/` + `lithoglyph/core-factor/gql/`
+| KRL (Knot query language) | hyperpolymath/krl | exists (canonical) | No KRL content in this monorepo
+| NQC (Nested Query Calculus) | hyperpolymath/nqc | to create | Already standalone in `nqc/` (Gleam)
+|===
+
+== VeriSim satellites
+
+[cols="1,2",options=header]
+|===
+| Component | Disposition
+| `verisim-core/` (slim Julia identity-core) | → own repo *hyperpolymath/VerisimCore.jl* (Julia-package pattern); create + push
+| `verisim-modular-experiment/` | → *folded into hyperpolymath/verisimdb* as a standard feature (no longer an experiment)
+|===
+
+== Reference strategy (after extraction)
+
+Hybrid: `verisimdb` and `lithoglyph` are git submodules of this coordination repo; every other
+repo is referenced by link from this registry.
+
+== What belongs in *this* (coordination) repo
+
+* Portfolio docs: `README.adoc`, `TOPOLOGY.md`, `ROADMAP.adoc`, `EXPLAINME.adoc`
+* This registry (`REGISTRY.adoc`)
+* Cross-database integration tests (`tests/`)
+* Shared infra & environment (`flake.nix`, `guix.scm`, `Justfile`, `stapeln.toml`, `opsm.toml`)
+* Governance & metadata (`.github/`, `.machine_readable/`, `.well-known/`, `LICENSES/`,
+  `CONTRIBUTING.md`, `SECURITY.md`, `0-AI-MANIFEST.a2ml`)
+
+[NOTE]
+====
+The per-database directories currently in this repo are *legacy* and are being extracted
+— see `docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc`. Do not add new content to them.
+====
