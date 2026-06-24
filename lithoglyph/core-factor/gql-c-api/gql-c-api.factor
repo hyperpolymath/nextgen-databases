@@ -1,4 +1,4 @@
-! SPDX-License-Identifier: PMPL-1.0-or-later
+! SPDX-License-Identifier: MPL-2.0
 ! gql-c-api - C API for GQL Runtime
 !
 ! Exports C-callable functions for integration with Zig FFI

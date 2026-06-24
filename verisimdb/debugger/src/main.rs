@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! VeriSimDB Debugger - Interactive debugger for VeriSimDB queries and drift
 //!
 //! Status: Alpha development (v0.1.0)

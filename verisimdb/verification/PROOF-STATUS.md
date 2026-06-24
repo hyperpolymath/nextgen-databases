@@ -1,6 +1,6 @@
 # Proof Status — VeriSimDB
 
-<!-- SPDX-License-Identifier: PMPL-1.0-or-later -->
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 <!-- Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) -->
 
 Tracking status of formal verification proofs for the VeriSimDB cross-modality octad database.

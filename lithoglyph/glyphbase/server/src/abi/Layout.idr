@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 -- Lith ABI Memory Layout Verification
 --
 -- This module provides compile-time proofs of memory layout correctness,

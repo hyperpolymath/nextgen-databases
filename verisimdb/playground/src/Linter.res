@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // VCL client-side linter — mirrors the Rust linter rules (VCL001–VCL011).
 
 type severity = Hint | Warning | Error

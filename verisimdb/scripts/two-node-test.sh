@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 # VeriSimDB Phase 4.B: Two-node federation test.
 #
 # Starts two VeriSimDB instances (primary + replica), creates data on the

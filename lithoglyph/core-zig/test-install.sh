@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 # Lithoglyph Installation Test
 #
 # Verifies that the Zig bridge can be built and installed correctly.

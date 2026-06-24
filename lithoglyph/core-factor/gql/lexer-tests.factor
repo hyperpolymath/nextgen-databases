@@ -1,4 +1,4 @@
-! SPDX-License-Identifier: PMPL-1.0-or-later
+! SPDX-License-Identifier: MPL-2.0
 ! Form.Runtime - GQL Lexer Unit Tests
 !
 ! Dedicated tests for the GQL tokenizer and parser primitives:

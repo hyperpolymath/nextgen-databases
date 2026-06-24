@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! Lith-Geo: Geospatial extension for Lith
 //!
 //! Provides spatial indexing and queries while preserving Lith's

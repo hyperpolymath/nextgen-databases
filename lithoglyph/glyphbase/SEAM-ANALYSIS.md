@@ -1,5 +1,5 @@
 # Glyphbase Seam Analysis
-<!-- SPDX-License-Identifier: PMPL-1.0-or-later -->
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 
 **Analysis Date:** 2026-02-05T23:30:00Z
 **Overall Status:** 95% Complete - 10 seams require attention

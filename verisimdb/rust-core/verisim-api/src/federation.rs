@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! Federation Protocol for VeriSimDB
 //!
 //! Enables cross-instance querying with drift-aware consistency policies.

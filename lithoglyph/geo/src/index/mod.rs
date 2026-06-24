@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! Spatial indexing using R-tree
 //!
 //! This module provides spatial indexing for Lith documents.

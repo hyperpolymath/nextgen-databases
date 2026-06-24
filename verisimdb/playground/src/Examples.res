@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Example VCL queries for the playground.
 // Covers all 8 octad modalities, real backend queries, and VCL-UT proof types.
 

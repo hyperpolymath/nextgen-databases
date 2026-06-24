@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! ZKP Bridge — Privacy-aware proof generation and verification.
 //!
 //! Wraps the existing ZKP primitives (hash commitments, Merkle proofs,
