@@ -1,5 +1,5 @@
 #!/bin/sh
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 #
 # VeriSimDB Test Infrastructure — InfluxDB 2 Seed Script
 #

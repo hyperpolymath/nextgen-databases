@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 //! Write throughput, read latency, and VCL complexity benchmarks for VeriSimDB.
 //!

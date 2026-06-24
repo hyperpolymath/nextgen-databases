@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 --
 -- 06-temporal-range.vcl
 -- Temporal range: find entities modified in the last 30 days

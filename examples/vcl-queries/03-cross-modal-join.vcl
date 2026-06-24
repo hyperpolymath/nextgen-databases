@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 --
 -- 03-cross-modal-join.vcl
 -- Cross-modal join: graph edges + vector similarity combined

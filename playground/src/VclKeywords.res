@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // VCL keyword definitions shared across syntax highlighting, completion, and linting.
 // Updated for the octad architecture (8 modalities) and 11 proof types.
 

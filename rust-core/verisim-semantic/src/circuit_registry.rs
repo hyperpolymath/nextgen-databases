@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! Circuit Registry for VeriSimDB ZKP Custom Circuits
 //!
 //! In-memory registry mapping circuit names to compiled verification functions.

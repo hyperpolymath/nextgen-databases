@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // VCL Playground — main application entry point.
 // Wires up the editor, VCL-UT toggle, linter, formatter, and query executor.
 // Tries the real verisim-api backend first, falls back to demo mode.

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // VCL Subtyping — Subtype relation for the VCL type system
 //
 // Implements the 6 subtyping rules from the formal spec (Section 4):
