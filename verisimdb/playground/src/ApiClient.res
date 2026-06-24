@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // VCL Playground API client — connects to a real verisim-api backend.
 // Falls back gracefully to demo mode when the backend is unreachable.
 

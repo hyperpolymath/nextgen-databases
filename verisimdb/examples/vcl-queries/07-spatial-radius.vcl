@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 --
 -- 07-spatial-radius.vcl
 -- Spatial radius: find entities within 5km of central London

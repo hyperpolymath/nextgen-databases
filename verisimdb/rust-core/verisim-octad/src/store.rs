@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! In-memory OctadStore implementation
 //!
 //! Coordinates all eight modality stores (octad) for unified entity management.

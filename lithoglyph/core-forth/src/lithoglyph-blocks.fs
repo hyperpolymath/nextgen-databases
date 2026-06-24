@@ -1,4 +1,4 @@
-\ SPDX-License-Identifier: PMPL-1.0-or-later
+\ SPDX-License-Identifier: MPL-2.0
 \ Form.Blocks - Fixed-size block storage layer
 \
 \ This is the truth core of Lithoglyph. All data goes through here.

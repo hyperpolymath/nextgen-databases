@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 
 /**
  * ReScript Code Generator
@@ -59,7 +59,7 @@ let generateTypeDef = (typeDef: typeDef): string => {
 
 /** Generate types file */
 let generateTypesFile = (spec: apiSpec): generatedFile => {
-  let header = `// SPDX-License-Identifier: PMPL-1.0-or-later
+  let header = `// SPDX-License-Identifier: MPL-2.0
 
 /**
  * Lith Types
@@ -112,7 +112,7 @@ let ${endpoint.name} = async (client: t${paramStr}): ${returnType} => {
 
 /** Generate client file */
 let generateClientFile = (spec: apiSpec): generatedFile => {
-  let header = `// SPDX-License-Identifier: PMPL-1.0-or-later
+  let header = `// SPDX-License-Identifier: MPL-2.0
 
 /**
  * Lith Client

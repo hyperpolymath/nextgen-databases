@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! GraphQL API for VeriSimDB.
 //!
 //! Exposes planner, octad, search, drift, and normalizer operations

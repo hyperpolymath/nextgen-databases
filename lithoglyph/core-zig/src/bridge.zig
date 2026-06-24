@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Lith.Bridge - C ABI Layer
 //
 // Provides stable C-compatible API for runtimes to interact with Lithoglyph.

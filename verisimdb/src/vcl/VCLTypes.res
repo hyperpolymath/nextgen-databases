@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // VCL Types — Core type definitions for the bidirectional type checker
 //
 // Implements the type system from vcl-type-system.adoc:

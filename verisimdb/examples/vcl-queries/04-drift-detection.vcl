@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 --
 -- 04-drift-detection.vcl
 -- Drift detection: find all entities with cross-modal drift above 0.3

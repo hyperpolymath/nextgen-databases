@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! Circuit Compiler for VeriSimDB
 //!
 //! Compiles circuit definitions from the VCL DSL into R1CS constraint systems

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! Atomicity tests for VeriSimDB octad operations.
 //!
 //! Verifies that cross-modal write operations are atomic: either all modality

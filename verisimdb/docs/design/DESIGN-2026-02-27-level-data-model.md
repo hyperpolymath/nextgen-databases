@@ -1,5 +1,5 @@
 # Design Document: IDApTIK Level Architect — Canonical Level Data Model
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: CC-BY-SA-4.0
 
 **Date:** 2026-02-27
 **Author:** Jonathan D.A. Jewell (hyperpolymath)

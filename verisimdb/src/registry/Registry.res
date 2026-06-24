@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // ReScript Federation Registry
 // The "tiny core" (<5k LOC) for universal federated knowledge
 

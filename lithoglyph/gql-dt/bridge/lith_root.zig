@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0
+// SPDX-License-Identifier: MPL-2.0
 // SPDX-FileCopyrightText: 2025 hyperpolymath
 //
 // lith_root.zig - Root module for Lith FFI bridge

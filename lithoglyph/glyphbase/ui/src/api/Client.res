@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // API client for Glyphbase server
 
 let baseUrl = "http://localhost:8080/api"

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Lithoglyph BEAM NIF - Rust/Rustler implementation
 //
 // This NIF connects BEAM (Erlang/Gleam/Elixir) to Lithoglyph via the Lithoglyph C ABI.
