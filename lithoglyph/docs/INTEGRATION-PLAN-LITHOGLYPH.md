@@ -1,6 +1,6 @@
 # Lithoglyph Integration Plan — Pipeline Role
 #
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: CC-BY-SA-4.0
 # Author: Jonathan D.A. Jewell
 # Created: 2026-03-13
 #

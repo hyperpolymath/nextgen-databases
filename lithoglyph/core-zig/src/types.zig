@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Lith.Bridge - Type Definitions
 //
 // Part of Lithoglyph: Stone-carved data for the ages.

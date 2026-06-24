@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! Oxigraph-backed graph store.
 //!
 //! This module is only compiled when the `oxigraph-backend` feature is enabled.

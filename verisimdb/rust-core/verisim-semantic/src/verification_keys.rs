@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! Verification Key Management for VeriSimDB Custom Circuits
 //!
 //! Stores verification keys per circuit with support for key rotation

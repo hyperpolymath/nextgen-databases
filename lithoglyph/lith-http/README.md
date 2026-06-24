@@ -2,7 +2,7 @@
 
 **Production-ready HTTP API for Lithoglyph with Rust NIF integration**
 
-![License](https://img.shields.io/badge/License-PMPL--1.0-blue.svg)
+![License](https://img.shields.io/badge/License-MPL--2.0-blue.svg)
 ![Build](https://img.shields.io/badge/build-passing-green.svg)
 ![Status](https://img.shields.io/badge/status-production--ready-green.svg)
 
@@ -169,7 +169,7 @@ mix precommit
 
 ## License
 
-SPDX-License-Identifier: PMPL-1.0-or-later
+SPDX-License-Identifier: CC-BY-SA-4.0
 
 See `LICENSE` for details.
 

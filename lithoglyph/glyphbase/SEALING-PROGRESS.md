@@ -1,5 +1,5 @@
 # Sealing Progress Report
-<!-- SPDX-License-Identifier: PMPL-1.0-or-later -->
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 
 **Session Date:** 2026-02-05T23:30:00Z - 2026-02-06T00:30:00Z
 **Status:** 70% Complete - 6 errors remaining

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // VCL syntax highlighting for the playground editor.
 // Produces HTML spans with CSS classes for keyword colouring.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 # Post-commit hook: auto-ingest the latest commit into .verisimdb/
 #
 # Install: cp scripts/post-commit-hook.sh .git/hooks/post-commit

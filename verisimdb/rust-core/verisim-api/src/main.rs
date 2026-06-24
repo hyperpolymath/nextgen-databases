@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! VeriSimDB API server binary
 //!
 //! Starts the HTTP API server for VeriSimDB.

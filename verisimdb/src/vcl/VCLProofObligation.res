@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // VCL Proof Obligation — Generates typed proof obligations from queries
 //
 // For each PROOF spec in a dependent-type query, generates a structured

@@ -1,7 +1,7 @@
 # GQLdt: Dependently-Typed Lithoglyph Query Language
 
-image:https://img.shields.io/badge/License-PMPL--1.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
-// SPDX-License-Identifier: PMPL-1.0-or-later
+image:https://img.shields.io/badge/License-MPL--2.0-blue.svg[License: PMPL-1.0,link="https://github.com/hyperpolymath/palimpsest-license"]
+// SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2025 hyperpolymath
 
 GQLdt extends [Lithoglyph](https://github.com/hyperpolymath/lithoglyph)'s query language with **dependent types**, enabling compile-time verification of database constraints, provenance tracking, and reversibility proofs.

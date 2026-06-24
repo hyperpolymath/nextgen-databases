@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Lithoglyph API Server - WebSocket Handler
 //
 // WebSocket support for GraphQL subscriptions and real-time journal streaming

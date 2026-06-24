@@ -1,4 +1,4 @@
-% SPDX-License-Identifier: PMPL-1.0-or-later
+% SPDX-License-Identifier: MPL-2.0
 % Security Lessons - Logtalk Rules for VeriSimDB Security Fixes
 % Intended for incorporation into reposystem and gitbot-fleet repos
 

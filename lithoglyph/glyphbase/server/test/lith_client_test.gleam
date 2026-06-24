@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Lithoglyph Client Integration Test - M10 PoC
 
 import lithoglyph/client

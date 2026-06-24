@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // HTTP Load Testing with k6
 // Run: k6 run bench/http_load_test.js
 

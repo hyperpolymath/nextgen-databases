@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0
+-- SPDX-License-Identifier: MPL-2.0
 -- SPDX-FileCopyrightText: 2025 hyperpolymath
 --
 -- GqlDt.Prompt.PromptDimension - PROMPT score dimension [0, 100]

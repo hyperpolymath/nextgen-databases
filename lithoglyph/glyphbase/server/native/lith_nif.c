@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // SPDX-FileCopyrightText: 2025 Jonathan D.A. Jewell (@hyperpolymath)
 //
 // lith_nif.c - Erlang NIF wrapper for Lith Zig FFI
