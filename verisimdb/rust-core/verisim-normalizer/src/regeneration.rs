@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! Regeneration Strategies for the VeriSim Normalizer
 //!
 //! Implements authority-ranked cross-modal regeneration. When drift is detected

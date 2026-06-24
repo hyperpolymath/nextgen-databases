@@ -1,4 +1,4 @@
-||| SPDX-License-Identifier: PMPL-1.0-or-later
+||| SPDX-License-Identifier: MPL-2.0
 ||| VeriSimDB Memory Layout Proofs
 |||
 ||| Formal proofs about memory layout, alignment, and padding for

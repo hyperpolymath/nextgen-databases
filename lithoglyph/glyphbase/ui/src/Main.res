@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Main entry point with formally verified DOM mounting
 
 // Use SafeDOM for high-assurance mount operations

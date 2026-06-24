@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: MPL-2.0 -->
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # CLAUDE.md — nextgen-databases (COORDINATION REPO)
 
 ## CRITICAL: This is a coordination repo. No database implementation lives here. (Read First)

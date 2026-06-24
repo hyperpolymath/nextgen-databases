@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 --
 -- 05-provenance-chain.vcl
 -- Provenance chain: trace the full origin and transformation history

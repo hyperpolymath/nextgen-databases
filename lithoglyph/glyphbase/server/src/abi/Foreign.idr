@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 -- Lithoglyph ABI Foreign Function Interface Declarations
 --
 -- This module declares the C-compatible FFI functions that will be

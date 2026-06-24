@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! HNSW (Hierarchical Navigable Small World) vector index
 //!
 //! Pure Rust implementation with proper lifetime management.

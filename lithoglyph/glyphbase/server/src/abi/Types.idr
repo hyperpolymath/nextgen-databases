@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 -- Lith ABI Type Definitions with Dependent Type Proofs
 --
 -- This module defines the ABI types for the Lith/Lithoglyph database

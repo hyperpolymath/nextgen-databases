@@ -1,4 +1,4 @@
-||| SPDX-License-Identifier: PMPL-1.0-or-later
+||| SPDX-License-Identifier: MPL-2.0
 ||| VeriSimDB ABI Type Definitions
 |||
 ||| Formal type definitions for the VeriSimDB cross-modal entity engine.

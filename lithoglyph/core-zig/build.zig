@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Form.Bridge - Build Configuration (Zig 0.15.2+)
 
 const std = @import("std");

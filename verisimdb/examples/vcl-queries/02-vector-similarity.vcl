@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 --
 -- 02-vector-similarity.vcl
 -- Vector similarity: find entities with embeddings close to entity-001

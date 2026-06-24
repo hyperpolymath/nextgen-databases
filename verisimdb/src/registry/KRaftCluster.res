@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // KRaft Cluster Manager
 // Drives the Raft consensus lifecycle: elections, heartbeats, client requests,
 // and applies committed commands to the Registry state machine.

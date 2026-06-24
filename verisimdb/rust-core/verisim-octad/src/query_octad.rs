@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 //! QueryOctad Builder — Creates a octad from a VCL query.
 //!
 //! Homoiconicity: queries are data. A VCL query stored as a octad has:

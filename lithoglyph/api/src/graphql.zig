@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: PMPL-1.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 // Lithoglyph API Server - GraphQL Handler
 //
 // GraphQL endpoint for Lithoglyph operations

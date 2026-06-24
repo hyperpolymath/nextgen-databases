@@ -1,5 +1,5 @@
 /-
-SPDX-License-Identifier: PMPL-1.0-or-later
+SPDX-License-Identifier: MPL-2.0
 Form.Normalizer - FFI Bridge to Zig Core
 
 Lean 4 foreign function interface bindings to the Form.Bridge

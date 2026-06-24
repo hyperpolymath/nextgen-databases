@@ -1,5 +1,5 @@
 #!/usr/bin/env escript
-%% SPDX-License-Identifier: PMPL-1.0-or-later
+%% SPDX-License-Identifier: MPL-2.0
 %% Test Lith Rust NIF from FormBase
 
 main(_) ->

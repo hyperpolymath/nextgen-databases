@@ -1,5 +1,5 @@
 K9!
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 #
 # deploy.k9.ncl — k9-svc deployment component for VeriSimDB test infrastructure
 #

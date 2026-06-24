@@ -1,6 +1,6 @@
 # Production Build Analysis
 
-<!-- SPDX-License-Identifier: PMPL-1.0-or-later -->
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 
 **Build Date:** 2026-02-06 **Vite Version:** 6.4.1 **Build Time:** 2.02 seconds
 

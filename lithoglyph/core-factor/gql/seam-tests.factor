@@ -1,4 +1,4 @@
-! SPDX-License-Identifier: PMPL-1.0-or-later
+! SPDX-License-Identifier: MPL-2.0
 ! Form.Runtime - Seam Tests
 !
 ! End-to-end tests validating the pipeline:
