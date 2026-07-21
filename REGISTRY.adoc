@@ -20,7 +20,7 @@ Resite: decisions finalised; execution per
 |===
 | Database | Repository | Status | Query language (repo)
 | VeriSimDB (cross-modal consistency) | hyperpolymath/verisimdb | exists (canonical) | VCL — nested in verisimdb
-| Lithoglyph (narrative-first) | hyperpolymath/lithoglyph | to create | GNPL — hyperpolymath/gnpl
+| Lithoglyph (narrative-first) | hyperpolymath/lithoglyph | to create | GNPL (narration/projection, over GQLdt) — hyperpolymath/gnpl (exists)
 | Glyphbase (Lithoglyph web UI) | hyperpolymath/glyphbase | to create | —
 | QuandleDB (knot-theory) | hyperpolymath/quandledb | exists (canonical) | KRL — hyperpolymath/krl
 |===
@@ -32,10 +32,36 @@ Resite: decisions finalised; execution per
 | Language | Repository | Status | Notes
 | VCL (Verified Consonance Language) | (in hyperpolymath/verisimdb) | exists | Production; stays nested in verisimdb
 | VCL-UT (usage-tracked extension) | hyperpolymath/vcl-ut | exists (canonical) | Maps to `typeql-experimental/`; reconcile + delete copy
-| GNPL / GQL (Glyph query language) | hyperpolymath/gnpl | to create | From `lithoglyph/gql-dt/` + `lithoglyph/core-factor/gql/`
+| GQLdt (dependently-typed Glyph query language) | (in hyperpolymath/gnpl) | exists (canonical) | Extracted from `lithoglyph/gql-dt/`; `lake build` green. Stays nested in `gnpl` as GNPL's lowering target
+| GNPL (narration/projection language) | hyperpolymath/gnpl | exists (canonical) | *Not* a query language — see note below
 | KRL (Knot query language) | hyperpolymath/krl | exists (canonical) | No KRL content in this monorepo
 | NQC (Nested Query Calculus) | hyperpolymath/nqc | to create | Already standalone in `nqc/` (Gleam)
 |===
+
+[NOTE]
+====
+*GNPL was re-scoped, 2026-07-21.* This registry previously recorded it as
+"GNPL / GQL (Glyph query language)" — i.e. a rename of GQL/GQL-dt, sourced from
+`lithoglyph/gql-dt/` *plus* `lithoglyph/core-factor/gql/`. That reading is superseded.
+
+GNPL is a *narration/projection* language: it answers "what account does this evidence
+support, told from whose stance, with what warrant", not "what is true in the store".
+It is being built as a layer *on top of* GQLdt in the `gnpl` repo and lowers to it:
+
+  GNPL --lowers to--> GQLdt --FFI--> Lithoglyph
+
+Consequences for this registry:
+
+* `lithoglyph/gql-dt/` was extracted to `gnpl` and is no longer canonical here.
+* `lithoglyph/core-factor/gql/` (5 Factor files) was *never* migrated and will not be.
+  It was the runtime/dynamic counterpart to GQLdt's compile-time proofs, and a typed
+  narration layer lowering to GQLdt supersedes it. It stays here as legacy.
+* `docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc` is amended accordingly; see
+  `lithoglyph/MOVED.md`.
+
+Rationale: https://github.com/hyperpolymath/gnpl/blob/main/docs/THEORY.adoc (the general
+case) and `docs/LITHOGLYPH.adoc` (what it gives Lithoglyph specifically).
+====
 
 == VeriSim satellites
 
