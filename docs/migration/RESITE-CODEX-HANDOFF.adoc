@@ -36,7 +36,8 @@ If any check fails, STOP and report exactly which access is missing. Do not work
 | `nqc/` | hyperpolymath/nqc | create | extract as-is
 | `verisim-core/` | hyperpolymath/VerisimCore.jl | create | extract (Julia package)
 | `lithoglyph/glyphbase/` | hyperpolymath/glyphbase | create | un-nest
-| `lithoglyph/gql-dt/` + `lithoglyph/core-factor/gql/` | hyperpolymath/gnpl | create | un-nest (2 paths)
+| `lithoglyph/gql-dt/` | hyperpolymath/gnpl | *exists, populated* | *DONE — do not re-run*
+| `lithoglyph/core-factor/gql/` | — | n/a | *superseded — do NOT migrate*
 | `lithoglyph/` (minus the two above) | hyperpolymath/lithoglyph | create | slimmed parent
 | `typeql-experimental/` | hyperpolymath/vcl-ut | exists | reconcile -> delete copy
 | `quandledb/` (stub) | hyperpolymath/quandledb | exists | reconcile -> delete copy
@@ -53,7 +54,8 @@ gh auth status
 git clone https://github.com/hyperpolymath/nextgen-databases /tmp/ngdb
 cd /tmp/ngdb && git rev-parse HEAD          # record baseline SHA in your final report
 # sanity-check the un-nest subpaths exist before extracting:
-ls -d lithoglyph/glyphbase lithoglyph/gql-dt lithoglyph/core-factor/gql
+ls -d lithoglyph/glyphbase          # gql-dt/ is already extracted (step 1d is DONE);
+                                    # core-factor/gql/ is superseded and stays put
 ----
 
 == Step 1 — create + populate NEW repos (no risk to existing)
@@ -93,15 +95,30 @@ extract lithoglyph/glyphbase/ glyphbase
 publish /tmp/glyphbase hyperpolymath/glyphbase "Glyphbase — Lithoglyph web UI / data layer"
 ----
 
-=== 1d. gnpl (un-nest, two source paths)
+=== 1d. gnpl — *DONE, DO NOT RUN*
+
+[WARNING]
+====
+`hyperpolymath/gnpl` *already exists and is populated* — `lithoglyph/gql-dt/` landed as
+squash-import `102c79e` (PR #4). Running the commands below would push over live content.
+They are retained only as a record of what was executed.
+
+Two amendments to what was originally planned:
+
+. Only `gql-dt/` moved. `core-factor/gql/` is *superseded, not migrated* — GNPL is a
+  narration/projection language layered over GQLdt, which supersedes the Factor runtime
+  counterpart. The Factor sources stay in the monorepo as legacy.
+. The extract was a *squash*, so granular history for this path lives only in the
+  `_split_gnpl` branch. Do not prune it.
+====
+
 [source,sh]
 ----
-rm -rf /tmp/gnpl && git clone --no-local /tmp/ngdb /tmp/gnpl
-( cd /tmp/gnpl && git filter-repo \
-    --path lithoglyph/gql-dt/ --path lithoglyph/core-factor/gql/ \
-    --path-rename lithoglyph/gql-dt/:gql-dt/ \
-    --path-rename lithoglyph/core-factor/gql/:core-factor-gql/ )
-publish /tmp/gnpl hyperpolymath/gnpl "GNPL — Glyph query language (dependently-typed)"
+# HISTORICAL — already executed. Do not re-run.
+# rm -rf /tmp/gnpl && git clone --no-local /tmp/ngdb /tmp/gnpl
+# ( cd /tmp/gnpl && git filter-repo \
+#     --path lithoglyph/gql-dt/ --path-rename lithoglyph/gql-dt/:gql-dt/ )
+# publish /tmp/gnpl hyperpolymath/gnpl "GNPL — Lithoglyph's narration/projection language"
 ----
 
 === 1e. lithoglyph (slimmed: drop the un-nested subdirs; two filter-repo passes)
@@ -110,7 +127,9 @@ publish /tmp/gnpl hyperpolymath/gnpl "GNPL — Glyph query language (dependently
 rm -rf /tmp/lithoglyph && git clone --no-local /tmp/ngdb /tmp/lithoglyph
 ( cd /tmp/lithoglyph \
     && git filter-repo --path lithoglyph/ --path-rename lithoglyph/: \
-    && git filter-repo --invert-paths --path glyphbase/ --path gql-dt/ --path core-factor/gql/ )
+    && git filter-repo --invert-paths --path glyphbase/ --path gql-dt/ )
+# NOTE: core-factor/gql/ is deliberately NOT dropped — it was superseded rather than
+# extracted, so it belongs to the slimmed lithoglyph parent as legacy.
 publish /tmp/lithoglyph hyperpolymath/lithoglyph "Lithoglyph — narrative-first, reversible, audit-grade database"
 ----
 

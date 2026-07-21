@@ -23,7 +23,8 @@ Authoritative table: `REGISTRY.adoc`. Summary:
 | `nqc/` | hyperpolymath/nqc | create | extract as-is (already standalone)
 | `verisim-core/` | hyperpolymath/VerisimCore.jl | create | extract (Julia package)
 | `lithoglyph/glyphbase/` | hyperpolymath/glyphbase | create | un-nest
-| `lithoglyph/gql-dt/` (+ `core-factor/gql/`) | hyperpolymath/gnpl | create | un-nest (two paths)
+| `lithoglyph/gql-dt/` | hyperpolymath/gnpl | *done* | un-nest — landed as `102c79e` (PR #4)
+| `lithoglyph/core-factor/gql/` | — | n/a | *superseded, stays here as legacy* (see note)
 | `lithoglyph/` (minus the two above) | hyperpolymath/lithoglyph | create | extract slimmed parent
 | `typeql-experimental/` | hyperpolymath/vcl-ut | yes | reconcile -> delete copy
 | `quandledb/` (stub) | hyperpolymath/quandledb | yes | reconcile -> delete copy
@@ -37,7 +38,14 @@ Authoritative table: `REGISTRY.adoc`. Summary:
 . `verisim-core` -> own repo `VerisimCore.jl` (Julia-package pattern).
 . `verisim-modular-experiment` -> folded into `verisimdb` as a standard feature (no longer
   an experiment).
-. `gnpl` -> un-nest GQL/GQL-DT now into its own repo.
+. `gnpl` -> un-nest GQL/GQL-DT now into its own repo. *DONE* (`102c79e`, PR #4).
+. *`gnpl` re-scoped, 2026-07-21.* This plan originally treated GNPL as a rename of the
+  "Glyph query language", sourced from two paths. Superseded: GNPL is a
+  *narration/projection* language ("what account does this evidence support") built as a
+  layer on top of GQLdt, which it lowers to. Consequently `core-factor/gql/` — the
+  runtime/dynamic counterpart to GQLdt's compile-time proofs — is *superseded rather than
+  migrated* and stays here as legacy. Only `gql-dt/` moved. See
+  `lithoglyph/MOVED.md`, `REGISTRY.adoc`, and `docs/THEORY.adoc` in the `gnpl` repo.
 . New repos: public (org convention). Existing repos (`verisimdb`, `quandledb`, `vcl-ut`,
   `krl`) are populated/canonical -> reconcile, never overwrite.
 . Thinned repo references: hybrid -- submodules for `verisimdb` + `lithoglyph`, registry
@@ -67,8 +75,9 @@ Two patterns:
   branch + PR only if there is unique work. *Never* force-push `main`. Delete the copy here
   only after the canonical is confirmed to hold the content.
 
-Un-nest order for Lithoglyph: extract `glyphbase` and `gnpl` (from `gql-dt/` +
-`core-factor/gql/`) first, then the slimmed `lithoglyph/`.
+Un-nest order for Lithoglyph: extract `glyphbase` and `gnpl` (from `gql-dt/` only —
+`core-factor/gql/` is superseded, see Decisions) first, then the slimmed `lithoglyph/`.
+`gnpl` is done; `glyphbase` remains.
 
 == Blockers
 . *GitHub scope*: the executing session must have access to the destination repos
