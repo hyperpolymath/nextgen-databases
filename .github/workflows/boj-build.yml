@@ -18,7 +18,21 @@ permissions:
 jobs:
   trigger-boj:
     runs-on: ubuntu-latest
-    if: ${{ vars.BOJ_SERVER_URL != '' || secrets.BOJ_SERVER_URL != '' }}
+    # No job-level `if:` here. It previously read
+    #
+    #     if: ${{ vars.BOJ_SERVER_URL != '' || secrets.BOJ_SERVER_URL != '' }}
+    #
+    # and `secrets` is not available in a job-level conditional — GitHub exposes
+    # that context only in `env:`, `with:` and step-level expressions. The file
+    # is valid YAML, so nothing local caught it, but Actions rejected the whole
+    # workflow at load time: every run failed in 0s, named after the file path
+    # rather than "BoJ Server Build Trigger", with no jobs and no check run.
+    # That is the startup_failure signature.
+    #
+    # Guarding here was redundant anyway: the step below already exits 0 when
+    # BOJ_URL is empty, and `vars`/`secrets` are resolved there legally. This
+    # workflow is documented as a no-op when BOJ_SERVER_URL is unset, and now
+    # it actually is one instead of failing the run.
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
