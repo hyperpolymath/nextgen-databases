@@ -74,8 +74,19 @@ case) and `docs/LITHOGLYPH.adoc` (what it gives Lithoglyph specifically).
 
 == Reference strategy (after extraction)
 
-Hybrid: `verisimdb` and `lithoglyph` are git submodules of this coordination repo; every other
-repo is referenced by link from this registry.
+Every repo is referenced by link from this registry. There are no git submodules.
+
+This previously read "`verisimdb` and `lithoglyph` are git submodules of this
+coordination repo". That was never true of either: `git ls-files --stage` showed both as
+ordinary tracked files, not gitlinks, and no `.gitmodules` has ever existed here.
+Corrected in favour of what the repo does rather than adding submodule machinery to
+make a stale sentence true — a submodule would have to be fetched with
+`submodules: recursive` in every workflow that touches the tree, which is real cost for
+a coordination repo that only needs to *point* at its members.
+
+`lithoglyph/` now holds a pointer README only; its 819 files were removed once the
+extraction completed (2026-07-27). `verisimdb/` is still 714 tracked files awaiting the
+same treatment.
 
 == What belongs in *this* (coordination) repo
 

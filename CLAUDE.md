@@ -40,7 +40,12 @@ See **`REGISTRY.adoc`** for the authoritative map. Examples: VeriSimDB →
 
 ### Transitional note
 
-The directories `verisimdb/`, `lithoglyph/`, `quandledb/`, `nqc/`,
+`lithoglyph/` is **done**: extraction completed 2026-07-27 and its 819 files were
+removed, leaving a pointer README. Everything it held is preserved at its original
+path in the `split-history/lithoglyph` tag on `origin` — never prune that tag or the
+`_split_lithoglyph` branch.
+
+The directories `verisimdb/`, `quandledb/`, `nqc/`,
 `typeql-experimental/`, `verisim-core/`, and `verisim-modular-experiment/` are **legacy
 content being extracted** to their own repos — see
 `docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc`. **Do not grow them.** A CI guard
