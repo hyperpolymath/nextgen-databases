@@ -38,10 +38,15 @@ jobs:
 
       - name: Validate A2ML manifests
         if: steps.detect.outputs.count > 0
-        uses: hyperpolymath/a2ml-validate-action@59145c7d1039fa3059b3ecacdb50ee23d7505898 # main
-        with:
-          path: '.'
-          strict: 'false'
+        # In-repo validator. hyperpolymath/a2ml-validate-action does not exist —
+        # `gh api repos/...` returns 404 and the job failed at "Set up job" with
+        # "Unable to resolve action ..., repository not found", so it never ran.
+        # .githooks/validate-a2ml.sh is the canonical RSR implementation (identical
+        # to the copy in rsr-template-repo) and takes the same INPUT_* interface.
+        env:
+          INPUT_PATH: '.'
+          INPUT_STRICT: 'false'
+        run: bash .githooks/validate-a2ml.sh
 
       - name: Write summary
         run: |
@@ -86,10 +91,11 @@ jobs:
 
       - name: Validate K9 contracts
         if: steps.detect.outputs.k9_count > 0
-        uses: hyperpolymath/k9-validate-action@2d96f43c538964b097d159ed3a56ba5b5ceca227 # main
-        with:
-          path: '.'
-          strict: 'false'
+        # In-repo validator — hyperpolymath/k9-validate-action is 404 as well.
+        env:
+          INPUT_PATH: '.'
+          INPUT_STRICT: 'false'
+        run: bash .githooks/validate-k9.sh
 
       - name: Write summary
         run: |
