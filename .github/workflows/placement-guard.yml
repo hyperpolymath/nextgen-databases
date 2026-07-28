@@ -52,7 +52,19 @@ jobs:
 
           # Allowed coordination paths (regex, anchored at repo root).
           ALLOW='^(README|EXPLAINME|TOPOLOGY|ROADMAP|TOOLING-STATUS|REGISTRY|CONTRIBUTING|CODE_OF_CONDUCT|SECURITY|MAINTAINERS|NOTICE|LICENSE|PROOF-NEEDS|TEST-NEEDS|QUICKSTART-[A-Z]+|0-AI-MANIFEST|CLAUDE|AGENTS|llm-warmup-[a-z]+)\.[A-Za-z0-9]+$'
-          ALLOW="$ALLOW"'|^(docs|tests|scripts|\.github|\.claude|\.machine_readable|\.bot_directives|\.well-known|\.hypatia|LICENSES|contractiles)/'
+          # `.githooks` added 2026-07-27. It is repo infrastructure, not database
+          # content — git resolves core.hooksPath relative to the worktree root,
+          # so it must live there, exactly like .github/ and .claude/ which were
+          # already allowed.
+          #
+          # This became load-bearing when #59 landed .githooks/validate-a2ml.sh and
+          # validate-k9.sh: those files are tracked on main today, so the next PR
+          # touching either one is flagged "Misplaced content" and fails the guard.
+          #
+          # rsr-template-repo's own root-allow.txt records the identical omission for
+          # the identical directory — it "failed check-root-shape.sh on this repo
+          # itself and on every repo instantiated from it". An oversight, not a policy.
+          ALLOW="$ALLOW"'|^(docs|tests|scripts|\.github|\.githooks|\.claude|\.machine_readable|\.bot_directives|\.well-known|\.hypatia|LICENSES|contractiles)/'
           ALLOW="$ALLOW"'|^(flake\.nix|guix\.scm|Justfile|contractile\.just|stapeln\.toml|opsm\.toml|setup\.sh|\.gitignore|\.gitattributes|\.editorconfig|\.gitlab-ci\.yml|\.nojekyll)$'
 
           # Legacy per-database dirs (grandfathered: warn, do not fail — being extracted).
