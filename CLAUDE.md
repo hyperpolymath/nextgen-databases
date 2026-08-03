@@ -40,12 +40,18 @@ See **`REGISTRY.adoc`** for the authoritative map. Examples: VeriSimDB →
 
 ### Transitional note
 
-`lithoglyph/` is **done**: extraction completed 2026-07-27 and its 819 files were
-removed, leaving a pointer README. Everything it held is preserved at its original
-path in the `split-history/lithoglyph` tag on `origin` — never prune that tag or the
-`_split_lithoglyph` branch.
+`lithoglyph/` and `verisimdb/` are **done**: extractions completed 2026-07-27 and
+2026-08-03, their 819 and 713 files removed, each leaving a pointer README.
+Everything they held is preserved at its original path in the
+`split-history/{lithoglyph,verisimdb}` tags on `origin` — never prune those tags or
+the `_split_*` branches.
 
-The directories `verisimdb/`, `quandledb/`, `nqc/`,
+verisimdb was a FORK, not a duplicate (108 files unique here, 331 substantive
+diffs), so seven files with no upstream counterpart were ported first —
+hyperpolymath/verisimdb#219. Do not assume the next extraction is a clean subset;
+check before deleting.
+
+The directories `quandledb/`, `nqc/`,
 `typeql-experimental/`, `verisim-core/`, and `verisim-modular-experiment/` are **legacy
 content being extracted** to their own repos — see
 `docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc`. **Do not grow them.** A CI guard

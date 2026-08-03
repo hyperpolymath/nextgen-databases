@@ -69,14 +69,15 @@ jobs:
 
           # Legacy per-database dirs (grandfathered: warn, do not fail — being extracted).
           #
-          # `lithoglyph` was removed from this list on 2026-07-27. Its extraction is
-          # complete (hyperpolymath/lithoglyph#4) and its 819 files are gone from this
-          # repo, so a new file under lithoglyph/ is no longer "legacy content not yet
-          # moved" — it is fresh duplication of a repo that already exists. Warning
-          # would let exactly the defect the extraction fixed grow back. It now fails.
+          # `lithoglyph` was removed from this list on 2026-07-27, `verisimdb` on
+          # 2026-08-03. Both extractions are complete and their files are gone from
+          # this repo, so a new file under either is no longer "legacy content not
+          # yet moved" — it is fresh duplication of a repo that already exists.
+          # Warning would let exactly the defect each extraction fixed grow back.
+          # Both now fail.
           #
           # Move a directory out of this list as each extraction completes.
-          GRANDFATHER='^(verisimdb|quandledb|nqc|typeql-experimental|verisim-core|verisim-modular-experiment)/'
+          GRANDFATHER='^(quandledb|nqc|typeql-experimental|verisim-core|verisim-modular-experiment)/'
 
           FAIL=0
           while IFS= read -r f; do
