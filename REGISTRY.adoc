@@ -20,8 +20,8 @@ Resite: decisions finalised; execution per
 |===
 | Database | Repository | Status | Query language (repo)
 | VeriSimDB (cross-modal consistency) | hyperpolymath/verisimdb | exists (canonical) | VCL — nested in verisimdb
-| Lithoglyph (narrative-first) | hyperpolymath/lithoglyph | to create | GNPL (narration/projection, over GQLdt) — hyperpolymath/gnpl (exists)
-| Glyphbase (Lithoglyph web UI) | hyperpolymath/glyphbase | to create | —
+| Lithoglyph (narrative-first) | hyperpolymath/lithoglyph | exists (canonical) | GNPL (narration/projection, over GQLdt) — hyperpolymath/gnpl (exists)
+| Glyphbase (Airtable-mode delivery) | hyperpolymath/glyphbase | exists (canonical) | —
 | QuandleDB (knot-theory) | hyperpolymath/quandledb | exists (canonical) | KRL — hyperpolymath/krl
 |===
 
@@ -84,9 +84,8 @@ make a stale sentence true — a submodule would have to be fetched with
 `submodules: recursive` in every workflow that touches the tree, which is real cost for
 a coordination repo that only needs to *point* at its members.
 
-`lithoglyph/` now holds a pointer README only; its 819 files were removed once the
-extraction completed (2026-07-27). `verisimdb/` is still 714 tracked files awaiting the
-same treatment.
+`lithoglyph/` and `verisimdb/` now hold pointer READMEs only; their 819 and 713 files
+were removed once each extraction completed (2026-07-27 and 2026-08-03).
 
 == What belongs in *this* (coordination) repo
 
@@ -99,6 +98,14 @@ same treatment.
 
 [NOTE]
 ====
-The per-database directories currently in this repo are *legacy* and are being extracted
-— see `docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc`. Do not add new content to them.
+The per-database directories still in this repo are *legacy* and are being extracted —
+see `docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc`. Do not add new content to them.
+
+`lithoglyph/` and `verisimdb/` are already done and now fail the placement guard rather
+than warning. `quandledb/`, `nqc/`, `typeql-experimental/`, `verisim-core/` and
+`verisim-modular-experiment/` remain grandfathered.
+
+**verisimdb was a fork, not a duplicate.** Do not assume the next extraction is a clean
+subset of its own repo — verify byte-identity per file first, and port whatever is
+unique before deleting.
 ====

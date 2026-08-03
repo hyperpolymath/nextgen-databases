@@ -1,1 +1,0 @@
-SELECT * FROM hexads LIMIT 10
