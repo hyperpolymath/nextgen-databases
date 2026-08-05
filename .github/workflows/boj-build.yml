@@ -20,8 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     # No job-level `if:` here. It previously read
     #
-    #     if: ${{ vars.BOJ_SERVER_URL != '' || secrets.BOJ_SERVER_URL != '' }}
-    #
+    #    #
     # and `secrets` is not available in a job-level conditional — GitHub exposes
     # that context only in `env:`, `with:` and step-level expressions. The file
     # is valid YAML, so nothing local caught it, but Actions rejected the whole
