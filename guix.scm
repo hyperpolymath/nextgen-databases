@@ -1,17 +1,21 @@
-; SPDX-License-Identifier: MPL-2.0
-;; guix.scm — GNU Guix package definition for nextgen-databases
-;; Usage: guix shell -f guix.scm
+;; SPDX-License-Identifier: MPL-2.0
+;; Guix development environment.
+;; Usage: guix shell -D -f guix.scm
 
 (use-modules (guix packages)
              (guix build-system gnu)
-             (guix licenses))
+             (guix licenses)
+             (gnu packages base)
+             (gnu packages bash)
+)
 
 (package
   (name "nextgen-databases")
   (version "0.1.0")
   (source #f)
   (build-system gnu-build-system)
+  (inputs (list coreutils bash ))
   (synopsis "nextgen-databases")
   (description "nextgen-databases — part of the hyperpolymath ecosystem.")
   (home-page "https://github.com/hyperpolymath/nextgen-databases")
-  (license mpl2.0))
+  (license ((@@ (guix licenses) license) "MPL-2.0" "https://github.com/hyperpolymath/palimpsest-license")))
