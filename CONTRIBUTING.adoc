@@ -1,37 +1,41 @@
-# Clone the repository
-git clone https://github.com/hyperpolymath/nextgen-databases.git
-cd nextgen-databases
+== Clone the repository
 
-# Using Nix (recommended for reproducibility)
+git clone https://github.com/hyperpolymath/nextgen-databases.git cd
+nextgen-databases
+
+== Using Nix (recommended for reproducibility)
+
 nix develop
 
-# Or using toolbox/distrobox
-toolbox create nextgen-databases-dev
-toolbox enter nextgen-databases-dev
+== Or using toolbox/distrobox
+
+toolbox create nextgen-databases-dev toolbox enter nextgen-databases-dev
 # Install dependencies manually
 
-# Verify setup
-just check   # or: cargo check / mix compile / etc.
-just test    # Run test suite
-```
+== Verify setup
+
+just check # or: cargo check / mix compile / etc. just test # Run test
+suite
+
+....
 
 ### Repository Structure
 
 `nextgen-databases` is a **coordination repo** — it does not hold database
 implementations. Each database and query language has its own repo (see `REGISTRY.adoc`).
+....
 
-```
-nextgen-databases/
-├── README.adoc / EXPLAINME.adoc / TOPOLOGY.md / ROADMAP.adoc  # Portfolio docs
-├── REGISTRY.adoc        # Authoritative map: database/language -> its own repo
-├── CLAUDE.md / AGENTS.md / 0-AI-MANIFEST.a2ml                 # Agent guardrails
-├── docs/                # Coordination docs (incl. migration runbooks)
-├── tests/               # CROSS-database integration tests only
-├── .machine_readable/   # Canonical SCM metadata
-├── .github/             # CI/CD, issue templates, governance
-├── .well-known/ LICENSES/
-└── flake.nix / Justfile / stapeln.toml / opsm.toml           # Shared env & orchestration
-```
+nextgen-databases/ ├── README.adoc / EXPLAINME.adoc / TOPOLOGY.md /
+ROADMAP.adoc # Portfolio docs ├── REGISTRY.adoc # Authoritative map:
+database/language -> its own repo ├── CLAUDE.md / AGENTS.md /
+0-AI-MANIFEST.a2ml # Agent guardrails ├── docs/ # Coordination docs
+(incl. migration runbooks) ├── tests/ # CROSS-database integration tests
+only ├── .machine_readable/ # Canonical SCM metadata ├── .github/ #
+CI/CD, issue templates, governance ├── .well-known/ LICENSES/ └──
+flake.nix / Justfile / stapeln.toml / opsm.toml # Shared env &
+orchestration
+
+....
 
 #### What belongs here vs. in a database repo
 
@@ -95,21 +99,22 @@ Look for issues labelled:
 ## Development Workflow
 
 ### Branch Naming
-```
-docs/short-description       # Documentation (P3)
-test/what-added              # Test additions (P3)
-feat/short-description       # New features (P2)
-fix/issue-number-description # Bug fixes (P2)
-refactor/what-changed        # Code improvements (P2)
-security/what-fixed          # Security fixes (P1-2)
-```
+....
+
+docs/short-description # Documentation (P3) test/what-added # Test
+additions (P3) feat/short-description # New features (P2)
+fix/issue-number-description # Bug fixes (P2) refactor/what-changed #
+Code improvements (P2) security/what-fixed # Security fixes (P1-2)
+
+....
 
 ### Commit Messages
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/):
-```
-<type>(<scope>): <description>
+....
 
-[optional body]
+():
 
-[optional footer]
+{empty}[optional body]
+
+{empty}[optional footer]
