@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 # This workflow is managed by gh actions-lock.
+# This workflow is managed by gh actions-lock.
 # Thin wrapper around hyperpolymath/standards hypatia-scan-reusable.yml.
 # See standards#191 for the reusable's purpose and design.
 
@@ -20,11 +21,12 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
+  actions: read
   contents: read
   security-events: write
   pull-requests: write
 
 jobs:
   hypatia:
-    uses: hyperpolymath/standards/.github/workflows/hypatia-scan-reusable.yml@81dbf2dd854b1444fd6236fa2352474383b2c2b9
+    uses: hyperpolymath/standards/.github/workflows/hypatia-scan-reusable.yml@84355587cb2a1f86e6882de83514a32db2646e7a
     secrets: inherit
