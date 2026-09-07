@@ -4,7 +4,7 @@
 ## CRITICAL: This is a coordination repo. No database implementation lives here. (Read First)
 
 `nextgen-databases` **coordinates** a portfolio of database projects. It does **not**
-hold their implementations. Each database and each query language has its **own repo**
+hold their implementations. Each database and each database language has its **own repo**
 (see `REGISTRY.adoc`).
 
 **Before you create or edit a file here, STOP and ask: is this coordination, or is it
@@ -14,7 +14,7 @@ own repo.
 ### NEVER (in this repo)
 
 1. **NEVER** add per-database source code, schemas, migrations, storage engines, or
-   query-language implementations here.
+   database-language implementations here.
 2. **NEVER** add per-database design docs, whitepapers, benchmarks, or datasets here.
 3. **NEVER** create a new top-level directory for a database or language — create or
    extend its own repo instead (`REGISTRY.adoc`).
@@ -23,19 +23,19 @@ own repo.
 
 ### ALWAYS (what DOES belong here)
 
-1. **Portfolio coordination**: `README.adoc`, `TOPOLOGY.md`, `ROADMAP.adoc`,
+1. **Portfolio coordination**: `README.adoc`, `TOPOLOGY.adoc`, `ROADMAP.adoc`,
    `EXPLAINME.adoc`.
 2. **The registry** of databases/languages → their repos: `REGISTRY.adoc`.
 3. **Cross-database** integration tests (`tests/`) and shared infrastructure
    (`flake.nix`, `Justfile`, `stapeln.toml`, `opsm.toml`).
 4. **Governance & metadata**: `.github/`, `.machine_readable/`, `.well-known/`,
-   `LICENSES/`, `CONTRIBUTING.md`, `SECURITY.md`, `0-AI-MANIFEST.a2ml`.
+   `LICENSES/`, `CONTRIBUTING.adoc`, `SECURITY.adoc`, `0-AI-MANIFEST.a2ml`.
 
 ### Where database content goes
 
 See **`REGISTRY.adoc`** for the authoritative map. Examples: VeriSimDB →
 `hyperpolymath/verisimdb`; Lithoglyph → `hyperpolymath/lithoglyph`; Glyphbase →
-`hyperpolymath/glyphbase`; the Glyph query language → `hyperpolymath/gnpl`; NQC →
+`hyperpolymath/glyphbase`; GNPL, the narration/projection language → `hyperpolymath/gnpl`; NQC →
 `hyperpolymath/nqc`.
 
 ### Transitional note
@@ -60,4 +60,4 @@ content being extracted** to their own repos — see
 directories is blocked, because it belongs in that database's own repo.
 
 ---
-*Also read `0-AI-MANIFEST.a2ml` (universal AI entry point) and `AGENTS.md`.*
+*Also read `0-AI-MANIFEST.a2ml` (universal AI entry point) and `AGENTS.adoc`.*
