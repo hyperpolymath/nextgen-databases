@@ -37,9 +37,9 @@ of every historical copy. See link:REGISTRY.adoc[repository ownership].
   is refused; heuristic bucket candidates are not checked isotopy witnesses.
 | VCL-UT parsing/admissibility/wire boundary
 | The standalone Rust parser workspace passes 36 tests with
-  `RUST_MIN_STACK=16777216`, including conformance, rejection and wire tests.
-| Default test-thread stack overflowed in the property-test harness. The existing
-  Parse Gate workflow already sets 32 MiB. These tests do not demonstrate that
+  `RUST_MIN_STACK=16777216` (16 MiB) in that recorded local run, including conformance, rejection and wire tests.
+| Default test-thread stack overflowed in the property-test harness. The reproduction command below follows the existing
+  Parse Gate workflow setting of 32 MiB; it is distinct from the recorded local run. These tests do not demonstrate that
   every VeriSimDB operation invokes the external gate.
 | Hermeneia invoke slice
 | 39 default Rust tests and 7 end-to-end slice tests passed, the latter against
