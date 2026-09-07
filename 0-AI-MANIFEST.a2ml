@@ -14,12 +14,12 @@ This is the AI manifest for **nextgen-databases**. It declares:
 ### Machine-Readable Metadata: `.machine_readable/` ONLY
 
 These 6 SCM files MUST exist in `.machine_readable/` directory ONLY:
-1. **.machine_readable/6a2/STATE.a2ml** - Project state, progress, blockers
-2. **.machine_readable/6a2/META.a2ml** - Architecture decisions, governance
-3. **.machine_readable/6a2/ECOSYSTEM.a2ml** - Position in ecosystem, relationships
-4. **.machine_readable/6a2/AGENTIC.a2ml** - AI agent interaction patterns
-5. **.machine_readable/6a2/NEUROSYM.a2ml** - Neurosymbolic integration config
-6. **.machine_readable/6a2/PLAYBOOK.a2ml** - Operational runbook
+1. **.machine_readable/descriptiles/STATE.a2ml** - Project state, progress, blockers
+2. **.machine_readable/descriptiles/META.a2ml** - Architecture decisions, governance
+3. **.machine_readable/descriptiles/ECOSYSTEM.a2ml** - Position in ecosystem, relationships
+4. **.machine_readable/descriptiles/AGENTIC.a2ml** - AI agent interaction patterns
+5. **.machine_readable/descriptiles/NEUROSYM.a2ml** - Neurosymbolic integration config
+6. **.machine_readable/descriptiles/PLAYBOOK.a2ml** - Operational runbook
 
 **CRITICAL:** If ANY of these files exist in the root directory, this is an ERROR.
 
@@ -41,10 +41,10 @@ Bot-specific instructions for:
 ## CORE INVARIANTS
 
 1. **Coordination only — no implementation** - This repo coordinates a portfolio of
-   databases. Per-database source, schemas, migrations, query-language implementations,
+   databases. Per-database source, schemas, migrations, database-language implementations,
    and per-database docs MUST live in that database's own repo (see `REGISTRY.adoc`).
    Adding per-database implementation content here is an ERROR.
-2. **No SCM duplication** - Root must NOT contain .machine_readable/6a2/STATE.a2ml, .machine_readable/6a2/META.a2ml, etc.
+2. **No SCM duplication** - Root must NOT contain .machine_readable/descriptiles/STATE.a2ml, .machine_readable/descriptiles/META.a2ml, etc.
 3. **Single source of truth** - `.machine_readable/` is authoritative
 4. **No stale metadata** - If root SCMs exist, they are OUT OF DATE
 5. **License consistency** - All code PMPL-1.0-or-later unless platform requires MPL-2.0
@@ -57,9 +57,9 @@ This is a **coordination repo**. Intended (target) contents:
 ```
 nextgen-databases/
 ├── 0-AI-MANIFEST.a2ml          # THIS FILE (start here)
-├── CLAUDE.md / AGENTS.md       # Agent guardrails (coordination-only)
+├── CLAUDE.md / AGENTS.adoc       # Agent guardrails (coordination-only)
 ├── REGISTRY.adoc               # Authoritative map: database/language -> its own repo
-├── README.adoc / EXPLAINME.adoc / TOPOLOGY.md / ROADMAP.adoc   # Portfolio docs
+├── README.adoc / EXPLAINME.adoc / TOPOLOGY.adoc / ROADMAP.adoc   # Portfolio docs
 ├── tests/                      # CROSS-database integration tests only
 ├── docs/                       # Coordination docs (incl. migration runbooks)
 ├── .machine_readable/          # Canonical SCM metadata
@@ -76,7 +76,7 @@ LEGACY (being extracted to their own repos — see
 
 This is a **parent/tracking (coordination) repository** — no implementation code.
 Satellite repos (authoritative list in `REGISTRY.adoc`): verisimdb, lithoglyph,
-glyphbase, quandledb, gnpl, vcl-ut, krl, nqc.
+glyphbase, quandledb, gnpl, vcl-ut, krl, vocarium, hermeneia, nqc.
 
 ## SESSION STARTUP CHECKLIST
 
@@ -84,8 +84,8 @@ glyphbase, quandledb, gnpl, vcl-ut, krl, nqc.
 ✅ Understand canonical locations (.machine_readable/, .bot_directives/)
 ✅ Know the invariants (no SCM duplication, etc.)
 ✅ Check for MCP enforcement (if applicable)
-✅ Read `.machine_readable/6a2/STATE.a2ml` for current status
-✅ Read `.machine_readable/6a2/AGENTIC.a2ml` for interaction patterns
+✅ Read `.machine_readable/descriptiles/STATE.a2ml` for current status
+✅ Read `.machine_readable/descriptiles/AGENTIC.a2ml` for interaction patterns
 
 ## LIFECYCLE HOOKS
 
@@ -97,7 +97,7 @@ When starting a new session:
 2. Log session start (optional but recommended)
    - Format: `[YYYY-MM-DD HH:MM:SS] Session started: [agent-name]`
    - Location: `.machine_readable/session-log.txt`
-3. Read `.machine_readable/6a2/STATE.a2ml`
+3. Read `.machine_readable/descriptiles/STATE.a2ml`
 4. Check for blockers
 5. State understanding of canonical locations
 
@@ -105,7 +105,7 @@ When starting a new session:
 
 When ending a session:
 
-1. Update `.machine_readable/6a2/STATE.a2ml` if changes made
+1. Update `.machine_readable/descriptiles/STATE.a2ml` if changes made
 2. Log session end (optional but recommended)
    - Format: `[YYYY-MM-DD HH:MM:SS] Session ended: [summary]`
    - Location: `.machine_readable/session-log.txt`
