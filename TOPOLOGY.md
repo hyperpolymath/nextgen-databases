@@ -1,101 +1,29 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
-<!-- TOPOLOGY.md — Project architecture map and completion dashboard -->
-<!-- Last updated: 2026-04-04 -->
+# Portfolio relationships
 
-# Next-Gen Databases — Project Topology
+Lines labelled “semantic pairing” describe design relationships; they do not
+assert a working integration or transferred proof guarantee.
 
-## System Architecture
-
-```
-                        ┌─────────────────────────────────────────┐
-                        │              DB ANALYST / USER          │
-                        │        (KQL, VCL, Web Dashboards)       │
-                        └───────────────────┬─────────────────────┘
-                                            │
-                                            ▼
-                        ┌─────────────────────────────────────────┐
-                        │           NEXT-GEN DATABASES HUB        │
-                        │                                         │
-                        │  ┌───────────┐  ┌───────────────────┐  │
-                        │  │ QuandleDB │  │  VeriSimDB        │  │
-                        │  │ (Knot Thy)│  │ (Verification)    │  │
-                        │  └─────┬─────┘  └────────┬──────────┘  │
-                        │        │                 │              │
-                        │  ┌─────▼─────┐  ┌────────▼──────────┐  │
-                        │  │ Lithoglyph│  │  FormDB           │  │
-                        │  │ (Glyphs)  │  │  (Audit-grade)    │  │
-                        │  └─────┬─────┘  └───────────────────┘  │
-                        └────────│────────────────────────────────┘
-                                 │
-                                 ▼
-                        ┌─────────────────────────────────────────┐
-                        │          SATELLITE REPOSITORIES         │
-                        │  ┌───────────┐  ┌───────────┐  ┌───────┐│
-                        │  │ Skein.jl  │  │ VCL Parser│  │ FBQL- ││
-                        │  │ (Engine)  │  │ (ReScript)│  │ DT    ││
-                        │  └───────────┘  └───────────┘  └───────┘│
-                        │  ┌───────────┐  ┌───────────┐  ┌───────┐│
-                        │  │ glyphbase │  │ verisim-  │  │ quandle││
-                        │  │ (Web UI)  │  │ data      │  │ kql   ││
-                        │  └───────────┘  └───────────┘  └───────┘│
-                        └───────────────────┬─────────────────────┘
-                                            │
-                                            ▼
-                        ┌─────────────────────────────────────────┐
-                        │          UPSTREAM STANDARDS             │
-                        │      (RSR Compliance, PMPL License)     │
-                        └─────────────────────────────────────────┘
-
-                        ┌─────────────────────────────────────────┐
-                        │          REPO INFRASTRUCTURE            │
-                        │  Parent Tracking Only .machine_readable/│
-                        │  No Local Code        0-AI-MANIFEST.a2ml│
-                        │  Groove Discovery     nqc/.well-known/  │
-                        └─────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    V[VeriSimDB] ---|semantic pairing| VCL[VCL-UT]
+    L[Lithoglyph] ---|semantic pairing| G[GNPL]
+    B[Glyphbase] ---|application surface| L
+    Q[QuandleDB] ---|semantic pairing| K[KRL]
+    VO[Vocarium] ---|semantic pairing| H[Hermeneia]
+    S[Skein.jl] -->|library used by| Q
+    KT[KnotTheory.jl] -->|library used by| Q
+    T[Tangle: independent Turing-complete language]
 ```
 
-## Completion Dashboard
+The four languages express different obligations: consonance/admissibility,
+narration/warrants, knot resolution, and use-relative sufficiency. Shared storage
+or retrieval mechanisms do not make their semantics interchangeable.
 
-```
-COMPONENT                          STATUS              NOTES
-─────────────────────────────────  ──────────────────  ─────────────────────────────────
-DATABASE PORTFOLIO
-  QuandleDB (Knot Theory)           ██████████ 100%    Skein.jl engine stable
-  VeriSimDB (Verification)          ██████████ 100%    Multimodal schema stable
-  LithoglyphDB (Glyphs)             ██████████ 100%    Provenance tracking verified
-  FormDB (Audit-grade)              ████████░░  80%    Narrative-first state active
+Skein.jl, KnotTheory.jl and Tangle have independent purposes. Their common knot
+subject matter does not turn them into successive compiler stages or assign each
+a single KRL operation.
 
-QUERY LANGUAGES
-  KQL (Knot Query)                  ██████░░░░  60%    Topology invariants active
-  VCL (Verification)                ████░░░░░░  40%    Compiler in progress
-  FBQL-DT (Dependently Typed)       █████░░░░░  50%    Compile-time proofs active
-
-REPO INFRASTRUCTURE
-  Parent Coordination               ██████████ 100%    Portfolio mapping verified
-  .machine_readable/                ██████████ 100%    STATE tracking active
-  0-AI-MANIFEST.a2ml                ██████████ 100%    AI entry point verified
-
-─────────────────────────────────────────────────────────────────────────────
-OVERALL:                            ██████████ 100%    Portfolio Architected & Indexed
-```
-
-## Key Dependencies
-
-```
-Database Engine ──────► Query DSL ────────► HTTP API ─────────► Web UI
-     │                    │                 │                 │
-     ▼                    ▼                 ▼                 ▼
-Julia / Rust ──────► ReScript Parser ────► JSON Endpoints ──► React SPA
-```
-
-## Update Protocol
-
-This file is maintained by both humans and AI agents. When updating:
-
-1. **After completing a component**: Change its bar and percentage
-2. **After adding a component**: Add a new row in the appropriate section
-3. **After architectural changes**: Update the ASCII diagram
-4. **Date**: Update the `Last updated` comment at the top of this file
-
-Progress bars use: `█` (filled) and `░` (empty), 10 characters wide.
-Percentages: 0%, 10%, 20%, ... 100% (in 10% increments).
+[Registry](REGISTRY.adoc) identifies canonical repositories.
+[Evidence ledger](EXPLAINME.adoc) states tested boundaries and remaining gaps.
+[Roadmap](ROADMAP.adoc) identifies the next substantive implementation work.
