@@ -1,118 +1,45 @@
-= Next-Generation Databases — Research Overview
+// SPDX-License-Identifier: CC-BY-SA-4.0
+= Next-Generation Databases
 
-== Overview
+This is the coordination repository for four database/language families. Canonical
+implementations live in their own repositories; link:REGISTRY.adoc[the registry]
+maps ownership. Remaining per-project directories here are extraction remnants.
 
-This repository contains experimental database systems built on mathematical foundations that go beyond traditional relational or document models.
+== Four distinct purposes
 
-The shared goal is:
+[cols="1,1,3",options=header]
+|===
+| Database | Language | Semantic purpose
+| VeriSimDB | VCL-UT | Express consonance, admissible transitions and the evidence/usage conditions under which representations may change.
+| Lithoglyph, with Glyphbase as an application surface | GNPL | Construct accounts from evidence, with explicit stances, warrants and rival interpretations.
+| QuandleDB | KRL | Construct and transform knot structures, resolve identity/equivalence questions, and retrieve resolution-relevant evidence.
+| Vocarium | Hermeneia | Work with situated meaning, warranted transformations and sufficiency relative to a declared use.
+|===
 
-*to treat semantic identity as primary, rather than raw data equality.*
+These are not interchangeable record-selection syntaxes. Their value depends on
+what an operation means, what evidence authorises it, and what remains unresolved
+when that evidence is missing. Retrieval, filtering and storage remain useful
+supporting operations. They do not determine the public language designs, and no
+additional public reporting language is precommitted.
 
-These systems store and operate on structured objects where identity is determined by equivalence under transformation.
+== Engineering evidence
 
-== Core Idea
+link:EXPLAINME.adoc[The evidence ledger] distinguishes implemented components,
+executable tests, formal obligations and integration gaps. It reports concrete
+boundaries instead of whole-project completion percentages.
 
-Traditional databases treat identity as:
+Current hardening includes rejection of unimplemented Lithoglyph proof verifiers,
+a runnable private typed substrate for GNPL, and KRL controls preventing index
+candidates from being advertised as checked equivalence results. These changes
+do not constitute full narration execution or a complete knot resolution engine.
 
-* equality of rows
-* equality of documents
-* equality of keys
+== Independent knot projects
 
-In contrast, these systems treat identity as:
+Skein.jl and KnotTheory.jl are independent Julia libraries with their own storage
+and mathematical purposes. QuandleDB uses them. Tangle is a separate
+Turing-complete language for knot mathematics. Shared knot theory creates no
+KRL-to-Tangle compilation pipeline and transfers no proof guarantees.
 
-*equivalence classes of structured objects.*
-
-This enables:
-
-* deduplication based on structure, not representation
-* queries over equivalence classes
-* indexing by invariants rather than raw values
-* explicit tracking of transformation history
-
-== Projects
-
-=== QuandleDB
-
-An algebraic database using *quandle structures* as a semantic identity layer.
-
-* Objects are indexed by algebraic invariants derived from their structure
-* Designed for equivalence detection under transformation (e.g. knot isotopy)
-
-Status: early-stage; core extraction and fingerprinting in progress.
-
----
-
-=== Skein.jl
-
-A persistence and indexing layer for topological objects.
-
-* Stores canonical representations (e.g. TangleIR)
-* Maintains invariant caches
-* Tracks rewrite history and provenance
-
-Status: active, undergoing refactoring.
-
----
-
-=== VeriSimDB / VanguardDB
-
-A self-normalising multimodal database with formal verification goals.
-
-* Rust core with Elixir/OTP orchestration
-* Focus on correctness and reliability guarantees
-
-Status: design phase.
-
----
-
-=== Lithoglyph / Glyphbase / GPL
-
-A narrative-first database system aimed at documentary and structured storytelling.
-
-* GPL (Glyph Projection Language) provides the query layer
-* Dependent-type extensions planned
-
-Status: specified.
-
-== Common Principles
-
-Across these systems:
-
-* Structured objects are primary, not rows or documents
-* Equivalence is a first-class concept
-* Invariants are used for indexing and identity
-* Provenance and transformation history are explicitly stored
-* Query systems operate over equivalence classes
-* Minimal typed calculi can provide small, inspectable test cases for identity, provenance, derivation history, and equivalence-aware indexing
-
-== Relationship to Languages
-
-These databases are designed to pair with languages in `nextgen-languages`:
-
-* KRL → QuandleDB / Skein (topological objects)
-* Other languages → domain-specific storage and verification systems
-
-The broader goal is a unified ecosystem where:
-
-* languages define construction and transformation
-* databases define identity and retrieval
-
-TypeFix Zero is a calibration calculus — TF0 exists to make the minimal typed/Turing-complete boundary explicit. It is intentionally smaller than TypeLL and should not inherit TypeLL’s open-ended production obligations. Its one non-total primitive, fix, is the designated source of Turing completeness.
-
-== Status
-
-This repository represents ongoing research work.
-
-Components vary in maturity:
-
-* some systems are partially implemented
-* others are specified but not yet built
-* formal obligations are documented but not fully discharged
-
-See proof and specification documents for current guarantees and gaps.
-
-== Suggested Entry Points
-
-* QuandleDB proof obligations — mathematical and systems requirements for equivalence
-* Skein.jl documentation — persistence and indexing design
-* KRL integration — example of language ↔ database interaction
+See link:TOPOLOGY.adoc[the relationship map] and link:ROADMAP.adoc[the engineering
+priorities]. Cross-family integration should preserve each family's semantic
+contract, including uncertainty, refusal and provenance.
