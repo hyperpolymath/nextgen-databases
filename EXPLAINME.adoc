@@ -35,12 +35,6 @@ of every historical copy. See link:REGISTRY.adoc[repository ownership].
   its new resolution-boundary suite passes 8.
 | Provider-based integration tests use fixtures. Stronger resolution assurance
   is refused; heuristic bucket candidates are not checked isotopy witnesses.
-| VCL-UT parsing/admissibility/wire boundary
-| The standalone Rust parser workspace passes 36 tests with
-  `RUST_MIN_STACK=16777216`, including conformance, rejection and wire tests.
-| Default test-thread stack overflowed in the property-test harness. The existing
-  Parse Gate workflow already sets 32 MiB. These tests do not demonstrate that
-  every VeriSimDB operation invokes the external gate.
 | Hermeneia invoke slice
 | 39 default Rust tests and 7 end-to-end slice tests passed, the latter against
   the real `tropecheck-rs` binary. The Slice workflow runs this boundary.
@@ -68,7 +62,6 @@ Use each repository's pinned toolchain and its own build instructions.
   See `spec/SURFACES.adoc`; this is fragment conformance.
 * QuandleDB: `julia --startup-file=no server/krl/test/seam_test.jl` and
   `julia --startup-file=no server/krl/test/resolution_boundary_test.jl`.
-* VCL-UT: `RUST_MIN_STACK=33554432 cargo test --manifest-path src/interface/parse/Cargo.toml --locked`.
 * Hermeneia: `cargo test --workspace`, then provide the real checker through
   `HERMENEIA_TROPECHECK` and run
   `cargo test -p hermeneia-cli --features e2e --test slice`.
