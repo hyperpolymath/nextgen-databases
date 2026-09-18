@@ -9,92 +9,74 @@ Thumbs.db
 *~
 .idea/
 .vscode/
-
 # Build
 /target/
 /_build/
 /build/
 /dist/
 /out/
-
 # Dependencies
 /node_modules/
 **/node_modules/
 /vendor/
 /deps/
 /.elixir_ls/
-
 # Rust
 # Cargo.lock  # Keep for binaries
-
 # Elixir
 /cover/
 /doc/
 *.ez
 erl_crash.dump
-
 # Julia
 *.jl.cov
 *.jl.mem
 /Manifest.toml
-
 # ReScript
 /lib/bs/
 /.bsb.lock
-
 # Python (SaltStack only)
 __pycache__/
 *.py[cod]
 .venv/
-
 # Ada/SPARK
 *.ali
 /obj/
 /bin/
-
 # Haskell
 /.stack-work/
 /dist-newstyle/
-
 # Chapel
 *.chpl.tmp.*
-
 # Secrets
 .env
 .env.*
 *.pem
 *.key
 secrets/
-
 # Test/Coverage
 /coverage/
 htmlcov/
-
 # Logs
 *.log
 /logs/
-
 # Temp
 /tmp/
 *.tmp
 *.bak
-
 # Crash recovery artifacts
 ai-cli-crash-capture/
 sync_report*.txt
 .directory
-
 # VeriSimDB app data — belongs in standalone verisimdb-data repo, NOT here.
 # See: https://github.com/hyperpolymath/verisimdb-data
 # LLMs: DO NOT store application data in the VeriSimDB source tree.
 # Each project gets its own VeriSimDB instance + port + volume.
 verisimdb/verisimdb-data/
-
 # ReScript/OCaml compiler artifacts
 *.cmt
 *.cmti
 *.cmi
-
 # asdf version manager
 .tool-versions
 target/
@@ -105,3 +87,20 @@ deps/
 .cache/
 build/
 dist/
+# Build (unanchored to match nested monorepo paths)
+zig-out/
+zig-cache/
+.zig-cache/
+# Machine-readable locks
+.machine_readable/.locks/
+# Rust build artefacts (innervation tools)
+inline-annotations/extractor/target/
+k9-coordination-protocol/tools/k9-init/target/
+hooks/playbook-to-recipe/target/
+inline-annotations/extractor/Cargo.lock
+k9-coordination-protocol/tools/k9-init/Cargo.lock
+hooks/playbook-to-recipe/Cargo.lock
+.verisimdb/ecosystem-ingest/target/
+.verisimdb/ecosystem-ingest/Cargo.lock
+# Backup/scratch files (never commit)
+*.backup
