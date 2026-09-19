@@ -44,12 +44,12 @@ jobs:
         # In-repo validator. hyperpolymath/a2ml-validate-action does not exist —
         # `gh api repos/...` returns 404 and the job failed at "Set up job" with
         # "Unable to resolve action ..., repository not found", so it never ran.
-        # .githooks/validate-a2ml.sh is the canonical RSR implementation (identical
+        # .github/hooks/validate-a2ml.sh is the canonical RSR implementation (identical
         # to the copy in rsr-template-repo) and takes the same INPUT_* interface.
         env:
           INPUT_PATH: '.'
           INPUT_STRICT: 'false'
-        run: bash .githooks/validate-a2ml.sh
+        run: bash .github/hooks/validate-a2ml.sh
 
       - name: Write summary
         run: |
@@ -98,7 +98,7 @@ jobs:
         env:
           INPUT_PATH: '.'
           INPUT_STRICT: 'false'
-        run: bash .githooks/validate-k9.sh
+        run: bash .github/hooks/validate-k9.sh
 
       - name: Write summary
         run: |

@@ -55,12 +55,12 @@ jobs:
 
           # Allowed coordination paths (regex, anchored at repo root).
           ALLOW='^(README|EXPLAINME|TOPOLOGY|ROADMAP|TOOLING-STATUS|REGISTRY|CONTRIBUTING|CODE_OF_CONDUCT|SECURITY|MAINTAINERS|NOTICE|LICENSE|PROOF-NEEDS|TEST-NEEDS|QUICKSTART-[A-Z]+|0-AI-MANIFEST|CLAUDE|GEMINI|AGENTS|llm-warmup-[a-z]+)\.[A-Za-z0-9]+$'
-          # `.githooks` added 2026-07-27. It is repo infrastructure, not database
+          # `.github/hooks` added 2026-07-27. It is repo infrastructure, not database
           # content — git resolves core.hooksPath relative to the worktree root,
           # so it must live there, exactly like .github/ and .claude/ which were
           # already allowed.
           #
-          # This became load-bearing when #59 landed .githooks/validate-a2ml.sh and
+          # This became load-bearing when #59 landed .github/hooks/validate-a2ml.sh and
           # validate-k9.sh: those files are tracked on main today, so the next PR
           # touching either one is flagged "Misplaced content" and fails the guard.
           #
