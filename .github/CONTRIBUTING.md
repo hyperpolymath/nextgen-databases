@@ -1,40 +1,40 @@
 # Clone the repository
 
-git clone <https://github.com/hyperpolymath/nextgen-databases.git> cd
-nextgen-databases
+git clone https://github.com/hyperpolymath/nextgen-databases.git
+cd nextgen-databases
 
-# Using Nix (recommended for reproducibility)
+# Using Guix (recommended for reproducibility)
 
-nix develop
+guix develop
 
 # Or using toolbox/distrobox
 
-toolbox create nextgen-databases-dev toolbox enter nextgen-databases-dev
-\# Install dependencies manually
+toolbox create nextgen-databases-dev
+toolbox enter nextgen-databases-dev
+# Install dependencies manually
 
 # Verify setup
 
-just check \# or: cargo check / mix compile / etc. just test \# Run test
-suite
+just check   # or: cargo check / mix compile / etc.
+just test    # Run test suite
 
-
-    ### Repository Structure
+### Repository Structure
 
     `nextgen-databases` is a **coordination repo** — it does not hold database
     implementations. Each database and query language has its own repo (see `REGISTRY.adoc`).
 
 nextgen-databases/ ├── README.adoc / EXPLAINME.adoc / TOPOLOGY.adoc /
-ROADMAP.adoc \# Portfolio docs ├── REGISTRY.adoc \# Authoritative map:
+ROADMAP.adoc # Portfolio docs ├── REGISTRY.adoc # Authoritative map:
 database/language → its own repo ├── CLAUDE.md / AGENTS.md /
-0-AI-MANIFEST.a2ml \# Agent guardrails ├── docs/ \# Coordination docs
-(incl. migration runbooks) ├── tests/ \# CROSS-database integration
-tests only ├── .machine_readable/ \# Canonical SCM metadata ├── .github/
-\# CI/CD, issue templates, governance ├── .well-known/ LICENSES/ └──
-flake.nix / Justfile / stapeln.toml / opsm.toml \# Shared env &
+0-AI-MANIFEST.a2ml # Agent guardrails ├── docs/ # Coordination docs
+(incl. migration runbooks) ├── tests/ # CROSS-database integration
+tests only ├── .machine_readable/ # Canonical SCM metadata ├── .github/
+# CI/CD, issue templates, governance ├── .well-known/ LICENSES/ └──
+flake.nix / Justfile / stapeln.toml / opsm.toml # Shared env &
 orchestration
 
 
-    #### What belongs here vs. in a database repo
+#### What belongs here vs. in a database repo
 
     - ✅ **Here**: portfolio docs, the registry, cross-database integration tests, shared
       infrastructure/orchestration, governance and machine-readable metadata.
@@ -47,9 +47,9 @@ orchestration
 
     ---
 
-    ## How to Contribute
+## How to Contribute
 
-    ### Reporting Bugs
+### Reporting Bugs
 
     **Before reporting**:
     1. Search existing issues
@@ -66,7 +66,7 @@ orchestration
     - Expected vs actual behaviour
     - Logs, screenshots, or minimal reproduction
 
-    ### Suggesting Features
+### Suggesting Features
 
     **Before suggesting**:
     1. Check the [roadmap](ROADMAP.md) if available
@@ -82,7 +82,7 @@ orchestration
     - Alternatives considered
     - Which perimeter this affects
 
-    ### Your First Contribution
+### Your First Contribution
 
     Look for issues labelled:
 
@@ -93,22 +93,25 @@ orchestration
 
     ---
 
-    ## Development Workflow
+## Development Workflow
 
-    ### Branch Naming
+### Branch Naming
 
-docs/short-description \# Documentation (P3) test/what-added \# Test
-additions (P3) feat/short-description \# New features (P2)
-fix/issue-number-description \# Bug fixes (P2) refactor/what-changed \#
-Code improvements (P2) security/what-fixed \# Security fixes (P1-2)
+docs/short-description # Documentation (P3) test/what-added # Test
+additions (P3) feat/short-description # New features (P2)
+fix/issue-number-description # Bug fixes (P2) refactor/what-changed #
+Code improvements (P2) security/what-fixed # Security fixes (P1-2)
 
 
-    ### Commit Messages
+### Commit Messages
 
     We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-():
+type(scope): description
 
+Body: what changed and why.
+
+Footer: issue reference, e.g. Closes #123
 \[optional body\]
 
 \[optional footer\]
