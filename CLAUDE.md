@@ -29,7 +29,7 @@ own repo.
 3. **Cross-database** integration tests (`tests/`) and shared infrastructure
    (`flake.nix`, `Justfile`, `stapeln.toml`, `opsm.toml`).
 4. **Governance & metadata**: `.github/`, `.machine_readable/`, `.well-known/`,
-   `LICENSES/`, `CONTRIBUTING.adoc`, `SECURITY.adoc`, `0-AI-MANIFEST.a2ml`.
+   `LICENSES/`, `.github/CONTRIBUTING.md`, `SECURITY.adoc`, `0-AI-MANIFEST.a2ml`.
 
 ### Where database content goes
 
