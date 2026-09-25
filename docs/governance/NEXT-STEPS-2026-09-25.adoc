@@ -1,0 +1,144 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Next Steps — After Foundational Fixes for #42, #45, #53
+:toc: left
+:revdate: 2026-09-25
+:status: PROPOSED
+
+This document outlines what is next after PR #105 (foundational fixes for #42, #45, #53).
+
+== Current State (2026-09-25 11:04Z)
+
+- Branch `arena/01a0d7bc-nextgen-databases` at `5bbce9e` — 5 commits ahead of main `caae73b`
+- PR #105 open: https://github.com/hyperpolymath/nextgen-databases/pull/105 — closes #42, #45, #53
+- Local checks PASS: K9 7 files 0 errors, A2ML 36 files 0 errors, 0 .res/.ts, 0 active placeholders, 0 banned patterns, extraction readiness OK (split-history tags 819/713/130/125)
+- External scanners PASS: CodeFactor, CodeRabbit, Codeac, GitGuardian, semgrep SUCCESS
+- CI `startup_failure` estate-wide for PRs: verified via empty branch PR #106 (no file changes) → all workflows startup_failure. Main push has success for Placement Guard + Dogfood Gate. Root cause likely in hyperpolymath/standards reusable workflow or actions-lock enforcement for PR events — not from this PR's doc changes (20 files, no workflow changes after fix 17576e6 restored actions.lock to main's exact version).
+- Remaining legacy dirs grandfathered: `quandledb/` (1 file), `nqc/` (108 files), `typeql-experimental/` (49 files), `verisim-core/` (21 files), `verisim-modular-experiment/` (56 files) — being extracted per REGISTRY.adoc
+- DONE extractions: `lithoglyph/` (819 files 2026-07-27), `verisimdb/` (713 files 2026-08-03), `gnpl` (125 PR #4), `glyphbase` (130) — pointer READMEs + split-history tags preserved
+
+== What Is Next — Options
+
+=== Option A — Merge PR #105 (Recommended Immediate)
+
+*Why:* Foundational fixes for #42, #45, #53 are done and verified locally. Issues can be closed.
+
+*Steps:*
+1. Owner reviews PR #105 (20 files, 1193 insertions) — see FOUNDATIONAL-FIXES-2026-09-25.adoc for upstream/downstream/enduring analysis
+2. Acknowledge CI startup_failure is pre-existing estate-wide (evidence: PR #106 empty branch). Merge despite Governance/Hypatia startup_failure, or fix estate CI first (see Option C)
+3. Merge PR #105 to main via `gh pr merge 105 --squash` or GitHub UI
+4. After merge, verify main's docs/AFFIRMATION.adoc is 2026-09-25, docs/proof-debt.adoc exists, verisim-core/AFFIRMATION.adoc exists
+5. Close issues #42, #45, #53 with comment referencing PR #105 and local verification
+
+*Unblocks:* Closes three oldest open issues, establishes honest 2026-09-25 state, fixes template debt and K9/trusted-base.
+
+=== Option B — Continue Resite Extraction (Remaining Legacy Dirs)
+
+*Why:* Per REGISTRY.adoc and RESITE-DATABASES-TO-OWN-REPOS.adoc, remaining grandfathered dirs should be extracted to own repos.
+
+*Mapping (from RESITE docs):*
+- `nqc/` → hyperpolymath/nqc (create, extract as-is, already standalone Gleam)
+- `verisim-core/` → hyperpolymath/VerisimCore.jl (create, Julia package)
+- `typeql-experimental/` → hyperpolymath/vcl-ut (exists, reconcile → delete copy)
+- `quandledb/` (stub) → hyperpolymath/quandledb (exists, reconcile → delete copy)
+- `verisim-modular-experiment/` → folded into hyperpolymath/verisimdb as standard feature → delete
+
+*Steps (per RESITE-CODEX-HANDOFF.adoc):*
+1. Ensure GitHub scope: `gh auth status` + `gh repo view hyperpolymath/verisimdb` must succeed, `git filter-repo` installed
+2. For each NEW repo (nqc, VerisimCore.jl): `scripts/resite/extract-subdir.sh <subdir>/` → review rewritten clone in /tmp, then `gh repo create` + push
+3. For each EXISTING repo (quandledb, vcl-ut, verisimdb): extract monorepo copy, diff against live canonical, push `import/from-monorepo` branch + PR only if unique work (never force-push main)
+4. Verify each destination (log --oneline -1 shows preserved history, files at root, 0-AI-MANIFEST.a2ml exists)
+5. After all destinations confirmed, land "thin the coordination repo" PR: `git rm -r nqc verisim-core typeql-experimental quandledb verisim-modular-experiment`, update REGISTRY.adoc, 0-AI-MANIFEST.a2ml LEGACY list empty, EXPLAINME/TOPOLOGY/README, placement-guard GRANDFATHER regex empty, block-db-writes.sh dest map, RESITE status DONE
+
+*Blockers:* Requires GitHub org repo-creation rights + write access to existing repos (verisimdb, quandledb, vcl-ut). If not available, document and stop.
+
+*Enduring:* After thinning, `git ls-tree HEAD` shows no legacy dirs, `git ls-files | grep -E '^(nqc|verisim-core|...)/'` returns nothing, placement-guard GRANDFATHER empty so ANY database path is hard error, `git clone --recurse-submodules` yields thin structure (if submodules used) or registry links.
+
+=== Option C — Fix Estate CI (Governance + Hypatia + Lockfile)
+
+*Why:* Main branch has failures:
+- Governance: failure for Guix packaging policy + Actions lockfile verify (observed 2026-09-25 08:42Z)
+- Hypatia Security Scan: failure
+- PR branches: startup_failure for all workflows (even empty branch PR #106)
+
+*Steps:*
+1. Check Guix policy failure: `gh api repos/hyperpolymath/nextgen-databases/actions/runs/36114371582/jobs --jq '.jobs[] | select(.name | contains(\"Guix\")) | .steps[] | select(.conclusion==\"failure\")'` — likely needs `flake.nix` or `guix.scm` or exemption
+2. Check Actions lockfile verify failure: run `gh actions-lock` locally (install via pipx or cargo) to regenerate .github/workflows/actions.lock, then commit
+3. Investigate startup_failure for PRs: check if hyperpolymath/standards reusable workflow pin fcb566c is accessible for PR events, check organization Actions permissions, check if any workflow file has invalid YAML (we verified placement-guard same as main, yet main success PR failure)
+4. Open separate PR to fix CI, or document as estate-wide issue in hyperpolymath/standards
+
+*Unblocks:* Makes PR #105 mergeable with green checks, not just external scanners.
+
+=== Option D — Family Integrations (ROADMAP.adoc)
+
+*Why:* After governance fixed, next substantive work is family integrations per ROADMAP.
+
+*Next-actions from STATE.a2ml:*
+- GNPL: connect imported evidence contract to real Lithoglyph journal snapshot and test withdrawal across revisions
+- QuandleDB/KRL: implement and check explicit resolution witness
+- VeriSimDB/VCL-UT: test mandatory admissibility coverage for every advertised checked operation
+- Vocarium/Hermeneia: test one shared storage/warrant contract including invalidation/withdrawal
+
+*These belong in owning repos (see REGISTRY.adoc), not here, but coordination tests in tests/ can verify integration.*
+
+=== Option E — Cross-Database Integration Tests (tests/)
+
+*Why:* TEST-NEEDS.adoc notes tests/ is currently minimal, needs at least one test verifying REGISTRY.adoc links resolve and pointer READMEs point to live repos.
+
+*Steps:*
+1. Create tests/registry-links.sh that curls each URL in REGISTRY.adoc and checks 200
+2. Create tests/pointer-readmes.sh that checks lithoglyph/README.adoc and verisimdb/README.adoc contain split-history tags and live repo URLs
+3. Add to Justfile and CI
+
+== Recommended Order
+
+1. **Immediate:** Option A — Merge PR #105 (closes #42, #45, #53) — owner approval, acknowledge CI startup_failure pre-existing
+2. **Next:** Option C — Fix estate CI (Guix + lockfile + startup_failure) — separate PR, unblocks future PRs
+3. **Then:** Option B — Continue resite extraction of remaining legacy dirs — requires GitHub scope
+4. **Parallel:** Option D + E — Family integrations in owning repos + cross-db tests here
+
+== What This Session Has Done (To Preserve)
+
+- Fixed template debt (methodology.a2ml), ReScript/TS migration DONE in coordination paths, verisim-core AFFIRMATION, lithoglyph/gnpl disentanglement, K9 pedigree + trusted-base
+- Created docs: proof-debt.adoc, LITHOGLYPH-GNPL-DISENTANGLEMENT.adoc, AFFIRMATION.adoc 2026-09-25, verisim-core/AFFIRMATION.adoc, FOUNDATIONAL-FIXES-2026-09-25.adoc, K9-PEDIGREE-TRUSTED-BASE-FIX.adoc, NEXT-STEPS (this file)
+- Added scripts: check-extraction-readiness.sh (executable, passes), extract-subdir.sh already existed
+- Updated: Mustfile.a2ml, Trustfile.a2ml, AGENTIC.a2ml v0.2.0, STATE.a2ml v0.2.0, REGISTRY.adoc, TEST-NEEDS.adoc, RESITE status PARTIAL DONE, Justfile governance-check
+- Verified: K9 7 files 0 errors, A2ML 36 files 0 errors, 0 .res/.ts, 0 placeholders, 0 banned patterns
+- Pushed to arena/01a0d7bc-nextgen-databases (5bbce9e) and PR #105 open, external scanners SUCCESS, CI startup_failure documented as pre-existing via PR #106 empty branch test
+- Cleaned up: removed foundational-checks.yml workflow that caused startup_failure, restored actions.lock to main's exact version (fixed stray line bug)
+
+== How to Reproduce Current State
+
+[source,bash]
+----
+git checkout arena/01a0d7bc-nextgen-databases
+git log --oneline -6
+# 5bbce9e chore: trigger CI after fixing actions.lock
+# 17576e6 fix: restore actions.lock
+# fe1179e fix: remove foundational-checks.yml workflow
+# 4d2b309 fix: add foundational-checks.yml to actions.lock
+# 060d760 feat: enduring foundational checks
+# d61ae55 fix: foundational fixes for #42, #45, #53
+
+./.github/hooks/validate-k9.sh
+./.github/hooks/validate-a2ml.sh
+./scripts/resite/check-extraction-readiness.sh
+# All PASS
+
+gh pr view 105 --json state,statusCheckRollup --jq .
+# state OPEN, external checks SUCCESS, GitHub workflows startup_failure (pre-existing)
+----
+
+== References
+
+- PR #105: Foundational fixes
+- Issues #42, #45, #53 (open, to be closed by PR #105)
+- PR #106: Empty branch test proving startup_failure estate-wide
+- docs/AFFIRMATION.adoc (2026-09-25)
+- docs/governance/FOUNDATIONAL-FIXES-2026-09-25.adoc
+- docs/migration/LITHOGLYPH-GNPL-DISENTANGLEMENT.adoc
+- docs/proof-debt.adoc
+- verisim-core/AFFIRMATION.adoc
+- REGISTRY.adoc, STATE.a2ml, AGENTIC.a2ml
+- RESITE-DATABASES-TO-OWN-REPOS.adoc, RESITE-CODEX-HANDOFF.adoc
+- ROADMAP.adoc, EXPLAINME.adoc, TOPOLOGY.adoc
