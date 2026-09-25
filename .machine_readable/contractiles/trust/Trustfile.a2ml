@@ -1,22 +1,43 @@
 # SPDX-License-Identifier: MPL-2.0
+# SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 # Trustfile — Integrity and Provenance Contract
+# Updated 2026-09-25: adds proof-debt and K9 pedigree governance for Issues #42, #45, #53
 
 [trustfile]
-version = "1.0.0"
+version = "1.1.0"
 format = "a2ml"
+last-updated = "2026-09-25"
 
 [provenance]
 source-control = "git"
 forge = "github"
 ci-verified = true
 signing-policy = "commit-signing-preferred"
+history-preservation = "split-history/* tags and _split_* branches must never be pruned — only granular history after squash imports"
 
 [integrity]
 spdx-compliant = true
 license-audit = "required"
 dependency-pinning = "sha-pinned"
+template-debt = "0 placeholder files — methodology.a2ml fixed 2026-09-25, A2ML validation 36 files 0 errors"
+rescript-ts-migration = "0 .res/.ts files in coordination paths — DONE via extraction, per-owning-repo migration continues"
+k9-pedigree = "validate-k9.sh passes — 7 files, 0 errors, all have metadata.name — enduring guard for Issue #53"
+trusted-base = "docs/proof-debt.adoc exists — no TRUSTED/AXIOM/believe_me in coordination paths, Mustfile checks proof-debt-documented"
 
 [verification]
 reproducible-builds = "goal"
 sbom-generation = "required"
 attestation = "sigstore-preferred"
+k9-validation = "required — .github/hooks/validate-k9.sh in CI"
+a2ml-validation = "required — .github/hooks/validate-a2ml.sh in CI"
+placement-guard = "required — .github/workflows/placement-guard.yml fails on new files outside coordination paths"
+proof-debt-gate = "required — docs/proof-debt.adoc must exist, Mustfile checks no undocumented TRUSTED/AXIOM"
+
+[extraction]
+lithoglyph = "DONE 2026-07-27 — 819 files removed, pointer README left, split-history/lithoglyph preserved, placement guard now FAILS on new files"
+verisimdb = "DONE 2026-08-03 — 713 files removed, pointer README left, split-history/verisimdb preserved, 7 files ported via #219"
+gnpl = "DONE — lithoglyph/gql-dt/ 125 files → hyperpolymath/gnpl as 102c79e PR #4, granular history in _split_gnpl"
+glyphbase = "DONE — lithoglyph/glyphbase/ 130 files → hyperpolymath/glyphbase, un-nested"
+remaining = "quandledb/, nqc/, typeql-experimental/, verisim-core/, verisim-modular-experiment/ — grandfathered, being extracted per REGISTRY.adoc and RESITE-DATABASES-TO-OWN-REPOS.adoc"
+disentanglement = "docs/migration/LITHOGLYPH-GNPL-DISENTANGLEMENT.adoc — GNPL vs LithoglyphDB semantic separation, core-factor/gql/ superseded"
+

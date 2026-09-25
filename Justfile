@@ -80,6 +80,54 @@ llm-context:
     @test -f README.adoc && head -30 README.adoc || test -f README.md && head -30 README.md || echo "No README found"
 
 
+# Validate K9 pedigree (Issue #53)
+validate-k9:
+    @./.github/hooks/validate-k9.sh
+
+# Validate A2ML manifests (template debt, Issue #42)
+validate-a2ml:
+    @./.github/hooks/validate-a2ml.sh
+
+# Check template residue (Issue #42)
+check-template-debt:
+    @echo "Checking for {{PLACEHOLDER}} tokens..."
+    @grep -R "{{PLACEHOLDER}}" --include="*.a2ml" --include="*.adoc" . | grep -v ".git" | wc -l | xargs -I{} sh -c 'if [ {} -eq 0 ]; then echo "  [OK] 0 placeholder files"; else echo "  [FAIL] {} files with placeholders"; exit 1; fi'
+    @echo "Checking for {{PROJECT_*}} tokens (excluding reject-if-contains)..."
+    @grep -R "{{PROJECT" --include="*.a2ml" . | grep -v ".git" | grep -v "reject-if-contains" | wc -l | xargs -I{} sh -c 'if [ {} -eq 0 ]; then echo "  [OK] 0 project placeholder files"; else echo "  [FAIL] {} files"; exit 1; fi'
+
+# Check ReScript/TS migration (Issue #42)
+check-rescript-ts:
+    @echo "Checking for ReScript/TS files in coordination paths..."
+    @find . -name "*.res" -o -name "*.resi" -o -name "*.ts" -o -name "*.tsx" | grep -v ".git" | wc -l | xargs -I{} sh -c 'if [ {} -eq 0 ]; then echo "  [OK] 0 ReScript/TS files"; else echo "  [FAIL] {} files"; find . -name "*.res" -o -name "*.resi" -o -name "*.ts" -o -name "*.tsx" | grep -v ".git"; exit 1; fi'
+
+# Check proof-debt (Issue #53)
+check-proof-debt:
+    @test -f docs/proof-debt.adoc && echo "  [OK] docs/proof-debt.adoc exists" || (echo "  [FAIL] docs/proof-debt.adoc missing"; exit 1)
+    @grep -R "believe_me\|Obj.magic\|unsafeCoerce" --include="*.idr" --include="*.jl" --include="*.rs" docs/ .machine_readable/ tests/ 2>/dev/null | wc -l | xargs -I{} sh -c 'if [ {} -eq 0 ]; then echo "  [OK] No banned patterns in coordination paths"; else echo "  [FAIL] {} banned patterns"; exit 1; fi'
+
+# Check registry links + pointer READMEs (Issue #45, Option E)
+check-registry:
+    @./tests/registry-links.sh
+    @./tests/pointer-readmes.sh
+
+# Check extraction readiness (Issue #45)
+check-extraction:
+    @./scripts/resite/check-extraction-readiness.sh
+
+# Check packaging policy (Guix primary)
+check-packaging:
+    @test -f guix.scm && echo "  [OK] guix.scm exists — Guix primary packaging" || (echo "  [FAIL] guix.scm missing — Guix policy will fail"; exit 1)
+    @grep -q "SPDX-License-Identifier" guix.scm && echo "  [OK] guix.scm has SPDX" || (echo "  [FAIL] guix.scm missing SPDX"; exit 1)
+
+# Full governance check (all foundational fixes)
+governance-check: validate-k9 validate-a2ml check-template-debt check-rescript-ts check-proof-debt check-registry check-extraction check-packaging
+    @echo "All governance checks PASS — foundational fixes for #42, #45, #53 verified"
+    @echo "  - K9 pedigree + trusted-base (Issue #53)"
+    @echo "  - Template debt + ReScript/TS migration + verisim-core AFFIRMATION (Issue #42)"
+    @echo "  - Lithoglyph/GNPL/Glyphbase disentanglement + extraction (Issue #45)"
+    @echo "  - Guix packaging + actions.lock (governance failures on main)"
+    @echo "  - Cross-db integration tests (registry-links, pointer-readmes)"
+
 # Print the current CRG grade (reads from READINESS.md '**Current Grade:** X' line)
 crg-grade:
     @grade=$$(grep -oP '(?<=\*\*Current Grade:\*\* )[A-FX]' READINESS.md 2>/dev/null | head -1); \

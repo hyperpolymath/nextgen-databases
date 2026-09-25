@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Fuzz Testing — Coordination Repo
+
+This directory previously contained a scorecard placeholder inherited from rsr-template-repo
+that did NOT provide real fuzz testing (see TEST-NEEDS.adoc FAKE-FUZZ ALERT).
+
+In this coordination repository, fuzz testing belongs in owning repositories per REGISTRY.adoc:
+
+- verisimdb: Rust property tests with RUST_MIN_STACK, VCL parser fuzzing
+- lithoglyph: Zig core tests, data structure invariants
+- gnpl: Lean suites with narration checks
+- quandledb: Julia integration tests
+
+Cross-database fuzzing (if needed) would test interaction between families, not per-database
+internals.
+
+The placeholder has been removed 2026-09-25 as part of foundational fixes for #42.

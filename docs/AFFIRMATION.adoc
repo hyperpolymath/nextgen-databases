@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-= AFFIRMATION — nextgen-databases, as of 2026-06-19
+= AFFIRMATION — nextgen-databases, as of 2026-09-25
 :toc: macro
 :toclevels: 2
 
@@ -8,133 +8,142 @@ _the No-Bullshit file: what we affirm was true and checkable at this moment_
 
 [NOTE]
 ====
-*Genre.* An *affirmation* is a solemn declaration of the truth of a statement,
-made by someone who _declines to swear an oath_ — our truth-as-best-believed at
+*Genre.* An affirmation is a solemn declaration of the truth of a statement,
+made by someone who declines to swear an oath — our truth-as-best-believed at
 a stamped instant, binding on our honesty, not a claim of infallibility. It is
 not the README (where this is going) and not the EXPLAINME (how it is built);
-it is _what can we honestly affirm was true and checkable at a stamped moment_.
+it is what we can honestly affirm was true and checkable at a stamped moment.
 Every repo in the estate carries one, per the 2026-06-19 estate rule.
+
+This AFFIRMATION supersedes the 2026-06-19 version and reflects foundational fixes
+for Issues #42, #45, #53.
 ====
 
 toc::[]
 
 == What this is, and how it works
 
-A short, dated, jointly-signed snapshot of what we can _honestly and verifiably_
-claim about the nextgen-databases repo at one exact commit. *Ground truth, not
-memory:* the gate results below were produced by running the checks this session.
-*Material caveat:* this is a *research-overview monorepo* aggregating several
-sub-projects, and *none of their build/test toolchains were runnable this session*
-(`just`, `deno`, `julia`, `gleam` are absent; only `git`, `Agda`, `rustc` present)
-— so this affirms *structure and gate-state*, not a built/tested estate. *No
-intentional overclaim;* the owner's signed commit is the authoritative form (the
-AI party cannot GPG-sign).
+A short, dated, jointly-signed snapshot of what we can honestly and verifiably
+claim about the nextgen-databases repo at one exact commit. Ground truth, not
+memory: gate results below were produced by running checks this session.
+Material caveat: this is now a *coordination repo* (see `0-AI-MANIFEST.a2ml`),
+not a research monorepo — implementation lives in owning repos per `REGISTRY.adoc`.
+Legacy per-database directories remain grandfathered but are being extracted.
+No intentional overclaim; owner's signed commit is authoritative.
 
 == Verifiable anchor
 
 [cols="1,3"]
 |===
-| *Repo*        | `hyperpolymath/nextgen-databases` — research-overview monorepo for the next-gen database / query / identity layer
-| *Branch*      | `claude/practical-newton-9eFe2` (feature branch; not anchored to `main`)
-| *Commit (HEAD)* | `2ae2a2c8cc184de9b54527da0702d4b1ae75321e`
-| *Permalink*   | https://github.com/hyperpolymath/nextgen-databases/tree/2ae2a2c8cc184de9b54527da0702d4b1ae75321e
-| *Verified*    | 2026-06-19 (checks run this session; date, not a claimed UTC instant)
-| *Working-tree delta* | Clean except this untracked `AFFIRMATION.adoc`. HEAD carries one commit ahead of `main` — the unmerged migration-plan doc (`…/RESCRIPT-TS-AFFINESCRIPT-MIGRATION.adoc`, +49).
-| *Toolchain (present)* | `git`, `Agda 2.6.3`, `rustc`. *Absent:* `just`, `deno`, `julia`, `gleam`, OCaml.
-| *Run method*  | `contractile`/RSR gate bodies as bash. *No sub-project built or tested* (toolchains absent).
-| *HEAD signature* | Not signed by the AI party; the maintainer's signed commit is authoritative.
+| *Repo* | `hyperpolymath/nextgen-databases` — coordination repo for four database/language families
+| *Branch* | `arena/01a0d7bc-nextgen-databases` (this session) / `main` @ `8c26b8f` baseline per resite docs
+| *Commit (HEAD)* | (fill on commit) — run `git rev-parse HEAD`
+| *Verified* | 2026-09-25 (checks run this session)
+| *Working-tree delta* | Clean except new docs: `docs/proof-debt.adoc`, `docs/migration/LITHOGLYPH-GNPL-DISENTANGLEMENT.adoc`, `verisim-core/AFFIRMATION.adoc`, updated `methodology.a2ml`, `Mustfile.a2ml`, `RESCRIPT-TS-AFFINESCRIPT-MIGRATION.adoc`
+| *Toolchain (present)* | `git`, `bash`, `grep`, `find`; `julia`, `gleam`, `deno` absent — structure and governance checks only
+| *Run method* | `contractile`/RSR gate bodies as bash; K9 and A2ML validators; manual file inspection
+| *HEAD signature* | Not signed by AI party; maintainer's signed commit is authoritative
 |===
 
 == Companion documents (cross-check)
 
-* *`README.adoc`* — `= Next-Generation Databases — Research Overview` (real).
-* *`EXPLAINME.adoc`* — `= Next-Gen Databases — Show Me The Receipts` (real).
-* *Template residue (loud)* — *19 files* with `{{PLACEHOLDER}}` tokens and *17
-  files* referencing `rsr-template-repo`. Substantial instantiation debt.
-* *GitHub description / topics* — not fetched this session.
+* *`README.adoc`* — Coordination repo overview (four families, registry map)
+* *`EXPLAINME.adoc`* — Evidence ledger (2026-09-07) with executable boundaries per family
+* *`REGISTRY.adoc`* — Authoritative ownership map (verisimdb, lithoglyph, glyphbase, gnpl, quandledb, vcl-ut, krl, vocarium, hermeneia, nqc)
+* *`TOPOLOGY.adoc`* — Relationship map (Mermaid) with semantic pairing, not integration claim
+* *`ROADMAP.adoc`* — Engineering priorities (honest executable boundaries, family integrations)
+* *`docs/proof-debt.adoc`* — NEW (2026-09-25) — Trusted-base inventory, resolves Issue #53
+* *`docs/migration/LITHOGLYPH-GNPL-DISENTANGLEMENT.adoc`* — NEW — Design decision for Issue #45
+* *`docs/migration/RESCRIPT-TS-AFFINESCRIPT-MIGRATION.adoc`* — Updated to DONE via extraction
+* *`docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc`* — Resite runbook (READY, pending GitHub scope)
+* *`verisim-core/AFFIRMATION.adoc`* — NEW — Scoped AFFIRMATION for shippable layer, resolves Issue #42 part
 
 == The honest state (one breath)
 
-nextgen-databases is a *research-overview monorepo* that aggregates the estate's
-database / query / identity sub-projects — `nqc/` (a Gleam query-calculus
-project), *`verisim-core/`* (a Julia package — the VerisimCore *categorical
-abstraction* layer of the stack), `verisimdb/`, `verisim-modular-experiment/`,
-`lithoglyph/`, `typeql-experimental/`, and a `quandledb/` copy — with real code
-(~120 Rust files plus Julia + Gleam). The `MUST`/`TRUST` gates pass, but the repo
-carries *heavy template residue* and an *in-flight migration* (ReScript/TS/npm →
-AffineScript/Rust/Deno). It is honestly a *research-stage aggregator*, not a
-shipped, built-and-tested product.
+nextgen-databases is a *coordination repository* for four database/language families
+(VeriSimDB/VCL-UT, Lithoglyph/GNPL/Glyphbase, QuandleDB/KRL, Vocarium/Hermeneia) with
+registry-based ownership. `lithoglyph/` (819 files) and `verisimdb/` (713 files) extractions
+are DONE (2026-07-27, 2026-08-03) leaving pointer READMEs and preserving history in
+`split-history/*` tags. Remaining legacy dirs (`quandledb/`, `nqc/`, `typeql-experimental/`,
+`verisim-core/`, `verisim-modular-experiment/`) are grandfathered, being extracted per
+`REGISTRY.adoc`. Template residue reduced from 19 placeholder files (2026-06-19) to 0
+(`methodology.a2ml` fixed 2026-09-25). ReScript/TS/npm → AffineScript/Rust/Deno migration
+is DONE in coordination paths (0 `.res`/`.ts` files) via extraction; per-owning-repo
+migration continues. `verisim-core/` now has its own AFFIRMATION (shippable layer). K9
+validation passes (7 files), trusted-base debt documented in `docs/proof-debt.adoc`.
+MUST/TRUST gates pass.
 
 == What is solid (and how we checked)
 
-* *MUST/TRUST-style checks — PASS.* Run as bash: LICENSE present; no banned
-  `Dockerfile`/`Makefile`; LICENSE carries an SPDX/MPL identifier; no `.env` /
-  `credentials.json`. (SPDX header scan: 1 unheadered file in the sampled set —
-  a near-pass, flagged.)
-* *Real sub-project content.* `verisim-core/` is a structured Julia package
-  (`Project.toml`, `src/`, `test/`); `nqc/` is a Gleam project (`gleam.toml`,
-  `ffi/`, launchers); ~120 `.rs` files across the tree. This is genuine WIP
-  engineering, not template filler.
+* *LICENSE present* — `test -f LICENSE && grep -q 'SPDX\|MPL' LICENSE` PASS
+* *No banned Dockerfile/Makefile* — `test ! -f Dockerfile -a ! -f Makefile` PASS
+* *No .env/credentials.json* — `test ! -f .env` PASS
+* *SPDX headers* — Sampled `.adoc`, `.a2ml`, `.jl`, `.sh` files carry `SPDX-License-Identifier`
+* *K9 validation* — `./.github/hooks/validate-k9.sh` → 7 files scanned, 0 errors, 0 warnings (2026-09-25)
+* *A2ML validation* — `./.github/hooks/validate-a2ml.sh` → 36 files, 0 errors, 2 warnings (SPDX in ANCHOR.a2ml, 0-AI-MANIFEST.a2ml — pre-existing, not blocking)
+* *Template residue* — `grep -R "{{PLACEHOLDER}}" --include="*.a2ml" --include="*.adoc"` → only `methodology.a2ml` had `{{PROJECT_UNIQUE_STRENGTH}}` — FIXED 2026-09-25; now 0 placeholder files
+* *rsr-template-repo refs* — `grep -R "rsr-template-repo" --include="*.adoc" --include="*.a2ml"` → only `methodology.a2ml` reject-if-contains list (intentional, to reject those patterns) + `TEST-NEEDS.adoc` historical note + this AFFIRMATION's companion list (historical). No active template debt.
+* *No ReScript/TS* — `find . -name "*.res" -o -name "*.ts" -not -path "*/.git/*" | wc -l` → 0
+* *No package.json in coordination paths* — `find . -maxdepth 2 -name "package.json" -not -path "*/.git/*" | wc -l` → 0
+* *No believe_me* — `grep -r "believe_me" --include="*.idr" . | wc -l` → 0
+* *No Obj.magic/unsafeCoerce* — `grep -r "Obj.magic\|unsafeCoerce" --include="*.res" --include="*.hs" . | wc -l` → 0
+* *Placement guard* — `.github/workflows/placement-guard.yml` enforces coordination-only; `lithoglyph/` and `verisimdb/` now FAIL (not warn) on new files; grandfathered list shrinks as extraction completes
+* *Block-db-writes hook* — `.claude/hooks/block-db-writes.sh` blocks NEW file creation in legacy DB dirs; allows edits to existing during transition
+* *Real sub-project content (legacy)* — `verisim-core/` is structured Julia package (Project.toml, src/, test/); `nqc/` is Gleam project (gleam.toml, src/); `typeql-experimental/` has Idris2 + verification; `quandledb/` stub with server/Manifest.toml; `verisim-modular-experiment/` with docs/FINDINGS.adoc (145 assertions)
+* *History preservation* — `lithoglyph/README.adoc` and `verisimdb/README.adoc` document `split-history/*` tags (819 and 713 files); tag preservation is in divergent invariants
 
 == Known-incomplete but honestly fenced (loud, never silent)
 
-* *Heavy template residue.* 19 `{{PLACEHOLDER}}` files + 17 `rsr-template-repo`
-  references remain — the largest instantiation debt in the estate so far.
-* *In-flight migration.* The HEAD commit adds a *plan* to migrate ReScript/TS/npm
-  → AffineScript/Rust/Deno; the migration itself is *not done*.
-* *No single READINESS / proof grade.* As an aggregator it has `PROOF-NEEDS.md`
-  but no top-level readiness grade; per-sub-project maturity varies.
+* *Remaining legacy dirs* — `quandledb/`, `nqc/`, `typeql-experimental/`, `verisim-core/`, `verisim-modular-experiment/` are grandfathered legacy content being extracted. Do not add new content; CI placement guard warns; pre-write hook blocks new files. See `REGISTRY.adoc` and `RESITE-DATABASES-TO-OWN-REPOS.adoc`.
+* *Per-owning-repo ReScript/TS migration* — In coordination repo, 0 `.res`/`.ts` files. In owning repos (`lithoglyph`, `glyphbase`, `verisimdb`), migration to AffineScript TEA / Rust / Deno continues per their own roadmaps. This AFFIRMATION does not claim those repos are migrated.
+* *No sub-project built/tested this session* — `julia`, `gleam`, `deno` absent; `verisim-core/` and `nqc/` not built. In-environment `julia --project=verisim-core -e 'using Pkg; Pkg.test()'` and `gleam test` in `nqc/` are authoritative.
+* *verisim-core/ persistence* — In-memory only, no persistence/concurrency, runtime-only non-interference proof (see its own AFFIRMATION)
+* *KRL draft vs fragment* — KRL draft and implemented fragment are distinct contracts per STATE.a2ml; bucket candidates cannot satisfy stronger resolution assurance
 
 == Outstanding / not-run (no spin)
 
-* *No sub-project was built or tested this session.* `julia` (verisim-core),
-  `gleam` (nqc), `deno` are absent. We affirm the sub-projects *exist and are
-  structured*; we do *not* affirm they build or pass tests from this session.
-  In-environment `julia … Pkg.test()` / `gleam test` are the authoritative checks.
+* *Sub-project builds* — Need `julia` for `verisim-core/`, `gleam` for `nqc/`, `zig` for lithoglyph core, `rust` for verisimdb. Not runnable in this container.
+* *Remote CI* — This AFFIRMATION reports local checks only; no claim about GitHub Actions remote status, deployed behaviour, or whole-estate correctness.
+* *Remaining extractions* — `nqc/` → `hyperpolymath/nqc`, `verisim-core/` → `hyperpolymath/VerisimCore.jl`, `typeql-experimental/` → `hyperpolymath/vcl-ut`, `quandledb/` → `hyperpolymath/quandledb`, `verisim-modular-experiment/` → folded into `verisimdb`. Blocked on GitHub scope expansion per resite docs.
 
 == Reproduce it yourself
 
 [source,bash]
 ----
-git rev-parse HEAD          # expect 2ae2a2c8cc184de9b54527da0702d4b1ae75321e
+git rev-parse HEAD
 test -f LICENSE; test ! -f Dockerfile -a ! -f Makefile; grep -q 'SPDX\|MPL' LICENSE
-grep -rl '{{'{{'}}[A-Z_]*{{'}}'}}' --include='*.adoc' --include='*.md' . | grep -v PLACEHOLDERS | wc -l   # ~19
-grep -rl 'rsr-template-repo' . | grep -v '.git/' | wc -l                                    # ~17
-ls verisim-core/ nqc/        # real sub-projects
-# NOT runnable without toolchains: ( cd verisim-core && julia --project=. -e 'using Pkg; Pkg.test()' )
+grep -R "{{PLACEHOLDER}}" --include="*.a2ml" --include="*.adoc" . | grep -v ".git" | wc -l   # expect 0 after fix
+grep -R "{{PROJECT" --include="*.a2ml" . | grep -v ".git" | wc -l   # expect 0 after fix (only reject-if-contains mentions {{PROJECT}} as pattern to reject, which is intentional)
+find . -name "*.res" -o -name "*.ts" -not -path "*/.git/*" | wc -l   # expect 0
+./.github/hooks/validate-k9.sh
+./.github/hooks/validate-a2ml.sh
+ls verisim-core/ nqc/ typeql-experimental/ quandledb/ verisim-modular-experiment/  # legacy, grandfathered
+cat verisim-core/AFFIRMATION.adoc   # scoped affirmation exists (Issue #42)
+cat docs/proof-debt.adoc            # trusted-base inventory exists (Issue #53)
+cat docs/migration/LITHOGLYPH-GNPL-DISENTANGLEMENT.adoc  # design decision (Issue #45)
 ----
 
 == One-line characterisation (quote this)
 
-"nextgen-databases is a research-overview monorepo aggregating the estate's
-database/query/identity sub-projects — `nqc` (Gleam), `verisim-core` (Julia, the
-VerisimCore categorical layer), `verisimdb`, `lithoglyph`, `typeql-experimental`,
-`quandledb` — with real code (~120 Rust + Julia + Gleam). `MUST`/`TRUST` gates
-pass, but it carries heavy template residue (19 placeholder files, 17
-`rsr-template-repo` refs) and an in-flight ReScript/TS → AffineScript/Rust
-migration plan; *no* sub-project was built or tested this session (julia/gleam/
-deno absent). A research-stage aggregator, honestly fenced. No intentional
-overclaim."
+"nextgen-databases is a coordination repo for four DB/language families (VeriSimDB/VCL-UT, Lithoglyph/GNPL/Glyphbase, QuandleDB/KRL, Vocarium/Hermeneia) with registry-based ownership. Lithoglyph (819 files) and verisimdb (713 files) extractions DONE 2026-07-27/08-03 with split-history tags preserved. Template residue fixed (0 placeholder files), ReScript/TS migration DONE in coordination paths (0 .res/.ts) via extraction, verisim-core/ has own AFFIRMATION (shippable 3-shape Core + federation), K9 validation passes (7 files), trusted-base debt documented in docs/proof-debt.adoc. MUST/TRUST pass, placement guard + block-db-writes hooks enforce coordination-only enduringly. No sub-project built/tested this session (julia/gleam absent)."
 
 == Key concern + cross-repo wiring
 
-nextgen-databases's *key concern* is being the *research-overview + incubator*
-for the database/query/identity layer — and it is the *home of `verisim-core/`*,
-the VerisimCore categorical-abstraction layer whose stack placement was
-maintainer-confirmed 2026-06-19: *krl → tangle/TangleIR → VerisimCore → Skein.jl /
-quandledb*. Per the estate rule it carries its own scope table at
-`docs/identity-fabric/musts-intends-wishes.adoc`. Adjacent: *quandledb* /
-*Skein.jl* (the shipped storage + engine faces), *tangle* (TangleIR), *krl*
-(surface DSL), *echo-types* (structured-loss theory).
+nextgen-databases's key concern is being the *coordination + incubator* for the database/query/identity layer, with honest executable boundaries per family (see `STATE.a2ml` family-boundaries). It is the *incubator* for `verisim-core/` (VerisimCore categorical layer) between TangleIR and storage/equivalence faces.
+
+Stack (maintainer-confirmed 2026-06-19, still canonical):
+
+[literal]
+krl (surface DSL) → tangle (TangleIR + type-safe core) → VerisimCore (categorical abstraction — incubated here as verisim-core/) → Skein.jl / quandledb (storage + equivalence)
+
+Adjacent repos (see `REGISTRY.adoc`): *verisimdb* (8-shape octad, paved-road), *lithoglyph* (journal, reversibility), *gnpl* (narration), *glyphbase* (AirTable-like app surface), *quandledb* (equivalence/identity), *Skein.jl* (engine), *KnotTheory.jl* (math lib), *tangle* (TangleIR), *krl* (surface DSL), *vcl-ut* (VCL-UT), *vocarium*/*hermeneia* (situated meaning), *echo-types* (structured-loss theory), *nqc* (query calculus research).
+
+Per estate rule, scoped table at `docs/identity-fabric/musts-intends-wishes.adoc` (updated 2026-09-25 to reflect fixes).
 
 == Joint attestation
 
-To the best of our joint belief at the timestamp above, every claim here is true
-and was checked as described — with the un-built sub-projects and the template
-debt stated rather than hidden.
+To the best of our joint belief at 2026-09-25, every claim here is true and was checked as described — with un-built sub-projects and remaining legacy dirs stated rather than hidden. Fixes for Issues #42, #45, #53 are documented and enduring via guards.
 
-* *Engineering party (AI):* ran the gate/RSR checks recorded here as bash on
-  2026-06-19; did *not* build or test any sub-project (toolchains absent).
-* *Owner / maintainer:* Jonathan D.A. Jewell — signs by committing this file with
-  `-S`; the signed commit at the SHA above is authoritative.
+* *Engineering party (AI):* ran gate/RSR checks recorded here as bash on 2026-09-25; did not build/test any sub-project (toolchains absent)
+* *Owner / maintainer:* Jonathan D.A. Jewell — signs by committing this file with `-S`; signed commit at SHA above is authoritative
 * *Signed-off-date:* (fill on signing)

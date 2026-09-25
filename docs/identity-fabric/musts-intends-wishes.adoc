@@ -2,16 +2,17 @@
 // SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = nextgen-databases — Normative Scope (Must / Intend / Wish)
 :toc: preamble
-:revdate: 2026-06-19
+:revdate: 2026-09-25
 
 [abstract]
-Per-repo normative-scope record for nextgen-databases (the research-overview +
-incubator monorepo for the database / query / identity layer, and the home of
-`verisim-core/`). Estate rule (2026-06-19): every repo carries its own scoped
-table; crossover content is duplicated and marked until resolved, then wired into
-the other relevant repos. `◇` marks proposals not yet canonical.
+Per-repo normative-scope record for nextgen-databases (the coordination repo for
+the database / query / identity layer, incubating `verisim-core/`). Estate rule
+(2026-06-19): every repo carries its own scoped table; crossover content is
+duplicated and marked until resolved, then wired into the other relevant repos.
+`◇` marks proposals not yet canonical. Updated 2026-09-25 to reflect foundational
+fixes for Issues #42, #45, #53.
 
-== Confirmed stack placement (2026-06-19)
+== Confirmed stack placement (2026-06-19, still canonical 2026-09-25)
 
 [literal]
 krl (surface DSL) → tangle (TangleIR + type-safe core) → VerisimCore (categorical
@@ -31,25 +32,36 @@ equivalence)
 | Level | nextgen-databases
 
 | *MUST*
-| Be the *research-overview + incubator* for the database/query/identity layer;
-  honestly host its sub-projects (`nqc` Gleam query-calculus; *`verisim-core`* —
-  the VerisimCore categorical layer, in Julia; `verisimdb`; `lithoglyph`;
-  `typeql-experimental`; a `quandledb` copy) with their own provenance; estate
-  governance — LICENSE/REUSE, SPDX headers, no banned files; honest KRL-stack
-  grounding (no op↔component category error).
+| Be the *coordination repo* for the database/query/identity layer (four families:
+  VeriSimDB/VCL-UT, Lithoglyph/GNPL/Glyphbase, QuandleDB/KRL, Vocarium/Hermeneia);
+  maintain `REGISTRY.adoc` as authoritative ownership map; enforce coordination-only
+  via placement guard + block-db-writes hook; preserve `split-history/*` tags and
+  `_split_*` branches (history-preserving extraction); estate governance — LICENSE/REUSE,
+  SPDX headers, no banned files (TS/ReScript banned estate-wide, now 0 in coordination paths),
+  K9 pedigree valid (7 files pass), trusted-base debt documented in `docs/proof-debt.adoc`;
+  honest KRL-stack grounding (no op↔component category error).
 
-| *INTEND*
-| *Pay down the template debt* (the live debt per `AFFIRMATION.adoc`: 19
-  `{{PLACEHOLDER}}` files + 17 `rsr-template-repo` references); execute the
-  *ReScript/TS/npm → AffineScript/Rust/Deno migration* now planned in
-  `RESCRIPT-TS-AFFINESCRIPT-MIGRATION.adoc`; mature `verisim-core` toward the
-  shippable VerisimCore layer; graduate stabilised sub-projects into their own
-  repos; give the aggregate a real readiness story.
+| *INTEND* (2026-09-25 update)
+| *DONE:* Pay down template debt — from 19 `{{PLACEHOLDER}}` files (2026-06-19) to 0
+  (methodology.a2ml fixed 2026-09-25, `{{PROJECT_UNIQUE_STRENGTH}}` → real description).
+  *DONE in coordination paths:* ReScript/TS/npm → AffineScript/Rust/Deno migration —
+  0 `.res`/`.ts`/`package.json` in coordination paths via extraction (per-owning-repo
+  migration continues). *DONE:* Give `verisim-core/` its own `AFFIRMATION.adoc` (shippable
+  layer, 2026-09-25). *INTEND remaining:* Complete resite — extract remaining grandfathered
+  dirs (`quandledb/` → `hyperpolymath/quandledb`, `nqc/` → `hyperpolymath/nqc`,
+  `typeql-experimental/` → `hyperpolymath/vcl-ut`, `verisim-core/` → `hyperpolymath/VerisimCore.jl`,
+  `verisim-modular-experiment/` → fold into `verisimdb`) per `RESITE-DATABASES-TO-OWN-REPOS.adoc`;
+  shrink placement-guard grandfather list to empty; mature `verisim-core` toward shippable
+  VerisimCore layer (persistence, concurrency, formal non-interference).
 
 | *WISH*
 | A coherent next-gen query surface (the `nqc` calculus) over the VerisimCore +
   Skein/QuandleDB substrate ◇; VerisimDB as a self-hostable identity-state store
-  ◇; a clean separation of incubated experiments from shipped components.
+  ◇; a clean separation of incubated experiments from shipped components — now
+  enforced enduringly via placement guard + block-db-writes hook + `0-AI-MANIFEST.a2ml`
+  coordination-only invariant. GNPL narration connected to live Lithoglyph journal
+  with withdrawal across revisions ◇; QuandleDB/KRL explicit resolution witness ◇;
+  VeriSimDB mandatory admissibility coverage for every advertised checked operation ◇.
 |===
 
 == Cross-repo wiring

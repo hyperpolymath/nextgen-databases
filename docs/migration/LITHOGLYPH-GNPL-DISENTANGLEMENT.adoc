@@ -1,0 +1,136 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Lithoglyph / GNPL / Glyphbase Disentanglement — Design Decision
+:toc: left
+:revdate: 2026-09-25
+:status: DONE — extraction completed, design decision recorded
+
+== Context (Issue #45)
+
+Reservation repos exist (`lithoglyphdb`, `gnpl`, `glyphbase`); content was still in
+`nextgen-databases/lithoglyph/` as of 2026-06-22. Prior attempt at a "lith monorepo"
+was an unauthorised agent fabrication (corrected in #44). Issue #45 requested:
+
+- Disentangle GNPL (the GQL-dt query language) from LithoglyphDB (the store)
+- Migrate LithoglyphDB core → `hyperpolymath/lithoglyphdb` (history-preserving)
+- Migrate GNPL/GQL-dt → `hyperpolymath/gnpl`
+- Migrate glyphbase → `hyperpolymath/glyphbase`
+- Remove lithoglyph/ subtree + update parent
+
+== Design Decision — GNPL vs LithoglyphDB (Not Mechanical)
+
+This is a *design decision*, not a mechanical file move. The two have distinct
+semantic purposes:
+
+[cols="1,1,3", options="header"]
+|===
+| Aspect | LithoglyphDB | GNPL
+
+| *Purpose* | Narrative-first, reversible, audit-grade database — stores journals, entities, proofs, with temporal reversibility and audit trail
+| GQL-dt / GNPL — narration/projection language: "what account does this evidence support?" Constructs accounts from evidence with stances, warrants, rival interpretations
+
+| *Layer* | Storage / persistence / journal / proof registry (Zig core, Elixir HTTP, Rust NIF)
+| Language / query / narration: typed selection, storage machinery (private impl), account construction, focalization, hypothetical withdrawal
+
+| *Proof* | Unimplemented builtin verifiers refuse success; registered callback plumbing has positive/rejection controls (per EXPLAINME.adoc 2026-09-07)
+| Independent direct-evidence narration kernel and CLI; 5 Lean suites (35 narration checks); withdrawal/order properties audited for [propext] footprint
+
+| *API* | Journal, entity, proof registry, reversibility
+| Narration: accounts, focalization, warrants, limited rival relation, hypothetical withdrawal — lowers to GQLdt
+|===
+
+*Why separate?*
+
+- LithoglyphDB can exist without GNPL (other query languages can target its journal)
+- GNPL can exist without LithoglyphDB (uses imported snapshots + direct-evidence warrants today; live Lithoglyph adapter remains work per STATE.a2ml)
+- Their proof obligations differ: Lithoglyph needs verifier integration; GNPL needs narration correctness + withdrawal properties
+- Their public language is GNPL (one of four: VCL-UT, GNPL, KRL, Hermeneia) — not "Lithoglyph query language"
+
+*What was superseded, not migrated:*
+
+- `lithoglyph/core-factor/gql/` — runtime/dynamic counterpart to GQLdt's compile-time proofs. A typed narration layer lowering to GQLdt replaces it, so it was never migrated and should not be "finished". See `lithoglyph/README.adoc` and `docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc`.
+
+== Extraction — What Went Where (History-Preserving)
+
+[cols="2,2,1,2", options="header"]
+|===
+| Was (in monorepo) | Now (canonical repo) | Files | Status
+
+| `lithoglyph/` (core, minus un-nested) | https://github.com/hyperpolymath/lithoglyph | 819 total before split | DONE 2026-07-27 — `split-history/lithoglyph` tag preserves 819 files across 68 commits
+| `lithoglyph/glyphbase/` (130 files) | https://github.com/hyperpolymath/glyphbase | 130 | DONE — extracted via `git filter-repo --path lithoglyph/glyphbase/ --path-rename lithoglyph/glyphbase/:`
+| `lithoglyph/gql-dt/` (125 files) | https://github.com/hyperpolymath/gnpl | 125 | DONE — landed as squash-import `102c79e` (PR #4) — granular history in `_split_gnpl` branch
+| `lithoglyph/core-factor/gql/` | — (superseded) | — | NOT MIGRATED — stays as legacy, do not finish
+|===
+
+*History preservation:*
+
+[source,console]
+----
+# Every file removed is preserved at original path in annotated tag
+git ls-tree -r split-history/lithoglyph --name-only | wc -l
+# 819
+
+git checkout split-history/lithoglyph -- <path>
+
+# Never prune these refs — imports were squash merges, so these are only granular history
+# Tags: split-history/lithoglyph, split-history/glyphbase, split-history/gnpl (via _split_gnpl branch)
+# Also: split-history/verisimdb (713 files, 124 commits)
+----
+
+*Verification:*
+
+- `lithoglyph/README.adoc` now holds pointer README only (not implementation)
+- `verisimdb/README.adoc` same (713 files removed 2026-08-03 after upstream recovery via #219)
+- Placement guard now FAILS (not warns) on new files under `lithoglyph/` and `verisimdb/` — they are done
+- Grandfathered legacy dirs still warn: `quandledb/`, `nqc/`, `typeql-experimental/`, `verisim-core/`, `verisim-modular-experiment/` — being extracted per `REGISTRY.adoc`
+
+== Glyphbase — Own Repo, Owner-Decided
+
+Glyphbase is an application surface (AirTable-like app) over LithoglyphDB, with Grid/Kanban/Calendar/Form/Gallery views + stores + bindings (Yjs/Jotai/Webapi/Fetch).
+
+- *Why own repo?* UI concerns (bindings, stores, view logic) differ from core DB concerns (journal, reversibility, audit). Owner decides UI stack (AffineScript TEA per migration plan, mirroring `quandledb/frontend` + `nqc`).
+- *Extraction:* Un-nested from `lithoglyph/glyphbase/` → `hyperpolymath/glyphbase`
+- *Status:* DONE (see `lithoglyph/README.adoc` Where each part went table)
+
+== Enduring Guards (Upstream/Downstream)
+
+*Upstream (prevent re-introduction):*
+
+- `.github/workflows/placement-guard.yml` — CI fails if new files added outside allowed coordination paths; `lithoglyph/` and `verisimdb/` now fail (not warn); remaining legacy dirs warn
+- `.claude/hooks/block-db-writes.sh` — PreToolUse hook blocks creation of NEW file inside legacy DB dirs; allows edits to existing files during transition; maps `lithoglyph/*` → `hyperpolymath/lithoglyph`, `glyphbase` → `hyperpolymath/glyphbase`, `gql-dt` → `hyperpolymath/gnpl`
+- `0-AI-MANIFEST.a2ml` — Declares coordination-only invariant, lists LEGACY dirs
+- `CLAUDE.md` / `AGENTS.adoc` — Explicit NEVER/ALWAYS for coordination vs implementation
+
+*Downstream (owning repos):*
+
+- `hyperpolymath/lithoglyph` — Owns journal, reversibility, proof registry; must verify actual certificates before reporting valid (unimplemented verifiers now refuse success)
+- `hyperpolymath/gnpl` — Owns narration kernel, CLI, Lean suites, withdrawal/order properties; next: connect imported evidence contract to real Lithoglyph journal snapshot and test withdrawal across revisions (per `STATE.a2ml` next-actions)
+- `hyperpolymath/glyphbase` — Owns UI; routes still include demo responses (per `EXPLAINME.adoc`); needs durable GNPL account workflow
+
+*Cross-repo wiring:*
+
+- `REGISTRY.adoc` — Authoritative ownership map, updated to reflect extraction
+- `TOPOLOGY.adoc` — Mermaid diagram shows semantic pairing: `Lithoglyph --- GNPL`, `B[Glypbase] --- application surface --- L`
+- `EXPLAINME.adoc` — Evidence ledger distinguishes implemented vs gaps per family
+- `STATE.a2ml` — Tracks `lithoglyph = "Unimplemented builtin proof verifiers refuse success..."`, `gnpl = "Independent direct-evidence narration kernel..."`
+
+== Acceptance Criteria (Issue #45)
+
+- [x] Disentangle GNPL from LithoglyphDB — design decision documented here (this file)
+- [x] Migrate LithoglyphDB core → `hyperpolymath/lithoglyph` (named `lithoglyph`, not `lithoglyphdb` — reservation name `lithoglyphdb` was superseded by `lithoglyph` per actual extraction; see `REGISTRY.adoc` — note discrepancy for owner to reconcile if needed)
+- [x] Migrate GNPL/GQL-dt → `hyperpolymath/gnpl` — DONE `102c79e`
+- [x] Migrate glyphbase → `hyperpolymath/glyphbase` — DONE
+- [x] Remove lithoglyph/ subtree + update parent — DONE: 819 files removed, pointer README left, `split-history/lithoglyph` preserved
+
+Note on naming: Issue says `hyperpolymath/lithoglyphdb` but actual canonical repo is `hyperpolymath/lithoglyph` per `REGISTRY.adoc` and extraction PR #4. Reservation `lithoglyphdb` exists but was not used; `lithoglyph` is the live canonical. If `lithoglyphdb` reservation should be canonical, owner to rename or alias — no code change needed here.
+
+== References
+
+- Issue #45: Extract Lithoglyph / GNPL / Glyphbase
+- #44: Prior lith monorepo fabrication corrected
+- `lithoglyph/README.adoc`: Pointer README with Where each part went
+- `docs/migration/RESITE-DATABASES-TO-OWN-REPOS.adoc`: Full resite runbook
+- `docs/migration/RESITE-CODEX-HANDOFF.adoc`: Agent command sheet
+- `REGISTRY.adoc`: Authoritative map
+- `EXPLAINME.adoc`: Evidence ledger (2026-09-07)
+- `STATE.a2ml`: Current boundaries and next-actions
