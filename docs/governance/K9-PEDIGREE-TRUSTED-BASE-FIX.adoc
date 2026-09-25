@@ -1,0 +1,151 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= K9 Pedigree + Trusted-Base Fix — Issue #53 Resolution
+:toc: left
+:revdate: 2026-09-25
+:status: DONE — foundational, enduring
+
+== Issue #53 Summary
+
+Two pre-existing, repo-internal findings flagged during 2026-06 estate CI-health work
+(hyperpolymath/hypatia#464), explicitly out of scope for central `actions/cache` + scanner-compile fixes:
+
+1. K9 pedigree — missing `metadata.name` in `verisimdb/connectors/test-infra/deploy.k9.ncl` — fails "Pedigree block missing 'name'". In `standards/k9-svc/pedigree.ncl`, `Metadata.name | String` is only metadata field with no default, so mandatory. Fix: add `metadata.name`; per canonical `standards/k9-svc/pandoc/container/deploy.k9.ncl`, ideally also `metadata.version` + `validation.pedigree_version` and leash level `trust_level`/`security_level` ∈ `'Kennel | 'Yard | 'Hunt` (shell-running deploy.k9.ncl is `'Hunt`).
+
+2. `governance / Trusted-base reduction policy` red — undocumented soundness-relevant escape hatch in proof-bearing file. Disposition per-repo — discharge, budget (`// TRUSTED:`), axiom (`// AXIOM:`), or dated entry in this repo's `docs/proof-debt.md`.
+
+Refs: hyperpolymath/hypatia#464, hyperpolymath/nextgen-typing#69.
+
+== Root Cause Analysis
+
+*K9 pedigree:*
+
+- File `verisimdb/connectors/test-infra/deploy.k9.ncl` existed in monorepo era (verisimdb still in this repo)
+- It used `let component_pedigree = { metadata = { name = "verisimdb-test-infra", ... } } in { pedigree = component_pedigree, ... }` pattern — valid Nickel, but early version of `validate-k9.sh` could not follow `let` indirection, so reported missing name even though name was present at line 23
+- Validator fixed in later version (see comment in `validate-k9.sh` about pedigree_alias handling) — now correctly resolves one-hop `let` indirection
+- File removed from this repo 2026-08-03 when verisimdb extracted to `hyperpolymath/verisimdb` (713 files)
+
+*Trusted-base:*
+
+- Proof-bearing files (`.idr`, `.lean`, `.agda`) lived in `verisimdb/`, `typeql-experimental/`, `verisim-modular-experiment/` in monorepo era
+- No `docs/proof-debt.md` existed to document `// TRUSTED:` / `// AXIOM:` / `believe_me` usage
+- Governance workflow flagged undocumented escape hatch but no disposition path existed in this repo
+
+== Foundational Fix (Upstream/Downstream, Enduring)
+
+=== Upstream — Validator Improvement (already in `validate-k9.sh`)
+
+The K9 validator now handles `let` indirection:
+
+[source,bash]
+----
+# From validate-k9.sh — resolves one-hop let binding
+pedigree_alias=$(sed -nE 's/^[[:space:]]*pedigree[[:space:]]*=[[:space:]]*([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*,?[[:space:]]*$/\1/p' "$file" | head -1)
+# If pedigree = <identifier> names a binding, treat let <identifier> = { as block opener too
+----
+
+This fix is upstream in `hyperpolymath/standards` governance bundle (reusable workflow) and local copy in `.github/hooks/validate-k9.sh`. It prevents false positives on valid Nickel `let` patterns.
+
+=== Downstream — Extraction (verisimdb → own repo)
+
+- `verisimdb/` extracted 2026-08-03 to `hyperpolymath/verisimdb` (713 files, 124 commits preserved in `split-history/verisimdb` tag)
+- K9 file now lives in owning repo where it is validated with proper Nickel evaluation (not just bash grep)
+- This repo's remaining K9 files: 7 template/example files under `.machine_readable/svc/k9/` — all have `metadata.name` (e.g., `name = "TODO: component-name"` satisfies String contract, but they are templates, not deploy files)
+- Validation passes: `./.github/hooks/validate-k9.sh` → 7 files, 0 errors, 0 warnings (2026-09-25)
+
+=== Enduring Guard — Placement Guard + Mustfile + CI
+
+*Placement guard* (`.github/workflows/placement-guard.yml`):
+
+- `lithoglyph/` and `verisimdb/` now FAIL (not warn) on new files — they are DONE
+- Remaining legacy dirs (`quandledb/`, `nqc/`, `typeql-experimental/`, `verisim-core/`, `verisim-modular-experiment/`) warn — being extracted
+- Any new K9 file in coordination paths would be caught — must have proper pedigree
+
+*Mustfile* (`.machine_readable/contractiles/must/Mustfile.a2ml`):
+
+[source,a2ml]
+----
+### k9-pedigree-valid
+- description: K9 files must have valid pedigree with name
+- run: ./.github/hooks/validate-k9.sh
+- severity: critical
+
+### proof-debt-documented
+- description: Any TRUSTED/AXIOM/believe_me must be documented in docs/proof-debt.adoc
+- run: test -f docs/proof-debt.adoc && ...
+- severity: critical
+----
+
+*Governance workflow* (`governance.yml`):
+
+- Uses `hyperpolymath/standards/.github/workflows/governance-reusable.yml@fcb566c` — estate-wide bundle that includes K9 validation, trusted-base reduction, language anti-pattern checks
+- Runs on push to main/master, PR, workflow_dispatch
+- Concurrency group cancels superseded runs (safe for read-only checks)
+
+=== Trusted-Base — Documentation + Process (docs/proof-debt.adoc)
+
+Created `docs/proof-debt.adoc` (2026-09-25) with:
+
+- Current status: coordination repo has no proof-bearing implementation code after extraction
+- Historical Issue #53 resolution
+- Escape hatch inventory (empty in coordination paths, documented for legacy)
+- Policy for new debt: `// TRUSTED: <reason> — review by <date> — issue #<n>` + entry in inventory
+- Verification commands
+- References to #53, hypatia#464, nextgen-typing#69, PROOF-NEEDS.adoc, AFFIRMATION.adoc
+
+*Enduring:*
+
+- Future `// TRUSTED:` / `// AXIOM:` must have comment + entry in `docs/proof-debt.adoc`
+- Mustfile check `proof-debt-documented` fails CI if undocumented
+- If debt belongs to database, document in that database's own `docs/proof-debt.md` per `REGISTRY.adoc`, not here
+- `no-believe-me` and `no-unsafe-coerce` checks in Mustfile prevent `believe_me`, `unsafeCoerce`, `Obj.magic`
+
+== Verification (2026-09-25)
+
+[source,bash]
+----
+# K9 validation
+./.github/hooks/validate-k9.sh
+# → Files scanned: 7, Errors: 0, Warnings: 0
+
+# A2ML validation (includes proof-debt and template checks)
+./.github/hooks/validate-a2ml.sh
+# → Files scanned: 36, Errors: 0, Warnings: 0 (after SPDX fix)
+
+# Template residue
+grep -R "{{PLACEHOLDER}}" --include="*.a2ml" --include="*.adoc" . | grep -v ".git" | wc -l
+# → 0
+
+# ReScript/TS
+find . -name "*.res" -o -name "*.ts" -not -path "*/.git/*" | wc -l
+# → 0
+
+# Banned patterns in coordination paths
+grep -R "believe_me\|Obj.magic\|unsafeCoerce" --include="*.idr" --include="*.jl" --include="*.rs" docs/ .machine_readable/ tests/ | wc -l
+# → 0
+
+# Proof-debt doc exists
+test -f docs/proof-debt.adoc && echo "exists"
+
+# Mustfile checks
+cat .machine_readable/contractiles/must/Mustfile.a2ml | grep -A2 "k9-pedigree-valid\|proof-debt-documented"
+----
+
+All pass.
+
+== Cross-References
+
+- `docs/proof-debt.adoc` — Full inventory and policy
+- `.github/hooks/validate-k9.sh` — Validator with let-indirection fix
+- `.github/workflows/placement-guard.yml` — Coordination-only enforcement
+- `.machine_readable/contractiles/must/Mustfile.a2ml` — k9-pedigree-valid + proof-debt-documented
+- `docs/AFFIRMATION.adoc` (2026-09-25) — Current honest state, K9 + trusted-base fixed
+- `lithoglyph/README.adoc`, `verisimdb/README.adoc` — Extraction completion, split-history tags
+- hyperpolymath/hypatia#464 — Original CI-health work
+- hyperpolymath/nextgen-typing#69 — Similar trusted-base disposition
+- hyperpolymath/standards — Governance reusable workflow
+
+== Acceptance Criteria
+
+- [x] K9 pedigree — missing `metadata.name` — RESOLVED: file no longer in this repo after extraction; remaining 7 K9 files have name, validation passes; enduring guard via validate-k9.sh + Mustfile + placement guard
+- [x] Trusted-base reduction policy red — RESOLVED: docs/proof-debt.adoc created, inventory shows no TRUSTED/AXIOM/believe_me in coordination paths, Mustfile checks proof-debt-documented, governance workflow enforces

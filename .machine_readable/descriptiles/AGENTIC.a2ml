@@ -5,8 +5,10 @@
 # Defines what AI agents can and cannot do in this repository.
 
 [metadata]
-version = "0.1.0"
-last-updated = "2026-03-16"
+version = "0.2.0"
+last-updated = "2026-09-25"
+project = "nextgen-databases"
+type = "coordination-repo"
 
 [agent-permissions]
 can-edit-source = true
@@ -16,12 +18,26 @@ can-edit-config = true
 can-create-files = true
 
 [agent-constraints]
-# What AI agents must NOT do:
-# - Never use banned language patterns (believe_me, unsafeCoerce, etc.)
-# - Never commit secrets or credentials
-# - Never use banned languages (TypeScript, Python, Go, etc.)
-# - Never place state files in repository root (must be in .machine_readable/)
-# - Never use AGPL license (use PMPL-1.0-or-later)
-# - Never add per-database implementation content (source, schemas, migrations,
-#   per-database docs, database-language implementations) to this COORDINATION repo;
-#   it belongs in that database's own repo (see REGISTRY.adoc)
+# What AI agents must NOT do — enduring guards for Issues #42, #45, #53:
+# - Never use banned language patterns (believe_me, unsafeCoerce, Obj.magic, unsafePerformIO)
+# - Never commit secrets or credentials (.env, credentials.json)
+# - Never use banned languages (TypeScript, ReScript, Python, Go) — estate-wide ban, use AffineScript TEA / Rust / Deno / Julia / Gleam per owning repo
+# - Never place state files in repository root (must be in .machine_readable/descriptiles/ — see 0-AI-MANIFEST.a2ml)
+# - Never use AGPL license (use PMPL-1.0-or-later, MPL-2.0 where platform requires)
+# - Never add per-database implementation content (source, schemas, migrations, storage engines, database-language implementations, per-database docs) to this COORDINATION repo; it belongs in that database's own repo (see REGISTRY.adoc)
+# - Never create new files under lithoglyph/ or verisimdb/ — extractions DONE, now FAIL in placement guard (pointer READMEs only)
+# - Never create new files under quandledb/, nqc/, typeql-experimental/, verisim-core/, verisim-modular-experiment/ — grandfathered legacy being extracted; block-db-writes hook blocks NEW files
+# - Never prune split-history/* tags or _split_* branches — they are only granular history (squash imports)
+# - Never use {{PLACEHOLDER}} or {{PROJECT_*}} tokens — template debt fixed 2026-09-25, methodology.a2ml now has real unique-strength
+# - Never add K9 files without pedigree.metadata.name — validate-k9.sh enforces
+# - Never add TRUSTED/AXIOM escape hatches without documenting in docs/proof-debt.adoc — Mustfile checks proof-debt-documented
+
+[agent-guidance]
+# Enduring patterns from foundational fixes (2026-09-25):
+# - Coordination repo strength: honest executable boundaries per family (EXPLAINME.adoc), registry ownership (REGISTRY.adoc), placement guard + block-db-writes hooks
+# - Template debt: methodology.a2ml unique-strength must be real description, not placeholder; divergent-invariants and known-constraints must be project-specific
+# - ReScript/TS migration: DONE in coordination paths via extraction (0 .res/.ts files); per-owning-repo migration continues (lithoglyph, glyphbase, verisimdb)
+# - verisim-core AFFIRMATION: shippable layer needs its own AFFIRMATION.adoc with scoped table (see verisim-core/AFFIRMATION.adoc)
+# - Lithoglyph/GNPL disentanglement: GNPL is narration/projection language (accounts, warrants, rival interpretations) layered over GQLdt; LithoglyphDB is journal/storage/reversibility; Glyphbase is application surface; core-factor/gql/ is superseded, not migrated
+# - K9 pedigree: all K9 files need metadata.name, metadata.version, validation.pedigree_version, trust_level/security_level ∈ 'Kennel|'Yard|'Hunt
+# - Trusted-base: no believe_me/unsafeCoerce/Obj.magic in coordination paths; any TRUSTED/AXIOM must be in docs/proof-debt.adoc with justification and review date

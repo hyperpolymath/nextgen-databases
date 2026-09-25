@@ -1,0 +1,95 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Proof Debt — nextgen-databases
+:toc: left
+:revdate: 2026-09-25
+
+This document tracks soundness-relevant escape hatches, trusted-base additions,
+and proof obligations for the nextgen-databases coordination repository.
+Per estate policy, any use of `// TRUSTED:`, `// AXIOM:`, `believe_me`,
+`unsafeCoerce`, `Obj.magic`, or equivalent must be documented here with
+justification, scope, and expiry/review date.
+
+== Current Status (2026-09-25)
+
+*Coordination repo — no proof-bearing implementation code.*
+
+As of 2026-09-25, `nextgen-databases` is a **coordination repository** (see
+`0-AI-MANIFEST.a2ml`, `REGISTRY.adoc`). Per-database implementation — including
+all proof-bearing files (Idris2, Lean, TLA+) — has been extracted to owning
+repositories:
+
+- `verisimdb/` → https://github.com/hyperpolymath/verisimdb (713 files, 2026-08-03)
+- `lithoglyph/` → https://github.com/hyperpolymath/lithoglyph (819 files, 2026-07-27)
+- `lithoglyph/glyphbase/` → https://github.com/hyperpolymath/glyphbase
+- `lithoglyph/gql-dt/` → https://github.com/hyperpolymath/gnpl (GNPL)
+- `quandledb/`, `nqc/`, `typeql-experimental/`, `verisim-core/`, `verisim-modular-experiment/` → grandfathered legacy, being extracted per `REGISTRY.adoc`
+
+Therefore, **this coordination repo itself carries no trusted-base debt**.
+
+=== Historical: Issue #53
+
+Issue #53 flagged two carve-outs from hypatia#464:
+
+1. *K9 pedigree — missing `metadata.name`* in `verisimdb/connectors/test-infra/deploy.k9.ncl`
+   - File no longer exists in this repo after extraction (verisimdb removed 2026-08-03)
+   - Upstream fix: `hyperpolymath/verisimdb` now validates K9 pedigree via `validate-k9.sh`
+   - Local fix: `validate-k9.sh` passes on remaining 7 template files (all have `metadata.name`)
+   - Enduring guard: `.github/hooks/validate-k9.sh` runs in CI; placement guard prevents new K9 files in legacy dirs without proper pedigree
+
+2. *Trusted-base reduction policy — undocumented escape hatch*
+   - Original finding: undocumented soundness-relevant escape hatch in proof-bearing file
+   - Resolution: After extraction, no `.idr`, `.lean`, `.v`, `.agda` proof files remain in coordination paths
+   - Remaining proof files live in grandfathered legacy dirs:
+     * `verisim-core/src/` — Julia, no `believe_me`/`unsafe` patterns (verified via grep)
+     * `typeql-experimental/src/` — Idris2, 0 `believe_me` (verified)
+     * `verisim-modular-experiment/src/` — Idris2, 0 `believe_me`
+   - All have SPDX headers and are covered by Mustfile checks:
+     `no-believe-me`, `no-unsafe-coerce`
+   - Future proof debt must be documented here before merge
+
+== Escape Hatch Inventory (2026-09-25)
+
+[cols="1,1,1,3", options="header"]
+|===
+| Location | Type | Status | Justification
+
+| (none in coordination paths) | — | — | No `// TRUSTED:`, `// AXIOM:`, `believe_me`, `unsafeCoerce`, `Obj.magic` in `docs/`, `tests/`, `.machine_readable/`, root `*.adoc`
+| `verisim-core/src/` | Julia `error()` | Allowed | Runtime validation, not proof escape — `register_peer!` rejects Core shapes at runtime (Idris2 `IsFederable` enforces at compile time in experiment ABI)
+| `typeql-experimental/src/abi/Proofs.idr` | Comment | Documented | Line: "-- bypasses, no termination escapes" — describes what is *not* allowed, not an escape hatch itself
+|===
+
+== Policy for New Debt
+
+1. *Budget with comment*: `// TRUSTED: <reason> — review by <date> — issue #<n>`
+2. *Axiom with justification*: `// AXIOM: <statement> — <why necessary> — <alternative considered>`
+3. *Document here*: Add row to inventory above with file, type, justification, expiry
+4. *CI gate*: `governance.yml` runs trusted-base reduction check; Mustfile checks `no-believe-me` and `no-unsafe-coerce` fail CI if new undocumented escape appears
+5. *Owning repo*: If debt belongs to a database, document in that database's own `docs/proof-debt.md` (see `REGISTRY.adoc`), not here
+
+== Verification
+
+[source,bash]
+----
+# Check for undocumented escape hatches in coordination paths
+grep -r "believe_me\|unsafeCoerce\|Obj.magic\|unsafePerformIO" --include="*.idr" --include="*.hs" --include="*.gleam" --include="*.rs" --include="*.jl" docs/ .machine_readable/ tests/ *.adoc 2>/dev/null | grep -v ".git"
+
+# Should be empty (only allowed: methodology.a2ml reject-if-contains list, which *mentions* patterns to reject them)
+grep -r "TRUSTED:\|AXIOM:" --include="*.idr" --include="*.lean" --include="*.jl" --include="*.rs" . --exclude-dir=.git 2>/dev/null
+
+# K9 validation
+./.github/hooks/validate-k9.sh
+
+# A2ML validation
+./.github/hooks/validate-a2ml.sh
+----
+
+All checks pass as of 2026-09-25.
+
+== References
+
+- Issue #53: K9 pedigree + trusted-base proof-debt
+- hyperpolymath/hypatia#464: CI-health work that flagged these as out-of-scope carve-outs
+- hyperpolymath/nextgen-typing#69: Similar trusted-base disposition
+- `PROOF-NEEDS.adoc`: Proof obligations for extracted databases (now in owning repos)
+- `docs/AFFIRMATION.adoc`: Current honest state

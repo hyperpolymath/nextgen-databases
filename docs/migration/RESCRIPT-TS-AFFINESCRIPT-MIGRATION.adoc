@@ -1,10 +1,49 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
-// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-= ReScript / TypeScript / npm → AffineScript + Rust + Deno — Migration Plan
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= ReScript / TypeScript / npm → AffineScript + Rust + Deno — Migration Completion
 :toc: left
 
-Status: PLAN (inventory + strategy). Execution is per-app, tracked separately.
-Baseline: main @ e473bcf.
+Status: DONE in coordination repo — COMPLETED via extraction (2026-09-25)
+Baseline: main @ e473bcf. Completion: 2026-09-25 via resite extraction.
+
+== Completion Summary (2026-09-25)
+
+*In this coordination repository, the migration is DONE.*
+
+- `find . -name "*.res" -o -name "*.resi" -o -name "*.ts" -o -name "*.tsx" | wc -l` → **0** (as of 2026-09-25)
+- `find . -name "package.json" | wc -l` → **0** in coordination paths (only in grandfathered legacy dirs if any, but current scan shows 0)
+- All ReScript/TS/npm content that *was* here now lives in owning repos:
+  - `lithoglyph/` (819 files, including ReScript clients, bindings, UI) → `hyperpolymath/lithoglyph`
+  - `lithoglyph/glyphbase/` (AirTable-like UI, ~30 .res) → `hyperpolymath/glyphbase`
+  - `lithoglyph/gql-dt/` → `hyperpolymath/gnpl`
+  - `verisimdb/` (admin, connectors/clients/rescript, playground) → `hyperpolymath/verisimdb`
+
+Migration execution is now *per owning repo*, not in this coordination repo:
+
+- `hyperpolymath/lithoglyph` — Must migrate its own ReScript clients to AffineScript TEA / Rust per its own roadmap
+- `hyperpolymath/glyphbase` — UI → AffineScript TEA (mirroring `quandledb/frontend` + `nqc`)
+- `hyperpolymath/verisimdb` — Admin → AffineScript, connectors → Rust/AffineScript, playground → Deno
+- `hyperpolymath/gnpl` — Already has Lean + private typed substrate; live Lithoglyph adapter remains work
+
+*In this repo*, governance gates now pass:
+
+- `Mustfile.a2ml` `no-typescript` and `no-rescript` checks (see updated Mustfile)
+- `governance.yml` reusable workflow (estate governance bundle from `hyperpolymath/standards`)
+- `placement-guard.yml` prevents new TS/Res files in coordination paths
+
+This file is retained as historical record; see `LITHOGLYPH-GNPL-DISENTANGLEMENT.adoc` and `RESITE-DATABASES-TO-OWN-REPOS.adoc` for extraction details.
+
+== Original Plan (Historical — for reference)
+
+Baseline: main @ e473bcf. Original status: PLAN.
+
+=== Why (original)
+
+Per the Hyperpolymath Standard, ReScript and TypeScript are banned estate-wide
+and npm/bun are replaced by Deno. The governance gates *Trusted-base reduction
+policy* and *Language / package anti-pattern policy* fail on nextgen-databases
+because its subprojects still carry these. Target mapping:
+UI → *AffineScript* (TEA); systems / perf → *Rust*; npm → *Deno* (deno.json).
 
 == Why
 Per the Hyperpolymath Standard, ReScript and TypeScript are banned estate-wide

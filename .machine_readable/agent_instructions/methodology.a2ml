@@ -8,8 +8,8 @@
 # Reference: ADR-002 in standards/agentic-a2ml/docs/
 
 [metadata]
-version = "1.0.0"
-last-updated = "2026-03-24"
+version = "1.1.0"
+last-updated = "2026-09-25"
 spec = "https://github.com/hyperpolymath/standards/blob/main/agentic-a2ml/docs/ADR-002-methodology-layer.adoc"
 
 # ============================================================================
@@ -55,7 +55,7 @@ perfective = 10   # % for SPDX headers, doc updates, formatting, style
 # Customise this per project — the template default is generic.
 
 [methodology.unique-strength]
-description = "{{PROJECT_UNIQUE_STRENGTH}}"
+description = "Coordination of four database/language families (VeriSimDB/VCL-UT, Lithoglyph/GNPL/Glyphbase, QuandleDB/KRL, Vocarium/Hermeneia) with honest executable boundaries, evidence ledger (EXPLAINME.adoc), and registry-based ownership. Strength is in maintaining clear semantic contracts and preventing implementation drift back into coordination repo via placement-guard and block-db-writes hooks."
 deepen-not-broaden = true
 
 # ============================================================================
@@ -71,15 +71,17 @@ deepen-not-broaden = true
 
 [methodology.divergent-invariants]
 rules = [
-  # Customise per project. Examples:
-  # "Idris2 only for formal verification — no Lean4, Coq, Agda",
-  # "believe_me count must remain zero",
-  # "FFI architecture: Idris2 → RefC → Zig → C ABI (no shortcuts)",
+  "Coordination only — no per-database implementation (source, schemas, migrations, language impl) in this repo; belongs in owning repo per REGISTRY.adoc",
+  "No SCM duplication — STATE.a2ml, META.a2ml live only in .machine_readable/descriptiles/",
+  "No AGPL, no banned languages (TypeScript, ReScript, Python, Go) in new code",
+  "Placement guard and block-db-writes hooks must stay enforced",
+  "History-preserving tags split-history/* and _split_* branches must never be pruned",
+  "believe_me count must remain zero in any Idris2 code",
+  "Four public languages only: VCL-UT, GNPL, KRL, Hermeneia — no extra reporting language precommitted",
 ]
 
-# Optional: language invariant for the core strength
-# If set, divergent mode will not introduce other languages for this purpose
-# language-invariant = "idris2"
+# Language invariant: coordination repo uses AsciiDoc + A2ML + shell for governance; per-database languages live in owning repos
+language-invariant = "adoc-a2ml"
 
 # ============================================================================
 # CONSTRAINT HINTS
@@ -89,9 +91,12 @@ rules = [
 
 [methodology.known-constraints]
 constraints = [
-  # Customise per project. Examples:
-  # "End-to-end build has never been verified",
-  # "libproject.so does not exist yet — all bindings call stubs",
+  "Lithoglyph and verisimdb extractions DONE (819 and 713 files removed, pointer READMEs left, split-history tags preserved)",
+  "Remaining legacy dirs grandfathered: quandledb/, nqc/, typeql-experimental/, verisim-core/, verisim-modular-experiment/ — being extracted per REGISTRY.adoc",
+  "No TypeScript/ReScript files remain in coordination paths after extraction; banned via Mustfile and governance workflow",
+  "K9 validation passes (7 files, all templates with proper pedigree); trusted-base proof-debt now documented in docs/proof-debt.adoc",
+  "Template residue reduced from 19 placeholder files to 1 (methodology.a2ml) — now fixed",
+  "verisim-core/ has own AFFIRMATION.adoc as of 2026-09-25",
 ]
 
 # ============================================================================

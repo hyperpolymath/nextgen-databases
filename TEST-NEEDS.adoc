@@ -1,144 +1,117 @@
-== TEST-NEEDS.md — nextgen-databases
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= TEST-NEEDS — nextgen-databases (Coordination Repo)
+:toc: left
+:revdate: 2026-09-25
 
-=== CRG Grade: C — ACHIEVED 2026-04-04
+== Status (2026-09-25) — Coordination Repo
 
-____
-Generated 2026-03-29 by punishing audit. Updated 2026-04-04: CRG C blitz
-— added E2E, P2P property, security, concurrency tests and throughput
-benchmarks.
-____
+This is a *coordination repository* (see `0-AI-MANIFEST.a2ml`, `REGISTRY.adoc`).
+Per-database implementation and its tests now live in owning repositories.
+This file tracks *cross-database integration tests* and *governance checks*
+that belong in this repo, not per-database unit tests.
 
-=== Current State
+Historical CRG Grade C (2026-04-04) referenced verisimdb/lithoglyph Elixir/Rust/Gleam
+tests that have been extracted to `hyperpolymath/verisimdb` and `hyperpolymath/lithoglyph`.
+Those counts are not reasserted here; see owning repos' own TEST-NEEDS.
 
-[width="100%",cols="47%,28%,25%",options="header",]
+== Current State — What This Repo Tests
+
+[cols="1,1,3", options="header"]
 |===
-|Category |Count |Notes
-|Unit tests |~40 |VeriSimDB Elixir: consensus (kraft_node, kraft_wal,
-kraft_recovery, kraft_transport), federation adapters (mongodb, redis,
-duckdb, clickhouse, surrealdb, sqlite, neo4j, vector_db, influxdb,
-object_storage), resolver, adapter + base tests
+| Category | Status | Notes
 
-|Integration |~12 |Federation adapter integration tests (mongodb, redis,
-neo4j, clickhouse, surrealdb, influxdb)
-
-|E2E |18
-|`+verisimdb/elixir-orchestration/test/verisim/e2e_verisimdb_test.exs+`
-— lifecycle, VCL, schema, error handling
-
-|P2P (property) |5 props + 1 test
-|`+verisimdb/elixir-orchestration/test/verisim/consensus/kraft_property_test.exs+`
-— leader uniqueness, log replication, state machine, partition
-tolerance, read-your-writes
-
-|Aspect: Security |10 tests
-|`+verisimdb/elixir-orchestration/test/verisim/aspect/security_test.exs+`
-— VCL injection, unauthorised access, cross-tenant isolation, error
-disclosure
-
-|Aspect: Concurrency |14 tests
-|`+verisimdb/elixir-orchestration/test/verisim/aspect/concurrency_test.exs+`
-— concurrent entity writes, parallel VCL, concurrent Kraft proposals,
-DriftMonitor load, SchemaRegistry concurrency
-
-|lithoglyph smoke |Gleam
-|`+lithoglyph/beam/test/lith_beam_smoke_test.gleam+` — version, connect,
-lifecycle, error handling
-
-|Benchmarks |2 real files |`+verisimdb/benches/modality_benchmarks.rs+`
-(Rust, pre-existing), `+verisimdb/benches/throughput_benchmarks.rs+`
-(Rust, new — write throughput, read latency, VCL complexity)
+| Governance (MUST/TRUST) | PASS | `LICENSE` present, no Dockerfile/Makefile, SPDX headers, no `.env`
+| K9 pedigree validation | PASS | `./.github/hooks/validate-k9.sh` — 7 files, 0 errors (2026-09-25)
+| A2ML validation | PASS (2 warnings) | `./.github/hooks/validate-a2ml.sh` — 36 files, 0 errors, 2 SPDX warnings in ANCHOR.a2ml + 0-AI-MANIFEST.a2ml (pre-existing, not blocking)
+| Placement guard | PASS | `.github/workflows/placement-guard.yml` — fails on new files outside coordination paths; lithoglyph/verisimdb now FAIL (not warn)
+| Block-db-writes hook | PASS | `.claude/hooks/block-db-writes.sh` — blocks NEW file creation in legacy DB dirs
+| Template residue | FIXED | `grep -R "{{PLACEHOLDER}}"` → 0 files (was 19 in 2026-06-19); methodology.a2ml fixed
+| ReScript/TS migration | DONE in coordination paths | `find . -name "*.res" -o -name "*.ts"` → 0 files (was 143 + 4 package.json)
+| Proof-debt | DOCUMENTED | `docs/proof-debt.adoc` exists, no TRUSTED/AXIOM/believe_me in coordination paths
+| SPDX compliance | PASS | Sampled `.adoc`, `.a2ml`, `.jl`, `.sh` carry SPDX
+| No banned patterns | PASS | `believe_me`, `Obj.magic`, `unsafeCoerce` → 0 in coordination paths
 |===
 
-*Source modules:* ~833 across 2 major subsystems. verisimdb: ~248 files
-(Rust core, Elixir orchestration, Gleam, Idris2 ABI, Zig FFI, ReScript).
-lithoglyph: ~212 files (Gleam, Rust, Factor).
+== What Belongs Here vs Owning Repos
 
-=== What’s Done (2026-04-04)
+*This repo (coordination):*
 
-==== Completed
+- Cross-database integration tests (`tests/` — currently minimal, see below)
+- Governance checks (Mustfile, Trustfile, K9, A2ML, placement guard)
+- Evidence ledger checks (EXPLAINME.adoc boundaries)
+- Registry consistency (REGISTRY.adoc links resolve)
 
-* [x] VeriSimDB E2E tests (18 tests): write→read lifecycle, VCL
-pipeline, schema validation, error handling
-* [x] Kraft consensus P2P property tests (5 properties + 1 unit): leader
-uniqueness, log replication, state machine safety, partition tolerance,
-read-your-writes
-* [x] VCL security aspect tests (10 tests): injection hardening, auth
-rejection, cross-tenant isolation, error disclosure
-* [x] Concurrency aspect tests (14 tests): concurrent EntityServer
-writes, parallel VCL, concurrent Kraft proposals, DriftMonitor load,
-SchemaRegistry concurrent registration
-* [x] lithoglyph Gleam smoke test: lifecycle smoke (graceful-failure
-when NIF not compiled)
-* [x] Rust throughput benchmarks: write throughput (1/10/100 batch),
-read latency (hot/cold), VCL complexity tiers, write-read round-trip
-latency
+*Owning repos (per REGISTRY.adoc):*
 
-==== Known Gaps Surfaced by Tests
+- `verisimdb` — E2E, P2P property, security, concurrency, benchmarks (was 40+12+18+5+10+14 tests in 2026-04-04 snapshot)
+- `lithoglyph` — Zig core tests (27 tests in core-zig per EXPLAINME.adoc), beam smoke
+- `gnpl` — Lean 4.15.0: `lake build` + `lake test` (5 suites, 35 narration checks, 26 private-substrate)
+- `quandledb` — Julia: fragment corpus 11 checks, integration 112 checks, resolution-boundary 8
+- `vcl-ut` (typeql-experimental) — Rust parser 36 tests with RUST_MIN_STACK
+- `hermeneia` — 39 Rust tests + 7 e2e slice tests
+- `vocarium` — 6 Zig tests + invoke_slice.sh
+- `verisim-core` — Julia 55 assertions (core lifecycle, Ed25519, attestation, federation)
 
-* VCLTypeChecker calls `+:erlang.binary_to_existing_atom/1+` for unknown
-proof types → ArgumentError (hardening gap, P1)
-* VCL built-in parser does NOT strip null bytes from entity IDs
-(C-string truncation risk at FFI layer, P1)
-* SchemaRegistry.register_type/1 returns `+{:error, :already_exists}+`
-for duplicate IRIs rather than idempotent `+:ok+` (P2)
-* `+kraft_node_test.exs+` `+remove_server+` test has a GenServer timeout
-(pre-existing, P2)
+== Known Gaps (Coordination Repo)
 
-=== What’s Still Missing
+- [ ] Cross-database integration tests in `tests/` — currently only placeholder structure; need at least one test that verifies REGISTRY.adoc links resolve and that pointer READMEs (lithoglyph/, verisimdb/) point to live repos
+- [ ] `tests/fuzz/placeholder.txt` — historical fake-fuzz alert from rsr-template-repo template. File does not exist in current tree (verified via `find tests -type f`), but if reintroduced, must be real fuzz harness or removed. Original alert retained as historical record: placeholder inherited from template does NOT provide real fuzz testing
+- [ ] Remote CI status — This file reports local checks only; no claim about GitHub Actions remote runs
+- [ ] Sub-project builds — `julia`, `gleam`, `deno`, `zig` absent in this container; authoritative checks are `julia --project=verisim-core -e 'using Pkg; Pkg.test()'`, `gleam test` in `nqc/`, etc.
 
-==== P2P (Property-Based) Tests
+== Priority (2026-09-25)
 
-* [ ] CRDT convergence: property tests for VeriSimDB’s CRDT operations
-* [ ] VCL query parsing: arbitrary query fuzzing (replace fuzz
-placeholder)
-* [ ] Federation: property tests for data consistency across adapters
-* [ ] lithoglyph: data structure invariant tests
+*Governance and coordination checks PASS.* Template debt FIXED, ReScript/TS migration DONE in coordination paths, verisim-core AFFIRMATION exists, K9 pedigree and trusted-base documented. Remaining work is completing resite extraction of grandfathered legacy dirs (`quandledb/`, `nqc/`, `typeql-experimental/`, `verisim-core/`, `verisim-modular-experiment/`) per `RESITE-DATABASES-TO-OWN-REPOS.adoc` and adding cross-database integration tests.
 
-==== E2E Tests
+== Verification
 
-* [ ] Federation: write through adapter → verify in external DB → read
-back
-* [ ] Kraft consensus: cluster formation → leader election → write →
-node failure → recovery
-* [ ] VCL: complex query execution with joins/aggregations
+[source,bash]
+----
+# Governance
+./.github/hooks/validate-k9.sh
+./.github/hooks/validate-a2ml.sh
 
-==== Build & Execution
+# Template residue
+grep -R "{{PLACEHOLDER}}" --include="*.a2ml" --include="*.adoc" . | grep -v ".git" | wc -l   # expect 0
+grep -R "{{PROJECT" --include="*.a2ml" . | grep -v ".git" | grep -v "reject-if-contains" | wc -l   # expect 0
 
-* [ ] `+mix test+` for VeriSimDB Elixir (currently 6 pre-existing
-failures, not from new tests)
-* [ ] `+cargo test+` for VeriSimDB Rust (integration test uses old API)
-* [ ] `+gleam test+` for lithoglyph Gleam (requires compiled NIF)
-* [ ] Zig FFI tests
+# ReScript/TS
+find . -name "*.res" -o -name "*.resi" -o -name "*.ts" -o -name "*.tsx" | grep -v ".git" | wc -l   # expect 0
 
-==== Benchmarks Still Needed
+# Banned patterns
+grep -R "believe_me\|Obj.magic\|unsafeCoerce" --include="*.idr" --include="*.jl" --include="*.rs" docs/ .machine_readable/ tests/ | wc -l   # expect 0
 
-* [ ] Kraft consensus round-trip time
-* [ ] Federation adapter roundtrip per backend
-* [ ] lithoglyph query performance
-* [ ] Replication lag measurement (multi-node)
+# Proof-debt
+test -f docs/proof-debt.adoc && echo "proof-debt documented"
 
-==== Self-Tests
+# Verisim-core AFFIRMATION
+test -f verisim-core/AFFIRMATION.adoc && echo "verisim-core AFFIRMATION exists"
 
-* [ ] Cluster health self-check
-* [ ] Federation adapter connectivity verification
-* [ ] Data integrity checksums
-* [ ] WAL consistency validation
+# Disentanglement
+test -f docs/migration/LITHOGLYPH-GNPL-DISENTANGLEMENT.adoc && echo "disentanglement documented"
+----
 
-=== Priority
+All checks pass as of 2026-09-25.
 
-*Partially addressed.* All CRG C test categories are now represented: -
-Unit + smoke: pre-existing + new E2E lifecycle tests - Build
-verification: `+mix test+` runs (6 pre-existing failures, not from new
-tests) - P2P: KRaft property tests - E2E: full lifecycle + VCL + schema
-+ error paths - Reflexive: type hierarchy, schema self-validation -
-Contract: VCL proof certificate tests (pre-existing) - Aspect: security
-injection + concurrency tests - Benchmarks: Rust throughput/latency/VCL
-complexity baselines
+== Historical — CRG Grade C (2026-04-04) for reference
 
-=== FAKE-FUZZ ALERT
+Pre-extraction snapshot (verisimdb + lithoglyph still in monorepo):
 
-* `+tests/fuzz/placeholder.txt+` is a scorecard placeholder inherited
-from rsr-template-repo — it does NOT provide real fuzz testing
-* Replace with an actual fuzz harness (see
-rsr-template-repo/tests/fuzz/README.adoc) or remove the file
-* Priority: P2 — creates false impression of fuzz coverage
+- Unit ~40, Integration ~12, E2E 18, P2P 5 props+1 test, Security 10, Concurrency 14, lithoglyph smoke Gleam, Benchmarks 2 Rust files
+- Source modules ~833 across 2 subsystems
+- Known gaps: VCLTypeChecker `binary_to_existing_atom` ArgumentError, VCL parser null-byte, SchemaRegistry idempotency, kraft_node remove_server timeout
+- FAKE-FUZZ ALERT: `tests/fuzz/placeholder.txt` inherited from rsr-template-repo — does NOT provide real fuzz testing — replace with real harness or remove
+
+That work was recovered upstream via `hyperpolymath/verisimdb#219` (7 files, 43 tests, 0 failures) and preserved in `split-history/verisimdb` tag (713 files, 124 commits). See `verisimdb/README.adoc`.
+
+== References
+
+- Issue #42: Template debt + ReScript/TS migration + verisim-core AFFIRMATION
+- Issue #45: Lithoglyph/GNPL/Glyphbase extraction
+- Issue #53: K9 pedigree + trusted-base
+- `docs/AFFIRMATION.adoc` (2026-09-25): Current honest state
+- `docs/proof-debt.adoc`: Trusted-base inventory
+- `docs/migration/LITHOGLYPH-GNPL-DISENTANGLEMENT.adoc`: Design decision
+- `EXPLAINME.adoc`: Evidence ledger with executable boundaries
+- `REGISTRY.adoc`: Ownership map

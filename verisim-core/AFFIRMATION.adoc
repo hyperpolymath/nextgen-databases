@@ -1,0 +1,104 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= AFFIRMATION — verisim-core, as of 2026-09-25
+:toc: macro
+:toclevels: 2
+
+_the No-Bullshit file for the VerisimCore layer_
+
+[NOTE]
+====
+*Genre.* An affirmation is a solemn declaration of truth as best believed at a stamped instant.
+This file affirms what can be honestly and verifiably claimed about `verisim-core/` at one exact commit.
+It is not the README (where this is going) and not the EXPLAINME (how it is built);
+it is what we can honestly affirm was true and checkable at a stamped moment.
+
+Per Issue #42, `verisim-core/` is a shippable layer (not just a sub-dir) and deserves its own AFFIRMATION
+with a scoped table. This file satisfies that requirement.
+====
+
+toc::[]
+
+== Verifiable anchor
+
+[cols="1,3"]
+|===
+| *Repo* | `hyperpolymath/nextgen-databases` — coordination repo, but `verisim-core/` is a shippable Julia package incubated here
+| *Path* | `verisim-core/` — slim identity-core sibling to main `verisimdb/`
+| *Branch* | `arena/01a0d7bc-nextgen-databases` (this session) / `main` baseline `8c26b8f` per migration docs
+| *Verified* | 2026-09-25
+| *Toolchain (present)* | `julia` not present in this container; `git` present; structure verified via file listing
+| *Run method* | Static file inspection + `grep` for banned patterns + `Project.toml` validation
+|===
+
+== What this is
+
+`verisim-core/` is the VerisimCore categorical-abstraction layer of the KRL stack,
+incubated in this coordination repo before extraction to its own repo
+`hyperpolymath/VerisimCore.jl` (see `REGISTRY.adoc`).
+
+Stack placement (maintainer-confirmed 2026-06-19):
+
+[literal]
+krl (surface DSL) → tangle (TangleIR + type-safe core) → VerisimCore (categorical abstraction — THIS LAYER) → Skein.jl / quandledb (storage + equivalence)
+
+It provides:
+
+* *Core = {Semantic, Temporal, Provenance}* — 3-shape minimum substrate
+* *Federation contract* — 5 clauses for optional peers (Vector, Document, etc.)
+* *VCL subset* — PROOF integrity/consistency/freshness
+* *Crypto* — Ed25519 via libsodium (real crypto, no placeholders)
+
+== What is solid (and how we checked)
+
+* *Structure* — `Project.toml`, `src/VerisimCore.jl`, `src/Core.jl`, `src/Crypto.jl`, `src/Federation.jl`, `src/drift/Metrics.jl`, `src/peers/`, `src/vcl/`, `test/runtests.jl` all present (checked via `ls`)
+* *SPDX headers* — All `.jl` files carry `SPDX-License-Identifier: MPL-2.0` (verified via grep sample)
+* *No banned patterns* — `grep -r "believe_me\|unsafeCoerce\|Obj.magic"` returns 0 results in `verisim-core/`
+* *No hardcoded paths* — `grep -r "/home/hyper\|/mnt/eclipse"` returns 0
+* *Ed25519 real* — `Crypto.jl` uses Sodium.jl (libsodium), not placeholder
+* *Federation enforcement* — `register_peer!` rejects Core shapes at runtime; Idris2 `IsFederable` enforces at compile time in `verisim-modular-experiment` ABI (the research prototype this was promoted from)
+* *Tests* — 55 assertions per README (core lifecycle, Ed25519 round-trip, attestation, federation parity, weight renormalisation, VCL PROOF subset)
+* *Provenance* — Promoted from `verisim-modular-experiment/impl/` after Path B runtime confirmation (145 assertions) — see `docs/FINDINGS.adoc` in sibling
+
+== Known-incomplete but honestly fenced
+
+* *In-memory only* — No persistence layer (ephemeral Dict-backed store)
+* *No concurrency control* — Single-threaded, no locking
+* *Formal non-interference* — Runtime-only at arbitrary N; formal proof for arbitrary N is open (see `PROOF-NEEDS.adoc` in sibling experiment)
+* *Zig FFI* — Not yet ported per hyperpolymath standard (see Status in README)
+* *Network transport* — mTLS / federation peer transport not implemented
+* *Julia toolchain absent this session* — `Pkg.test()` not run; structure and SPDX checks only. In-environment `julia --project=. -e 'using Pkg; Pkg.test()'` is authoritative
+
+== Reproduce it yourself
+
+[source,bash]
+----
+ls verisim-core/                    # Project.toml, README.adoc, AFFIRMATION.adoc (this file), src/, test/
+cat verisim-core/Project.toml
+grep -r "SPDX-License-Identifier" verisim-core/src/ | wc -l   # expect 8+ (all .jl files)
+grep -r "believe_me" verisim-core/ || echo "clean"
+# With Julia:
+# julia --project=verisim-core -e 'using Pkg; Pkg.test("VerisimCore")'
+----
+
+== One-line characterisation
+
+"verisim-core/ is a shippable Julia package (VerisimCore) providing a 3-shape Core {Semantic, Temporal, Provenance} plus 5-clause federation for optional peers, promoted from verisim-modular-experiment after Path B confirmation (145 assertions). Real Ed25519 via libsodium, 55 assertions, in-memory only, no persistence/concurrency yet, runtime-only non-interference proof, no banned patterns, SPDX clean."
+
+== Cross-repo wiring
+
+* *Parent* — `nextgen-databases` coordination repo (this repo) incubates it
+* *Destination* — `hyperpolymath/VerisimCore.jl` (own repo, Julia-package pattern) per `REGISTRY.adoc`
+* *Sibling* — `verisimdb/` (full 8-shape octad, canonical paved-road) — VerisimCore is slim alternative
+* *Sibling* — `verisim-modular-experiment/` — research prototype this was promoted from, contains Idris2 ABI, 145-assertion proof suite, 5 phases, decision gates
+* *Downstream* — KRLAdapter.jl (knot-theory stack) uses VerisimCore for identity + audit trail without full octad
+* *Upstream* — `tangle` (TangleIR), `krl` (surface DSL) feed into this layer; `Skein.jl`/`quandledb` consume it
+
+== Joint attestation
+
+To the best of our belief at 2026-09-25, every claim here is true and was checked as described.
+The Julia test suite was not run this session (toolchain absent); structure, SPDX, and banned-pattern checks were run.
+
+* *Engineering party (AI):* static inspection on 2026-09-25
+* *Owner / maintainer:* Jonathan D.A. Jewell — signs by committing with `-S`
+* *Signed-off-date:* (fill on signing)

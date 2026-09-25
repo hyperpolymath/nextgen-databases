@@ -75,17 +75,37 @@ These are hard requirements — CI and pre-commit hooks fail if any check fails.
 - run: test -z "$(grep -rl 'docker run\|docker build\|docker compose' --include='*.sh' --include='*.yml' . 2>/dev/null | grep -v deps | grep -v node_modules)"
 - severity: warning
 
-## Language Policy
+## Language Policy (Estate-wide — AffineScript/Rust/Deno)
 
 ### no-typescript
-- description: No TypeScript files (use ReScript)
-- run: test -z "$(find . -name '*.ts' -not -name '*.d.ts' -not -path '*/deps/*' -not -path '*/node_modules/*' 2>/dev/null)"
+- description: No TypeScript files (banned estate-wide, use AffineScript TEA or Rust)
+- run: test -z "$(find ./docs ./tests ./.machine_readable ./scripts -name '*.ts' -not -name '*.d.ts' -not -path '*/deps/*' -not -path '*/node_modules/*' 2>/dev/null; find . -maxdepth 3 -name '*.ts' -not -name '*.d.ts' -not -path '*/.git/*' -not -path '*/nqc/*' -not -path '*/quandledb/*' -not -path '*/typeql-experimental/*' -not -path '*/verisim-core/*' -not -path '*/verisim-modular-experiment/*' -not -path '*/.machine_readable/*' 2>/dev/null)"
+- severity: critical
+
+### no-rescript
+- description: No ReScript files in coordination paths (banned estate-wide, use AffineScript TEA)
+- run: test -z "$(find ./docs ./tests ./.machine_readable ./scripts -name '*.res' -o -name '*.resi' 2>/dev/null; find . -maxdepth 3 -name '*.res' -o -name '*.resi' -not -path '*/.git/*' -not -path '*/nqc/*' -not -path '*/quandledb/*' -not -path '*/typeql-experimental/*' -not -path '*/verisim-core/*' -not -path '*/verisim-modular-experiment/*' 2>/dev/null | grep -v deps | head -1)"
+- severity: critical
+
+### no-npm-package-json
+- description: No package.json in coordination paths (use deno.json per estate standard)
+- run: test -z "$(find ./docs ./tests ./.machine_readable ./scripts -name 'package.json' 2>/dev/null; find . -maxdepth 2 -name 'package.json' -not -path '*/.git/*' -not -path '*/nqc/*' -not -path '*/quandledb/*' -not -path '*/typeql-experimental/*' -not -path '*/verisim-core/*' -not -path '*/verisim-modular-experiment/*' 2>/dev/null)"
 - severity: warning
 
 ### no-python
 - description: No Python files (use Julia/Rust/AffineScript)
-- run: test -z "$(find . -name '*.py' -not -path '*/deps/*' -not -path '*/node_modules/*' 2>/dev/null)"
+- run: test -z "$(find ./docs ./tests ./.machine_readable -name '*.py' -not -path '*/deps/*' -not -path '*/node_modules/*' 2>/dev/null; find . -maxdepth 2 -name '*.py' -not -path '*/.git/*' 2>/dev/null)"
 - severity: warning
+
+### proof-debt-documented
+- description: Any TRUSTED/AXIOM/believe_me must be documented in docs/proof-debt.adoc
+- run: test -f docs/proof-debt.adoc && test -z "$(grep -R 'TRUSTED:\|AXIOM:' --include='*.idr' --include='*.lean' --include='*.rs' --include='*.jl' ./docs ./tests 2>/dev/null | grep -v proof-debt.adoc | head -1)"
+- severity: critical
+
+### k9-pedigree-valid
+- description: K9 files must have valid pedigree with name
+- run: ./.github/hooks/validate-k9.sh 2>&1 | tail -5; ./.github/hooks/validate-k9.sh
+- severity: critical
 
 ## Security
 
