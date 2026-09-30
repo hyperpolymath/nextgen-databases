@@ -40,7 +40,7 @@ uninstall:
 # Clean build artifacts
 clean:
     rm -rf web/node_modules web/.deno web/dist
-    rm -f /tmp/nqc.pid /tmp/nqc.log
+    rm -f "${XDG_RUNTIME_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}}/launch-scaffolder/nqc/server.pid" "${XDG_STATE_HOME:-$HOME/.local/state}/launch-scaffolder/nqc/server.log"
 
 # Run tests
 test:
