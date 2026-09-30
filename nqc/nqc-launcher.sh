@@ -62,20 +62,17 @@ PID_FILE="${XDG_RUNTIME_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}}/launch-scaff
 LOG_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/launch-scaffolder/nqc/server.log"
 
 # Both defaults live in per-app directories under per-user XDG state. Create
-# the default leaves as 0700 before
-# the first write: a predictable path inside a world-writable directory (the
-# old /tmp default) let any local user pre-create or symlink the pid file and
-# steer what this script later killed or removed (Hypatia 82/83, #48).
-# Default locations use unique per-app directories before chmod. Explicit
-# paths are never chmodded: a path such as /tmp must never have its parent
-# permissions changed. Every resolved parent is checked before PID/log I/O.
+# new directories as 0700 before the first write: a predictable path inside a
+# world-writable directory (the old /tmp default) let any local user pre-create
+# or symlink the pid file and steer what this script later killed or removed
+# (Hypatia 82/83, #48).
+# Existing directory permissions are never changed. Every resolved parent is
+# checked before PID/log I/O.
 ensure_state_dirs() {
     local pid_dir log_dir
     pid_dir="$(dirname "$PID_FILE")"
     log_dir="$(dirname "$LOG_FILE")"
-    mkdir -p "$pid_dir" "$log_dir"
-chmod 0700 "$pid_dir"
-chmod 0700 "$log_dir"
+    (umask 077; mkdir -p "$pid_dir" "$log_dir") || return 1
     check_private_state_dir "$pid_dir" || return 1
     check_private_state_dir "$log_dir" || return 1
 }
@@ -85,6 +82,7 @@ chmod 0700 "$log_dir"
 # file to other local users.
 check_private_state_dir() {
     local dir="$1" mode digits numeric
+    [[ -d "$dir" && ! -L "$dir" ]] || { err "State path is not a non-symlink directory: $dir"; return 1; }
     [[ -O "$dir" ]] || { err "State directory is not owned by this user: $dir"; return 1; }
     mode="$(stat -c '%a' "$dir" 2>/dev/null || stat -f '%Lp' "$dir" 2>/dev/null)" || {
         err "Cannot inspect state-directory permissions: $dir"; return 1;
@@ -649,7 +647,7 @@ case "$MODE" in
     --stop)           stop_server ;;
     --status)
         if is_running; then
-            log "Running (PID $(cat "$PID_FILE"))${URL:+ — $URL}"
+            log "Running (PID $(read_pid))${URL:+ — $URL}"
         else
             log "Not running${URL:+ — $URL}"
         fi
