@@ -117,6 +117,7 @@ is_gui_context() {
     [ ! -t 2 ] && { [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; }
 }
 
+# Print $1 (title) and $2 (body) to stderr and, when available, a GUI dialog.
 gui_error() {
     local title="$1"
     local body="$2"
@@ -192,6 +193,7 @@ esac
 # PROCESS MANAGEMENT
 # ----------------------------------------------------------------------------
 
+# Succeed if the PID directory is absent or passes the private-state checks.
 pid_directory_is_safe() {
     local pid_dir
     pid_dir="$(dirname "$PID_FILE")"
@@ -199,6 +201,7 @@ pid_directory_is_safe() {
     check_private_state_dir "$pid_dir"
 }
 
+# Print the PID from PID_FILE; fail if unreadable, malformed, or less than 2.
 read_pid() {
     local pid
     IFS= read -r pid < "$PID_FILE" || return 1
@@ -209,6 +212,7 @@ read_pid() {
     printf '%s' "$pid"
 }
 
+# Succeed when a safe PID file contains a valid PID reachable with kill -0.
 is_running() {
     [ -f "$PID_FILE" ] || return 1
     pid_directory_is_safe || return 1
@@ -217,6 +221,8 @@ is_running() {
     kill -0 "$pid" 2>/dev/null
 }
 
+# Remove an existing PID file when is_running fails; call only after validating
+# the state directory with ensure_state_dirs.
 clear_stale_pid() {
     if [ -f "$PID_FILE" ] && ! is_running; then
         warn "Removing stale or invalid PID file"
@@ -226,6 +232,8 @@ clear_stale_pid() {
 
 
 
+# Start START_COMMAND with output in LOG_FILE and its PID in PID_FILE.
+# Return success if already running, or failure if startup validation fails.
 start_server() {
     ensure_state_dirs || return 1
     clear_stale_pid
@@ -261,6 +269,7 @@ log "Started (PID $(read_pid))"
     return 0
 }
 
+# Signal the validated running PID and remove PID_FILE; succeed if not running.
 stop_server() {
 if ! is_running; then
         log "No running instance found"
@@ -301,15 +310,19 @@ open_browser() {
 # SYSTEM INTEGRATION — --integ / --disinteg
 # ----------------------------------------------------------------------------
 
+# Succeed if $1 exists, including when it is a dangling symbolic link.
 path_exists() {
     [ -e "$1" ] || [ -L "$1" ]
 }
 
+# Succeed if any configured desktop, icon, ownership marker, or launcher exists.
 already_integrated() {
     path_exists "$DESKTOP_FILE_TARGET" || path_exists "$DESKTOP_SHORTCUT_TARGET" || \
         path_exists "$ICON_TARGET" || path_exists "$ICON_MARKER_TARGET" || path_exists "$LAUNCHER_TARGET"
 }
 
+# Succeed if at least one integration artifact exists and all existing artifacts
+# have the required launch-scaffolder ownership markers.
 is_managed_install() {
     local found_marker="false" target
     local marker_targets=("$LAUNCHER_TARGET" "$DESKTOP_FILE_TARGET" "$DESKTOP_SHORTCUT_TARGET")
@@ -343,6 +356,8 @@ is_managed_install() {
     [ "$found_marker" = "true" ]
 }
 
+# Atomically install the icon ownership marker at ICON_MARKER_TARGET as 0644.
+# Return failure and clean up the temporary file if installation fails.
 atomic_write_icon_marker() {
     local temp
     if ! temp="$(mktemp "${ICON_MARKER_TARGET}.tmp.XXXXXX")"; then
@@ -357,6 +372,8 @@ atomic_write_icon_marker() {
     fi
 }
 
+# Copy $1 (source) to $2 (target) with $3 (mode) via a temporary sibling file.
+# Atomically replace the target, or clean up the temporary file on failure.
 atomic_copy() {
     local source="$1" target="$2" mode="$3" temp
     if ! temp="$(mktemp "${target}.tmp.XXXXXX")"; then
@@ -370,6 +387,8 @@ atomic_copy() {
     fi
 }
 
+# Print $1 with backslashes and newline, carriage-return, and tab characters
+# escaped for a desktop-entry string value.
 desktop_escape() {
     local value="$1"
     value="${value//\\/\\\\}"
@@ -379,6 +398,8 @@ desktop_escape() {
     printf '%s' "$value"
 }
 
+# Print $1 as a quoted desktop-entry Exec argument, escaping reserved characters
+# and doubling percent signs to prevent field-code expansion.
 desktop_exec_arg() {
  local value="$1"
  value="${value//\\/\\\\}"
@@ -389,6 +410,8 @@ desktop_exec_arg() {
  printf '"%s"\n' "$value"
 }
 
+# Atomically write a managed Linux desktop entry to $1 with mode 0644,
+# launcher actions, and the configured icon or a system fallback.
 write_linux_desktop_file() {
     local target="$1" temp
     local icon_name
@@ -449,6 +472,8 @@ EOF
     fi
 }
 
+# Install the launcher, optional icon and marker, menu entry, and desktop
+# shortcut on Linux, then refresh available desktop metadata tools.
 do_integ_linux() {
     mkdir -p "$APPS_DIR" "$ICON_DIR" "$BIN_DIR" "$DESKTOP_SHORTCUT_DIR"
     # Declared and assigned separately (shellcheck SC2155). `local x="$(cmd)"`
@@ -497,6 +522,8 @@ do_integ_linux() {
     fi
 }
 
+# Delegate integration to launch-scaffolder when available; otherwise install
+# on Linux, refusing unmarked artifacts and prompting unless FORCE is true.
 do_integ() {
     # Fast path: delegate to `launch-scaffolder provision` when it's on
     # $PATH and the source config is still where it was at mint time.
@@ -529,6 +556,8 @@ do_integ() {
     log "✓ $APP_DISPLAY is now in your menu and on your Desktop."
 }
 
+# Stop a running process, then delegate removal to launch-scaffolder when
+# available; otherwise remove managed integration artifacts and the PID file.
 do_disinteg() {
     ensure_state_dirs || return 1
     # Fast path: delegate to `launch-scaffolder provision --disinteg`
@@ -574,6 +603,7 @@ if is_running; then
     fi
 }
 
+# Print launcher usage, supported modes, and the detected runtime configuration.
 show_help() {
     cat <<EOF
 $APP_DISPLAY launcher — $APP_DESC
@@ -607,6 +637,7 @@ EOF
 # MAIN SWITCH
 # ----------------------------------------------------------------------------
 
+# Print the detected platform and machine architecture joined by a hyphen.
 platform_id() {
     local arch
     arch="$(uname -m)"
