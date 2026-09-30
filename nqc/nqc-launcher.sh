@@ -227,7 +227,7 @@ clear_stale_pid() {
 
 
 start_server() {
-    ensure_state_dirs
+    ensure_state_dirs || return 1
     clear_stale_pid
 if is_running; then
         log "Already running (PID $(read_pid))"
